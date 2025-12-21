@@ -15,7 +15,7 @@ export default async function AdminUserDetailPage({
   const user = await prisma.user.findUnique({
     where: { id },
     include: {
-      artistProfile: { select: { id: true, artistName: true } },
+      artistProfile: { select: { id: true, artistName: true, tracks: { select: { id: true } } } },
       reviewerProfile: {
         select: {
           id: true,
@@ -30,7 +30,6 @@ export default async function AdminUserDetailPage({
           flagCount: true,
         },
       },
-      tracks: { select: { id: true } },
     },
   });
 
@@ -133,9 +132,9 @@ export default async function AdminUserDetailPage({
         </Link>
       </div>
 
-      {user.isArtist ? (
+      {user.artistProfile ? (
         <div className="text-sm text-neutral-500">
-          <span className="font-medium text-neutral-800">Track count:</span> {user.tracks.length}
+          <span className="font-medium text-neutral-800">Track count:</span> {user.artistProfile.tracks.length}
         </div>
       ) : null}
     </div>
