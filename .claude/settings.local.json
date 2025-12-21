@@ -6,7 +6,9 @@
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
       "Bash(NEXT_TURBOPACK=0 npm run build:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(find \"C:\\\\Users\\\\simli\\\\Desktop\\\\review\\\\soundcheck\\\\src\\\\app\\\\\\(dashboard\\)\" -name \"page.tsx\")",
+      "Bash(head:*)"
     ]
   }
 }
