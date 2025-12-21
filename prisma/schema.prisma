@@ -1,0 +1,358 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────────────────────
+// USERS & AUTH
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String?   // For credentials auth
+  name          String?
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Role: can be both artist and reviewer
+  isArtist   Boolean @default(false)
+  isReviewer Boolean @default(false)
+
+  // Relations
+  artistProfile   ArtistProfile?
+  reviewerProfile ReviewerProfile?
+  accounts        Account[]
+  sessions        Session[]
+}
+
+// NextAuth required models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─────────────────────────────────────────────────────────────
+// PROFILES
+// ─────────────────────────────────────────────────────────────
+
+model ArtistProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  artistName String
+  genres     Genre[] @relation("ArtistGenres")
+
+  // Stats
+  totalTracks Int @default(0)
+  totalSpent  Int @default(0) // in cents
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tracks Track[]
+}
+
+model ReviewerProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Tier system
+  tier ReviewerTier @default(ROOKIE)
+
+  // Stats
+  totalReviews   Int   @default(0)
+  averageRating  Float @default(0)
+  totalEarnings  Int   @default(0) // in cents
+  pendingBalance Int   @default(0) // in cents, not yet withdrawn
+
+  // Genre expertise
+  genres Genre[] @relation("ReviewerGenres")
+
+  // Linked accounts for taste verification
+  spotifyId      String?
+  lastfmUsername String?
+
+  stripeAccountId String? @unique
+
+  onboardingQuizScore      Int      @default(0)
+  onboardingQuizPassed     Boolean  @default(false)
+  onboardingQuizCompletedAt DateTime?
+
+  // Quality flags
+  flagCount      Int     @default(0)
+  isRestricted   Boolean @default(false)
+  completedOnboarding Boolean @default(false)
+
+  // Daily limits
+  reviewsToday     Int      @default(0)
+  lastReviewDate   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reviews      Review[]
+  queueEntries ReviewQueue[]
+  payouts      Payout[]
+}
+
+enum ReviewerTier {
+  ROOKIE
+  VERIFIED
+  PRO
+}
+
+// ─────────────────────────────────────────────────────────────
+// GENRES
+// ─────────────────────────────────────────────────────────────
+
+model Genre {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  artistProfiles   ArtistProfile[]   @relation("ArtistGenres")
+  reviewerProfiles ReviewerProfile[] @relation("ReviewerGenres")
+  tracks           Track[]           @relation("TrackGenres")
+}
+
+// ─────────────────────────────────────────────────────────────
+// TRACKS
+// ─────────────────────────────────────────────────────────────
+
+model Track {
+  id       String @id @default(cuid())
+  artistId String
+  artist   ArtistProfile @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  // Source info
+  sourceUrl  String
+  sourceType TrackSource
+  title      String
+  artworkUrl String?
+  duration   Int? // in seconds
+
+  // Categorization
+  genres Genre[] @relation("TrackGenres")
+
+  // Optional guidance
+  feedbackFocus String? // "Looking for feedback on the mix" etc.
+
+  // Submission status
+  status TrackStatus @default(PENDING_PAYMENT)
+
+  // Package info
+  packageType      PackageType
+  reviewsRequested Int
+  reviewsCompleted Int         @default(0)
+
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  paidAt      DateTime?
+  completedAt DateTime?
+
+  // Relations
+  payment      Payment?
+  reviews      Review[]
+  queueEntries ReviewQueue[]
+
+  @@index([status, createdAt])
+  @@index([artistId])
+}
+
+enum TrackSource {
+  SOUNDCLOUD
+  BANDCAMP
+  YOUTUBE
+  UPLOAD
+}
+
+enum TrackStatus {
+  PENDING_PAYMENT
+  QUEUED      // Paid, waiting for reviewers
+  IN_PROGRESS // Some reviews complete
+  COMPLETED   // All reviews done
+  CANCELLED
+}
+
+enum PackageType {
+  STARTER   // 5 reviews, mixed
+  STANDARD  // 10 reviews, verified+
+  PRO       // 10 reviews, pro only
+  DEEP_DIVE // 25 reviews, mixed + 3 Pro
+}
+
+// ─────────────────────────────────────────────────────────────
+// REVIEWS
+// ─────────────────────────────────────────────────────────────
+
+model Review {
+  id         String          @id @default(cuid())
+  trackId    String
+  track      Track           @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   ReviewerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  status ReviewStatus @default(ASSIGNED)
+
+  // Listen tracking
+  listenDuration Int @default(0) // seconds actually listened
+  lastHeartbeat  DateTime?
+
+  // Structured feedback
+  firstImpression  FirstImpression?
+  productionScore  Int? // 1-5
+  vocalScore       Int? // 1-5 (nullable for instrumentals)
+  originalityScore Int? // 1-5
+  wouldListenAgain Boolean?
+
+  // Genre/artist matching
+  perceivedGenre String?
+  similarArtists String? // comma-separated
+
+  // Qualitative feedback
+  bestPart          String?
+  bestPartTimestamp Int?    // seconds
+  weakestPart       String?
+  weakestTimestamp  Int?    // seconds
+  additionalNotes   String?
+
+  // Earnings
+  paidAmount Int @default(0) // cents
+
+  // Quality tracking
+  artistRating Int?     // 1-5, set by artist
+  wasFlagged   Boolean  @default(false)
+  flagReason   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([trackId, reviewerId])
+  @@index([reviewerId, status])
+  @@index([trackId])
+}
+
+enum ReviewStatus {
+  ASSIGNED    // Reviewer assigned, not started
+  IN_PROGRESS // Listening/reviewing
+  COMPLETED   // Submitted
+  EXPIRED     // Timed out, reassigned
+  SKIPPED     // Reviewer skipped
+}
+
+enum FirstImpression {
+  STRONG_HOOK
+  DECENT
+  LOST_INTEREST
+}
+
+// ─────────────────────────────────────────────────────────────
+// PAYMENTS
+// ─────────────────────────────────────────────────────────────
+
+model Payment {
+  id      String @id @default(cuid())
+  trackId String @unique
+  track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  amount           Int    // cents
+  stripeSessionId  String @unique
+  stripePaymentId  String?
+  status           PaymentStatus @default(PENDING)
+
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model Payout {
+  id         String          @id @default(cuid())
+  reviewerId String
+  reviewer   ReviewerProfile @relation(fields: [reviewerId], references: [id])
+
+  amount Int          // cents
+  method PayoutMethod
+  status PayoutStatus
+
+  // External reference
+  externalId String? // PayPal transaction ID, Stripe transfer ID, etc.
+
+  createdAt   DateTime  @default(now())
+  processedAt DateTime?
+}
+
+enum PayoutMethod {
+  PAYPAL
+  STRIPE_CONNECT
+  MANUAL
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+// ─────────────────────────────────────────────────────────────
+// QUEUE MANAGEMENT
+// ─────────────────────────────────────────────────────────────
+
+model ReviewQueue {
+  id         String          @id @default(cuid())
+  trackId    String
+  track      Track           @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   ReviewerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  priority   Int      @default(0) // Higher = more urgent
+  assignedAt DateTime @default(now())
+  expiresAt  DateTime // Auto-reassign if not completed
+
+  @@unique([trackId, reviewerId])
+  @@index([reviewerId, expiresAt])
+}
