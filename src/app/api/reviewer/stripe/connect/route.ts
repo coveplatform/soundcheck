@@ -17,18 +17,45 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { email: true },
+      select: { email: true, emailVerified: true },
     });
+
+    if (!user?.emailVerified) {
+      return NextResponse.json(
+        { error: "Please verify your email to continue" },
+        { status: 403 }
+      );
+    }
 
     const reviewer = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
-      select: { id: true, stripeAccountId: true },
+      select: {
+        id: true,
+        stripeAccountId: true,
+        isRestricted: true,
+        completedOnboarding: true,
+        onboardingQuizPassed: true,
+      },
     });
 
     if (!reviewer) {
       return NextResponse.json(
         { error: "Reviewer profile not found" },
         { status: 404 }
+      );
+    }
+
+    if (reviewer.isRestricted) {
+      return NextResponse.json(
+        { error: "Reviewer account restricted" },
+        { status: 403 }
+      );
+    }
+
+    if (!reviewer.completedOnboarding || !reviewer.onboardingQuizPassed) {
+      return NextResponse.json(
+        { error: "Please complete onboarding before connecting Stripe" },
+        { status: 403 }
       );
     }
 

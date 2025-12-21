@@ -17,6 +17,37 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { emailVerified: true },
+    });
+
+    if (!user?.emailVerified) {
+      return NextResponse.json(
+        { error: "Please verify your email to continue" },
+        { status: 403 }
+      );
+    }
+
+    const reviewerProfile = await prisma.reviewerProfile.findUnique({
+      where: { userId: session.user.id },
+      select: { isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
+    });
+
+    if (reviewerProfile?.isRestricted) {
+      return NextResponse.json(
+        { error: "Reviewer account restricted" },
+        { status: 403 }
+      );
+    }
+
+    if (reviewerProfile && (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed)) {
+      return NextResponse.json(
+        { error: "Please complete onboarding before reviewing" },
+        { status: 403 }
+      );
+    }
+
     const review = await prisma.review.findUnique({
       where: { id },
       include: {
@@ -68,6 +99,18 @@ export async function PATCH(
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { emailVerified: true },
+    });
+
+    if (!user?.emailVerified) {
+      return NextResponse.json(
+        { error: "Please verify your email to continue" },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();

@@ -1,5 +1,7 @@
 import { prisma } from "./prisma";
 import { PackageType, ReviewerTier } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+import { sendTierChangeEmail } from "@/lib/email";
 
 const MIN_REVIEWER_ACCOUNT_AGE_HOURS = Number(
   process.env.MIN_REVIEWER_ACCOUNT_AGE_HOURS ?? "24"
@@ -29,36 +31,38 @@ export async function getEligibleReviewers(
   const cutoff = new Date();
   cutoff.setHours(cutoff.getHours() - (Number.isFinite(MIN_REVIEWER_ACCOUNT_AGE_HOURS) ? MIN_REVIEWER_ACCOUNT_AGE_HOURS : 24));
 
-  // Base query for eligible reviewers
-  const eligibleReviewers = await prisma.reviewerProfile.findMany({
-    where: {
-      completedOnboarding: true,
-      onboardingQuizPassed: true,
-      isRestricted: false,
-      user: {
-        createdAt: {
-          lte: cutoff,
-        },
+  const where: Prisma.ReviewerProfileWhereInput = {
+    completedOnboarding: true,
+    onboardingQuizPassed: true,
+    isRestricted: false,
+    user: {
+      createdAt: {
+        lte: cutoff,
       },
-      // Must have at least one matching genre
-      genres: {
-        some: {
-          id: { in: genreIds },
-        },
-      },
-      // Haven't already reviewed this track
-      reviews: {
-        none: {
-          trackId: track.id,
-        },
-      },
-      // Not already in queue for this track
-      queueEntries: {
-        none: {
-          trackId: track.id,
-        },
+      emailVerified: {
+        not: null,
       },
     },
+    genres: {
+      some: {
+        id: { in: genreIds },
+      },
+    },
+    reviews: {
+      none: {
+        trackId: track.id,
+      },
+    },
+    queueEntries: {
+      none: {
+        trackId: track.id,
+      },
+    },
+  };
+
+  // Base query for eligible reviewers
+  const eligibleReviewers = await prisma.reviewerProfile.findMany({
+    where,
     include: {
       genres: true,
       user: { select: { id: true, email: true } },
@@ -123,41 +127,53 @@ export async function assignReviewersToTrack(trackId: string) {
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 48); // 48 hour expiration
 
-  for (const reviewer of reviewersToAssign) {
-    await prisma.reviewQueue.create({
-      data: {
-        trackId,
-        reviewerId: reviewer.id,
-        expiresAt,
-        priority:
-          track.packageType === "PRO"
-            ? 10
-            : track.packageType === "STANDARD"
-            ? 5
-            : 0,
-      },
-    });
+  const priority =
+    track.packageType === "PRO" ? 10 : track.packageType === "STANDARD" ? 5 : 0;
 
-    // Create a pending review
-    await prisma.review.create({
-      data: {
-        trackId,
-        reviewerId: reviewer.id,
-        status: "ASSIGNED",
-      },
-    });
-  }
+  await prisma.$transaction(async (tx) => {
+    if (reviewersToAssign.length > 0) {
+      await tx.reviewQueue.createMany({
+        data: reviewersToAssign.map((reviewer) => ({
+          trackId,
+          reviewerId: reviewer.id,
+          expiresAt,
+          priority,
+        })),
+        skipDuplicates: true,
+      });
 
-  // Update track status if we have all reviewers assigned
-  if (reviewersToAssign.length >= neededReviews) {
-    await prisma.track.update({
-      where: { id: trackId },
-      data: { status: "IN_PROGRESS" },
-    });
-  }
+      await tx.review.createMany({
+        data: reviewersToAssign.map((reviewer) => ({
+          trackId,
+          reviewerId: reviewer.id,
+          status: "ASSIGNED",
+        })),
+        skipDuplicates: true,
+      });
+    }
+
+    const [completed, active] = await Promise.all([
+      tx.review.count({ where: { trackId, status: "COMPLETED" } }),
+      tx.review.count({
+        where: { trackId, status: { in: ["ASSIGNED", "IN_PROGRESS"] } },
+      }),
+    ]);
+
+    const remaining = track.reviewsRequested - completed - active;
+
+    if (remaining <= 0) {
+      await tx.track.update({
+        where: { id: trackId },
+        data: { status: "IN_PROGRESS" },
+      });
+    }
+  });
 }
 
-export async function expireAndReassignExpiredQueueEntries() {
+export async function expireAndReassignExpiredQueueEntries(): Promise<{
+  expiredCount: number;
+  affectedTrackCount: number;
+}> {
   const now = new Date();
 
   const expired = await prisma.reviewQueue.findMany({
@@ -170,7 +186,9 @@ export async function expireAndReassignExpiredQueueEntries() {
     },
   });
 
-  if (expired.length === 0) return;
+  if (expired.length === 0) {
+    return { expiredCount: 0, affectedTrackCount: 0 };
+  }
 
   const affectedTrackIds = new Set<string>();
 
@@ -199,6 +217,8 @@ export async function expireAndReassignExpiredQueueEntries() {
   for (const trackId of affectedTrackIds) {
     await assignReviewersToTrack(trackId);
   }
+
+  return { expiredCount: expired.length, affectedTrackCount: affectedTrackIds.size };
 }
 
 // Get queue for a reviewer
@@ -240,6 +260,7 @@ export function calculateTier(
 export async function updateReviewerTier(reviewerId: string) {
   const reviewer = await prisma.reviewerProfile.findUnique({
     where: { id: reviewerId },
+    include: { user: { select: { email: true } } },
   });
 
   if (!reviewer) return;
@@ -247,10 +268,26 @@ export async function updateReviewerTier(reviewerId: string) {
   const newTier = calculateTier(reviewer.totalReviews, reviewer.averageRating);
 
   if (newTier !== reviewer.tier) {
+    const tierOrder: Record<ReviewerTier, number> = {
+      ROOKIE: 1,
+      VERIFIED: 2,
+      PRO: 3,
+    };
+
+    const isUpgrade = tierOrder[newTier] > tierOrder[reviewer.tier];
+
     await prisma.reviewerProfile.update({
       where: { id: reviewerId },
       data: { tier: newTier },
     });
+
+    if (isUpgrade && reviewer.user?.email) {
+      await sendTierChangeEmail({
+        to: reviewer.user.email,
+        newTier,
+        newRateCents: TIER_RATES[newTier],
+      });
+    }
   }
 }
 

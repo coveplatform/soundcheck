@@ -20,6 +20,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { emailVerified: true },
+    });
+
+    if (!user?.emailVerified) {
+      return NextResponse.json(
+        { error: "Please verify your email to request payouts" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { amountCents } = requestPayoutSchema.parse(body);
 
@@ -27,6 +39,9 @@ export async function POST(request: Request) {
       where: { userId: session.user.id },
       select: {
         id: true,
+        isRestricted: true,
+        completedOnboarding: true,
+        onboardingQuizPassed: true,
         pendingBalance: true,
         stripeAccountId: true,
       },
@@ -36,6 +51,20 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Reviewer profile not found" },
         { status: 404 }
+      );
+    }
+
+    if (reviewer.isRestricted) {
+      return NextResponse.json(
+        { error: "Reviewer account restricted" },
+        { status: 403 }
+      );
+    }
+
+    if (!reviewer.completedOnboarding || !reviewer.onboardingQuizPassed) {
+      return NextResponse.json(
+        { error: "Please complete onboarding before requesting payouts" },
+        { status: 403 }
       );
     }
 

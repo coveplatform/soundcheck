@@ -23,7 +23,15 @@ export default async function ReviewerDashboardPage() {
     redirect("/login");
   }
 
-  await expireAndReassignExpiredQueueEntries();
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { emailVerified: true, email: true },
+  });
+
+  if (!user?.emailVerified) {
+    const email = user?.email ? `?email=${encodeURIComponent(user.email)}` : "";
+    redirect(`/verify-email${email}`);
+  }
 
   const reviewerProfile = await prisma.reviewerProfile.findUnique({
     where: { userId: session.user.id },
@@ -48,9 +56,33 @@ export default async function ReviewerDashboardPage() {
     redirect("/reviewer/onboarding");
   }
 
-  if (!reviewerProfile.completedOnboarding) {
+  if (reviewerProfile.isRestricted) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Reviewer Dashboard</h1>
+          <p className="text-neutral-500">Your reviewer account is restricted.</p>
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Access restricted</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-neutral-600">
+              You can’t accept or work on new reviews right now. If you believe this is a mistake,
+              please contact support.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed) {
     redirect("/reviewer/onboarding");
   }
+
+  await expireAndReassignExpiredQueueEntries();
 
   // Calculate tier progress
   const tierProgress = {

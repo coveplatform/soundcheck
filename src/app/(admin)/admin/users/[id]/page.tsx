@@ -1,0 +1,143 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { prisma } from "@/lib/prisma";
+import { ForceVerifyEmailButton } from "@/components/admin/force-verify-email-button";
+import { ReviewerRestrictionToggle } from "@/components/admin/reviewer-restriction-toggle";
+
+export default async function AdminUserDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const user = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      artistProfile: { select: { id: true, artistName: true } },
+      reviewerProfile: {
+        select: {
+          id: true,
+          tier: true,
+          isRestricted: true,
+          completedOnboarding: true,
+          onboardingQuizPassed: true,
+          stripeAccountId: true,
+          pendingBalance: true,
+          totalReviews: true,
+          averageRating: true,
+          flagCount: true,
+        },
+      },
+      tracks: { select: { id: true } },
+    },
+  });
+
+  if (!user) {
+    notFound();
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">User</h1>
+          <p className="text-neutral-500">{user.email}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {!user.emailVerified ? <ForceVerifyEmailButton userId={user.id} /> : null}
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-4">
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+          <div className="text-sm text-neutral-500">Email verified</div>
+          <div className="font-medium">{user.emailVerified ? "Yes" : "No"}</div>
+        </div>
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+          <div className="text-sm text-neutral-500">Roles</div>
+          <div className="font-medium">
+            {user.isArtist && user.isReviewer
+              ? "Artist, Reviewer"
+              : user.isArtist
+              ? "Artist"
+              : user.isReviewer
+              ? "Reviewer"
+              : ""}
+          </div>
+        </div>
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+          <div className="text-sm text-neutral-500">Created</div>
+          <div className="font-medium">{new Date(user.createdAt).toLocaleString()}</div>
+        </div>
+      </div>
+
+      {user.artistProfile ? (
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+          <div className="font-medium">Artist profile</div>
+          <div className="mt-2 text-sm">
+            <div className="text-neutral-500">Name</div>
+            <div className="font-medium">{user.artistProfile.artistName}</div>
+          </div>
+        </div>
+      ) : null}
+
+      {user.reviewerProfile ? (
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="font-medium">Reviewer profile</div>
+            <ReviewerRestrictionToggle
+              reviewerId={user.reviewerProfile.id}
+              isRestricted={user.reviewerProfile.isRestricted}
+            />
+          </div>
+          <div className="mt-3 grid md:grid-cols-3 gap-3 text-sm">
+            <div>
+              <div className="text-neutral-500">Tier</div>
+              <div className="font-medium">{user.reviewerProfile.tier}</div>
+            </div>
+            <div>
+              <div className="text-neutral-500">Onboarding</div>
+              <div className="font-medium">
+                {user.reviewerProfile.completedOnboarding && user.reviewerProfile.onboardingQuizPassed
+                  ? "Complete"
+                  : "Incomplete"}
+              </div>
+            </div>
+            <div>
+              <div className="text-neutral-500">Stripe</div>
+              <div className="font-medium">
+                {user.reviewerProfile.stripeAccountId ? "Connected" : "Not connected"}
+              </div>
+            </div>
+            <div>
+              <div className="text-neutral-500">Total reviews</div>
+              <div className="font-medium">{user.reviewerProfile.totalReviews}</div>
+            </div>
+            <div>
+              <div className="text-neutral-500">Avg rating</div>
+              <div className="font-medium">{user.reviewerProfile.averageRating.toFixed(2)}</div>
+            </div>
+            <div>
+              <div className="text-neutral-500">Flags</div>
+              <div className="font-medium">{user.reviewerProfile.flagCount}</div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <div>
+        <Link className="text-sm text-neutral-600 hover:text-neutral-900 underline" href="/admin/users">
+          Back to users
+        </Link>
+      </div>
+
+      {user.isArtist ? (
+        <div className="text-sm text-neutral-500">
+          <span className="font-medium text-neutral-800">Track count:</span> {user.tracks.length}
+        </div>
+      ) : null}
+    </div>
+  );
+}

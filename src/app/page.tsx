@@ -1,8 +1,29 @@
 import Link from "next/link";
+import { getServerSession } from "next-auth";
 import { Button } from "@/components/ui/button";
 import { Music, Headphones, Star, DollarSign, Shield, Zap } from "lucide-react";
+import { PACKAGES } from "@/lib/metadata";
+import { authOptions } from "@/lib/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions);
+  const user = session?.user as
+    | { isArtist?: boolean; isReviewer?: boolean }
+    | undefined;
+
+  const dashboardHref = user?.isArtist
+    ? "/artist/dashboard"
+    : user?.isReviewer
+      ? "/reviewer/dashboard"
+      : "/login";
+
+  const pricing = [
+    { key: "STARTER", ...PACKAGES.STARTER },
+    { key: "STANDARD", ...PACKAGES.STANDARD },
+    { key: "PRO", ...PACKAGES.PRO },
+    { key: "DEEP_DIVE", ...PACKAGES.DEEP_DIVE },
+  ] as const;
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -15,12 +36,20 @@ export default function Home() {
             <span className="font-semibold text-lg">SoundCheck</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="ghost">Sign in</Button>
-            </Link>
-            <Link href="/signup">
-              <Button>Get Started</Button>
-            </Link>
+            {session ? (
+              <Link href={dashboardHref}>
+                <Button>Go to dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost">Sign in</Button>
+                </Link>
+                <Link href="/signup">
+                  <Button>Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -183,6 +212,68 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="bg-neutral-50 py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-4">Pricing</h2>
+          <p className="text-neutral-600 text-center mb-12">
+            Pick a package based on how deep you want the feedback.
+          </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {pricing.map((p) => {
+              const price = (p.price / 100).toFixed(2);
+              const perReview = (p.price / Math.max(1, p.reviews) / 100).toFixed(2);
+              const isPopular = p.key === "STANDARD";
+
+              return (
+                <div
+                  key={p.key}
+                  className={`rounded-xl border bg-white p-6 shadow-sm ${
+                    isPopular
+                      ? "border-neutral-900 ring-1 ring-neutral-900"
+                      : "border-neutral-200"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-semibold text-lg">{p.name}</h3>
+                      <p className="text-sm text-neutral-500">{p.description}</p>
+                    </div>
+                    {isPopular ? (
+                      <span className="text-xs font-medium bg-neutral-900 text-white px-2.5 py-1 rounded-full">
+                        Most Popular
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="mt-6">
+                    <div className="text-3xl font-bold">${price}</div>
+                    <div className="text-sm text-neutral-500">${perReview} / review</div>
+                  </div>
+
+                  <div className="mt-6 space-y-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-500">Reviews</span>
+                      <span className="font-medium">{p.reviews}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-500">Mix</span>
+                      <span className="font-medium">{p.mix}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <Link href="/signup">
+                      <Button className="w-full">Get started</Button>
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="bg-neutral-900 text-white py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
@@ -203,10 +294,68 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">FAQ</h2>
+          <div className="space-y-4">
+            {[
+              {
+                q: "How does SoundCheck work?",
+                a: "Artists submit a private link to their track and choose a review package. Reviewers matched by genre listen and submit structured feedback.",
+              },
+              {
+                q: "How much does it cost?",
+                a: "Packages start at $3.00. Pricing scales with the number of reviews and reviewer tier mix.",
+              },
+              {
+                q: "Who are the reviewers?",
+                a: "Reviewers are genre-matched listeners who complete onboarding requirements and are rewarded for high-quality feedback.",
+              },
+              {
+                q: "How long until I get feedback?",
+                a: "Most tracks complete within 24–72 hours depending on package and reviewer availability.",
+              },
+              {
+                q: "Is my music kept private?",
+                a: "Yes. Tracks are shared only with assigned reviewers. Do not share publicly if you want strict privacy.",
+              },
+              {
+                q: "How do reviewers get paid?",
+                a: "Reviewers earn per completed review and can request payouts once they reach the minimum balance.",
+              },
+              {
+                q: "Can I get a refund?",
+                a: "For MVP, refunds are handled manually by support. If your track has not started receiving reviews, we can usually refund.",
+              },
+            ].map((item) => (
+              <details
+                key={item.q}
+                className="rounded-lg border border-neutral-200 p-4"
+              >
+                <summary className="font-medium cursor-pointer">
+                  {item.q}
+                </summary>
+                <p className="mt-2 text-sm text-neutral-600">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-neutral-200 py-8">
         <div className="max-w-6xl mx-auto px-4 text-center text-sm text-neutral-500">
-          <p>&copy; {new Date().getFullYear()} SoundCheck. All rights reserved.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <p>&copy; {new Date().getFullYear()} SoundCheck. All rights reserved.</p>
+            <div className="flex items-center gap-3">
+              <Link href="/terms" className="hover:text-neutral-900">
+                Terms
+              </Link>
+              <Link href="/privacy" className="hover:text-neutral-900">
+                Privacy
+              </Link>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

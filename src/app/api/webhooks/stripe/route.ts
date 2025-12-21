@@ -18,10 +18,17 @@ export async function POST(request: Request) {
   let event: Stripe.Event;
 
   try {
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      return NextResponse.json(
+        { error: "STRIPE_WEBHOOK_SECRET is not defined" },
+        { status: 500 }
+      );
+    }
+
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
     console.error("Webhook signature verification failed:", err);
@@ -61,32 +68,71 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   }
 
   try {
-    // Update payment record
-    await prisma.payment.update({
-      where: { stripeSessionId: session.id },
+    const completedAt = new Date();
+
+    const updated = await prisma.payment.updateMany({
+      where: { stripeSessionId: session.id, status: { not: "REFUNDED" } },
       data: {
         status: "COMPLETED",
         stripePaymentId: session.payment_intent as string,
-        completedAt: new Date(),
+        completedAt,
       },
     });
 
-    // Update track status to QUEUED
-    await prisma.track.update({
-      where: { id: trackId },
-      data: {
-        status: "QUEUED",
-        paidAt: new Date(),
-      },
-    });
+    if (updated.count === 0) {
+      try {
+        await prisma.payment.create({
+          data: {
+            trackId,
+            amount: session.amount_total || 0,
+            stripeSessionId: session.id,
+            stripePaymentId: session.payment_intent as string,
+            status: "COMPLETED",
+            completedAt,
+          },
+        });
+      } catch (error) {
+        console.error("Payment create fallback failed:", error);
+      }
+    }
 
-    // Update artist stats
     const track = await prisma.track.findUnique({
       where: { id: trackId },
-      include: { artist: { include: { user: true } } },
+      include: { artist: { include: { user: true } }, payment: true },
     });
 
-    if (track) {
+    if (!track) {
+      console.error("Track not found for checkout completion:", trackId);
+      return;
+    }
+
+    if (track.status === "CANCELLED") {
+      if (track.payment?.status !== "REFUNDED" && session.payment_intent) {
+        try {
+          await stripe.refunds.create({
+            payment_intent: session.payment_intent as string,
+          }, {
+            idempotencyKey: `webhook_refund_${session.id}`,
+          });
+
+          await prisma.payment.updateMany({
+            where: { stripeSessionId: session.id },
+            data: { status: "REFUNDED" },
+          });
+        } catch (error) {
+          console.error("Refund failed for cancelled track:", error);
+        }
+      }
+
+      return;
+    }
+
+    const firstQueue = await prisma.track.updateMany({
+      where: { id: trackId, paidAt: null, status: "PENDING_PAYMENT" },
+      data: { status: "QUEUED", paidAt: completedAt },
+    });
+
+    if (firstQueue.count > 0) {
       await prisma.artistProfile.update({
         where: { id: track.artistId },
         data: {
@@ -94,15 +140,21 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
           totalSpent: { increment: session.amount_total || 0 },
         },
       });
-    }
 
-    console.log(`Track ${trackId} queued for review`);
+      console.log("Track queued for review", {
+        trackId,
+        stripeSessionId: session.id,
+        stripePaymentId: session.payment_intent,
+      });
 
-    // Trigger queue assignment to match reviewers
-    await assignReviewersToTrack(trackId);
+      await assignReviewersToTrack(trackId);
 
-    if (track?.artist?.user?.email) {
-      await sendTrackQueuedEmail(track.artist.user.email, track.title);
+      if (track?.artist?.user?.email) {
+        await sendTrackQueuedEmail(track.artist.user.email, track.title);
+      }
+    } else {
+      // replay/retry: safe to re-run assignment (idempotent) but avoid duplicate emails/stats
+      await assignReviewersToTrack(trackId);
     }
   } catch (error) {
     console.error("Error handling checkout complete:", error);
@@ -111,8 +163,8 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
 async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
   try {
-    await prisma.payment.update({
-      where: { stripeSessionId: session.id },
+    await prisma.payment.updateMany({
+      where: { stripeSessionId: session.id, status: "PENDING" },
       data: { status: "FAILED" },
     });
   } catch (error) {

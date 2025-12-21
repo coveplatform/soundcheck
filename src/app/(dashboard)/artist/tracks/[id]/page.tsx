@@ -6,7 +6,9 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReviewRating } from "@/components/artist/review-rating";
 import { ReviewFlag } from "@/components/artist/review-flag";
+import { TrackCancelButton } from "@/components/artist/track-cancel-button";
 import { AggregateAnalytics } from "@/components/feedback/aggregate-analytics";
+import { AudioPlayer } from "@/components/audio/audio-player";
 import {
   ArrowLeft,
   Music,
@@ -35,6 +37,7 @@ export default async function TrackDetailPage({
         include: { user: true },
       },
       genres: true,
+      payment: true,
       reviews: {
         where: { status: "COMPLETED" },
         orderBy: { createdAt: "desc" },
@@ -95,34 +98,77 @@ export default async function TrackDetailPage({
             )}
           </div>
         </div>
-        <a
-          href={track.sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900"
-        >
-          <ExternalLink className="h-4 w-4" />
-          View Track
-        </a>
+        <div className="flex items-start gap-3">
+          {(track.status === "PENDING_PAYMENT" || track.status === "QUEUED") && (
+            <TrackCancelButton
+              trackId={track.id}
+              willRefund={track.payment?.status === "COMPLETED"}
+            />
+          )}
+          <a
+            href={track.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900"
+          >
+            <ExternalLink className="h-4 w-4" />
+            {track.sourceType === "UPLOAD" ? "Download audio" : "View Track"}
+          </a>
+        </div>
       </div>
 
-      {/* Progress */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">Review Progress</span>
-            <span className="text-sm text-neutral-500">
-              {completedReviews} of {track.reviewsRequested} reviews
-            </span>
-          </div>
-          <div className="w-full h-2 bg-neutral-100 rounded-full">
-            <div
-              className="h-full bg-neutral-900 rounded-full transition-all"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+        <CardHeader>
+          <CardTitle>Listen</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AudioPlayer
+            sourceUrl={track.sourceUrl}
+            sourceType={track.sourceType}
+            showListenTracker={false}
+            showWaveform={track.sourceType === "UPLOAD"}
+          />
         </CardContent>
       </Card>
+
+      {track.status === "CANCELLED" ? (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="font-medium">This track was cancelled</p>
+                <p className="text-sm text-neutral-500">
+                  {track.payment?.status === "REFUNDED"
+                    ? "Your payment has been refunded."
+                    : track.payment?.status === "COMPLETED"
+                    ? "Refund is processing or pending."
+                    : "No payment was captured."}
+                </p>
+              </div>
+              <div className="text-sm text-neutral-500">Status: CANCELLED</div>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {track.status !== "CANCELLED" ? (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">Review Progress</span>
+              <span className="text-sm text-neutral-500">
+                {completedReviews} of {track.reviewsRequested} reviews
+              </span>
+            </div>
+            <div className="w-full h-2 bg-neutral-100 rounded-full">
+              <div
+                className="h-full bg-neutral-900 rounded-full transition-all"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {/* Stats */}
       {completedReviews > 0 && (

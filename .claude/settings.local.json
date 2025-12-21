@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(NEXT_TURBOPACK=0 npm run build:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

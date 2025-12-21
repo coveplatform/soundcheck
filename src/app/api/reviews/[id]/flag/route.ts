@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { assignReviewersToTrack } from "@/lib/queue";
 
 const flagSchema = z.object({
   reason: z.enum(["low_effort", "spam", "offensive", "irrelevant"]),
@@ -19,6 +20,18 @@ export async function POST(
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { emailVerified: true },
+    });
+
+    if (!user?.emailVerified) {
+      return NextResponse.json(
+        { error: "Please verify your email to continue" },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();
@@ -86,8 +99,40 @@ export async function POST(
           })
         : reviewer;
 
-      return { updatedReview, reviewer: reviewerAfter };
+      let affectedTrackIds: string[] = [];
+
+      if (shouldRestrict) {
+        const activeReviews = await tx.review.findMany({
+          where: {
+            reviewerId: reviewerAfter.id,
+            status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+          },
+          select: { trackId: true },
+        });
+
+        affectedTrackIds = Array.from(new Set(activeReviews.map((r) => r.trackId)));
+
+        await tx.reviewQueue.deleteMany({
+          where: { reviewerId: reviewerAfter.id },
+        });
+
+        await tx.review.updateMany({
+          where: {
+            reviewerId: reviewerAfter.id,
+            status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+          },
+          data: { status: "EXPIRED" },
+        });
+      }
+
+      return { updatedReview, reviewer: reviewerAfter, affectedTrackIds };
     });
+
+    if (result.reviewer.isRestricted && result.affectedTrackIds.length > 0) {
+      for (const trackId of result.affectedTrackIds) {
+        await assignReviewersToTrack(trackId);
+      }
+    }
 
     return NextResponse.json({
       success: true,

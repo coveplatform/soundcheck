@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Music, Headphones, Users } from "lucide-react";
+import { funnels, track } from "@/lib/analytics";
 
 type Role = "artist" | "reviewer" | "both";
 
@@ -26,10 +26,17 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Track page view
+  useEffect(() => {
+    funnels.artistSignup.start();
+  }, []);
+
   const handleRoleSelect = (selectedRole: Role) => {
+    funnels.artistSignup.selectRole(selectedRole);
     setRole(selectedRole);
     setStep("details");
   };
@@ -38,43 +45,39 @@ export default function SignupPage() {
     e.preventDefault();
     if (!role) return;
 
+    if (!acceptedTerms) {
+      setError("You must agree to the Terms and Privacy Policy");
+      return;
+    }
+
     setError("");
     setIsLoading(true);
+    funnels.artistSignup.submit(role);
 
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name, role }),
+        body: JSON.stringify({ email, password, name, role, acceptedTerms }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        setError(data.error || "Something went wrong");
+        const data = await response.json().catch(() => null);
+        const errorMsg = data?.error || "Something went wrong";
+        setError(errorMsg);
+        track("signup_failed", { error: errorMsg });
         return;
       }
 
-      // Sign in after successful signup
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
+      const data = await response.json().catch(() => ({}));
+      funnels.artistSignup.complete(data.userId || "unknown", role);
+      track("email_verification_sent");
 
-      if (result?.error) {
-        setError("Account created but couldn't sign in. Please try logging in.");
-      } else {
-        // Redirect based on role
-        if (data.isArtist) {
-          router.push("/artist/onboarding");
-        } else {
-          router.push("/reviewer/onboarding");
-        }
-        router.refresh();
-      }
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+      router.refresh();
     } catch {
       setError("Something went wrong");
+      track("signup_failed", { error: "network_error" });
     } finally {
       setIsLoading(false);
     }
@@ -198,9 +201,34 @@ export default function SignupPage() {
               required
             />
           </div>
+          <div className="flex items-start gap-2">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="mt-1"
+            />
+            <label htmlFor="terms" className="text-sm text-neutral-600">
+              I agree to the{" "}
+              <Link href="/terms" className="text-neutral-900 hover:underline">
+                Terms of Service
+              </Link>
+              {" "}and{" "}
+              <Link href="/privacy" className="text-neutral-900 hover:underline">
+                Privacy Policy
+              </Link>
+              .
+            </label>
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button type="submit" className="w-full" isLoading={isLoading}>
+          <Button
+            type="submit"
+            className="w-full"
+            isLoading={isLoading}
+            disabled={!acceptedTerms}
+          >
             Create account
           </Button>
           <button

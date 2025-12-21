@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Clock, ArrowRight } from "lucide-react";
+import { track } from "@/lib/analytics";
 
 export default function SuccessPage() {
   const searchParams = useSearchParams();
@@ -12,6 +14,19 @@ export default function SuccessPage() {
   // In a real app, you'd verify the session with Stripe
   // For now, we just show success if there's a session_id
   const isVerified = Boolean(sessionId);
+
+  // Track checkout completion
+  useEffect(() => {
+    if (isVerified && sessionId) {
+      // Note: Actual package/price info would come from API verification
+      // For now we track that checkout was successful
+      track("checkout_completed", {
+        package: "unknown",
+        price: 0,
+        trackId: sessionId,
+      });
+    }
+  }, [isVerified, sessionId]);
 
   if (!isVerified) {
     return (

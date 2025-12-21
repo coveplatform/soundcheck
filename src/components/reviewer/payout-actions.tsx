@@ -17,6 +17,31 @@ export function PayoutActions({
   const [isRequestingPayout, setIsRequestingPayout] = useState(false);
   const [isReconnecting, setIsReconnecting] = useState(false);
 
+  function maybeRedirectForAuth(status: number, message: unknown) {
+    if (status === 401) {
+      window.location.href = "/login";
+      return true;
+    }
+
+    if (status === 403) {
+      const msg = typeof message === "string" ? message.toLowerCase() : "";
+      if (msg.includes("verify")) {
+        window.location.href = "/verify-email";
+        return true;
+      }
+      if (msg.includes("onboarding")) {
+        window.location.href = "/reviewer/onboarding";
+        return true;
+      }
+      if (msg.includes("restricted")) {
+        window.location.href = "/reviewer/dashboard";
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   async function connect() {
     setError("");
     setIsConnecting(true);
@@ -25,6 +50,9 @@ export function PayoutActions({
       const res = await fetch("/api/reviewer/stripe/connect", { method: "POST" });
       const data = await res.json();
       if (!res.ok) {
+        if (maybeRedirectForAuth(res.status, data?.error)) {
+          return;
+        }
         setError(data?.error || "Failed to start Stripe onboarding");
         return;
       }
@@ -46,6 +74,9 @@ export function PayoutActions({
       });
       const data = await res.json();
       if (!res.ok) {
+        if (maybeRedirectForAuth(res.status, data?.error)) {
+          return;
+        }
         setError(data?.error || "Failed to start Stripe onboarding");
         return;
       }
@@ -65,6 +96,9 @@ export function PayoutActions({
       const res = await fetch("/api/reviewer/stripe/dashboard", { method: "POST" });
       const data = await res.json();
       if (!res.ok) {
+        if (maybeRedirectForAuth(res.status, data?.error)) {
+          return;
+        }
         setError(data?.error || "Failed to open Stripe dashboard");
         return;
       }
@@ -88,6 +122,9 @@ export function PayoutActions({
       });
       const data = await res.json();
       if (!res.ok) {
+        if (maybeRedirectForAuth(res.status, data?.error)) {
+          return;
+        }
         setError(data?.error || "Failed to request payout");
         return;
       }

@@ -54,6 +54,44 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { emailVerified: true },
+    });
+
+    if (!user?.emailVerified) {
+      return NextResponse.json(
+        { error: "Please verify your email to submit reviews" },
+        { status: 403 }
+      );
+    }
+
+    const reviewerProfile = await prisma.reviewerProfile.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true, isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
+    });
+
+    if (!reviewerProfile) {
+      return NextResponse.json(
+        { error: "Reviewer profile not found" },
+        { status: 404 }
+      );
+    }
+
+    if (reviewerProfile.isRestricted) {
+      return NextResponse.json(
+        { error: "Reviewer account restricted" },
+        { status: 403 }
+      );
+    }
+
+    if (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed) {
+      return NextResponse.json(
+        { error: "Please complete onboarding before submitting reviews" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const data = submitReviewSchema.parse(body);
 
@@ -137,12 +175,23 @@ export async function POST(request: Request) {
     });
 
     // Update reviewer stats
+    const now = new Date();
+
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
+
     await prisma.reviewerProfile.update({
       where: { id: review.reviewerId },
       data: {
         totalReviews: { increment: 1 },
         pendingBalance: { increment: earnings },
         totalEarnings: { increment: earnings },
+        lastReviewDate: now,
+        reviewsToday:
+          review.reviewer.lastReviewDate &&
+          review.reviewer.lastReviewDate >= startOfToday
+            ? { increment: 1 }
+            : 1,
       },
     });
 

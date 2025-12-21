@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { getSession, signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -20,14 +20,32 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const authError = searchParams.get("error");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [needsVerificationEmail, setNeedsVerificationEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!authError) return;
+    if (authError === "EmailNotVerified") {
+      setError("Please verify your email before signing in.");
+      return;
+    }
+
+    if (authError === "CredentialsSignin") {
+      setError("Invalid email or password");
+      return;
+    }
+
+    setError("Sign in failed");
+  }, [authError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setNeedsVerificationEmail(null);
     setIsLoading(true);
 
     try {
@@ -37,10 +55,27 @@ export default function LoginPage() {
         redirect: false,
       });
 
+      if (!result) {
+        setError("Sign in failed");
+        return;
+      }
+
       if (result?.error) {
-        setError("Invalid email or password");
+        if (result.error === "EmailNotVerified") {
+          setNeedsVerificationEmail(email);
+          setError("Please verify your email before signing in.");
+        } else {
+          setError("Invalid email or password");
+        }
       } else {
-        router.push(callbackUrl);
+        const session = await getSession();
+        const defaultUrl = session?.user?.isArtist
+          ? "/artist/dashboard"
+          : session?.user?.isReviewer
+          ? "/reviewer/dashboard"
+          : "/";
+        const target = callbackUrl && callbackUrl !== "/" ? callbackUrl : defaultUrl;
+        router.push(target);
         router.refresh();
       }
     } catch {
@@ -63,6 +98,18 @@ export default function LoginPage() {
           {error && (
             <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md">
               {error}
+              {needsVerificationEmail ? (
+                <div className="mt-2">
+                  <Link
+                    href={`/verify-email?email=${encodeURIComponent(
+                      needsVerificationEmail
+                    )}`}
+                    className="underline underline-offset-4"
+                  >
+                    Resend verification email
+                  </Link>
+                </div>
+              ) : null}
             </div>
           )}
           <div className="space-y-2">
@@ -91,6 +138,12 @@ export default function LoginPage() {
           <Button type="submit" className="w-full" isLoading={isLoading}>
             Sign in
           </Button>
+          <Link
+            href="/forgot-password"
+            className="text-sm text-neutral-500 hover:text-neutral-900"
+          >
+            Forgot password?
+          </Link>
           <p className="text-sm text-neutral-500 text-center">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-neutral-900 hover:underline">

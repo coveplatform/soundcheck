@@ -14,6 +14,7 @@ import {
 import { Check, Music, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, PACKAGES, PackageType } from "@/lib/metadata";
+import { AudioPlayer } from "@/components/audio/audio-player";
 
 interface Genre {
   id: string;
@@ -25,7 +26,11 @@ export default function SubmitTrackPage() {
   const router = useRouter();
 
   // Form state
+  const [inputMode, setInputMode] = useState<"url" | "upload">("url");
   const [url, setUrl] = useState("");
+  const [uploadedUrl, setUploadedUrl] = useState<string>("");
+  const [uploadedDuration, setUploadedDuration] = useState<number | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [title, setTitle] = useState("");
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -79,6 +84,116 @@ export default function SubmitTrackPage() {
     }
   };
 
+  const handleUpload = async (file: File) => {
+    setError("");
+    setUrlError("");
+    setIsUploading(true);
+    setUploadedDuration(null);
+
+    try {
+      let finalUrl = "";
+
+      const presignRes = await fetch("/api/uploads/track/presign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type || "audio/mpeg",
+          contentLength: file.size,
+        }),
+      });
+
+      if (presignRes.ok) {
+        const presignData = (await presignRes.json()) as {
+          uploadUrl?: string;
+          fileUrl?: string;
+          contentType?: string;
+          error?: string;
+        };
+
+        if (!presignData.uploadUrl || !presignData.fileUrl) {
+          setError(presignData.error || "Failed to prepare upload");
+          return;
+        }
+
+        const putRes = await fetch(presignData.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": presignData.contentType || "audio/mpeg" },
+          body: file,
+        });
+
+        if (!putRes.ok) {
+          setError("Failed to upload MP3");
+          return;
+        }
+
+        finalUrl = presignData.fileUrl;
+      } else {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("/api/uploads/track", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = (await res.json()) as { url?: string; error?: string };
+
+        if (!res.ok || !data.url) {
+          setError(data.error || "Failed to upload MP3");
+          return;
+        }
+
+        finalUrl = data.url;
+      }
+
+      if (!finalUrl) {
+        setError("Failed to upload MP3");
+        return;
+      }
+
+      setUploadedUrl(finalUrl);
+
+      await new Promise<void>((resolve) => {
+        const audio = new Audio();
+        audio.preload = "metadata";
+        audio.src = finalUrl;
+
+        const cleanup = () => {
+          audio.removeEventListener("loadedmetadata", onLoaded);
+          audio.removeEventListener("error", onError);
+        };
+
+        const onLoaded = () => {
+          cleanup();
+          if (Number.isFinite(audio.duration) && audio.duration > 0) {
+            setUploadedDuration(Math.round(audio.duration));
+          }
+          resolve();
+        };
+
+        const onError = () => {
+          cleanup();
+          resolve();
+        };
+
+        audio.addEventListener("loadedmetadata", onLoaded);
+        audio.addEventListener("error", onError);
+      });
+
+      if (!title.trim()) {
+        const base = file.name.replace(/\.mp3$/i, "").trim();
+        if (base) {
+          setTitle(base);
+        }
+      }
+    } catch {
+      setError("Failed to upload MP3");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const toggleGenre = (genreId: string) => {
     setSelectedGenres((prev) => {
       if (prev.includes(genreId)) {
@@ -94,11 +209,17 @@ export default function SubmitTrackPage() {
   const handleSubmit = async () => {
     setError("");
 
-    // Validate
-    const validation = validateTrackUrl(url);
-    if (!validation.valid) {
-      setUrlError(validation.error || "Invalid URL");
-      return;
+    if (inputMode === "url") {
+      const validation = validateTrackUrl(url);
+      if (!validation.valid) {
+        setUrlError(validation.error || "Invalid URL");
+        return;
+      }
+    } else {
+      if (!uploadedUrl) {
+        setError("Please upload an MP3 first");
+        return;
+      }
     }
 
     if (!title.trim()) {
@@ -118,7 +239,11 @@ export default function SubmitTrackPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sourceUrl: url,
+          sourceUrl: inputMode === "upload" ? uploadedUrl : url,
+          ...(inputMode === "upload" ? { sourceType: "UPLOAD" } : {}),
+          ...(inputMode === "upload" && uploadedDuration
+            ? { duration: uploadedDuration }
+            : {}),
           title: title.trim(),
           genreIds: selectedGenres,
           feedbackFocus: feedbackFocus.trim() || undefined,
@@ -162,23 +287,77 @@ export default function SubmitTrackPage() {
       {/* Track URL */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Track URL</CardTitle>
+          <CardTitle className="text-lg">Track</CardTitle>
           <CardDescription>
-            Paste a link to your track on SoundCloud, Bandcamp, or YouTube
+            Submit via URL or upload an MP3
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Input
-              placeholder="https://soundcloud.com/artist/track"
-              value={url}
-              onChange={(e) => handleUrlChange(e.target.value)}
-              className={cn(urlError && "border-red-500")}
-            />
-            {urlError && <p className="text-sm text-red-500">{urlError}</p>}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setInputMode("url");
+                setUploadedUrl("");
+              }}
+              className={cn(
+                "px-3 py-2 rounded-md text-sm font-medium border transition-colors",
+                inputMode === "url"
+                  ? "bg-neutral-900 text-white border-neutral-900"
+                  : "border-neutral-200 text-neutral-700 hover:border-neutral-300"
+              )}
+            >
+              Link
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setInputMode("upload");
+                setUrl("");
+                setUrlError("");
+              }}
+              className={cn(
+                "px-3 py-2 rounded-md text-sm font-medium border transition-colors",
+                inputMode === "upload"
+                  ? "bg-neutral-900 text-white border-neutral-900"
+                  : "border-neutral-200 text-neutral-700 hover:border-neutral-300"
+              )}
+            >
+              Upload MP3
+            </button>
           </div>
 
-          {url && !urlError && (
+          <div className="space-y-2">
+            {inputMode === "url" ? (
+              <>
+                <Input
+                  placeholder="https://soundcloud.com/artist/track"
+                  value={url}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  className={cn(urlError && "border-red-500")}
+                />
+                {urlError && <p className="text-sm text-red-500">{urlError}</p>}
+              </>
+            ) : (
+              <>
+                <Input
+                  type="file"
+                  accept="audio/mpeg,audio/mp3,.mp3"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      void handleUpload(file);
+                    }
+                  }}
+                />
+                <p className="text-xs text-neutral-500">
+                  MP3 only (max 25MB). Files are stored locally in dev.
+                </p>
+              </>
+            )}
+          </div>
+
+          {(inputMode === "url" ? url && !urlError : !!uploadedUrl) && (
             <div className="flex items-center gap-2 p-3 bg-neutral-50 rounded-lg">
               <Music className="h-5 w-5 text-neutral-400" />
               <div className="flex-1 min-w-0">
@@ -189,16 +368,31 @@ export default function SubmitTrackPage() {
                   className="border-0 bg-transparent p-0 h-auto font-medium focus-visible:ring-0"
                 />
               </div>
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-neutral-400 hover:text-neutral-600"
-              >
-                <ExternalLink className="h-4 w-4" />
-              </a>
+              {inputMode === "url" ? (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-neutral-400 hover:text-neutral-600"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              ) : null}
             </div>
           )}
+
+          {inputMode === "upload" && isUploading ? (
+            <p className="text-sm text-neutral-500">Uploading...</p>
+          ) : null}
+
+          {inputMode === "upload" && uploadedUrl ? (
+            <AudioPlayer
+              sourceUrl={uploadedUrl}
+              sourceType="UPLOAD"
+              showListenTracker={false}
+              showWaveform={true}
+            />
+          ) : null}
 
           {isLoadingMetadata && (
             <p className="text-sm text-neutral-500">Fetching track info...</p>

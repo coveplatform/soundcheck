@@ -11,6 +11,7 @@ import { AudioPlayer } from "@/components/audio/audio-player";
 import { ArrowLeft, Star, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
+import { funnels, track } from "@/lib/analytics";
 
 interface Review {
   id: string;
@@ -78,8 +79,37 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         if (response.ok) {
           const data = await response.json();
           setReview(data);
+          // Track review started
+          funnels.review.start(data.track.id, data.id);
         } else {
-          setError("Review not found");
+          const data = await response.json().catch(() => null);
+          const message = data?.error || "Review not found";
+
+          if (response.status === 401) {
+            router.push("/login");
+            router.refresh();
+            return;
+          }
+
+          if (response.status === 403) {
+            if (typeof message === "string" && message.toLowerCase().includes("verify")) {
+              router.push("/verify-email");
+              router.refresh();
+              return;
+            }
+            if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
+              router.push("/reviewer/onboarding");
+              router.refresh();
+              return;
+            }
+            if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
+              router.push("/reviewer/dashboard");
+              router.refresh();
+              return;
+            }
+          }
+
+          setError(message);
         }
       } catch {
         setError("Failed to load review");
@@ -144,13 +174,47 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Failed to submit review");
+        const message = data?.error || "Failed to submit review";
+
+        if (response.status === 401) {
+          router.push("/login");
+          router.refresh();
+          return;
+        }
+
+        if (response.status === 403) {
+          if (typeof message === "string" && message.toLowerCase().includes("verify")) {
+            router.push("/verify-email");
+            router.refresh();
+            return;
+          }
+          if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
+            router.push("/reviewer/onboarding");
+            router.refresh();
+            return;
+          }
+          if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
+            router.push("/reviewer/dashboard");
+            router.refresh();
+            return;
+          }
+        }
+
+        setError(message);
+        track("review_form_validation_failed", { field: "api", error: message });
         return;
       }
 
+      // Track successful review completion
+      funnels.review.complete(
+        review.track.id,
+        review.id,
+        data.earnings || TIER_EARNINGS[review.reviewer.tier]
+      );
       setSuccess(true);
     } catch {
       setError("Something went wrong");
+      track("review_form_validation_failed", { field: "api", error: "network_error" });
     } finally {
       setIsSubmitting(false);
     }
@@ -161,6 +225,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
     setError("");
     setIsSkipping(true);
+    track("reviewer_track_skipped", { trackId: review.track.id });
 
     try {
       const response = await fetch(`/api/reviews/${review.id}/skip`, {
@@ -172,7 +237,33 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Failed to skip review");
+        const message = data?.error || "Failed to skip review";
+
+        if (response.status === 401) {
+          router.push("/login");
+          router.refresh();
+          return;
+        }
+
+        if (response.status === 403) {
+          if (typeof message === "string" && message.toLowerCase().includes("verify")) {
+            router.push("/verify-email");
+            router.refresh();
+            return;
+          }
+          if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
+            router.push("/reviewer/onboarding");
+            router.refresh();
+            return;
+          }
+          if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
+            router.push("/reviewer/dashboard");
+            router.refresh();
+            return;
+          }
+        }
+
+        setError(message);
         return;
       }
 
@@ -202,15 +293,45 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         body: "{}",
       });
 
-      const data = await res.json().catch(() => null);
-      if (!res.ok) return;
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        const message = data?.error;
 
-      const serverListen = typeof data?.listenDuration === "number" ? data.listenDuration : null;
-      if (serverListen !== null) {
-        setListenTime((prev) => Math.max(prev, serverListen));
+        if (res.status === 401) {
+          router.push("/login");
+          router.refresh();
+          return;
+        }
+
+        if (res.status === 403) {
+          const msg = typeof message === "string" ? message.toLowerCase() : "";
+          if (msg.includes("verify")) {
+            router.push("/verify-email");
+            router.refresh();
+            return;
+          }
+          if (msg.includes("onboarding")) {
+            router.push("/reviewer/onboarding");
+            router.refresh();
+            return;
+          }
+          if (msg.includes("restricted")) {
+            router.push("/reviewer/dashboard");
+            router.refresh();
+            return;
+          }
+        }
       }
-      if (data?.minimumReached) {
-        setCanSubmit(true);
+
+      if (res.ok) {
+        const data = await res.json();
+        const serverListen = typeof data.listenDuration === "number" ? data.listenDuration : null;
+        if (serverListen !== null) {
+          setListenTime((prev) => Math.max(prev, serverListen));
+        }
+        if (data.minimumReached) {
+          setCanSubmit(true);
+        }
       }
     } catch {
     } finally {
@@ -308,7 +429,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               setListenTime((prev) => Math.max(prev, seconds));
               void maybeSendHeartbeat();
             }}
-            onMinimumReached={() => setCanSubmit(true)}
+            onMinimumReached={() => {
+              setCanSubmit(true);
+              funnels.review.minimumReached(review.track.id, MIN_LISTEN_SECONDS);
+            }}
           />
         </CardContent>
       </Card>

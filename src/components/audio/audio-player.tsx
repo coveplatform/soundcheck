@@ -10,6 +10,8 @@ interface AudioPlayerProps {
   minListenTime?: number; // seconds required before can submit
   onListenProgress?: (seconds: number) => void;
   onMinimumReached?: () => void;
+  showListenTracker?: boolean;
+  showWaveform?: boolean;
 }
 
 export function AudioPlayer({
@@ -18,6 +20,8 @@ export function AudioPlayer({
   minListenTime = 90,
   onListenProgress,
   onMinimumReached,
+  showListenTracker = true,
+  showWaveform = false,
 }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -25,6 +29,7 @@ export function AudioPlayer({
   const [isMuted, setIsMuted] = useState(false);
   const [totalListenTime, setTotalListenTime] = useState(0);
   const [hasReachedMinimum, setHasReachedMinimum] = useState(false);
+  const [waveformPeaks, setWaveformPeaks] = useState<number[] | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -46,6 +51,10 @@ export function AudioPlayer({
 
   // Track listen time
   useEffect(() => {
+    if (!showListenTracker) {
+      return;
+    }
+
     if (isPlaying) {
       progressIntervalRef.current = setInterval(() => {
         setTotalListenTime((prev) => {
@@ -71,7 +80,14 @@ export function AudioPlayer({
         clearInterval(progressIntervalRef.current);
       }
     };
-  }, [isPlaying, hasReachedMinimum, minListenTime, onListenProgress, onMinimumReached]);
+  }, [
+    isPlaying,
+    hasReachedMinimum,
+    minListenTime,
+    onListenProgress,
+    onMinimumReached,
+    showListenTracker,
+  ]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -79,7 +95,81 @@ export function AudioPlayer({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const listenProgress = Math.min((totalListenTime / minListenTime) * 100, 100);
+  const listenProgress =
+    showListenTracker && minListenTime > 0
+      ? Math.min((totalListenTime / minListenTime) * 100, 100)
+      : 0;
+
+  useEffect(() => {
+    if (!showWaveform) {
+      setWaveformPeaks(null);
+      return;
+    }
+
+    if (isEmbedded) {
+      setWaveformPeaks(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const run = async () => {
+      try {
+        const res = await fetch(sourceUrl);
+        if (!res.ok) {
+          return;
+        }
+
+        const arrayBuffer = await res.arrayBuffer();
+
+        const AudioContextCtor =
+          window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        const ctx = new AudioContextCtor();
+
+        const audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0));
+        const channel = audioBuffer.getChannelData(0);
+
+        const bars = 96;
+        const blockSize = Math.max(1, Math.floor(channel.length / bars));
+        const peaks: number[] = [];
+
+        let max = 0;
+        for (let i = 0; i < bars; i++) {
+          const start = i * blockSize;
+          const end = Math.min(channel.length, start + blockSize);
+          let sum = 0;
+          for (let j = start; j < end; j++) {
+            sum += Math.abs(channel[j] ?? 0);
+          }
+          const value = sum / Math.max(1, end - start);
+          peaks.push(value);
+          if (value > max) {
+            max = value;
+          }
+        }
+
+        const normalized = max > 0 ? peaks.map((p) => p / max) : peaks.map(() => 0);
+
+        try {
+          await ctx.close();
+        } catch {
+          // ignore
+        }
+
+        if (!cancelled) {
+          setWaveformPeaks(normalized);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isEmbedded, showWaveform, sourceUrl]);
 
   if (isEmbedded) {
     return (
@@ -95,56 +185,56 @@ export function AudioPlayer({
           />
         </div>
 
-        {/* Listen Time Tracker */}
-        <div className="bg-neutral-50 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">Listen Time</span>
-            <span className="text-sm text-neutral-500">
-              {formatTime(totalListenTime)} / {formatTime(minListenTime)} required
-            </span>
-          </div>
-          <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
-            <div
-              className={cn(
-                "h-full transition-all duration-300",
-                hasReachedMinimum ? "bg-green-500" : "bg-neutral-900"
-              )}
-              style={{ width: `${listenProgress}%` }}
-            />
-          </div>
-          {hasReachedMinimum ? (
-            <p className="text-xs text-green-600 mt-2">
-              Minimum listen time reached. You can now submit your review.
-            </p>
-          ) : (
-            <p className="text-xs text-neutral-400 mt-2">
-              Play the track above. Time is tracked automatically.
-            </p>
-          )}
-
-          {/* Manual play tracking for embedded */}
-          <div className="flex gap-2 mt-3">
-            <button
-              onClick={() => setIsPlaying(true)}
-              className={cn(
-                "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors",
-                isPlaying
-                  ? "bg-neutral-200 text-neutral-500"
-                  : "bg-neutral-900 text-white hover:bg-neutral-800"
-              )}
-            >
-              {isPlaying ? "Tracking..." : "Start Tracking"}
-            </button>
-            {isPlaying && (
-              <button
-                onClick={() => setIsPlaying(false)}
-                className="py-2 px-4 rounded-md text-sm font-medium bg-neutral-200 text-neutral-700 hover:bg-neutral-300"
-              >
-                Pause Tracking
-              </button>
+        {showListenTracker ? (
+          <div className="bg-neutral-50 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">Listen Time</span>
+              <span className="text-sm text-neutral-500">
+                {formatTime(totalListenTime)} / {formatTime(minListenTime)} required
+              </span>
+            </div>
+            <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
+              <div
+                className={cn(
+                  "h-full transition-all duration-300",
+                  hasReachedMinimum ? "bg-green-500" : "bg-neutral-900"
+                )}
+                style={{ width: `${listenProgress}%` }}
+              />
+            </div>
+            {hasReachedMinimum ? (
+              <p className="text-xs text-green-600 mt-2">
+                Minimum listen time reached. You can now submit your review.
+              </p>
+            ) : (
+              <p className="text-xs text-neutral-400 mt-2">
+                Play the track above. Time is tracked automatically.
+              </p>
             )}
+
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={() => setIsPlaying(true)}
+                className={cn(
+                  "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors",
+                  isPlaying
+                    ? "bg-neutral-200 text-neutral-500"
+                    : "bg-neutral-900 text-white hover:bg-neutral-800"
+                )}
+              >
+                {isPlaying ? "Tracking..." : "Start Tracking"}
+              </button>
+              {isPlaying && (
+                <button
+                  onClick={() => setIsPlaying(false)}
+                  className="py-2 px-4 rounded-md text-sm font-medium bg-neutral-200 text-neutral-700 hover:bg-neutral-300"
+                >
+                  Pause Tracking
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     );
   }
@@ -168,6 +258,28 @@ export function AudioPlayer({
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
       />
+
+      {showWaveform && waveformPeaks ? (
+        <div className="rounded-lg bg-neutral-50 p-3">
+          <div className="flex items-end gap-[2px] h-16">
+            {waveformPeaks.map((p, idx) => {
+              const progress = duration > 0 ? currentTime / duration : 0;
+              const isActive = idx / waveformPeaks.length <= progress;
+
+              return (
+                <div
+                  key={idx}
+                  className={cn(
+                    "flex-1 rounded-sm",
+                    isActive ? "bg-neutral-900" : "bg-neutral-200"
+                  )}
+                  style={{ height: `${Math.max(6, Math.round(p * 100))}%` }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
 
       <div className="bg-neutral-50 rounded-lg p-4">
         {/* Controls */}
@@ -222,29 +334,30 @@ export function AudioPlayer({
           </button>
         </div>
 
-        {/* Listen Time Progress */}
-        <div className="mt-4 pt-4 border-t border-neutral-200">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">Listen Time</span>
-            <span className="text-sm text-neutral-500">
-              {formatTime(totalListenTime)} / {formatTime(minListenTime)} required
-            </span>
+        {showListenTracker ? (
+          <div className="mt-4 pt-4 border-t border-neutral-200">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">Listen Time</span>
+              <span className="text-sm text-neutral-500">
+                {formatTime(totalListenTime)} / {formatTime(minListenTime)} required
+              </span>
+            </div>
+            <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
+              <div
+                className={cn(
+                  "h-full transition-all duration-300",
+                  hasReachedMinimum ? "bg-green-500" : "bg-neutral-900"
+                )}
+                style={{ width: `${listenProgress}%` }}
+              />
+            </div>
+            {hasReachedMinimum && (
+              <p className="text-xs text-green-600 mt-2">
+                Minimum listen time reached!
+              </p>
+            )}
           </div>
-          <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
-            <div
-              className={cn(
-                "h-full transition-all duration-300",
-                hasReachedMinimum ? "bg-green-500" : "bg-neutral-900"
-              )}
-              style={{ width: `${listenProgress}%` }}
-            />
-          </div>
-          {hasReachedMinimum && (
-            <p className="text-xs text-green-600 mt-2">
-              Minimum listen time reached!
-            </p>
-          )}
-        </div>
+        ) : null}
       </div>
     </div>
   );

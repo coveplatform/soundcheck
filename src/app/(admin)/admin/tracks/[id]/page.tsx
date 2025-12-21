@@ -1,0 +1,190 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import { prisma } from "@/lib/prisma";
+import { RefundButton } from "@/components/admin/refund-button";
+import { CancelTrackButton } from "@/components/admin/cancel-track-button";
+import { AudioPlayer } from "@/components/audio/audio-player";
+
+export default async function AdminTrackDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const track = await prisma.track.findUnique({
+    where: { id },
+    include: {
+      artist: { include: { user: { select: { id: true, email: true } } } },
+      genres: true,
+      payment: true,
+      queueEntries: {
+        include: { reviewer: { include: { user: { select: { email: true } } } } },
+        orderBy: { assignedAt: "asc" },
+      },
+      reviews: {
+        include: {
+          reviewer: { include: { user: { select: { email: true } } } },
+        },
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
+
+  if (!track) {
+    notFound();
+  }
+
+  const hasStartedReviews = track.reviews.some(
+    (r) => r.status === "IN_PROGRESS" || r.status === "COMPLETED"
+  );
+
+  const canRefund =
+    track.payment?.status === "COMPLETED" &&
+    track.status !== "CANCELLED" &&
+    !!track.payment.stripePaymentId &&
+    !hasStartedReviews;
+
+  const canCancel =
+    track.status !== "CANCELLED" &&
+    (track.status === "PENDING_PAYMENT" || track.status === "QUEUED");
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Track</h1>
+          <p className="text-neutral-500">{track.title}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {canRefund ? <RefundButton trackId={track.id} /> : null}
+          {canCancel ? <CancelTrackButton trackId={track.id} /> : null}
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+        <div className="text-sm text-neutral-500">Listen</div>
+        <div className="mt-3">
+          <AudioPlayer
+            sourceUrl={track.sourceUrl}
+            sourceType={track.sourceType}
+            showListenTracker={false}
+            showWaveform={track.sourceType === "UPLOAD"}
+          />
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-4">
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+          <div className="text-sm text-neutral-500">Status</div>
+          <div className="font-medium">{track.status}</div>
+        </div>
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+          <div className="text-sm text-neutral-500">Payment</div>
+          <div className="font-medium">{track.payment?.status ?? "None"}</div>
+        </div>
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+          <div className="text-sm text-neutral-500">Artist</div>
+          <div className="font-medium">
+            <Link className="underline" href={`/admin/users/${track.artist.user.id}`}>
+              {track.artist.user.email}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+        <div className="text-sm text-neutral-500">Details</div>
+        <div className="mt-2 grid md:grid-cols-3 gap-3 text-sm">
+          <div>
+            <div className="text-neutral-500">Package</div>
+            <div className="font-medium">{track.packageType}</div>
+          </div>
+          <div>
+            <div className="text-neutral-500">Reviews</div>
+            <div className="font-medium">
+              {track.reviewsCompleted} / {track.reviewsRequested}
+            </div>
+          </div>
+          <div>
+            <div className="text-neutral-500">Created</div>
+            <div className="font-medium">{new Date(track.createdAt).toLocaleString()}</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-neutral-200 font-medium">Reviews</div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-neutral-50 text-neutral-600">
+                <tr>
+                  <th className="text-left font-medium px-4 py-3">Reviewer</th>
+                  <th className="text-left font-medium px-4 py-3">Status</th>
+                  <th className="text-left font-medium px-4 py-3">Flagged</th>
+                  <th className="text-left font-medium px-4 py-3">Created</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-100">
+                {track.reviews.map((r) => (
+                  <tr key={r.id} className="text-neutral-700">
+                    <td className="px-4 py-3">{r.reviewer.user.email}</td>
+                    <td className="px-4 py-3">{r.status}</td>
+                    <td className="px-4 py-3">{r.wasFlagged ? "Yes" : "No"}</td>
+                    <td className="px-4 py-3">{new Date(r.createdAt).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+                {track.reviews.length === 0 ? (
+                  <tr>
+                    <td className="px-4 py-6 text-center text-neutral-500" colSpan={4}>
+                      No reviews yet
+                    </td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-neutral-200 font-medium">Queue</div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-neutral-50 text-neutral-600">
+                <tr>
+                  <th className="text-left font-medium px-4 py-3">Reviewer</th>
+                  <th className="text-left font-medium px-4 py-3">Assigned</th>
+                  <th className="text-left font-medium px-4 py-3">Expires</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-100">
+                {track.queueEntries.map((q) => (
+                  <tr key={q.id} className="text-neutral-700">
+                    <td className="px-4 py-3">{q.reviewer.user.email}</td>
+                    <td className="px-4 py-3">{new Date(q.assignedAt).toLocaleString()}</td>
+                    <td className="px-4 py-3">{new Date(q.expiresAt).toLocaleString()}</td>
+                  </tr>
+                ))}
+                {track.queueEntries.length === 0 ? (
+                  <tr>
+                    <td className="px-4 py-6 text-center text-neutral-500" colSpan={3}>
+                      Queue is empty
+                    </td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <Link className="text-sm text-neutral-600 hover:text-neutral-900 underline" href="/admin/tracks">
+          Back to tracks
+        </Link>
+      </div>
+    </div>
+  );
+}

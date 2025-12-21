@@ -6,9 +6,11 @@ import { z } from "zod";
 import { detectSource, PACKAGES, PackageType } from "@/lib/metadata";
 
 const createTrackSchema = z.object({
-  sourceUrl: z.string().url("Invalid URL"),
+  sourceUrl: z.string().min(1, "Track source is required"),
+  sourceType: z.enum(["SOUNDCLOUD", "BANDCAMP", "YOUTUBE", "UPLOAD"]).optional(),
   title: z.string().min(1, "Title is required").max(200),
   artworkUrl: z.string().url().optional().nullable(),
+  duration: z.number().int().positive().max(60 * 60).optional(),
   genreIds: z.array(z.string()).min(1, "Select at least one genre").max(3),
   feedbackFocus: z.string().max(500).optional(),
   packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE"]),
@@ -20,6 +22,18 @@ export async function POST(request: Request) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { emailVerified: true },
+    });
+
+    if (!user?.emailVerified) {
+      return NextResponse.json(
+        { error: "Please verify your email to submit a track" },
+        { status: 403 }
+      );
     }
 
     // Get artist profile
@@ -37,8 +51,28 @@ export async function POST(request: Request) {
     const body = await request.json();
     const data = createTrackSchema.parse(body);
 
-    // Detect source type from URL
-    const sourceType = detectSource(data.sourceUrl);
+    let sourceType = data.sourceType ?? detectSource(data.sourceUrl);
+
+    if (data.sourceType === "UPLOAD") {
+      const isLocalUpload = data.sourceUrl.startsWith("/uploads/");
+      let isRemoteUpload = false;
+
+      if (!isLocalUpload) {
+        try {
+          const parsed = new URL(data.sourceUrl);
+          isRemoteUpload = parsed.protocol === "https:" || parsed.protocol === "http:";
+        } catch {
+          isRemoteUpload = false;
+        }
+      }
+
+      if (!isLocalUpload && !isRemoteUpload) {
+        return NextResponse.json({ error: "Invalid upload URL" }, { status: 400 });
+      }
+
+      sourceType = "UPLOAD";
+    }
+
     if (!sourceType) {
       return NextResponse.json(
         { error: "Invalid track URL. Use SoundCloud, Bandcamp, or YouTube" },
@@ -57,6 +91,7 @@ export async function POST(request: Request) {
         sourceType,
         title: data.title,
         artworkUrl: data.artworkUrl,
+        duration: data.duration,
         feedbackFocus: data.feedbackFocus,
         packageType: data.packageType,
         reviewsRequested: packageDetails.reviews,

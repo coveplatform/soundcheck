@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { funnels, track } from "@/lib/analytics";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -28,8 +29,15 @@ export default function CheckoutPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          setError(data.error || "Failed to create checkout session");
+          const errorMsg = data.error || "Failed to create checkout session";
+          setError(errorMsg);
+          track("payment_error", { type: "checkout_creation", message: errorMsg });
           return;
+        }
+
+        // Track checkout started
+        if (data.package && data.amount) {
+          funnels.checkout.start(data.package, data.amount, trackId);
         }
 
         // Redirect to Stripe checkout
@@ -37,9 +45,11 @@ export default function CheckoutPage() {
           window.location.href = data.url;
         } else {
           setError("No checkout URL returned");
+          track("payment_error", { type: "no_checkout_url", message: "No checkout URL returned" });
         }
       } catch {
         setError("Something went wrong");
+        track("payment_error", { type: "network_error", message: "Something went wrong" });
       }
     }
 

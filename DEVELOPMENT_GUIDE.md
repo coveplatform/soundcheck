@@ -2,6 +2,8 @@
 
 ## Current Status
 
+For MVP launch readiness, see `MVP_LAUNCH_CHECKLIST.md`.
+
 ### Completed (Phases 0-3)
 - [x] Project setup (Next.js, Prisma, Tailwind)
 - [x] Authentication (NextAuth with credentials)
@@ -16,11 +18,16 @@
 - [x] Review form and submission
 - [x] Basic feedback display
 
+### Completed (Phase 4+)
+- [x] Aggregate analytics component
+- [x] Artist rating of reviews
+- [x] Review flagging
+- [x] Email notifications (track queued + review progress)
+- [x] Stripe Connect onboarding + payouts (tested)
+
 ### Remaining Work
-- [ ] Phase 4: Enhanced Feedback Display
-- [ ] Phase 5: Quality & Tier System
-- [ ] Phase 6: Automated Payouts (Stripe Connect)
-- [ ] Phase 7: Polish & Launch
+- [ ] Phase 5: Quality & Tier System (continue improving quality safeguards)
+- [ ] Phase 7: Polish & Launch (see MVP launch checklist)
 - [ ] Phase 8: Growth Features
 
 ---
