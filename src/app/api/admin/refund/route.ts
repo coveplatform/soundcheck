@@ -5,7 +5,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { isAdminEmail } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 const schema = z.object({
   trackId: z.string().min(1),
@@ -60,6 +60,8 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    const stripe = getStripe();
 
     await stripe.refunds.create(
       {

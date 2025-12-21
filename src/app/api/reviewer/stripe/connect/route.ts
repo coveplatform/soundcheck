@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripePlatformDefaults, stripe } from "@/lib/stripe";
+import { getStripe, getStripePlatformDefaults } from "@/lib/stripe";
 
 export async function POST(request: Request) {
   try {
@@ -75,6 +75,7 @@ export async function POST(request: Request) {
     }
 
     if (!accountId) {
+      const stripe = getStripe();
       const defaults = await getStripePlatformDefaults();
       const country = process.env.STRIPE_CONNECT_COUNTRY ?? defaults.country;
       const account = await stripe.accounts.create({
@@ -98,6 +99,7 @@ export async function POST(request: Request) {
       });
     }
 
+    const stripe = getStripe();
     const link = await stripe.accountLinks.create({
       account: accountId,
       refresh_url: `${baseUrl}/reviewer/earnings?stripe=refresh`,

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { assignReviewersToTrack } from "@/lib/queue";
 import { sendTrackQueuedEmail } from "@/lib/email";
@@ -24,6 +24,8 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    const stripe = getStripe();
 
     event = stripe.webhooks.constructEvent(
       body,
@@ -68,6 +70,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   }
 
   try {
+    const stripe = getStripe();
     const completedAt = new Date();
 
     const updated = await prisma.payment.updateMany({

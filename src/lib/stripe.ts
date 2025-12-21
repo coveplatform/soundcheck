@@ -1,12 +1,19 @@
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not defined");
-}
+let stripeSingleton: Stripe | null = null;
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  typescript: true,
-});
+export function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error("STRIPE_SECRET_KEY is not defined");
+  }
+
+  stripeSingleton ??= new Stripe(key, {
+    typescript: true,
+  });
+
+  return stripeSingleton;
+}
 
 let platformDefaultsPromise: Promise<{ country: string; currency: string }> | null = null;
 
@@ -17,6 +24,7 @@ export async function getStripePlatformDefaults(): Promise<{
   if (platformDefaultsPromise) return platformDefaultsPromise;
 
   platformDefaultsPromise = (async () => {
+    const stripe = getStripe();
     const account = await stripe.accounts.retrieve();
     if ("deleted" in account && account.deleted) {
       return { country: "US", currency: "usd" };

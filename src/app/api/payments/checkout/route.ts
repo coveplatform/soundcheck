@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripePlatformDefaults, stripe } from "@/lib/stripe";
+import { getStripe, getStripePlatformDefaults } from "@/lib/stripe";
 import { PACKAGES, PackageType } from "@/lib/metadata";
 
 export async function POST(request: Request) {
@@ -34,6 +34,8 @@ export async function POST(request: Request) {
     if (!trackId) {
       return NextResponse.json({ error: "Track ID required" }, { status: 400 });
     }
+
+    const stripe = getStripe();
 
     // Get track
     const track = await prisma.track.findUnique({

@@ -26,5 +26,5 @@ export const mockStripe = {
 }
 
 vi.mock('@/lib/stripe', () => ({
-  stripe: mockStripe,
+  getStripe: () => mockStripe,
 }))

@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripePlatformDefaults, stripe } from "@/lib/stripe";
+import { getStripe, getStripePlatformDefaults } from "@/lib/stripe";
 
 const MIN_PAYOUT_CENTS = 1000;
 
@@ -107,6 +107,7 @@ export async function POST(request: Request) {
     });
 
     try {
+      const stripe = getStripe();
       const defaults = await getStripePlatformDefaults();
       const currency = (process.env.STRIPE_CURRENCY ?? defaults.currency).toLowerCase();
       const transfer = await stripe.transfers.create({
