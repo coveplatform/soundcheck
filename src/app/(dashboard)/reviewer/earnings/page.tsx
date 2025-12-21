@@ -7,6 +7,8 @@ import { DollarSign, TrendingUp, Clock, CheckCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { PayoutActions } from "@/components/reviewer/payout-actions";
 
+export const dynamic = 'force-dynamic';
+
 export default async function EarningsPage() {
   const session = await getServerSession(authOptions);
 

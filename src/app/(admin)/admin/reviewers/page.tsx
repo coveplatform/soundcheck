@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { ReviewerRestrictionToggle } from "@/components/admin/reviewer-restriction-toggle";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminReviewersPage({
   searchParams,
 }: {

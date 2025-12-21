@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { RefundButton } from "@/components/admin/refund-button";
 import Link from "next/link";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminTracksPage({
   searchParams,
 }: {

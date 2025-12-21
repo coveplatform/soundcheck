@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { ForceVerifyEmailButton } from "@/components/admin/force-verify-email-button";
 import { ReviewerRestrictionToggle } from "@/components/admin/reviewer-restriction-toggle";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminUserDetailPage({
   params,
 }: {

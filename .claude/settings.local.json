@@ -9,7 +9,8 @@
       "Bash(npx tsc:*)",
       "Bash(find \"C:\\\\Users\\\\simli\\\\Desktop\\\\review\\\\soundcheck\\\\src\\\\app\\\\\\(dashboard\\)\" -name \"page.tsx\")",
       "Bash(head:*)",
-      "Bash(npm run test:run:*)"
+      "Bash(npm run test:run:*)",
+      "Bash(grep:*)"
     ]
   }
 }

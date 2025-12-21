@@ -6,6 +6,8 @@ import { RefundButton } from "@/components/admin/refund-button";
 import { CancelTrackButton } from "@/components/admin/cancel-track-button";
 import { AudioPlayer } from "@/components/audio/audio-player";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminTrackDetailPage({
   params,
 }: {

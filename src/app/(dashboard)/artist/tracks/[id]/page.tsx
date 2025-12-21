@@ -18,6 +18,8 @@ import {
   ThumbsDown,
 } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default async function TrackDetailPage({
   params,
 }: {

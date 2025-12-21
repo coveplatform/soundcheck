@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Music, Plus, Clock, CheckCircle, AlertCircle } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default async function ArtistDashboardPage() {
   const session = await getServerSession(authOptions);
 

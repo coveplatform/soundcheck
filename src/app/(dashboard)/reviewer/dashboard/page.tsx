@@ -16,6 +16,8 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { expireAndReassignExpiredQueueEntries, TIER_RATES } from "@/lib/queue";
 
+export const dynamic = 'force-dynamic';
+
 export default async function ReviewerDashboardPage() {
   const session = await getServerSession(authOptions);
 
