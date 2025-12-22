@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type MouseEvent as ReactMouseEvent } from "react";
 import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +33,23 @@ export function AudioPlayer({
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const seekToRatio = (ratio: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (!Number.isFinite(duration) || duration <= 0) return;
+
+    const nextTime = Math.max(0, Math.min(1, ratio)) * duration;
+    audio.currentTime = nextTime;
+    setCurrentTime(nextTime);
+  };
+
+  const seekFromClick = (e: ReactMouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const ratio = rect.width > 0 ? x / rect.width : 0;
+    seekToRatio(ratio);
+  };
 
   // For embedded players (SoundCloud, YouTube)
   const isEmbedded = sourceType === "SOUNDCLOUD" || sourceType === "YOUTUBE";
@@ -127,28 +144,54 @@ export function AudioPlayer({
         const ctx = new AudioContextCtor();
 
         const audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0));
-        const channel = audioBuffer.getChannelData(0);
+        const bars = 192;
+        const length = audioBuffer.length;
+        const blockSize = Math.max(1, Math.floor(length / bars));
 
-        const bars = 96;
-        const blockSize = Math.max(1, Math.floor(channel.length / bars));
-        const peaks: number[] = [];
-
-        let max = 0;
-        for (let i = 0; i < bars; i++) {
-          const start = i * blockSize;
-          const end = Math.min(channel.length, start + blockSize);
-          let sum = 0;
-          for (let j = start; j < end; j++) {
-            sum += Math.abs(channel[j] ?? 0);
-          }
-          const value = sum / Math.max(1, end - start);
-          peaks.push(value);
-          if (value > max) {
-            max = value;
-          }
+        const channelCount = Math.max(1, audioBuffer.numberOfChannels);
+        const channels: Float32Array[] = [];
+        for (let c = 0; c < channelCount; c++) {
+          channels.push(audioBuffer.getChannelData(c));
         }
 
-        const normalized = max > 0 ? peaks.map((p) => p / max) : peaks.map(() => 0);
+        const peaks: number[] = [];
+        let max = 0;
+
+        for (let i = 0; i < bars; i++) {
+          const start = i * blockSize;
+          const end = Math.min(length, start + blockSize);
+
+          let peak = 0;
+          let sumSquares = 0;
+          let count = 0;
+
+          for (let j = start; j < end; j++) {
+            let sample = 0;
+            for (let c = 0; c < channelCount; c++) {
+              sample += channels[c]?.[j] ?? 0;
+            }
+            sample = sample / channelCount;
+
+            const abs = Math.abs(sample);
+            if (abs > peak) peak = abs;
+            sumSquares += sample * sample;
+            count += 1;
+          }
+
+          const rms = count > 0 ? Math.sqrt(sumSquares / count) : 0;
+          const value = peak * 0.65 + rms * 0.35;
+          peaks.push(value);
+          if (value > max) max = value;
+        }
+
+        const smoothed = peaks.map((_, i) => {
+          const a = peaks[i - 1] ?? peaks[i] ?? 0;
+          const b = peaks[i] ?? 0;
+          const c = peaks[i + 1] ?? peaks[i] ?? 0;
+          return a * 0.25 + b * 0.5 + c * 0.25;
+        });
+
+        const normalized = max > 0 ? smoothed.map((p) => Math.min(1, p / max)) : smoothed.map(() => 0);
 
         try {
           await ctx.close();
@@ -260,20 +303,35 @@ export function AudioPlayer({
       />
 
       {showWaveform && waveformPeaks ? (
-        <div className="rounded-lg bg-neutral-50 p-3">
-          <div className="flex items-end gap-[2px] h-16">
+        <div className="rounded-lg bg-neutral-950 p-3 relative overflow-hidden">
+          <div className="absolute inset-x-0 top-1/2 h-px bg-neutral-800 pointer-events-none" />
+          <div
+            className="absolute top-1 bottom-1 w-0.5 bg-rose-500 pointer-events-none"
+            style={{ left: `${Math.min(100, Math.max(0, (duration > 0 ? (currentTime / duration) * 100 : 0)))}%` }}
+          />
+
+          <div
+            className="grid items-center gap-[2px] h-20 cursor-pointer relative"
+            style={{
+              gridTemplateColumns: `repeat(${waveformPeaks.length}, minmax(0, 1fr))`,
+            }}
+            onClick={seekFromClick}
+            role="button"
+            aria-label="Seek audio"
+          >
             {waveformPeaks.map((p, idx) => {
               const progress = duration > 0 ? currentTime / duration : 0;
               const isActive = idx / waveformPeaks.length <= progress;
+              const pxHeight = Math.max(6, Math.round(6 + p * 58));
 
               return (
                 <div
                   key={idx}
                   className={cn(
-                    "flex-1 rounded-sm",
-                    isActive ? "bg-neutral-900" : "bg-neutral-200"
+                    "rounded-sm",
+                    isActive ? "bg-neutral-200" : "bg-neutral-700"
                   )}
-                  style={{ height: `${Math.max(6, Math.round(p * 100))}%` }}
+                  style={{ height: `${pxHeight}px` }}
                 />
               );
             })}
@@ -309,7 +367,12 @@ export function AudioPlayer({
               <span>/</span>
               <span>{formatTime(duration)}</span>
             </div>
-            <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
+            <div
+              className="h-2 bg-neutral-200 rounded-full overflow-hidden cursor-pointer"
+              onClick={seekFromClick}
+              role="button"
+              aria-label="Seek audio"
+            >
               <div
                 className="h-full bg-neutral-900 transition-all"
                 style={{ width: `${(currentTime / duration) * 100 || 0}%` }}

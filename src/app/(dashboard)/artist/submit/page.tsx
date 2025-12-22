@@ -74,7 +74,7 @@ export default function SubmitTrackPage() {
     setIsLoadingMetadata(true);
     try {
       const metadata = await fetchTrackMetadata(value);
-      if (metadata) {
+      if (metadata && typeof metadata.title === "string" && metadata.title.trim()) {
         setTitle(metadata.title);
       }
     } catch {
@@ -272,14 +272,14 @@ export default function SubmitTrackPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Submit a Track</h1>
-        <p className="text-neutral-500 mt-1">
+        <h1 className="text-2xl font-black">Submit a Track</h1>
+        <p className="text-neutral-600 mt-1">
           Get genuine feedback from real listeners
         </p>
       </div>
 
       {error && (
-        <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md">
+        <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
           {error}
         </div>
       )}
@@ -301,10 +301,10 @@ export default function SubmitTrackPage() {
                 setUploadedUrl("");
               }}
               className={cn(
-                "px-3 py-2 rounded-md text-sm font-medium border transition-colors",
+                "px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
                 inputMode === "url"
-                  ? "bg-neutral-900 text-white border-neutral-900"
-                  : "border-neutral-200 text-neutral-700 hover:border-neutral-300"
+                  ? "bg-black text-white"
+                  : "bg-white text-black hover:bg-neutral-100"
               )}
             >
               Link
@@ -317,10 +317,10 @@ export default function SubmitTrackPage() {
                 setUrlError("");
               }}
               className={cn(
-                "px-3 py-2 rounded-md text-sm font-medium border transition-colors",
+                "px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
                 inputMode === "upload"
-                  ? "bg-neutral-900 text-white border-neutral-900"
-                  : "border-neutral-200 text-neutral-700 hover:border-neutral-300"
+                  ? "bg-black text-white"
+                  : "bg-white text-black hover:bg-neutral-100"
               )}
             >
               Upload MP3
@@ -331,16 +331,18 @@ export default function SubmitTrackPage() {
             {inputMode === "url" ? (
               <>
                 <Input
+                  key="track-url"
                   placeholder="https://soundcloud.com/artist/track"
                   value={url}
                   onChange={(e) => handleUrlChange(e.target.value)}
                   className={cn(urlError && "border-red-500")}
                 />
-                {urlError && <p className="text-sm text-red-500">{urlError}</p>}
+                {urlError && <p className="text-sm text-red-500 font-medium">{urlError}</p>}
               </>
             ) : (
               <>
                 <Input
+                  key="track-upload"
                   type="file"
                   accept="audio/mpeg,audio/mp3,.mp3"
                   onChange={(e) => {
@@ -350,22 +352,22 @@ export default function SubmitTrackPage() {
                     }
                   }}
                 />
-                <p className="text-xs text-neutral-500">
-                  MP3 only (max 25MB). Files are stored locally in dev.
+                <p className="text-xs text-neutral-600 font-mono">
+                  MP3 only (max 25MB)
                 </p>
               </>
             )}
           </div>
 
           {(inputMode === "url" ? url && !urlError : !!uploadedUrl) && (
-            <div className="flex items-center gap-2 p-3 bg-neutral-50 rounded-lg">
-              <Music className="h-5 w-5 text-neutral-400" />
+            <div className="flex items-center gap-2 p-3 bg-neutral-50 border-2 border-black">
+              <Music className="h-5 w-5 text-black" />
               <div className="flex-1 min-w-0">
                 <Input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Track title"
-                  className="border-0 bg-transparent p-0 h-auto font-medium focus-visible:ring-0"
+                  className="border-0 bg-transparent p-0 h-auto font-bold focus-visible:ring-0"
                 />
               </div>
               {inputMode === "url" ? (
@@ -373,7 +375,7 @@ export default function SubmitTrackPage() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-neutral-400 hover:text-neutral-600"
+                  className="text-neutral-600 hover:text-black"
                 >
                   <ExternalLink className="h-4 w-4" />
                 </a>
@@ -382,7 +384,7 @@ export default function SubmitTrackPage() {
           )}
 
           {inputMode === "upload" && isUploading ? (
-            <p className="text-sm text-neutral-500">Uploading...</p>
+            <p className="text-sm text-neutral-600 font-medium">Uploading...</p>
           ) : null}
 
           {inputMode === "upload" && uploadedUrl ? (
@@ -395,7 +397,7 @@ export default function SubmitTrackPage() {
           ) : null}
 
           {isLoadingMetadata && (
-            <p className="text-sm text-neutral-500">Fetching track info...</p>
+            <p className="text-sm text-neutral-600 font-medium">Fetching track info...</p>
           )}
         </CardContent>
       </Card>
@@ -418,10 +420,10 @@ export default function SubmitTrackPage() {
                   type="button"
                   onClick={() => toggleGenre(genre.id)}
                   className={cn(
-                    "px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5",
+                    "px-3 py-1.5 text-sm font-bold transition-colors flex items-center gap-1.5 border-2 border-black",
                     isSelected
-                      ? "bg-neutral-900 text-white"
-                      : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+                      ? "bg-lime-400 text-black"
+                      : "bg-white text-black hover:bg-neutral-100"
                   )}
                 >
                   {isSelected && <Check className="h-3 w-3" />}
@@ -446,11 +448,11 @@ export default function SubmitTrackPage() {
             placeholder="e.g., I'm wondering if the mix sounds muddy, or if the vocals sit well in the track..."
             value={feedbackFocus}
             onChange={(e) => setFeedbackFocus(e.target.value)}
-            className="w-full px-3 py-2 border border-neutral-200 rounded-md text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950"
+            className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
             maxLength={500}
           />
-          <p className="text-xs text-neutral-400 mt-1">
-            {feedbackFocus.length}/500 characters
+          <p className="text-xs text-neutral-600 mt-1 font-mono">
+            {feedbackFocus.length}/500
           </p>
         </CardContent>
       </Card>
@@ -474,33 +476,33 @@ export default function SubmitTrackPage() {
                   type="button"
                   onClick={() => setSelectedPackage(key)}
                   className={cn(
-                    "p-4 rounded-lg border-2 text-left transition-colors",
+                    "p-4 border-2 border-black text-left transition-colors",
                     isSelected
-                      ? "border-neutral-900 bg-neutral-50"
-                      : "border-neutral-200 hover:border-neutral-300"
+                      ? "bg-lime-400"
+                      : "bg-white hover:bg-neutral-50"
                   )}
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="font-medium">{pkg.name}</h3>
-                      <p className="text-sm text-neutral-500 mt-0.5">
+                      <h3 className="font-bold">{pkg.name}</h3>
+                      <p className="text-sm text-neutral-600 mt-0.5">
                         {pkg.reviews} reviews
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">
+                      <p className="font-black text-lg">
                         ${(pkg.price / 100).toFixed(0)}
                       </p>
-                      <p className="text-xs text-neutral-400">
+                      <p className="text-xs text-neutral-600 font-mono">
                         ${(pkg.price / pkg.reviews / 100).toFixed(2)}/review
                       </p>
                     </div>
                   </div>
-                  <p className="text-xs text-neutral-400 mt-2">{pkg.mix}</p>
+                  <p className="text-xs text-neutral-600 mt-2">{pkg.mix}</p>
                   {isSelected && (
-                    <div className="flex items-center gap-1.5 mt-2 text-neutral-900">
+                    <div className="flex items-center gap-1.5 mt-2 text-black">
                       <Check className="h-4 w-4" />
-                      <span className="text-sm font-medium">Selected</span>
+                      <span className="text-sm font-bold">Selected</span>
                     </div>
                   )}
                 </button>
@@ -511,29 +513,38 @@ export default function SubmitTrackPage() {
       </Card>
 
       {/* Summary & Submit */}
-      <Card className="bg-neutral-900 text-white border-neutral-800">
+      <Card className="bg-black text-white border-black">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-neutral-400 text-sm">Total</p>
-              <p className="text-2xl font-bold">
+              <p className="text-neutral-400 text-sm font-medium">Total</p>
+              <p className="text-3xl font-black">
                 ${(selectedPackageDetails.price / 100).toFixed(2)}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-neutral-400 text-sm">
+              <p className="text-neutral-400 text-sm font-mono">
                 {selectedPackageDetails.reviews} reviews
               </p>
-              <p className="text-neutral-400 text-sm">
-                Est. delivery: 24-72 hours
+              <p className="text-neutral-400 text-sm font-mono">
+                24-72 hours
               </p>
             </div>
           </div>
           <Button
             onClick={handleSubmit}
             isLoading={isSubmitting}
-            disabled={!url || !!urlError || !title.trim() || selectedGenres.length === 0}
-            className="w-full bg-white text-neutral-900 hover:bg-neutral-100"
+            disabled={
+              isUploading ||
+              isSubmitting ||
+              !title.trim() ||
+              selectedGenres.length === 0 ||
+              (inputMode === "url"
+                ? !url || !!urlError
+                : !uploadedUrl)
+            }
+            variant="primary"
+            className="w-full"
           >
             Continue to Payment
           </Button>

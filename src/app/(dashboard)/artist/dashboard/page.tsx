@@ -54,11 +54,11 @@ export default async function ArtistDashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Welcome back, {artistProfile.artistName}</h1>
-          <p className="text-neutral-500">Manage your tracks and view feedback</p>
+          <h1 className="text-2xl font-black">Welcome back, {artistProfile.artistName}</h1>
+          <p className="text-neutral-600">Manage your tracks and view feedback</p>
         </div>
         <Link href="/artist/submit">
-          <Button>
+          <Button variant="primary">
             <Plus className="h-4 w-4 mr-2" />
             Submit Track
           </Button>
@@ -70,12 +70,12 @@ export default async function ArtistDashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-neutral-100 rounded-lg flex items-center justify-center">
-                <Music className="h-5 w-5 text-neutral-600" />
+              <div className="h-12 w-12 bg-neutral-100 border-2 border-black flex items-center justify-center">
+                <Music className="h-6 w-6 text-black" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{totalTracks}</p>
-                <p className="text-sm text-neutral-500">Total Tracks</p>
+                <p className="text-3xl font-black">{totalTracks}</p>
+                <p className="text-sm text-neutral-600 font-medium">Total Tracks</p>
               </div>
             </div>
           </CardContent>
@@ -83,12 +83,12 @@ export default async function ArtistDashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                <Clock className="h-5 w-5 text-amber-600" />
+              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center">
+                <Clock className="h-6 w-6 text-black" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{activeSubmissions}</p>
-                <p className="text-sm text-neutral-500">In Progress</p>
+                <p className="text-3xl font-black">{activeSubmissions}</p>
+                <p className="text-sm text-neutral-600 font-medium">In Progress</p>
               </div>
             </div>
           </CardContent>
@@ -96,12 +96,12 @@ export default async function ArtistDashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+              <div className="h-12 w-12 bg-lime-400 border-2 border-black flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-black" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{completedTracks}</p>
-                <p className="text-sm text-neutral-500">Completed</p>
+                <p className="text-3xl font-black">{completedTracks}</p>
+                <p className="text-sm text-neutral-600 font-medium">Completed</p>
               </div>
             </div>
           </CardContent>
@@ -115,20 +115,20 @@ export default async function ArtistDashboardPage() {
         </CardHeader>
         <CardContent>
           {artistProfile.tracks.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="mx-auto w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mb-4">
-                <Music className="h-6 w-6 text-neutral-400" />
+            <div className="text-center py-12 border-2 border-dashed border-black">
+              <div className="mx-auto w-12 h-12 bg-neutral-100 border-2 border-black flex items-center justify-center mb-4">
+                <Music className="h-6 w-6 text-black" />
               </div>
-              <h3 className="font-medium text-neutral-900">No tracks yet</h3>
-              <p className="text-sm text-neutral-500 mt-1 mb-4">
+              <h3 className="font-bold text-black">No tracks yet</h3>
+              <p className="text-sm text-neutral-600 mt-1 mb-4">
                 Submit your first track to get feedback
               </p>
               <Link href="/artist/submit">
-                <Button>Submit Your First Track</Button>
+                <Button variant="primary">Submit Your First Track</Button>
               </Link>
             </div>
           ) : (
-            <div className="divide-y divide-neutral-100">
+            <div className="divide-y-2 divide-black border-t-2 border-black">
               {artistProfile.tracks.map((track) => {
                 const completedReviews = track.reviews.filter(
                   (r) => r.status === "COMPLETED"
@@ -145,12 +145,12 @@ export default async function ArtistDashboardPage() {
                   >
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="h-10 w-10 bg-neutral-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Music className="h-5 w-5 text-neutral-400" />
+                        <div className="h-10 w-10 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
+                          <Music className="h-5 w-5 text-black" />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-medium truncate">{track.title}</p>
-                          <div className="flex items-center gap-2 text-sm text-neutral-500">
+                          <p className="font-bold truncate">{track.title}</p>
+                          <div className="flex items-center gap-2 text-sm text-neutral-600">
                             <span>
                               {track.genres.map((g) => g.name).join(", ")}
                             </span>
@@ -161,12 +161,12 @@ export default async function ArtistDashboardPage() {
                       <div className="flex items-center gap-4 flex-shrink-0">
                         {/* Progress */}
                         <div className="text-right hidden sm:block">
-                          <p className="text-sm font-medium">
+                          <p className="text-sm font-bold">
                             {completedReviews}/{track.reviewsRequested} reviews
                           </p>
-                          <div className="w-24 h-1.5 bg-neutral-100 rounded-full mt-1">
+                          <div className="w-24 h-2 bg-neutral-200 border border-black mt-1">
                             <div
-                              className="h-full bg-neutral-900 rounded-full"
+                              className="h-full bg-lime-400"
                               style={{ width: `${progress}%` }}
                             />
                           </div>
@@ -191,27 +191,27 @@ function StatusBadge({ status }: { status: string }) {
   const configs = {
     PENDING_PAYMENT: {
       label: "Pending Payment",
-      className: "bg-amber-100 text-amber-700",
+      className: "bg-orange-400 text-black border-black",
       icon: AlertCircle,
     },
     QUEUED: {
       label: "Queued",
-      className: "bg-blue-100 text-blue-700",
+      className: "bg-blue-400 text-black border-black",
       icon: Clock,
     },
     IN_PROGRESS: {
       label: "In Progress",
-      className: "bg-purple-100 text-purple-700",
+      className: "bg-purple-400 text-black border-black",
       icon: Clock,
     },
     COMPLETED: {
       label: "Completed",
-      className: "bg-green-100 text-green-700",
+      className: "bg-lime-400 text-black border-black",
       icon: CheckCircle,
     },
     CANCELLED: {
       label: "Cancelled",
-      className: "bg-neutral-100 text-neutral-700",
+      className: "bg-neutral-200 text-black border-black",
       icon: AlertCircle,
     },
   };
@@ -221,7 +221,7 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${config.className}`}
+      className={`inline-flex items-center gap-1 px-2.5 py-1 border-2 text-xs font-bold ${config.className}`}
     >
       <Icon className="h-3 w-3" />
       {config.label}

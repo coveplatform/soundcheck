@@ -87,22 +87,22 @@ export default function SignupPage() {
     return (
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Join SoundCheck</CardTitle>
+          <CardTitle className="text-2xl">Join MixReflect</CardTitle>
           <CardDescription>
-            How do you want to use SoundCheck?
+            How do you want to use MixReflect?
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <button
             onClick={() => handleRoleSelect("artist")}
-            className="w-full p-4 border border-neutral-200 rounded-lg hover:border-neutral-400 hover:bg-neutral-50 transition-colors text-left flex items-start gap-4"
+            className="w-full p-4 border-2 border-black bg-white hover:bg-lime-400 transition-colors text-left flex items-start gap-4 group"
           >
-            <div className="p-2 bg-neutral-100 rounded-lg">
+            <div className="p-2 bg-black text-white group-hover:bg-black">
               <Music className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-medium">I&apos;m an Artist</h3>
-              <p className="text-sm text-neutral-500">
+              <h3 className="font-bold">I&apos;m an Artist</h3>
+              <p className="text-sm text-neutral-600">
                 Get genuine feedback on your tracks before release
               </p>
             </div>
@@ -110,14 +110,14 @@ export default function SignupPage() {
 
           <button
             onClick={() => handleRoleSelect("reviewer")}
-            className="w-full p-4 border border-neutral-200 rounded-lg hover:border-neutral-400 hover:bg-neutral-50 transition-colors text-left flex items-start gap-4"
+            className="w-full p-4 border-2 border-black bg-white hover:bg-orange-400 transition-colors text-left flex items-start gap-4 group"
           >
-            <div className="p-2 bg-neutral-100 rounded-lg">
+            <div className="p-2 bg-black text-white group-hover:bg-black">
               <Headphones className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-medium">I&apos;m a Reviewer</h3>
-              <p className="text-sm text-neutral-500">
+              <h3 className="font-bold">I&apos;m a Reviewer</h3>
+              <p className="text-sm text-neutral-600">
                 Get paid to discover new music and share feedback
               </p>
             </div>
@@ -125,23 +125,23 @@ export default function SignupPage() {
 
           <button
             onClick={() => handleRoleSelect("both")}
-            className="w-full p-4 border border-neutral-200 rounded-lg hover:border-neutral-400 hover:bg-neutral-50 transition-colors text-left flex items-start gap-4"
+            className="w-full p-4 border-2 border-black bg-white hover:bg-neutral-100 transition-colors text-left flex items-start gap-4 group"
           >
-            <div className="p-2 bg-neutral-100 rounded-lg">
+            <div className="p-2 bg-black text-white group-hover:bg-black">
               <Users className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-medium">Both</h3>
-              <p className="text-sm text-neutral-500">
+              <h3 className="font-bold">Both</h3>
+              <p className="text-sm text-neutral-600">
                 Submit tracks and review others&apos; music
               </p>
             </div>
           </button>
         </CardContent>
         <CardFooter>
-          <p className="text-sm text-neutral-500 text-center w-full">
+          <p className="text-sm text-neutral-600 text-center w-full">
             Already have an account?{" "}
-            <Link href="/login" className="text-neutral-900 hover:underline">
+            <Link href="/login" className="text-black font-bold hover:underline">
               Sign in
             </Link>
           </p>
@@ -163,12 +163,12 @@ export default function SignupPage() {
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md">
+            <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
               {error}
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" className="font-bold">Name</Label>
             <Input
               id="name"
               type="text"
@@ -179,7 +179,7 @@ export default function SignupPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="font-bold">Email</Label>
             <Input
               id="email"
               type="email"
@@ -190,7 +190,7 @@ export default function SignupPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="font-bold">Password</Label>
             <Input
               id="password"
               type="password"
@@ -201,21 +201,21 @@ export default function SignupPage() {
               required
             />
           </div>
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-3 pt-2">
             <input
               id="terms"
               type="checkbox"
               checked={acceptedTerms}
               onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className="mt-1"
+              className="mt-1 h-4 w-4 border-2 border-black accent-lime-400"
             />
             <label htmlFor="terms" className="text-sm text-neutral-600">
               I agree to the{" "}
-              <Link href="/terms" className="text-neutral-900 hover:underline">
+              <Link href="/terms" className="text-black font-bold hover:underline">
                 Terms of Service
               </Link>
               {" "}and{" "}
-              <Link href="/privacy" className="text-neutral-900 hover:underline">
+              <Link href="/privacy" className="text-black font-bold hover:underline">
                 Privacy Policy
               </Link>
               .
@@ -234,9 +234,9 @@ export default function SignupPage() {
           <button
             type="button"
             onClick={() => setStep("role")}
-            className="text-sm text-neutral-500 hover:text-neutral-900"
+            className="text-sm text-neutral-600 hover:text-black font-medium"
           >
-            Back to role selection
+            &larr; Back to role selection
           </button>
         </CardFooter>
       </form>

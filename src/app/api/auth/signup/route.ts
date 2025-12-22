@@ -5,6 +5,8 @@ import { z } from "zod";
 import { createHash, randomBytes } from "crypto";
 import { sendEmailVerificationEmail } from "@/lib/email";
 
+export const runtime = "nodejs";
+
 const signupSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -71,12 +73,23 @@ export async function POST(request: Request) {
       verifyUrl,
     });
 
+    const emailConfigured = Boolean(
+      process.env.RESEND_API_KEY && (process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM)
+    );
+
+    if (process.env.NODE_ENV !== "production" && !emailConfigured) {
+      console.log("Dev email verification link:", verifyUrl);
+    }
+
     return NextResponse.json(
       {
         message: "User created successfully",
         userId: user.id,
         isArtist: user.isArtist,
         isReviewer: user.isReviewer,
+        ...(process.env.NODE_ENV !== "production" && !emailConfigured
+          ? { verifyUrl }
+          : {}),
       },
       { status: 201 }
     );

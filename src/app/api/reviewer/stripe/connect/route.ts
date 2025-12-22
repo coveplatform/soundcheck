@@ -15,6 +15,10 @@ export async function POST(request: Request) {
 
     const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
 
+    const bypassPayments =
+      process.env.NODE_ENV !== "production" &&
+      process.env.BYPASS_PAYMENTS === "true";
+
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { email: true, emailVerified: true },
@@ -72,6 +76,21 @@ export async function POST(request: Request) {
         data: { stripeAccountId: null },
       });
       accountId = null;
+    }
+
+    if (bypassPayments) {
+      if (!accountId) {
+        accountId = `bypass_${reviewer.id}`;
+        await prisma.reviewerProfile.update({
+          where: { id: reviewer.id },
+          data: { stripeAccountId: accountId },
+        });
+      }
+
+      return NextResponse.json({
+        url: `${baseUrl}/reviewer/earnings?stripe=bypass`,
+        bypassed: true,
+      });
     }
 
     if (!accountId) {

@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -24,6 +24,12 @@ export async function POST() {
         { status: 403 }
       );
     }
+
+    const bypassPayments =
+      process.env.NODE_ENV !== "production" &&
+      process.env.BYPASS_PAYMENTS === "true";
+
+    const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
 
     const reviewer = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
@@ -54,6 +60,13 @@ export async function POST() {
         { error: "Stripe account not connected" },
         { status: 400 }
       );
+    }
+
+    if (bypassPayments) {
+      return NextResponse.json({
+        url: `${baseUrl}/reviewer/earnings?stripe=dashboard`,
+        bypassed: true,
+      });
     }
 
     const stripe = getStripe();

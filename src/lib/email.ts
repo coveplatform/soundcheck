@@ -9,10 +9,16 @@ async function sendEmail({ to, subject, html }: SendEmailParams) {
   const from = process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM;
 
   if (!apiKey || !from) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("Email not sent (missing RESEND_API_KEY or RESEND_FROM_EMAIL/RESEND_FROM)", {
+        to,
+        subject,
+      });
+    }
     return;
   }
 
-  await fetch("https://api.resend.com/emails", {
+  const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -25,6 +31,17 @@ async function sendEmail({ to, subject, html }: SendEmailParams) {
       html,
     }),
   });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    console.error("Resend email request failed", {
+      status: res.status,
+      to,
+      subject,
+      body,
+    });
+    return;
+  }
 }
 
 export async function sendTierChangeEmail(params: {
@@ -36,7 +53,7 @@ export async function sendTierChangeEmail(params: {
 
   await sendEmail({
     to: params.to,
-    subject: `You're now ${params.newTier} on SoundCheck`,
+    subject: `You're now ${params.newTier} on MixReflect`,
     html: `
       <div style="font-family: ui-sans-serif, system-ui; line-height: 1.6;">
         <h2 style="margin: 0 0 12px;">Tier upgrade</h2>
@@ -56,7 +73,7 @@ export async function sendPasswordResetEmail(params: {
 
   await sendEmail({
     to: params.to,
-    subject: "Reset your SoundCheck password",
+    subject: "Reset your MixReflect password",
     html: `
       <div style="font-family: ui-sans-serif, system-ui; line-height: 1.6;">
         <h2 style="margin: 0 0 12px;">Reset your password</h2>
@@ -76,7 +93,7 @@ export async function sendEmailVerificationEmail(params: {
 
   await sendEmail({
     to: params.to,
-    subject: "Verify your SoundCheck email",
+    subject: "Verify your MixReflect email",
     html: `
       <div style="font-family: ui-sans-serif, system-ui; line-height: 1.6;">
         <h2 style="margin: 0 0 12px;">Verify your email</h2>

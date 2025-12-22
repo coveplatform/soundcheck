@@ -179,7 +179,7 @@ describe('Checkout Session Creation', () => {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `SoundCheck ${pkg.name}`,
+            name: `MixReflect ${pkg.name}`,
             description: `${pkg.reviews} reviews for your track`,
           },
           unit_amount: pkg.price,
@@ -188,7 +188,7 @@ describe('Checkout Session Creation', () => {
       }
 
       expect(lineItem.price_data.unit_amount).toBe(600)
-      expect(lineItem.price_data.product_data.name).toBe('SoundCheck Standard')
+      expect(lineItem.price_data.product_data.name).toBe('MixReflect Standard')
     })
 
     it('includes track metadata in session', () => {

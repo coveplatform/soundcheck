@@ -1,4 +1,4 @@
-# SoundCheck Development Guide
+# MixReflect Development Guide
 
 ## Current Status
 
@@ -502,7 +502,7 @@ Create `src/components/onboarding/tutorial.tsx`:
 ```typescript
 // Multi-step tutorial modal for new users
 // For Artists:
-// 1. Welcome to SoundCheck
+// 1. Welcome to MixReflect
 // 2. How to submit a track
 // 3. Understanding feedback
 // 4. Rating reviewers
@@ -565,22 +565,22 @@ Update `src/app/layout.tsx`:
 ```typescript
 export const metadata: Metadata = {
   title: {
-    default: "SoundCheck - Get Real Feedback on Your Music",
-    template: "%s | SoundCheck",
+    default: "MixReflect - Get Real Feedback on Your Music",
+    template: "%s | MixReflect",
   },
   description: "A private feedback marketplace...",
   keywords: ["music feedback", "track reviews", ...],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://soundcheck.app",
-    title: "SoundCheck",
+    url: "https://mixreflect.com",
+    title: "MixReflect",
     description: "...",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SoundCheck",
+    title: "MixReflect",
     description: "...",
     images: ["/og-image.png"],
   },

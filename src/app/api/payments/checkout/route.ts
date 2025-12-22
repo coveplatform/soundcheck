@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe, getStripePlatformDefaults } from "@/lib/stripe";
 import { PACKAGES, PackageType } from "@/lib/metadata";
+import { assignReviewersToTrack } from "@/lib/queue";
 
 export async function POST(request: Request) {
   try {
@@ -25,17 +26,17 @@ export async function POST(request: Request) {
       );
     }
 
+    const bypassPayments =
+      process.env.NODE_ENV !== "production" &&
+      process.env.BYPASS_PAYMENTS === "true";
+
     const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
-    const defaults = await getStripePlatformDefaults();
-    const currency = (process.env.STRIPE_CURRENCY ?? defaults.currency).toLowerCase();
 
     const { trackId } = await request.json();
 
     if (!trackId) {
       return NextResponse.json({ error: "Track ID required" }, { status: 400 });
     }
-
-    const stripe = getStripe();
 
     // Get track
     const track = await prisma.track.findUnique({
@@ -70,6 +71,38 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid package" }, { status: 400 });
     }
 
+    if (bypassPayments) {
+      const paidAt = new Date();
+
+      const updated = await prisma.track.updateMany({
+        where: { id: track.id, status: "PENDING_PAYMENT", paidAt: null },
+        data: { status: "QUEUED", paidAt },
+      });
+
+      if (updated.count > 0) {
+        await prisma.artistProfile.update({
+          where: { id: track.artistId },
+          data: {
+            totalTracks: { increment: 1 },
+          },
+        });
+
+        await assignReviewersToTrack(track.id);
+      }
+
+      return NextResponse.json({
+        url: `${baseUrl}/artist/submit/success?session_id=bypass_${track.id}`,
+        package: track.packageType,
+        amount: packageDetails.price,
+        bypassed: true,
+      });
+    }
+
+    const defaults = await getStripePlatformDefaults();
+    const currency = (process.env.STRIPE_CURRENCY ?? defaults.currency).toLowerCase();
+
+    const stripe = getStripe();
+
     // Create Stripe checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -80,7 +113,7 @@ export async function POST(request: Request) {
           price_data: {
             currency,
             product_data: {
-              name: `SoundCheck ${packageDetails.name} Package`,
+              name: `MixReflect ${packageDetails.name} Package`,
               description: `${packageDetails.reviews} reviews for "${track.title}"`,
             },
             unit_amount: packageDetails.price,

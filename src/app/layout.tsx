@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://soundcheck.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mixreflect.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "SoundCheck - Get Real Feedback on Your Music",
-    template: "%s | SoundCheck",
+    default: "MixReflect - Get Real Feedback on Your Music",
+    template: "%s | MixReflect",
   },
   description:
     "A private feedback marketplace where artists get genuine listener feedback and reviewers get paid to discover new music. Get 5-25 structured reviews starting at $3.",
@@ -34,14 +34,14 @@ export const metadata: Metadata = {
     "artist feedback",
     "honest music reviews",
   ],
-  authors: [{ name: "SoundCheck" }],
-  creator: "SoundCheck",
+  authors: [{ name: "MixReflect" }],
+  creator: "MixReflect",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: siteUrl,
-    siteName: "SoundCheck",
-    title: "SoundCheck - Get Real Feedback on Your Music",
+    siteName: "MixReflect",
+    title: "MixReflect - Get Real Feedback on Your Music",
     description:
       "A private feedback marketplace where artists get genuine listener feedback and reviewers get paid to discover new music.",
     images: [
@@ -49,17 +49,17 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "SoundCheck - Music Feedback Marketplace",
+        alt: "MixReflect - Music Feedback Marketplace",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SoundCheck - Get Real Feedback on Your Music",
+    title: "MixReflect - Get Real Feedback on Your Music",
     description:
       "Get structured feedback from genre-matched listeners before you release.",
     images: ["/og-image.png"],
-    creator: "@soundcheck",
+    creator: "@mixreflect",
   },
   robots: {
     index: true,

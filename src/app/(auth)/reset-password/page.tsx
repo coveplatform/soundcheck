@@ -83,7 +83,7 @@ export default function ResetPasswordPage() {
         </CardHeader>
         <CardFooter>
           <Link href="/login" className="w-full">
-            <Button className="w-full">Go to login</Button>
+            <Button variant="primary" className="w-full">Go to login</Button>
           </Link>
         </CardFooter>
       </Card>
@@ -99,12 +99,12 @@ export default function ResetPasswordPage() {
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md">
+            <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
               {error}
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="password">New password</Label>
+            <Label htmlFor="password" className="font-bold">New password</Label>
             <Input
               id="password"
               type="password"
@@ -116,7 +116,7 @@ export default function ResetPasswordPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm password</Label>
+            <Label htmlFor="confirmPassword" className="font-bold">Confirm password</Label>
             <Input
               id="confirmPassword"
               type="password"
@@ -131,8 +131,8 @@ export default function ResetPasswordPage() {
           <Button type="submit" className="w-full" isLoading={isLoading}>
             Update password
           </Button>
-          <Link href="/login" className="text-sm text-neutral-500 hover:text-neutral-900">
-            Back to login
+          <Link href="/login" className="text-sm text-neutral-600 hover:text-black font-medium">
+            &larr; Back to login
           </Link>
         </CardFooter>
       </form>

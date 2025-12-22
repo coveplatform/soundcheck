@@ -186,78 +186,74 @@ export default function ReviewerOnboardingPage() {
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-neutral-900 rounded-full flex items-center justify-center mb-4">
-              <Headphones className="h-6 w-6 text-white" />
+            <div className="mx-auto w-12 h-12 bg-orange-400 border-2 border-black flex items-center justify-center mb-4">
+              <Headphones className="h-6 w-6 text-black" />
             </div>
-            <CardTitle className="text-2xl">Welcome to SoundCheck</CardTitle>
+            <CardTitle className="text-2xl">Welcome to MixReflect</CardTitle>
             <CardDescription>
               Get paid to discover new music and share your honest feedback
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <p className="text-xs text-neutral-400 text-center">Step 1 of 3</p>
+            <p className="text-xs text-neutral-600 text-center font-mono">Step 1 of 3</p>
             <div className="grid gap-4">
-              <div className="flex items-start gap-4 p-4 bg-neutral-50 rounded-lg">
-                <div className="p-2 bg-white rounded-lg">
-                  <Headphones className="h-5 w-5 text-neutral-600" />
+              <div className="flex items-start gap-4 p-4 border-2 border-black">
+                <div className="p-2 bg-orange-400 border-2 border-black">
+                  <Headphones className="h-5 w-5 text-black" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Listen to New Tracks</h3>
-                  <p className="text-sm text-neutral-500">
+                  <h3 className="font-bold">Listen to New Tracks</h3>
+                  <p className="text-sm text-neutral-600">
                     Discover unreleased music matched to your genres
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-4 bg-neutral-50 rounded-lg">
-                <div className="p-2 bg-white rounded-lg">
-                  <DollarSign className="h-5 w-5 text-neutral-600" />
+              <div className="flex items-start gap-4 p-4 border-2 border-black">
+                <div className="p-2 bg-lime-400 border-2 border-black">
+                  <DollarSign className="h-5 w-5 text-black" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Earn Money</h3>
-                  <p className="text-sm text-neutral-500">
+                  <h3 className="font-bold">Earn Money</h3>
+                  <p className="text-sm text-neutral-600">
                     Start at $0.15 per review, earn up to $0.50 as you level up
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-4 bg-neutral-50 rounded-lg">
-                <div className="p-2 bg-white rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-neutral-600" />
+              <div className="flex items-start gap-4 p-4 border-2 border-black">
+                <div className="p-2 bg-purple-400 border-2 border-black">
+                  <TrendingUp className="h-5 w-5 text-black" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Build Your Reputation</h3>
-                  <p className="text-sm text-neutral-500">
+                  <h3 className="font-bold">Build Your Reputation</h3>
+                  <p className="text-sm text-neutral-600">
                     Level up from Rookie to Verified to Pro based on quality
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-amber-50 p-4 rounded-lg">
-              <h4 className="font-medium text-amber-800 mb-2">
+            <div className="bg-neutral-100 border-2 border-black p-4">
+              <h4 className="font-bold mb-3">
                 Tier System
               </h4>
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-sm font-mono">
                 <div className="flex justify-between">
-                  <span className="text-amber-700">Rookie</span>
-                  <span className="text-amber-600">$0.15/review</span>
+                  <span>Rookie</span>
+                  <span className="font-bold">$0.15/review</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-amber-700">
-                    Verified (25 reviews, 4.0+ rating)
-                  </span>
-                  <span className="text-amber-600">$0.30/review</span>
+                  <span>Verified (25 reviews, 4.0+ rating)</span>
+                  <span className="font-bold">$0.30/review</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-amber-700">
-                    Pro (100 reviews, 4.5+ rating)
-                  </span>
-                  <span className="text-amber-600">$0.50/review</span>
+                  <span>Pro (100 reviews, 4.5+ rating)</span>
+                  <span className="font-bold">$0.50/review</span>
                 </div>
               </div>
             </div>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => setStep("quiz")} className="w-full">
+            <Button onClick={() => setStep("quiz")} variant="primary" className="w-full">
               Get Started
             </Button>
           </CardFooter>
@@ -277,18 +273,18 @@ export default function ReviewerOnboardingPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <p className="text-xs text-neutral-400">Step 2 of 3</p>
-            <p className="text-sm text-neutral-500">
+            <p className="text-xs text-neutral-600 font-mono">Step 2 of 3</p>
+            <p className="text-sm text-neutral-600">
               Pass requirement: <strong>3/4 correct</strong>
             </p>
             {error && (
-              <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md">
+              <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
                 {error}
               </div>
             )}
 
             <div className="space-y-3">
-              <Label>What is compression primarily used for?</Label>
+              <Label className="font-bold">What is compression primarily used for?</Label>
               <div className="grid gap-2">
                 {[
                   { value: "make_louder", label: "Make audio louder" },
@@ -305,10 +301,10 @@ export default function ReviewerOnboardingPage() {
                       }))
                     }
                     className={cn(
-                      "px-3 py-2 rounded-md text-sm font-medium transition-colors border text-left",
+                      "px-4 py-3 text-sm font-medium transition-colors border-2 border-black text-left",
                       quizAnswers.compression === opt.value
-                        ? "bg-neutral-900 text-white border-neutral-900"
-                        : "border-neutral-200 hover:border-neutral-300"
+                        ? "bg-lime-400 text-black"
+                        : "bg-white hover:bg-neutral-50"
                     )}
                   >
                     {opt.label}
@@ -318,7 +314,7 @@ export default function ReviewerOnboardingPage() {
             </div>
 
             <div className="space-y-3">
-              <Label>What does BPM measure?</Label>
+              <Label className="font-bold">What does BPM measure?</Label>
               <div className="grid gap-2">
                 {[
                   { value: "volume", label: "Volume" },
@@ -332,10 +328,10 @@ export default function ReviewerOnboardingPage() {
                       setQuizAnswers((prev) => ({ ...prev, bpm: opt.value }))
                     }
                     className={cn(
-                      "px-3 py-2 rounded-md text-sm font-medium transition-colors border text-left",
+                      "px-4 py-3 text-sm font-medium transition-colors border-2 border-black text-left",
                       quizAnswers.bpm === opt.value
-                        ? "bg-neutral-900 text-white border-neutral-900"
-                        : "border-neutral-200 hover:border-neutral-300"
+                        ? "bg-lime-400 text-black"
+                        : "bg-white hover:bg-neutral-50"
                     )}
                   >
                     {opt.label}
@@ -345,7 +341,7 @@ export default function ReviewerOnboardingPage() {
             </div>
 
             <div className="space-y-3">
-              <Label>What does EQ primarily change?</Label>
+              <Label className="font-bold">What does EQ primarily change?</Label>
               <div className="grid gap-2">
                 {[
                   { value: "frequency_balance", label: "Frequency balance" },
@@ -359,10 +355,10 @@ export default function ReviewerOnboardingPage() {
                       setQuizAnswers((prev) => ({ ...prev, eq: opt.value }))
                     }
                     className={cn(
-                      "px-3 py-2 rounded-md text-sm font-medium transition-colors border text-left",
+                      "px-4 py-3 text-sm font-medium transition-colors border-2 border-black text-left",
                       quizAnswers.eq === opt.value
-                        ? "bg-neutral-900 text-white border-neutral-900"
-                        : "border-neutral-200 hover:border-neutral-300"
+                        ? "bg-lime-400 text-black"
+                        : "bg-white hover:bg-neutral-50"
                     )}
                   >
                     {opt.label}
@@ -372,7 +368,7 @@ export default function ReviewerOnboardingPage() {
             </div>
 
             <div className="space-y-3">
-              <Label>What is a DAW?</Label>
+              <Label className="font-bold">What is a DAW?</Label>
               <div className="grid gap-2">
                 {[
                   { value: "digital_audio_workstation", label: "Digital Audio Workstation" },
@@ -386,10 +382,10 @@ export default function ReviewerOnboardingPage() {
                       setQuizAnswers((prev) => ({ ...prev, daw: opt.value }))
                     }
                     className={cn(
-                      "px-3 py-2 rounded-md text-sm font-medium transition-colors border text-left",
+                      "px-4 py-3 text-sm font-medium transition-colors border-2 border-black text-left",
                       quizAnswers.daw === opt.value
-                        ? "bg-neutral-900 text-white border-neutral-900"
-                        : "border-neutral-200 hover:border-neutral-300"
+                        ? "bg-lime-400 text-black"
+                        : "bg-white hover:bg-neutral-50"
                     )}
                   >
                     {opt.label}
@@ -420,25 +416,25 @@ export default function ReviewerOnboardingPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-xs text-neutral-400">Step 3 of 3</p>
+          <p className="text-xs text-neutral-600 font-mono">Step 3 of 3</p>
           {error && (
-            <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md">
+            <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
               {error}
             </div>
           )}
 
           <div className="space-y-3">
-            <Label>
+            <Label className="font-bold">
               Your Genres{" "}
-              <span className="text-neutral-500 font-normal">
+              <span className="text-neutral-600 font-normal">
                 ({selectedGenres.length}/5 selected, minimum 3)
               </span>
             </Label>
             {isLoadingGenres ? (
-              <div className="text-sm text-neutral-500">Loading genres...</div>
+              <div className="text-sm text-neutral-600">Loading genres...</div>
             ) : genres.length === 0 ? (
               <div className="space-y-3">
-                <p className="text-sm text-neutral-500">
+                <p className="text-sm text-neutral-600">
                   No genres available right now. Try reloading.
                 </p>
                 <Button variant="outline" onClick={fetchGenres}>
@@ -455,10 +451,10 @@ export default function ReviewerOnboardingPage() {
                       type="button"
                       onClick={() => toggleGenre(genre.id)}
                       className={cn(
-                        "px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5",
+                        "px-3 py-1.5 text-sm font-bold transition-colors flex items-center gap-1.5 border-2 border-black",
                         isSelected
-                          ? "bg-neutral-900 text-white"
-                          : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+                          ? "bg-orange-400 text-black"
+                          : "bg-white text-black hover:bg-neutral-100"
                       )}
                     >
                       {isSelected && <Check className="h-3 w-3" />}
@@ -476,6 +472,7 @@ export default function ReviewerOnboardingPage() {
           </Button>
           <Button
             onClick={handleSubmit}
+            variant="primary"
             className="flex-1"
             isLoading={isLoading}
             disabled={selectedGenres.length < 3}

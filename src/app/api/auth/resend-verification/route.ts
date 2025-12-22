@@ -5,6 +5,8 @@ import { createHash, randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { sendEmailVerificationEmail } from "@/lib/email";
 
+export const runtime = "nodejs";
+
 const schema = z.object({
   email: z.string().email(),
 });
@@ -48,7 +50,20 @@ export async function POST(request: Request) {
       verifyUrl,
     });
 
-    return NextResponse.json({ success: true });
+    const emailConfigured = Boolean(
+      process.env.RESEND_API_KEY && (process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM)
+    );
+
+    if (process.env.NODE_ENV !== "production" && !emailConfigured) {
+      console.log("Dev email verification link:", verifyUrl);
+    }
+
+    return NextResponse.json({
+      success: true,
+      ...(process.env.NODE_ENV !== "production" && !emailConfigured
+        ? { verifyUrl }
+        : {}),
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

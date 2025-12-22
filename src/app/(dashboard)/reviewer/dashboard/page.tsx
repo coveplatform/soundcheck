@@ -62,8 +62,8 @@ export default async function ReviewerDashboardPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Reviewer Dashboard</h1>
-          <p className="text-neutral-500">Your reviewer account is restricted.</p>
+          <h1 className="text-2xl font-black">Reviewer Dashboard</h1>
+          <p className="text-neutral-600">Your reviewer account is restricted.</p>
         </div>
         <Card>
           <CardHeader>
@@ -71,7 +71,7 @@ export default async function ReviewerDashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-neutral-600">
-              You can’t accept or work on new reviews right now. If you believe this is a mistake,
+              You can&apos;t accept or work on new reviews right now. If you believe this is a mistake,
               please contact support.
             </p>
           </CardContent>
@@ -118,8 +118,8 @@ export default async function ReviewerDashboardPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">Reviewer Dashboard</h1>
-        <p className="text-neutral-500">
+        <h1 className="text-2xl font-black">Reviewer Dashboard</h1>
+        <p className="text-neutral-600">
           Discover new music and earn while you listen
         </p>
       </div>
@@ -129,12 +129,12 @@ export default async function ReviewerDashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-purple-600" />
+              <div className="h-12 w-12 bg-purple-400 border-2 border-black flex items-center justify-center">
+                <TrendingUp className="h-6 w-6 text-black" />
               </div>
               <div>
-                <p className="text-sm text-neutral-500">Current Tier</p>
-                <p className="text-xl font-bold">{reviewerProfile.tier}</p>
+                <p className="text-sm text-neutral-600 font-medium">Current Tier</p>
+                <p className="text-2xl font-black">{reviewerProfile.tier}</p>
               </div>
             </div>
           </CardContent>
@@ -142,12 +142,12 @@ export default async function ReviewerDashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Headphones className="h-5 w-5 text-blue-600" />
+              <div className="h-12 w-12 bg-blue-400 border-2 border-black flex items-center justify-center">
+                <Headphones className="h-6 w-6 text-black" />
               </div>
               <div>
-                <p className="text-sm text-neutral-500">Total Reviews</p>
-                <p className="text-xl font-bold">{reviewerProfile.totalReviews}</p>
+                <p className="text-sm text-neutral-600 font-medium">Total Reviews</p>
+                <p className="text-2xl font-black">{reviewerProfile.totalReviews}</p>
               </div>
             </div>
           </CardContent>
@@ -155,12 +155,12 @@ export default async function ReviewerDashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                <Star className="h-5 w-5 text-amber-600" />
+              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center">
+                <Star className="h-6 w-6 text-black" />
               </div>
               <div>
-                <p className="text-sm text-neutral-500">Average Rating</p>
-                <p className="text-xl font-bold">
+                <p className="text-sm text-neutral-600 font-medium">Avg Rating</p>
+                <p className="text-2xl font-black">
                   {reviewerProfile.averageRating.toFixed(1)}
                 </p>
               </div>
@@ -170,12 +170,12 @@ export default async function ReviewerDashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-green-600" />
+              <div className="h-12 w-12 bg-lime-400 border-2 border-black flex items-center justify-center">
+                <DollarSign className="h-6 w-6 text-black" />
               </div>
               <div>
-                <p className="text-sm text-neutral-500">Balance</p>
-                <p className="text-xl font-bold">
+                <p className="text-sm text-neutral-600 font-medium">Balance</p>
+                <p className="text-2xl font-black">
                   {formatCurrency(reviewerProfile.pendingBalance)}
                 </p>
               </div>
@@ -189,27 +189,27 @@ export default async function ReviewerDashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">
+              <span className="text-sm font-bold">
                 Progress to {currentTierProgress.next}
               </span>
-              <span className="text-sm text-neutral-500">
+              <span className="text-sm text-neutral-600 font-mono">
                 {currentTierProgress.reviewsNeeded > 0
-                  ? `${currentTierProgress.reviewsNeeded} more reviews needed`
+                  ? `${currentTierProgress.reviewsNeeded} more reviews`
                   : "Reviews complete!"}
                 {reviewerProfile.averageRating < currentTierProgress.ratingNeeded &&
                   ` (need ${currentTierProgress.ratingNeeded}+ rating)`}
               </span>
             </div>
-            <div className="w-full h-2 bg-neutral-100 rounded-full">
+            <div className="w-full h-3 bg-neutral-200 border border-black">
               <div
-                className="h-full bg-purple-600 rounded-full transition-all"
+                className="h-full bg-purple-400 transition-all"
                 style={{ width: `${currentTierProgress.progress}%` }}
               />
             </div>
-            <div className="flex justify-between mt-2 text-xs text-neutral-400">
+            <div className="flex justify-between mt-2 text-xs text-neutral-600 font-mono">
               <span>{reviewerProfile.tier}</span>
               <span>
-                Earns {formatCurrency(TIER_RATES[reviewerProfile.tier])}/review
+                {formatCurrency(TIER_RATES[reviewerProfile.tier])}/review
               </span>
               <span>{currentTierProgress.next}</span>
             </div>
@@ -232,12 +232,12 @@ export default async function ReviewerDashboardPage() {
         </CardHeader>
         <CardContent>
           {pendingReviews.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="mx-auto w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mb-4">
-                <Music className="h-6 w-6 text-neutral-400" />
+            <div className="text-center py-12 border-2 border-dashed border-black">
+              <div className="mx-auto w-12 h-12 bg-neutral-100 border-2 border-black flex items-center justify-center mb-4">
+                <Music className="h-6 w-6 text-black" />
               </div>
-              <h3 className="font-medium text-neutral-900">No tracks to review</h3>
-              <p className="text-sm text-neutral-500 mt-1">
+              <h3 className="font-bold text-black">No tracks to review</h3>
+              <p className="text-sm text-neutral-600 mt-1">
                 New tracks matching your genres will appear here
               </p>
             </div>
@@ -247,20 +247,20 @@ export default async function ReviewerDashboardPage() {
                 <Link
                   key={review.id}
                   href={`/reviewer/review/${review.id}`}
-                  className="flex items-center justify-between p-4 border border-neutral-200 rounded-lg hover:border-neutral-300 hover:bg-neutral-50 transition-colors"
+                  className="flex items-center justify-between p-4 border-2 border-black hover:bg-neutral-50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 bg-neutral-100 rounded-lg flex items-center justify-center">
-                      <Music className="h-5 w-5 text-neutral-400" />
+                    <div className="h-10 w-10 bg-neutral-100 border-2 border-black flex items-center justify-center">
+                      <Music className="h-5 w-5 text-black" />
                     </div>
                     <div>
-                      <p className="font-medium">{review.track.title}</p>
-                      <p className="text-sm text-neutral-500">
+                      <p className="font-bold">{review.track.title}</p>
+                      <p className="text-sm text-neutral-600">
                         {review.track.genres.map((g) => g.name).join(", ")}
                       </p>
                     </div>
                   </div>
-                  <Button size="sm">
+                  <Button size="sm" variant="primary">
                     Review
                     <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
@@ -281,7 +281,7 @@ export default async function ReviewerDashboardPage() {
             {reviewerProfile.genres.map((genre) => (
               <span
                 key={genre.id}
-                className="px-3 py-1.5 bg-neutral-100 rounded-full text-sm font-medium"
+                className="px-3 py-1.5 bg-neutral-100 border-2 border-black text-sm font-bold"
               >
                 {genre.name}
               </span>

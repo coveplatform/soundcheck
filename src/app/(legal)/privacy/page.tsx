@@ -1,59 +1,86 @@
 import Link from "next/link";
+import { Music } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 export default function PrivacyPage() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12 space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-3xl font-bold">Privacy Policy</h1>
-        <Link href="/">
-          <Button variant="outline">Home</Button>
-        </Link>
-      </div>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="border-b-2 border-black">
+        <div className="max-w-3xl mx-auto px-4 py-4">
+          <Link href="/" className="flex items-center gap-2 w-fit">
+            <div className="h-8 w-8 bg-black flex items-center justify-center">
+              <Music className="h-5 w-5 text-white" />
+            </div>
+            <span className="font-bold text-lg tracking-tight">MixReflect</span>
+          </Link>
+        </div>
+      </header>
 
-      <p className="text-sm text-neutral-500">Last updated: {new Date().toLocaleDateString()}</p>
+      <div className="max-w-3xl mx-auto px-4 py-12 space-y-6">
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-3xl font-black">Privacy Policy</h1>
+          <Link href="/">
+            <Button variant="outline">Home</Button>
+          </Link>
+        </div>
 
-      <div className="space-y-4 text-sm text-neutral-700 leading-6">
-        <p>
-          This policy describes how SoundCheck collects and uses information to operate the
-          service.
-        </p>
+        <p className="text-sm text-neutral-600 font-mono">Last updated: {new Date().toLocaleDateString()}</p>
 
-        <h2 className="text-lg font-semibold">Data we collect</h2>
-        <p>
-          We collect account information (email, name), submitted track metadata, review content,
-          and transaction metadata needed to process payments.
-        </p>
+        <div className="space-y-6 text-neutral-700 leading-7">
+          <p>
+            This policy describes how MixReflect collects and uses information to operate the
+            service.
+          </p>
 
-        <h2 className="text-lg font-semibold">How we use data</h2>
-        <p>
-          We use your information to authenticate you, match reviewers to tracks, process payments,
-          prevent abuse, and improve product quality.
-        </p>
+          <div className="border-t-2 border-black pt-6">
+            <h2 className="text-xl font-black mb-3">Data we collect</h2>
+            <p>
+              We collect account information (email, name), submitted track metadata, review content,
+              and transaction metadata needed to process payments.
+            </p>
+          </div>
 
-        <h2 className="text-lg font-semibold">Third parties</h2>
-        <p>
-          Payments are processed by Stripe. Emails may be sent using Resend. These providers may
-          receive information needed to provide their services.
-        </p>
+          <div className="border-t-2 border-black pt-6">
+            <h2 className="text-xl font-black mb-3">How we use data</h2>
+            <p>
+              We use your information to authenticate you, match reviewers to tracks, process payments,
+              prevent abuse, and improve product quality.
+            </p>
+          </div>
 
-        <h2 className="text-lg font-semibold">Cookies</h2>
-        <p>
-          We use cookies for authentication and security. You can control cookie settings in your
-          browser.
-        </p>
+          <div className="border-t-2 border-black pt-6">
+            <h2 className="text-xl font-black mb-3">Third parties</h2>
+            <p>
+              Payments are processed by Stripe. Emails may be sent using Resend. These providers may
+              receive information needed to provide their services.
+            </p>
+          </div>
 
-        <h2 className="text-lg font-semibold">Your rights</h2>
-        <p>
-          You can request access to or deletion of your account data, subject to legal and
-          operational requirements.
-        </p>
+          <div className="border-t-2 border-black pt-6">
+            <h2 className="text-xl font-black mb-3">Cookies</h2>
+            <p>
+              We use cookies for authentication and security. You can control cookie settings in your
+              browser.
+            </p>
+          </div>
 
-        <h2 className="text-lg font-semibold">Contact</h2>
-        <p>
-          For privacy questions, contact us at the email address listed on the site.
-        </p>
+          <div className="border-t-2 border-black pt-6">
+            <h2 className="text-xl font-black mb-3">Your rights</h2>
+            <p>
+              You can request access to or deletion of your account data, subject to legal and
+              operational requirements.
+            </p>
+          </div>
+
+          <div className="border-t-2 border-black pt-6">
+            <h2 className="text-xl font-black mb-3">Contact</h2>
+            <p>
+              For privacy questions, contact us at the email address listed on the site.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

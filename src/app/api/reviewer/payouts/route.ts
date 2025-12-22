@@ -32,6 +32,10 @@ export async function POST(request: Request) {
       );
     }
 
+    const bypassPayments =
+      process.env.NODE_ENV !== "production" &&
+      process.env.BYPASS_PAYMENTS === "true";
+
     const body = await request.json();
     const { amountCents } = requestPayoutSchema.parse(body);
 
@@ -68,20 +72,21 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!reviewer.stripeAccountId) {
-      return NextResponse.json(
-        { error: "Stripe account not connected" },
-        { status: 400 }
-      );
-    }
-
     const requested = amountCents ?? reviewer.pendingBalance;
 
-    if (requested < MIN_PAYOUT_CENTS) {
-      return NextResponse.json(
-        { error: `Minimum payout is $${(MIN_PAYOUT_CENTS / 100).toFixed(2)}` },
-        { status: 400 }
-      );
+    if (!bypassPayments) {
+      if (!reviewer.stripeAccountId) {
+        return NextResponse.json(
+          { error: "Stripe account not connected" },
+          { status: 400 }
+        );
+      }
+      if (requested < MIN_PAYOUT_CENTS) {
+        return NextResponse.json(
+          { error: `Minimum payout is $${(MIN_PAYOUT_CENTS / 100).toFixed(2)}` },
+          { status: 400 }
+        );
+      }
     }
 
     if (requested > reviewer.pendingBalance) {
@@ -89,6 +94,25 @@ export async function POST(request: Request) {
         { error: "Insufficient balance" },
         { status: 400 }
       );
+    }
+
+    if (bypassPayments) {
+      const payout = await prisma.payout.create({
+        data: {
+          reviewerId: reviewer.id,
+          amount: requested,
+          method: "MANUAL",
+          status: "COMPLETED",
+          processedAt: new Date(),
+        },
+      });
+
+      await prisma.reviewerProfile.update({
+        where: { id: reviewer.id },
+        data: { pendingBalance: { decrement: requested } },
+      });
+
+      return NextResponse.json({ success: true, payout, bypassed: true });
     }
 
     const payout = await prisma.payout.create({

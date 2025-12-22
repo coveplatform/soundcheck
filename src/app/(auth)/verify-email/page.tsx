@@ -88,7 +88,7 @@ export default function VerifyEmailPage() {
     return (
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Verifying…</CardTitle>
+          <CardTitle className="text-2xl">Verifying...</CardTitle>
           <CardDescription>Please wait a moment.</CardDescription>
         </CardHeader>
       </Card>
@@ -100,11 +100,11 @@ export default function VerifyEmailPage() {
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Email verified</CardTitle>
-          <CardDescription>You can now sign in and start using SoundCheck.</CardDescription>
+          <CardDescription>You can now sign in and start using MixReflect.</CardDescription>
         </CardHeader>
         <CardFooter>
           <Link href="/login" className="w-full">
-            <Button className="w-full">Continue to login</Button>
+            <Button variant="primary" className="w-full">Continue to login</Button>
           </Link>
         </CardFooter>
       </Card>
@@ -116,17 +116,17 @@ export default function VerifyEmailPage() {
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Verify your email</CardTitle>
         <CardDescription>
-          We sent you a verification link. If you can’t find it, resend below.
+          We sent you a verification link. Check your inbox.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {error && (
-          <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md">
+          <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
             {error}
           </div>
         )}
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className="font-bold">Email</Label>
           <Input
             id="email"
             type="email"
@@ -136,7 +136,7 @@ export default function VerifyEmailPage() {
           />
         </div>
         {status === "resent" ? (
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-neutral-600 bg-lime-100 border-2 border-lime-400 p-3">
             If that email exists, a new verification link has been sent.
           </p>
         ) : null}
@@ -145,8 +145,8 @@ export default function VerifyEmailPage() {
         <Button onClick={resend} className="w-full">
           Resend verification
         </Button>
-        <Link href="/login" className="text-sm text-neutral-500 hover:text-neutral-900">
-          Back to login
+        <Link href="/login" className="text-sm text-neutral-600 hover:text-black font-medium">
+          &larr; Back to login
         </Link>
       </CardFooter>
     </Card>

@@ -90,13 +90,13 @@ export default function LoginPage() {
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Welcome back</CardTitle>
         <CardDescription>
-          Sign in to your SoundCheck account
+          Sign in to your MixReflect account
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md">
+            <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
               {error}
               {needsVerificationEmail ? (
                 <div className="mt-2">
@@ -104,7 +104,7 @@ export default function LoginPage() {
                     href={`/verify-email?email=${encodeURIComponent(
                       needsVerificationEmail
                     )}`}
-                    className="underline underline-offset-4"
+                    className="underline underline-offset-4 hover:text-red-800"
                   >
                     Resend verification email
                   </Link>
@@ -113,7 +113,7 @@ export default function LoginPage() {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="font-bold">Email</Label>
             <Input
               id="email"
               type="email"
@@ -124,7 +124,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="font-bold">Password</Label>
             <Input
               id="password"
               type="password"
@@ -140,13 +140,13 @@ export default function LoginPage() {
           </Button>
           <Link
             href="/forgot-password"
-            className="text-sm text-neutral-500 hover:text-neutral-900"
+            className="text-sm text-neutral-600 hover:text-black font-medium"
           >
             Forgot password?
           </Link>
-          <p className="text-sm text-neutral-500 text-center">
+          <p className="text-sm text-neutral-600 text-center">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-neutral-900 hover:underline">
+            <Link href="/signup" className="text-black font-bold hover:underline">
               Sign up
             </Link>
           </p>

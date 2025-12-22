@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
           </Link>
           <button
             type="button"
-            className="text-sm text-neutral-500 hover:text-neutral-900"
+            className="text-sm text-neutral-600 hover:text-black font-medium"
             onClick={() => {
               setSuccess(false);
               setEmail("");
@@ -80,18 +80,18 @@ export default function ForgotPasswordPage() {
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Forgot your password?</CardTitle>
         <CardDescription>
-          Enter your email and we’ll send you a reset link.
+          Enter your email and we&apos;ll send you a reset link.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md">
+            <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
               {error}
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="font-bold">Email</Label>
             <Input
               id="email"
               type="email"
@@ -106,8 +106,8 @@ export default function ForgotPasswordPage() {
           <Button type="submit" className="w-full" isLoading={isLoading}>
             Send reset link
           </Button>
-          <Link href="/login" className="text-sm text-neutral-500 hover:text-neutral-900">
-            Back to login
+          <Link href="/login" className="text-sm text-neutral-600 hover:text-black font-medium">
+            &larr; Back to login
           </Link>
         </CardFooter>
       </form>

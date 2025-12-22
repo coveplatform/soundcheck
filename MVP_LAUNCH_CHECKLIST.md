@@ -1,6 +1,6 @@
-# SoundCheck MVP Launch Checklist
+# MixReflect MVP Launch Checklist
 
-This checklist is the single source of truth for shipping the first SoundCheck MVP.
+This checklist is the single source of truth for shipping the first MixReflect MVP.
 
 ## How to use
 

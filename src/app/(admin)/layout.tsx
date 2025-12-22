@@ -27,7 +27,7 @@ export default async function AdminLayout({
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <Link href="/" className="font-semibold">
-                SoundCheck
+                MixReflect
               </Link>
               <span className="text-sm text-neutral-400">Admin</span>
             </div>
