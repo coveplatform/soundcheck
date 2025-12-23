@@ -1,0 +1,7 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rounded square with abstract sound notch -->
+  <rect x="4" y="4" width="40" height="40" rx="12" fill="#18181B"/>
+  <path d="M14 24 L20 18 L20 30 Z" fill="#FAFAFA"/>
+  <rect x="24" y="20" width="4" height="8" rx="2" fill="#FAFAFA"/>
+  <rect x="30" y="16" width="4" height="16" rx="2" fill="#FAFAFA"/>
+</svg>

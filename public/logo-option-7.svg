@@ -1,0 +1,6 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- SC lettermark - stacked, geometric -->
+  <rect x="4" y="4" width="40" height="40" rx="8" fill="#18181B"/>
+  <path d="M16 16 C12 16 12 22 16 22 L20 22 C24 22 24 28 20 28 L14 28" stroke="#FAFAFA" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M28 28 C28 32 32 32 32 28 L32 20 C32 16 36 16 36 20" stroke="#FAFAFA" stroke-width="4" stroke-linecap="round" fill="none"/>
+</svg>

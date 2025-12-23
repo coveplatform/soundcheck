@@ -65,6 +65,7 @@ export function createMockReviewerProfile(
     onboardingQuizScore: 0,
     onboardingQuizPassed: true,
     onboardingQuizCompletedAt: new Date(),
+    gemCount: 0,
     flagCount: 0,
     isRestricted: false,
     completedOnboarding: true,
@@ -73,7 +74,7 @@ export function createMockReviewerProfile(
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
-  }
+  } as any
 }
 
 export function createMockGenre(overrides: Partial<Genre> = {}): Genre {
@@ -129,19 +130,20 @@ export function createMockReview(overrides: Partial<Review> = {}): Review {
     additionalNotes: null,
     paidAmount: 0,
     artistRating: null,
+    isGem: false,
     wasFlagged: false,
     flagReason: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
-  }
+  } as any
 }
 
 export function createMockPayment(overrides: Partial<Payment> = {}): Payment {
   return {
     id: generateId(),
     trackId: generateId(),
-    amount: 600,
+    amount: 499,
     stripeSessionId: `cs_test_${generateId()}`,
     stripePaymentId: null,
     status: 'PENDING',

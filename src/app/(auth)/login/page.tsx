@@ -26,6 +26,34 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [needsVerificationEmail, setNeedsVerificationEmail] = useState<string | null>(null);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    getSession()
+      .then((session) => {
+        if (cancelled) return;
+        if (session?.user) {
+          const defaultUrl = session.user.isArtist
+            ? "/artist/dashboard"
+            : session.user.isReviewer
+            ? "/reviewer/dashboard"
+            : "/";
+          router.replace(defaultUrl);
+          router.refresh();
+          return;
+        }
+        setIsCheckingSession(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setIsCheckingSession(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   useEffect(() => {
     if (!authError) return;
@@ -84,6 +112,8 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  if (isCheckingSession) return null;
 
   return (
     <Card>

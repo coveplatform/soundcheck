@@ -112,31 +112,37 @@ export const PACKAGES = {
   STARTER: {
     name: "Starter",
     reviews: 5,
-    price: 300, // cents
-    description: "Perfect for testing the waters",
-    mix: "Rookie & Verified reviewers",
+    minProReviews: 0,
+    price: 499, // cents
+    description: "Quick gut-check from real listeners",
+    mix: "Vetted reviewers",
   },
   STANDARD: {
     name: "Standard",
     reviews: 10,
-    price: 600,
-    description: "Most popular choice",
-    mix: "Priority for Verified+ reviewers",
+    minProReviews: 2,
+    price: 899,
+    description: "More signal, more clarity",
+    mix: "Guaranteed 2 PRO reviews",
   },
   PRO: {
     name: "Pro",
-    reviews: 10,
-    price: 1200,
-    description: "Expert feedback only",
-    mix: "Pro reviewers only",
+    reviews: 20,
+    minProReviews: 5,
+    price: 1499,
+    description: "High-quality feedback, faster improvements",
+    mix: "Guaranteed 5 PRO reviews",
   },
   DEEP_DIVE: {
     name: "Deep Dive",
-    reviews: 25,
-    price: 1800,
-    description: "Comprehensive feedback",
-    mix: "Mixed tiers + 3 guaranteed Pro reviews",
+    reviews: 20,
+    minProReviews: 5,
+    price: 1499,
+    description: "Maximum signal from multiple perspectives",
+    mix: "Guaranteed 5 PRO reviews",
   },
 } as const;
+
+export const ACTIVE_PACKAGE_TYPES = ["STARTER", "STANDARD", "PRO"] as const;
 
 export type PackageType = keyof typeof PACKAGES;

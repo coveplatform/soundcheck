@@ -14,7 +14,12 @@ import {
   Music,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { expireAndReassignExpiredQueueEntries, TIER_RATES } from "@/lib/queue";
+import { GenreTagList } from "@/components/ui/genre-tag";
+import {
+  expireAndReassignExpiredQueueEntries,
+  TIER_RATES,
+  assignReviewersToRecentTracks,
+} from "@/lib/queue";
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +38,59 @@ export default async function ReviewerDashboardPage() {
   if (!user?.emailVerified) {
     const email = user?.email ? `?email=${encodeURIComponent(user.email)}` : "";
     redirect(`/verify-email${email}`);
+  }
+
+  const bypassPayments =
+    process.env.NODE_ENV !== "production" &&
+    process.env.BYPASS_PAYMENTS === "true";
+
+  const baseReviewer = await prisma.reviewerProfile.findUnique({
+    where: { userId: session.user.id },
+    select: {
+      id: true,
+      isRestricted: true,
+      completedOnboarding: true,
+      onboardingQuizPassed: true,
+    },
+  });
+
+  if (!baseReviewer) {
+    redirect("/reviewer/onboarding");
+  }
+
+  if (baseReviewer.isRestricted) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-black">Reviewer Dashboard</h1>
+          <p className="text-neutral-600">Your reviewer account is restricted.</p>
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Access restricted</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-neutral-600">
+              You can&apos;t accept or work on new reviews right now. If you believe this is a mistake,
+              {" "}
+              <Link href="/support" className="font-bold hover:underline underline-offset-4">
+                contact support
+              </Link>
+              .
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!baseReviewer.completedOnboarding || !baseReviewer.onboardingQuizPassed) {
+    redirect("/reviewer/onboarding");
+  }
+
+  await expireAndReassignExpiredQueueEntries();
+  if (bypassPayments) {
+    await assignReviewersToRecentTracks();
   }
 
   const reviewerProfile = await prisma.reviewerProfile.findUnique({
@@ -57,34 +115,6 @@ export default async function ReviewerDashboardPage() {
   if (!reviewerProfile) {
     redirect("/reviewer/onboarding");
   }
-
-  if (reviewerProfile.isRestricted) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-black">Reviewer Dashboard</h1>
-          <p className="text-neutral-600">Your reviewer account is restricted.</p>
-        </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Access restricted</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-neutral-600">
-              You can&apos;t accept or work on new reviews right now. If you believe this is a mistake,
-              please contact support.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed) {
-    redirect("/reviewer/onboarding");
-  }
-
-  await expireAndReassignExpiredQueueEntries();
 
   // Calculate tier progress
   const tierProgress = {
@@ -139,19 +169,21 @@ export default async function ReviewerDashboardPage() {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-blue-400 border-2 border-black flex items-center justify-center">
-                <Headphones className="h-6 w-6 text-black" />
+        <Link href="/reviewer/history" className="block">
+          <Card interactive>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 bg-blue-400 border-2 border-black flex items-center justify-center">
+                  <Headphones className="h-6 w-6 text-black" />
+                </div>
+                <div>
+                  <p className="text-sm text-neutral-600 font-medium">Total Reviews</p>
+                  <p className="text-2xl font-black">{reviewerProfile.totalReviews}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-neutral-600 font-medium">Total Reviews</p>
-                <p className="text-2xl font-black">{reviewerProfile.totalReviews}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </Link>
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
@@ -170,7 +202,7 @@ export default async function ReviewerDashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-lime-400 border-2 border-black flex items-center justify-center">
+              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
                 <DollarSign className="h-6 w-6 text-black" />
               </div>
               <div>
@@ -219,11 +251,11 @@ export default async function ReviewerDashboardPage() {
 
       {/* Pending Reviews */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <CardTitle>Tracks to Review</CardTitle>
           {pendingReviews.length > 0 && (
             <Link href="/reviewer/queue">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="w-full sm:w-auto">
                 View All
                 <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
@@ -247,20 +279,23 @@ export default async function ReviewerDashboardPage() {
                 <Link
                   key={review.id}
                   href={`/reviewer/review/${review.id}`}
-                  className="flex items-center justify-between p-4 border-2 border-black hover:bg-neutral-50 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border-2 border-black hover:bg-neutral-50 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div className="h-10 w-10 bg-neutral-100 border-2 border-black flex items-center justify-center">
                       <Music className="h-5 w-5 text-black" />
                     </div>
-                    <div>
-                      <p className="font-bold">{review.track.title}</p>
-                      <p className="text-sm text-neutral-600">
-                        {review.track.genres.map((g) => g.name).join(", ")}
-                      </p>
+                    <div className="min-w-0">
+                      <p className="font-bold truncate">{review.track.title}</p>
+                      <GenreTagList
+                        genres={review.track.genres}
+                        variant="reviewer"
+                        size="sm"
+                        maxDisplay={2}
+                      />
                     </div>
                   </div>
-                  <Button size="sm" variant="primary">
+                  <Button size="sm" variant="primary" className="w-full sm:w-auto">
                     Review
                     <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
@@ -277,16 +312,10 @@ export default async function ReviewerDashboardPage() {
           <CardTitle>Your Genres</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {reviewerProfile.genres.map((genre) => (
-              <span
-                key={genre.id}
-                className="px-3 py-1.5 bg-neutral-100 border-2 border-black text-sm font-bold"
-              >
-                {genre.name}
-              </span>
-            ))}
-          </div>
+          <GenreTagList
+            genres={reviewerProfile.genres}
+            variant="reviewer"
+          />
         </CardContent>
       </Card>
     </div>

@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -64,6 +65,13 @@ export default async function ArtistReviewersPage({
     take: 50,
   });
 
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(/\s+/g).filter(Boolean);
+    const first = parts[0]?.[0] ?? "?";
+    const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? "" : "";
+    return (first + last).toUpperCase();
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -106,7 +114,15 @@ export default async function ArtistReviewersPage({
               {reviewers.map((r) => (
                 <tr key={r.id} className="text-neutral-700">
                   <td className="px-4 py-3">
-                    <div className="font-medium">{r.user.name ?? "Reviewer"}</div>
+                    <Link
+                      href={`/artist/reviewers/${r.id}`}
+                      className="inline-flex items-center gap-2 font-medium hover:text-black"
+                    >
+                      <span className="h-7 w-7 rounded-full bg-neutral-100 border border-black overflow-hidden flex items-center justify-center text-[11px] font-black text-black">
+                        {getInitials(r.user.name ?? "Reviewer")}
+                      </span>
+                      <span>{r.user.name ?? "Reviewer"}</span>
+                    </Link>
                   </td>
                   <td className="px-4 py-3">{r.tier}</td>
                   <td className="px-4 py-3">{r.averageRating.toFixed(2)}</td>

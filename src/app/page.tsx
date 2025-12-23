@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { Button } from "@/components/ui/button";
-import { Music, Headphones, Star, DollarSign, Shield, Zap, ArrowRight } from "lucide-react";
-import { PACKAGES } from "@/lib/metadata";
+import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Users, Target, Clock } from "lucide-react";
+import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { authOptions } from "@/lib/auth";
 
 export default async function Home() {
@@ -17,25 +17,20 @@ export default async function Home() {
       ? "/reviewer/dashboard"
       : "/login";
 
-  const pricing = [
-    { key: "STARTER", ...PACKAGES.STARTER },
-    { key: "STANDARD", ...PACKAGES.STANDARD },
-    { key: "PRO", ...PACKAGES.PRO },
-    { key: "DEEP_DIVE", ...PACKAGES.DEEP_DIVE },
-  ] as const;
+  const pricing = ACTIVE_PACKAGE_TYPES.map((key) => ({ key, ...PACKAGES[key] }));
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b-2 border-black">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 bg-black flex items-center justify-center">
               <Music className="h-5 w-5 text-white" />
             </div>
             <span className="font-bold text-lg tracking-tight">MixReflect</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 ml-auto">
             {session ? (
               <Link href={dashboardHref}>
                 <Button className="bg-black text-white hover:bg-neutral-800 font-medium">
@@ -60,17 +55,18 @@ export default async function Home() {
 
       {/* Hero */}
       <section className="border-b-2 border-black">
-        <div className="max-w-6xl mx-auto px-4 py-20 md:py-28">
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight text-black max-w-4xl leading-[1.1]">
+        <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-28">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight text-black max-w-4xl leading-[1.1]">
             Get honest feedback on your music.
           </h1>
           <p className="mt-6 text-xl text-neutral-600 max-w-xl leading-relaxed">
-            Submit your unreleased tracks. Get paid reviews from real listeners
-            matched to your genre. No fluff, no bots.
+            Submit your unreleased tracks and get structured reviews from real listeners
+            matched to your genre. Or become a reviewer—listen to new music and get paid
+            for your honest feedback.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/signup">
-              <Button size="lg" className="bg-lime-400 text-black hover:bg-lime-300 font-bold text-base px-8 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 font-bold text-base px-8 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
                 Submit a Track <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -80,9 +76,10 @@ export default async function Home() {
               </Button>
             </Link>
           </div>
-          <p className="mt-6 text-sm text-neutral-500 font-mono">
-            5 reviews from $3 • No subscription • Reviews in 24-72hrs
-          </p>
+          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-500 font-mono">
+            <span>Artists: From $4.99 • 24-72hr turnaround</span>
+            <span>Reviewers: Earn $0.15–$0.50 per review</span>
+          </div>
         </div>
       </section>
 
@@ -93,7 +90,7 @@ export default async function Home() {
             {/* For Artists */}
             <div className="p-8 md:p-12 border-b-2 md:border-b-0 md:border-r-2 border-black">
               <div className="flex items-center gap-3 mb-8">
-                <div className="h-12 w-12 bg-lime-400 border-2 border-black flex items-center justify-center">
+                <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
                   <Music className="h-6 w-6 text-black" />
                 </div>
                 <h2 className="text-2xl font-bold">For Artists</h2>
@@ -117,7 +114,7 @@ export default async function Home() {
                   <div>
                     <p className="font-bold">Pick your package</p>
                     <p className="text-neutral-600 mt-1">
-                      5-25 reviews from genre-matched listeners
+                      5-20 reviews from genre-matched listeners
                     </p>
                   </div>
                 </li>
@@ -128,7 +125,7 @@ export default async function Home() {
                   <div>
                     <p className="font-bold">Get real feedback</p>
                     <p className="text-neutral-600 mt-1">
-                      Structured reviews on mix, production, vibe
+                      Structured feedback you can act on
                     </p>
                   </div>
                 </li>
@@ -149,9 +146,9 @@ export default async function Home() {
                     01
                   </span>
                   <div>
-                    <p className="font-bold">Pick your genres</p>
+                    <p className="font-bold">Pass the quiz</p>
                     <p className="text-neutral-600 mt-1">
-                      Only get music you actually want to hear
+                      10 questions to prove you know music and can give useful feedback
                     </p>
                   </div>
                 </li>
@@ -160,9 +157,9 @@ export default async function Home() {
                     02
                   </span>
                   <div>
-                    <p className="font-bold">Listen & review</p>
+                    <p className="font-bold">Pick your genres</p>
                     <p className="text-neutral-600 mt-1">
-                      Give structured feedback, earn per review
+                      Only get tracks in genres you actually listen to
                     </p>
                   </div>
                 </li>
@@ -171,9 +168,20 @@ export default async function Home() {
                     03
                   </span>
                   <div>
-                    <p className="font-bold">Get paid, level up</p>
+                    <p className="font-bold">Listen & review (~10 min)</p>
                     <p className="text-neutral-600 mt-1">
-                      $0.15-$0.50 per review based on tier
+                      Rate production, originality, vocals. Write what works and what doesn&apos;t.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <span className="flex-shrink-0 w-8 h-8 bg-black text-white font-mono font-bold flex items-center justify-center text-sm">
+                    04
+                  </span>
+                  <div>
+                    <p className="font-bold">Earn $0.15–$0.50 per review</p>
+                    <p className="text-neutral-600 mt-1">
+                      Get rated by artists. Higher ratings = higher tier = more pay.
                     </p>
                   </div>
                 </li>
@@ -183,37 +191,182 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* What Feedback Looks Like */}
+      <section className="border-b-2 border-black py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-black mb-2">What You&apos;ll Get</h2>
+          <p className="text-neutral-600 mb-10">
+            Every review follows a structured format so you get actionable feedback.
+          </p>
+
+          <div className="border-2 border-black bg-white">
+            <div className="grid md:grid-cols-2 border-b-2 border-black">
+              <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-black">
+                <h3 className="font-bold mb-4">Ratings</h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                    <span className="text-neutral-600">First Impression</span>
+                    <span className="font-mono text-xs">Strong Hook / Decent / Lost Interest</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                    <span className="text-neutral-600">Production Quality</span>
+                    <span className="font-mono">1-5 stars</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                    <span className="text-neutral-600">Originality</span>
+                    <span className="font-mono">1-5 stars</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                    <span className="text-neutral-600">Vocals (if applicable)</span>
+                    <span className="font-mono">1-5 stars</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                    <span className="text-neutral-600">Would listen again?</span>
+                    <span className="font-mono">Yes / No</span>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="font-bold mb-4">Written Feedback</h3>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <span className="text-neutral-600">Best part of the track</span>
+                    <p className="font-mono text-xs mt-1 text-neutral-500">Min. 30 words</p>
+                  </div>
+                  <div>
+                    <span className="text-neutral-600">Areas to improve</span>
+                    <p className="font-mono text-xs mt-1 text-neutral-500">Min. 30 words</p>
+                  </div>
+                  <div>
+                    <span className="text-neutral-600">Similar artists</span>
+                    <p className="font-mono text-xs mt-1 text-neutral-500">Optional</p>
+                  </div>
+                  <div>
+                    <span className="text-neutral-600">Additional notes</span>
+                    <p className="font-mono text-xs mt-1 text-neutral-500">Optional</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 bg-neutral-50 text-sm text-neutral-600">
+              <strong>Quality enforced:</strong> Reviewers must listen for 3+ minutes. You rate every review. Low-quality reviewers lose access.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Reviewer Earnings */}
+      <section className="border-b-2 border-black py-16 bg-orange-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-black mb-2">Earn Money Reviewing Music</h2>
+          <p className="text-neutral-600 mb-10">
+            Level up by delivering quality reviews. Higher tiers = better pay.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-0 border-2 border-black">
+            {/* Rookie */}
+            <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white">
+              <div className="text-sm font-mono text-neutral-500 mb-2">TIER 1</div>
+              <h3 className="font-bold text-xl mb-1">Rookie</h3>
+              <div className="text-3xl font-black text-black">$0.15<span className="text-base font-normal text-neutral-500">/review</span></div>
+              <p className="text-sm text-neutral-600 mt-4">Starting tier. Pass the onboarding quiz to begin.</p>
+            </div>
+
+            {/* Verified */}
+            <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-black bg-neutral-50">
+              <div className="text-sm font-mono text-neutral-500 mb-2">TIER 2</div>
+              <h3 className="font-bold text-xl mb-1">Verified</h3>
+              <div className="text-3xl font-black text-black">$0.30<span className="text-base font-normal text-neutral-500">/review</span></div>
+              <p className="text-sm text-neutral-600 mt-4">25+ reviews with 4.0+ average rating.</p>
+            </div>
+
+            {/* Pro */}
+            <div className="p-6 bg-lime-500">
+              <div className="text-sm font-mono text-black/60 mb-2">TIER 3</div>
+              <h3 className="font-bold text-xl mb-1">Pro</h3>
+              <div className="text-3xl font-black text-black">$0.50<span className="text-base font-normal text-black/60">/review</span></div>
+              <p className="text-sm text-black/70 mt-4">100+ reviews with 4.5+ average rating.</p>
+            </div>
+          </div>
+
+          <p className="mt-6 text-sm text-neutral-500 text-center">
+            Pro reviewers doing 10 reviews/week earn ~$260/month
+          </p>
+        </div>
+      </section>
+
       {/* Features */}
       <section className="border-b-2 border-black py-16">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-12">Why MixReflect?</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-0 border-2 border-black">
-            <div className="p-6 border-b-2 sm:border-b-2 lg:border-b-0 sm:border-r-2 lg:border-r-2 border-black">
-              <Star className="h-8 w-8 text-black mb-4" />
-              <h3 className="font-bold mb-2">Quality enforced</h3>
+          <h2 className="text-3xl font-black mb-2">Why MixReflect?</h2>
+          <p className="text-neutral-600 mb-10">
+            Built for artists who want real feedback, not ego boosts.
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Quality */}
+            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-4">
+                <Star className="h-6 w-6 text-black" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Quality you can trust</h3>
               <p className="text-sm text-neutral-600">
-                Tiered reviewers. Bad reviews get rejected.
+                Every reviewer passes a quiz. Must listen 3+ minutes. You rate every review—bad ones get filtered out.
               </p>
             </div>
-            <div className="p-6 border-b-2 lg:border-b-0 lg:border-r-2 border-black">
-              <Shield className="h-8 w-8 text-black mb-4" />
-              <h3 className="font-bold mb-2">Private by default</h3>
+
+            {/* Genre Match */}
+            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center mb-4">
+                <Target className="h-6 w-6 text-black" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Genre-matched ears</h3>
               <p className="text-sm text-neutral-600">
-                Your unreleased tracks stay unreleased.
+                Your trap beat won&apos;t get reviewed by someone who only listens to country. Reviewers pick their genres.
               </p>
             </div>
-            <div className="p-6 border-b-2 sm:border-b-0 sm:border-r-2 lg:border-r-2 border-black">
-              <Zap className="h-8 w-8 text-black mb-4" />
-              <h3 className="font-bold mb-2">Fast turnaround</h3>
+
+            {/* Fast */}
+            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+              <div className="h-12 w-12 bg-sky-400 border-2 border-black flex items-center justify-center mb-4">
+                <Clock className="h-6 w-6 text-black" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Fast turnaround</h3>
               <p className="text-sm text-neutral-600">
-                24-72 hours for full feedback.
+                Get all your reviews in 24-72 hours. No waiting weeks for feedback on a track you&apos;re excited about.
               </p>
             </div>
-            <div className="p-6">
-              <DollarSign className="h-8 w-8 text-black mb-4" />
-              <h3 className="font-bold mb-2">Cheap & fair</h3>
+
+            {/* Private */}
+            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+              <div className="h-12 w-12 bg-purple-400 border-2 border-black flex items-center justify-center mb-4">
+                <Shield className="h-6 w-6 text-black" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Your music stays private</h3>
               <p className="text-sm text-neutral-600">
-                $3 for 5 reviews. Reviewers get 70%.
+                Only assigned reviewers hear your track. We never share, publish, or leak your unreleased work.
+              </p>
+            </div>
+
+            {/* Real People */}
+            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+              <div className="h-12 w-12 bg-pink-400 border-2 border-black flex items-center justify-center mb-4">
+                <Users className="h-6 w-6 text-black" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Real people, not bots</h3>
+              <p className="text-sm text-neutral-600">
+                No AI-generated feedback. Every review comes from a real listener who actually played your track.
+              </p>
+            </div>
+
+            {/* Affordable */}
+            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+              <div className="h-12 w-12 bg-emerald-400 border-2 border-black flex items-center justify-center mb-4">
+                <DollarSign className="h-6 w-6 text-black" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Affordable & fair</h3>
+              <p className="text-sm text-neutral-600">
+                From $4.99 for 5 reviews. No subscriptions, no hidden fees. Reviewers get paid fairly for their time.
               </p>
             </div>
           </div>
@@ -228,9 +381,9 @@ export default async function Home() {
             Pick based on how many ears you want on your track.
           </p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pricing.map((p) => {
-              const price = (p.price / 100).toFixed(0);
+              const price = (p.price / 100).toFixed(2);
               const perReview = (p.price / Math.max(1, p.reviews) / 100).toFixed(2);
               const isPopular = p.key === "STANDARD";
 
@@ -238,11 +391,11 @@ export default async function Home() {
                 <div
                   key={p.key}
                   className={`border-2 border-black bg-white p-6 ${
-                    isPopular ? "ring-4 ring-lime-400" : ""
+                    isPopular ? "ring-4 ring-lime-500" : ""
                   }`}
                 >
                   {isPopular && (
-                    <span className="inline-block text-xs font-bold bg-lime-400 text-black px-2 py-1 mb-4 border border-black">
+                    <span className="inline-block text-xs font-bold bg-lime-500 text-black px-2 py-1 mb-4 border border-black">
                       POPULAR
                     </span>
                   )}
@@ -260,16 +413,21 @@ export default async function Home() {
                       <span className="font-bold">{p.reviews}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Mix</span>
-                      <span className="font-bold">{p.mix}</span>
+                      <span className="text-neutral-600">Pro reviewers</span>
+                      <span className="font-bold">
+                        {p.minProReviews === 0 ? "Not guaranteed" : `${p.minProReviews}+ guaranteed`}
+                      </span>
                     </div>
                   </div>
+                  <p className="text-xs text-neutral-500 mt-3">
+                    Pro = 100+ reviews, 4.5+ rating
+                  </p>
 
                   <div className="mt-6">
                     <Link href="/signup">
                       <Button className={`w-full border-2 border-black font-bold ${
                         isPopular
-                          ? "bg-lime-400 text-black hover:bg-lime-300"
+                          ? "bg-lime-500 text-black hover:bg-lime-400"
                           : "bg-black text-white hover:bg-neutral-800"
                       }`}>
                         Get started
@@ -295,7 +453,7 @@ export default async function Home() {
           <Link href="/signup">
             <Button
               size="lg"
-              className="bg-lime-400 text-black hover:bg-lime-300 font-bold text-base px-10 border-2 border-lime-400"
+              className="bg-lime-500 text-black hover:bg-lime-400 font-bold text-base px-10 border-2 border-lime-500"
             >
               Get Started Free
             </Button>
@@ -315,15 +473,23 @@ export default async function Home() {
               },
               {
                 q: "Who are the reviewers?",
-                a: "Real people who passed our onboarding. They're matched by genre and paid for quality feedback.",
+                a: "Real people who passed a 10-question onboarding quiz. They're matched by genre and ranked by artist ratings. Top-rated reviewers get more assignments and earn more.",
               },
               {
                 q: "Is my music private?",
                 a: "Yes. Only assigned reviewers hear your track. We don't share or publish anything.",
               },
               {
-                q: "How do reviewers get paid?",
-                a: "Per review, based on tier. Higher quality = higher tier = more per review. Payouts via Stripe.",
+                q: "How much can I earn as a reviewer?",
+                a: "Rookies earn $0.15/review. Hit 25 reviews with a 4.0+ rating to become Verified ($0.30). Hit 100 reviews with 4.5+ rating to become Pro ($0.50). Pro reviewers doing 10 reviews/week make ~$260/month.",
+              },
+              {
+                q: "What's the difference between reviewer tiers?",
+                a: "Tiers reflect experience and quality. Pro reviewers have completed 100+ reviews with excellent ratings. Higher packages guarantee Pro reviewers on your track.",
+              },
+              {
+                q: "What do I have to do to review?",
+                a: "Pass a 10-question onboarding quiz, select your genres, then review tracks from your queue. Each review takes ~10 minutes: listen for at least 3 minutes, rate production/originality/vocals, and write what worked and what didn't.",
               },
               {
                 q: "Can I get a refund?",
@@ -362,6 +528,9 @@ export default async function Home() {
             </Link>
             <Link href="/privacy" className="hover:text-black font-medium">
               Privacy
+            </Link>
+            <Link href="/support" className="hover:text-black font-medium">
+              Support
             </Link>
           </div>
         </div>

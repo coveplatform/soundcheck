@@ -2,10 +2,76 @@ import { prisma } from "./prisma";
 import { PackageType, ReviewerTier } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import { sendTierChangeEmail } from "@/lib/email";
+import { PACKAGES } from "@/lib/metadata";
 
 const MIN_REVIEWER_ACCOUNT_AGE_HOURS = Number(
   process.env.MIN_REVIEWER_ACCOUNT_AGE_HOURS ?? "24"
 );
+
+// Parent genre slugs mapped to their child slugs for hierarchical matching
+const GENRE_HIERARCHY: Record<string, string[]> = {
+  electronic: [
+    "house", "deep-house", "progressive-house", "techno", "hard-techno",
+    "drum-and-bass", "dubstep", "trance", "ambient", "edm", "synthwave",
+    "lo-fi", "future-bass",
+  ],
+  "hip-hop-rnb": ["hip-hop", "trap", "rnb", "boom-bap", "drill"],
+  "rock-metal": ["rock", "indie-rock", "alternative", "metal", "punk"],
+  "pop-parent": ["pop", "indie-pop", "electropop", "synth-pop"],
+  other: [
+    "jazz", "soul", "funk", "reggae", "country", "folk", "classical",
+    "world", "experimental", "singer-songwriter",
+  ],
+};
+
+// Reverse mapping: child slug -> parent slug
+const CHILD_TO_PARENT: Record<string, string> = {};
+for (const [parent, children] of Object.entries(GENRE_HIERARCHY)) {
+  for (const child of children) {
+    CHILD_TO_PARENT[child] = parent;
+  }
+}
+
+/**
+ * Expand genre IDs to include parent genres for matching.
+ * If a track has "deep-house", this returns IDs for both "deep-house" AND "electronic"
+ * so reviewers with either will match.
+ */
+async function expandGenresForMatching(genreIds: string[]): Promise<string[]> {
+  // Get the genres from the database to know their slugs
+  const genres = await prisma.genre.findMany({
+    where: { id: { in: genreIds } },
+    select: { id: true, slug: true },
+  });
+
+  const expandedSlugs = new Set<string>();
+
+  for (const genre of genres) {
+    expandedSlugs.add(genre.slug);
+
+    // If this is a child genre, also add the parent
+    const parentSlug = CHILD_TO_PARENT[genre.slug];
+    if (parentSlug) {
+      expandedSlugs.add(parentSlug);
+    }
+
+    // If this is a parent genre, also add all children
+    const childSlugs = GENRE_HIERARCHY[genre.slug];
+    if (childSlugs) {
+      for (const child of childSlugs) {
+        expandedSlugs.add(child);
+      }
+    }
+  }
+
+  // Get IDs for all expanded slugs
+  const expandedGenres = await prisma.genre.findMany({
+    where: { slug: { in: Array.from(expandedSlugs) } },
+    select: { id: true },
+  });
+
+  return expandedGenres.map((g) => g.id);
+}
 
 // Tier-based pay rates in cents
 export const TIER_RATES: Record<ReviewerTier, number> = {
@@ -17,7 +83,7 @@ export const TIER_RATES: Record<ReviewerTier, number> = {
 // Get eligible reviewers for a track
 export async function getEligibleReviewers(
   trackId: string,
-  packageType: PackageType
+  _packageType: PackageType
 ) {
   const track = await prisma.track.findUnique({
     where: { id: trackId },
@@ -26,10 +92,23 @@ export async function getEligibleReviewers(
 
   if (!track) return [];
 
-  const genreIds = track.genres.map((g) => g.id);
+  const trackGenreIds = track.genres.map((g) => g.id);
+
+  // Expand genres to include parent/child relationships for matching
+  // e.g., track with "deep-house" will match reviewers with "electronic" OR "deep-house"
+  const genreIds = await expandGenresForMatching(trackGenreIds);
+
+  const bypassPayments =
+    process.env.NODE_ENV !== "production" &&
+    process.env.BYPASS_PAYMENTS === "true";
+
+  const minAccountAgeHours = bypassPayments ? 0 : MIN_REVIEWER_ACCOUNT_AGE_HOURS;
 
   const cutoff = new Date();
-  cutoff.setHours(cutoff.getHours() - (Number.isFinite(MIN_REVIEWER_ACCOUNT_AGE_HOURS) ? MIN_REVIEWER_ACCOUNT_AGE_HOURS : 24));
+  cutoff.setHours(
+    cutoff.getHours() -
+      (Number.isFinite(minAccountAgeHours) ? minAccountAgeHours : 24)
+  );
 
   const where: Prisma.ReviewerProfileWhereInput = {
     completedOnboarding: true,
@@ -75,20 +154,33 @@ export async function getEligibleReviewers(
     ],
   });
 
-  // Filter based on package type
-  if (packageType === "PRO") {
-    return eligibleReviewers.filter((r) => r.tier === "PRO");
-  }
+  const sortedByQuality = eligibleReviewers.sort((a, b) => {
+    const tierOrder = { PRO: 3, VERIFIED: 2, ROOKIE: 1 };
+    const tierDiff = tierOrder[b.tier] - tierOrder[a.tier];
+    if (tierDiff !== 0) return tierDiff;
 
-  if (packageType === "STANDARD") {
-    // Priority to Verified and Pro, but allow Rookies if needed
-    return eligibleReviewers.sort((a, b) => {
-      const tierOrder = { PRO: 3, VERIFIED: 2, ROOKIE: 1 };
-      return tierOrder[b.tier] - tierOrder[a.tier];
-    });
-  }
+    const ratingDiff = (b.averageRating ?? 0) - (a.averageRating ?? 0);
+    if (ratingDiff !== 0) return ratingDiff;
 
-  return eligibleReviewers;
+    const gemDiff = ((b as any).gemCount ?? 0) - ((a as any).gemCount ?? 0);
+    return gemDiff;
+  });
+  return sortedByQuality;
+}
+
+export async function assignReviewersToRecentTracks(limit = 20) {
+  const tracks = await prisma.track.findMany({
+    where: {
+      status: { in: ["QUEUED", "IN_PROGRESS"] },
+    },
+    select: { id: true },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+
+  for (const t of tracks) {
+    await assignReviewersToTrack(t.id);
+  }
 }
 
 // Assign reviewers to a track
@@ -96,7 +188,15 @@ export async function assignReviewersToTrack(trackId: string) {
   const track = await prisma.track.findUnique({
     where: { id: trackId },
     include: {
-      reviews: true,
+      reviews: {
+        include: {
+          reviewer: {
+            select: {
+              tier: true,
+            },
+          },
+        },
+      },
       queueEntries: true,
     },
   });
@@ -112,6 +212,11 @@ export async function assignReviewersToTrack(trackId: string) {
     (r) => r.status === "ASSIGNED" || r.status === "IN_PROGRESS"
   ).length;
 
+  const countedStatuses = new Set(["ASSIGNED", "IN_PROGRESS", "COMPLETED"]);
+  const existingProCount = track.reviews.filter(
+    (r) => countedStatuses.has(r.status) && r.reviewer?.tier === "PRO"
+  ).length;
+
   const neededReviews = track.reviewsRequested - completedReviews - activeAssignments;
 
   if (neededReviews <= 0) return;
@@ -121,14 +226,43 @@ export async function assignReviewersToTrack(trackId: string) {
     track.packageType
   );
 
-  const reviewersToAssign = eligibleReviewers.slice(0, neededReviews);
+  const existingReviewerIds = new Set(track.reviews.map((r) => r.reviewerId));
+  const eligibleUnique = eligibleReviewers.filter((r) => !existingReviewerIds.has(r.id));
+
+  const packageConfig = (PACKAGES as unknown as Record<string, { minProReviews?: number }>)[
+    track.packageType
+  ];
+  const minProReviews = Math.max(0, packageConfig?.minProReviews ?? 0);
+
+  const proShortfall = Math.max(
+    0,
+    Math.min(minProReviews, track.reviewsRequested) - existingProCount
+  );
+  const proSlotsToReserve = Math.min(proShortfall, neededReviews);
+
+  const proCandidates = eligibleUnique.filter((r) => r.tier === "PRO");
+  const proToAssign = proCandidates.slice(0, Math.min(proSlotsToReserve, proCandidates.length));
+  const proToAssignIds = new Set(proToAssign.map((r) => r.id));
+
+  const nonProSlots = neededReviews - proSlotsToReserve;
+  const additionalCandidates = eligibleUnique.filter((r) => !proToAssignIds.has(r.id));
+  const additionalToAssign = additionalCandidates.slice(
+    0,
+    Math.min(nonProSlots, additionalCandidates.length)
+  );
+
+  const reviewersToAssign = [...proToAssign, ...additionalToAssign];
 
   // Create queue entries
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 48); // 48 hour expiration
 
   const priority =
-    track.packageType === "PRO" ? 10 : track.packageType === "STANDARD" ? 5 : 0;
+    track.packageType === "PRO" || track.packageType === "DEEP_DIVE"
+      ? 10
+      : track.packageType === "STANDARD"
+        ? 5
+        : 0;
 
   await prisma.$transaction(async (tx) => {
     if (reviewersToAssign.length > 0) {
@@ -247,10 +381,12 @@ export function calculateTier(
   totalReviews: number,
   averageRating: number
 ): ReviewerTier {
-  if (totalReviews >= 100 && averageRating >= 4.5) {
+  const effectiveReviews = totalReviews;
+
+  if (effectiveReviews >= 100 && averageRating >= 4.5) {
     return "PRO";
   }
-  if (totalReviews >= 25 && averageRating >= 4.0) {
+  if (effectiveReviews >= 25 && averageRating >= 4.0) {
     return "VERIFIED";
   }
   return "ROOKIE";
@@ -265,7 +401,9 @@ export async function updateReviewerTier(reviewerId: string) {
 
   if (!reviewer) return;
 
-  const newTier = calculateTier(reviewer.totalReviews, reviewer.averageRating);
+  const gemCount = (reviewer as any).gemCount ?? 0;
+  const effectiveReviews = reviewer.totalReviews + gemCount * 2;
+  const newTier = calculateTier(effectiveReviews, reviewer.averageRating);
 
   if (newTier !== reviewer.tier) {
     const tierOrder: Record<ReviewerTier, number> = {

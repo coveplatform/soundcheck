@@ -362,7 +362,7 @@ export function AudioPlayer({
           </button>
 
           <div className="flex-1">
-            <div className="flex items-center gap-2 text-sm text-neutral-500 mb-1">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-neutral-500 mb-1 flex-wrap">
               <span>{formatTime(currentTime)}</span>
               <span>/</span>
               <span>{formatTime(duration)}</span>

@@ -165,19 +165,22 @@ describe('Queue Assignment Integration', () => {
   })
 
   describe('Package-Based Filtering', () => {
-    it('PRO package only assigns PRO tier reviewers', async () => {
+    it('PRO package prioritizes PRO tier reviewers but does not exclude others', async () => {
       const proReviewer = createMockReviewerProfile({ tier: 'PRO' })
       const verifiedReviewer = createMockReviewerProfile({ tier: 'VERIFIED' })
       const rookieReviewer = createMockReviewerProfile({ tier: 'ROOKIE' })
 
-      const allReviewers = [proReviewer, verifiedReviewer, rookieReviewer]
-      const packageType = 'PRO'
+      const allReviewers = [rookieReviewer, verifiedReviewer, proReviewer]
 
-      // Filter for PRO package
-      const eligibleForPro = allReviewers.filter(r => r.tier === 'PRO')
+      // Sort by tier for PRO package (eligibility includes all tiers)
+      const tierOrder = { PRO: 3, VERIFIED: 2, ROOKIE: 1 } as const
+      const sorted = [...allReviewers].sort(
+        (a, b) => tierOrder[b.tier] - tierOrder[a.tier]
+      )
 
-      expect(eligibleForPro.length).toBe(1)
-      expect(eligibleForPro[0].tier).toBe('PRO')
+      expect(sorted[0].tier).toBe('PRO')
+      expect(sorted[1].tier).toBe('VERIFIED')
+      expect(sorted[2].tier).toBe('ROOKIE')
     })
 
     it('STANDARD package prioritizes VERIFIED and PRO reviewers', async () => {

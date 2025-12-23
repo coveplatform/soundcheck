@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AudioPlayer } from "@/components/audio/audio-player";
-import { ArrowLeft, Star, Check, Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowLeft, Star, Check, Music, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
 import { funnels, track } from "@/lib/analytics";
@@ -16,6 +17,18 @@ import { funnels, track } from "@/lib/analytics";
 interface Review {
   id: string;
   status: string;
+  createdAt?: string;
+  paidAmount?: number;
+  firstImpression?: FirstImpression | null;
+  productionScore?: number | null;
+  vocalScore?: number | null;
+  originalityScore?: number | null;
+  wouldListenAgain?: boolean | null;
+  perceivedGenre?: string | null;
+  similarArtists?: string | null;
+  bestPart?: string | null;
+  weakestPart?: string | null;
+  additionalNotes?: string | null;
   track: {
     id: string;
     title: string;
@@ -43,6 +56,13 @@ const TIER_EARNINGS: Record<string, number> = {
   VERIFIED: 30,
   PRO: 50,
 };
+
+function formatFirstImpression(value: FirstImpression | null | undefined) {
+  if (!value) return "—";
+  if (value === "STRONG_HOOK") return "Strong Hook";
+  if (value === "DECENT") return "Decent";
+  return "Lost Interest";
+}
 
 export default function ReviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -79,8 +99,14 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         if (response.ok) {
           const data = await response.json();
           setReview(data);
-          // Track review started
-          funnels.review.start(data.track.id, data.id);
+          if (data.status === "SKIPPED" || data.status === "EXPIRED") {
+            router.push("/reviewer/queue");
+            router.refresh();
+            return;
+          }
+          if (data.status !== "COMPLETED") {
+            funnels.review.start(data.track.id, data.id);
+          }
         } else {
           const data = await response.json().catch(() => null);
           const message = data?.error || "Review not found";
@@ -341,24 +367,161 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
+      <div className="max-w-3xl mx-auto space-y-6">
+        <Skeleton className="h-8 w-32" />
+        <div className="border-2 border-black bg-white p-6 space-y-4">
+          <Skeleton className="h-6 w-1/2" />
+          <Skeleton className="h-4 w-1/3" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+        <div className="border-2 border-black bg-white p-6 space-y-4">
+          <Skeleton className="h-6 w-1/4" />
+          <div className="grid sm:grid-cols-3 gap-4">
+            <Skeleton className="h-20" />
+            <Skeleton className="h-20" />
+            <Skeleton className="h-20" />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error && !review) {
     return (
-      <div className="text-center py-20">
-        <p className="text-red-500">{error}</p>
-        <Link href="/reviewer/queue" className="text-sm text-neutral-500 hover:text-neutral-900 mt-4 inline-block">
-          Back to queue
+      <div className="max-w-md mx-auto text-center py-20">
+        <div className="w-16 h-16 bg-red-100 border-2 border-black flex items-center justify-center mx-auto mb-6">
+          <Music className="h-8 w-8 text-red-600" />
+        </div>
+        <h2 className="text-2xl font-black mb-2">Something went wrong</h2>
+        <p className="text-neutral-600 mb-6">{error}</p>
+        <Link href="/reviewer/queue">
+          <Button variant="outline">Back to Queue</Button>
         </Link>
       </div>
     );
   }
 
   if (!review) return null;
+
+  if (review.status === "COMPLETED") {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6">
+        <div className="flex items-center justify-between gap-4">
+          <Link
+            href="/reviewer/history"
+            className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to History
+          </Link>
+          <div className="text-right">
+            <p className="text-xs text-neutral-600 font-mono">Earned</p>
+            <p className="text-lg font-black">{formatCurrency(review.paidAmount ?? 0)}</p>
+          </div>
+        </div>
+
+        <Card>
+          <CardHeader className="border-b-2 border-black">
+            <div className="flex items-start gap-4">
+              <div className="h-12 w-12 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <Music className="h-6 w-6 text-black" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">{review.track.title}</CardTitle>
+                <p className="text-sm text-neutral-600">
+                  {review.track.genres.map((g) => g.name).join(", ")}
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <AudioPlayer
+              sourceUrl={review.track.sourceUrl}
+              sourceType={review.track.sourceType}
+              showListenTracker={false}
+              showWaveform={review.track.sourceType === "UPLOAD"}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="border-b-2 border-black">
+            <CardTitle>Your Submitted Review</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-4">
+            <div className="flex flex-wrap gap-3 text-sm">
+              <div className="px-3 py-1.5 bg-neutral-100 border-2 border-black">
+                <span className="text-neutral-600">First impression:</span>{" "}
+                <span className="font-bold">{formatFirstImpression(review.firstImpression)}</span>
+              </div>
+              {typeof review.productionScore === "number" && (
+                <div className="px-3 py-1.5 bg-neutral-100 border-2 border-black">
+                  <span className="text-neutral-600">Production:</span>{" "}
+                  <span className="font-bold">{review.productionScore}/5</span>
+                </div>
+              )}
+              {typeof review.vocalScore === "number" && (
+                <div className="px-3 py-1.5 bg-neutral-100 border-2 border-black">
+                  <span className="text-neutral-600">Vocals:</span>{" "}
+                  <span className="font-bold">{review.vocalScore}/5</span>
+                </div>
+              )}
+              {typeof review.originalityScore === "number" && (
+                <div className="px-3 py-1.5 bg-neutral-100 border-2 border-black">
+                  <span className="text-neutral-600">Originality:</span>{" "}
+                  <span className="font-bold">{review.originalityScore}/5</span>
+                </div>
+              )}
+              {review.wouldListenAgain !== null && review.wouldListenAgain !== undefined && (
+                <div className="px-3 py-1.5 bg-neutral-100 border-2 border-black">
+                  <span className="text-neutral-600">Would listen again:</span>{" "}
+                  <span className="font-bold">{review.wouldListenAgain ? "Yes" : "No"}</span>
+                </div>
+              )}
+            </div>
+
+            {(review.perceivedGenre || review.similarArtists) && (
+              <div className="text-sm p-3 bg-neutral-50 border-2 border-black">
+                {review.perceivedGenre ? (
+                  <p>
+                    <span className="text-neutral-600 font-medium">Perceived genre:</span>{" "}
+                    <span className="font-bold">{review.perceivedGenre}</span>
+                  </p>
+                ) : null}
+                {review.similarArtists ? (
+                  <p className={review.perceivedGenre ? "mt-1" : ""}>
+                    <span className="text-neutral-600 font-medium">Similar artists:</span>{" "}
+                    <span className="font-bold">{review.similarArtists}</span>
+                  </p>
+                ) : null}
+              </div>
+            )}
+
+            {review.bestPart ? (
+              <div className="bg-lime-50 border-2 border-lime-500 p-4">
+                <p className="text-xs font-bold text-lime-700 mb-2">Best Part</p>
+                <p className="text-sm text-lime-900">{review.bestPart}</p>
+              </div>
+            ) : null}
+
+            {review.weakestPart ? (
+              <div className="bg-red-50 border-2 border-red-400 p-4">
+                <p className="text-xs font-bold text-red-700 mb-2">Areas for Improvement</p>
+                <p className="text-sm text-red-900">{review.weakestPart}</p>
+              </div>
+            ) : null}
+
+            {review.additionalNotes ? (
+              <div className="bg-neutral-100 border-2 border-black p-4">
+                <p className="text-xs font-bold text-neutral-700 mb-2">Additional Notes</p>
+                <p className="text-sm text-neutral-800">{review.additionalNotes}</p>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const bestPartWords = countWords(bestPart);
   const weakestPartWords = countWords(weakestPart);
@@ -369,18 +532,21 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   if (success) {
     return (
       <div className="max-w-md mx-auto text-center py-20">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Check className="h-8 w-8 text-green-600" />
+        <div className="w-16 h-16 bg-lime-500 border-2 border-black flex items-center justify-center mx-auto mb-6">
+          <Check className="h-8 w-8 text-black" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">Review Submitted!</h2>
-        <p className="text-neutral-500 mb-2">
-          You earned {formatCurrency(TIER_EARNINGS[review.reviewer.tier])}
-        </p>
-        <p className="text-sm text-neutral-400 mb-6">
+        <h2 className="text-2xl font-black mb-2">Review Submitted!</h2>
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-lime-500 border-2 border-black mb-4">
+          <DollarSign className="h-5 w-5 text-black" />
+          <span className="font-black text-lg">
+            +{formatCurrency(TIER_EARNINGS[review.reviewer.tier])}
+          </span>
+        </div>
+        <p className="text-neutral-600 mb-6">
           Your feedback helps artists improve their music.
         </p>
         <Link href="/reviewer/queue">
-          <Button>Continue Reviewing</Button>
+          <Button variant="primary">Continue Reviewing</Button>
         </Link>
       </div>
     );
@@ -388,11 +554,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      {/* Back Link */}
-      <div className="flex items-center justify-between gap-4">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <Link
           href="/reviewer/queue"
-          className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900"
+          className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Queue
@@ -402,28 +568,39 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           size="sm"
           onClick={handleSkip}
           isLoading={isSkipping}
+          className="w-full sm:w-auto"
         >
-          Skip
+          Skip Track
         </Button>
       </div>
 
       {/* Track Info */}
       <Card>
-        <CardHeader>
-          <CardTitle>{review.track.title}</CardTitle>
-          <p className="text-sm text-neutral-500">
-            {review.track.genres.map((g) => g.name).join(", ")}
-          </p>
+        <CardHeader className="border-b-2 border-black">
+          <div className="flex items-start gap-4">
+            <div className="h-12 w-12 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
+              <Music className="h-6 w-6 text-black" />
+            </div>
+            <div>
+              <CardTitle className="text-xl">{review.track.title}</CardTitle>
+              <p className="text-sm text-neutral-600">
+                {review.track.genres.map((g) => g.name).join(", ")}
+              </p>
+            </div>
+          </div>
           {review.track.feedbackFocus && (
-            <p className="text-sm text-amber-600 mt-2">
-              Artist is looking for: {review.track.feedbackFocus}
-            </p>
+            <div className="mt-4 p-3 bg-amber-50 border-2 border-amber-400">
+              <p className="text-sm font-bold text-amber-800">
+                Artist note: <span className="font-medium">{review.track.feedbackFocus}</span>
+              </p>
+            </div>
           )}
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <AudioPlayer
             sourceUrl={review.track.sourceUrl}
             sourceType={review.track.sourceType}
+            showWaveform={review.track.sourceType === "UPLOAD"}
             minListenTime={MIN_LISTEN_SECONDS}
             onListenProgress={(seconds) => {
               setListenTime((prev) => Math.max(prev, seconds));
@@ -439,34 +616,38 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
       {/* Review Form */}
       <Card>
-        <CardHeader>
+        <CardHeader className="border-b-2 border-black">
           <CardTitle>Your Review</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           {error && (
-            <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md">
+            <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
               {error}
             </div>
           )}
 
           {/* First Impression */}
-          <div className="space-y-2">
-            <Label>First Impression (after 30 seconds)</Label>
+          <div className="space-y-3">
+            <Label className="text-base font-bold">First Impression (after 30 seconds)</Label>
             <div className="flex gap-2">
               {[
-                { value: "STRONG_HOOK", label: "Strong Hook" },
-                { value: "DECENT", label: "Decent" },
-                { value: "LOST_INTEREST", label: "Lost Interest" },
+                { value: "STRONG_HOOK", label: "Strong Hook", color: "lime" },
+                { value: "DECENT", label: "Decent", color: "orange" },
+                { value: "LOST_INTEREST", label: "Lost Interest", color: "neutral" },
               ].map((option) => (
                 <button
                   key={option.value}
                   type="button"
                   onClick={() => setFirstImpression(option.value as FirstImpression)}
                   className={cn(
-                    "flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors border",
+                    "flex-1 py-2.5 px-3 text-sm font-bold transition-colors border-2 border-black",
                     firstImpression === option.value
-                      ? "bg-neutral-900 text-white border-neutral-900"
-                      : "border-neutral-200 hover:border-neutral-300"
+                      ? option.color === "lime"
+                        ? "bg-lime-500 text-black"
+                        : option.color === "orange"
+                        ? "bg-orange-400 text-black"
+                        : "bg-neutral-800 text-white"
+                      : "bg-white text-black hover:bg-neutral-100"
                   )}
                 >
                   {option.label}
@@ -495,17 +676,17 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Would Listen Again */}
-          <div className="space-y-2">
-            <Label>Would you listen to this again?</Label>
+          <div className="space-y-3">
+            <Label className="text-base font-bold">Would you listen to this again?</Label>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setWouldListenAgain(true)}
                 className={cn(
-                  "flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors border",
+                  "flex-1 py-2.5 px-3 text-sm font-bold transition-colors border-2 border-black",
                   wouldListenAgain === true
-                    ? "bg-green-600 text-white border-green-600"
-                    : "border-neutral-200 hover:border-neutral-300"
+                    ? "bg-lime-500 text-black"
+                    : "bg-white text-black hover:bg-neutral-100"
                 )}
               >
                 Yes
@@ -514,10 +695,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                 type="button"
                 onClick={() => setWouldListenAgain(false)}
                 className={cn(
-                  "flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors border",
+                  "flex-1 py-2.5 px-3 text-sm font-bold transition-colors border-2 border-black",
                   wouldListenAgain === false
-                    ? "bg-neutral-600 text-white border-neutral-600"
-                    : "border-neutral-200 hover:border-neutral-300"
+                    ? "bg-neutral-800 text-white"
+                    : "bg-white text-black hover:bg-neutral-100"
                 )}
               >
                 No
@@ -548,63 +729,113 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Best & Weakest Parts */}
-          <div className="space-y-2">
-            <Label htmlFor="best">Best part of the track *</Label>
+          <div className="space-y-3">
+            <Label htmlFor="best" className="text-base font-bold">Best part of the track *</Label>
             <textarea
               id="best"
               placeholder="What stood out to you? What worked well?"
               value={bestPart}
               onChange={(e) => setBestPart(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-200 rounded-md text-sm min-h-[80px] resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950"
+              className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
             />
-            <p className="text-xs text-neutral-400">
-              {bestPartWords}/{MIN_WORDS_PER_SECTION} words minimum
-            </p>
+            <div className="flex items-center justify-between">
+              <p className={cn(
+                "text-xs font-mono",
+                bestPartWords >= MIN_WORDS_PER_SECTION ? "text-lime-600" : "text-neutral-500"
+              )}>
+                {bestPartWords}/{MIN_WORDS_PER_SECTION} words
+              </p>
+              {bestPartWords >= MIN_WORDS_PER_SECTION && (
+                <span className="text-xs font-bold text-lime-600 flex items-center gap-1">
+                  <Check className="h-3 w-3" /> Complete
+                </span>
+              )}
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="weakest">Weakest part / Areas for improvement *</Label>
+          <div className="space-y-3">
+            <Label htmlFor="weakest" className="text-base font-bold">Weakest part / Areas for improvement *</Label>
             <textarea
               id="weakest"
               placeholder="What could be better? Be constructive."
               value={weakestPart}
               onChange={(e) => setWeakestPart(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-200 rounded-md text-sm min-h-[80px] resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950"
+              className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
             />
-            <p className="text-xs text-neutral-400">
-              {weakestPartWords}/{MIN_WORDS_PER_SECTION} words minimum
-            </p>
+            <div className="flex items-center justify-between">
+              <p className={cn(
+                "text-xs font-mono",
+                weakestPartWords >= MIN_WORDS_PER_SECTION ? "text-lime-600" : "text-neutral-500"
+              )}>
+                {weakestPartWords}/{MIN_WORDS_PER_SECTION} words
+              </p>
+              {weakestPartWords >= MIN_WORDS_PER_SECTION && (
+                <span className="text-xs font-bold text-lime-600 flex items-center gap-1">
+                  <Check className="h-3 w-3" /> Complete
+                </span>
+              )}
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="notes">Additional notes (optional)</Label>
+          <div className="space-y-3">
+            <Label htmlFor="notes" className="text-base font-bold">Additional notes (optional)</Label>
             <textarea
               id="notes"
               placeholder="Any other thoughts..."
               value={additionalNotes}
               onChange={(e) => setAdditionalNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-200 rounded-md text-sm min-h-[80px] resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950"
+              className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
             />
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Submit */}
-          <div className="pt-4 border-t border-neutral-100">
-            <Button
-              onClick={handleSubmit}
-              isLoading={isSubmitting}
-              disabled={!canSubmit || !meetsTextMinimum}
-              className="w-full"
-            >
-              {canSubmit && meetsTextMinimum
-                ? `Submit Review & Earn ${formatCurrency(TIER_EARNINGS[review.reviewer.tier])}`
-                : `Listen for ${Math.floor(MIN_LISTEN_SECONDS / 60)} minutes and complete feedback to submit`}
-            </Button>
-            {(!canSubmit || !meetsTextMinimum) && (
-              <p className="text-xs text-neutral-400 text-center mt-2">
-                Keep listening and write detailed feedback to unlock submit
+      {/* Submit Card */}
+      <Card className="bg-black text-white border-black">
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div className="min-w-0">
+              <p className="text-neutral-400 text-sm font-medium">You&apos;ll earn</p>
+              <p className="text-3xl font-black text-lime-500">
+                {formatCurrency(TIER_EARNINGS[review.reviewer.tier])}
               </p>
-            )}
+            </div>
+            <div className="text-left sm:text-right">
+              <div className="flex items-center gap-2 text-sm flex-wrap">
+                {canSubmit ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-lime-500 text-black font-bold text-xs">
+                    <Check className="h-3 w-3" /> Listening complete
+                  </span>
+                ) : (
+                  <span className="text-neutral-400 font-mono">
+                    Listen for {Math.floor(MIN_LISTEN_SECONDS / 60)}+ min
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 text-sm mt-1 flex-wrap">
+                {meetsTextMinimum ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-lime-500 text-black font-bold text-xs">
+                    <Check className="h-3 w-3" /> Feedback complete
+                  </span>
+                ) : (
+                  <span className="text-neutral-400 font-mono">
+                    {MIN_WORDS_PER_SECTION} words min per section
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
+          <Button
+            onClick={handleSubmit}
+            isLoading={isSubmitting}
+            disabled={!canSubmit || !meetsTextMinimum}
+            variant="primary"
+            className="w-full"
+          >
+            {canSubmit && meetsTextMinimum
+              ? `Submit Review & Earn ${formatCurrency(TIER_EARNINGS[review.reviewer.tier])}`
+              : "Complete requirements to submit"}
+          </Button>
         </CardContent>
       </Card>
     </div>
@@ -621,27 +852,30 @@ function ScoreInput({
   onChange: (value: number) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="flex gap-1">
+    <div className="space-y-3">
+      <Label className="font-bold">{label}</Label>
+      <div className="flex gap-1 p-2 border-2 border-black bg-white">
         {[1, 2, 3, 4, 5].map((score) => (
           <button
             key={score}
             type="button"
             onClick={() => onChange(score)}
-            className="flex-1"
+            className="flex-1 p-1 hover:bg-neutral-100 transition-colors"
           >
             <Star
               className={cn(
                 "h-6 w-6 mx-auto transition-colors",
                 score <= value
-                  ? "text-amber-400 fill-amber-400"
-                  : "text-neutral-200 hover:text-neutral-300"
+                  ? "text-amber-500 fill-amber-500"
+                  : "text-neutral-300 hover:text-neutral-400"
               )}
             />
           </button>
         ))}
       </div>
+      {value > 0 && (
+        <p className="text-xs font-mono text-neutral-600 text-center">{value}/5</p>
+      )}
     </div>
   );
 }

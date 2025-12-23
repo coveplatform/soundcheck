@@ -1,0 +1,5 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Minimal: circle with offset inner circle (like a vinyl/record abstraction) -->
+  <circle cx="24" cy="24" r="20" fill="#18181B"/>
+  <circle cx="28" cy="20" r="8" fill="#22C55E"/>
+</svg>

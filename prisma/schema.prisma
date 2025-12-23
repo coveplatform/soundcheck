@@ -32,6 +32,7 @@ model User {
 
   passwordResetTokens    PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
+  supportTickets         SupportTicket[]
 }
 
 // NextAuth required models
@@ -148,6 +149,7 @@ model ReviewerProfile {
   onboardingQuizCompletedAt DateTime?
 
   // Quality flags
+  gemCount       Int     @default(0)
   flagCount      Int     @default(0)
   isRestricted   Boolean @default(false)
   completedOnboarding Boolean @default(false)
@@ -290,6 +292,7 @@ model Review {
 
   // Quality tracking
   artistRating Int?     // 1-5, set by artist
+  isGem        Boolean  @default(false)
   wasFlagged   Boolean  @default(false)
   flagReason   String?
 
@@ -307,6 +310,51 @@ enum ReviewStatus {
   COMPLETED   // Submitted
   EXPIRED     // Timed out, reassigned
   SKIPPED     // Reviewer skipped
+}
+
+enum SupportTicketStatus {
+  OPEN
+  NEEDS_INFO
+  RESOLVED
+  CLOSED
+}
+
+enum SupportMessageAuthorType {
+  USER
+  ADMIN
+}
+
+model SupportTicket {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  subject String
+  status  SupportTicketStatus @default(OPEN)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages SupportMessage[]
+
+  @@index([userId, createdAt])
+  @@index([status, updatedAt])
+}
+
+model SupportMessage {
+  id       String @id @default(cuid())
+  ticketId String
+  ticket   SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  authorType  SupportMessageAuthorType
+  authorUserId String?
+  authorEmail  String?
+
+  body String
+
+  createdAt DateTime @default(now())
+
+  @@index([ticketId, createdAt])
 }
 
 enum FirstImpression {

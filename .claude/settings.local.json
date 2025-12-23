@@ -10,7 +10,10 @@
       "Bash(find \"C:\\\\Users\\\\simli\\\\Desktop\\\\review\\\\soundcheck\\\\src\\\\app\\\\\\(dashboard\\)\" -name \"page.tsx\")",
       "Bash(head:*)",
       "Bash(npm run test:run:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(dir:*)",
+      "Bash(npx prisma db seed)"
     ]
   }
 }

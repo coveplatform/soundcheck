@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,11 +30,41 @@ export default function SignupPage() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getSession()
+      .then((session) => {
+        if (cancelled) return;
+        if (session?.user) {
+          const defaultUrl = session.user.isArtist
+            ? "/artist/dashboard"
+            : session.user.isReviewer
+            ? "/reviewer/dashboard"
+            : "/";
+          router.replace(defaultUrl);
+          router.refresh();
+          return;
+        }
+        setIsCheckingSession(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setIsCheckingSession(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   // Track page view
   useEffect(() => {
+    if (isCheckingSession) return;
     funnels.artistSignup.start();
-  }, []);
+  }, [isCheckingSession]);
 
   const handleRoleSelect = (selectedRole: Role) => {
     funnels.artistSignup.selectRole(selectedRole);
@@ -82,6 +113,8 @@ export default function SignupPage() {
       setIsLoading(false);
     }
   };
+
+  if (isCheckingSession) return null;
 
   if (step === "role") {
     return (

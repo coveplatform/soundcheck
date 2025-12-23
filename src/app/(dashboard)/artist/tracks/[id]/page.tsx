@@ -6,9 +6,11 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReviewRating } from "@/components/artist/review-rating";
 import { ReviewFlag } from "@/components/artist/review-flag";
+import { ReviewGem } from "@/components/artist/review-gem";
 import { TrackCancelButton } from "@/components/artist/track-cancel-button";
 import { AggregateAnalytics } from "@/components/feedback/aggregate-analytics";
 import { AudioPlayer } from "@/components/audio/audio-player";
+import { GenreTagList } from "@/components/ui/genre-tag";
 import {
   ArrowLeft,
   Music,
@@ -42,6 +44,13 @@ export default async function TrackDetailPage({
       payment: true,
       reviews: {
         where: { status: "COMPLETED" },
+        include: {
+          reviewer: {
+            include: {
+              user: { select: { name: true } },
+            },
+          },
+        },
         orderBy: { createdAt: "desc" },
       },
     },
@@ -71,12 +80,19 @@ export default async function TrackDetailPage({
     (wouldListenAgain / (completedReviews || 1)) * 100
   );
 
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(/\s+/g).filter(Boolean);
+    const first = parts[0]?.[0] ?? "?";
+    const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? "" : "";
+    return (first + last).toUpperCase();
+  };
+
   return (
     <div className="space-y-6">
       {/* Back Link */}
       <Link
         href="/artist/dashboard"
-        className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900"
+        className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Dashboard
@@ -85,17 +101,19 @@ export default async function TrackDetailPage({
       {/* Track Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">
-          <div className="h-16 w-16 bg-neutral-100 rounded-lg flex items-center justify-center">
-            <Music className="h-8 w-8 text-neutral-400" />
+          <div className="h-16 w-16 bg-neutral-100 border-2 border-black flex items-center justify-center">
+            <Music className="h-8 w-8 text-black" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">{track.title}</h1>
-            <p className="text-neutral-500">
-              {track.genres.map((g) => g.name).join(", ")}
-            </p>
+            <h1 className="text-2xl font-black">{track.title}</h1>
+            <GenreTagList
+              genres={track.genres}
+              variant="artist"
+              size="sm"
+            />
             {track.feedbackFocus && (
-              <p className="text-sm text-neutral-400 mt-1">
-                Focus: {track.feedbackFocus}
+              <p className="text-sm text-amber-600 font-medium mt-2">
+                Artist note: {track.feedbackFocus}
               </p>
             )}
           </div>
@@ -111,7 +129,7 @@ export default async function TrackDetailPage({
             href={track.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900"
+            className="flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
           >
             <ExternalLink className="h-4 w-4" />
             {track.sourceType === "UPLOAD" ? "Download audio" : "View Track"}
@@ -156,15 +174,15 @@ export default async function TrackDetailPage({
       {track.status !== "CANCELLED" ? (
         <Card>
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Review Progress</span>
-              <span className="text-sm text-neutral-500">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2">
+              <span className="text-sm font-bold">Review Progress</span>
+              <span className="text-sm text-neutral-600 font-mono">
                 {completedReviews} of {track.reviewsRequested} reviews
               </span>
             </div>
-            <div className="w-full h-2 bg-neutral-100 rounded-full">
+            <div className="w-full h-3 bg-neutral-200 border-2 border-black">
               <div
-                className="h-full bg-neutral-900 rounded-full transition-all"
+                className="h-full bg-lime-500 transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -177,16 +195,16 @@ export default async function TrackDetailPage({
         <div className="grid sm:grid-cols-3 gap-4">
           <Card>
             <CardContent className="pt-6 text-center">
-              <p className="text-3xl font-bold">{avgProduction.toFixed(1)}</p>
-              <p className="text-sm text-neutral-500">Avg. Production Score</p>
+              <p className="text-3xl font-black">{avgProduction.toFixed(1)}</p>
+              <p className="text-sm text-neutral-600 font-medium">Avg. Production Score</p>
               <div className="flex justify-center mt-2">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <Star
                     key={i}
                     className={`h-4 w-4 ${
                       i <= Math.round(avgProduction)
-                        ? "text-amber-400 fill-amber-400"
-                        : "text-neutral-200"
+                        ? "text-amber-500 fill-amber-500"
+                        : "text-neutral-300"
                     }`}
                   />
                 ))}
@@ -195,16 +213,16 @@ export default async function TrackDetailPage({
           </Card>
           <Card>
             <CardContent className="pt-6 text-center">
-              <p className="text-3xl font-bold">{avgOriginality.toFixed(1)}</p>
-              <p className="text-sm text-neutral-500">Avg. Originality Score</p>
+              <p className="text-3xl font-black">{avgOriginality.toFixed(1)}</p>
+              <p className="text-sm text-neutral-600 font-medium">Avg. Originality Score</p>
               <div className="flex justify-center mt-2">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <Star
                     key={i}
                     className={`h-4 w-4 ${
                       i <= Math.round(avgOriginality)
-                        ? "text-amber-400 fill-amber-400"
-                        : "text-neutral-200"
+                        ? "text-amber-500 fill-amber-500"
+                        : "text-neutral-300"
                     }`}
                   />
                 ))}
@@ -213,11 +231,11 @@ export default async function TrackDetailPage({
           </Card>
           <Card>
             <CardContent className="pt-6 text-center">
-              <p className="text-3xl font-bold">{wouldListenAgainPercent}%</p>
-              <p className="text-sm text-neutral-500">Would Listen Again</p>
-              <div className="flex justify-center gap-2 mt-2">
-                <ThumbsUp className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-neutral-500">
+              <p className="text-3xl font-black">{wouldListenAgainPercent}%</p>
+              <p className="text-sm text-neutral-600 font-medium">Would Listen Again</p>
+              <div className="flex justify-center items-center gap-2 mt-2">
+                <ThumbsUp className="h-4 w-4 text-lime-600" />
+                <span className="text-sm text-neutral-600 font-mono">
                   {wouldListenAgain} of {completedReviews}
                 </span>
               </div>
@@ -230,171 +248,177 @@ export default async function TrackDetailPage({
 
       {/* Reviews */}
       <Card>
-        <CardHeader>
-          <CardTitle>Reviews</CardTitle>
+        <CardHeader className="border-b-2 border-black">
+          <CardTitle>Reviews ({completedReviews})</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {completedReviews === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-neutral-500">
-                No reviews yet. Check back soon!
+            <div className="text-center py-12 px-6">
+              <div className="mx-auto w-12 h-12 bg-neutral-100 border-2 border-black flex items-center justify-center mb-4">
+                <Music className="h-6 w-6 text-black" />
+              </div>
+              <h3 className="font-bold text-black">No reviews yet</h3>
+              <p className="text-sm text-neutral-600 mt-1">
+                Check back soon!
               </p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="divide-y-2 divide-black">
               {track.reviews.map((review, index) => (
-                <div
-                  key={review.id}
-                  className="border-b border-neutral-100 pb-6 last:border-0 last:pb-0"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-medium text-neutral-500">
-                      Reviewer #{index + 1}
-                    </span>
-                    <span className="text-xs text-neutral-400">
-                      {review.createdAt.toLocaleDateString()}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <ReviewRating
-                      reviewId={review.id}
-                      initialRating={review.artistRating ?? null}
-                    />
-                    <ReviewFlag
-                      reviewId={review.id}
-                      wasFlagged={review.wasFlagged}
-                      flagReason={review.flagReason}
-                    />
-                  </div>
-
-                  {/* First Impression */}
-                  {review.firstImpression && (
-                    <div className="mb-3">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                          review.firstImpression === "STRONG_HOOK"
-                            ? "bg-green-100 text-green-700"
-                            : review.firstImpression === "DECENT"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        First Impression:{" "}
-                        {review.firstImpression === "STRONG_HOOK"
-                          ? "Strong Hook"
-                          : review.firstImpression === "DECENT"
-                          ? "Decent"
-                          : "Lost Interest"}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Scores */}
-                  <div className="flex flex-wrap gap-4 mb-3 text-sm">
-                    {review.productionScore && (
-                      <div>
-                        <span className="text-neutral-500">Production:</span>{" "}
-                        <span className="font-medium">
-                          {review.productionScore}/5
-                        </span>
+                <article key={review.id} className="p-6">
+                  {/* Header: Number + Actions */}
+                  <header className="flex items-start justify-between gap-4 mb-5">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 bg-black text-white font-mono text-sm font-bold flex items-center justify-center">
+                        {String(index + 1).padStart(2, "0")}
                       </div>
+                      <div>
+                        <time className="text-xs text-neutral-500 font-mono">
+                          {review.createdAt.toLocaleDateString()}
+                        </time>
+                        <div className="mt-0.5">
+                          <Link
+                            href={`/artist/reviewers/${review.reviewer.id}`}
+                            className="inline-flex items-center gap-2 text-xs font-bold text-neutral-700 hover:text-black"
+                          >
+                            <span className="h-6 w-6 rounded-full bg-neutral-100 border border-black overflow-hidden flex items-center justify-center text-[10px] font-black text-black">
+                              {getInitials(review.reviewer.user.name ?? "Reviewer")}
+                            </span>
+                            <span>
+                              {review.reviewer.user.name ? review.reviewer.user.name : "Anonymous"}
+                            </span>
+                          </Link>
+                        </div>
+                        {/* First Impression inline */}
+                        {review.firstImpression && (
+                          <div className="mt-0.5">
+                            <span className={`text-xs font-bold ${
+                              review.firstImpression === "STRONG_HOOK"
+                                ? "text-lime-600"
+                                : review.firstImpression === "DECENT"
+                                ? "text-orange-600"
+                                : "text-neutral-500"
+                            }`}>
+                              {review.firstImpression === "STRONG_HOOK"
+                                ? "Strong Hook"
+                                : review.firstImpression === "DECENT"
+                                ? "Decent Start"
+                                : "Lost Interest"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Action toolbar */}
+                    <div className="flex items-center gap-3">
+                      <ReviewRating
+                        reviewId={review.id}
+                        initialRating={review.artistRating ?? null}
+                      />
+                      <ReviewGem
+                        reviewId={review.id}
+                        initialIsGem={(review as any).isGem ?? false}
+                      />
+                    </div>
+                  </header>
+
+                  {/* Scores - Compact inline display */}
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-neutral-600 mb-5">
+                    {review.productionScore && (
+                      <span>
+                        Production <strong className="text-black">{review.productionScore}/5</strong>
+                      </span>
                     )}
                     {review.vocalScore && (
-                      <div>
-                        <span className="text-neutral-500">Vocals:</span>{" "}
-                        <span className="font-medium">
-                          {review.vocalScore}/5
-                        </span>
-                      </div>
+                      <span>
+                        Vocals <strong className="text-black">{review.vocalScore}/5</strong>
+                      </span>
                     )}
                     {review.originalityScore && (
-                      <div>
-                        <span className="text-neutral-500">Originality:</span>{" "}
-                        <span className="font-medium">
-                          {review.originalityScore}/5
-                        </span>
-                      </div>
+                      <span>
+                        Originality <strong className="text-black">{review.originalityScore}/5</strong>
+                      </span>
                     )}
                     {review.wouldListenAgain !== null && (
-                      <div className="flex items-center gap-1">
+                      <span className="flex items-center gap-1">
                         {review.wouldListenAgain ? (
                           <>
-                            <ThumbsUp className="h-4 w-4 text-green-500" />
-                            <span className="text-green-600">
-                              Would listen again
-                            </span>
+                            <ThumbsUp className="h-3.5 w-3.5 text-lime-600" />
+                            <strong className="text-lime-600">Would listen again</strong>
                           </>
                         ) : (
                           <>
-                            <ThumbsDown className="h-4 w-4 text-neutral-400" />
-                            <span className="text-neutral-500">
-                              Wouldn&apos;t listen again
-                            </span>
+                            <ThumbsDown className="h-3.5 w-3.5 text-neutral-400" />
+                            <span className="text-neutral-500">Wouldn&apos;t replay</span>
                           </>
                         )}
-                      </div>
+                      </span>
                     )}
                   </div>
 
-                  {/* Genre & Similar Artists */}
-                  {(review.perceivedGenre || review.similarArtists) && (
-                    <div className="text-sm mb-3">
-                      {review.perceivedGenre && (
-                        <p>
-                          <span className="text-neutral-500">
-                            Perceived genre:
-                          </span>{" "}
-                          {review.perceivedGenre}
-                        </p>
-                      )}
-                      {review.similarArtists && (
-                        <p>
-                          <span className="text-neutral-500">
-                            Similar artists:
-                          </span>{" "}
-                          {review.similarArtists}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Best & Weakest Parts */}
-                  <div className="grid sm:grid-cols-2 gap-4 mb-3">
+                  {/* Main Feedback - The star of the show */}
+                  <div className="space-y-4 mb-5">
                     {review.bestPart && (
-                      <div className="bg-green-50 p-3 rounded-lg">
-                        <p className="text-xs font-medium text-green-700 mb-1">
-                          Best Part
-                        </p>
-                        <p className="text-sm text-green-800">
+                      <div>
+                        <h4 className="text-xs font-bold text-lime-700 uppercase tracking-wide mb-1.5">
+                          What Worked
+                        </h4>
+                        <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-lime-500">
                           {review.bestPart}
                         </p>
                       </div>
                     )}
                     {review.weakestPart && (
-                      <div className="bg-red-50 p-3 rounded-lg">
-                        <p className="text-xs font-medium text-red-700 mb-1">
-                          Weakest Part
-                        </p>
-                        <p className="text-sm text-red-800">
+                      <div>
+                        <h4 className="text-xs font-bold text-red-600 uppercase tracking-wide mb-1.5">
+                          To Improve
+                        </h4>
+                        <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-red-400">
                           {review.weakestPart}
+                        </p>
+                      </div>
+                    )}
+                    {review.additionalNotes && (
+                      <div>
+                        <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wide mb-1.5">
+                          Additional Notes
+                        </h4>
+                        <p className="text-sm text-neutral-700 leading-relaxed pl-3 border-l-4 border-neutral-300">
+                          {review.additionalNotes}
                         </p>
                       </div>
                     )}
                   </div>
 
-                  {/* Additional Notes */}
-                  {review.additionalNotes && (
-                    <div className="bg-neutral-50 p-3 rounded-lg">
-                      <p className="text-xs font-medium text-neutral-500 mb-1">
-                        Additional Notes
-                      </p>
-                      <p className="text-sm text-neutral-700">
-                        {review.additionalNotes}
-                      </p>
+                  {/* Secondary info - inline text, not boxed */}
+                  {(review.perceivedGenre || review.similarArtists) && (
+                    <div className="text-xs text-neutral-500 mb-4">
+                      {review.perceivedGenre && (
+                        <span>
+                          Sounds like <strong className="text-neutral-700">{review.perceivedGenre}</strong>
+                        </span>
+                      )}
+                      {review.perceivedGenre && review.similarArtists && (
+                        <span className="mx-2">·</span>
+                      )}
+                      {review.similarArtists && (
+                        <span>
+                          Similar to <strong className="text-neutral-700">{review.similarArtists}</strong>
+                        </span>
+                      )}
                     </div>
                   )}
-                </div>
+
+                  {/* Flag control - minimal, at the bottom */}
+                  <footer className="pt-4 border-t border-neutral-200">
+                    <ReviewFlag
+                      reviewId={review.id}
+                      wasFlagged={review.wasFlagged}
+                      flagReason={review.flagReason}
+                    />
+                  </footer>
+                </article>
               ))}
             </div>
           )}

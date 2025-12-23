@@ -44,36 +44,35 @@ export function ReviewRating({
   }
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-neutral-500">Rate this review</span>
-        <div className="flex items-center gap-0.5">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <button
-              key={n}
-              type="button"
-              onClick={() => submit(n)}
-              onMouseEnter={() => setHover(n)}
-              onMouseLeave={() => setHover(null)}
-              disabled={isSaving}
+    <div className="flex items-center gap-1.5">
+      <span className="text-xs text-neutral-400 hidden sm:inline">Rate</span>
+      <div className="flex items-center">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => submit(n)}
+            onMouseEnter={() => setHover(n)}
+            onMouseLeave={() => setHover(null)}
+            disabled={isSaving}
+            title={`Rate ${n}/5`}
+            className={cn(
+              "p-0.5 transition-transform hover:scale-110",
+              isSaving && "opacity-60 cursor-not-allowed"
+            )}
+          >
+            <Star
               className={cn(
-                "p-0.5 rounded-sm",
-                isSaving && "opacity-60 cursor-not-allowed"
+                "h-4 w-4 transition-colors",
+                displayRating !== null && n <= displayRating
+                  ? "text-amber-500 fill-amber-500"
+                  : "text-neutral-300 hover:text-neutral-400"
               )}
-            >
-              <Star
-                className={cn(
-                  "h-4 w-4 transition-colors",
-                  displayRating !== null && n <= displayRating
-                    ? "text-amber-400 fill-amber-400"
-                    : "text-neutral-200"
-                )}
-              />
-            </button>
-          ))}
-        </div>
+            />
+          </button>
+        ))}
       </div>
-      {error ? <p className="text-xs text-red-500">{error}</p> : null}
+      {error && <span className="text-xs text-red-500">!</span>}
     </div>
   );
 }

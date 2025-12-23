@@ -123,6 +123,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (review.status !== "ASSIGNED" && review.status !== "IN_PROGRESS") {
+      return NextResponse.json(
+        { error: "This review is no longer active" },
+        { status: 400 }
+      );
+    }
+
     if (review.listenDuration < MIN_LISTEN_SECONDS) {
       return NextResponse.json(
         { error: `Must listen for at least ${MIN_LISTEN_SECONDS} seconds` },

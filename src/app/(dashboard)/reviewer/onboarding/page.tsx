@@ -12,7 +12,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Check, Headphones, DollarSign, TrendingUp } from "lucide-react";
+import { Headphones, DollarSign, TrendingUp } from "lucide-react";
+import { GenreSelector } from "@/components/ui/genre-selector";
 import { cn } from "@/lib/utils";
 
 interface Genre {
@@ -423,48 +424,27 @@ export default function ReviewerOnboardingPage() {
             </div>
           )}
 
-          <div className="space-y-3">
-            <Label className="font-bold">
-              Your Genres{" "}
-              <span className="text-neutral-600 font-normal">
-                ({selectedGenres.length}/5 selected, minimum 3)
-              </span>
-            </Label>
-            {isLoadingGenres ? (
-              <div className="text-sm text-neutral-600">Loading genres...</div>
-            ) : genres.length === 0 ? (
-              <div className="space-y-3">
-                <p className="text-sm text-neutral-600">
-                  No genres available right now. Try reloading.
-                </p>
-                <Button variant="outline" onClick={fetchGenres}>
-                  Retry
-                </Button>
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {genres.map((genre) => {
-                  const isSelected = selectedGenres.includes(genre.id);
-                  return (
-                    <button
-                      key={genre.id}
-                      type="button"
-                      onClick={() => toggleGenre(genre.id)}
-                      className={cn(
-                        "px-3 py-1.5 text-sm font-bold transition-colors flex items-center gap-1.5 border-2 border-black",
-                        isSelected
-                          ? "bg-orange-400 text-black"
-                          : "bg-white text-black hover:bg-neutral-100"
-                      )}
-                    >
-                      {isSelected && <Check className="h-3 w-3" />}
-                      {genre.name}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          {isLoadingGenres ? (
+            <div className="text-sm text-neutral-600">Loading genres...</div>
+          ) : genres.length === 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-neutral-600">
+                No genres available right now. Try reloading.
+              </p>
+              <Button variant="outline" onClick={fetchGenres}>
+                Retry
+              </Button>
+            </div>
+          ) : (
+            <GenreSelector
+              genres={genres}
+              selectedIds={selectedGenres}
+              onToggle={toggleGenre}
+              minSelections={3}
+              maxSelections={5}
+              variant="reviewer"
+            />
+          )}
         </CardContent>
         <CardFooter className="flex gap-3">
           <Button variant="outline" onClick={() => setStep("intro")}>

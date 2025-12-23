@@ -64,6 +64,9 @@ export default async function AdminPage() {
           <Link className="text-neutral-600 hover:text-neutral-900" href="/admin/reviewers">
             Reviewer restrictions
           </Link>
+          <Link className="text-neutral-600 hover:text-neutral-900" href="/admin/support">
+            Support tickets
+          </Link>
         </div>
       </div>
     </div>

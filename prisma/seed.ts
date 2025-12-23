@@ -11,9 +11,19 @@ const prisma = new PrismaClient({
 });
 
 const genres = [
-  // Electronic
+  // Parent categories (broad genres)
+  { name: "Electronic", slug: "electronic" },
+  { name: "Hip-Hop & R&B", slug: "hip-hop-rnb" },
+  { name: "Rock & Metal", slug: "rock-metal" },
+  { name: "Pop & Dance", slug: "pop-dance" },
+  { name: "Other", slug: "other" },
+
+  // Electronic sub-genres
   { name: "House", slug: "house" },
+  { name: "Deep House", slug: "deep-house" },
+  { name: "Progressive House", slug: "progressive-house" },
   { name: "Techno", slug: "techno" },
+  { name: "Hard Techno", slug: "hard-techno" },
   { name: "Drum & Bass", slug: "drum-and-bass" },
   { name: "Dubstep", slug: "dubstep" },
   { name: "Trance", slug: "trance" },
@@ -23,27 +33,27 @@ const genres = [
   { name: "Lo-Fi", slug: "lo-fi" },
   { name: "Future Bass", slug: "future-bass" },
 
-  // Hip-Hop & R&B
+  // Hip-Hop & R&B sub-genres
   { name: "Hip-Hop", slug: "hip-hop" },
   { name: "Trap", slug: "trap" },
   { name: "R&B", slug: "rnb" },
   { name: "Boom Bap", slug: "boom-bap" },
   { name: "Drill", slug: "drill" },
 
-  // Rock & Metal
+  // Rock & Metal sub-genres
   { name: "Rock", slug: "rock" },
   { name: "Indie Rock", slug: "indie-rock" },
   { name: "Alternative", slug: "alternative" },
   { name: "Metal", slug: "metal" },
   { name: "Punk", slug: "punk" },
 
-  // Pop & Mainstream
+  // Pop sub-genres
   { name: "Pop", slug: "pop" },
   { name: "Indie Pop", slug: "indie-pop" },
   { name: "Electropop", slug: "electropop" },
   { name: "Synth Pop", slug: "synth-pop" },
 
-  // Other
+  // Other sub-genres
   { name: "Jazz", slug: "jazz" },
   { name: "Soul", slug: "soul" },
   { name: "Funk", slug: "funk" },

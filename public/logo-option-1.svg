@@ -1,0 +1,5 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Abstract S shape - two offset rounded rectangles -->
+  <rect x="8" y="8" width="24" height="16" rx="8" fill="#7C3AED"/>
+  <rect x="16" y="24" width="24" height="16" rx="8" fill="#7C3AED"/>
+</svg>

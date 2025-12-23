@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Music, Plus, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { GenreTagList } from "@/components/ui/genre-tag";
 
 export const dynamic = 'force-dynamic';
 
@@ -52,13 +53,13 @@ export default async function ArtistDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="min-w-0">
           <h1 className="text-2xl font-black">Welcome back, {artistProfile.artistName}</h1>
           <p className="text-neutral-600">Manage your tracks and view feedback</p>
         </div>
         <Link href="/artist/submit">
-          <Button variant="primary">
+          <Button variant="primary" className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Submit Track
           </Button>
@@ -96,7 +97,7 @@ export default async function ArtistDashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-lime-400 border-2 border-black flex items-center justify-center">
+              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
                 <CheckCircle className="h-6 w-6 text-black" />
               </div>
               <div>
@@ -141,7 +142,7 @@ export default async function ArtistDashboardPage() {
                   <Link
                     key={track.id}
                     href={`/artist/tracks/${track.id}`}
-                    className="block py-4 hover:bg-neutral-50 -mx-6 px-6 transition-colors"
+                    className="block py-4 hover:bg-neutral-50 -mx-4 px-4 sm:-mx-6 sm:px-6 transition-colors"
                   >
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3 min-w-0">
@@ -150,11 +151,12 @@ export default async function ArtistDashboardPage() {
                         </div>
                         <div className="min-w-0">
                           <p className="font-bold truncate">{track.title}</p>
-                          <div className="flex items-center gap-2 text-sm text-neutral-600">
-                            <span>
-                              {track.genres.map((g) => g.name).join(", ")}
-                            </span>
-                          </div>
+                          <GenreTagList
+                            genres={track.genres}
+                            variant="artist"
+                            size="sm"
+                            maxDisplay={2}
+                          />
                         </div>
                       </div>
 
@@ -166,7 +168,7 @@ export default async function ArtistDashboardPage() {
                           </p>
                           <div className="w-24 h-2 bg-neutral-200 border border-black mt-1">
                             <div
-                              className="h-full bg-lime-400"
+                              className="h-full bg-lime-500"
                               style={{ width: `${progress}%` }}
                             />
                           </div>
@@ -206,7 +208,7 @@ function StatusBadge({ status }: { status: string }) {
     },
     COMPLETED: {
       label: "Completed",
-      className: "bg-lime-400 text-black border-black",
+      className: "bg-lime-500 text-black border-black",
       icon: CheckCircle,
     },
     CANCELLED: {

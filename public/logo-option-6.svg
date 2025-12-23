@@ -1,0 +1,5 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Two overlapping rounded squares - represents connection/review -->
+  <rect x="6" y="12" width="24" height="24" rx="6" fill="#7C3AED"/>
+  <rect x="18" y="12" width="24" height="24" rx="6" fill="#18181B"/>
+</svg>

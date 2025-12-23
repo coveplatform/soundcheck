@@ -168,9 +168,9 @@ export default async function EarningsPage() {
               {reviewerProfile.payouts.map((payout) => (
                 <div
                   key={payout.id}
-                  className="py-3 flex items-center justify-between"
+                  className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-medium">{formatCurrency(payout.amount)}</p>
                     <p className="text-sm text-neutral-500">
                       {new Date(payout.createdAt).toLocaleDateString()}
@@ -209,10 +209,10 @@ export default async function EarningsPage() {
               {reviewerProfile.reviews.map((review) => (
                 <div
                   key={review.id}
-                  className="py-3 flex items-center justify-between"
+                  className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
                 >
-                  <div>
-                    <p className="font-medium">{review.track.title}</p>
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">{review.track.title}</p>
                     <p className="text-sm text-neutral-500">
                       {new Date(review.createdAt).toLocaleDateString()}
                     </p>

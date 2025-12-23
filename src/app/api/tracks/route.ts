@@ -12,7 +12,7 @@ const createTrackSchema = z.object({
   artworkUrl: z.string().url().optional().nullable(),
   duration: z.number().int().positive().max(60 * 60).optional(),
   genreIds: z.array(z.string()).min(1, "Select at least one genre").max(3),
-  feedbackFocus: z.string().max(500).optional(),
+  feedbackFocus: z.string().max(1000).optional(),
   packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE"]),
 });
 

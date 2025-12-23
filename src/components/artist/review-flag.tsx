@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Flag } from "lucide-react";
+import { Flag, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function ReviewFlag({
   reviewId,
@@ -14,8 +15,16 @@ export function ReviewFlag({
 }) {
   const [reason, setReason] = useState<string>(flagReason ?? "low_effort");
   const [flagged, setFlagged] = useState<boolean>(wasFlagged);
+  const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string>("");
+
+  const reasonLabels: Record<string, string> = {
+    low_effort: "Low effort",
+    spam: "Spam",
+    offensive: "Offensive",
+    irrelevant: "Irrelevant",
+  };
 
   async function submit() {
     setError("");
@@ -35,6 +44,7 @@ export function ReviewFlag({
       }
 
       setFlagged(true);
+      setIsOpen(false);
     } catch {
       setError("Failed to flag review");
     } finally {
@@ -44,40 +54,65 @@ export function ReviewFlag({
 
   if (flagged) {
     return (
-      <div className="flex items-center gap-2 text-xs text-neutral-500">
-        <Flag className="h-4 w-4 text-red-500" />
-        <span>
-          Flagged{reason ? `: ${reason}` : ""}
-        </span>
+      <div className="flex items-center gap-1.5 text-xs text-red-600">
+        <Flag className="h-3.5 w-3.5" />
+        <span>Flagged as {reasonLabels[reason] || reason}</span>
       </div>
     );
   }
 
+  if (!isOpen) {
+    return (
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
+      >
+        <Flag className="h-3.5 w-3.5" />
+        <span>Report issue</span>
+      </button>
+    );
+  }
+
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 flex-wrap">
       <div className="flex items-center gap-2">
-        <Flag className="h-4 w-4 text-neutral-400" />
-        <select
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          disabled={isSaving}
-          className="text-xs border border-neutral-200 rounded-md px-2 py-1 bg-white"
-        >
-          <option value="low_effort">Low effort</option>
-          <option value="spam">Spam</option>
-          <option value="offensive">Offensive</option>
-          <option value="irrelevant">Irrelevant</option>
-        </select>
+        <Flag className="h-3.5 w-3.5 text-neutral-500" />
+        <div className="relative">
+          <select
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            disabled={isSaving}
+            className="text-xs border-2 border-black pl-2 pr-6 py-1 bg-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-1"
+          >
+            <option value="low_effort">Low effort</option>
+            <option value="spam">Spam</option>
+            <option value="offensive">Offensive</option>
+            <option value="irrelevant">Irrelevant</option>
+          </select>
+          <ChevronDown className="h-3 w-3 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-500" />
+        </div>
       </div>
       <button
         type="button"
         onClick={submit}
         disabled={isSaving}
-        className="text-xs px-2 py-1 rounded-md border border-neutral-200 hover:bg-neutral-50 disabled:opacity-60"
+        className={cn(
+          "text-xs px-2.5 py-1 font-bold border-2 border-black transition-colors",
+          "bg-red-500 text-white hover:bg-red-600",
+          isSaving && "opacity-60 cursor-not-allowed"
+        )}
       >
-        {isSaving ? "Flagging..." : "Flag"}
+        {isSaving ? "..." : "Flag"}
       </button>
-      {error ? <span className="text-xs text-red-500">{error}</span> : null}
+      <button
+        type="button"
+        onClick={() => setIsOpen(false)}
+        className="text-xs text-neutral-500 hover:text-neutral-700"
+      >
+        Cancel
+      </button>
+      {error && <span className="text-xs text-red-500">{error}</span>}
     </div>
   );
 }

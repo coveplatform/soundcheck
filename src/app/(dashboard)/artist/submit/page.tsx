@@ -11,9 +11,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Check, Music, ExternalLink } from "lucide-react";
+import { Music, ExternalLink, Check } from "lucide-react";
+import { GenreSelector } from "@/components/ui/genre-selector";
 import { cn } from "@/lib/utils";
-import { validateTrackUrl, fetchTrackMetadata, PACKAGES, PackageType } from "@/lib/metadata";
+import { validateTrackUrl, fetchTrackMetadata, ACTIVE_PACKAGE_TYPES, PACKAGES, PackageType } from "@/lib/metadata";
 import { AudioPlayer } from "@/components/audio/audio-player";
 
 interface Genre {
@@ -274,7 +275,7 @@ export default function SubmitTrackPage() {
       <div>
         <h1 className="text-2xl font-black">Submit a Track</h1>
         <p className="text-neutral-600 mt-1">
-          Get genuine feedback from real listeners
+          Get vetted, genre-matched feedback from real listeners. Rate reviews (and mark Gems) to help the best reviewers rise.
         </p>
       </div>
 
@@ -293,7 +294,7 @@ export default function SubmitTrackPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <button
               type="button"
               onClick={() => {
@@ -301,7 +302,7 @@ export default function SubmitTrackPage() {
                 setUploadedUrl("");
               }}
               className={cn(
-                "px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
+                "flex-1 sm:flex-none px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
                 inputMode === "url"
                   ? "bg-black text-white"
                   : "bg-white text-black hover:bg-neutral-100"
@@ -317,7 +318,7 @@ export default function SubmitTrackPage() {
                 setUrlError("");
               }}
               className={cn(
-                "px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
+                "flex-1 sm:flex-none px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
                 inputMode === "upload"
                   ? "bg-black text-white"
                   : "bg-white text-black hover:bg-neutral-100"
@@ -360,7 +361,7 @@ export default function SubmitTrackPage() {
           </div>
 
           {(inputMode === "url" ? url && !urlError : !!uploadedUrl) && (
-            <div className="flex items-center gap-2 p-3 bg-neutral-50 border-2 border-black">
+            <div className="flex flex-wrap items-center gap-2 p-3 bg-neutral-50 border-2 border-black">
               <Music className="h-5 w-5 text-black" />
               <div className="flex-1 min-w-0">
                 <Input
@@ -407,52 +408,38 @@ export default function SubmitTrackPage() {
         <CardHeader>
           <CardTitle className="text-lg">Genres</CardTitle>
           <CardDescription>
-            Select up to 3 genres that best describe this track
+            Help us match your track with the right reviewers
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {genres.map((genre) => {
-              const isSelected = selectedGenres.includes(genre.id);
-              return (
-                <button
-                  key={genre.id}
-                  type="button"
-                  onClick={() => toggleGenre(genre.id)}
-                  className={cn(
-                    "px-3 py-1.5 text-sm font-bold transition-colors flex items-center gap-1.5 border-2 border-black",
-                    isSelected
-                      ? "bg-lime-400 text-black"
-                      : "bg-white text-black hover:bg-neutral-100"
-                  )}
-                >
-                  {isSelected && <Check className="h-3 w-3" />}
-                  {genre.name}
-                </button>
-              );
-            })}
-          </div>
+          <GenreSelector
+            genres={genres}
+            selectedIds={selectedGenres}
+            onToggle={toggleGenre}
+            maxSelections={3}
+            variant="artist"
+          />
         </CardContent>
       </Card>
 
       {/* Feedback Focus (Optional) */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Feedback Focus (Optional)</CardTitle>
+          <CardTitle className="text-lg">Explain Your Track (Optional)</CardTitle>
           <CardDescription>
-            Is there anything specific you want reviewers to focus on?
+            Describe the context in your own words (vibe, inspiration, what you were going for, anything you want them to know).
           </CardDescription>
         </CardHeader>
         <CardContent>
           <textarea
-            placeholder="e.g., I'm wondering if the mix sounds muddy, or if the vocals sit well in the track..."
+            placeholder="e.g., This is a demo for my next EP. I'm going for a dark club vibe. I'm unsure if the vocal sits right and whether the drop hits hard enough..."
             value={feedbackFocus}
             onChange={(e) => setFeedbackFocus(e.target.value)}
             className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
-            maxLength={500}
+            maxLength={1000}
           />
           <p className="text-xs text-neutral-600 mt-1 font-mono">
-            {feedbackFocus.length}/500
+            {feedbackFocus.length}/1000
           </p>
         </CardContent>
       </Card>
@@ -462,12 +449,12 @@ export default function SubmitTrackPage() {
         <CardHeader>
           <CardTitle className="text-lg">Choose Your Package</CardTitle>
           <CardDescription>
-            Select how many reviews you&apos;d like to receive
+            Select how many reviews you&apos;d like to receive (higher tiers prioritize top-rated reviewers)
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid sm:grid-cols-2 gap-3">
-            {(Object.keys(PACKAGES) as PackageType[]).map((key) => {
+            {ACTIVE_PACKAGE_TYPES.map((key) => {
               const pkg = PACKAGES[key];
               const isSelected = selectedPackage === key;
               return (
@@ -478,20 +465,20 @@ export default function SubmitTrackPage() {
                   className={cn(
                     "p-4 border-2 border-black text-left transition-colors",
                     isSelected
-                      ? "bg-lime-400"
+                      ? "bg-lime-500"
                       : "bg-white hover:bg-neutral-50"
                   )}
                 >
                   <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-bold">{pkg.name}</h3>
+                    <div className="min-w-0">
+                      <h3 className="font-bold truncate">{pkg.name}</h3>
                       <p className="text-sm text-neutral-600 mt-0.5">
                         {pkg.reviews} reviews
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex-shrink-0">
                       <p className="font-black text-lg">
-                        ${(pkg.price / 100).toFixed(0)}
+                        ${(pkg.price / 100).toFixed(2)}
                       </p>
                       <p className="text-xs text-neutral-600 font-mono">
                         ${(pkg.price / pkg.reviews / 100).toFixed(2)}/review
@@ -515,14 +502,14 @@ export default function SubmitTrackPage() {
       {/* Summary & Submit */}
       <Card className="bg-black text-white border-black">
         <CardContent className="pt-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div className="min-w-0">
               <p className="text-neutral-400 text-sm font-medium">Total</p>
               <p className="text-3xl font-black">
                 ${(selectedPackageDetails.price / 100).toFixed(2)}
               </p>
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right">
               <p className="text-neutral-400 text-sm font-mono">
                 {selectedPackageDetails.reviews} reviews
               </p>

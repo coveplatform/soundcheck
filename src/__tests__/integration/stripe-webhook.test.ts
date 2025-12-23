@@ -57,9 +57,9 @@ describe('Stripe Webhook Integration', () => {
 
     it('updates artist totalSpent', async () => {
       const artist = createMockArtistProfile({ totalSpent: 0 })
-      const payment = createMockPayment({ amount: 600 })
+      const payment = createMockPayment({ amount: 499 })
 
-      const updatedArtist = { ...artist, totalSpent: 600 }
+      const updatedArtist = { ...artist, totalSpent: 499 }
       prismaMock.artistProfile.update.mockResolvedValue(updatedArtist)
 
       const updated = await prismaMock.artistProfile.update({
@@ -67,7 +67,7 @@ describe('Stripe Webhook Integration', () => {
         data: { totalSpent: { increment: payment.amount } },
       })
 
-      expect(updated.totalSpent).toBe(600)
+      expect(updated.totalSpent).toBe(499)
     })
 
     it('sends track queued email to artist', async () => {
@@ -166,10 +166,10 @@ describe('Checkout Session Creation', () => {
   describe('Session Data', () => {
     it('includes correct line item for package', () => {
       const PACKAGES = {
-        STARTER: { price: 300, name: 'Starter', reviews: 5 },
-        STANDARD: { price: 600, name: 'Standard', reviews: 10 },
-        PRO: { price: 1200, name: 'Pro', reviews: 10 },
-        DEEP_DIVE: { price: 1800, name: 'Deep Dive', reviews: 25 },
+        STARTER: { price: 499, name: 'Starter', reviews: 5 },
+        STANDARD: { price: 899, name: 'Standard', reviews: 10 },
+        PRO: { price: 1499, name: 'Pro', reviews: 20 },
+        DEEP_DIVE: { price: 1499, name: 'Deep Dive', reviews: 20 },
       }
 
       const packageType = 'STANDARD' as keyof typeof PACKAGES
@@ -187,7 +187,7 @@ describe('Checkout Session Creation', () => {
         quantity: 1,
       }
 
-      expect(lineItem.price_data.unit_amount).toBe(600)
+      expect(lineItem.price_data.unit_amount).toBe(899)
       expect(lineItem.price_data.product_data.name).toBe('MixReflect Standard')
     })
 
@@ -225,7 +225,7 @@ describe('Checkout Session Creation', () => {
       const payment = createMockPayment({
         trackId: track.id,
         stripeSessionId,
-        amount: 600,
+        amount: 499,
         status: 'PENDING',
       })
 
@@ -235,7 +235,7 @@ describe('Checkout Session Creation', () => {
         data: {
           trackId: track.id,
           stripeSessionId,
-          amount: 600,
+          amount: 499,
           status: 'PENDING',
         },
       })
