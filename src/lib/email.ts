@@ -9,12 +9,12 @@ async function sendEmail({ to, subject, html }: SendEmailParams) {
   const from = process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM;
 
   if (!apiKey || !from) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("Email not sent (missing RESEND_API_KEY or RESEND_FROM_EMAIL/RESEND_FROM)", {
-        to,
-        subject,
-      });
-    }
+    console.warn("Email not sent (missing RESEND_API_KEY or RESEND_FROM_EMAIL/RESEND_FROM)", {
+      to,
+      subject,
+      hasApiKey: Boolean(apiKey),
+      hasFrom: Boolean(from),
+    });
     return;
   }
 

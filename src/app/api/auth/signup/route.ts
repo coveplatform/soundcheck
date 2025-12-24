@@ -20,6 +20,17 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { email, password, name, role, acceptedTerms } = signupSchema.parse(body);
 
+    const emailConfigured = Boolean(
+      process.env.RESEND_API_KEY && (process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM)
+    );
+
+    if (process.env.NODE_ENV === "production" && !emailConfigured) {
+      return NextResponse.json(
+        { error: "Email service is not configured" },
+        { status: 500 }
+      );
+    }
+
     if (!acceptedTerms) {
       return NextResponse.json(
         { error: "You must agree to the Terms and Privacy Policy" },
@@ -72,10 +83,6 @@ export async function POST(request: Request) {
       to: email,
       verifyUrl,
     });
-
-    const emailConfigured = Boolean(
-      process.env.RESEND_API_KEY && (process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM)
-    );
 
     if (process.env.NODE_ENV !== "production" && !emailConfigured) {
       console.log("Dev email verification link:", verifyUrl);
