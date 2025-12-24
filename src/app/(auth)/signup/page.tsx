@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Music, Headphones, Users } from "lucide-react";
+import { Music, Headphones, Users, ArrowLeft, Loader2 } from "lucide-react";
 import { funnels, track } from "@/lib/analytics";
 
 type Role = "artist" | "reviewer" | "both";
@@ -114,12 +114,30 @@ export default function SignupPage() {
     }
   };
 
-  if (isCheckingSession) return null;
+  if (isCheckingSession) {
+    return (
+      <Card>
+        <CardContent className="py-12">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
+            <p className="text-sm text-neutral-500">Loading...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (step === "role") {
     return (
       <Card>
         <CardHeader className="text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-black transition-colors mb-4 self-start"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Home
+          </Link>
           <CardTitle className="text-2xl">Join MixReflect</CardTitle>
           <CardDescription>
             How do you want to use MixReflect?
@@ -186,6 +204,14 @@ export default function SignupPage() {
   return (
     <Card>
       <CardHeader className="text-center">
+        <button
+          type="button"
+          onClick={() => setStep("role")}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-black transition-colors mb-4 self-start"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
         <CardTitle className="text-2xl">Create your account</CardTitle>
         <CardDescription>
           {role === "artist" && "Start getting feedback on your music"}
@@ -264,13 +290,12 @@ export default function SignupPage() {
           >
             Create account
           </Button>
-          <button
-            type="button"
-            onClick={() => setStep("role")}
-            className="text-sm text-neutral-600 hover:text-black font-medium"
-          >
-            &larr; Back to role selection
-          </button>
+          <p className="text-sm text-neutral-600 text-center">
+            Already have an account?{" "}
+            <Link href="/login" className="text-black font-bold hover:underline">
+              Sign in
+            </Link>
+          </p>
         </CardFooter>
       </form>
     </Card>

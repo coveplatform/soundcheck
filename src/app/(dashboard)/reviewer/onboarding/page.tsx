@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Headphones, DollarSign, TrendingUp } from "lucide-react";
+import { Headphones, DollarSign, TrendingUp, Loader2 } from "lucide-react";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { cn } from "@/lib/utils";
 
@@ -421,7 +421,10 @@ export default function ReviewerOnboardingPage() {
           )}
 
           {isLoadingGenres ? (
-            <div className="text-sm text-neutral-600">Loading genres...</div>
+            <div className="flex items-center gap-2 text-sm text-neutral-600">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading genres...
+            </div>
           ) : genres.length === 0 ? (
             <div className="space-y-3">
               <p className="text-sm text-neutral-600">

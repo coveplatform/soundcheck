@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getSession, signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -113,11 +114,29 @@ export default function LoginPage() {
     }
   };
 
-  if (isCheckingSession) return null;
+  if (isCheckingSession) {
+    return (
+      <Card>
+        <CardContent className="py-12">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
+            <p className="text-sm text-neutral-500">Loading...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
       <CardHeader className="text-center">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-black transition-colors mb-4 self-start"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Home
+        </Link>
         <CardTitle className="text-2xl">Welcome back</CardTitle>
         <CardDescription>
           Sign in to your MixReflect account

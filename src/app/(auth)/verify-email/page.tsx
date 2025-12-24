@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ export default function VerifyEmailPage() {
     "idle" | "verifying" | "verified" | "error" | "resent"
   >(token ? "verifying" : "idle");
   const [error, setError] = useState("");
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
     async function verify() {
@@ -64,6 +66,8 @@ export default function VerifyEmailPage() {
       return;
     }
 
+    setIsResending(true);
+
     try {
       const res = await fetch("/api/auth/resend-verification", {
         method: "POST",
@@ -81,16 +85,21 @@ export default function VerifyEmailPage() {
       setStatus("resent");
     } catch {
       setError("Failed to resend verification");
+    } finally {
+      setIsResending(false);
     }
   };
 
   if (status === "verifying") {
     return (
       <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Verifying...</CardTitle>
-          <CardDescription>Please wait a moment.</CardDescription>
-        </CardHeader>
+        <CardContent className="py-12">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
+            <p className="text-sm font-medium text-neutral-700">Verifying your email...</p>
+            <p className="text-xs text-neutral-500">Please wait a moment</p>
+          </div>
+        </CardContent>
       </Card>
     );
   }
@@ -142,7 +151,7 @@ export default function VerifyEmailPage() {
         ) : null}
       </CardContent>
       <CardFooter className="flex flex-col gap-3">
-        <Button onClick={resend} className="w-full">
+        <Button onClick={resend} className="w-full" isLoading={isResending}>
           Resend verification
         </Button>
         <Link href="/login" className="text-sm text-neutral-600 hover:text-black font-medium">

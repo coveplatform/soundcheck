@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Music, ExternalLink, Check } from "lucide-react";
+import { Music, ExternalLink, Check, Loader2 } from "lucide-react";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, ACTIVE_PACKAGE_TYPES, PACKAGES, PackageType } from "@/lib/metadata";
@@ -390,7 +390,10 @@ export default function SubmitTrackPage() {
           )}
 
           {inputMode === "upload" && isUploading ? (
-            <p className="text-sm text-neutral-600 font-medium">Uploading...</p>
+            <div className="flex items-center gap-2 text-sm text-neutral-600 font-medium">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Uploading your track...
+            </div>
           ) : null}
 
           {inputMode === "upload" && uploadedUrl ? (
@@ -403,7 +406,10 @@ export default function SubmitTrackPage() {
           ) : null}
 
           {isLoadingMetadata && (
-            <p className="text-sm text-neutral-600 font-medium">Fetching track info...</p>
+            <div className="flex items-center gap-2 text-sm text-neutral-600 font-medium">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Fetching track info...
+            </div>
           )}
         </CardContent>
       </Card>
