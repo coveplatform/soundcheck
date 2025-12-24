@@ -29,6 +29,9 @@ interface Review {
   bestPart?: string | null;
   weakestPart?: string | null;
   additionalNotes?: string | null;
+  addressedArtistNote?: "YES" | "PARTIALLY" | "NO" | null;
+  nextActions?: string | null;
+  timestamps?: Array<{ seconds: number; note: string }> | null;
   track: {
     id: string;
     title: string;
@@ -47,15 +50,20 @@ type FirstImpression = "STRONG_HOOK" | "DECENT" | "LOST_INTEREST";
 const MIN_LISTEN_SECONDS = 180;
 const MIN_WORDS_PER_SECTION = 30;
 
+function formatTimestamp(seconds: number) {
+  const s = Math.max(0, Math.floor(seconds));
+  const mins = Math.floor(s / 60);
+  const secs = s % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
+
 function countWords(text: string): number {
   return (text.toLowerCase().match(/[a-z0-9']+/g) ?? []).length;
 }
 
-const TIER_EARNINGS: Record<string, number> = {
-  ROOKIE: 15,
-  VERIFIED: 30,
-  PRO: 50,
-};
+function getTierEarningsCents(tier: string | null | undefined): number {
+  return tier === "PRO" ? 150 : 50;
+}
 
 function formatFirstImpression(value: FirstImpression | null | undefined) {
   if (!value) return "—";
@@ -68,6 +76,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const { id } = use(params);
   const router = useRouter();
 
+  const draftKey = `review_draft_${id}`;
+
   const lastHeartbeatSentAt = useRef<number>(0);
   const heartbeatInFlight = useRef(false);
 
@@ -78,8 +88,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const [draftReady, setDraftReady] = useState(false);
+  const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
+
   // Form state
-  const [, setListenTime] = useState(0);
+  const [listenTime, setListenTime] = useState(0);
   const [canSubmit, setCanSubmit] = useState(false);
   const [firstImpression, setFirstImpression] = useState<FirstImpression | null>(null);
   const [productionScore, setProductionScore] = useState<number>(0);
@@ -91,6 +104,14 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [bestPart, setBestPart] = useState("");
   const [weakestPart, setWeakestPart] = useState("");
   const [additionalNotes, setAdditionalNotes] = useState("");
+  const [addressedArtistNote, setAddressedArtistNote] = useState<
+    "YES" | "PARTIALLY" | "NO" | null
+  >(null);
+  const [nextActions, setNextActions] = useState("");
+  const [timestampNotes, setTimestampNotes] = useState<
+    Array<{ seconds: number; note: string }>
+  >([]);
+  const [playerSeconds, setPlayerSeconds] = useState(0);
 
   useEffect(() => {
     async function fetchReview() {
@@ -100,7 +121,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           const data = await response.json();
           setReview(data);
           if (data.status === "SKIPPED" || data.status === "EXPIRED") {
-            router.push("/reviewer/queue");
+            try {
+              localStorage.removeItem(draftKey);
+            } catch {
+            }
+
+            const notice = data.status === "SKIPPED" ? "skipped" : "expired";
+            router.push(`/reviewer/queue?notice=${notice}`);
             router.refresh();
             return;
           }
@@ -146,6 +173,134 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     fetchReview();
   }, [id]);
 
+  const isDirty =
+    Boolean(firstImpression) ||
+    productionScore > 0 ||
+    vocalScore > 0 ||
+    originalityScore > 0 ||
+    wouldListenAgain !== null ||
+    perceivedGenre.trim().length > 0 ||
+    similarArtists.trim().length > 0 ||
+    bestPart.trim().length > 0 ||
+    weakestPart.trim().length > 0 ||
+    additionalNotes.trim().length > 0 ||
+    addressedArtistNote !== null ||
+    nextActions.trim().length > 0 ||
+    timestampNotes.some((t) => t.note.trim().length > 0);
+
+  const confirmLeave = () => {
+    if (!isDirty) return true;
+    return window.confirm("You have unsaved changes. Leave this review?");
+  };
+
+  useEffect(() => {
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!review) return;
+      if (review.status === "COMPLETED") return;
+      if (success) return;
+      if (!isDirty) return;
+
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [isDirty, review, success]);
+
+  useEffect(() => {
+    if (!review) return;
+    if (review.status === "COMPLETED") return;
+
+    try {
+      const raw = localStorage.getItem(draftKey);
+      if (raw) {
+        const parsed = JSON.parse(raw) as any;
+        if (parsed && parsed.reviewId === review.id) {
+          setFirstImpression(parsed.firstImpression ?? null);
+          setProductionScore(typeof parsed.productionScore === "number" ? parsed.productionScore : 0);
+          setVocalScore(typeof parsed.vocalScore === "number" ? parsed.vocalScore : 0);
+          setOriginalityScore(typeof parsed.originalityScore === "number" ? parsed.originalityScore : 0);
+          setWouldListenAgain(
+            typeof parsed.wouldListenAgain === "boolean" ? parsed.wouldListenAgain : null
+          );
+          setPerceivedGenre(typeof parsed.perceivedGenre === "string" ? parsed.perceivedGenre : "");
+          setSimilarArtists(typeof parsed.similarArtists === "string" ? parsed.similarArtists : "");
+          setBestPart(typeof parsed.bestPart === "string" ? parsed.bestPart : "");
+          setWeakestPart(typeof parsed.weakestPart === "string" ? parsed.weakestPart : "");
+          setAdditionalNotes(typeof parsed.additionalNotes === "string" ? parsed.additionalNotes : "");
+          setAddressedArtistNote(parsed.addressedArtistNote ?? null);
+          setNextActions(typeof parsed.nextActions === "string" ? parsed.nextActions : "");
+          setTimestampNotes(Array.isArray(parsed.timestampNotes) ? parsed.timestampNotes : []);
+          setDraftSavedAt(typeof parsed.savedAt === "number" ? parsed.savedAt : null);
+          setDraftReady(true);
+          return;
+        }
+      }
+    } catch {
+    }
+
+    setAddressedArtistNote(review.addressedArtistNote ?? null);
+    setNextActions(typeof review.nextActions === "string" ? review.nextActions : "");
+    setTimestampNotes(Array.isArray(review.timestamps) ? review.timestamps : []);
+    setDraftReady(true);
+  }, [draftKey, review]);
+
+  useEffect(() => {
+    if (!draftReady) return;
+    if (!review) return;
+    if (review.status === "COMPLETED") return;
+    if (success) return;
+
+    const handle = window.setTimeout(() => {
+      const savedAt = Date.now();
+
+      const payload = {
+        reviewId: review.id,
+        savedAt,
+        firstImpression,
+        productionScore,
+        vocalScore,
+        originalityScore,
+        wouldListenAgain,
+        perceivedGenre,
+        similarArtists,
+        bestPart,
+        weakestPart,
+        additionalNotes,
+        addressedArtistNote,
+        nextActions,
+        timestampNotes,
+      };
+
+      try {
+        localStorage.setItem(draftKey, JSON.stringify(payload));
+        setDraftSavedAt(savedAt);
+      } catch {
+      }
+    }, 500);
+
+    return () => window.clearTimeout(handle);
+  }, [
+    draftKey,
+    draftReady,
+    review,
+    success,
+    firstImpression,
+    productionScore,
+    vocalScore,
+    originalityScore,
+    wouldListenAgain,
+    perceivedGenre,
+    similarArtists,
+    bestPart,
+    weakestPart,
+    additionalNotes,
+    addressedArtistNote,
+    nextActions,
+    timestampNotes,
+  ]);
+
   const handleSubmit = async () => {
     if (!review) return;
 
@@ -175,6 +330,21 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       return;
     }
 
+    if (!addressedArtistNote) {
+      setError("Please indicate whether you addressed the artist note");
+      return;
+    }
+
+    const actionLines = nextActions
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
+
+    if (actionLines.length < 3) {
+      setError("Next actions must include at least 3 lines (one actionable step per line)");
+      return;
+    }
+
     setError("");
     setIsSubmitting(true);
 
@@ -194,6 +364,16 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           bestPart,
           weakestPart,
           additionalNotes: additionalNotes || undefined,
+          addressedArtistNote,
+          nextActions,
+          timestamps:
+            timestampNotes
+              .map((t) => ({ seconds: t.seconds, note: t.note.trim() }))
+              .filter((t) => t.note.length > 0).length > 0
+              ? timestampNotes
+                  .map((t) => ({ seconds: t.seconds, note: t.note.trim() }))
+                  .filter((t) => t.note.length > 0)
+              : undefined,
         }),
       });
 
@@ -235,8 +415,14 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       funnels.review.complete(
         review.track.id,
         review.id,
-        data.earnings || TIER_EARNINGS[review.reviewer.tier]
+        data.earnings || getTierEarningsCents(review.reviewer.tier)
       );
+
+      try {
+        localStorage.removeItem(draftKey);
+      } catch {
+      }
+
       setSuccess(true);
     } catch {
       setError("Something went wrong");
@@ -248,6 +434,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   const handleSkip = async () => {
     if (!review) return;
+
+    if (!confirmLeave()) {
+      return;
+    }
 
     setError("");
     setIsSkipping(true);
@@ -293,7 +483,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         return;
       }
 
-      router.push("/reviewer/queue");
+      try {
+        localStorage.removeItem(draftKey);
+      } catch {
+      }
+
+      router.push("/reviewer/queue?notice=skipped");
       router.refresh();
     } catch {
       setError("Failed to skip review");
@@ -380,6 +575,31 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <Skeleton className="h-20" />
             <Skeleton className="h-20" />
             <Skeleton className="h-20" />
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-base font-bold">Did you address the artist note? *</Label>
+            <div className="flex gap-2">
+              {([
+                { value: "YES", label: "Yes" },
+                { value: "PARTIALLY", label: "Partially" },
+                { value: "NO", label: "No" },
+              ] as const).map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setAddressedArtistNote(opt.value)}
+                  className={cn(
+                    "flex-1 py-2.5 px-3 text-sm font-bold transition-colors border-2 border-black",
+                    addressedArtistNote === opt.value
+                      ? "bg-purple-400 text-black"
+                      : "bg-white text-black hover:bg-neutral-100"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -525,9 +745,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   const bestPartWords = countWords(bestPart);
   const weakestPartWords = countWords(weakestPart);
+  const nextActionCount = nextActions
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean).length;
   const meetsTextMinimum =
     bestPartWords >= MIN_WORDS_PER_SECTION &&
     weakestPartWords >= MIN_WORDS_PER_SECTION;
+  const hasNextActions = nextActionCount >= 3;
+  const hasAddressedArtistNote = addressedArtistNote !== null;
 
   if (success) {
     return (
@@ -539,7 +765,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-lime-500 border-2 border-black mb-4">
           <DollarSign className="h-5 w-5 text-black" />
           <span className="font-black text-lg">
-            +{formatCurrency(TIER_EARNINGS[review.reviewer.tier])}
+            +{formatCurrency(getTierEarningsCents(review.reviewer.tier))}
           </span>
         </div>
         <p className="text-neutral-600 mb-6">
@@ -556,13 +782,18 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <Link
-          href="/reviewer/queue"
+        <button
+          type="button"
+          onClick={() => {
+            if (!confirmLeave()) return;
+            router.push("/reviewer/queue");
+            router.refresh();
+          }}
           className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Queue
-        </Link>
+        </button>
         <Button
           variant="destructive"
           size="sm"
@@ -602,6 +833,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             sourceType={review.track.sourceType}
             showWaveform={review.track.sourceType === "UPLOAD"}
             minListenTime={MIN_LISTEN_SECONDS}
+            onTimeUpdate={(seconds) => setPlayerSeconds(seconds)}
             onListenProgress={(seconds) => {
               setListenTime((prev) => Math.max(prev, seconds));
               void maybeSendHeartbeat();
@@ -787,6 +1019,77 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
             />
           </div>
+
+          <div className="space-y-3">
+            <Label htmlFor="next-actions" className="text-base font-bold">Next actions (3+ lines) *</Label>
+            <textarea
+              id="next-actions"
+              placeholder={`- Lower the vocal 1-2 dB in the hook\n- Reduce reverb tail on the snare\n- Tighten the drop by shortening the pre-drop fill`}
+              value={nextActions}
+              onChange={(e) => setNextActions(e.target.value)}
+              className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <Label className="text-base font-bold">Timestamped notes (optional)</Label>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!review) return;
+                  if (review.track.sourceType !== "UPLOAD") {
+                    setError("Timestamps are only available for uploaded tracks right now.");
+                    return;
+                  }
+                  setTimestampNotes((prev) => [
+                    ...prev,
+                    { seconds: Math.floor(playerSeconds), note: "" },
+                  ]);
+                }}
+                className="px-3 py-2 text-xs font-bold border-2 border-black bg-white hover:bg-neutral-100"
+              >
+                Add current time ({formatTimestamp(playerSeconds)})
+              </button>
+            </div>
+
+            {timestampNotes.length === 0 ? (
+              <p className="text-xs text-neutral-600 font-mono">
+                Tip: click the waveform to jump to a moment, then add a timestamp note.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {timestampNotes.map((t, idx) => (
+                  <div key={`${t.seconds}-${idx}`} className="border-2 border-black p-3">
+                    <div className="flex items-center justify-between gap-3 mb-2">
+                      <span className="text-xs font-mono text-neutral-600">
+                        {formatTimestamp(t.seconds)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setTimestampNotes((prev) => prev.filter((_, i) => i !== idx))
+                        }
+                        className="text-xs font-bold text-neutral-600 hover:text-black"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <Input
+                      value={t.note}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setTimestampNotes((prev) =>
+                          prev.map((p, i) => (i === idx ? { ...p, note: v } : p))
+                        );
+                      }}
+                      placeholder="What happens here? (e.g. drop hits hard, vocal gets buried, etc.)"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -797,8 +1100,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <div className="min-w-0">
               <p className="text-neutral-400 text-sm font-medium">You&apos;ll earn</p>
               <p className="text-3xl font-black text-lime-500">
-                {formatCurrency(TIER_EARNINGS[review.reviewer.tier])}
+                {formatCurrency(getTierEarningsCents(review.reviewer.tier))}
               </p>
+              {draftSavedAt ? (
+                <p className="text-neutral-400 text-xs font-mono mt-2">
+                  Draft saved {new Date(draftSavedAt).toLocaleTimeString()}
+                </p>
+              ) : null}
             </div>
             <div className="text-left sm:text-right">
               <div className="flex items-center gap-2 text-sm flex-wrap">
@@ -808,7 +1116,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                   </span>
                 ) : (
                   <span className="text-neutral-400 font-mono">
-                    Listen for {Math.floor(MIN_LISTEN_SECONDS / 60)}+ min
+                    {formatTimestamp(Math.min(listenTime, MIN_LISTEN_SECONDS))}/{formatTimestamp(MIN_LISTEN_SECONDS)}
                   </span>
                 )}
               </div>
@@ -823,17 +1131,39 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                   </span>
                 )}
               </div>
+              <div className="flex items-center gap-2 text-sm mt-1 flex-wrap">
+                {hasNextActions ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-lime-500 text-black font-bold text-xs">
+                    <Check className="h-3 w-3" /> Next actions ready
+                  </span>
+                ) : (
+                  <span className="text-neutral-400 font-mono">
+                    Next actions: {nextActionCount}/3 lines
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 text-sm mt-1 flex-wrap">
+                {hasAddressedArtistNote ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-lime-500 text-black font-bold text-xs">
+                    <Check className="h-3 w-3" /> Artist note answered
+                  </span>
+                ) : (
+                  <span className="text-neutral-400 font-mono">
+                    Address artist note
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           <Button
             onClick={handleSubmit}
             isLoading={isSubmitting}
-            disabled={!canSubmit || !meetsTextMinimum}
+            disabled={!canSubmit || !meetsTextMinimum || !hasNextActions || !hasAddressedArtistNote}
             variant="primary"
             className="w-full"
           >
-            {canSubmit && meetsTextMinimum
-              ? `Submit Review & Earn ${formatCurrency(TIER_EARNINGS[review.reviewer.tier])}`
+            {canSubmit && meetsTextMinimum && hasNextActions && hasAddressedArtistNote
+              ? `Submit Review & Earn ${formatCurrency(getTierEarningsCents(review.reviewer.tier))}`
               : "Complete requirements to submit"}
           </Button>
         </CardContent>

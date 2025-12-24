@@ -110,36 +110,36 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
 // Package configuration
 export const PACKAGES = {
   STARTER: {
-    name: "Starter",
+    name: "Listener Pulse",
     reviews: 5,
     minProReviews: 0,
-    price: 499, // cents
-    description: "Quick gut-check from real listeners",
-    mix: "Vetted reviewers",
+    price: 495, // cents
+    description: "Structured reactions from genre-matched listeners",
+    mix: "Curated, genre-matched panel",
   },
   STANDARD: {
-    name: "Standard",
+    name: "Release Ready",
     reviews: 10,
     minProReviews: 2,
-    price: 899,
-    description: "More signal, more clarity",
-    mix: "Guaranteed 2 PRO reviews",
+    price: 1495,
+    description: "More signal + clearer next steps",
+    mix: "Includes 2+ top-rated (PRO) reviewers",
   },
   PRO: {
-    name: "Pro",
+    name: "Maximum Signal",
     reviews: 20,
     minProReviews: 5,
-    price: 1499,
-    description: "High-quality feedback, faster improvements",
-    mix: "Guaranteed 5 PRO reviews",
+    price: 2995,
+    description: "Highest confidence before you release",
+    mix: "Includes 5+ top-rated (PRO) reviewers",
   },
   DEEP_DIVE: {
     name: "Deep Dive",
     reviews: 20,
     minProReviews: 5,
-    price: 1499,
+    price: 2995,
     description: "Maximum signal from multiple perspectives",
-    mix: "Guaranteed 5 PRO reviews",
+    mix: "Includes 5+ top-rated (PRO) reviewers",
   },
 } as const;
 

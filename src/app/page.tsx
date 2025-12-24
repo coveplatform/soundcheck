@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Users, Target, Clock } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { authOptions } from "@/lib/auth";
+import { Logo } from "@/components/ui/logo";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -23,32 +24,31 @@ export default async function Home() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b-2 border-black">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 bg-black flex items-center justify-center">
-              <Music className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-bold text-lg tracking-tight">MixReflect</span>
-          </div>
-          <div className="flex items-center gap-3 ml-auto">
-            {session ? (
-              <Link href={dashboardHref}>
-                <Button className="bg-black text-white hover:bg-neutral-800 font-medium">
-                  Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" className="font-medium">Sign in</Button>
-                </Link>
-                <Link href="/signup">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-center justify-between h-14">
+            <Link href="/" className="flex items-center gap-2">
+              <Logo />
+            </Link>
+            <div className="flex items-center gap-3">
+              {session ? (
+                <Link href={dashboardHref}>
                   <Button className="bg-black text-white hover:bg-neutral-800 font-medium">
-                    Get Started
+                    Dashboard
                   </Button>
                 </Link>
-              </>
-            )}
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="ghost" className="font-medium">Sign in</Button>
+                  </Link>
+                  <Link href="/signup">
+                    <Button className="bg-black text-white hover:bg-neutral-800 font-medium">
+                      Get Started
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -60,8 +60,8 @@ export default async function Home() {
             Get honest feedback on your music.
           </h1>
           <p className="mt-6 text-xl text-neutral-600 max-w-xl leading-relaxed">
-            Submit your unreleased tracks and get structured reviews from real listeners
-            matched to your genre. Or become a reviewer—listen to new music and get paid
+            Submit your unreleased tracks and get structured reviews from a curated listener
+            panel matched to your genre. Or become a reviewer—listen to new music and get paid
             for your honest feedback.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
@@ -77,8 +77,8 @@ export default async function Home() {
             </Link>
           </div>
           <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-500 font-mono">
-            <span>Artists: From $4.99 • 24-72hr turnaround</span>
-            <span>Reviewers: Earn $0.15–$0.50 per review</span>
+            <span>Artists: From $4.95 • 24-72hr turnaround</span>
+            <span>Reviewers: Earn $0.50–$1.50 per review</span>
           </div>
         </div>
       </section>
@@ -114,7 +114,7 @@ export default async function Home() {
                   <div>
                     <p className="font-bold">Pick your package</p>
                     <p className="text-neutral-600 mt-1">
-                      5-20 reviews from genre-matched listeners
+                      5-20 structured reviews from genre-matched listeners
                     </p>
                   </div>
                 </li>
@@ -123,7 +123,7 @@ export default async function Home() {
                     03
                   </span>
                   <div>
-                    <p className="font-bold">Get real feedback</p>
+                    <p className="font-bold">Get structured feedback</p>
                     <p className="text-neutral-600 mt-1">
                       Structured feedback you can act on
                     </p>
@@ -179,7 +179,7 @@ export default async function Home() {
                     04
                   </span>
                   <div>
-                    <p className="font-bold">Earn $0.15–$0.50 per review</p>
+                    <p className="font-bold">Earn $0.50–$1.50 per review</p>
                     <p className="text-neutral-600 mt-1">
                       Get rated by artists. Higher ratings = higher tier = more pay.
                     </p>
@@ -196,7 +196,7 @@ export default async function Home() {
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-black mb-2">What You&apos;ll Get</h2>
           <p className="text-neutral-600 mb-10">
-            Every review follows a structured format so you get actionable feedback.
+            Every review follows a structured format so you get specific, actionable feedback.
           </p>
 
           <div className="border-2 border-black bg-white">
@@ -231,11 +231,19 @@ export default async function Home() {
                 <div className="space-y-3 text-sm">
                   <div>
                     <span className="text-neutral-600">Best part of the track</span>
-                    <p className="font-mono text-xs mt-1 text-neutral-500">Min. 30 words</p>
+                    <p className="font-mono text-xs mt-1 text-neutral-500">Min. 30 words + anti-filler checks</p>
                   </div>
                   <div>
                     <span className="text-neutral-600">Areas to improve</span>
-                    <p className="font-mono text-xs mt-1 text-neutral-500">Min. 30 words</p>
+                    <p className="font-mono text-xs mt-1 text-neutral-500">Min. 30 words + anti-filler checks</p>
+                  </div>
+                  <div>
+                    <span className="text-neutral-600">Next actions</span>
+                    <p className="font-mono text-xs mt-1 text-neutral-500">3+ concrete steps (one per line)</p>
+                  </div>
+                  <div>
+                    <span className="text-neutral-600">Timestamped notes</span>
+                    <p className="font-mono text-xs mt-1 text-neutral-500">Optional (available for uploads)</p>
                   </div>
                   <div>
                     <span className="text-neutral-600">Similar artists</span>
@@ -249,7 +257,7 @@ export default async function Home() {
               </div>
             </div>
             <div className="p-4 bg-neutral-50 text-sm text-neutral-600">
-              <strong>Quality enforced:</strong> Reviewers must listen for 3+ minutes. You rate every review. Low-quality reviewers lose access.
+              <strong>Quality enforced:</strong> Reviewers must listen for 3+ minutes. We block repetitive filler. You rate every review.
             </div>
           </div>
         </div>
@@ -263,34 +271,24 @@ export default async function Home() {
             Level up by delivering quality reviews. Higher tiers = better pay.
           </p>
 
-          <div className="grid md:grid-cols-3 gap-0 border-2 border-black">
-            {/* Rookie */}
+          <div className="grid md:grid-cols-2 gap-0 border-2 border-black">
             <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white">
               <div className="text-sm font-mono text-neutral-500 mb-2">TIER 1</div>
-              <h3 className="font-bold text-xl mb-1">Rookie</h3>
-              <div className="text-3xl font-black text-black">$0.15<span className="text-base font-normal text-neutral-500">/review</span></div>
+              <h3 className="font-bold text-xl mb-1">Normal</h3>
+              <div className="text-3xl font-black text-black">$0.50<span className="text-base font-normal text-neutral-500">/review</span></div>
               <p className="text-sm text-neutral-600 mt-4">Starting tier. Pass the onboarding quiz to begin.</p>
             </div>
 
-            {/* Verified */}
-            <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-black bg-neutral-50">
-              <div className="text-sm font-mono text-neutral-500 mb-2">TIER 2</div>
-              <h3 className="font-bold text-xl mb-1">Verified</h3>
-              <div className="text-3xl font-black text-black">$0.30<span className="text-base font-normal text-neutral-500">/review</span></div>
-              <p className="text-sm text-neutral-600 mt-4">25+ reviews with 4.0+ average rating.</p>
-            </div>
-
-            {/* Pro */}
             <div className="p-6 bg-lime-500">
-              <div className="text-sm font-mono text-black/60 mb-2">TIER 3</div>
+              <div className="text-sm font-mono text-black/60 mb-2">TIER 2</div>
               <h3 className="font-bold text-xl mb-1">Pro</h3>
-              <div className="text-3xl font-black text-black">$0.50<span className="text-base font-normal text-black/60">/review</span></div>
-              <p className="text-sm text-black/70 mt-4">100+ reviews with 4.5+ average rating.</p>
+              <div className="text-3xl font-black text-black">$1.50<span className="text-base font-normal text-black/60">/review</span></div>
+              <p className="text-sm text-black/70 mt-4">50+ reviews with 4.7+ average rating OR 10 gems.</p>
             </div>
           </div>
 
           <p className="mt-6 text-sm text-neutral-500 text-center">
-            Pro reviewers doing 10 reviews/week earn ~$260/month
+            Pro reviewers doing 10 reviews/week earn ~$60/month
           </p>
         </div>
       </section>
@@ -303,9 +301,8 @@ export default async function Home() {
             Built for artists who want real feedback, not ego boosts.
           </p>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Quality */}
-            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-black border-2 border-black">
+            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
               <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-4">
                 <Star className="h-6 w-6 text-black" />
               </div>
@@ -315,8 +312,7 @@ export default async function Home() {
               </p>
             </div>
 
-            {/* Genre Match */}
-            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
               <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center mb-4">
                 <Target className="h-6 w-6 text-black" />
               </div>
@@ -326,8 +322,7 @@ export default async function Home() {
               </p>
             </div>
 
-            {/* Fast */}
-            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
               <div className="h-12 w-12 bg-sky-400 border-2 border-black flex items-center justify-center mb-4">
                 <Clock className="h-6 w-6 text-black" />
               </div>
@@ -337,8 +332,7 @@ export default async function Home() {
               </p>
             </div>
 
-            {/* Private */}
-            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
               <div className="h-12 w-12 bg-purple-400 border-2 border-black flex items-center justify-center mb-4">
                 <Shield className="h-6 w-6 text-black" />
               </div>
@@ -348,8 +342,7 @@ export default async function Home() {
               </p>
             </div>
 
-            {/* Real People */}
-            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
               <div className="h-12 w-12 bg-pink-400 border-2 border-black flex items-center justify-center mb-4">
                 <Users className="h-6 w-6 text-black" />
               </div>
@@ -359,14 +352,13 @@ export default async function Home() {
               </p>
             </div>
 
-            {/* Affordable */}
-            <div className="border-2 border-black p-6 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow">
+            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
               <div className="h-12 w-12 bg-emerald-400 border-2 border-black flex items-center justify-center mb-4">
                 <DollarSign className="h-6 w-6 text-black" />
               </div>
               <h3 className="font-bold text-lg mb-2">Affordable & fair</h3>
               <p className="text-sm text-neutral-600">
-                From $4.99 for 5 reviews. No subscriptions, no hidden fees. Reviewers get paid fairly for their time.
+                From $4.95 for 5 reviews. No subscriptions, no hidden fees. Reviewers get paid fairly for their time.
               </p>
             </div>
           </div>
@@ -384,7 +376,6 @@ export default async function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pricing.map((p) => {
               const price = (p.price / 100).toFixed(2);
-              const perReview = (p.price / Math.max(1, p.reviews) / 100).toFixed(2);
               const isPopular = p.key === "STANDARD";
 
               return (
@@ -404,7 +395,6 @@ export default async function Home() {
 
                   <div className="mt-6">
                     <div className="text-4xl font-black">${price}</div>
-                    <div className="text-sm text-neutral-500 font-mono">${perReview}/review</div>
                   </div>
 
                   <div className="mt-6 space-y-2 text-sm border-t-2 border-black pt-4">
@@ -413,14 +403,14 @@ export default async function Home() {
                       <span className="font-bold">{p.reviews}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Pro reviewers</span>
+                      <span className="text-neutral-600">Top-rated (PRO) reviewers</span>
                       <span className="font-bold">
                         {p.minProReviews === 0 ? "Not guaranteed" : `${p.minProReviews}+ guaranteed`}
                       </span>
                     </div>
                   </div>
                   <p className="text-xs text-neutral-500 mt-3">
-                    Pro = 100+ reviews, 4.5+ rating
+                    PRO = 50+ reviews with 4.7+ rating OR 10 gems
                   </p>
 
                   <div className="mt-6">
@@ -455,7 +445,7 @@ export default async function Home() {
               size="lg"
               className="bg-lime-500 text-black hover:bg-lime-400 font-bold text-base px-10 border-2 border-lime-500"
             >
-              Get Started Free
+              Get Started
             </Button>
           </Link>
         </div>
@@ -481,11 +471,11 @@ export default async function Home() {
               },
               {
                 q: "How much can I earn as a reviewer?",
-                a: "Rookies earn $0.15/review. Hit 25 reviews with a 4.0+ rating to become Verified ($0.30). Hit 100 reviews with 4.5+ rating to become Pro ($0.50). Pro reviewers doing 10 reviews/week make ~$260/month.",
+                a: "Normal reviewers earn $0.50/review. Become Pro by completing 50 reviews with a 4.7+ rating (or getting gemmed 10 times) to earn $1.50/review. Pro reviewers doing 10 reviews/week make ~$60/month.",
               },
               {
                 q: "What's the difference between reviewer tiers?",
-                a: "Tiers reflect experience and quality. Pro reviewers have completed 100+ reviews with excellent ratings. Higher packages guarantee Pro reviewers on your track.",
+                a: "Tiers reflect quality and consistency. Pro reviewers have either completed 50+ reviews with a 4.7+ rating or been gemmed 10 times. Higher packages guarantee Pro reviewers on your track.",
               },
               {
                 q: "What do I have to do to review?",
@@ -514,10 +504,7 @@ export default async function Home() {
       <footer className="py-8">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="h-6 w-6 bg-black flex items-center justify-center">
-              <Music className="h-3 w-3 text-white" />
-            </div>
-            <span className="font-bold">MixReflect</span>
+            <Logo />
           </div>
           <p className="text-neutral-500">
             &copy; {new Date().getFullYear()} MixReflect

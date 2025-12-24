@@ -11,7 +11,11 @@ import { GenreTagList } from "@/components/ui/genre-tag";
 
 export const dynamic = 'force-dynamic';
 
-export default async function ReviewQueuePage() {
+export default async function ReviewQueuePage({
+  searchParams,
+}: {
+  searchParams?: { notice?: string };
+}) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -97,6 +101,38 @@ export default async function ReviewQueuePage() {
 
   return (
     <div className="space-y-6">
+      {searchParams?.notice === "skipped" ? (
+        <div className="border-2 border-black bg-orange-50 p-4">
+          <p className="text-sm font-bold text-black">
+            Track skipped.
+          </p>
+          <p className="text-sm text-neutral-700 mt-1">
+            We removed it from your queue and reassigned it.
+          </p>
+          <div className="mt-3">
+            <Link href="/reviewer/queue" className="text-sm font-bold hover:underline underline-offset-4">
+              Dismiss
+            </Link>
+          </div>
+        </div>
+      ) : null}
+
+      {searchParams?.notice === "expired" ? (
+        <div className="border-2 border-black bg-red-50 p-4">
+          <p className="text-sm font-bold text-black">
+            Review expired.
+          </p>
+          <p className="text-sm text-neutral-700 mt-1">
+            This review timed out and was reassigned.
+          </p>
+          <div className="mt-3">
+            <Link href="/reviewer/queue" className="text-sm font-bold hover:underline underline-offset-4">
+              Dismiss
+            </Link>
+          </div>
+        </div>
+      ) : null}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="min-w-0">

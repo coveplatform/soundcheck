@@ -46,15 +46,15 @@ Total: ~36 hours
 
 ### 1) Password Reset Flow (Launch Blocker)
 
-- [ ] Add pages:
+- [x] Add pages:
   - `src/app/(auth)/forgot-password/page.tsx`
   - `src/app/(auth)/reset-password/page.tsx`
-- [ ] Add API routes:
+- [x] Add API routes:
   - `src/app/api/auth/forgot-password/route.ts`
   - `src/app/api/auth/reset-password/route.ts`
-- [ ] DB: store reset token + expiry
-- [ ] Send email via Resend
-- [ ] Add "Forgot password?" link on login
+- [x] DB: store reset token + expiry
+- [x] Send email via Resend
+- [x] Add "Forgot password?" link on login
 
 Notes:
 - Use a single-use token, store hashed token in DB.
@@ -66,14 +66,14 @@ Estimated: ~3 hours
 
 ### 2) Email Verification Flow (Launch Blocker)
 
-- [ ] Pages:
+- [x] Pages:
   - `src/app/(auth)/verify-email/page.tsx`
-- [ ] API routes:
+- [x] API routes:
   - `src/app/api/auth/verify-email/route.ts`
   - `src/app/api/auth/resend-verification/route.ts`
-- [ ] Generate verification token on signup
-- [ ] Update `User.emailVerified`
-- [ ] Show signup UX: "Check your email"
+- [x] Generate verification token on signup
+- [x] Update `User.emailVerified`
+- [x] Show signup UX: "Check your email"
 
 Notes:
 - For MVP, we can allow browsing but block key actions (submit track / submit review) until verified.
@@ -84,11 +84,11 @@ Estimated: ~4 hours
 
 ### 3) Error & 404 Pages (Launch Blocker)
 
-- [ ] `src/app/error.tsx`
-- [ ] `src/app/not-found.tsx`
-- [ ] `src/app/global-error.tsx`
-- [ ] Consistent styling + retry button
-- [ ] Console logging (Sentry later)
+- [x] `src/app/error.tsx`
+- [x] `src/app/not-found.tsx`
+- [x] `src/app/global-error.tsx`
+- [x] Consistent styling + retry button
+- [x] Console logging (Sentry later)
 
 Estimated: ~2 hours
 
@@ -96,9 +96,9 @@ Estimated: ~2 hours
 
 ### 4) Queue Expiration Cron Job (Launch Blocker)
 
-- [ ] Create endpoint: `src/app/api/cron/expire-queue/route.ts`
-- [ ] Protect with header secret: `CRON_SECRET`
-- [ ] Add `vercel.json` cron schedule:
+- [x] Create endpoint: `src/app/api/cron/expire-queue/route.ts`
+- [x] Protect with header secret: `CRON_SECRET`
+- [x] Add `vercel.json` cron schedule:
 
 ```json
 {

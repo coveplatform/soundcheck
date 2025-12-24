@@ -127,7 +127,7 @@ model ReviewerProfile {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Tier system
-  tier ReviewerTier @default(ROOKIE)
+  tier ReviewerTier @default(NORMAL)
 
   // Stats
   totalReviews   Int   @default(0)
@@ -167,8 +167,7 @@ model ReviewerProfile {
 }
 
 enum ReviewerTier {
-  ROOKIE
-  VERIFIED
+  NORMAL
   PRO
 }
 
@@ -287,6 +286,10 @@ model Review {
   weakestTimestamp  Int?    // seconds
   additionalNotes   String?
 
+  addressedArtistNote AddressedArtistNote?
+  nextActions         String?
+  timestamps          Json?
+
   // Earnings
   paidAmount Int @default(0) // cents
 
@@ -310,6 +313,12 @@ enum ReviewStatus {
   COMPLETED   // Submitted
   EXPIRED     // Timed out, reassigned
   SKIPPED     // Reviewer skipped
+}
+
+enum AddressedArtistNote {
+  YES
+  PARTIALLY
+  NO
 }
 
 enum SupportTicketStatus {

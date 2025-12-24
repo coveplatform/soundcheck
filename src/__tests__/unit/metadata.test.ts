@@ -176,36 +176,36 @@ describe('Package Configuration', () => {
     it('STARTER package has correct configuration', () => {
       expect(PACKAGES.STARTER.reviews).toBe(5)
       expect(PACKAGES.STARTER.minProReviews).toBe(0)
-      expect(PACKAGES.STARTER.price).toBe(499)
-      expect(PACKAGES.STARTER.name).toBe('Starter')
+      expect(PACKAGES.STARTER.price).toBe(495)
+      expect(PACKAGES.STARTER.name).toBe('Listener Pulse')
     })
 
     it('STANDARD package has correct configuration', () => {
       expect(PACKAGES.STANDARD.reviews).toBe(10)
       expect(PACKAGES.STANDARD.minProReviews).toBe(2)
-      expect(PACKAGES.STANDARD.price).toBe(899)
-      expect(PACKAGES.STANDARD.name).toBe('Standard')
+      expect(PACKAGES.STANDARD.price).toBe(1495)
+      expect(PACKAGES.STANDARD.name).toBe('Release Ready')
     })
 
     it('PRO package has correct configuration', () => {
       expect(PACKAGES.PRO.reviews).toBe(20)
       expect(PACKAGES.PRO.minProReviews).toBe(5)
-      expect(PACKAGES.PRO.price).toBe(1499)
-      expect(PACKAGES.PRO.name).toBe('Pro')
+      expect(PACKAGES.PRO.price).toBe(2995)
+      expect(PACKAGES.PRO.name).toBe('Maximum Signal')
     })
 
     it('DEEP_DIVE package has correct configuration', () => {
       expect(PACKAGES.DEEP_DIVE.reviews).toBe(20)
       expect(PACKAGES.DEEP_DIVE.minProReviews).toBe(5)
-      expect(PACKAGES.DEEP_DIVE.price).toBe(1499)
+      expect(PACKAGES.DEEP_DIVE.price).toBe(2995)
       expect(PACKAGES.DEEP_DIVE.name).toBe('Deep Dive')
     })
 
     it('prices are in cents', () => {
-      expect(PACKAGES.STARTER.price).toBe(499) // $4.99
-      expect(PACKAGES.STANDARD.price).toBe(899) // $8.99
-      expect(PACKAGES.PRO.price).toBe(1499) // $14.99
-      expect(PACKAGES.DEEP_DIVE.price).toBe(1499) // $14.99
+      expect(PACKAGES.STARTER.price).toBe(495) // $4.95
+      expect(PACKAGES.STANDARD.price).toBe(1495) // $14.95
+      expect(PACKAGES.PRO.price).toBe(2995) // $29.95
+      expect(PACKAGES.DEEP_DIVE.price).toBe(2995) // $29.95
     })
 
     it('all packages have required fields', () => {
@@ -227,19 +227,19 @@ describe('Package Configuration', () => {
       const proPerReview = PACKAGES.PRO.price / PACKAGES.PRO.reviews
       const deepDivePerReview = PACKAGES.DEEP_DIVE.price / PACKAGES.DEEP_DIVE.reviews
 
-      expect(starterPerReview).toBeCloseTo(99.8, 1) // $0.998 per review
-      expect(standardPerReview).toBeCloseTo(89.9, 1) // $0.899 per review
-      expect(proPerReview).toBeCloseTo(74.95, 1) // $0.7495 per review
-      expect(deepDivePerReview).toBeCloseTo(74.95, 1) // $0.7495 per review
+      expect(starterPerReview).toBeCloseTo(99.0, 1) // $0.99 per review
+      expect(standardPerReview).toBeCloseTo(149.5, 1) // $1.495 per review
+      expect(proPerReview).toBeCloseTo(149.75, 2) // $1.4975 per review
+      expect(deepDivePerReview).toBeCloseTo(149.75, 2) // $1.4975 per review
     })
 
-    it('higher tiers cost less per review (volume discount)', () => {
+    it('higher tiers cost more per review', () => {
       const proPerReview = PACKAGES.PRO.price / PACKAGES.PRO.reviews
       const standardPerReview = PACKAGES.STANDARD.price / PACKAGES.STANDARD.reviews
       const starterPerReview = PACKAGES.STARTER.price / PACKAGES.STARTER.reviews
 
-      expect(starterPerReview).toBeGreaterThan(standardPerReview)
-      expect(standardPerReview).toBeGreaterThan(proPerReview)
+      expect(standardPerReview).toBeGreaterThan(starterPerReview)
+      expect(proPerReview).toBeGreaterThan(standardPerReview)
     })
   })
 })

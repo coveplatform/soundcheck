@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
 import { DashboardNav } from "@/components/dashboard/nav";
+import { Logo } from "@/components/ui/logo";
 
 export const dynamic = "force-dynamic";
 
@@ -27,8 +28,8 @@ export default async function SupportLayout({
       <header className="bg-white border-b-2 border-black sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
-            <Link href="/" className="font-bold text-lg tracking-tight">
-              MixReflect
+            <Link href="/" className="flex items-center">
+              <Logo />
             </Link>
             <nav className="flex items-center gap-4 text-sm font-bold text-neutral-600">
               <Link href="/login" className="hover:text-black">

@@ -166,10 +166,10 @@ describe('Checkout Session Creation', () => {
   describe('Session Data', () => {
     it('includes correct line item for package', () => {
       const PACKAGES = {
-        STARTER: { price: 499, name: 'Starter', reviews: 5 },
-        STANDARD: { price: 899, name: 'Standard', reviews: 10 },
-        PRO: { price: 1499, name: 'Pro', reviews: 20 },
-        DEEP_DIVE: { price: 1499, name: 'Deep Dive', reviews: 20 },
+        STARTER: { price: 495, name: 'Listener Pulse', reviews: 5 },
+        STANDARD: { price: 1495, name: 'Release Ready', reviews: 10 },
+        PRO: { price: 2995, name: 'Maximum Signal', reviews: 20 },
+        DEEP_DIVE: { price: 2995, name: 'Deep Dive', reviews: 20 },
       }
 
       const packageType = 'STANDARD' as keyof typeof PACKAGES
@@ -179,7 +179,7 @@ describe('Checkout Session Creation', () => {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `MixReflect ${pkg.name}`,
+            name: `MixReflect ${pkg.name} Package`,
             description: `${pkg.reviews} reviews for your track`,
           },
           unit_amount: pkg.price,
@@ -187,8 +187,8 @@ describe('Checkout Session Creation', () => {
         quantity: 1,
       }
 
-      expect(lineItem.price_data.unit_amount).toBe(899)
-      expect(lineItem.price_data.product_data.name).toBe('MixReflect Standard')
+      expect(lineItem.price_data.unit_amount).toBe(1495)
+      expect(lineItem.price_data.product_data.name).toBe('MixReflect Release Ready Package')
     })
 
     it('includes track metadata in session', () => {
@@ -208,12 +208,12 @@ describe('Checkout Session Creation', () => {
       const baseUrl = 'http://localhost:3000'
       const trackId = 'track-123'
 
-      const successUrl = `${baseUrl}/artist/submit/success?trackId=${trackId}`
-      const cancelUrl = `${baseUrl}/artist/submit?cancelled=true`
+      const successUrl = `${baseUrl}/artist/submit/success?session_id={CHECKOUT_SESSION_ID}`
+      const cancelUrl = `${baseUrl}/artist/submit?trackId=${trackId}`
 
       expect(successUrl).toContain('/artist/submit/success')
-      expect(successUrl).toContain('trackId=track-123')
-      expect(cancelUrl).toContain('cancelled=true')
+      expect(successUrl).toContain('session_id={CHECKOUT_SESSION_ID}')
+      expect(cancelUrl).toContain('trackId=track-123')
     })
   })
 
@@ -225,7 +225,7 @@ describe('Checkout Session Creation', () => {
       const payment = createMockPayment({
         trackId: track.id,
         stripeSessionId,
-        amount: 499,
+        amount: 495,
         status: 'PENDING',
       })
 
@@ -235,7 +235,7 @@ describe('Checkout Session Creation', () => {
         data: {
           trackId: track.id,
           stripeSessionId,
-          amount: 499,
+          amount: 495,
           status: 'PENDING',
         },
       })

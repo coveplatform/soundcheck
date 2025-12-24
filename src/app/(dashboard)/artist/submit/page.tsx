@@ -255,6 +255,11 @@ export default function SubmitTrackPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 403 && typeof data?.error === "string" && data.error.toLowerCase().includes("verify")) {
+          router.push("/verify-email");
+          router.refresh();
+          return;
+        }
         setError(data.error || "Something went wrong");
         return;
       }
@@ -275,7 +280,7 @@ export default function SubmitTrackPage() {
       <div>
         <h1 className="text-2xl font-black">Submit a Track</h1>
         <p className="text-neutral-600 mt-1">
-          Get vetted, genre-matched feedback from real listeners. Rate reviews (and mark Gems) to help the best reviewers rise.
+          Get structured feedback from a curated, genre-matched listener panel. Rate reviews (and mark Gems) to keep the panel high-signal.
         </p>
       </div>
 
@@ -449,7 +454,7 @@ export default function SubmitTrackPage() {
         <CardHeader>
           <CardTitle className="text-lg">Choose Your Package</CardTitle>
           <CardDescription>
-            Select how many reviews you&apos;d like to receive (higher tiers prioritize top-rated reviewers)
+            Select how many structured reviews you&apos;d like (higher tiers prioritize top-rated reviewers)
           </CardDescription>
         </CardHeader>
         <CardContent>

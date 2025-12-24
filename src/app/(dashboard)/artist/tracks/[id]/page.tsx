@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReviewRating } from "@/components/artist/review-rating";
 import { ReviewFlag } from "@/components/artist/review-flag";
 import { ReviewGem } from "@/components/artist/review-gem";
+import { Prisma } from "@prisma/client";
 import { TrackCancelButton } from "@/components/artist/track-cancel-button";
 import { AggregateAnalytics } from "@/components/feedback/aggregate-analytics";
 import { AudioPlayer } from "@/components/audio/audio-player";
@@ -21,6 +22,13 @@ import {
 } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
+
+function isTimestampNote(value: Prisma.JsonValue): value is { seconds: number; note: string } {
+  if (!value || typeof value !== "object") return false;
+  if (Array.isArray(value)) return false;
+  const v = value as Record<string, unknown>;
+  return typeof v.seconds === "number" && typeof v.note === "string" && v.note.length > 0;
+}
 
 export default async function TrackDetailPage({
   params,
@@ -359,6 +367,11 @@ export default async function TrackDetailPage({
 
                   {/* Main Feedback - The star of the show */}
                   <div className="space-y-4 mb-5">
+                    {review.addressedArtistNote && (
+                      <div className="text-xs text-neutral-600 font-mono">
+                        Addressed your note: <strong className="text-black">{review.addressedArtistNote}</strong>
+                      </div>
+                    )}
                     {review.bestPart && (
                       <div>
                         <h4 className="text-xs font-bold text-lime-700 uppercase tracking-wide mb-1.5">
@@ -387,6 +400,35 @@ export default async function TrackDetailPage({
                         <p className="text-sm text-neutral-700 leading-relaxed pl-3 border-l-4 border-neutral-300">
                           {review.additionalNotes}
                         </p>
+                      </div>
+                    )}
+
+                    {review.nextActions && (
+                      <div>
+                        <h4 className="text-xs font-bold text-black uppercase tracking-wide mb-1.5">
+                          Next Actions
+                        </h4>
+                        <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-black whitespace-pre-wrap">
+                          {review.nextActions}
+                        </p>
+                      </div>
+                    )}
+
+                    {Array.isArray(review.timestamps) && review.timestamps.filter(isTimestampNote).length > 0 && (
+                      <div>
+                        <h4 className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-1.5">
+                          Timestamps
+                        </h4>
+                        <div className="space-y-2">
+                          {review.timestamps.filter(isTimestampNote).map((t, i) => (
+                            <div key={`${t.seconds}-${i}`} className="pl-3 border-l-4 border-purple-400">
+                              <p className="text-xs font-mono text-neutral-600">
+                                {`${Math.floor(t.seconds / 60)}:${String(Math.floor(t.seconds % 60)).padStart(2, "0")}`}
+                              </p>
+                              <p className="text-sm text-neutral-800 leading-relaxed">{t.note}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

@@ -165,12 +165,12 @@ describe('Review Submission Integration', () => {
     })
 
     it('records earnings based on reviewer tier', async () => {
-      const TIER_RATES = { ROOKIE: 15, VERIFIED: 30, PRO: 50 }
+      const TIER_RATES = { NORMAL: 50, PRO: 150 }
 
       const review = createMockReview()
-      const reviewer = createMockReviewerProfile({ tier: 'VERIFIED' })
+      const reviewer = createMockReviewerProfile({ tier: 'NORMAL' as any })
 
-      const earnings = TIER_RATES[reviewer.tier]
+      const earnings = reviewer.tier === 'PRO' ? TIER_RATES.PRO : TIER_RATES.NORMAL
       const completedReview = { ...review, paidAmount: earnings }
 
       prismaMock.review.update.mockResolvedValue(completedReview)
@@ -183,7 +183,7 @@ describe('Review Submission Integration', () => {
         },
       })
 
-      expect(updated.paidAmount).toBe(30)
+      expect(updated.paidAmount).toBe(50)
     })
   })
 

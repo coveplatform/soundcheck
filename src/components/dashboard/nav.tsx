@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import { Music, LayoutDashboard, Upload, Headphones, DollarSign, LogOut, User, Clock, ArrowRight, Menu, X, ChevronDown, Settings, LifeBuoy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/logo";
 import { useEffect, useRef, useState } from "react";
 
 interface DashboardNavProps {
@@ -97,10 +98,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <div className="h-8 w-8 bg-black flex items-center justify-center">
-                <Music className="h-5 w-5 text-white" />
-              </div>
-              <span className="font-bold text-lg tracking-tight hidden sm:inline">MixReflect</span>
+              <Logo />
             </Link>
 
             {/* User Menu */}

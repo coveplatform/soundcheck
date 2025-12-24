@@ -216,7 +216,7 @@ export default function ReviewerOnboardingPage() {
                 <div>
                   <h3 className="font-bold">Earn Money</h3>
                   <p className="text-sm text-neutral-600">
-                    Start at $0.15 per review, earn up to $0.50 as you level up
+                    Start at $0.50 per review, earn up to $1.50 as you level up
                   </p>
                 </div>
               </div>
@@ -227,28 +227,24 @@ export default function ReviewerOnboardingPage() {
                 <div>
                   <h3 className="font-bold">Build Your Reputation</h3>
                   <p className="text-sm text-neutral-600">
-                    Level up from Rookie to Verified to Pro based on quality
+                    Level up from Normal to Pro based on quality
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="bg-neutral-100 border-2 border-black p-4">
-              <h4 className="font-bold mb-3">
-                Tier System
+              <h4 className="font-bold text-black mb-3">
+                Earnings per review
               </h4>
               <div className="space-y-2 text-sm font-mono">
                 <div className="flex justify-between">
-                  <span>Rookie</span>
-                  <span className="font-bold">$0.15/review</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Verified (25 reviews, 4.0+ rating)</span>
-                  <span className="font-bold">$0.30/review</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Pro (100 reviews, 4.5+ rating)</span>
+                  <span>Normal</span>
                   <span className="font-bold">$0.50/review</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Pro (50 reviews, 4.7+ rating OR 10 gems)</span>
+                  <span className="font-bold">$1.50/review</span>
                 </div>
               </div>
             </div>

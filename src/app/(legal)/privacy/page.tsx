@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Music } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 import { Button } from "@/components/ui/button";
 
@@ -10,10 +10,7 @@ export default function PrivacyPage() {
       <header className="border-b-2 border-black">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="h-8 w-8 bg-black flex items-center justify-center">
-              <Music className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-bold text-lg tracking-tight">MixReflect</span>
+            <Logo />
           </Link>
         </div>
       </header>

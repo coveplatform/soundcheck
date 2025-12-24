@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s | MixReflect",
   },
   description:
-    "A private feedback marketplace where artists get genuine listener feedback and reviewers get paid to discover new music. Get 5-25 structured reviews starting at $3.",
+    "A private feedback marketplace where artists get structured reviews from a curated listener panel and reviewers get paid to discover new music. Get 5-20 structured reviews starting at $4.95.",
   keywords: [
     "music feedback",
     "song reviews",

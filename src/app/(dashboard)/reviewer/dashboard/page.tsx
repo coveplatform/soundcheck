@@ -17,7 +17,7 @@ import { formatCurrency } from "@/lib/utils";
 import { GenreTagList } from "@/components/ui/genre-tag";
 import {
   expireAndReassignExpiredQueueEntries,
-  TIER_RATES,
+  getTierRateCents,
   assignReviewersToRecentTracks,
 } from "@/lib/queue";
 
@@ -117,31 +117,31 @@ export default async function ReviewerDashboardPage() {
   }
 
   // Calculate tier progress
+  const reviewsNeeded = Math.max(0, 50 - reviewerProfile.totalReviews);
+  const gemsNeeded = Math.max(0, 10 - (reviewerProfile.gemCount ?? 0));
+
+  const reviewProgress = Math.min((reviewerProfile.totalReviews / 50) * 100, 100);
+  const gemProgress = Math.min(((reviewerProfile.gemCount ?? 0) / 10) * 100, 100);
+
   const tierProgress = {
-    ROOKIE: {
-      next: "VERIFIED",
-      reviewsNeeded: 25 - reviewerProfile.totalReviews,
-      ratingNeeded: 4.0,
-      progress: Math.min((reviewerProfile.totalReviews / 25) * 100, 100),
-    },
-    VERIFIED: {
+    NORMAL: {
       next: "PRO",
-      reviewsNeeded: 100 - reviewerProfile.totalReviews,
-      ratingNeeded: 4.5,
-      progress: Math.min(
-        ((reviewerProfile.totalReviews - 25) / 75) * 100,
-        100
-      ),
+      reviewsNeeded,
+      ratingNeeded: 4.7,
+      gemsNeeded,
+      progress: Math.max(reviewProgress, gemProgress),
     },
     PRO: {
       next: null,
       reviewsNeeded: 0,
       ratingNeeded: 0,
+      gemsNeeded: 0,
       progress: 100,
     },
   };
 
-  const currentTierProgress = tierProgress[reviewerProfile.tier];
+  const tierKey = reviewerProfile.tier === "PRO" ? "PRO" : "NORMAL";
+  const currentTierProgress = tierProgress[tierKey];
   const pendingReviews = reviewerProfile.reviews;
 
   return (
@@ -228,8 +228,12 @@ export default async function ReviewerDashboardPage() {
                 {currentTierProgress.reviewsNeeded > 0
                   ? `${currentTierProgress.reviewsNeeded} more reviews`
                   : "Reviews complete!"}
-                {reviewerProfile.averageRating < currentTierProgress.ratingNeeded &&
-                  ` (need ${currentTierProgress.ratingNeeded}+ rating)`}
+                {reviewerProfile.averageRating < currentTierProgress.ratingNeeded
+                  ? ` (need ${currentTierProgress.ratingNeeded}+ rating)`
+                  : ""}
+                {currentTierProgress.gemsNeeded > 0
+                  ? ` • or ${currentTierProgress.gemsNeeded} gems`
+                  : ""}
               </span>
             </div>
             <div className="w-full h-3 bg-neutral-200 border border-black">
@@ -241,7 +245,7 @@ export default async function ReviewerDashboardPage() {
             <div className="flex justify-between mt-2 text-xs text-neutral-600 font-mono">
               <span>{reviewerProfile.tier}</span>
               <span>
-                {formatCurrency(TIER_RATES[reviewerProfile.tier])}/review
+                {formatCurrency(getTierRateCents(reviewerProfile.tier))}/review
               </span>
               <span>{currentTierProgress.next}</span>
             </div>

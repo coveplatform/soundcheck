@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { TIER_RATES, updateReviewerTier } from "@/lib/queue";
+import { updateReviewerTier, getTierRateCents, updateReviewerAverageRating } from "@/lib/queue";
 import { sendReviewProgressEmail } from "@/lib/email";
 
 const MIN_LISTEN_SECONDS = 180;
@@ -11,6 +11,62 @@ const MIN_WORDS_PER_SECTION = 30;
 
 function extractWords(text: string): string[] {
   return text.toLowerCase().match(/[a-z0-9']+/g) ?? [];
+}
+
+function hasSpecificSignals(text: string, words: string[]): boolean {
+  if (/\b\d:\d{2}\b/.test(text)) return true;
+  if (/(because|so that|for example|e\.g\.)/i.test(text)) return true;
+
+  const keywordSet = new Set([
+    "kick",
+    "snare",
+    "hihat",
+    "hat",
+    "clap",
+    "bass",
+    "sub",
+    "808",
+    "vocal",
+    "vocals",
+    "hook",
+    "chorus",
+    "verse",
+    "drop",
+    "bridge",
+    "mix",
+    "mixing",
+    "master",
+    "mastering",
+    "eq",
+    "compress",
+    "compression",
+    "limiter",
+    "reverb",
+    "delay",
+    "stereo",
+    "mono",
+    "pan",
+    "panning",
+    "automation",
+    "arrangement",
+    "structure",
+    "tempo",
+    "bpm",
+  ]);
+
+  for (const w of words) {
+    if (keywordSet.has(w)) return true;
+  }
+
+  return false;
+}
+
+function countActionLines(text: string): number {
+  const lines = text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  return lines.length;
 }
 
 function validateReviewText(fieldLabel: string, text: string): string | null {
@@ -25,6 +81,10 @@ function validateReviewText(fieldLabel: string, text: string): string | null {
 
   if (unique.size < 8 || uniqueRatio < 0.3) {
     return `${fieldLabel} seems too repetitive. Please be more specific.`;
+  }
+
+  if (!hasSpecificSignals(text, words)) {
+    return `${fieldLabel} needs more specific, actionable details (e.g. mention an element like vocals/kick, a section like the drop, or a timestamp).`;
   }
 
   return null;
@@ -44,6 +104,17 @@ const submitReviewSchema = z.object({
   weakestPart: z.string().min(1, "Please describe the weakest part"),
   weakestTimestamp: z.number().optional().nullable(),
   additionalNotes: z.string().optional(),
+  addressedArtistNote: z.enum(["YES", "PARTIALLY", "NO"]),
+  nextActions: z.string().min(1, "Please provide next actions"),
+  timestamps: z
+    .array(
+      z.object({
+        seconds: z.number().int().min(0),
+        note: z.string().min(1).max(240),
+      })
+    )
+    .max(30)
+    .optional(),
 });
 
 export async function POST(request: Request) {
@@ -157,8 +228,37 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: weakestPartError }, { status: 400 });
     }
 
+    const nextActionsWords = extractWords(data.nextActions);
+    const nextActionsUnique = new Set(nextActionsWords);
+    const nextActionsUniqueRatio =
+      nextActionsWords.length > 0 ? nextActionsUnique.size / nextActionsWords.length : 0;
+
+    if (countActionLines(data.nextActions) < 3) {
+      return NextResponse.json(
+        { error: "Next actions must include at least 3 lines (one actionable step per line)." },
+        { status: 400 }
+      );
+    }
+
+    if (nextActionsUnique.size < 6 || nextActionsUniqueRatio < 0.35) {
+      return NextResponse.json(
+        { error: "Next actions seems too repetitive. Please be more specific." },
+        { status: 400 }
+      );
+    }
+
+    if (!hasSpecificSignals(data.nextActions, nextActionsWords)) {
+      return NextResponse.json(
+        {
+          error:
+            "Next actions needs more specific, actionable details (e.g. mention an element like vocals/kick, a section like the drop, or a timestamp).",
+        },
+        { status: 400 }
+      );
+    }
+
     // Calculate earnings based on tier
-    const earnings = TIER_RATES[review.reviewer.tier];
+    const earnings = getTierRateCents(review.reviewer.tier);
 
     // Update review with all data
     const updatedReview = await prisma.review.update({
@@ -177,6 +277,9 @@ export async function POST(request: Request) {
         weakestPart: data.weakestPart,
         weakestTimestamp: data.weakestTimestamp,
         additionalNotes: data.additionalNotes,
+        addressedArtistNote: data.addressedArtistNote,
+        nextActions: data.nextActions,
+        timestamps: data.timestamps,
         paidAmount: earnings,
       },
     });

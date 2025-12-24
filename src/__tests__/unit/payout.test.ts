@@ -8,30 +8,23 @@ import { TIER_RATES } from '@/lib/queue'
 
 describe('Payout Logic', () => {
   describe('Earnings Calculation', () => {
-    it('ROOKIE earns 15 cents per review', () => {
-      const earnings = TIER_RATES.ROOKIE
-      expect(earnings).toBe(15)
-    })
-
-    it('VERIFIED earns 30 cents per review', () => {
-      const earnings = TIER_RATES.VERIFIED
-      expect(earnings).toBe(30)
-    })
-
-    it('PRO earns 50 cents per review', () => {
-      const earnings = TIER_RATES.PRO
+    it('NORMAL earns 50 cents per review', () => {
+      const earnings = TIER_RATES.NORMAL
       expect(earnings).toBe(50)
+    })
+
+    it('PRO earns 150 cents per review', () => {
+      const earnings = TIER_RATES.PRO
+      expect(earnings).toBe(150)
     })
 
     it('calculates total earnings for multiple reviews', () => {
       const reviewCount = 10
-      const rookieTotal = TIER_RATES.ROOKIE * reviewCount
-      const verifiedTotal = TIER_RATES.VERIFIED * reviewCount
       const proTotal = TIER_RATES.PRO * reviewCount
+      const normalTotal = TIER_RATES.NORMAL * reviewCount
 
-      expect(rookieTotal).toBe(150) // $1.50
-      expect(verifiedTotal).toBe(300) // $3.00
-      expect(proTotal).toBe(500) // $5.00
+      expect(normalTotal).toBe(500) // $5.00
+      expect(proTotal).toBe(1500) // $15.00
     })
   })
 
@@ -52,19 +45,14 @@ describe('Payout Logic', () => {
       expect(pendingBalance >= MIN_PAYOUT_CENTS).toBe(false)
     })
 
-    it('ROOKIE needs ~67 reviews to reach minimum payout', () => {
-      const reviewsNeeded = Math.ceil(MIN_PAYOUT_CENTS / TIER_RATES.ROOKIE)
-      expect(reviewsNeeded).toBe(67)
-    })
-
-    it('VERIFIED needs ~34 reviews to reach minimum payout', () => {
-      const reviewsNeeded = Math.ceil(MIN_PAYOUT_CENTS / TIER_RATES.VERIFIED)
-      expect(reviewsNeeded).toBe(34)
-    })
-
-    it('PRO needs 20 reviews to reach minimum payout', () => {
-      const reviewsNeeded = Math.ceil(MIN_PAYOUT_CENTS / TIER_RATES.PRO)
+    it('NORMAL needs 20 reviews to reach minimum payout', () => {
+      const reviewsNeeded = Math.ceil(MIN_PAYOUT_CENTS / TIER_RATES.NORMAL)
       expect(reviewsNeeded).toBe(20)
+    })
+
+    it('PRO needs 7 reviews to reach minimum payout', () => {
+      const reviewsNeeded = Math.ceil(MIN_PAYOUT_CENTS / TIER_RATES.PRO)
+      expect(reviewsNeeded).toBe(7)
     })
   })
 
@@ -103,13 +91,13 @@ describe('Payout Logic', () => {
   describe('Balance Updates', () => {
     it('adds earnings to pending balance on review completion', () => {
       let pendingBalance = 0
-      const earnings = TIER_RATES.VERIFIED
+      const earnings = TIER_RATES.NORMAL
 
       pendingBalance += earnings
-      expect(pendingBalance).toBe(30)
+      expect(pendingBalance).toBe(50)
 
       pendingBalance += earnings
-      expect(pendingBalance).toBe(60)
+      expect(pendingBalance).toBe(100)
     })
 
     it('deducts from pending balance on successful payout', () => {
@@ -202,10 +190,10 @@ describe('Earnings Tracking', () => {
     let totalEarnings = 0
 
     // Multiple reviews
-    totalEarnings += TIER_RATES.ROOKIE // 15
-    totalEarnings += TIER_RATES.ROOKIE // 15
-    totalEarnings += TIER_RATES.VERIFIED // 30 (tier upgraded)
+    totalEarnings += TIER_RATES.NORMAL // 50
+    totalEarnings += TIER_RATES.NORMAL // 50
+    totalEarnings += TIER_RATES.PRO // 150 (tier upgraded)
 
-    expect(totalEarnings).toBe(60)
+    expect(totalEarnings).toBe(250)
   })
 })

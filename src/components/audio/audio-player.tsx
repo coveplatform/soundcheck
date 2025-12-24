@@ -10,6 +10,7 @@ interface AudioPlayerProps {
   minListenTime?: number; // seconds required before can submit
   onListenProgress?: (seconds: number) => void;
   onMinimumReached?: () => void;
+  onTimeUpdate?: (seconds: number) => void;
   showListenTracker?: boolean;
   showWaveform?: boolean;
 }
@@ -20,6 +21,7 @@ export function AudioPlayer({
   minListenTime = 90,
   onListenProgress,
   onMinimumReached,
+  onTimeUpdate,
   showListenTracker = true,
   showWaveform = false,
 }: AudioPlayerProps) {
@@ -42,6 +44,7 @@ export function AudioPlayer({
     const nextTime = Math.max(0, Math.min(1, ratio)) * duration;
     audio.currentTime = nextTime;
     setCurrentTime(nextTime);
+    onTimeUpdate?.(nextTime);
   };
 
   const seekFromClick = (e: ReactMouseEvent<HTMLDivElement>) => {
@@ -290,7 +293,9 @@ export function AudioPlayer({
         src={sourceUrl}
         onTimeUpdate={() => {
           if (audioRef.current) {
-            setCurrentTime(audioRef.current.currentTime);
+            const t = audioRef.current.currentTime;
+            setCurrentTime(t);
+            onTimeUpdate?.(t);
           }
         }}
         onLoadedMetadata={() => {

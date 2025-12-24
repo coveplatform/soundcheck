@@ -3,6 +3,7 @@
  * Creates mock data for testing with sensible defaults
  */
 
+import type { ReviewerTier } from '@prisma/client'
 import type {
   User,
   ArtistProfile,
@@ -54,7 +55,7 @@ export function createMockReviewerProfile(
   return {
     id: generateId(),
     userId: generateId(),
-    tier: 'ROOKIE',
+    tier: 'NORMAL' as ReviewerTier,
     totalReviews: 0,
     averageRating: 0,
     totalEarnings: 0,
@@ -143,7 +144,7 @@ export function createMockPayment(overrides: Partial<Payment> = {}): Payment {
   return {
     id: generateId(),
     trackId: generateId(),
-    amount: 499,
+    amount: 495,
     stripeSessionId: `cs_test_${generateId()}`,
     stripePaymentId: null,
     status: 'PENDING',

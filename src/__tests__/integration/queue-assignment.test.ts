@@ -166,50 +166,45 @@ describe('Queue Assignment Integration', () => {
 
   describe('Package-Based Filtering', () => {
     it('PRO package prioritizes PRO tier reviewers but does not exclude others', async () => {
-      const proReviewer = createMockReviewerProfile({ tier: 'PRO' })
-      const verifiedReviewer = createMockReviewerProfile({ tier: 'VERIFIED' })
-      const rookieReviewer = createMockReviewerProfile({ tier: 'ROOKIE' })
+      const proReviewer = createMockReviewerProfile({ tier: 'PRO' as any })
+      const normalReviewer = createMockReviewerProfile({ tier: 'NORMAL' as any })
 
-      const allReviewers = [rookieReviewer, verifiedReviewer, proReviewer]
+      const allReviewers = [normalReviewer, proReviewer]
 
       // Sort by tier for PRO package (eligibility includes all tiers)
-      const tierOrder = { PRO: 3, VERIFIED: 2, ROOKIE: 1 } as const
+      const tierRank = (tier: any) => (tier === 'PRO' ? 2 : 1)
       const sorted = [...allReviewers].sort(
-        (a, b) => tierOrder[b.tier] - tierOrder[a.tier]
+        (a, b) => tierRank(b.tier) - tierRank(a.tier)
       )
 
       expect(sorted[0].tier).toBe('PRO')
-      expect(sorted[1].tier).toBe('VERIFIED')
-      expect(sorted[2].tier).toBe('ROOKIE')
+      expect(sorted[1].tier).not.toBe('PRO')
     })
 
-    it('STANDARD package prioritizes VERIFIED and PRO reviewers', async () => {
-      const proReviewer = createMockReviewerProfile({ tier: 'PRO' })
-      const verifiedReviewer = createMockReviewerProfile({ tier: 'VERIFIED' })
-      const rookieReviewer = createMockReviewerProfile({ tier: 'ROOKIE' })
+    it('STANDARD package prioritizes PRO reviewers over NORMAL reviewers', async () => {
+      const proReviewer = createMockReviewerProfile({ tier: 'PRO' as any })
+      const normalReviewer = createMockReviewerProfile({ tier: 'NORMAL' as any })
 
-      const allReviewers = [rookieReviewer, verifiedReviewer, proReviewer]
+      const allReviewers = [normalReviewer, proReviewer]
 
       // Sort by tier for STANDARD package
-      const tierOrder = { PRO: 3, VERIFIED: 2, ROOKIE: 1 } as const
+      const tierRank = (tier: any) => (tier === 'PRO' ? 2 : 1)
       const sorted = [...allReviewers].sort(
-        (a, b) => tierOrder[b.tier] - tierOrder[a.tier]
+        (a, b) => tierRank(b.tier) - tierRank(a.tier)
       )
 
       expect(sorted[0].tier).toBe('PRO')
-      expect(sorted[1].tier).toBe('VERIFIED')
-      expect(sorted[2].tier).toBe('ROOKIE')
+      expect(sorted[1].tier).not.toBe('PRO')
     })
 
     it('STARTER package accepts all tiers', async () => {
       const reviewers = [
-        createMockReviewerProfile({ tier: 'ROOKIE' }),
-        createMockReviewerProfile({ tier: 'VERIFIED' }),
-        createMockReviewerProfile({ tier: 'PRO' }),
+        createMockReviewerProfile({ tier: 'NORMAL' as any }),
+        createMockReviewerProfile({ tier: 'PRO' as any }),
       ]
 
-      // STARTER doesn't filter by tier
-      expect(reviewers.length).toBe(3)
+      // STARTER doesn't filter eligibility by tier
+      expect(reviewers.length).toBe(2)
     })
   })
 

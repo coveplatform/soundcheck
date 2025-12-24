@@ -29,6 +29,15 @@ export default function CheckoutPage() {
         const data = await response.json();
 
         if (!response.ok) {
+          if (
+            response.status === 403 &&
+            typeof data?.error === "string" &&
+            data.error.toLowerCase().includes("verify")
+          ) {
+            router.push("/verify-email");
+            router.refresh();
+            return;
+          }
           const errorMsg = data.error || "Failed to create checkout session";
           setError(errorMsg);
           track("payment_error", { type: "checkout_creation", message: errorMsg });
@@ -79,7 +88,8 @@ export default function CheckoutPage() {
       <Card>
         <CardContent className="pt-6 text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto text-neutral-400" />
-          <p className="mt-4 text-neutral-600">Redirecting to checkout...</p>
+          <p className="mt-4 text-neutral-600">Redirecting to secure checkout…</p>
+          <p className="mt-2 text-sm text-neutral-500">Payments are processed by Stripe.</p>
         </CardContent>
       </Card>
     </div>

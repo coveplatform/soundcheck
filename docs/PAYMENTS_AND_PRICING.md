@@ -12,15 +12,15 @@ Pricing is defined in `src/lib/metadata.ts` as cents (minor currency units).
 
 - `STARTER`
   - **5 reviews**
-  - **$4.99** (`499`)
+  - **$4.95** (`495`)
   - **Guaranteed PRO reviews:** `0`
 - `STANDARD`
   - **10 reviews**
-  - **$8.99** (`899`)
+  - **$14.95** (`1495`)
   - **Guaranteed PRO reviews:** `2`
 - `PRO`
   - **20 reviews**
-  - **$14.99** (`1499`)
+  - **$29.95** (`2995`)
   - **Guaranteed PRO reviews:** `5`
 
 Only the active tiers are shown in the UI via `ACTIVE_PACKAGE_TYPES`.
@@ -29,9 +29,8 @@ Only the active tiers are shown in the UI via `ACTIVE_PACKAGE_TYPES`.
 
 Reviewer pay is per completed review and defined in `src/lib/queue.ts` as cents:
 
-- `ROOKIE`: 15 ($0.15)
-- `VERIFIED`: 30 ($0.30)
-- `PRO`: 50 ($0.50)
+- `NORMAL`: 50 ($0.50)
+- `PRO`: 150 ($1.50)
 
 Earnings accrue when a review is submitted:
 
@@ -60,6 +59,19 @@ Earnings accrue when a review is submitted:
   - updates `Track.status = QUEUED` and sets `paidAt`
   - increments `ArtistProfile.totalSpent` by `session.amount_total`
   - calls assignment (`assignReviewersToTrack`)
+
+### Checkout status verification (UX)
+
+To avoid treating a `session_id` query param as payment confirmation, the success page verifies checkout status via an API route:
+
+- Route: `src/app/api/payments/checkout-status/route.ts`
+- Page: `src/app/(dashboard)/artist/submit/success/page.tsx`
+
+Behavior:
+
+- The page polls `/api/payments/checkout-status?session_id=...` until the payment becomes `COMPLETED` or `FAILED`.
+- The status route checks the local `Payment` row and (if still pending) retrieves the Stripe Checkout session to confirm `payment_status=paid`.
+- If Stripe shows the session is paid, the route idempotently finalizes the track (queues it + runs assignment) so the UI becomes consistent even if the webhook is delayed.
 
 ## Stripe Payout Flow (platform -> reviewer)
 

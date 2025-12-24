@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { authOptions } from "@/lib/auth";
 import { isAdminEmail } from "@/lib/admin";
+import { Logo } from "@/components/ui/logo";
 
 export default async function AdminLayout({
   children,
@@ -22,12 +23,12 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      <header className="bg-white border-b border-neutral-200 sticky top-0 z-50">
+      <header className="bg-white border-b-2 border-black sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
-              <Link href="/" className="font-semibold">
-                MixReflect
+              <Link href="/" className="flex items-center">
+                <Logo />
               </Link>
               <span className="text-sm text-neutral-400">Admin</span>
             </div>

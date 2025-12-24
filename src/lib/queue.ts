@@ -74,11 +74,19 @@ async function expandGenresForMatching(genreIds: string[]): Promise<string[]> {
 }
 
 // Tier-based pay rates in cents
-export const TIER_RATES: Record<ReviewerTier, number> = {
-  ROOKIE: 15,
-  VERIFIED: 30,
-  PRO: 50,
-};
+export const TIER_RATES = {
+  NORMAL: 50,
+  PRO: 150,
+} as const;
+
+function getNonProTierValue(): ReviewerTier {
+  const enumObj = ReviewerTier as unknown as Record<string, ReviewerTier | undefined>;
+  return enumObj.NORMAL ?? ("NORMAL" as unknown as ReviewerTier);
+}
+
+export function getTierRateCents(tier: ReviewerTier): number {
+  return tier === "PRO" ? TIER_RATES.PRO : TIER_RATES.NORMAL;
+}
 
 // Get eligible reviewers for a track
 export async function getEligibleReviewers(
@@ -155,14 +163,14 @@ export async function getEligibleReviewers(
   });
 
   const sortedByQuality = eligibleReviewers.sort((a, b) => {
-    const tierOrder = { PRO: 3, VERIFIED: 2, ROOKIE: 1 };
-    const tierDiff = tierOrder[b.tier] - tierOrder[a.tier];
+    const tierWeight = (tier: ReviewerTier) => (tier === "PRO" ? 2 : 1);
+    const tierDiff = tierWeight(b.tier) - tierWeight(a.tier);
     if (tierDiff !== 0) return tierDiff;
 
     const ratingDiff = (b.averageRating ?? 0) - (a.averageRating ?? 0);
     if (ratingDiff !== 0) return ratingDiff;
 
-    const gemDiff = ((b as any).gemCount ?? 0) - ((a as any).gemCount ?? 0);
+    const gemDiff = (b.gemCount ?? 0) - (a.gemCount ?? 0);
     return gemDiff;
   });
   return sortedByQuality;
@@ -232,11 +240,11 @@ export async function assignReviewersToTrack(trackId: string) {
   const packageConfig = (PACKAGES as unknown as Record<string, { minProReviews?: number }>)[
     track.packageType
   ];
-  const minProReviews = Math.max(0, packageConfig?.minProReviews ?? 0);
+  const proReviewCap = Math.max(0, packageConfig?.minProReviews ?? 0);
 
   const proShortfall = Math.max(
     0,
-    Math.min(minProReviews, track.reviewsRequested) - existingProCount
+    Math.min(proReviewCap, track.reviewsRequested) - existingProCount
   );
   const proSlotsToReserve = Math.min(proShortfall, neededReviews);
 
@@ -245,7 +253,9 @@ export async function assignReviewersToTrack(trackId: string) {
   const proToAssignIds = new Set(proToAssign.map((r) => r.id));
 
   const nonProSlots = neededReviews - proSlotsToReserve;
-  const additionalCandidates = eligibleUnique.filter((r) => !proToAssignIds.has(r.id));
+  const additionalCandidates = eligibleUnique.filter(
+    (r) => !proToAssignIds.has(r.id) && r.tier !== "PRO"
+  );
   const additionalToAssign = additionalCandidates.slice(
     0,
     Math.min(nonProSlots, additionalCandidates.length)
@@ -381,15 +391,10 @@ export function calculateTier(
   totalReviews: number,
   averageRating: number
 ): ReviewerTier {
-  const effectiveReviews = totalReviews;
-
-  if (effectiveReviews >= 100 && averageRating >= 4.5) {
-    return "PRO";
+  if (totalReviews >= 50 && averageRating >= 4.7) {
+    return "PRO" as unknown as ReviewerTier;
   }
-  if (effectiveReviews >= 25 && averageRating >= 4.0) {
-    return "VERIFIED";
-  }
-  return "ROOKIE";
+  return getNonProTierValue();
 }
 
 // Update reviewer tier
@@ -401,18 +406,14 @@ export async function updateReviewerTier(reviewerId: string) {
 
   if (!reviewer) return;
 
-  const gemCount = (reviewer as any).gemCount ?? 0;
-  const effectiveReviews = reviewer.totalReviews + gemCount * 2;
-  const newTier = calculateTier(effectiveReviews, reviewer.averageRating);
+  const gemCount = reviewer.gemCount ?? 0;
+  const newTier = gemCount >= 10
+    ? ("PRO" as unknown as ReviewerTier)
+    : calculateTier(reviewer.totalReviews, reviewer.averageRating);
 
   if (newTier !== reviewer.tier) {
-    const tierOrder: Record<ReviewerTier, number> = {
-      ROOKIE: 1,
-      VERIFIED: 2,
-      PRO: 3,
-    };
-
-    const isUpgrade = tierOrder[newTier] > tierOrder[reviewer.tier];
+    const tierRank = (tier: ReviewerTier) => (tier === "PRO" ? 2 : 1);
+    const isUpgrade = tierRank(newTier) > tierRank(reviewer.tier);
 
     await prisma.reviewerProfile.update({
       where: { id: reviewerId },
@@ -423,7 +424,7 @@ export async function updateReviewerTier(reviewerId: string) {
       await sendTierChangeEmail({
         to: reviewer.user.email,
         newTier,
-        newRateCents: TIER_RATES[newTier],
+        newRateCents: getTierRateCents(newTier),
       });
     }
   }
