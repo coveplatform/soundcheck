@@ -8,13 +8,14 @@ const globalForPrisma = globalThis as unknown as {
 const databaseUrl =
   process.env.DATABASE_URL ??
   process.env.POSTGRES_PRISMA_URL ??
+  process.env.POSTGRES_URL_NON_POOLING ??
   process.env.POSTGRES_URL;
 
 function createMissingDatabaseUrlPrisma(): PrismaClient {
   const handler: ProxyHandler<Record<string, unknown>> = {
     get() {
       throw new Error(
-        "Database URL is not defined (set DATABASE_URL or POSTGRES_PRISMA_URL/POSTGRES_URL)"
+        "Database URL is not defined (set DATABASE_URL or POSTGRES_PRISMA_URL/POSTGRES_URL_NON_POOLING/POSTGRES_URL)"
       );
     },
   };
