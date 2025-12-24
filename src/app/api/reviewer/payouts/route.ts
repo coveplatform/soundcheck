@@ -73,9 +73,10 @@ export async function POST(request: Request) {
     }
 
     const requested = amountCents ?? reviewer.pendingBalance;
+    const stripeAccountId = reviewer.stripeAccountId;
 
     if (!bypassPayments) {
-      if (!reviewer.stripeAccountId) {
+      if (!stripeAccountId) {
         return NextResponse.json(
           { error: "Stripe account not connected" },
           { status: 400 }
@@ -137,7 +138,7 @@ export async function POST(request: Request) {
       const transfer = await stripe.transfers.create({
         amount: requested,
         currency,
-        destination: reviewer.stripeAccountId,
+        destination: stripeAccountId as string,
         metadata: {
           payoutId: payout.id,
           reviewerId: reviewer.id,
