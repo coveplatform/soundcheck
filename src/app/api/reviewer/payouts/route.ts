@@ -73,22 +73,6 @@ export async function POST(request: Request) {
     }
 
     const requested = amountCents ?? reviewer.pendingBalance;
-    const stripeAccountId = reviewer.stripeAccountId;
-
-    if (!bypassPayments) {
-      if (!stripeAccountId) {
-        return NextResponse.json(
-          { error: "Stripe account not connected" },
-          { status: 400 }
-        );
-      }
-      if (requested < MIN_PAYOUT_CENTS) {
-        return NextResponse.json(
-          { error: `Minimum payout is $${(MIN_PAYOUT_CENTS / 100).toFixed(2)}` },
-          { status: 400 }
-        );
-      }
-    }
 
     if (requested > reviewer.pendingBalance) {
       return NextResponse.json(
@@ -116,6 +100,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, payout, bypassed: true });
     }
 
+    const stripeAccountId = reviewer.stripeAccountId;
+    if (!stripeAccountId) {
+      return NextResponse.json(
+        { error: "Stripe account not connected" },
+        { status: 400 }
+      );
+    }
+    if (requested < MIN_PAYOUT_CENTS) {
+      return NextResponse.json(
+        { error: `Minimum payout is $${(MIN_PAYOUT_CENTS / 100).toFixed(2)}` },
+        { status: 400 }
+      );
+    }
+
     const payout = await prisma.payout.create({
       data: {
         reviewerId: reviewer.id,
@@ -138,7 +136,7 @@ export async function POST(request: Request) {
       const transfer = await stripe.transfers.create({
         amount: requested,
         currency,
-        destination: stripeAccountId as string,
+        destination: stripeAccountId,
         metadata: {
           payoutId: payout.id,
           reviewerId: reviewer.id,
