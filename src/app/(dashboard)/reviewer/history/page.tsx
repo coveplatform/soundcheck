@@ -120,12 +120,12 @@ export default async function ReviewerHistoryPage() {
                       <p className="text-xs text-neutral-600 font-mono">Earned</p>
                       <p className="font-black">{formatCurrency(review.paidAmount)}</p>
                       <div className="mt-1 flex items-center justify-end gap-1">
-                        {review.artistRating ? (
+                        {review.artistRating !== null && review.artistRating !== undefined ? (
                           [1, 2, 3, 4, 5].map((i) => (
                             <Star
                               key={i}
                               className={
-                                i <= review.artistRating
+                                i <= (review.artistRating ?? 0)
                                   ? "h-4 w-4 text-amber-500 fill-amber-500"
                                   : "h-4 w-4 text-neutral-300"
                               }
