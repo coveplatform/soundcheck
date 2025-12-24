@@ -99,7 +99,7 @@ type TrackSubmissionEvents = {
   track_feedback_focus_entered: { hasContent: boolean };
   track_submission_form_completed: undefined;
   checkout_started: { package: string; price: number; trackId: string };
-  checkout_completed: { package: string; price: number; trackId: string };
+  checkout_completed: { package: string; price: number; trackId: string; bypassed?: boolean };
   checkout_abandoned: { package: string; price: number };
   track_cancelled: { trackId: string; hadPayment: boolean };
 };
