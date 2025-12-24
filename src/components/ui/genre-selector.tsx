@@ -55,7 +55,7 @@ const GENRE_CATEGORIES: Record<
   },
   pop: {
     label: "Pop",
-    parentSlug: "pop-parent",
+    parentSlug: "pop-dance",
     childSlugs: ["pop", "indie-pop", "electropop", "synth-pop"],
   },
   other: {
