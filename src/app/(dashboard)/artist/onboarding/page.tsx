@@ -13,8 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Check } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { GenreSelector } from "@/components/ui/genre-selector";
 
 interface Genre {
   id: string;
@@ -141,27 +140,14 @@ export default function ArtistOnboardingPage() {
               {isLoadingGenres ? (
                 <div className="text-sm text-neutral-500">Loading genres...</div>
               ) : (
-                <div className="flex flex-wrap gap-2">
-                  {genres.map((genre) => {
-                    const isSelected = selectedGenres.includes(genre.id);
-                    return (
-                      <button
-                        key={genre.id}
-                        type="button"
-                        onClick={() => toggleGenre(genre.id)}
-                        className={cn(
-                          "px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5",
-                          isSelected
-                            ? "bg-neutral-900 text-white"
-                            : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-                        )}
-                      >
-                        {isSelected && <Check className="h-3 w-3" />}
-                        {genre.name}
-                      </button>
-                    );
-                  })}
-                </div>
+                <GenreSelector
+                  genres={genres}
+                  selectedIds={selectedGenres}
+                  onToggle={toggleGenre}
+                  minSelections={1}
+                  maxSelections={5}
+                  variant="artist"
+                />
               )}
               <p className="text-sm text-neutral-500">
                 These help us match your tracks with reviewers who understand

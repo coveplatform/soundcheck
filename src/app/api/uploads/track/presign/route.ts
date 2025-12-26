@@ -18,22 +18,30 @@ const presignSchema = z.object({
   contentLength: z.number().int().positive(),
 });
 
-function getS3Client() {
+function getS3Client(): { client: S3Client | null; missingEnv: string[] } {
   const endpoint = process.env.UPLOADS_S3_ENDPOINT;
   const region = process.env.UPLOADS_S3_REGION;
   const accessKeyId = process.env.UPLOADS_S3_ACCESS_KEY_ID;
   const secretAccessKey = process.env.UPLOADS_S3_SECRET_ACCESS_KEY;
 
-  if (!region || !accessKeyId || !secretAccessKey) {
-    return null;
+  const missingEnv: string[] = [];
+  if (!region) missingEnv.push("UPLOADS_S3_REGION");
+  if (!accessKeyId) missingEnv.push("UPLOADS_S3_ACCESS_KEY_ID");
+  if (!secretAccessKey) missingEnv.push("UPLOADS_S3_SECRET_ACCESS_KEY");
+
+  if (missingEnv.length > 0) {
+    return { client: null, missingEnv };
   }
 
-  return new S3Client({
-    region,
-    endpoint: endpoint || undefined,
-    forcePathStyle: Boolean(endpoint),
-    credentials: { accessKeyId, secretAccessKey },
-  });
+  return {
+    client: new S3Client({
+      region: region!,
+      endpoint: endpoint || undefined,
+      forcePathStyle: Boolean(endpoint),
+      credentials: { accessKeyId: accessKeyId!, secretAccessKey: secretAccessKey! },
+    }),
+    missingEnv: [],
+  };
 }
 
 export async function POST(request: Request) {
@@ -59,11 +67,18 @@ export async function POST(request: Request) {
     const bucket = process.env.UPLOADS_S3_BUCKET;
     const publicBaseUrl = process.env.UPLOADS_PUBLIC_BASE_URL;
 
-    const client = getS3Client();
+    const { client, missingEnv } = getS3Client();
+    const missing = [...missingEnv];
+    if (!bucket) missing.push("UPLOADS_S3_BUCKET");
+    if (!publicBaseUrl) missing.push("UPLOADS_PUBLIC_BASE_URL");
 
     if (!client || !bucket || !publicBaseUrl) {
+      console.warn("Cloud uploads not configured", { missing });
       return NextResponse.json(
-        { error: "Cloud uploads not configured" },
+        {
+          error: "Cloud uploads not configured",
+          missing,
+        },
         { status: 501 }
       );
     }
@@ -106,7 +121,11 @@ export async function POST(request: Request) {
 
     const uploadUrl = await getSignedUrl(client, command, { expiresIn: 60 });
 
-    const base = publicBaseUrl.replace(/\/+$/, "");
+    const baseRaw = publicBaseUrl.trim().replace(/\/+$/, "");
+    const base =
+      baseRaw.startsWith("https://") || baseRaw.startsWith("http://")
+        ? baseRaw
+        : `https://${baseRaw}`;
     const fileUrl = `${base}/${key}`;
 
     return NextResponse.json({

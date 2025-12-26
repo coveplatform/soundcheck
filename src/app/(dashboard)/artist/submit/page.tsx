@@ -111,6 +111,7 @@ export default function SubmitTrackPage() {
           fileUrl?: string;
           contentType?: string;
           error?: string;
+          missing?: string[];
         };
 
         if (!presignData.uploadUrl || !presignData.fileUrl) {
@@ -131,6 +132,27 @@ export default function SubmitTrackPage() {
 
         finalUrl = presignData.fileUrl;
       } else {
+        const presignError = (await presignRes.json().catch(() => null)) as
+          | { error?: string; missing?: string[] }
+          | null;
+
+        // In production on Vercel, the local filesystem upload fallback is unreliable
+        // (request body limits + non-persistent filesystem). If cloud uploads aren't configured,
+        // fail fast with an actionable message.
+        if (presignRes.status === 501 && process.env.NODE_ENV === "production") {
+          const missing = presignError?.missing?.length
+            ? ` Missing: ${presignError.missing.join(", ")}`
+            : "";
+          setError((presignError?.error || "Cloud uploads not configured") + missing);
+          return;
+        }
+
+        // For other presign failures (auth, validation), surface the error instead of falling back.
+        if (presignRes.status !== 501) {
+          setError(presignError?.error || "Failed to prepare upload");
+          return;
+        }
+
         const formData = new FormData();
         formData.append("file", file);
 
