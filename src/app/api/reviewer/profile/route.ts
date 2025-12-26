@@ -4,8 +4,17 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+const countrySchema = z
+  .string()
+  .trim()
+  .transform((value) => value.toUpperCase())
+  .refine((value) => /^[A-Z]{2}$/.test(value), {
+    message: "Country must be a 2-letter code (e.g. AU, US)",
+  });
+
 const createProfileSchema = z.object({
   genreIds: z.array(z.string()).min(3, "Select at least 3 genres").max(5),
+  country: countrySchema.optional(),
 });
 
 const quizAnswersSchema = z.object({
@@ -17,6 +26,7 @@ const quizAnswersSchema = z.object({
 
 const patchProfileSchema = z.object({
   completedOnboarding: z.boolean().optional(),
+  country: countrySchema.optional(),
   quizAnswers: quizAnswersSchema.optional(),
 });
 
@@ -38,7 +48,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { genreIds } = createProfileSchema.parse(body);
+    const { genreIds, country } = createProfileSchema.parse(body);
 
     // Check if profile already exists
     const existingProfile = await prisma.reviewerProfile.findUnique({
@@ -53,6 +63,7 @@ export async function POST(request: Request) {
           genres: {
             set: genreIds.map((id) => ({ id })),
           },
+          country: country ?? undefined,
         },
         include: { genres: true },
       });
@@ -67,6 +78,7 @@ export async function POST(request: Request) {
         genres: {
           connect: genreIds.map((id) => ({ id })),
         },
+        country: country ?? undefined,
       },
       include: { genres: true },
     });
@@ -130,7 +142,7 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { completedOnboarding, quizAnswers } = patchProfileSchema.parse(body);
+    const { completedOnboarding, quizAnswers, country } = patchProfileSchema.parse(body);
 
     let profile = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
@@ -161,6 +173,7 @@ export async function PATCH(request: Request) {
           onboardingQuizScore: score,
           onboardingQuizPassed: passed,
           onboardingQuizCompletedAt: new Date(),
+          country: country ?? undefined,
         },
       });
 
@@ -185,12 +198,20 @@ export async function PATCH(request: Request) {
           { status: 400 }
         );
       }
+      const completedCountry = country ?? profile.country;
+      if (!completedCountry) {
+        return NextResponse.json(
+          { error: "Please set your country before finishing onboarding" },
+          { status: 400 }
+        );
+      }
     }
 
     const updated = await prisma.reviewerProfile.update({
       where: { id: profile.id },
       data: {
         completedOnboarding: completedOnboarding ?? undefined,
+        country: country ?? undefined,
       },
     });
 

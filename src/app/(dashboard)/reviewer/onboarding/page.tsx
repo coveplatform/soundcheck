@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Card,
@@ -26,6 +27,7 @@ interface ReviewerProfileState {
   completedOnboarding: boolean;
   onboardingQuizPassed: boolean;
   genres?: { id: string }[];
+  country?: string | null;
 }
 
 export default function ReviewerOnboardingPage() {
@@ -33,6 +35,7 @@ export default function ReviewerOnboardingPage() {
   const [step, setStep] = useState<"intro" | "quiz" | "genres">("intro");
   const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [country, setCountry] = useState<string>("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingGenres, setIsLoadingGenres] = useState(true);
@@ -80,6 +83,10 @@ export default function ReviewerOnboardingPage() {
 
         if (Array.isArray(data.genres) && data.genres.length > 0) {
           setSelectedGenres(data.genres.map((g) => g.id));
+        }
+
+        if (typeof data.country === "string" && data.country.trim()) {
+          setCountry(data.country.trim().toUpperCase());
         }
       } catch {
       }
@@ -151,13 +158,19 @@ export default function ReviewerOnboardingPage() {
       return;
     }
 
+    const normalizedCountry = country.trim().toUpperCase();
+    if (!/^[A-Z]{2}$/.test(normalizedCountry)) {
+      setError("Please enter your country as a 2-letter code (e.g. AU, US)");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const response = await fetch("/api/reviewer/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ genreIds: selectedGenres }),
+        body: JSON.stringify({ genreIds: selectedGenres, country: normalizedCountry }),
       });
 
       if (!response.ok) {
@@ -419,6 +432,20 @@ export default function ReviewerOnboardingPage() {
               {error}
             </div>
           )}
+
+          <div className="space-y-2">
+            <Label className="font-bold">Country (for payouts)</Label>
+            <Input
+              value={country}
+              onChange={(e) => setCountry(e.target.value.toUpperCase())}
+              placeholder="US"
+              maxLength={2}
+              autoComplete="country"
+            />
+            <p className="text-xs text-neutral-600 font-mono">
+              Use a 2-letter code like AU, US, GB. This is required to connect Stripe payouts.
+            </p>
+          </div>
 
           {isLoadingGenres ? (
             <div className="flex items-center gap-2 text-sm text-neutral-600">

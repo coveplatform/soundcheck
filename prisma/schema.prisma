@@ -144,6 +144,8 @@ model ReviewerProfile {
 
   stripeAccountId String? @unique
 
+  country String?
+
   onboardingQuizScore      Int      @default(0)
   onboardingQuizPassed     Boolean  @default(false)
   onboardingQuizCompletedAt DateTime?

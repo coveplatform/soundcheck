@@ -156,6 +156,7 @@ export default async function EarningsPage() {
             <PayoutActions
               pendingBalance={reviewerProfile.pendingBalance}
               stripeAccountId={reviewerProfile.stripeAccountId ?? null}
+              country={reviewerProfile.country ?? null}
             />
           </div>
 

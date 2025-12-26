@@ -34,15 +34,22 @@ function emailWrapper(content: string): string {
             <td style="padding: 32px 40px 24px; border-bottom: 2px solid ${COLORS.black};">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td>
-                    <!-- Logo: Black square with waveform -->
+                  <td align="center">
+                    <!-- Logo with inline SVG waveform -->
                     <table role="presentation" cellspacing="0" cellpadding="0">
                       <tr>
                         <td style="vertical-align: middle;">
-                          <div style="width: 36px; height: 36px; background-color: ${COLORS.black}; border-radius: 6px; display: inline-block; vertical-align: middle;"></div>
+                          <!--[if mso]>
+                          <v:rect xmlns:v="urn:schemas-microsoft-com:vml" style="width:36px;height:36px;" fillcolor="#000000" stroked="false">
+                            <v:textbox inset="0,0,0,0"></v:textbox>
+                          </v:rect>
+                          <![endif]-->
+                          <!--[if !mso]><!-->
+                          <img src="https://mixreflect.com/icon.svg" alt="MixReflect" width="36" height="36" style="display: block; border: 0; width: 36px; height: 36px;" />
+                          <!--<![endif]-->
                         </td>
-                        <td style="vertical-align: middle; padding-left: 10px;">
-                          <span style="font-size: 20px; font-weight: 700; color: ${COLORS.black}; letter-spacing: -0.5px;">mixreflect</span>
+                        <td style="vertical-align: middle; padding-left: 12px;">
+                          <span style="font-size: 22px; font-weight: 700; color: ${COLORS.black}; letter-spacing: -0.5px;">mixreflect</span>
                         </td>
                       </tr>
                     </table>
@@ -90,14 +97,20 @@ function emailWrapper(content: string): string {
   `.trim();
 }
 
-// Reusable button component
+// Reusable button component - centered by default
 function emailButton(text: string, url: string, variant: "primary" | "secondary" = "primary"): string {
   const isPrimary = variant === "primary";
   return `
-    <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 24px 0;">
+    <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin: 24px 0;">
       <tr>
-        <td style="background-color: ${isPrimary ? COLORS.black : COLORS.white}; border: 2px solid ${COLORS.black}; padding: 14px 28px;">
-          <a href="${url}" style="color: ${isPrimary ? COLORS.white : COLORS.black}; text-decoration: none; font-weight: 700; font-size: 14px; display: inline-block;">${text}</a>
+        <td align="center">
+          <table role="presentation" cellspacing="0" cellpadding="0">
+            <tr>
+              <td style="background-color: ${isPrimary ? COLORS.black : COLORS.white}; border: 2px solid ${COLORS.black}; padding: 14px 28px;">
+                <a href="${url}" style="color: ${isPrimary ? COLORS.white : COLORS.black}; text-decoration: none; font-weight: 700; font-size: 14px; display: inline-block;">${text}</a>
+              </td>
+            </tr>
+          </table>
         </td>
       </tr>
     </table>
@@ -229,9 +242,7 @@ export async function sendEmailVerificationEmail(params: {
     <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Thanks for signing up! Please confirm your email address to complete your account setup and get started.
     </p>
-    <div style="text-align: center;">
-      ${emailButton("Verify Email Address", params.verifyUrl)}
-    </div>
+    ${emailButton("Verify Email Address", params.verifyUrl)}
     <p style="margin: 0 0 24px; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       This link will expire in <strong>24 hours</strong>.
     </p>
@@ -322,9 +333,7 @@ export async function sendReviewProgressEmail(
       <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
         Your feedback is ready! Log in to read all reviews and rate them.
       </p>
-      <div style="text-align: center;">
-        ${emailButton("View Your Reviews", "https://mixreflect.com/artist/dashboard")}
-      </div>
+      ${emailButton("View Your Reviews", "https://mixreflect.com/artist/dashboard")}
     `
     : `
       <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
@@ -341,9 +350,7 @@ export async function sendReviewProgressEmail(
       <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
         Reviews are coming in! You can already view completed reviews in your dashboard.
       </p>
-      <div style="text-align: center;">
-        ${emailButton("View Progress", "https://mixreflect.com/artist/dashboard", "secondary")}
-      </div>
+      ${emailButton("View Progress", "https://mixreflect.com/artist/dashboard", "secondary")}
     `;
 
   await sendEmail({

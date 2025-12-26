@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe, getStripePlatformDefaults } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       select: {
         id: true,
         stripeAccountId: true,
+        country: true,
         isRestricted: true,
         completedOnboarding: true,
         onboardingQuizPassed: true,
@@ -95,8 +96,15 @@ export async function POST(request: Request) {
 
     if (!accountId) {
       const stripe = getStripe();
-      const defaults = await getStripePlatformDefaults();
-      const country = process.env.STRIPE_CONNECT_COUNTRY ?? defaults.country;
+
+      const country = reviewer.country?.trim().toUpperCase();
+      if (!country) {
+        return NextResponse.json(
+          { error: "Please set your country before connecting Stripe" },
+          { status: 400 }
+        );
+      }
+
       const account = await stripe.accounts.create({
         type: "express",
         country,
