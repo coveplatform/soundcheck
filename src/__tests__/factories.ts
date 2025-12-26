@@ -97,6 +97,7 @@ export function createMockTrack(overrides: Partial<Track> = {}): Track {
     title: 'Test Track',
     artworkUrl: null,
     duration: 180,
+    bpm: null,
     feedbackFocus: null,
     status: 'QUEUED',
     packageType: 'STANDARD',

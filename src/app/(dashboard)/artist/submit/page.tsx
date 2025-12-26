@@ -33,6 +33,7 @@ export default function SubmitTrackPage() {
   const [uploadedDuration, setUploadedDuration] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [title, setTitle] = useState("");
+  const [bpm, setBpm] = useState<string>("");
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<PackageType>("STANDARD");
@@ -233,6 +234,17 @@ export default function SubmitTrackPage() {
       return;
     }
 
+    if (!bpm.trim()) {
+      setError("Please enter the BPM of your track");
+      return;
+    }
+
+    const bpmValue = parseInt(bpm, 10);
+    if (isNaN(bpmValue) || bpmValue < 1 || bpmValue > 999) {
+      setError("BPM must be a number between 1 and 999");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -246,6 +258,7 @@ export default function SubmitTrackPage() {
             ? { duration: uploadedDuration }
             : {}),
           title: title.trim(),
+          bpm: bpmValue,
           genreIds: selectedGenres,
           feedbackFocus: feedbackFocus.trim() || undefined,
           packageType: selectedPackage,
@@ -366,26 +379,44 @@ export default function SubmitTrackPage() {
           </div>
 
           {(inputMode === "url" ? url && !urlError : !!uploadedUrl) && (
-            <div className="flex flex-wrap items-center gap-2 p-3 bg-neutral-50 border-2 border-black">
-              <Music className="h-5 w-5 text-black" />
-              <div className="flex-1 min-w-0">
-                <Input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Track title"
-                  className="border-0 bg-transparent p-0 h-auto font-bold focus-visible:ring-0"
-                />
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center gap-2 p-3 bg-neutral-50 border-2 border-black">
+                <Music className="h-5 w-5 text-black" />
+                <div className="flex-1 min-w-0">
+                  <Input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Track title"
+                    className="border-0 bg-transparent p-0 h-auto font-bold focus-visible:ring-0"
+                  />
+                </div>
+                {inputMode === "url" ? (
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-neutral-600 hover:text-black"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                ) : null}
               </div>
-              {inputMode === "url" ? (
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-neutral-600 hover:text-black"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              ) : null}
+              <div className="flex items-center gap-3">
+                <label htmlFor="bpm" className="text-sm font-bold text-black whitespace-nowrap">
+                  BPM *
+                </label>
+                <Input
+                  id="bpm"
+                  type="number"
+                  min={1}
+                  max={999}
+                  value={bpm}
+                  onChange={(e) => setBpm(e.target.value)}
+                  placeholder="e.g., 128"
+                  className="w-24"
+                />
+                <span className="text-xs text-neutral-500">Required</span>
+              </div>
             </div>
           )}
 
@@ -525,7 +556,7 @@ export default function SubmitTrackPage() {
                 {selectedPackageDetails.reviews} reviews
               </p>
               <p className="text-neutral-400 text-sm font-mono">
-                24-72 hours
+                24 hours max (usually shorter)
               </p>
             </div>
           </div>
@@ -536,6 +567,7 @@ export default function SubmitTrackPage() {
               isUploading ||
               isSubmitting ||
               !title.trim() ||
+              !bpm.trim() ||
               selectedGenres.length === 0 ||
               (inputMode === "url"
                 ? !url || !!urlError

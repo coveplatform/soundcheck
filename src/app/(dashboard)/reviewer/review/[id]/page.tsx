@@ -842,6 +842,16 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               setCanSubmit(true);
               funnels.review.minimumReached(review.track.id, MIN_LISTEN_SECONDS);
             }}
+            onAddTimestamp={
+              review.track.sourceType === "UPLOAD"
+                ? (seconds) => {
+                    setTimestampNotes((prev) => [
+                      ...prev,
+                      { seconds, note: "" },
+                    ]);
+                  }
+                : undefined
+            }
           />
         </CardContent>
       </Card>

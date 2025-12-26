@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, type MouseEvent as ReactMouseEvent } from "react";
-import { Play, Pause, Volume2, VolumeX } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AudioPlayerProps {
@@ -13,6 +13,7 @@ interface AudioPlayerProps {
   onTimeUpdate?: (seconds: number) => void;
   showListenTracker?: boolean;
   showWaveform?: boolean;
+  onAddTimestamp?: (seconds: number) => void; // callback for adding timestamps at current time
 }
 
 export function AudioPlayer({
@@ -24,6 +25,7 @@ export function AudioPlayer({
   onTimeUpdate,
   showListenTracker = true,
   showWaveform = false,
+  onAddTimestamp,
 }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -361,6 +363,16 @@ export function AudioPlayer({
           {/* Time display inside waveform */}
           <div className="flex items-center justify-between mt-3 text-xs font-mono text-neutral-500">
             <span>{formatTime(currentTime)}</span>
+            {onAddTimestamp && (
+              <button
+                type="button"
+                onClick={() => onAddTimestamp(Math.floor(currentTime))}
+                className="flex items-center gap-1 px-2 py-1 text-xs font-bold bg-white text-black border-2 border-black hover:bg-neutral-100 transition-colors"
+              >
+                <Plus className="h-3 w-3" />
+                Add timestamp ({formatTime(currentTime)})
+              </button>
+            )}
             <span>{formatTime(duration)}</span>
           </div>
         </div>

@@ -77,7 +77,7 @@ export default async function Home() {
             </Link>
           </div>
           <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-500 font-mono">
-            <span>Artists: From $4.95 • 24-72hr turnaround</span>
+            <span>Artists: From $4.95 • 24h max turnaround (usually shorter)</span>
             <span>Reviewers: Earn $0.50–$1.50 per review</span>
           </div>
         </div>
@@ -328,7 +328,7 @@ export default async function Home() {
               </div>
               <h3 className="font-bold text-lg mb-2">Fast turnaround</h3>
               <p className="text-sm text-neutral-600">
-                Get all your reviews in 24-72 hours. No waiting weeks for feedback on a track you&apos;re excited about.
+                Get all your reviews in 24 hours max (usually shorter). No waiting weeks for feedback on a track you&apos;re excited about.
               </p>
             </div>
 
@@ -459,7 +459,7 @@ export default async function Home() {
             {[
               {
                 q: "How does it work?",
-                a: "Submit a private link. Pick a package. Get structured feedback from genre-matched reviewers within 24-72 hours.",
+                a: "Submit a private link. Pick a package. Get structured feedback from genre-matched reviewers within 24 hours (usually shorter).",
               },
               {
                 q: "Who are the reviewers?",

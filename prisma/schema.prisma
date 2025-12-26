@@ -200,6 +200,7 @@ model Track {
   title      String
   artworkUrl String?
   duration   Int? // in seconds
+  bpm        Int? // beats per minute
 
   // Categorization
   genres Genre[] @relation("TrackGenres")
