@@ -4,14 +4,37 @@ import { createHash } from "crypto";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "@/lib/prisma";
+import { PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE } from "@/lib/password";
+import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 
 const schema = z.object({
   token: z.string().min(1),
-  password: z.string().min(8),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE),
 });
 
 export async function POST(request: Request) {
   try {
+    // Rate limiting
+    const clientIp = getClientIp(request);
+    const rateLimit = checkRateLimit(`reset-password:${clientIp}`, RATE_LIMITS.resetPassword);
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: `Too many password reset attempts. Please try again in ${rateLimit.retryAfterSeconds} seconds.`,
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rateLimit.retryAfterSeconds),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { token, password } = schema.parse(body);
 

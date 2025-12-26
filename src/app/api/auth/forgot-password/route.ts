@@ -4,6 +4,7 @@ import { createHash, randomBytes } from "crypto";
 
 import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 
 const schema = z.object({
   email: z.string().email(),
@@ -11,6 +12,24 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   try {
+    // Rate limiting
+    const clientIp = getClientIp(request);
+    const rateLimit = checkRateLimit(`forgot-password:${clientIp}`, RATE_LIMITS.forgotPassword);
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: `Too many password reset requests. Please try again in ${rateLimit.retryAfterSeconds} seconds.`,
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rateLimit.retryAfterSeconds),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { email } = schema.parse(body);
 

@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/card";
 import { Music, Headphones, Users, ArrowLeft, Loader2 } from "lucide-react";
 import { funnels, track } from "@/lib/analytics";
+import { PasswordStrength } from "@/components/ui/password-strength";
+import { validatePassword } from "@/lib/password";
 
 type Role = "artist" | "reviewer" | "both";
 
@@ -27,6 +29,7 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -75,6 +78,19 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!role) return;
+
+    // Validate password requirements
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      setError("Password doesn't meet requirements: " + passwordValidation.errors[0]);
+      return;
+    }
+
+    // Validate password confirmation
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
 
     if (!acceptedTerms) {
       setError("You must agree to the Terms and Privacy Policy");
@@ -253,12 +269,29 @@ export default function SignupPage() {
             <Input
               id="password"
               type="password"
-              placeholder="At least 8 characters"
+              placeholder="Create a strong password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              minLength={8}
               required
             />
+            <PasswordStrength password={password} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="font-bold">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="Re-enter your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            {confirmPassword && password !== confirmPassword && (
+              <p className="text-xs text-red-500 font-medium">Passwords do not match</p>
+            )}
+            {confirmPassword && password === confirmPassword && password.length > 0 && (
+              <p className="text-xs text-green-600 font-medium">Passwords match</p>
+            )}
           </div>
           <div className="flex items-start gap-3 pt-2">
             <input
@@ -286,7 +319,11 @@ export default function SignupPage() {
             type="submit"
             className="w-full"
             isLoading={isLoading}
-            disabled={!acceptedTerms}
+            disabled={
+              !acceptedTerms ||
+              !validatePassword(password).valid ||
+              password !== confirmPassword
+            }
           >
             Create account
           </Button>

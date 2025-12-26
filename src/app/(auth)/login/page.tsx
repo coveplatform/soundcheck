@@ -68,6 +68,11 @@ export default function LoginPage() {
       return;
     }
 
+    if (authError.startsWith("TooManyAttempts")) {
+      setError("Too many login attempts. Please try again later.");
+      return;
+    }
+
     setError("Sign in failed");
   }, [authError]);
 
@@ -93,6 +98,9 @@ export default function LoginPage() {
         if (result.error === "EmailNotVerified") {
           setNeedsVerificationEmail(email);
           setError("Please verify your email before signing in.");
+        } else if (result.error.startsWith("TooManyAttempts:")) {
+          const seconds = result.error.split(":")[1];
+          setError(`Too many login attempts. Please try again in ${seconds} seconds.`);
         } else {
           setError("Invalid email or password");
         }

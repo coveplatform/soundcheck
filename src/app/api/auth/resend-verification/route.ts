@@ -4,6 +4,7 @@ import { createHash, randomBytes } from "crypto";
 
 import { prisma } from "@/lib/prisma";
 import { sendEmailVerificationEmail } from "@/lib/email";
+import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -13,6 +14,24 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   try {
+    // Rate limiting
+    const clientIp = getClientIp(request);
+    const rateLimit = checkRateLimit(`resend-verification:${clientIp}`, RATE_LIMITS.resendVerification);
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: `Too many verification requests. Please try again in ${rateLimit.retryAfterSeconds} seconds.`,
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rateLimit.retryAfterSeconds),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { email } = schema.parse(body);
 

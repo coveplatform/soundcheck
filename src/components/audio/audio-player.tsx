@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect, type MouseEvent as ReactMouseEvent } from "react";
-import { Play, Pause, Volume2, VolumeX, Plus } from "lucide-react";
+import { useState, useRef, useEffect, useCallback, type MouseEvent as ReactMouseEvent } from "react";
+import { Play, Pause, Volume2, VolumeX, Plus, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AudioPlayerProps {
@@ -34,9 +34,23 @@ export function AudioPlayer({
   const [totalListenTime, setTotalListenTime] = useState(0);
   const [hasReachedMinimum, setHasReachedMinimum] = useState(false);
   const [waveformPeaks, setWaveformPeaks] = useState<number[] | null>(null);
+  const [timestampAdded, setTimestampAdded] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Store callbacks in refs to avoid effect dependency issues
+  const onListenProgressRef = useRef(onListenProgress);
+  const onMinimumReachedRef = useRef(onMinimumReached);
+
+  // Keep refs in sync with props
+  useEffect(() => {
+    onListenProgressRef.current = onListenProgress;
+  }, [onListenProgress]);
+
+  useEffect(() => {
+    onMinimumReachedRef.current = onMinimumReached;
+  }, [onMinimumReached]);
 
   const seekToRatio = (ratio: number) => {
     const audio = audioRef.current;
@@ -71,7 +85,7 @@ export function AudioPlayer({
     return sourceUrl;
   };
 
-  // Track listen time
+  // Track listen time - use refs for callbacks to prevent interval restarts
   useEffect(() => {
     if (!showListenTracker) {
       return;
@@ -81,11 +95,16 @@ export function AudioPlayer({
       progressIntervalRef.current = setInterval(() => {
         setTotalListenTime((prev) => {
           const newTime = prev + 1;
-          onListenProgress?.(newTime);
+          // Use refs to call the latest callbacks without effect re-runs
+          onListenProgressRef.current?.(newTime);
 
-          if (!hasReachedMinimum && newTime >= minListenTime) {
-            setHasReachedMinimum(true);
-            onMinimumReached?.();
+          if (newTime >= minListenTime) {
+            setHasReachedMinimum((wasReached) => {
+              if (!wasReached) {
+                onMinimumReachedRef.current?.();
+              }
+              return true;
+            });
           }
 
           return newTime;
@@ -102,14 +121,7 @@ export function AudioPlayer({
         clearInterval(progressIntervalRef.current);
       }
     };
-  }, [
-    isPlaying,
-    hasReachedMinimum,
-    minListenTime,
-    onListenProgress,
-    onMinimumReached,
-    showListenTracker,
-  ]);
+  }, [isPlaying, minListenTime, showListenTracker]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -366,11 +378,29 @@ export function AudioPlayer({
             {onAddTimestamp && (
               <button
                 type="button"
-                onClick={() => onAddTimestamp(Math.floor(currentTime))}
-                className="flex items-center gap-1 px-2 py-1 text-xs font-bold bg-white text-black border-2 border-black hover:bg-neutral-100 transition-colors"
+                onClick={() => {
+                  onAddTimestamp(Math.floor(currentTime));
+                  setTimestampAdded(true);
+                  setTimeout(() => setTimestampAdded(false), 1500);
+                }}
+                className={cn(
+                  "flex items-center gap-1 px-2 py-1 text-xs font-bold border-2 transition-all",
+                  timestampAdded
+                    ? "bg-lime-500 text-black border-lime-600 scale-105"
+                    : "bg-white text-black border-black hover:bg-neutral-100"
+                )}
               >
-                <Plus className="h-3 w-3" />
-                Add timestamp ({formatTime(currentTime)})
+                {timestampAdded ? (
+                  <>
+                    <Check className="h-3 w-3" />
+                    Added!
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-3 w-3" />
+                    Add timestamp ({formatTime(currentTime)})
+                  </>
+                )}
               </button>
             )}
             <span>{formatTime(duration)}</span>

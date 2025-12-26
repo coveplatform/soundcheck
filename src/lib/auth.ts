@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
+import { checkRateLimit, RATE_LIMITS } from "./rate-limit";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -18,6 +19,18 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid credentials");
+        }
+
+        // Rate limit by email to prevent brute force attacks
+        const rateLimit = checkRateLimit(
+          `login:${credentials.email.toLowerCase()}`,
+          RATE_LIMITS.login
+        );
+
+        if (!rateLimit.success) {
+          throw new Error(
+            `TooManyAttempts:${rateLimit.retryAfterSeconds}`
+          );
         }
 
         const user = await prisma.user.findUnique({

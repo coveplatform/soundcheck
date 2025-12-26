@@ -4,12 +4,17 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { createHash, randomBytes } from "crypto";
 import { sendEmailVerificationEmail } from "@/lib/email";
+import { PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE } from "@/lib/password";
+import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
 const signupSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE),
   name: z.string().min(1, "Name is required"),
   role: z.enum(["artist", "reviewer", "both"]),
   acceptedTerms: z.boolean(),
@@ -17,6 +22,24 @@ const signupSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    // Rate limiting
+    const clientIp = getClientIp(request);
+    const rateLimit = checkRateLimit(`signup:${clientIp}`, RATE_LIMITS.signup);
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: `Too many signup attempts. Please try again in ${rateLimit.retryAfterSeconds} seconds.`,
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rateLimit.retryAfterSeconds),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { email, password, name, role, acceptedTerms } = signupSchema.parse(body);
 
