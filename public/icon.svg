@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Black square background -->
+  <rect x="2" y="2" width="28" height="28" rx="4" fill="#000000"/>
+  <!-- Simplified waveform bars in white - optimized for small sizes -->
+  <g fill="#ffffff">
+    <rect x="6" y="13" width="3" height="6" rx="1"/>
+    <rect x="10" y="10" width="3" height="12" rx="1"/>
+    <rect x="14" y="7" width="3" height="18" rx="1"/>
+    <rect x="18" y="11" width="3" height="10" rx="1"/>
+    <rect x="22" y="9" width="3" height="14" rx="1"/>
+  </g>
+</svg>
