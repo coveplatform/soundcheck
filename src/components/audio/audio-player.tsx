@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, type MouseEvent as ReactMouseEvent } from "react";
-import { Play, Pause, Volume2, VolumeX, Plus, Check } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Plus, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AudioPlayerProps {
@@ -34,6 +34,7 @@ export function AudioPlayer({
   const [totalListenTime, setTotalListenTime] = useState(0);
   const [hasReachedMinimum, setHasReachedMinimum] = useState(false);
   const [waveformPeaks, setWaveformPeaks] = useState<number[] | null>(null);
+  const [isWaveformLoading, setIsWaveformLoading] = useState(false);
   const [timestampAdded, setTimestampAdded] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -137,20 +138,28 @@ export function AudioPlayer({
   useEffect(() => {
     if (!showWaveform) {
       setWaveformPeaks(null);
+      setIsWaveformLoading(false);
       return;
     }
 
     if (isEmbedded) {
       setWaveformPeaks(null);
+      setIsWaveformLoading(false);
       return;
     }
 
     let cancelled = false;
 
+    setWaveformPeaks(null);
+    setIsWaveformLoading(true);
+
     const run = async () => {
       try {
         const res = await fetch(sourceUrl);
         if (!res.ok) {
+          if (!cancelled) {
+            setIsWaveformLoading(false);
+          }
           return;
         }
 
@@ -218,9 +227,12 @@ export function AudioPlayer({
 
         if (!cancelled) {
           setWaveformPeaks(normalized);
+          setIsWaveformLoading(false);
         }
       } catch {
-        // ignore
+        if (!cancelled) {
+          setIsWaveformLoading(false);
+        }
       }
     };
 
@@ -325,86 +337,106 @@ export function AudioPlayer({
         onPause={() => setIsPlaying(false)}
       />
 
-      {showWaveform && waveformPeaks ? (
+      {showWaveform ? (
         <div className="rounded-xl bg-neutral-950 p-4 overflow-hidden">
-          <div className="relative">
-            {/* Center line */}
-            <div className="absolute inset-x-0 top-1/2 h-px bg-neutral-800/50 pointer-events-none" />
-
-            {/* Progress line */}
-            <div
-              className="absolute top-0 bottom-0 w-0.5 bg-rose-500 pointer-events-none z-10 shadow-[0_0_8px_rgba(244,63,94,0.6)]"
-              style={{ left: `${Math.min(100, Math.max(0, (duration > 0 ? (currentTime / duration) * 100 : 0)))}%` }}
-            />
-
-            {/* Waveform bars */}
-            <div
-              className="grid items-center gap-[2px] h-24 cursor-pointer"
-              style={{
-                gridTemplateColumns: `repeat(${waveformPeaks.length}, minmax(0, 1fr))`,
-              }}
-              onClick={seekFromClick}
-              role="slider"
-              aria-label="Seek audio"
-              aria-valuenow={currentTime}
-              aria-valuemin={0}
-              aria-valuemax={duration}
-            >
-              {waveformPeaks.map((p, idx) => {
-                const progress = duration > 0 ? currentTime / duration : 0;
-                const barPosition = idx / waveformPeaks.length;
-                const isActive = barPosition <= progress;
-                const pxHeight = Math.max(4, Math.round(4 + p * 80));
-
-                return (
+          {isWaveformLoading ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-xs font-mono text-neutral-500">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Generating waveform...
+              </div>
+              <div className="grid items-center gap-[2px] h-24 animate-pulse" style={{ gridTemplateColumns: "repeat(48, minmax(0, 1fr))" }}>
+                {Array.from({ length: 48 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className={cn(
-                      "rounded-full transition-colors duration-150",
-                      isActive
-                        ? "bg-gradient-to-t from-rose-400 to-rose-300"
-                        : "bg-neutral-700 hover:bg-neutral-600"
-                    )}
-                    style={{ height: `${pxHeight}px` }}
+                    className="rounded-full bg-neutral-800"
+                    style={{ height: `${8 + (idx % 9) * 6}px` }}
                   />
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
+          ) : waveformPeaks ? (
+            <>
+              <div className="relative">
+                <div className="absolute inset-x-0 top-1/2 h-px bg-neutral-800/50 pointer-events-none" />
 
-          {/* Time display inside waveform */}
-          <div className="flex items-center justify-between mt-3 text-xs font-mono text-neutral-500">
-            <span>{formatTime(currentTime)}</span>
-            {onAddTimestamp && (
-              <button
-                type="button"
-                onClick={() => {
-                  onAddTimestamp(Math.floor(currentTime));
-                  setTimestampAdded(true);
-                  setTimeout(() => setTimestampAdded(false), 1500);
-                }}
-                className={cn(
-                  "flex items-center gap-1 px-2 py-1 text-xs font-bold border-2 transition-all",
-                  timestampAdded
-                    ? "bg-lime-500 text-black border-lime-600 scale-105"
-                    : "bg-white text-black border-black hover:bg-neutral-100"
+                <div
+                  className="absolute top-0 bottom-0 w-0.5 bg-rose-500 pointer-events-none z-10 shadow-[0_0_8px_rgba(244,63,94,0.6)]"
+                  style={{ left: `${Math.min(100, Math.max(0, (duration > 0 ? (currentTime / duration) * 100 : 0)))}%` }}
+                />
+
+                <div
+                  className="grid items-center gap-[2px] h-24 cursor-pointer"
+                  style={{
+                    gridTemplateColumns: `repeat(${waveformPeaks.length}, minmax(0, 1fr))`,
+                  }}
+                  onClick={seekFromClick}
+                  role="slider"
+                  aria-label="Seek audio"
+                  aria-valuenow={currentTime}
+                  aria-valuemin={0}
+                  aria-valuemax={duration}
+                >
+                  {waveformPeaks.map((p, idx) => {
+                    const progress = duration > 0 ? currentTime / duration : 0;
+                    const barPosition = idx / waveformPeaks.length;
+                    const isActive = barPosition <= progress;
+                    const pxHeight = Math.max(4, Math.round(4 + p * 80));
+
+                    return (
+                      <div
+                        key={idx}
+                        className={cn(
+                          "rounded-full transition-colors duration-150",
+                          isActive
+                            ? "bg-gradient-to-t from-rose-400 to-rose-300"
+                            : "bg-neutral-700 hover:bg-neutral-600"
+                        )}
+                        style={{ height: `${pxHeight}px` }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mt-3 text-xs font-mono text-neutral-500">
+                <span>{formatTime(currentTime)}</span>
+                {onAddTimestamp && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onAddTimestamp(Math.floor(currentTime));
+                      setTimestampAdded(true);
+                      setTimeout(() => setTimestampAdded(false), 1500);
+                    }}
+                    className={cn(
+                      "flex items-center gap-1 px-2 py-1 text-xs font-bold border-2 transition-all",
+                      timestampAdded
+                        ? "bg-lime-500 text-black border-lime-600 scale-105"
+                        : "bg-white text-black border-black hover:bg-neutral-100"
+                    )}
+                  >
+                    {timestampAdded ? (
+                      <>
+                        <Check className="h-3 w-3" />
+                        Added!
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="h-3 w-3" />
+                        Add timestamp ({formatTime(currentTime)})
+                      </>
+                    )}
+                  </button>
                 )}
-              >
-                {timestampAdded ? (
-                  <>
-                    <Check className="h-3 w-3" />
-                    Added!
-                  </>
-                ) : (
-                  <>
-                    <Plus className="h-3 w-3" />
-                    Add timestamp ({formatTime(currentTime)})
-                  </>
-                )}
-              </button>
-            )}
-            <span>{formatTime(duration)}</span>
-          </div>
+                <span>{formatTime(duration)}</span>
+              </div>
+            </>
+          ) : (
+            <div className="h-24 flex items-center justify-center text-xs font-mono text-neutral-500">
+              Waveform unavailable
+            </div>
+          )}
         </div>
       ) : null}
 

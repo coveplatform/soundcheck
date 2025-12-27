@@ -256,15 +256,15 @@ export default function SubmitTrackPage() {
       return;
     }
 
-    if (!bpm.trim()) {
-      setError("Please enter the BPM of your track");
-      return;
-    }
-
-    const bpmValue = parseInt(bpm, 10);
-    if (isNaN(bpmValue) || bpmValue < 1 || bpmValue > 999) {
-      setError("BPM must be a number between 1 and 999");
-      return;
+    const bpmTrimmed = bpm.trim();
+    let bpmValue: number | undefined;
+    if (bpmTrimmed) {
+      const parsed = parseInt(bpmTrimmed, 10);
+      if (isNaN(parsed) || parsed < 1 || parsed > 999) {
+        setError("BPM must be a number between 1 and 999");
+        return;
+      }
+      bpmValue = parsed;
     }
 
     setIsSubmitting(true);
@@ -280,7 +280,7 @@ export default function SubmitTrackPage() {
             ? { duration: uploadedDuration }
             : {}),
           title: title.trim(),
-          bpm: bpmValue,
+          ...(typeof bpmValue === "number" ? { bpm: bpmValue } : {}),
           genreIds: selectedGenres,
           feedbackFocus: feedbackFocus.trim() || undefined,
           packageType: selectedPackage,
@@ -290,7 +290,11 @@ export default function SubmitTrackPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 403 && typeof data?.error === "string" && data.error.toLowerCase().includes("verify")) {
+        if (
+          response.status === 403 &&
+          typeof data?.error === "string" &&
+          data.error.toLowerCase().includes("verify")
+        ) {
           router.push("/verify-email");
           router.refresh();
           return;
@@ -299,7 +303,6 @@ export default function SubmitTrackPage() {
         return;
       }
 
-      // Redirect to checkout
       router.push(`/artist/submit/checkout?trackId=${data.id}`);
     } catch {
       setError("Something went wrong");
@@ -425,7 +428,7 @@ export default function SubmitTrackPage() {
               </div>
               <div className="flex items-center gap-3">
                 <label htmlFor="bpm" className="text-sm font-bold text-black whitespace-nowrap">
-                  BPM *
+                  BPM
                 </label>
                 <Input
                   id="bpm"
@@ -437,7 +440,7 @@ export default function SubmitTrackPage() {
                   placeholder="e.g., 128"
                   className="w-24"
                 />
-                <span className="text-xs text-neutral-500">Required</span>
+                <span className="text-xs text-neutral-500">Optional</span>
               </div>
             </div>
           )}
@@ -513,7 +516,7 @@ export default function SubmitTrackPage() {
         <CardHeader>
           <CardTitle className="text-lg">Choose Your Package</CardTitle>
           <CardDescription>
-            Select how many structured reviews you&apos;d like (higher tiers prioritize top-rated reviewers)
+            Select how many structured reviews you'd like (higher tiers prioritize top-rated reviewers)
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -589,7 +592,6 @@ export default function SubmitTrackPage() {
               isUploading ||
               isSubmitting ||
               !title.trim() ||
-              !bpm.trim() ||
               selectedGenres.length === 0 ||
               (inputMode === "url"
                 ? !url || !!urlError
