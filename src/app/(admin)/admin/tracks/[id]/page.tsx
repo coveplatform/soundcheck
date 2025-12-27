@@ -54,7 +54,8 @@ export default async function AdminTrackDetailPage({
     (track.status === "PENDING_PAYMENT" || track.status === "QUEUED");
 
   const canGrantFree =
-    track.status === "PENDING_PAYMENT" && !track.payment;
+    track.status === "PENDING_PAYMENT" &&
+    (!track.payment || track.payment.status === "PENDING");
 
   return (
     <div className="space-y-6">

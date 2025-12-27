@@ -38,27 +38,41 @@ export async function POST(
       );
     }
 
-    if (track.payment) {
+    // Only allow if no payment or payment is still PENDING
+    if (track.payment && track.payment.status !== "PENDING") {
       return NextResponse.json(
-        { error: "Track already has a payment record" },
+        { error: "Track already has a completed payment" },
         { status: 400 }
       );
     }
 
     const now = new Date();
 
-    // Create a $0 payment record and queue the track
+    // Create or update payment record to $0 COMPLETED, and queue the track
+    const paymentOp = track.payment
+      ? prisma.payment.update({
+          where: { id: track.payment.id },
+          data: {
+            amount: 0,
+            stripeSessionId: `admin_free_${track.id}_${now.getTime()}`,
+            stripePaymentId: null,
+            status: "COMPLETED",
+            completedAt: now,
+          },
+        })
+      : prisma.payment.create({
+          data: {
+            trackId: track.id,
+            amount: 0,
+            stripeSessionId: `admin_free_${track.id}_${now.getTime()}`,
+            stripePaymentId: null,
+            status: "COMPLETED",
+            completedAt: now,
+          },
+        });
+
     await prisma.$transaction([
-      prisma.payment.create({
-        data: {
-          trackId: track.id,
-          amount: 0,
-          stripeSessionId: `admin_free_${track.id}_${now.getTime()}`,
-          stripePaymentId: null,
-          status: "COMPLETED",
-          completedAt: now,
-        },
-      }),
+      paymentOp,
       prisma.track.update({
         where: { id: track.id },
         data: {
