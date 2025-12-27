@@ -37,6 +37,7 @@ export default function SubmitTrackPage() {
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<PackageType>("STANDARD");
+  const [promoCode, setPromoCode] = useState("");
 
   // UI state
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -303,7 +304,10 @@ export default function SubmitTrackPage() {
         return;
       }
 
-      router.push(`/artist/submit/checkout?trackId=${data.id}`);
+      const checkoutUrl = promoCode.trim()
+        ? `/artist/submit/checkout?trackId=${data.id}&promo=${encodeURIComponent(promoCode.trim())}`
+        : `/artist/submit/checkout?trackId=${data.id}`;
+      router.push(checkoutUrl);
     } catch {
       setError("Something went wrong");
     } finally {
@@ -584,6 +588,14 @@ export default function SubmitTrackPage() {
                 24 hours max (usually shorter)
               </p>
             </div>
+          </div>
+          <div className="mb-4">
+            <Input
+              placeholder="Promo code (optional)"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+              className="bg-neutral-900 border-neutral-700 text-white placeholder:text-neutral-500 font-mono"
+            />
           </div>
           <Button
             onClick={handleSubmit}

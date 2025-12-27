@@ -32,11 +32,19 @@ export async function POST(request: Request) {
 
     const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
 
-    const { trackId } = await request.json();
+    const { trackId, promoCode } = await request.json();
 
     if (!trackId) {
       return NextResponse.json({ error: "Track ID required" }, { status: 400 });
     }
+
+    // Check if promo code is valid
+    const validPromoCodes = (process.env.PROMO_CODES ?? "")
+      .split(",")
+      .map((code) => code.trim().toUpperCase())
+      .filter(Boolean);
+    const isValidPromo =
+      promoCode && validPromoCodes.includes(promoCode.toUpperCase());
 
     // Get track
     const track = await prisma.track.findUnique({
@@ -71,7 +79,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid package" }, { status: 400 });
     }
 
-    if (bypassPayments) {
+    if (bypassPayments || isValidPromo) {
       const paidAt = new Date();
 
       const updated = await prisma.track.updateMany({
@@ -80,6 +88,20 @@ export async function POST(request: Request) {
       });
 
       if (updated.count > 0) {
+        // Create $0 payment record for promo codes
+        if (isValidPromo) {
+          await prisma.payment.create({
+            data: {
+              trackId: track.id,
+              amount: 0,
+              stripeSessionId: `promo_${promoCode.toUpperCase()}_${track.id}_${paidAt.getTime()}`,
+              stripePaymentId: null,
+              status: "COMPLETED",
+              completedAt: paidAt,
+            },
+          });
+        }
+
         await prisma.artistProfile.update({
           where: { id: track.artistId },
           data: {
@@ -91,7 +113,7 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json({
-        url: `${baseUrl}/artist/submit/success?session_id=bypass_${track.id}`,
+        url: `${baseUrl}/artist/submit/success?session_id=${isValidPromo ? "promo" : "bypass"}_${track.id}`,
         package: track.packageType,
         amount: packageDetails.price,
         bypassed: true,

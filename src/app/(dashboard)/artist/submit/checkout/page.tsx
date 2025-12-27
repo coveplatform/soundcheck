@@ -10,6 +10,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const trackId = searchParams.get("trackId");
+  const promoCode = searchParams.get("promo");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function CheckoutPage() {
         const response = await fetch("/api/payments/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ trackId }),
+          body: JSON.stringify({ trackId, promoCode: promoCode || undefined }),
         });
 
         const data = await response.json();
