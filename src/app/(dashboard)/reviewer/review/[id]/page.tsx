@@ -576,31 +576,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <Skeleton className="h-20" />
             <Skeleton className="h-20" />
           </div>
-
-          <div className="space-y-3">
-            <Label className="text-base font-bold">Did you address the artist note? *</Label>
-            <div className="flex gap-2">
-              {([
-                { value: "YES", label: "Yes" },
-                { value: "PARTIALLY", label: "Partially" },
-                { value: "NO", label: "No" },
-              ] as const).map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setAddressedArtistNote(opt.value)}
-                  className={cn(
-                    "flex-1 py-2.5 px-3 text-sm font-bold transition-colors border-2 border-black",
-                    addressedArtistNote === opt.value
-                      ? "bg-purple-400 text-black"
-                      : "bg-white text-black hover:bg-neutral-100"
-                  )}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-10 w-full" />
         </div>
       </div>
     );
@@ -1028,6 +1006,32 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               onChange={(e) => setAdditionalNotes(e.target.value)}
               className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
             />
+          </div>
+
+          {/* Did you address the artist note */}
+          <div className="space-y-3">
+            <Label className="text-base font-bold">Did you address the artist note? *</Label>
+            <div className="flex gap-2">
+              {([
+                { value: "YES", label: "Yes" },
+                { value: "PARTIALLY", label: "Partially" },
+                { value: "NO", label: "No" },
+              ] as const).map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setAddressedArtistNote(opt.value)}
+                  className={cn(
+                    "flex-1 py-2.5 px-3 text-sm font-bold transition-colors border-2 border-black",
+                    addressedArtistNote === opt.value
+                      ? "bg-purple-400 text-black"
+                      : "bg-white text-black hover:bg-neutral-100"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-3">
