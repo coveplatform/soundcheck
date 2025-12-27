@@ -19,6 +19,7 @@ interface Review {
   status: string;
   createdAt?: string;
   paidAmount?: number;
+  listenDuration?: number;
   firstImpression?: FirstImpression | null;
   productionScore?: number | null;
   vocalScore?: number | null;
@@ -212,11 +213,21 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     if (!review) return;
     if (review.status === "COMPLETED") return;
 
+    // Restore listen time from server first (most reliable)
+    const serverListenTime = typeof review.listenDuration === "number" ? review.listenDuration : 0;
+
     try {
       const raw = localStorage.getItem(draftKey);
       if (raw) {
         const parsed = JSON.parse(raw) as any;
         if (parsed && parsed.reviewId === review.id) {
+          // Use max of draft and server listen time
+          const draftListenTime = typeof parsed.listenTime === "number" ? parsed.listenTime : 0;
+          const restoredListenTime = Math.max(draftListenTime, serverListenTime);
+          setListenTime(restoredListenTime);
+          if (restoredListenTime >= MIN_LISTEN_SECONDS) {
+            setCanSubmit(true);
+          }
           setFirstImpression(parsed.firstImpression ?? null);
           setProductionScore(typeof parsed.productionScore === "number" ? parsed.productionScore : 0);
           setVocalScore(typeof parsed.vocalScore === "number" ? parsed.vocalScore : 0);
@@ -240,6 +251,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     } catch {
     }
 
+    // No draft found, restore from server
+    if (serverListenTime > 0) {
+      setListenTime(serverListenTime);
+      if (serverListenTime >= MIN_LISTEN_SECONDS) {
+        setCanSubmit(true);
+      }
+    }
     setAddressedArtistNote(review.addressedArtistNote ?? null);
     setNextActions(typeof review.nextActions === "string" ? review.nextActions : "");
     setTimestampNotes(Array.isArray(review.timestamps) ? review.timestamps : []);
@@ -258,6 +276,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       const payload = {
         reviewId: review.id,
         savedAt,
+        listenTime,
         firstImpression,
         productionScore,
         vocalScore,
@@ -286,6 +305,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     draftReady,
     review,
     success,
+    listenTime,
     firstImpression,
     productionScore,
     vocalScore,
