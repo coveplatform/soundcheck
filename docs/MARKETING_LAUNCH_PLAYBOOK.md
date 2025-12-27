@@ -270,7 +270,7 @@ Don't underestimate this:
 
 3. **Launch Announcement (One Time):**
    ```markdown
-   Title: I built a platform for getting real feedback on unreleased tracks
+   Title: I built a platform for getting real feedback on unreleased trackss
 
    Hey r/WeAreTheMusicMakers,
 

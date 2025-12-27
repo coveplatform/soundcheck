@@ -18,7 +18,9 @@
       "Bash(set NEXT_TURBOPACK=0)",
       "Bash(npx next build:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git fetch:*)",
+      "Bash(git push)"
     ]
   }
 }
