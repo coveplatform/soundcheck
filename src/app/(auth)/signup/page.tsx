@@ -30,6 +30,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [referralSource, setReferralSource] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -105,7 +106,7 @@ export default function SignupPage() {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name, role, acceptedTerms }),
+        body: JSON.stringify({ email, password, name, role, acceptedTerms, referralSource: referralSource || undefined }),
       });
 
       if (!response.ok) {
@@ -292,6 +293,27 @@ export default function SignupPage() {
             {confirmPassword && password === confirmPassword && password.length > 0 && (
               <p className="text-xs text-green-600 font-medium">Passwords match</p>
             )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="referralSource" className="font-bold">How did you hear about us? <span className="font-normal text-neutral-400">(optional)</span></Label>
+            <select
+              id="referralSource"
+              value={referralSource}
+              onChange={(e) => setReferralSource(e.target.value)}
+              className="w-full h-10 px-3 border-2 border-black bg-white text-sm focus:outline-none focus:ring-2 focus:ring-lime-400"
+            >
+              <option value="">Select an option...</option>
+              <option value="reddit">Reddit</option>
+              <option value="twitter">Twitter / X</option>
+              <option value="instagram">Instagram</option>
+              <option value="tiktok">TikTok</option>
+              <option value="youtube">YouTube</option>
+              <option value="discord">Discord</option>
+              <option value="forum">Music forum</option>
+              <option value="friend">Friend or colleague</option>
+              <option value="search">Google search</option>
+              <option value="other">Other</option>
+            </select>
           </div>
           <div className="flex items-start gap-3 pt-2">
             <input

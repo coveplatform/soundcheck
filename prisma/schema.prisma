@@ -24,6 +24,9 @@ model User {
   isArtist   Boolean @default(false)
   isReviewer Boolean @default(false)
 
+  // How did they hear about us?
+  referralSource String?
+
   // Relations
   artistProfile   ArtistProfile?
   reviewerProfile ReviewerProfile?

@@ -263,6 +263,104 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Example Review */}
+      <section className="border-b-2 border-black py-16 bg-sky-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-black mb-2">Real Review Example</h2>
+          <p className="text-neutral-600 mb-10">
+            Here&apos;s what actual feedback looks like on MixReflect.
+          </p>
+
+          <div className="border-2 border-black bg-white">
+            {/* Review Header */}
+            <div className="p-4 border-b-2 border-black bg-neutral-50 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center font-bold">
+                  R
+                </div>
+                <div>
+                  <p className="font-bold text-sm">Pro Reviewer</p>
+                  <p className="text-xs text-neutral-500">Genres: Electronic, Indie, Alternative</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="font-mono text-neutral-500">Listened: 4m 32s</span>
+              </div>
+            </div>
+
+            {/* Ratings */}
+            <div className="p-6 border-b-2 border-black">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="text-center p-3 bg-neutral-50 border border-neutral-200">
+                  <p className="text-xs text-neutral-500 mb-1">First Impression</p>
+                  <p className="font-bold text-lime-600">Strong Hook</p>
+                </div>
+                <div className="text-center p-3 bg-neutral-50 border border-neutral-200">
+                  <p className="text-xs text-neutral-500 mb-1">Production</p>
+                  <p className="font-bold">4/5</p>
+                </div>
+                <div className="text-center p-3 bg-neutral-50 border border-neutral-200">
+                  <p className="text-xs text-neutral-500 mb-1">Originality</p>
+                  <p className="font-bold">4/5</p>
+                </div>
+                <div className="text-center p-3 bg-neutral-50 border border-neutral-200">
+                  <p className="text-xs text-neutral-500 mb-1">Listen Again?</p>
+                  <p className="font-bold text-lime-600">Yes</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Written Feedback */}
+            <div className="p-6 space-y-6">
+              <div>
+                <h4 className="font-bold text-sm text-neutral-500 uppercase tracking-wide mb-2">Best Part</h4>
+                <p className="text-neutral-800 leading-relaxed">
+                  The synth melody that comes in around 0:45 is genuinely catchy and got stuck in my head. The way it interplays with the drums creates this driving energy that makes you want to move. The production on the low end is tight—punchy kick that cuts through without being muddy. The breakdown at 2:15 was unexpected and added a nice dynamic shift.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-sm text-neutral-500 uppercase tracking-wide mb-2">Areas to Improve</h4>
+                <p className="text-neutral-800 leading-relaxed">
+                  The intro feels a bit long before the main hook hits—I&apos;d consider trimming 8-10 seconds to get to the good stuff faster. The hi-hats get a little repetitive in the second verse; some variation or a filter sweep could help. The vocal sample around 1:30 sits a bit too loud in the mix and clashes with the lead synth frequencies.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-sm text-neutral-500 uppercase tracking-wide mb-2">Suggested Next Steps</h4>
+                <ul className="text-neutral-800 space-y-1">
+                  <li className="flex items-start gap-2">
+                    <span className="text-lime-600 font-bold">1.</span>
+                    <span>Cut the intro down by 8-10 seconds to hook listeners faster</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-lime-600 font-bold">2.</span>
+                    <span>Add hi-hat variations or automate a filter in verse 2</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-lime-600 font-bold">3.</span>
+                    <span>EQ the vocal sample to carve out space for the lead synth</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-sm text-neutral-500 uppercase tracking-wide mb-2">Similar Artists</h4>
+                <p className="text-neutral-600">
+                  Reminds me of Bonobo meets Four Tet, with some Tycho influence in the atmospheric pads.
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 bg-neutral-50 border-t-2 border-black flex items-center justify-between">
+              <span className="text-sm text-neutral-500">This is 1 of 10 reviews from a Release Ready package</span>
+              <span className="text-xs font-mono text-neutral-400">Example review</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Reviewer Earnings */}
       <section className="border-b-2 border-black py-16 bg-orange-50">
         <div className="max-w-6xl mx-auto px-4">

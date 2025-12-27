@@ -18,6 +18,7 @@ const signupSchema = z.object({
   name: z.string().min(1, "Name is required"),
   role: z.enum(["artist", "reviewer", "both"]),
   acceptedTerms: z.boolean(),
+  referralSource: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { email, password, name, role, acceptedTerms } = signupSchema.parse(body);
+    const { email, password, name, role, acceptedTerms, referralSource } = signupSchema.parse(body);
 
     const emailConfigured = Boolean(
       process.env.RESEND_API_KEY && (process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM)
@@ -84,6 +85,7 @@ export async function POST(request: Request) {
         name,
         isArtist: role === "artist" || role === "both",
         isReviewer: role === "reviewer" || role === "both",
+        referralSource,
       },
     });
 
