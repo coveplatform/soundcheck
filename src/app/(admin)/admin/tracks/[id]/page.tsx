@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { RefundButton } from "@/components/admin/refund-button";
 import { CancelTrackButton } from "@/components/admin/cancel-track-button";
+import { GrantFreeButton } from "@/components/admin/grant-free-button";
 import { AudioPlayer } from "@/components/audio/audio-player";
 
 export const dynamic = 'force-dynamic';
@@ -52,6 +53,9 @@ export default async function AdminTrackDetailPage({
     track.status !== "CANCELLED" &&
     (track.status === "PENDING_PAYMENT" || track.status === "QUEUED");
 
+  const canGrantFree =
+    track.status === "PENDING_PAYMENT" && !track.payment;
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -60,6 +64,7 @@ export default async function AdminTrackDetailPage({
           <p className="text-neutral-500">{track.title}</p>
         </div>
         <div className="flex items-center gap-2">
+          {canGrantFree ? <GrantFreeButton trackId={track.id} /> : null}
           {canRefund ? <RefundButton trackId={track.id} /> : null}
           {canCancel ? <CancelTrackButton trackId={track.id} /> : null}
         </div>

@@ -36,17 +36,18 @@ function emailWrapper(content: string): string {
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <!-- Logo with inline SVG waveform -->
                     <table role="presentation" cellspacing="0" cellpadding="0">
                       <tr>
                         <td style="vertical-align: middle;">
                           <!--[if mso]>
                           <v:rect xmlns:v="urn:schemas-microsoft-com:vml" style="width:36px;height:36px;" fillcolor="#000000" stroked="false">
-                            <v:textbox inset="0,0,0,0"></v:textbox>
+                            <v:textbox inset="0,0,0,0">
+                              <div style="width:36px;height:36px;line-height:36px;text-align:center;font-weight:700;color:#ffffff;font-family:Arial, sans-serif;font-size:18px;">m</div>
+                            </v:textbox>
                           </v:rect>
                           <![endif]-->
                           <!--[if !mso]><!-->
-                          <img src="https://mixreflect.com/icon.svg" alt="MixReflect" width="36" height="36" style="display: block; border: 0; width: 36px; height: 36px;" />
+                          <span style="display:inline-block;width:36px;height:36px;line-height:36px;background-color:#000000;color:#ffffff;text-align:center;font-weight:700;font-family:Arial, sans-serif;font-size:18px;">m</span>
                           <!--<![endif]-->
                         </td>
                         <td style="vertical-align: middle; padding-left: 12px;">
