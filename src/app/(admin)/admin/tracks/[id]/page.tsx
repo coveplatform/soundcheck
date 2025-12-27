@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { RefundButton } from "@/components/admin/refund-button";
 import { CancelTrackButton } from "@/components/admin/cancel-track-button";
 import { GrantFreeButton } from "@/components/admin/grant-free-button";
+import { DeleteTrackButton } from "@/components/admin/delete-track-button";
 import { AudioPlayer } from "@/components/audio/audio-player";
 
 export const dynamic = 'force-dynamic';
@@ -68,6 +69,7 @@ export default async function AdminTrackDetailPage({
           {canGrantFree ? <GrantFreeButton trackId={track.id} /> : null}
           {canRefund ? <RefundButton trackId={track.id} /> : null}
           {canCancel ? <CancelTrackButton trackId={track.id} /> : null}
+          <DeleteTrackButton trackId={track.id} />
         </div>
       </div>
 
