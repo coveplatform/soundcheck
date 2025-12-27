@@ -82,9 +82,16 @@ export async function POST(request: Request) {
     if (bypassPayments || isValidPromo) {
       const paidAt = new Date();
 
+      // Promo codes get 1 review only
+      const promoReviewCount = isValidPromo ? 1 : undefined;
+
       const updated = await prisma.track.updateMany({
         where: { id: track.id, status: "PENDING_PAYMENT", paidAt: null },
-        data: { status: "QUEUED", paidAt },
+        data: {
+          status: "QUEUED",
+          paidAt,
+          ...(promoReviewCount && { reviewsRequested: promoReviewCount }),
+        },
       });
 
       if (updated.count > 0) {
