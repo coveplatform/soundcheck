@@ -30,6 +30,7 @@ export function createMockUser(overrides: Partial<User> = {}): User {
     updatedAt: new Date(),
     isArtist: false,
     isReviewer: false,
+    referralSource: null,
     ...overrides,
   }
 }
