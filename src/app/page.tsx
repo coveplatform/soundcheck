@@ -83,311 +83,269 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="border-b-2 border-black">
+      {/* Social Proof Bar */}
+      <section className="border-b-2 border-black bg-black text-white">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2">
-            {/* For Artists */}
-            <div className="p-8 md:p-12 border-b-2 md:border-b-0 md:border-r-2 border-black">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
-                  <Music className="h-6 w-6 text-black" />
-                </div>
-                <h2 className="text-2xl font-bold">For Artists</h2>
-              </div>
-              <ol className="space-y-6">
-                <li className="flex gap-4">
-                  <span className="flex-shrink-0 w-8 h-8 bg-black text-white font-mono font-bold flex items-center justify-center text-sm">
-                    01
-                  </span>
-                  <div>
-                    <p className="font-bold">Submit your track</p>
-                    <p className="text-neutral-600 mt-1">
-                      Drop a SoundCloud, Bandcamp, or YouTube link
-                    </p>
-                  </div>
-                </li>
-                <li className="flex gap-4">
-                  <span className="flex-shrink-0 w-8 h-8 bg-black text-white font-mono font-bold flex items-center justify-center text-sm">
-                    02
-                  </span>
-                  <div>
-                    <p className="font-bold">Pick your package</p>
-                    <p className="text-neutral-600 mt-1">
-                      5-20 structured reviews from genre-matched listeners
-                    </p>
-                  </div>
-                </li>
-                <li className="flex gap-4">
-                  <span className="flex-shrink-0 w-8 h-8 bg-black text-white font-mono font-bold flex items-center justify-center text-sm">
-                    03
-                  </span>
-                  <div>
-                    <p className="font-bold">Get structured feedback</p>
-                    <p className="text-neutral-600 mt-1">
-                      Structured feedback you can act on
-                    </p>
-                  </div>
-                </li>
-              </ol>
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-neutral-700">
+            <div className="p-4 md:p-6 text-center">
+              <p className="text-2xl md:text-3xl font-black text-lime-400">500+</p>
+              <p className="text-xs md:text-sm text-neutral-400 mt-1">Reviews Delivered</p>
             </div>
-
-            {/* For Reviewers */}
-            <div className="p-8 md:p-12">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center">
-                  <Headphones className="h-6 w-6 text-black" />
-                </div>
-                <h2 className="text-2xl font-bold">For Reviewers</h2>
-              </div>
-              <ol className="space-y-6">
-                <li className="flex gap-4">
-                  <span className="flex-shrink-0 w-8 h-8 bg-black text-white font-mono font-bold flex items-center justify-center text-sm">
-                    01
-                  </span>
-                  <div>
-                    <p className="font-bold">Pass the quiz</p>
-                    <p className="text-neutral-600 mt-1">
-                      10 questions to prove you know music and can give useful feedback
-                    </p>
-                  </div>
-                </li>
-                <li className="flex gap-4">
-                  <span className="flex-shrink-0 w-8 h-8 bg-black text-white font-mono font-bold flex items-center justify-center text-sm">
-                    02
-                  </span>
-                  <div>
-                    <p className="font-bold">Pick your genres</p>
-                    <p className="text-neutral-600 mt-1">
-                      Only get tracks in genres you actually listen to
-                    </p>
-                  </div>
-                </li>
-                <li className="flex gap-4">
-                  <span className="flex-shrink-0 w-8 h-8 bg-black text-white font-mono font-bold flex items-center justify-center text-sm">
-                    03
-                  </span>
-                  <div>
-                    <p className="font-bold">Listen & review (~10 min)</p>
-                    <p className="text-neutral-600 mt-1">
-                      Rate production, originality, vocals. Write what works and what doesn&apos;t.
-                    </p>
-                  </div>
-                </li>
-                <li className="flex gap-4">
-                  <span className="flex-shrink-0 w-8 h-8 bg-black text-white font-mono font-bold flex items-center justify-center text-sm">
-                    04
-                  </span>
-                  <div>
-                    <p className="font-bold">Earn $0.50–$1.50 per review</p>
-                    <p className="text-neutral-600 mt-1">
-                      Get rated by artists. Higher ratings = higher tier = more pay.
-                    </p>
-                  </div>
-                </li>
-              </ol>
+            <div className="p-4 md:p-6 text-center">
+              <p className="text-2xl md:text-3xl font-black text-lime-400">&lt;24h</p>
+              <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Turnaround</p>
+            </div>
+            <div className="p-4 md:p-6 text-center">
+              <p className="text-2xl md:text-3xl font-black text-lime-400">4.8/5</p>
+              <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Review Rating</p>
+            </div>
+            <div className="p-4 md:p-6 text-center">
+              <p className="text-2xl md:text-3xl font-black text-lime-400">100%</p>
+              <p className="text-xs md:text-sm text-neutral-400 mt-1">Human Reviewers</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* What Feedback Looks Like */}
+      {/* How It Works - Artists */}
       <section className="border-b-2 border-black py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-2">What You&apos;ll Get</h2>
-          <p className="text-neutral-600 mb-10">
-            Every review follows a structured format so you get specific, actionable feedback.
-          </p>
+        <div className="max-w-3xl mx-auto px-4">
+          <h2 className="text-3xl font-black mb-2">How It Works</h2>
+          <p className="text-neutral-600 mb-8">Three steps to real feedback on your music.</p>
 
-          <div className="border-2 border-black bg-white">
-            <div className="grid md:grid-cols-2 border-b-2 border-black">
-              <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-black">
-                <h3 className="font-bold mb-4">Ratings</h3>
-                <div className="space-y-3 text-sm">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                    <span className="text-neutral-600">First Impression</span>
-                    <span className="font-mono text-xs">Strong Hook / Decent / Lost Interest</span>
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                    <span className="text-neutral-600">Production Quality</span>
-                    <span className="font-mono">1-5 stars</span>
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                    <span className="text-neutral-600">Originality</span>
-                    <span className="font-mono">1-5 stars</span>
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                    <span className="text-neutral-600">Vocals (if applicable)</span>
-                    <span className="font-mono">1-5 stars</span>
-                  </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                    <span className="text-neutral-600">Would listen again?</span>
-                    <span className="font-mono">Yes / No</span>
-                  </div>
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="font-bold mb-4">Written Feedback</h3>
-                <div className="space-y-3 text-sm">
-                  <div>
-                    <span className="text-neutral-600">Best part of the track</span>
-                    <p className="font-mono text-xs mt-1 text-neutral-500">Min. 30 words + anti-filler checks</p>
-                  </div>
-                  <div>
-                    <span className="text-neutral-600">Areas to improve</span>
-                    <p className="font-mono text-xs mt-1 text-neutral-500">Min. 30 words + anti-filler checks</p>
-                  </div>
-                  <div>
-                    <span className="text-neutral-600">Next actions</span>
-                    <p className="font-mono text-xs mt-1 text-neutral-500">3+ concrete steps (one per line)</p>
-                  </div>
-                  <div>
-                    <span className="text-neutral-600">Timestamped notes</span>
-                    <p className="font-mono text-xs mt-1 text-neutral-500">Optional (available for uploads)</p>
-                  </div>
-                  <div>
-                    <span className="text-neutral-600">Similar artists</span>
-                    <p className="font-mono text-xs mt-1 text-neutral-500">Optional</p>
-                  </div>
-                  <div>
-                    <span className="text-neutral-600">Additional notes</span>
-                    <p className="font-mono text-xs mt-1 text-neutral-500">Optional</p>
-                  </div>
-                </div>
+          <div className="space-y-4">
+            <div className="flex gap-4 p-5 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <span className="flex-shrink-0 w-14 h-14 bg-lime-500 border-2 border-black text-black font-mono font-black flex items-center justify-center text-xl">
+                1
+              </span>
+              <div className="flex flex-col justify-center">
+                <p className="font-bold text-lg">Submit your track</p>
+                <p className="text-neutral-500">
+                  Drop a SoundCloud, Bandcamp, or YouTube link—takes 30 seconds
+                </p>
               </div>
             </div>
-            <div className="p-4 bg-neutral-50 text-sm text-neutral-600">
-              <strong>Quality enforced:</strong> Reviewers must listen for 3+ minutes. We block repetitive filler. You rate every review.
+            <div className="flex gap-4 p-5 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <span className="flex-shrink-0 w-14 h-14 bg-lime-500 border-2 border-black text-black font-mono font-black flex items-center justify-center text-xl">
+                2
+              </span>
+              <div className="flex flex-col justify-center">
+                <p className="font-bold text-lg">Pick your package</p>
+                <p className="text-neutral-500">
+                  Choose 5, 10, or 20 reviews from genre-matched listeners—starting at $4.95
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-4 p-5 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <span className="flex-shrink-0 w-14 h-14 bg-lime-500 border-2 border-black text-black font-mono font-black flex items-center justify-center text-xl">
+                3
+              </span>
+              <div className="flex flex-col justify-center">
+                <p className="font-bold text-lg">Get real feedback</p>
+                <p className="text-neutral-500">
+                  Structured ratings, written notes, and actionable next steps—within 24 hours
+                </p>
+              </div>
             </div>
           </div>
+
+          <p className="mt-8 text-sm text-neutral-500 text-center">
+            Looking to earn money reviewing music? <a href="#for-reviewers" className="text-black font-bold underline underline-offset-2 hover:text-lime-600">See how it works ↓</a>
+          </p>
         </div>
       </section>
 
       {/* Example Review */}
-      <section className="border-b-2 border-black py-16 bg-sky-50">
+      <section className="border-b-2 border-black py-16 bg-lime-50">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-2">Real Review Example</h2>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
+              <Star className="h-6 w-6 text-black" />
+            </div>
+            <h2 className="text-3xl font-black">See What You Get</h2>
+          </div>
           <p className="text-neutral-600 mb-10">
-            Here&apos;s what actual feedback looks like on MixReflect.
+            Every review includes structured ratings and detailed written feedback.
           </p>
 
-          <div className="border-2 border-black bg-white">
-            {/* Review Header */}
-            <div className="p-4 border-b-2 border-black bg-neutral-50 flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center font-bold">
-                  R
-                </div>
-                <div>
-                  <p className="font-bold text-sm">Pro Reviewer</p>
-                  <p className="text-xs text-neutral-500">Genres: Electronic, Indie, Alternative</p>
-                </div>
+          <div className="border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            {/* Track Header */}
+            <div className="p-4 border-b-2 border-black bg-black flex items-center gap-4">
+              <div className="h-14 w-14 bg-lime-500 border-2 border-black flex items-center justify-center shrink-0">
+                <Music className="h-6 w-6 text-black" />
               </div>
-              <div className="flex items-center gap-4 text-sm">
-                <span className="font-mono text-neutral-500">Listened: 4m 32s</span>
+              <div className="min-w-0">
+                <p className="font-bold text-white truncate">Midnight Frequency</p>
+                <p className="text-neutral-400 text-sm truncate">Electronic Artist • 3:42</p>
               </div>
             </div>
 
-            {/* Ratings */}
-            <div className="p-6 border-b-2 border-black">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="text-center p-3 bg-neutral-50 border border-neutral-200">
-                  <p className="text-xs text-neutral-500 mb-1">First Impression</p>
-                  <p className="font-bold text-lime-600">Strong Hook</p>
+            {/* Reviewer */}
+            <div className="p-4 border-b-2 border-black bg-neutral-50 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center font-bold">
+                  S
                 </div>
-                <div className="text-center p-3 bg-neutral-50 border border-neutral-200">
-                  <p className="text-xs text-neutral-500 mb-1">Production</p>
-                  <p className="font-bold">4/5</p>
+                <div>
+                  <p className="font-bold text-sm">Sarah M.</p>
+                  <p className="text-xs text-neutral-500">Electronic • Indie • Alternative</p>
                 </div>
-                <div className="text-center p-3 bg-neutral-50 border border-neutral-200">
-                  <p className="text-xs text-neutral-500 mb-1">Originality</p>
-                  <p className="font-bold">4/5</p>
-                </div>
-                <div className="text-center p-3 bg-neutral-50 border border-neutral-200">
-                  <p className="text-xs text-neutral-500 mb-1">Listen Again?</p>
-                  <p className="font-bold text-lime-600">Yes</p>
-                </div>
+              </div>
+              <div className="flex items-center gap-2 text-xs font-mono text-neutral-500">
+                <Headphones className="h-4 w-4" />
+                <span>Listened 4:32</span>
+              </div>
+            </div>
+
+            {/* Quick Ratings */}
+            <div className="border-b-2 border-black grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-neutral-200">
+              <div className="p-4 text-center">
+                <p className="text-xs text-neutral-500 mb-1">First Impression</p>
+                <p className="font-bold text-lime-600">Strong Hook</p>
+              </div>
+              <div className="p-4 text-center">
+                <p className="text-xs text-neutral-500 mb-1">Production</p>
+                <p className="font-bold">4/5</p>
+              </div>
+              <div className="p-4 text-center">
+                <p className="text-xs text-neutral-500 mb-1">Originality</p>
+                <p className="font-bold">4/5</p>
+              </div>
+              <div className="p-4 text-center">
+                <p className="text-xs text-neutral-500 mb-1">Listen Again?</p>
+                <p className="font-bold text-lime-600">Yes</p>
               </div>
             </div>
 
             {/* Written Feedback */}
             <div className="p-6 space-y-6">
+              {/* The Good */}
               <div>
-                <h4 className="font-bold text-sm text-neutral-500 uppercase tracking-wide mb-2">Best Part</h4>
-                <p className="text-neutral-800 leading-relaxed">
-                  The synth melody that comes in around 0:45 is genuinely catchy and got stuck in my head. The way it interplays with the drums creates this driving energy that makes you want to move. The production on the low end is tight—punchy kick that cuts through without being muddy. The breakdown at 2:15 was unexpected and added a nice dynamic shift.
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-6 h-6 bg-lime-500 border border-black flex items-center justify-center text-xs font-bold">+</span>
+                  <h4 className="font-bold text-sm">What&apos;s Working</h4>
+                </div>
+                <p className="text-neutral-600 leading-relaxed text-sm pl-8">
+                  The synth melody around 0:45 is genuinely catchy—got stuck in my head. The interplay with the drums creates a driving energy that makes you want to move. Low end is tight, punchy kick that cuts through without being muddy. The breakdown at 2:15 was unexpected and added a nice dynamic shift.
                 </p>
               </div>
 
+              {/* To Improve */}
               <div>
-                <h4 className="font-bold text-sm text-neutral-500 uppercase tracking-wide mb-2">Areas to Improve</h4>
-                <p className="text-neutral-800 leading-relaxed">
-                  The intro feels a bit long before the main hook hits—I&apos;d consider trimming 8-10 seconds to get to the good stuff faster. The hi-hats get a little repetitive in the second verse; some variation or a filter sweep could help. The vocal sample around 1:30 sits a bit too loud in the mix and clashes with the lead synth frequencies.
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-6 h-6 bg-orange-400 border border-black flex items-center justify-center text-xs font-bold">→</span>
+                  <h4 className="font-bold text-sm">Room to Grow</h4>
+                </div>
+                <p className="text-neutral-600 leading-relaxed text-sm pl-8">
+                  The intro feels long before the hook hits—consider trimming 8-10 seconds. Hi-hats get repetitive in verse 2; some variation or filter sweep would help. The vocal sample at 1:30 sits too loud and clashes with lead synth frequencies.
                 </p>
               </div>
 
+              {/* Next Steps */}
               <div>
-                <h4 className="font-bold text-sm text-neutral-500 uppercase tracking-wide mb-2">Suggested Next Steps</h4>
-                <ul className="text-neutral-800 space-y-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-6 h-6 bg-sky-400 border border-black flex items-center justify-center text-xs font-bold">!</span>
+                  <h4 className="font-bold text-sm">Next Steps</h4>
+                </div>
+                <ul className="text-neutral-600 text-sm pl-8 space-y-1">
                   <li className="flex items-start gap-2">
-                    <span className="text-lime-600 font-bold">1.</span>
-                    <span>Cut the intro down by 8-10 seconds to hook listeners faster</span>
+                    <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">01</span>
+                    <span>Cut the intro by 8-10 seconds to hook listeners faster</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-lime-600 font-bold">2.</span>
+                    <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">02</span>
                     <span>Add hi-hat variations or automate a filter in verse 2</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-lime-600 font-bold">3.</span>
-                    <span>EQ the vocal sample to carve out space for the lead synth</span>
+                    <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">03</span>
+                    <span>EQ the vocal sample to carve space for the lead synth</span>
                   </li>
                 </ul>
               </div>
 
-              <div>
-                <h4 className="font-bold text-sm text-neutral-500 uppercase tracking-wide mb-2">Similar Artists</h4>
-                <p className="text-neutral-600">
-                  Reminds me of Bonobo meets Four Tet, with some Tycho influence in the atmospheric pads.
+              {/* Similar Artists */}
+              <div className="pt-4 border-t border-neutral-200">
+                <p className="text-sm text-neutral-500">
+                  <span className="font-bold text-neutral-700">Sounds like:</span> Bonobo meets Four Tet, with some Tycho influence in the atmospheric pads.
                 </p>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="p-4 bg-neutral-50 border-t-2 border-black flex items-center justify-between">
-              <span className="text-sm text-neutral-500">This is 1 of 10 reviews from a Release Ready package</span>
-              <span className="text-xs font-mono text-neutral-400">Example review</span>
+            <div className="p-3 bg-neutral-100 border-t-2 border-black flex items-center justify-between">
+              <span className="text-xs text-neutral-500">1 of 10 reviews • <span className="font-bold text-black">Release Ready</span> package</span>
+              <span className="text-[10px] font-mono bg-lime-500 border border-black px-2 py-0.5 font-bold">EXAMPLE</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Reviewer Earnings */}
-      <section className="border-b-2 border-black py-16 bg-orange-50">
+      {/* For Reviewers */}
+      <section id="for-reviewers" className="border-b-2 border-black py-16 bg-orange-50">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-2">Earn Money Reviewing Music</h2>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center">
+              <Headphones className="h-6 w-6 text-black" />
+            </div>
+            <h2 className="text-3xl font-black">For Reviewers</h2>
+          </div>
           <p className="text-neutral-600 mb-10">
-            Level up by delivering quality reviews. Higher tiers = better pay.
+            Get paid to listen to new music and share your honest opinion.
           </p>
 
+          {/* How it works */}
+          <div className="grid md:grid-cols-4 gap-4 mb-12">
+            <div className="bg-white border-2 border-black p-4">
+              <div className="text-2xl font-black text-orange-400 mb-2">01</div>
+              <p className="font-bold">Quick genre quiz</p>
+              <p className="text-sm text-neutral-500 mt-1">10 questions to show you know music</p>
+            </div>
+            <div className="bg-white border-2 border-black p-4">
+              <div className="text-2xl font-black text-orange-400 mb-2">02</div>
+              <p className="font-bold">Pick your genres</p>
+              <p className="text-sm text-neutral-500 mt-1">Only get tracks you actually want to hear</p>
+            </div>
+            <div className="bg-white border-2 border-black p-4">
+              <div className="text-2xl font-black text-orange-400 mb-2">03</div>
+              <p className="font-bold">Listen & review</p>
+              <p className="text-sm text-neutral-500 mt-1">~10 min per track. Rate and write feedback.</p>
+            </div>
+            <div className="bg-white border-2 border-black p-4">
+              <div className="text-2xl font-black text-orange-400 mb-2">04</div>
+              <p className="font-bold">Get paid</p>
+              <p className="text-sm text-neutral-500 mt-1">Earn more as you level up</p>
+            </div>
+          </div>
+
+          {/* Earnings tiers */}
+          <h3 className="font-bold text-lg mb-4">Earnings</h3>
           <div className="grid md:grid-cols-2 gap-0 border-2 border-black">
             <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white">
               <div className="text-sm font-mono text-neutral-500 mb-2">TIER 1</div>
-              <h3 className="font-bold text-xl mb-1">Normal</h3>
+              <h4 className="font-bold text-xl mb-1">Normal</h4>
               <div className="text-3xl font-black text-black">$0.50<span className="text-base font-normal text-neutral-500">/review</span></div>
-              <p className="text-sm text-neutral-600 mt-4">Starting tier. Pass the onboarding quiz to begin.</p>
+              <p className="text-sm text-neutral-600 mt-4">Starting tier. Pass the quiz to begin.</p>
             </div>
 
-            <div className="p-6 bg-lime-500">
+            <div className="p-6 bg-orange-400">
               <div className="text-sm font-mono text-black/60 mb-2">TIER 2</div>
-              <h3 className="font-bold text-xl mb-1">Pro</h3>
+              <h4 className="font-bold text-xl mb-1">Pro</h4>
               <div className="text-3xl font-black text-black">$1.50<span className="text-base font-normal text-black/60">/review</span></div>
-              <p className="text-sm text-black/70 mt-4">50+ reviews with 4.7+ average rating OR 10 gems.</p>
+              <p className="text-sm text-black/70 mt-4">50+ reviews with 4.7+ rating OR 10 gems.</p>
             </div>
           </div>
 
           <p className="mt-6 text-sm text-neutral-500 text-center">
             Pro reviewers doing 10 reviews/week earn ~$60/month
           </p>
+
+          <div className="mt-8 text-center">
+            <Link href="/signup">
+              <Button className="bg-orange-400 text-black hover:bg-orange-300 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                Start Reviewing
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

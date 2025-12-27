@@ -43,6 +43,7 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const { email, password, name, role, acceptedTerms, referralSource } = signupSchema.parse(body);
+    const normalizedEmail = email.trim().toLowerCase();
 
     const emailConfigured = Boolean(
       process.env.RESEND_API_KEY && (process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM)
@@ -63,8 +64,13 @@ export async function POST(request: Request) {
     }
 
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        email: {
+          equals: normalizedEmail,
+          mode: "insensitive",
+        },
+      },
     });
 
     if (existingUser) {
@@ -80,7 +86,7 @@ export async function POST(request: Request) {
     // Create user with role flags
     const user = await prisma.user.create({
       data: {
-        email,
+        email: normalizedEmail,
         password: hashedPassword,
         name,
         isArtist: role === "artist" || role === "both",
@@ -102,10 +108,10 @@ export async function POST(request: Request) {
     });
 
     const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
-    const verifyUrl = `${baseUrl}/verify-email?token=${token}&email=${encodeURIComponent(email)}`;
+    const verifyUrl = `${baseUrl}/verify-email?token=${token}&email=${encodeURIComponent(normalizedEmail)}`;
 
     await sendEmailVerificationEmail({
-      to: email,
+      to: normalizedEmail,
       verifyUrl,
     });
 

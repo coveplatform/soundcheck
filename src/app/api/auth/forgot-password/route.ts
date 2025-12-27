@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 
+export const runtime = "nodejs";
+
 const schema = z.object({
   email: z.string().email(),
 });
@@ -32,9 +34,27 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const { email } = schema.parse(body);
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const user = await prisma.user.findUnique({
-      where: { email },
+    const emailConfigured = Boolean(
+      process.env.RESEND_API_KEY &&
+        (process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM)
+    );
+
+    if (process.env.NODE_ENV === "production" && !emailConfigured) {
+      return NextResponse.json(
+        { error: "Email service is not configured" },
+        { status: 500 }
+      );
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        email: {
+          equals: normalizedEmail,
+          mode: "insensitive",
+        },
+      },
       select: { id: true, email: true },
     });
 
@@ -60,8 +80,16 @@ export async function POST(request: Request) {
       },
     });
 
-    const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
+    const baseUrl =
+      process.env.NEXTAUTH_URL ??
+      process.env.NEXT_PUBLIC_SITE_URL ??
+      new URL(request.url).origin;
     const resetUrl = `${baseUrl}/reset-password?token=${token}`;
+
+    if (process.env.NODE_ENV !== "production" && !emailConfigured) {
+      console.log("Dev password reset link:", resetUrl);
+      return NextResponse.json({ success: true, resetUrl });
+    }
 
     await sendPasswordResetEmail({
       to: user.email,

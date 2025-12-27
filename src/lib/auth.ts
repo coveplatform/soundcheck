@@ -21,9 +21,11 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
+        const normalizedEmail = credentials.email.trim().toLowerCase();
+
         // Rate limit by email to prevent brute force attacks
         const rateLimit = await checkRateLimit(
-          `login:${credentials.email.toLowerCase()}`,
+          `login:${normalizedEmail}`,
           RATE_LIMITS.login
         );
 
@@ -33,8 +35,13 @@ export const authOptions: NextAuthOptions = {
           );
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+        const user = await prisma.user.findFirst({
+          where: {
+            email: {
+              equals: normalizedEmail,
+              mode: "insensitive",
+            },
+          },
         });
 
         if (!user || !user.password) {
@@ -98,8 +105,15 @@ export const authOptions: NextAuthOptions = {
       }
       // Fetch user roles from database
       if (token.email) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: token.email },
+        const normalizedEmail =
+          typeof token.email === "string" ? token.email.trim().toLowerCase() : "";
+        const dbUser = await prisma.user.findFirst({
+          where: {
+            email: {
+              equals: normalizedEmail,
+              mode: "insensitive",
+            },
+          },
           select: {
             id: true,
             isArtist: true,

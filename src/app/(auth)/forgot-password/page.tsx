@@ -20,6 +20,7 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [devResetUrl, setDevResetUrl] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,10 +34,17 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify({ email }),
       });
 
+      const data = (await res.json().catch(() => null)) as
+        | { error?: string; resetUrl?: string }
+        | null;
+
       if (!res.ok) {
-        const data = await res.json().catch(() => null);
         setError(data?.error || "Something went wrong");
         return;
+      }
+
+      if (process.env.NODE_ENV !== "production" && data?.resetUrl) {
+        setDevResetUrl(data.resetUrl);
       }
 
       setSuccess(true);
@@ -57,6 +65,17 @@ export default function ForgotPasswordPage() {
           </CardDescription>
         </CardHeader>
         <CardFooter className="flex flex-col gap-3">
+          {process.env.NODE_ENV !== "production" && devResetUrl ? (
+            <div className="w-full bg-neutral-50 border-2 border-black p-3 text-left text-sm">
+              <p className="font-bold mb-1">Dev reset link</p>
+              <a
+                href={devResetUrl}
+                className="break-all underline underline-offset-4"
+              >
+                {devResetUrl}
+              </a>
+            </div>
+          ) : null}
           <Link href="/login" className="w-full">
             <Button className="w-full">Back to login</Button>
           </Link>
@@ -66,6 +85,7 @@ export default function ForgotPasswordPage() {
             onClick={() => {
               setSuccess(false);
               setEmail("");
+              setDevResetUrl("");
             }}
           >
             Use a different email

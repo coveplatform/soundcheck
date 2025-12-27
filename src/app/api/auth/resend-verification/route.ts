@@ -34,9 +34,15 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const { email } = schema.parse(body);
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const user = await prisma.user.findUnique({
-      where: { email },
+    const user = await prisma.user.findFirst({
+      where: {
+        email: {
+          equals: normalizedEmail,
+          mode: "insensitive",
+        },
+      },
       select: { id: true, email: true, emailVerified: true },
     });
 
@@ -62,7 +68,7 @@ export async function POST(request: Request) {
     });
 
     const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
-    const verifyUrl = `${baseUrl}/verify-email?token=${token}&email=${encodeURIComponent(email)}`;
+    const verifyUrl = `${baseUrl}/verify-email?token=${token}&email=${encodeURIComponent(normalizedEmail)}`;
 
     await sendEmailVerificationEmail({
       to: user.email,
