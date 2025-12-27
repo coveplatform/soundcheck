@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Rate limit by email to prevent brute force attacks
-        const rateLimit = checkRateLimit(
+        const rateLimit = await checkRateLimit(
           `login:${credentials.email.toLowerCase()}`,
           RATE_LIMITS.login
         );

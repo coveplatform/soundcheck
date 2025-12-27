@@ -186,8 +186,13 @@ export async function assignReviewersToRecentTracks(limit = 20) {
     take: limit,
   });
 
-  for (const t of tracks) {
-    await assignReviewersToTrack(t.id);
+  const concurrency = Number(process.env.ASSIGNMENT_CONCURRENCY ?? "5");
+  const batchSize = Number.isFinite(concurrency) && concurrency > 0 ? concurrency : 5;
+
+  for (let i = 0; i < tracks.length; i += batchSize) {
+    await Promise.all(
+      tracks.slice(i, i + batchSize).map((t) => assignReviewersToTrack(t.id))
+    );
   }
 }
 
@@ -334,35 +339,46 @@ export async function expireAndReassignExpiredQueueEntries(): Promise<{
     return { expiredCount: 0, affectedTrackCount: 0 };
   }
 
-  const affectedTrackIds = new Set<string>();
+  const affectedTrackIds = Array.from(new Set(expired.map((e) => e.trackId)));
 
-  for (const entry of expired) {
-    affectedTrackIds.add(entry.trackId);
+  const updateOr = expired.map((e) => ({ trackId: e.trackId, reviewerId: e.reviewerId }));
 
-    await prisma.review.updateMany({
-      where: {
-        trackId: entry.trackId,
-        reviewerId: entry.reviewerId,
-        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-      },
-      data: { status: "EXPIRED" },
-    });
+  const chunkSize = 200;
+  for (let i = 0; i < updateOr.length; i += chunkSize) {
+    const chunk = updateOr.slice(i, i + chunkSize);
 
-    await prisma.reviewQueue.delete({
-      where: {
-        trackId_reviewerId: {
-          trackId: entry.trackId,
-          reviewerId: entry.reviewerId,
+    await prisma.$transaction(async (tx) => {
+      await tx.review.updateMany({
+        where: {
+          OR: chunk,
+          status: { in: ["ASSIGNED", "IN_PROGRESS"] },
         },
-      },
+        data: { status: "EXPIRED" },
+      });
+
+      await tx.reviewQueue.deleteMany({
+        where: {
+          OR: chunk,
+        },
+      });
     });
   }
 
-  for (const trackId of affectedTrackIds) {
-    await assignReviewersToTrack(trackId);
+  const concurrency = Number(process.env.ASSIGNMENT_CONCURRENCY ?? "5");
+  const batchSize = Number.isFinite(concurrency) && concurrency > 0 ? concurrency : 5;
+
+  for (let i = 0; i < affectedTrackIds.length; i += batchSize) {
+    await Promise.all(
+      affectedTrackIds
+        .slice(i, i + batchSize)
+        .map((trackId) => assignReviewersToTrack(trackId))
+    );
   }
 
-  return { expiredCount: expired.length, affectedTrackCount: affectedTrackIds.size };
+  return {
+    expiredCount: expired.length,
+    affectedTrackCount: affectedTrackIds.length,
+  };
 }
 
 // Get queue for a reviewer

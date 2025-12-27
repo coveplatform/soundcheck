@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { assignReviewersToTrack } from "@/lib/queue";
 import { sendTrackQueuedEmail } from "@/lib/email";
+import { finalizePaidCheckoutSession } from "@/lib/payments";
 import type Stripe from "stripe";
 
 export async function POST(request: Request) {
@@ -41,6 +42,25 @@ export async function POST(request: Request) {
   }
 
   // Handle the event
+  let shouldProcess = true;
+  try {
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const inserted = await prisma.$executeRaw`
+      INSERT INTO "StripeWebhookEvent" ("id", "type", "expiresAt", "createdAt")
+      VALUES (${event.id}, ${event.type}, ${expiresAt}, ${new Date()})
+      ON CONFLICT ("id") DO NOTHING
+    `;
+    if (inserted === 0) {
+      shouldProcess = false;
+    }
+  } catch (e) {
+    console.error("Stripe webhook deduplication failed:", e);
+  }
+
+  if (!shouldProcess) {
+    return NextResponse.json({ received: true });
+  }
+
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
@@ -73,32 +93,6 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     const stripe = getStripe();
     const completedAt = new Date();
 
-    const updated = await prisma.payment.updateMany({
-      where: { stripeSessionId: session.id, status: { not: "REFUNDED" } },
-      data: {
-        status: "COMPLETED",
-        stripePaymentId: session.payment_intent as string,
-        completedAt,
-      },
-    });
-
-    if (updated.count === 0) {
-      try {
-        await prisma.payment.create({
-          data: {
-            trackId,
-            amount: session.amount_total || 0,
-            stripeSessionId: session.id,
-            stripePaymentId: session.payment_intent as string,
-            status: "COMPLETED",
-            completedAt,
-          },
-        });
-      } catch (error) {
-        console.error("Payment create fallback failed:", error);
-      }
-    }
-
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: { artist: { include: { user: true } }, payment: true },
@@ -130,34 +124,19 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       return;
     }
 
-    const firstQueue = await prisma.track.updateMany({
-      where: { id: trackId, paidAt: null, status: "PENDING_PAYMENT" },
-      data: { status: "QUEUED", paidAt: completedAt },
+    const result = await finalizePaidCheckoutSession({
+      stripeSessionId: session.id,
+      trackId,
+      stripePaymentId: (session.payment_intent as string) || null,
+      amountTotalCents:
+        typeof session.amount_total === "number" ? session.amount_total : null,
+      completedAt,
     });
 
-    if (firstQueue.count > 0) {
-      await prisma.artistProfile.update({
-        where: { id: track.artistId },
-        data: {
-          totalTracks: { increment: 1 },
-          totalSpent: { increment: session.amount_total || 0 },
-        },
-      });
+    await assignReviewersToTrack(result.trackId);
 
-      console.log("Track queued for review", {
-        trackId,
-        stripeSessionId: session.id,
-        stripePaymentId: session.payment_intent,
-      });
-
-      await assignReviewersToTrack(trackId);
-
-      if (track?.artist?.user?.email) {
-        await sendTrackQueuedEmail(track.artist.user.email, track.title);
-      }
-    } else {
-      // replay/retry: safe to re-run assignment (idempotent) but avoid duplicate emails/stats
-      await assignReviewersToTrack(trackId);
+    if (result.queuedNow && result.artistEmail && result.trackTitle) {
+      await sendTrackQueuedEmail(result.artistEmail, result.trackTitle);
     }
   } catch (error) {
     console.error("Error handling checkout complete:", error);

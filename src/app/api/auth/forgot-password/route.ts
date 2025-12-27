@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   try {
     // Rate limiting
     const clientIp = getClientIp(request);
-    const rateLimit = checkRateLimit(`forgot-password:${clientIp}`, RATE_LIMITS.forgotPassword);
+    const rateLimit = await checkRateLimit(`forgot-password:${clientIp}`, RATE_LIMITS.forgotPassword);
 
     if (!rateLimit.success) {
       return NextResponse.json(

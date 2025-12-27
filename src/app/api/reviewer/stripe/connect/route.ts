@@ -36,7 +36,6 @@ export async function POST(request: Request) {
       select: {
         id: true,
         stripeAccountId: true,
-        country: true,
         isRestricted: true,
         completedOnboarding: true,
         onboardingQuizPassed: true,
@@ -81,11 +80,17 @@ export async function POST(request: Request) {
 
     if (bypassPayments) {
       if (!accountId) {
+        const connectedAt = new Date();
         accountId = `bypass_${reviewer.id}`;
         await prisma.reviewerProfile.update({
           where: { id: reviewer.id },
           data: { stripeAccountId: accountId },
         });
+        await prisma.$executeRaw`
+          UPDATE "ReviewerProfile"
+          SET "stripeConnectedAt" = ${connectedAt}, "updatedAt" = ${connectedAt}
+          WHERE "id" = ${reviewer.id} AND "stripeConnectedAt" IS NULL
+        `;
       }
 
       return NextResponse.json({
@@ -97,7 +102,14 @@ export async function POST(request: Request) {
     if (!accountId) {
       const stripe = getStripe();
 
-      const country = reviewer.country?.trim().toUpperCase();
+      const rows = await prisma.$queryRaw<Array<{ country: string | null }>>`
+        SELECT "country"
+        FROM "ReviewerProfile"
+        WHERE "id" = ${reviewer.id}
+        LIMIT 1
+      `;
+
+      const country = rows[0]?.country?.trim().toUpperCase();
       if (!country) {
         return NextResponse.json(
           { error: "Please set your country before connecting Stripe" },
@@ -119,11 +131,18 @@ export async function POST(request: Request) {
       });
 
       accountId = account.id;
+      const connectedAt = new Date();
 
       await prisma.reviewerProfile.update({
         where: { id: reviewer.id },
         data: { stripeAccountId: accountId },
       });
+
+      await prisma.$executeRaw`
+        UPDATE "ReviewerProfile"
+        SET "stripeConnectedAt" = ${connectedAt}, "updatedAt" = ${connectedAt}
+        WHERE "id" = ${reviewer.id} AND "stripeConnectedAt" IS NULL
+      `;
     }
 
     const stripe = getStripe();

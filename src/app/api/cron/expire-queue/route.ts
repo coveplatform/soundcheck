@@ -3,10 +3,10 @@ import { NextResponse } from "next/server";
 import { expireAndReassignExpiredQueueEntries } from "@/lib/queue";
 
 function isAuthorized(request: Request): boolean {
-  if (request.headers.get("x-vercel-cron") === "1") return true;
-
   const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
+  if (!secret) {
+    return process.env.NODE_ENV !== "production";
+  }
 
   const headerSecret = request.headers.get("x-cron-secret");
   if (headerSecret && headerSecret === secret) return true;

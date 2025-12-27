@@ -2,6 +2,7 @@ type SendEmailParams = {
   to: string;
   subject: string;
   html: string;
+  required?: boolean;
 };
 
 // Brand colors
@@ -117,7 +118,7 @@ function emailButton(text: string, url: string, variant: "primary" | "secondary"
   `;
 }
 
-async function sendEmail({ to, subject, html }: SendEmailParams) {
+async function sendEmail({ to, subject, html, required }: SendEmailParams) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM;
 
@@ -128,6 +129,10 @@ async function sendEmail({ to, subject, html }: SendEmailParams) {
       hasApiKey: Boolean(apiKey),
       hasFrom: Boolean(from),
     });
+
+    if (required) {
+      throw new Error("Email service is not configured");
+    }
     return;
   }
 
@@ -153,6 +158,10 @@ async function sendEmail({ to, subject, html }: SendEmailParams) {
       subject,
       body,
     });
+
+    if (required) {
+      throw new Error(`Email send failed (${res.status})`);
+    }
     return;
   }
 }
@@ -221,6 +230,7 @@ export async function sendPasswordResetEmail(params: {
     to: params.to,
     subject: "Reset your MixReflect password",
     html: emailWrapper(content),
+    required: true,
   });
 }
 
@@ -260,6 +270,7 @@ export async function sendEmailVerificationEmail(params: {
     to: params.to,
     subject: "Verify your email - MixReflect",
     html: emailWrapper(content),
+    required: true,
   });
 }
 

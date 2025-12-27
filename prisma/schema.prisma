@@ -144,6 +144,8 @@ model ReviewerProfile {
 
   stripeAccountId String? @unique
 
+  stripeConnectedAt DateTime?
+
   country String?
 
   onboardingQuizScore      Int      @default(0)
@@ -166,6 +168,8 @@ model ReviewerProfile {
   reviews      Review[]
   queueEntries ReviewQueue[]
   payouts      Payout[]
+
+  @@index([lastReviewDate])
 }
 
 enum ReviewerTier {
@@ -230,6 +234,7 @@ model Track {
 
   @@index([status, createdAt])
   @@index([artistId])
+  @@index([paidAt])
 }
 
 enum TrackSource {
@@ -308,6 +313,7 @@ model Review {
   @@unique([trackId, reviewerId])
   @@index([reviewerId, status])
   @@index([trackId])
+  @@index([status])
 }
 
 enum ReviewStatus {
@@ -446,4 +452,25 @@ model ReviewQueue {
 
   @@unique([trackId, reviewerId])
   @@index([reviewerId, expiresAt])
+}
+
+model RateLimit {
+  id      String   @id
+  count   Int      @default(0)
+  resetAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([resetAt])
+}
+
+model StripeWebhookEvent {
+  id        String   @id
+  type      String
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
 }

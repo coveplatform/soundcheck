@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { assignReviewersToTrack } from "@/lib/queue";
 import { sendTrackQueuedEmail } from "@/lib/email";
 import { getStripe } from "@/lib/stripe";
+import { finalizePaidCheckoutSession } from "@/lib/payments";
 
 type CheckoutStatus = "PENDING" | "COMPLETED" | "FAILED";
 
@@ -42,45 +43,18 @@ async function finalizeIfPaid(params: {
 
   const completedAt = new Date();
 
-  await prisma.payment.updateMany({
-    where: { stripeSessionId: params.stripeSessionId, status: "PENDING" },
-    data: {
-      status: "COMPLETED",
-      stripePaymentId: (session.payment_intent as string) || null,
-      completedAt,
-    },
+  const result = await finalizePaidCheckoutSession({
+    stripeSessionId: params.stripeSessionId,
+    trackId: params.trackId,
+    stripePaymentId: (session.payment_intent as string) || null,
+    amountTotalCents: typeof session.amount_total === "number" ? session.amount_total : null,
+    completedAt,
   });
 
-  const track = await prisma.track.findUnique({
-    where: { id: params.trackId },
-    include: { artist: { include: { user: true } }, payment: true },
-  });
+  await assignReviewersToTrack(result.trackId);
 
-  if (!track) {
-    return { status: "PENDING" as const };
-  }
-
-  const firstQueue = await prisma.track.updateMany({
-    where: { id: track.id, paidAt: null, status: "PENDING_PAYMENT" },
-    data: { status: "QUEUED", paidAt: completedAt },
-  });
-
-  if (firstQueue.count > 0) {
-    await prisma.artistProfile.update({
-      where: { id: track.artistId },
-      data: {
-        totalTracks: { increment: 1 },
-        totalSpent: { increment: track.payment?.amount ?? 0 },
-      },
-    });
-
-    await assignReviewersToTrack(track.id);
-
-    if (track.artist?.user?.email) {
-      await sendTrackQueuedEmail(track.artist.user.email, track.title);
-    }
-  } else {
-    await assignReviewersToTrack(track.id);
+  if (result.queuedNow && result.artistEmail && result.trackTitle) {
+    await sendTrackQueuedEmail(result.artistEmail, result.trackTitle);
   }
 
   return { status: "COMPLETED" as const };

@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   try {
     // Rate limiting
     const clientIp = getClientIp(request);
-    const rateLimit = checkRateLimit(`resend-verification:${clientIp}`, RATE_LIMITS.resendVerification);
+    const rateLimit = await checkRateLimit(`resend-verification:${clientIp}`, RATE_LIMITS.resendVerification);
 
     if (!rateLimit.success) {
       return NextResponse.json(

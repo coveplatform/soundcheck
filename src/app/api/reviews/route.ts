@@ -260,100 +260,181 @@ export async function POST(request: Request) {
     // Calculate earnings based on tier
     const earnings = getTierRateCents(review.reviewer.tier);
 
-    // Update review with all data
-    const updatedReview = await prisma.review.update({
-      where: { id: data.reviewId },
-      data: {
-        status: "COMPLETED",
-        firstImpression: data.firstImpression,
-        productionScore: data.productionScore,
-        vocalScore: data.vocalScore,
-        originalityScore: data.originalityScore,
-        wouldListenAgain: data.wouldListenAgain,
-        perceivedGenre: data.perceivedGenre,
-        similarArtists: data.similarArtists,
-        bestPart: data.bestPart,
-        bestPartTimestamp: data.bestPartTimestamp,
-        weakestPart: data.weakestPart,
-        weakestTimestamp: data.weakestTimestamp,
-        additionalNotes: data.additionalNotes,
-        addressedArtistNote: data.addressedArtistNote,
-        nextActions: data.nextActions,
-        timestamps: data.timestamps,
-        paidAmount: earnings,
-      },
-    });
-
-    // Update reviewer stats
     const now = new Date();
-
     const startOfToday = new Date(now);
     startOfToday.setHours(0, 0, 0, 0);
+    const heartbeatCutoff = new Date(now.getTime() - 2 * 60 * 1000);
 
-    await prisma.reviewerProfile.update({
-      where: { id: review.reviewerId },
-      data: {
-        totalReviews: { increment: 1 },
-        pendingBalance: { increment: earnings },
-        totalEarnings: { increment: earnings },
-        lastReviewDate: now,
-        reviewsToday:
-          review.reviewer.lastReviewDate &&
-          review.reviewer.lastReviewDate >= startOfToday
-            ? { increment: 1 }
-            : 1,
-      },
-    });
-
-    // Update tier if needed
-    await updateReviewerTier(review.reviewerId);
-
-    // Update track review count
-    const completedReviews = await prisma.review.count({
-      where: {
-        trackId: review.trackId,
-        status: "COMPLETED",
-      },
-    });
-
-    await prisma.track.update({
-      where: { id: review.trackId },
-      data: {
-        reviewsCompleted: completedReviews,
-        ...(completedReviews >= review.track.reviewsRequested && {
+    const result = await prisma.$transaction(async (tx) => {
+      const updated = await tx.review.updateMany({
+        where: {
+          id: data.reviewId,
+          reviewerId: review.reviewerId,
+          status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+          listenDuration: { gte: MIN_LISTEN_SECONDS },
+          lastHeartbeat: { gte: heartbeatCutoff },
+        },
+        data: {
           status: "COMPLETED",
-          completedAt: new Date(),
-        }),
-      },
+          firstImpression: data.firstImpression,
+          productionScore: data.productionScore,
+          vocalScore: data.vocalScore,
+          originalityScore: data.originalityScore,
+          wouldListenAgain: data.wouldListenAgain,
+          perceivedGenre: data.perceivedGenre,
+          similarArtists: data.similarArtists,
+          bestPart: data.bestPart,
+          bestPartTimestamp: data.bestPartTimestamp,
+          weakestPart: data.weakestPart,
+          weakestTimestamp: data.weakestTimestamp,
+          additionalNotes: data.additionalNotes,
+          addressedArtistNote: data.addressedArtistNote,
+          nextActions: data.nextActions,
+          timestamps: data.timestamps,
+          paidAmount: earnings,
+        },
+      });
+
+      if (updated.count === 0) {
+        const current = await tx.review.findUnique({
+          where: { id: data.reviewId },
+          select: { status: true, listenDuration: true, lastHeartbeat: true },
+        });
+
+        if (!current) {
+          return { updated: false as const, reason: "NOT_FOUND" as const };
+        }
+
+        if (current.status === "COMPLETED") {
+          return { updated: false as const, reason: "ALREADY_SUBMITTED" as const };
+        }
+
+        if (current.status !== "ASSIGNED" && current.status !== "IN_PROGRESS") {
+          return { updated: false as const, reason: "NOT_ACTIVE" as const };
+        }
+
+        if (!current.lastHeartbeat || current.lastHeartbeat.getTime() < heartbeatCutoff.getTime()) {
+          return { updated: false as const, reason: "HEARTBEAT_EXPIRED" as const };
+        }
+
+        if (current.listenDuration < MIN_LISTEN_SECONDS) {
+          return { updated: false as const, reason: "INSUFFICIENT_LISTEN" as const };
+        }
+
+        return { updated: false as const, reason: "UNKNOWN" as const };
+      }
+
+      await tx.reviewerProfile.update({
+        where: { id: review.reviewerId },
+        data: {
+          totalReviews: { increment: 1 },
+          pendingBalance: { increment: earnings },
+          totalEarnings: { increment: earnings },
+          lastReviewDate: now,
+          reviewsToday:
+            review.reviewer.lastReviewDate &&
+            review.reviewer.lastReviewDate >= startOfToday
+              ? { increment: 1 }
+              : 1,
+        },
+      });
+
+      const completedReviews = await tx.review.count({
+        where: {
+          trackId: review.trackId,
+          status: "COMPLETED",
+        },
+      });
+
+      const updatedTrack = await tx.track.update({
+        where: { id: review.trackId },
+        data: {
+          reviewsCompleted: completedReviews,
+          ...(completedReviews >= review.track.reviewsRequested && {
+            status: "COMPLETED",
+            completedAt: new Date(),
+          }),
+        },
+        select: {
+          title: true,
+          reviewsRequested: true,
+          artist: { select: { user: { select: { email: true } } } },
+        },
+      });
+
+      await tx.reviewQueue.deleteMany({
+        where: {
+          trackId: review.trackId,
+          reviewerId: review.reviewerId,
+        },
+      });
+
+      const updatedReview = await tx.review.findUnique({
+        where: { id: data.reviewId },
+      });
+
+      return {
+        updated: true as const,
+        updatedReview,
+        completedReviews,
+        track: {
+          title: updatedTrack.title,
+          reviewsRequested: updatedTrack.reviewsRequested,
+          artistEmail: updatedTrack.artist.user?.email ?? null,
+        },
+      };
     });
 
-    const milestoneHalf = Math.ceil(review.track.reviewsRequested / 2);
-    const milestoneFull = review.track.reviewsRequested;
-
-    if (
-      review.track.artist.user.email &&
-      (completedReviews === milestoneHalf || completedReviews === milestoneFull)
-    ) {
-      await sendReviewProgressEmail(
-        review.track.artist.user.email,
-        review.track.title,
-        completedReviews,
-        review.track.reviewsRequested
+    if (!result.updated) {
+      if (result.reason === "NOT_FOUND") {
+        return NextResponse.json({ error: "Review not found" }, { status: 404 });
+      }
+      if (result.reason === "NOT_ACTIVE") {
+        return NextResponse.json(
+          { error: "This review is no longer active" },
+          { status: 400 }
+        );
+      }
+      if (result.reason === "HEARTBEAT_EXPIRED") {
+        return NextResponse.json(
+          { error: "Listen session expired. Please keep listening and try again." },
+          { status: 400 }
+        );
+      }
+      if (result.reason === "INSUFFICIENT_LISTEN") {
+        return NextResponse.json(
+          { error: `Must listen for at least ${MIN_LISTEN_SECONDS} seconds` },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json(
+        { error: "Review already submitted" },
+        { status: 400 }
       );
     }
 
-    // Remove from queue
-    await prisma.reviewQueue.deleteMany({
-      where: {
-        trackId: review.trackId,
-        reviewerId: review.reviewerId,
-      },
-    });
+    await updateReviewerTier(review.reviewerId);
+
+    const milestoneHalf = Math.ceil(result.track.reviewsRequested / 2);
+    const milestoneFull = result.track.reviewsRequested;
+
+    if (
+      result.track.artistEmail &&
+      (result.completedReviews === milestoneHalf ||
+        result.completedReviews === milestoneFull)
+    ) {
+      await sendReviewProgressEmail(
+        result.track.artistEmail,
+        result.track.title,
+        result.completedReviews,
+        result.track.reviewsRequested
+      );
+    }
 
     return NextResponse.json({
       success: true,
       earnings,
-      review: updatedReview,
+      review: result.updatedReview,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

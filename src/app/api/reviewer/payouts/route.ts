@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { getStripe, getStripePlatformDefaults } from "@/lib/stripe";
 
 const MIN_PAYOUT_CENTS = 1000;
+const PAYOUT_DELAY_DAYS = 7;
 
 const requestPayoutSchema = z.object({
   amountCents: z.number().int().positive().optional(),
@@ -82,20 +83,40 @@ export async function POST(request: Request) {
     }
 
     if (bypassPayments) {
-      const payout = await prisma.payout.create({
-        data: {
-          reviewerId: reviewer.id,
-          amount: requested,
-          method: "MANUAL",
-          status: "COMPLETED",
-          processedAt: new Date(),
-        },
-      });
+      let payout;
+      try {
+        payout = await prisma.$transaction(async (tx) => {
+          const reserved = await tx.reviewerProfile.updateMany({
+            where: {
+              id: reviewer.id,
+              pendingBalance: { gte: requested },
+            },
+            data: { pendingBalance: { decrement: requested } },
+          });
 
-      await prisma.reviewerProfile.update({
-        where: { id: reviewer.id },
-        data: { pendingBalance: { decrement: requested } },
-      });
+          if (reserved.count === 0) {
+            throw new Error("Insufficient balance");
+          }
+
+          return tx.payout.create({
+            data: {
+              reviewerId: reviewer.id,
+              amount: requested,
+              method: "MANUAL",
+              status: "COMPLETED",
+              processedAt: new Date(),
+            },
+          });
+        });
+      } catch (e) {
+        if (e instanceof Error && e.message === "Insufficient balance") {
+          return NextResponse.json(
+            { error: "Insufficient balance" },
+            { status: 400 }
+          );
+        }
+        throw e;
+      }
 
       return NextResponse.json({ success: true, payout, bypassed: true });
     }
@@ -107,6 +128,40 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    try {
+      const rows = await prisma.$queryRaw<Array<{ stripeConnectedAt: Date | null }>>`
+        SELECT "stripeConnectedAt"
+        FROM "ReviewerProfile"
+        WHERE "id" = ${reviewer.id}
+        LIMIT 1
+      `;
+      const connectedAt = rows[0]?.stripeConnectedAt;
+      if (!connectedAt) {
+        return NextResponse.json(
+          { error: `Payouts are available ${PAYOUT_DELAY_DAYS} days after connecting Stripe` },
+          { status: 403 }
+        );
+      }
+
+      const daysSince = Math.floor(
+        (Date.now() - connectedAt.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      if (daysSince < PAYOUT_DELAY_DAYS) {
+        return NextResponse.json(
+          { error: `Payouts are available ${PAYOUT_DELAY_DAYS} days after connecting Stripe` },
+          { status: 403 }
+        );
+      }
+    } catch {
+      if (process.env.NODE_ENV === "production") {
+        return NextResponse.json(
+          { error: "Payouts are temporarily unavailable" },
+          { status: 503 }
+        );
+      }
+    }
+
     if (requested < MIN_PAYOUT_CENTS) {
       return NextResponse.json(
         { error: `Minimum payout is $${(MIN_PAYOUT_CENTS / 100).toFixed(2)}` },
@@ -114,34 +169,59 @@ export async function POST(request: Request) {
       );
     }
 
-    const payout = await prisma.payout.create({
-      data: {
-        reviewerId: reviewer.id,
-        amount: requested,
-        method: "STRIPE_CONNECT",
-        status: "PROCESSING",
-      },
-      select: { id: true, amount: true, status: true },
-    });
+    let payout;
+    try {
+      payout = await prisma.$transaction(async (tx) => {
+        const reserved = await tx.reviewerProfile.updateMany({
+          where: {
+            id: reviewer.id,
+            pendingBalance: { gte: requested },
+          },
+          data: { pendingBalance: { decrement: requested } },
+        });
 
-    await prisma.reviewerProfile.update({
-      where: { id: reviewer.id },
-      data: { pendingBalance: { decrement: requested } },
-    });
+        if (reserved.count === 0) {
+          throw new Error("Insufficient balance");
+        }
+
+        return tx.payout.create({
+          data: {
+            reviewerId: reviewer.id,
+            amount: requested,
+            method: "STRIPE_CONNECT",
+            status: "PROCESSING",
+          },
+          select: { id: true, amount: true, status: true },
+        });
+      });
+    } catch (e) {
+      if (e instanceof Error && e.message === "Insufficient balance") {
+        return NextResponse.json(
+          { error: "Insufficient balance" },
+          { status: 400 }
+        );
+      }
+      throw e;
+    }
 
     try {
       const stripe = getStripe();
       const defaults = await getStripePlatformDefaults();
       const currency = (process.env.STRIPE_CURRENCY ?? defaults.currency).toLowerCase();
-      const transfer = await stripe.transfers.create({
-        amount: requested,
-        currency,
-        destination: stripeAccountId,
-        metadata: {
-          payoutId: payout.id,
-          reviewerId: reviewer.id,
+      const transfer = await stripe.transfers.create(
+        {
+          amount: requested,
+          currency,
+          destination: stripeAccountId,
+          metadata: {
+            payoutId: payout.id,
+            reviewerId: reviewer.id,
+          },
         },
-      });
+        {
+          idempotencyKey: `payout_${payout.id}`,
+        }
+      );
 
       const completed = await prisma.payout.update({
         where: { id: payout.id },
@@ -154,14 +234,18 @@ export async function POST(request: Request) {
 
       return NextResponse.json({ success: true, payout: completed });
     } catch (transferError) {
-      await prisma.payout.update({
-        where: { id: payout.id },
-        data: { status: "FAILED" },
-      });
+      await prisma.$transaction(async (tx) => {
+        const updated = await tx.payout.updateMany({
+          where: { id: payout.id, status: "PROCESSING" },
+          data: { status: "FAILED" },
+        });
 
-      await prisma.reviewerProfile.update({
-        where: { id: reviewer.id },
-        data: { pendingBalance: { increment: requested } },
+        if (updated.count > 0) {
+          await tx.reviewerProfile.update({
+            where: { id: reviewer.id },
+            data: { pendingBalance: { increment: requested } },
+          });
+        }
       });
 
       const message =
