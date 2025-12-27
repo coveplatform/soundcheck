@@ -135,6 +135,7 @@ export default async function AdminTrackDetailPage({
                   <th className="text-left font-medium px-4 py-3">Status</th>
                   <th className="text-left font-medium px-4 py-3">Flagged</th>
                   <th className="text-left font-medium px-4 py-3">Created</th>
+                  <th className="text-left font-medium px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
@@ -144,11 +145,21 @@ export default async function AdminTrackDetailPage({
                     <td className="px-4 py-3">{r.status}</td>
                     <td className="px-4 py-3">{r.wasFlagged ? "Yes" : "No"}</td>
                     <td className="px-4 py-3">{new Date(r.createdAt).toLocaleDateString()}</td>
+                    <td className="px-4 py-3">
+                      {r.status === "COMPLETED" ? (
+                        <Link
+                          href={`/admin/reviews/${r.id}`}
+                          className="text-sm text-blue-600 hover:text-blue-800 underline"
+                        >
+                          View
+                        </Link>
+                      ) : null}
+                    </td>
                   </tr>
                 ))}
                 {track.reviews.length === 0 ? (
                   <tr>
-                    <td className="px-4 py-6 text-center text-neutral-500" colSpan={4}>
+                    <td className="px-4 py-6 text-center text-neutral-500" colSpan={5}>
                       No reviews yet
                     </td>
                   </tr>

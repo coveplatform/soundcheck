@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, Gift } from "lucide-react";
 import { funnels, track } from "@/lib/analytics";
 
 export default function CheckoutPage() {
@@ -12,6 +12,8 @@ export default function CheckoutPage() {
   const trackId = searchParams.get("trackId");
   const promoCode = searchParams.get("promo");
   const [error, setError] = useState("");
+
+  const hasPromo = useMemo(() => Boolean(promoCode?.trim()), [promoCode]);
 
   useEffect(() => {
     async function createCheckout() {
@@ -78,6 +80,22 @@ export default function CheckoutPage() {
             >
               Back to submission
             </button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (hasPromo) {
+    return (
+      <div className="max-w-md mx-auto mt-20">
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <Gift className="h-8 w-8 mx-auto text-lime-600" />
+            <p className="mt-4 text-neutral-600">Applying your promo code…</p>
+            <p className="mt-2 text-sm text-neutral-500">
+              You&apos;ll receive 1 free review for your track.
+            </p>
           </CardContent>
         </Card>
       </div>
