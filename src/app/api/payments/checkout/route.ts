@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getStripe, getStripePlatformDefaults } from "@/lib/stripe";
 import { PACKAGES, PackageType } from "@/lib/metadata";
 import { assignReviewersToTrack } from "@/lib/queue";
+import { sendAdminNewTrackNotification } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -139,6 +140,16 @@ export async function POST(request: Request) {
         });
 
         await assignReviewersToTrack(track.id);
+
+        // Notify admin of new track submission
+        await sendAdminNewTrackNotification({
+          trackTitle: track.title,
+          artistEmail: track.artist.user.email,
+          packageType: track.packageType,
+          reviewsRequested: promoReviewCount ?? packageDetails.reviews,
+          isPromo: isValidPromo,
+          promoCode: isValidPromo ? promoCode.toUpperCase() : undefined,
+        });
       }
 
       return NextResponse.json({

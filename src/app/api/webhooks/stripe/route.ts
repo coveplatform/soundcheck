@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { assignReviewersToTrack } from "@/lib/queue";
-import { sendTrackQueuedEmail } from "@/lib/email";
+import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email";
 import { finalizePaidCheckoutSession } from "@/lib/payments";
 import type Stripe from "stripe";
 
@@ -137,6 +137,15 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
     if (result.queuedNow && result.artistEmail && result.trackTitle) {
       await sendTrackQueuedEmail(result.artistEmail, result.trackTitle);
+
+      // Notify admin of new paid submission
+      await sendAdminNewTrackNotification({
+        trackTitle: result.trackTitle,
+        artistEmail: result.artistEmail,
+        packageType: track.packageType,
+        reviewsRequested: track.reviewsRequested,
+        isPromo: false,
+      });
     }
   } catch (error) {
     console.error("Error handling checkout complete:", error);
