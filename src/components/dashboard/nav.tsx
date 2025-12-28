@@ -41,7 +41,6 @@ export function DashboardNav({ user }: DashboardNavProps) {
   const artistLinks = [
     { href: "/artist/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/artist/submit", label: "Submit Track", icon: Upload },
-    { href: "/artist/reviewers", label: "Reviewers", icon: Headphones },
   ];
 
   const reviewerLinks = [
