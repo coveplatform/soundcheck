@@ -6,6 +6,7 @@ import { RefundButton } from "@/components/admin/refund-button";
 import { CancelTrackButton } from "@/components/admin/cancel-track-button";
 import { GrantFreeButton } from "@/components/admin/grant-free-button";
 import { DeleteTrackButton } from "@/components/admin/delete-track-button";
+import { DebugAssignButton } from "@/components/admin/debug-assign-button";
 import { AudioPlayer } from "@/components/audio/audio-player";
 
 export const dynamic = 'force-dynamic';
@@ -200,6 +201,14 @@ export default async function AdminTrackDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Debug Assignment */}
+      {track.status === "QUEUED" || track.status === "IN_PROGRESS" ? (
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+          <div className="text-sm text-neutral-500 mb-3">Debug</div>
+          <DebugAssignButton trackId={track.id} />
+        </div>
+      ) : null}
 
       <div>
         <Link className="text-sm text-neutral-600 hover:text-neutral-900 underline" href="/admin/tracks">

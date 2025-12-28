@@ -43,8 +43,29 @@ export async function POST(request: Request) {
       .split(",")
       .map((code) => code.trim().toUpperCase())
       .filter(Boolean);
-    const isValidPromo =
+    let isValidPromo =
       promoCode && validPromoCodes.includes(promoCode.toUpperCase());
+
+    // Check if user already used a promo code before
+    if (isValidPromo) {
+      const existingPromoUsage = await prisma.payment.findFirst({
+        where: {
+          stripeSessionId: { startsWith: "promo_" },
+          track: {
+            artist: {
+              userId: session.user.id,
+            },
+          },
+        },
+      });
+
+      if (existingPromoUsage) {
+        return NextResponse.json(
+          { error: "You have already used a promo code" },
+          { status: 400 }
+        );
+      }
+    }
 
     // Get track
     const track = await prisma.track.findUnique({
