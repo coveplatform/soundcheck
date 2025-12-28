@@ -30,7 +30,13 @@ export default async function AdminTracksPage({
     },
     orderBy: { createdAt: "desc" },
     take: 50,
-    include: {
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      packageType: true,
+      promoCode: true,
+      createdAt: true,
       artist: { include: { user: { select: { id: true, email: true } } } },
       payment: { select: { status: true, stripePaymentId: true } },
     },
@@ -93,7 +99,18 @@ export default async function AdminTracksPage({
                     </Link>
                   </td>
                   <td className="px-4 py-3">{t.status}</td>
-                  <td className="px-4 py-3">{t.packageType}</td>
+                  <td className="px-4 py-3">
+                    {t.promoCode ? (
+                      <span className="inline-flex items-center gap-1">
+                        <span className="px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
+                          PROMO
+                        </span>
+                        <span className="text-neutral-400 text-xs">{t.promoCode}</span>
+                      </span>
+                    ) : (
+                      t.packageType
+                    )}
+                  </td>
                   <td className="px-4 py-3">{t.payment?.status ?? ""}</td>
                   <td className="px-4 py-3">
                     <Link className="underline" href={`/admin/users/${t.artist.user.id}`}>

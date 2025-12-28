@@ -112,6 +112,7 @@ export async function POST(request: Request) {
           status: "QUEUED",
           paidAt,
           ...(promoReviewCount && { reviewsRequested: promoReviewCount }),
+          ...(isValidPromo && { promoCode: promoCode.toUpperCase() }),
         },
       });
 

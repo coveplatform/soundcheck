@@ -257,7 +257,10 @@ export async function assignReviewersToTrack(trackId: string) {
   const proToAssign = proCandidates.slice(0, Math.min(proSlotsToReserve, proCandidates.length));
   const proToAssignIds = new Set(proToAssign.map((r) => r.id));
 
-  const nonProSlots = neededReviews - proSlotsToReserve;
+  // If we couldn't fill all PRO slots, make remaining slots available to NORMAL reviewers
+  const unfilledProSlots = proSlotsToReserve - proToAssign.length;
+  const nonProSlots = neededReviews - proSlotsToReserve + unfilledProSlots;
+
   const additionalCandidates = eligibleUnique.filter(
     (r) => !proToAssignIds.has(r.id) && r.tier !== "PRO"
   );

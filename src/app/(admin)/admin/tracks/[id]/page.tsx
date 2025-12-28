@@ -110,7 +110,17 @@ export default async function AdminTrackDetailPage({
         <div className="mt-2 grid md:grid-cols-3 gap-3 text-sm">
           <div>
             <div className="text-neutral-500">Package</div>
-            <div className="font-medium">{track.packageType}</div>
+            <div className="font-medium">
+              {track.promoCode ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="px-2 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
+                    PROMO: {track.promoCode}
+                  </span>
+                </span>
+              ) : (
+                track.packageType
+              )}
+            </div>
           </div>
           <div>
             <div className="text-neutral-500">Reviews</div>

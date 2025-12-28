@@ -225,6 +225,9 @@ model Track {
   reviewsRequested Int
   reviewsCompleted Int         @default(0)
 
+  // Promo tracking
+  promoCode String? // Which promo code was used (null if paid normally)
+
   // Timestamps
   createdAt   DateTime  @default(now())
   paidAt      DateTime?
