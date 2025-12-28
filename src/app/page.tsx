@@ -96,8 +96,8 @@ export default async function Home() {
               <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Turnaround</p>
             </div>
             <div className="p-4 md:p-6 text-center">
-              <p className="text-2xl md:text-3xl font-black text-lime-400">4.8/5</p>
-              <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Review Rating</p>
+              <p className="text-2xl md:text-3xl font-black text-lime-400">180+</p>
+              <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Words/Review</p>
             </div>
             <div className="p-4 md:p-6 text-center">
               <p className="text-2xl md:text-3xl font-black text-lime-400">100%</p>
@@ -150,7 +150,7 @@ export default async function Home() {
           </div>
 
           <p className="mt-8 text-sm text-neutral-500 text-center">
-            Looking to earn money reviewing music? <a href="#for-reviewers" className="text-black font-bold underline underline-offset-2 hover:text-lime-600">See how it works ↓</a>
+            Looking to earn money reviewing music? <a href="#for-reviewers" className="text-black font-bold underline underline-offset-2 hover:text-orange-500">Learn more ↓</a>
           </p>
         </div>
       </section>
@@ -280,74 +280,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* For Reviewers */}
-      <section id="for-reviewers" className="border-b-2 border-black py-16 bg-orange-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center">
-              <Headphones className="h-6 w-6 text-black" />
-            </div>
-            <h2 className="text-3xl font-black">For Reviewers</h2>
-          </div>
-          <p className="text-neutral-600 mb-10">
-            Get paid to listen to new music and share your honest opinion.
-          </p>
-
-          {/* How it works */}
-          <div className="grid md:grid-cols-4 gap-4 mb-12">
-            <div className="bg-white border-2 border-black p-4">
-              <div className="text-2xl font-black text-orange-400 mb-2">01</div>
-              <p className="font-bold">Quick genre quiz</p>
-              <p className="text-sm text-neutral-500 mt-1">10 questions to show you know music</p>
-            </div>
-            <div className="bg-white border-2 border-black p-4">
-              <div className="text-2xl font-black text-orange-400 mb-2">02</div>
-              <p className="font-bold">Pick your genres</p>
-              <p className="text-sm text-neutral-500 mt-1">Only get tracks you actually want to hear</p>
-            </div>
-            <div className="bg-white border-2 border-black p-4">
-              <div className="text-2xl font-black text-orange-400 mb-2">03</div>
-              <p className="font-bold">Listen & review</p>
-              <p className="text-sm text-neutral-500 mt-1">~10 min per track. Rate and write feedback.</p>
-            </div>
-            <div className="bg-white border-2 border-black p-4">
-              <div className="text-2xl font-black text-orange-400 mb-2">04</div>
-              <p className="font-bold">Get paid</p>
-              <p className="text-sm text-neutral-500 mt-1">Earn more as you level up</p>
-            </div>
-          </div>
-
-          {/* Earnings tiers */}
-          <h3 className="font-bold text-lg mb-4">Earnings</h3>
-          <div className="grid md:grid-cols-2 gap-0 border-2 border-black">
-            <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white">
-              <div className="text-sm font-mono text-neutral-500 mb-2">TIER 1</div>
-              <h4 className="font-bold text-xl mb-1">Normal</h4>
-              <div className="text-3xl font-black text-black">$0.50<span className="text-base font-normal text-neutral-500">/review</span></div>
-              <p className="text-sm text-neutral-600 mt-4">Starting tier. Pass the quiz to begin.</p>
-            </div>
-
-            <div className="p-6 bg-orange-400">
-              <div className="text-sm font-mono text-black/60 mb-2">TIER 2</div>
-              <h4 className="font-bold text-xl mb-1">Pro</h4>
-              <div className="text-3xl font-black text-black">$1.50<span className="text-base font-normal text-black/60">/review</span></div>
-              <p className="text-sm text-black/70 mt-4">50+ reviews with 4.7+ rating OR 10 gems.</p>
-            </div>
-          </div>
-
-          <p className="mt-6 text-sm text-neutral-500 text-center">
-            Pro reviewers doing 10 reviews/week earn ~$60/month
-          </p>
-
-          <div className="mt-8 text-center">
-            <Link href="/signup">
-              <Button className="bg-orange-400 text-black hover:bg-orange-300 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                Start Reviewing
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* Features */}
       <section className="border-b-2 border-black py-16">
@@ -552,6 +484,30 @@ export default async function Home() {
                 <p className="mt-3 text-neutral-600">{item.a}</p>
               </details>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* For Reviewers - Compact */}
+      <section id="for-reviewers" className="border-b-2 border-black py-12 bg-orange-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-10 w-10 bg-orange-400 border-2 border-black flex items-center justify-center">
+                  <Headphones className="h-5 w-5 text-black" />
+                </div>
+                <h2 className="text-2xl font-black">Want to get paid for reviewing?</h2>
+              </div>
+              <p className="text-neutral-600">
+                Earn $0.50–$1.50 per review. Listen to new music, share honest feedback, get paid.
+              </p>
+            </div>
+            <Link href="/signup" className="shrink-0">
+              <Button className="bg-orange-400 text-black hover:bg-orange-300 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                Start Reviewing
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
