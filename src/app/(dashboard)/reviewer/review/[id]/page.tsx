@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use, useRef } from "react";
+import { useState, useEffect, use, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Star, Check, Music, DollarSign } from "lucide-react";
+import { ArrowLeft, Star, Check, Music, DollarSign, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
 import { funnels, track } from "@/lib/analytics";
@@ -105,14 +105,35 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [bestPart, setBestPart] = useState("");
   const [weakestPart, setWeakestPart] = useState("");
   const [additionalNotes, setAdditionalNotes] = useState("");
-  const [addressedArtistNote, setAddressedArtistNote] = useState<
-    "YES" | "PARTIALLY" | "NO" | null
-  >(null);
   const [nextActions, setNextActions] = useState("");
   const [timestampNotes, setTimestampNotes] = useState<
     Array<{ seconds: number; note: string }>
   >([]);
   const [playerSeconds, setPlayerSeconds] = useState(0);
+  const [validationIssues, setValidationIssues] = useState<Array<{ id: string; message: string; section: string }>>([]);
+
+  // Section refs for scroll-to functionality
+  const firstImpressionRef = useRef<HTMLDivElement>(null);
+  const scoresRef = useRef<HTMLDivElement>(null);
+  const wouldListenAgainRef = useRef<HTMLDivElement>(null);
+  const bestPartRef = useRef<HTMLDivElement>(null);
+  const weakestPartRef = useRef<HTMLDivElement>(null);
+  const nextActionsRef = useRef<HTMLDivElement>(null);
+
+  const scrollToSection = useCallback((sectionId: string) => {
+    const refs: Record<string, React.RefObject<HTMLDivElement | null>> = {
+      firstImpression: firstImpressionRef,
+      scores: scoresRef,
+      wouldListenAgain: wouldListenAgainRef,
+      bestPart: bestPartRef,
+      weakestPart: weakestPartRef,
+      nextActions: nextActionsRef,
+    };
+    const ref = refs[sectionId];
+    if (ref?.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchReview() {
@@ -185,8 +206,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     bestPart.trim().length > 0 ||
     weakestPart.trim().length > 0 ||
     additionalNotes.trim().length > 0 ||
-    addressedArtistNote !== null ||
-    nextActions.trim().length > 0 ||
     timestampNotes.some((t) => t.note.trim().length > 0);
 
   const confirmLeave = () => {
@@ -240,7 +259,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           setBestPart(typeof parsed.bestPart === "string" ? parsed.bestPart : "");
           setWeakestPart(typeof parsed.weakestPart === "string" ? parsed.weakestPart : "");
           setAdditionalNotes(typeof parsed.additionalNotes === "string" ? parsed.additionalNotes : "");
-          setAddressedArtistNote(parsed.addressedArtistNote ?? null);
           setNextActions(typeof parsed.nextActions === "string" ? parsed.nextActions : "");
           setTimestampNotes(Array.isArray(parsed.timestampNotes) ? parsed.timestampNotes : []);
           setDraftSavedAt(typeof parsed.savedAt === "number" ? parsed.savedAt : null);
@@ -258,8 +276,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         setCanSubmit(true);
       }
     }
-    setAddressedArtistNote(review.addressedArtistNote ?? null);
-    setNextActions(typeof review.nextActions === "string" ? review.nextActions : "");
     setTimestampNotes(Array.isArray(review.timestamps) ? review.timestamps : []);
     setDraftReady(true);
   }, [draftKey, review]);
@@ -287,7 +303,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         bestPart,
         weakestPart,
         additionalNotes,
-        addressedArtistNote,
         nextActions,
         timestampNotes,
       };
@@ -316,7 +331,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     bestPart,
     weakestPart,
     additionalNotes,
-    addressedArtistNote,
     nextActions,
     timestampNotes,
   ]);
@@ -324,47 +338,42 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const handleSubmit = async () => {
     if (!review) return;
 
-    // Validate
+    // Build validation issues
+    const issues: Array<{ id: string; message: string; section: string }> = [];
+
     if (!firstImpression) {
-      setError("Please select your first impression");
-      return;
+      issues.push({ id: "firstImpression", message: "Select your first impression", section: "firstImpression" });
     }
     if (productionScore === 0) {
-      setError("Please rate the production quality");
-      return;
+      issues.push({ id: "productionScore", message: "Rate the production quality", section: "scores" });
     }
     if (originalityScore === 0) {
-      setError("Please rate the originality");
-      return;
+      issues.push({ id: "originalityScore", message: "Rate the originality", section: "scores" });
     }
     if (wouldListenAgain === null) {
-      setError("Please indicate if you would listen again");
-      return;
+      issues.push({ id: "wouldListenAgain", message: "Indicate if you would listen again", section: "wouldListenAgain" });
     }
     if (countWords(bestPart) < MIN_WORDS_PER_SECTION) {
-      setError(`Best part must be at least ${MIN_WORDS_PER_SECTION} words`);
-      return;
+      issues.push({ id: "bestPart", message: `Best part needs ${MIN_WORDS_PER_SECTION - countWords(bestPart)} more words`, section: "bestPart" });
     }
     if (countWords(weakestPart) < MIN_WORDS_PER_SECTION) {
-      setError(`Weakest part must be at least ${MIN_WORDS_PER_SECTION} words`);
-      return;
+      issues.push({ id: "weakestPart", message: `Weakest part needs ${MIN_WORDS_PER_SECTION - countWords(weakestPart)} more words`, section: "weakestPart" });
     }
 
-    if (!addressedArtistNote) {
-      setError("Please indicate whether you addressed the artist note");
-      return;
-    }
-
-    const actionLines = nextActions
-      .split(/\r?\n/)
-      .map((l) => l.trim())
-      .filter(Boolean);
-
+    const actionLines = nextActions.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
     if (actionLines.length < 3) {
-      setError("Next actions must include at least 3 lines (one actionable step per line)");
+      issues.push({ id: "nextActions", message: `Need ${3 - actionLines.length} more action item${3 - actionLines.length === 1 ? "" : "s"}`, section: "nextActions" });
+    }
+
+    if (issues.length > 0) {
+      setValidationIssues(issues);
+      setError("");
+      // Scroll to first issue
+      scrollToSection(issues[0].section);
       return;
     }
 
+    setValidationIssues([]);
     setError("");
     setIsSubmitting(true);
 
@@ -384,7 +393,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           bestPart,
           weakestPart,
           additionalNotes: additionalNotes || undefined,
-          addressedArtistNote,
           nextActions,
           timestamps:
             timestampNotes
@@ -743,15 +751,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   const bestPartWords = countWords(bestPart);
   const weakestPartWords = countWords(weakestPart);
-  const nextActionCount = nextActions
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter(Boolean).length;
+  const nextActionCount = nextActions.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).length;
   const meetsTextMinimum =
     bestPartWords >= MIN_WORDS_PER_SECTION &&
     weakestPartWords >= MIN_WORDS_PER_SECTION;
   const hasNextActions = nextActionCount >= 3;
-  const hasAddressedArtistNote = addressedArtistNote !== null;
 
   if (success) {
     return (
@@ -840,16 +844,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               setCanSubmit(true);
               funnels.review.minimumReached(review.track.id, MIN_LISTEN_SECONDS);
             }}
-            onAddTimestamp={
-              review.track.sourceType === "UPLOAD"
-                ? (seconds) => {
-                    setTimestampNotes((prev) => [
-                      ...prev,
-                      { seconds, note: "" },
-                    ]);
-                  }
-                : undefined
-            }
+            onAddTimestamp={(seconds) => {
+              setTimestampNotes((prev) => [
+                ...prev,
+                { seconds, note: "" },
+              ]);
+            }}
           />
         </CardContent>
       </Card>
@@ -867,8 +867,20 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           )}
 
           {/* First Impression */}
-          <div className="space-y-3">
+          <div
+            ref={firstImpressionRef}
+            className={cn(
+              "space-y-3 p-4 -m-4 rounded-lg transition-colors",
+              validationIssues.some((i) => i.section === "firstImpression") && "bg-red-50 border-2 border-red-300"
+            )}
+          >
             <Label className="text-base font-bold">First Impression (after 30 seconds)</Label>
+            {validationIssues.some((i) => i.section === "firstImpression") && (
+              <p className="text-xs font-medium text-red-600 flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" />
+                {validationIssues.find((i) => i.section === "firstImpression")?.message}
+              </p>
+            )}
             <div className="flex gap-2">
               {[
                 { value: "STRONG_HOOK", label: "Strong Hook", color: "lime" },
@@ -897,27 +909,55 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Scores */}
-          <div className="grid sm:grid-cols-3 gap-4">
-            <ScoreInput
-              label="Production Quality"
-              value={productionScore}
-              onChange={setProductionScore}
-            />
-            <ScoreInput
-              label="Vocals (optional)"
-              value={vocalScore}
-              onChange={setVocalScore}
-            />
-            <ScoreInput
-              label="Originality"
-              value={originalityScore}
-              onChange={setOriginalityScore}
-            />
+          <div
+            ref={scoresRef}
+            className={cn(
+              "p-4 -m-4 rounded-lg transition-colors",
+              validationIssues.some((i) => i.section === "scores") && "bg-red-50 border-2 border-red-300"
+            )}
+          >
+            {validationIssues.some((i) => i.section === "scores") && (
+              <p className="text-xs font-medium text-red-600 flex items-center gap-1 mb-3">
+                <AlertTriangle className="h-3 w-3" />
+                {validationIssues.filter((i) => i.section === "scores").map((i) => i.message).join(", ")}
+              </p>
+            )}
+            <div className="grid sm:grid-cols-3 gap-4">
+              <ScoreInput
+                label="Production Quality"
+                value={productionScore}
+                onChange={setProductionScore}
+                hasError={validationIssues.some((i) => i.id === "productionScore")}
+              />
+              <ScoreInput
+                label="Vocals (optional)"
+                value={vocalScore}
+                onChange={setVocalScore}
+              />
+              <ScoreInput
+                label="Originality"
+                value={originalityScore}
+                onChange={setOriginalityScore}
+                hasError={validationIssues.some((i) => i.id === "originalityScore")}
+              />
+            </div>
           </div>
 
           {/* Would Listen Again */}
-          <div className="space-y-3">
+          <div
+            ref={wouldListenAgainRef}
+            className={cn(
+              "space-y-3 p-4 -m-4 rounded-lg transition-colors",
+              validationIssues.some((i) => i.section === "wouldListenAgain") && "bg-red-50 border-2 border-red-300"
+            )}
+          >
             <Label className="text-base font-bold">Would you listen to this again?</Label>
+            {validationIssues.some((i) => i.section === "wouldListenAgain") && (
+              <p className="text-xs font-medium text-red-600 flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" />
+                {validationIssues.find((i) => i.section === "wouldListenAgain")?.message}
+              </p>
+            )}
             <div className="flex gap-2">
               <button
                 type="button"
@@ -968,9 +1008,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           </div>
 
-          {/* Best & Weakest Parts */}
-          <div className="space-y-3">
+          {/* Best Part */}
+          <div ref={bestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-lg transition-colors", validationIssues.some((i) => i.section === "bestPart") && "bg-red-50 border-2 border-red-300")}>
             <Label htmlFor="best" className="text-base font-bold">Best part of the track *</Label>
+            {validationIssues.some((i) => i.section === "bestPart") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "bestPart")?.message}</p>)}
             <textarea
               id="best"
               placeholder="What stood out to you? What worked well?"
@@ -993,8 +1034,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           </div>
 
-          <div className="space-y-3">
+          {/* Weakest Part */}
+          <div ref={weakestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-lg transition-colors", validationIssues.some((i) => i.section === "weakestPart") && "bg-red-50 border-2 border-red-300")}>
             <Label htmlFor="weakest" className="text-base font-bold">Weakest part / Areas for improvement *</Label>
+            {validationIssues.some((i) => i.section === "weakestPart") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "weakestPart")?.message}</p>)}
             <textarea
               id="weakest"
               placeholder="What could be better? Be constructive."
@@ -1028,68 +1071,45 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             />
           </div>
 
-          {/* Did you address the artist note */}
-          <div className="space-y-3">
-            <Label className="text-base font-bold">Did you address the artist note? *</Label>
-            <div className="flex gap-2">
-              {([
-                { value: "YES", label: "Yes" },
-                { value: "PARTIALLY", label: "Partially" },
-                { value: "NO", label: "No" },
-              ] as const).map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setAddressedArtistNote(opt.value)}
-                  className={cn(
-                    "flex-1 py-2.5 px-3 text-sm font-bold transition-colors border-2 border-black",
-                    addressedArtistNote === opt.value
-                      ? "bg-purple-400 text-black"
-                      : "bg-white text-black hover:bg-neutral-100"
-                  )}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <Label htmlFor="next-actions" className="text-base font-bold">Next actions (3+ lines) *</Label>
+          {/* Next Actions */}
+          <div ref={nextActionsRef} className={cn("space-y-3 p-4 -m-4 rounded-lg transition-colors", validationIssues.some((i) => i.section === "nextActions") && "bg-red-50 border-2 border-red-300")}>
+            <Label htmlFor="next-actions" className="text-base font-bold">Next actions (3+ actionable items) *</Label>
+            {validationIssues.some((i) => i.section === "nextActions") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "nextActions")?.message}</p>)}
             <textarea
               id="next-actions"
               placeholder={`- Lower the vocal 1-2 dB in the hook\n- Reduce reverb tail on the snare\n- Tighten the drop by shortening the pre-drop fill`}
               value={nextActions}
               onChange={(e) => setNextActions(e.target.value)}
-              className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+              className={cn("w-full px-3 py-2 border-2 text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2", validationIssues.some((i) => i.section === "nextActions") ? "border-red-400" : "border-black")}
             />
+            <p className="text-xs text-neutral-500">One actionable suggestion per line (e.g. &quot;Lower the vocal 1-2 dB in the hook&quot;)</p>
           </div>
 
+          {/* Timestamped notes */}
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <Label className="text-base font-bold">Timestamped notes (optional)</Label>
-              <button
-                type="button"
-                onClick={() => {
-                  if (!review) return;
-                  if (review.track.sourceType !== "UPLOAD") {
-                    setError("Timestamps are only available for uploaded tracks right now.");
-                    return;
-                  }
-                  setTimestampNotes((prev) => [
-                    ...prev,
-                    { seconds: Math.floor(playerSeconds), note: "" },
-                  ]);
-                }}
-                className="px-3 py-2 text-xs font-bold border-2 border-black bg-white hover:bg-neutral-100"
-              >
-                Add current time ({formatTimestamp(playerSeconds)})
-              </button>
+              {review.track.sourceType === "UPLOAD" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTimestampNotes((prev) => [
+                      ...prev,
+                      { seconds: Math.floor(playerSeconds), note: "" },
+                    ]);
+                  }}
+                  className="px-3 py-2 text-xs font-bold border-2 border-black bg-white hover:bg-neutral-100"
+                >
+                  Add current time ({formatTimestamp(playerSeconds)})
+                </button>
+              )}
             </div>
 
             {timestampNotes.length === 0 ? (
               <p className="text-xs text-neutral-600 font-mono">
-                Tip: click the waveform to jump to a moment, then add a timestamp note.
+                {review.track.sourceType === "UPLOAD"
+                  ? "Tip: click the waveform to jump to a moment, then add a timestamp note."
+                  : "Tip: use the \"Add timestamp\" button while playing to mark specific moments."}
               </p>
             ) : (
               <div className="space-y-2">
@@ -1172,31 +1192,44 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                   </span>
                 ) : (
                   <span className="text-neutral-400 font-mono">
-                    Next actions: {nextActionCount}/3 lines
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2 text-sm mt-1 flex-wrap">
-                {hasAddressedArtistNote ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-lime-500 text-black font-bold text-xs">
-                    <Check className="h-3 w-3" /> Artist note answered
-                  </span>
-                ) : (
-                  <span className="text-neutral-400 font-mono">
-                    Address artist note
+                    Next actions: {nextActionCount}/3 items
                   </span>
                 )}
               </div>
             </div>
           </div>
+
+          {/* Validation Warnings */}
+          {validationIssues.length > 0 && (
+            <div className="mb-4 p-4 bg-red-500/20 border border-red-500/40 rounded-lg">
+              <p className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                Please fix {validationIssues.length} issue{validationIssues.length === 1 ? "" : "s"} before submitting:
+              </p>
+              <div className="space-y-1">
+                {validationIssues.map((issue) => (
+                  <button
+                    key={issue.id}
+                    type="button"
+                    onClick={() => scrollToSection(issue.section)}
+                    className="w-full text-left text-sm text-red-200 hover:text-white hover:bg-red-500/30 px-2 py-1 rounded transition-colors flex items-center gap-2"
+                  >
+                    <span className="text-red-400">→</span>
+                    {issue.message}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <Button
             onClick={handleSubmit}
             isLoading={isSubmitting}
-            disabled={!canSubmit || !meetsTextMinimum || !hasNextActions || !hasAddressedArtistNote}
+            disabled={!canSubmit || !meetsTextMinimum || !hasNextActions}
             variant="primary"
             className="w-full"
           >
-            {canSubmit && meetsTextMinimum && hasNextActions && hasAddressedArtistNote
+            {canSubmit && meetsTextMinimum && hasNextActions
               ? `Submit Review & Earn ${formatCurrency(getTierEarningsCents(review.reviewer.tier))}`
               : "Complete requirements to submit"}
           </Button>
@@ -1210,15 +1243,17 @@ function ScoreInput({
   label,
   value,
   onChange,
+  hasError = false,
 }: {
   label: string;
   value: number;
   onChange: (value: number) => void;
+  hasError?: boolean;
 }) {
   return (
     <div className="space-y-3">
-      <Label className="font-bold">{label}</Label>
-      <div className="flex gap-1 p-2 border-2 border-black bg-white">
+      <Label className={cn("font-bold", hasError && "text-red-600")}>{label}</Label>
+      <div className={cn("flex gap-1 p-2 border-2 bg-white", hasError ? "border-red-400" : "border-black")}>
         {[1, 2, 3, 4, 5].map((score) => (
           <button
             key={score}

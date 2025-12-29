@@ -59,6 +59,15 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isArtistPath) {
+    const isArtistOnboarding = pathname === "/artist/onboarding";
+    if (isArtistOnboarding) {
+      // Already an artist? Redirect to dashboard instead of showing onboarding
+      if (token.isArtist) {
+        return NextResponse.redirect(new URL("/artist/dashboard", request.url));
+      }
+      return NextResponse.next();
+    }
+    // Not an artist and not on onboarding? Redirect to home
     if (!token.isArtist) {
       return NextResponse.redirect(new URL("/", request.url));
     }
@@ -66,6 +75,15 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isReviewerPath) {
+    const isReviewerOnboarding = pathname === "/reviewer/onboarding";
+    if (isReviewerOnboarding) {
+      // Already a reviewer? Redirect to dashboard instead of showing onboarding
+      if (token.isReviewer) {
+        return NextResponse.redirect(new URL("/reviewer/dashboard", request.url));
+      }
+      return NextResponse.next();
+    }
+    // Not a reviewer and not on onboarding? Redirect to home
     if (!token.isReviewer) {
       return NextResponse.redirect(new URL("/", request.url));
     }

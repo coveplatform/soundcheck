@@ -243,56 +243,60 @@ export default function SignupPage() {
               {error}
             </div>
           )}
-          <div className="space-y-2">
-            <Label htmlFor="name" className="font-bold">Name</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="font-bold">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="font-bold">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="email" className="font-bold">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="font-bold">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Create a strong password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <PasswordStrength password={password} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="font-bold">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Re-enter your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-            {confirmPassword && password !== confirmPassword && (
-              <p className="text-xs text-red-500 font-medium">Passwords do not match</p>
-            )}
-            {confirmPassword && password === confirmPassword && password.length > 0 && (
-              <p className="text-xs text-green-600 font-medium">Passwords match</p>
-            )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="password" className="font-bold">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Create a strong password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <PasswordStrength password={password} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="font-bold">Confirm</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Re-enter password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              {confirmPassword && password !== confirmPassword && (
+                <p className="text-xs text-red-500 font-medium">Passwords do not match</p>
+              )}
+              {confirmPassword && password === confirmPassword && password.length > 0 && (
+                <p className="text-xs text-green-600 font-medium">Passwords match</p>
+              )}
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="referralSource" className="font-bold">How did you hear about us? <span className="font-normal text-neutral-400">(optional)</span></Label>
@@ -315,7 +319,7 @@ export default function SignupPage() {
               <option value="other">Other</option>
             </select>
           </div>
-          <div className="flex items-start gap-3 pt-2">
+          <div className="flex items-start gap-3">
             <input
               id="terms"
               type="checkbox"

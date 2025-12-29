@@ -4,6 +4,52 @@ import { useState, useRef, useEffect, useCallback, type MouseEvent as ReactMouse
 import { Play, Pause, Volume2, VolumeX, Plus, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// SoundCloud Widget API types
+interface SoundCloudWidget {
+  bind: (event: string, callback: () => void) => void;
+  unbind: (event: string) => void;
+  getPosition: (callback: (position: number) => void) => void;
+  getDuration: (callback: (duration: number) => void) => void;
+}
+
+interface SoundCloudWidgetAPI {
+  (iframe: HTMLIFrameElement): SoundCloudWidget;
+  Events: {
+    PLAY: string;
+    PAUSE: string;
+    FINISH: string;
+  };
+}
+
+interface YouTubePlayer {
+  destroy: () => void;
+  getCurrentTime: () => number;
+  getDuration: () => number;
+}
+
+declare global {
+  interface Window {
+    SC?: { Widget: SoundCloudWidgetAPI };
+    YT?: {
+      Player: new (
+        elementId: string,
+        config: {
+          events: {
+            onStateChange?: (event: { data: number }) => void;
+            onReady?: () => void;
+          };
+        }
+      ) => YouTubePlayer;
+      PlayerState: {
+        PLAYING: number;
+        PAUSED: number;
+        ENDED: number;
+      };
+    };
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
 interface AudioPlayerProps {
   sourceUrl: string;
   sourceType: string;
@@ -39,10 +85,16 @@ export function AudioPlayer({
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const embedTimeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const scIframeRef = useRef<HTMLIFrameElement | null>(null);
+  const scWidgetRef = useRef<SoundCloudWidget | null>(null);
+  const ytPlayerRef = useRef<YouTubePlayer | null>(null);
+  const ytContainerId = useRef(`yt-player-${Math.random().toString(36).slice(2, 9)}`);
 
   // Store callbacks in refs to avoid effect dependency issues
   const onListenProgressRef = useRef(onListenProgress);
   const onMinimumReachedRef = useRef(onMinimumReached);
+  const onTimeUpdateRef = useRef(onTimeUpdate);
 
   // Keep refs in sync with props
   useEffect(() => {
@@ -52,6 +104,10 @@ export function AudioPlayer({
   useEffect(() => {
     onMinimumReachedRef.current = onMinimumReached;
   }, [onMinimumReached]);
+
+  useEffect(() => {
+    onTimeUpdateRef.current = onTimeUpdate;
+  }, [onTimeUpdate]);
 
   const seekToRatio = (ratio: number) => {
     const audio = audioRef.current;
@@ -243,19 +299,229 @@ export function AudioPlayer({
     };
   }, [isEmbedded, showWaveform, sourceUrl]);
 
+  // SoundCloud Widget API integration - auto-detect play/pause
+  useEffect(() => {
+    if (sourceType !== "SOUNDCLOUD" || !showListenTracker) return;
+
+    let mounted = true;
+
+    const initWidget = () => {
+      const iframe = scIframeRef.current;
+      if (!iframe || !window.SC?.Widget) return;
+
+      const widget = window.SC.Widget(iframe);
+      scWidgetRef.current = widget;
+
+      widget.bind(window.SC.Widget.Events.PLAY, () => {
+        if (mounted) setIsPlaying(true);
+      });
+
+      widget.bind(window.SC.Widget.Events.PAUSE, () => {
+        if (mounted) setIsPlaying(false);
+      });
+
+      widget.bind(window.SC.Widget.Events.FINISH, () => {
+        if (mounted) setIsPlaying(false);
+      });
+    };
+
+    // Load SoundCloud Widget API if not already loaded
+    if (window.SC?.Widget) {
+      // Small delay to ensure iframe is ready
+      const timer = setTimeout(initWidget, 500);
+      return () => {
+        mounted = false;
+        clearTimeout(timer);
+      };
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://w.soundcloud.com/player/api.js";
+    script.async = true;
+    script.onload = () => {
+      // Small delay to ensure iframe is ready
+      setTimeout(initWidget, 500);
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      mounted = false;
+    };
+  }, [sourceType, showListenTracker, sourceUrl]);
+
+  // YouTube IFrame API integration - auto-detect play/pause
+  useEffect(() => {
+    if (sourceType !== "YOUTUBE" || !showListenTracker) return;
+
+    let mounted = true;
+
+    const initPlayer = () => {
+      if (!window.YT?.Player || !mounted) return;
+
+      try {
+        const player = new window.YT.Player(ytContainerId.current, {
+          events: {
+            onStateChange: (event: { data: number }) => {
+              if (!mounted) return;
+              // YT.PlayerState: PLAYING = 1, PAUSED = 2, ENDED = 0
+              if (event.data === 1) {
+                setIsPlaying(true);
+              } else if (event.data === 2 || event.data === 0) {
+                setIsPlaying(false);
+              }
+            },
+          },
+        });
+        ytPlayerRef.current = player;
+      } catch {
+        // Player initialization can fail if iframe not ready
+      }
+    };
+
+    // Load YouTube IFrame API if not already loaded
+    if (window.YT?.Player) {
+      const timer = setTimeout(initPlayer, 500);
+      return () => {
+        mounted = false;
+        clearTimeout(timer);
+        ytPlayerRef.current?.destroy();
+      };
+    }
+
+    // Set up callback for when API is ready
+    const existingCallback = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      existingCallback?.();
+      setTimeout(initPlayer, 500);
+    };
+
+    const script = document.createElement("script");
+    script.src = "https://www.youtube.com/iframe_api";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      mounted = false;
+      ytPlayerRef.current?.destroy();
+    };
+  }, [sourceType, showListenTracker, sourceUrl]);
+
+  // Poll current time for embedded players to enable timestamps
+  useEffect(() => {
+    if (!isEmbedded || !isPlaying) {
+      if (embedTimeIntervalRef.current) {
+        clearInterval(embedTimeIntervalRef.current);
+        embedTimeIntervalRef.current = null;
+      }
+      return;
+    }
+
+    embedTimeIntervalRef.current = setInterval(() => {
+      if (sourceType === "SOUNDCLOUD" && scWidgetRef.current) {
+        scWidgetRef.current.getPosition((positionMs) => {
+          const seconds = Math.floor(positionMs / 1000);
+          setCurrentTime(seconds);
+          onTimeUpdateRef.current?.(seconds);
+        });
+        scWidgetRef.current.getDuration((durationMs) => {
+          setDuration(Math.floor(durationMs / 1000));
+        });
+      } else if (sourceType === "YOUTUBE" && ytPlayerRef.current) {
+        try {
+          const seconds = Math.floor(ytPlayerRef.current.getCurrentTime());
+          setCurrentTime(seconds);
+          onTimeUpdateRef.current?.(seconds);
+          setDuration(Math.floor(ytPlayerRef.current.getDuration()));
+        } catch {
+          // Player may not be ready yet
+        }
+      }
+    }, 500);
+
+    return () => {
+      if (embedTimeIntervalRef.current) {
+        clearInterval(embedTimeIntervalRef.current);
+        embedTimeIntervalRef.current = null;
+      }
+    };
+  }, [isEmbedded, isPlaying, sourceType]);
+
   if (isEmbedded) {
     return (
       <div className="space-y-4">
         {/* Embedded Player */}
         <div className="rounded-xl overflow-hidden bg-neutral-950 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <iframe
-            src={getEmbedUrl()}
-            width="100%"
-            height={sourceType === "YOUTUBE" ? 315 : 166}
-            allow="autoplay; encrypted-media"
-            className="border-0"
-          />
+          {sourceType === "SOUNDCLOUD" ? (
+            <iframe
+              ref={scIframeRef}
+              src={getEmbedUrl()}
+              width="100%"
+              height={166}
+              allow="autoplay; encrypted-media"
+              className="border-0"
+            />
+          ) : (
+            <iframe
+              id={ytContainerId.current}
+              src={getEmbedUrl()}
+              width="100%"
+              height={315}
+              allow="autoplay; encrypted-media"
+              className="border-0"
+            />
+          )}
         </div>
+
+        {/* Current time and timestamp button for embedded players */}
+        {onAddTimestamp && (
+          <div className="bg-white border-2 border-black rounded-xl p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-mono text-neutral-600">
+                <span>Current: {formatTime(currentTime)}</span>
+                {duration > 0 && (
+                  <>
+                    <span className="text-neutral-300">/</span>
+                    <span>{formatTime(duration)}</span>
+                  </>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onAddTimestamp(currentTime);
+                  setTimestampAdded(true);
+                  setTimeout(() => setTimestampAdded(false), 1500);
+                }}
+                disabled={!isPlaying && currentTime === 0}
+                className={cn(
+                  "flex items-center gap-1 px-3 py-1.5 text-xs font-bold border-2 transition-all",
+                  timestampAdded
+                    ? "bg-lime-500 text-black border-lime-600 scale-105"
+                    : !isPlaying && currentTime === 0
+                    ? "bg-neutral-100 text-neutral-400 border-neutral-300 cursor-not-allowed"
+                    : "bg-white text-black border-black hover:bg-neutral-100"
+                )}
+              >
+                {timestampAdded ? (
+                  <>
+                    <Check className="h-3 w-3" />
+                    Added!
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-3 w-3" />
+                    Add timestamp
+                  </>
+                )}
+              </button>
+            </div>
+            {!isPlaying && currentTime === 0 && (
+              <p className="text-xs text-neutral-400 mt-2">
+                Start playing to enable timestamps
+              </p>
+            )}
+          </div>
+        )}
 
         {showListenTracker ? (
           <div className="bg-white border-2 border-black rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
@@ -281,34 +547,16 @@ export function AudioPlayer({
                 <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
                 Ready to submit your review
               </p>
+            ) : isPlaying ? (
+              <p className="text-xs text-neutral-500 mt-2 flex items-center gap-1">
+                <span className="inline-block w-2 h-2 rounded-full bg-black animate-pulse" />
+                Tracking... keep listening
+              </p>
             ) : (
               <p className="text-xs text-neutral-400 mt-2">
-                Play the track above. Time is tracked automatically.
+                Press play above to start tracking
               </p>
             )}
-
-            <div className="flex gap-2 mt-4">
-              <button
-                onClick={() => setIsPlaying(true)}
-                className={cn(
-                  "flex-1 py-2.5 px-4 rounded-lg text-sm font-bold transition-all border-2",
-                  isPlaying
-                    ? "bg-neutral-100 text-neutral-400 border-neutral-200 cursor-default"
-                    : "bg-black text-white border-black hover:bg-neutral-800 active:scale-[0.98]"
-                )}
-                disabled={isPlaying}
-              >
-                {isPlaying ? "Tracking..." : "Start Tracking"}
-              </button>
-              {isPlaying && (
-                <button
-                  onClick={() => setIsPlaying(false)}
-                  className="py-2.5 px-4 rounded-lg text-sm font-bold bg-white text-black border-2 border-black hover:bg-neutral-50 transition-all active:scale-[0.98]"
-                >
-                  Pause
-                </button>
-              )}
-            </div>
           </div>
         ) : null}
       </div>

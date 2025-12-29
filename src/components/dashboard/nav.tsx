@@ -128,7 +128,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
                       <Link
                         href={accountHref}
                         onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-bold border-2 border-transparent hover:border-black/20"
+                        className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-black border-2 border-transparent hover:border-black/20"
                         role="menuitem"
                       >
                         <Settings className="h-4 w-4" />
@@ -137,7 +137,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
                       <Link
                         href="/support"
                         onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-bold border-2 border-transparent hover:border-black/20"
+                        className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-black border-2 border-transparent hover:border-black/20"
                         role="menuitem"
                       >
                         <LifeBuoy className="h-4 w-4" />
@@ -149,7 +149,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
                           setUserMenuOpen(false);
                           signOut({ callbackUrl: "/" });
                         }}
-                        className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm font-bold border-2 border-transparent hover:border-black/20"
+                        className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm font-bold text-black border-2 border-transparent hover:border-black/20"
                         role="menuitem"
                       >
                         <LogOut className="h-4 w-4" />
