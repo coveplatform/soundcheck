@@ -23,7 +23,10 @@
       "Bash(git push)",
       "Bash(npx vercel --prod --yes)",
       "Bash(ls:*)",
-      "Bash(del \"\\\\?\\\\C:\\\\Users\\\\simli\\\\Desktop\\\\review\\\\soundcheck\\\\nul\")"
+      "Bash(del \"\\\\?\\\\C:\\\\Users\\\\simli\\\\Desktop\\\\review\\\\soundcheck\\\\nul\")",
+      "Bash(xargs cat:*)",
+      "Bash(npx tsx:*)",
+      "Bash(findstr:*)"
     ]
   }
 }
