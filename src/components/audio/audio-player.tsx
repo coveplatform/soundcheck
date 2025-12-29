@@ -150,22 +150,7 @@ export function AudioPlayer({
 
     if (isPlaying) {
       progressIntervalRef.current = setInterval(() => {
-        setTotalListenTime((prev) => {
-          const newTime = prev + 1;
-          // Use refs to call the latest callbacks without effect re-runs
-          onListenProgressRef.current?.(newTime);
-
-          if (newTime >= minListenTime) {
-            setHasReachedMinimum((wasReached) => {
-              if (!wasReached) {
-                onMinimumReachedRef.current?.();
-              }
-              return true;
-            });
-          }
-
-          return newTime;
-        });
+        setTotalListenTime((prev) => prev + 1);
       }, 1000);
     } else {
       if (progressIntervalRef.current) {
@@ -179,6 +164,18 @@ export function AudioPlayer({
       }
     };
   }, [isPlaying, minListenTime, showListenTracker]);
+
+  // Handle callbacks when totalListenTime changes (separate from state update to avoid React warning)
+  useEffect(() => {
+    if (!showListenTracker || totalListenTime === 0) return;
+
+    onListenProgressRef.current?.(totalListenTime);
+
+    if (totalListenTime >= minListenTime && !hasReachedMinimum) {
+      setHasReachedMinimum(true);
+      onMinimumReachedRef.current?.();
+    }
+  }, [totalListenTime, minListenTime, hasReachedMinimum, showListenTracker]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
