@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { RefundButton } from "@/components/admin/refund-button";
-import Link from "next/link";
+import { AdminTracksTable } from "@/components/admin/admin-tracks-table";
 
 export const dynamic = 'force-dynamic';
 
@@ -76,61 +75,7 @@ export default async function AdminTracksPage({
         </button>
       </form>
 
-      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-neutral-50 text-neutral-600">
-              <tr>
-                <th className="text-left font-medium px-4 py-3">Title</th>
-                <th className="text-left font-medium px-4 py-3">Status</th>
-                <th className="text-left font-medium px-4 py-3">Package</th>
-                <th className="text-left font-medium px-4 py-3">Payment</th>
-                <th className="text-left font-medium px-4 py-3">Artist</th>
-                <th className="text-left font-medium px-4 py-3">Created</th>
-                <th className="text-left font-medium px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100">
-              {tracks.map((t) => (
-                <tr key={t.id} className="text-neutral-700">
-                  <td className="px-4 py-3">
-                    <Link className="underline" href={`/admin/tracks/${t.id}`}>
-                      {t.title}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">{t.status}</td>
-                  <td className="px-4 py-3">
-                    {t.promoCode ? (
-                      <span className="inline-flex items-center gap-1">
-                        <span className="px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
-                          PROMO
-                        </span>
-                        <span className="text-neutral-400 text-xs">{t.promoCode}</span>
-                      </span>
-                    ) : (
-                      t.packageType
-                    )}
-                  </td>
-                  <td className="px-4 py-3">{t.payment?.status ?? ""}</td>
-                  <td className="px-4 py-3">
-                    <Link className="underline" href={`/admin/users/${t.artist.user.id}`}>
-                      {t.artist.user.email}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">{new Date(t.createdAt).toLocaleDateString()}</td>
-                  <td className="px-4 py-3">
-                    {t.payment?.status === "COMPLETED" &&
-                    t.status !== "CANCELLED" &&
-                    t.payment.stripePaymentId ? (
-                      <RefundButton trackId={t.id} />
-                    ) : null}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <AdminTracksTable tracks={tracks} />
     </div>
   );
 }
