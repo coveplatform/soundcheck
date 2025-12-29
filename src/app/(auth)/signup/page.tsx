@@ -176,35 +176,43 @@ export default function SignupPage() {
             </div>
           </button>
 
-          <button
-            onClick={() => handleRoleSelect("reviewer")}
-            className="w-full p-4 border-2 border-black bg-white hover:bg-orange-400 transition-colors text-left flex items-start gap-4 group"
+          <div
+            className="w-full p-4 border-2 border-neutral-300 bg-neutral-50 text-left flex items-start gap-4 cursor-not-allowed opacity-60"
           >
-            <div className="p-2 bg-black text-white group-hover:bg-black">
+            <div className="p-2 bg-neutral-400 text-white">
               <Headphones className="h-5 w-5" />
             </div>
-            <div>
-              <h3 className="font-bold">I&apos;m a Reviewer</h3>
-              <p className="text-sm text-neutral-600">
-                Get paid to discover new music and share feedback
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-neutral-500">I&apos;m a Reviewer</h3>
+                <span className="text-xs font-bold bg-neutral-200 text-neutral-500 px-2 py-0.5">
+                  WAITLIST FULL
+                </span>
+              </div>
+              <p className="text-sm text-neutral-400">
+                We&apos;re not accepting new reviewers right now
               </p>
             </div>
-          </button>
+          </div>
 
-          <button
-            onClick={() => handleRoleSelect("both")}
-            className="w-full p-4 border-2 border-black bg-white hover:bg-neutral-100 transition-colors text-left flex items-start gap-4 group"
+          <div
+            className="w-full p-4 border-2 border-neutral-300 bg-neutral-50 text-left flex items-start gap-4 cursor-not-allowed opacity-60"
           >
-            <div className="p-2 bg-black text-white group-hover:bg-black">
+            <div className="p-2 bg-neutral-400 text-white">
               <Users className="h-5 w-5" />
             </div>
-            <div>
-              <h3 className="font-bold">Both</h3>
-              <p className="text-sm text-neutral-600">
-                Submit tracks and review others&apos; music
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-neutral-500">Both</h3>
+                <span className="text-xs font-bold bg-neutral-200 text-neutral-500 px-2 py-0.5">
+                  WAITLIST FULL
+                </span>
+              </div>
+              <p className="text-sm text-neutral-400">
+                Reviewer signups paused — artist signups open
               </p>
             </div>
-          </button>
+          </div>
         </CardContent>
         <CardFooter>
           <p className="text-sm text-neutral-600 text-center w-full">
@@ -245,11 +253,11 @@ export default function SignupPage() {
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="font-bold">Name</Label>
+              <Label htmlFor="name" className="font-bold">First name</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Your name"
+                placeholder="Sarah"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required

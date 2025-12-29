@@ -36,6 +36,7 @@ export default function SubmitTrackPage() {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("");
+  const [artworkUrl, setArtworkUrl] = useState<string | undefined>();
   const [bpm, setBpm] = useState<string>("");
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -148,8 +149,13 @@ export default function SubmitTrackPage() {
     setIsLoadingMetadata(true);
     try {
       const metadata = await fetchTrackMetadata(value);
-      if (metadata && typeof metadata.title === "string" && metadata.title.trim()) {
-        setTitle(metadata.title);
+      if (metadata) {
+        if (typeof metadata.title === "string" && metadata.title.trim()) {
+          setTitle(metadata.title);
+        }
+        if (metadata.artworkUrl) {
+          setArtworkUrl(metadata.artworkUrl);
+        }
       }
     } catch {
       // Silently fail - user can enter title manually
@@ -353,6 +359,7 @@ export default function SubmitTrackPage() {
             ? { duration: uploadedDuration }
             : {}),
           title: title.trim(),
+          ...(artworkUrl ? { artworkUrl } : {}),
           ...(typeof bpmValue === "number" ? { bpm: bpmValue } : {}),
           genreIds: selectedGenres,
           feedbackFocus: feedbackFocus.trim() || undefined,

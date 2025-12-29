@@ -21,10 +21,29 @@ export async function generateMetadata({ params }: { params: Promise<{ shareId: 
     return { title: "Review Not Found | MixReflect" };
   }
 
-  const title = `Review of "${review.track.title}" | MixReflect`;
-  const description = review.bestPart
-    ? `"${review.bestPart.slice(0, 150)}${review.bestPart.length > 150 ? "..." : ""}"`
-    : "Get honest feedback on your music from real listeners.";
+  // Calculate average score for compelling description
+  const scores = [review.productionScore, review.originalityScore, review.vocalScore].filter(
+    (s): s is number => s !== null
+  );
+  const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+  const roundedScore = Math.round(avgScore * 10) / 10;
+
+  const title = `"${review.track.title}" scored ${roundedScore}/5 on MixReflect`;
+
+  // Build a compelling description that front-loads key info
+  const parts: string[] = [];
+  if (review.wouldListenAgain) {
+    parts.push("✓ Would Listen Again");
+  }
+  if (review.bestPart) {
+    const quote = review.bestPart.slice(0, 100);
+    parts.push(`"${quote}${review.bestPart.length > 100 ? "..." : ""}"`);
+  }
+  const description = parts.length > 0
+    ? parts.join(" · ")
+    : "Real listener feedback on MixReflect";
+
+  const url = `https://mixreflect.com/r/${shareId}`;
 
   return {
     title,
@@ -34,6 +53,15 @@ export async function generateMetadata({ params }: { params: Promise<{ shareId: 
       description,
       type: "article",
       siteName: "MixReflect",
+      url,
+      images: [
+        {
+          url: `/r/${shareId}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: `Review of ${review.track.title}`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",

@@ -50,6 +50,18 @@ export function validateTrackUrl(url: string): { valid: boolean; error?: string 
     };
   }
 
+  // Validate Bandcamp URLs are track pages (not album pages)
+  if (source === "BANDCAMP") {
+    const parsed = new URL(url);
+    const path = parsed.pathname.toLowerCase();
+    if (!path.includes("/track/")) {
+      return {
+        valid: false,
+        error: "Please enter a Bandcamp track URL (not an album page)",
+      };
+    }
+  }
+
   return { valid: true };
 }
 
@@ -64,7 +76,23 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
     const parsed = new URL(url);
 
     if (source === "SOUNDCLOUD") {
-      // Extract track name from URL path
+      // Use SoundCloud's oEmbed API to get proper metadata including artwork
+      try {
+        const oembedUrl = `https://soundcloud.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+        const response = await fetch(oembedUrl);
+        if (response.ok) {
+          const data = await response.json();
+          return {
+            title: data.title || "Untitled Track",
+            source,
+            artworkUrl: data.thumbnail_url,
+          };
+        }
+      } catch {
+        // Fall back to URL parsing if oEmbed fails
+      }
+
+      // Fallback: extract title from URL slug
       const parts = parsed.pathname.split("/").filter(Boolean);
       const trackSlug = parts[parts.length - 1] || "";
       const title = trackSlug
@@ -78,7 +106,23 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
     }
 
     if (source === "BANDCAMP") {
-      // Bandcamp URLs: artist.bandcamp.com/track/track-name
+      // Use Bandcamp's oEmbed API to get proper metadata
+      try {
+        const oembedUrl = `https://bandcamp.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+        const response = await fetch(oembedUrl);
+        if (response.ok) {
+          const data = await response.json();
+          return {
+            title: data.title || "Untitled Track",
+            source,
+            artworkUrl: data.thumbnail_url,
+          };
+        }
+      } catch {
+        // Fall back to URL parsing if oEmbed fails
+      }
+
+      // Fallback: extract title from URL slug
       const parts = parsed.pathname.split("/").filter(Boolean);
       const trackSlug = parts[parts.length - 1] || "";
       const title = trackSlug

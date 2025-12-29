@@ -82,6 +82,7 @@ export function AudioPlayer({
   const [waveformPeaks, setWaveformPeaks] = useState<number[] | null>(null);
   const [isWaveformLoading, setIsWaveformLoading] = useState(false);
   const [timestampAdded, setTimestampAdded] = useState(false);
+  const [bandcampEmbedUrl, setBandcampEmbedUrl] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -90,6 +91,7 @@ export function AudioPlayer({
   const scWidgetRef = useRef<SoundCloudWidget | null>(null);
   const ytPlayerRef = useRef<YouTubePlayer | null>(null);
   const ytContainerId = useRef(`yt-player-${Math.random().toString(36).slice(2, 9)}`);
+  const bcIframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // Store callbacks in refs to avoid effect dependency issues
   const onListenProgressRef = useRef(onListenProgress);
@@ -127,8 +129,39 @@ export function AudioPlayer({
     seekToRatio(ratio);
   };
 
-  // For embedded players (SoundCloud, YouTube)
-  const isEmbedded = sourceType === "SOUNDCLOUD" || sourceType === "YOUTUBE";
+  // For embedded players (SoundCloud, YouTube, Bandcamp)
+  const isEmbedded = sourceType === "SOUNDCLOUD" || sourceType === "YOUTUBE" || sourceType === "BANDCAMP";
+
+  // Fetch Bandcamp embed URL via oEmbed
+  useEffect(() => {
+    if (sourceType !== "BANDCAMP") return;
+
+    let cancelled = false;
+
+    const fetchBandcampEmbed = async () => {
+      try {
+        const oembedUrl = `https://bandcamp.com/oembed?url=${encodeURIComponent(sourceUrl)}&format=json`;
+        const response = await fetch(oembedUrl);
+        if (response.ok && !cancelled) {
+          const data = await response.json();
+          // Extract src URL from the HTML string
+          // Format: <iframe ... src="https://bandcamp.com/EmbeddedPlayer/..." ...></iframe>
+          const srcMatch = data.html?.match(/src="([^"]+)"/);
+          if (srcMatch?.[1]) {
+            setBandcampEmbedUrl(srcMatch[1]);
+          }
+        }
+      } catch {
+        // Bandcamp embed fetch failed, will show loading state
+      }
+    };
+
+    void fetchBandcampEmbed();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sourceType, sourceUrl]);
 
   // Get embed URL
   const getEmbedUrl = () => {
@@ -138,6 +171,9 @@ export function AudioPlayer({
     if (sourceType === "YOUTUBE") {
       const videoId = new URL(sourceUrl).searchParams.get("v") || sourceUrl.split("/").pop();
       return `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+    }
+    if (sourceType === "BANDCAMP") {
+      return bandcampEmbedUrl || "";
     }
     return sourceUrl;
   };
@@ -457,7 +493,7 @@ export function AudioPlayer({
               allow="autoplay; encrypted-media"
               className="border-0"
             />
-          ) : (
+          ) : sourceType === "YOUTUBE" ? (
             <iframe
               id={ytContainerId.current}
               src={getEmbedUrl()}
@@ -466,11 +502,64 @@ export function AudioPlayer({
               allow="autoplay; encrypted-media"
               className="border-0"
             />
-          )}
+          ) : sourceType === "BANDCAMP" ? (
+            bandcampEmbedUrl ? (
+              <iframe
+                ref={bcIframeRef}
+                src={bandcampEmbedUrl}
+                width="100%"
+                height={120}
+                allow="autoplay; encrypted-media"
+                className="border-0"
+                style={{ border: 0 }}
+              />
+            ) : (
+              <div className="h-[120px] flex items-center justify-center text-neutral-400">
+                <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                Loading Bandcamp player...
+              </div>
+            )
+          ) : null}
         </div>
 
+        {/* Manual tracking toggle for Bandcamp (no JS API available) */}
+        {sourceType === "BANDCAMP" && showListenTracker && (
+          <div className="bg-white border-2 border-black rounded-xl p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-neutral-600">
+                <span className="font-medium">Tracking listen time</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsPlaying(!isPlaying)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 transition-all",
+                  isPlaying
+                    ? "bg-black text-white border-black"
+                    : "bg-lime-500 text-black border-black hover:bg-lime-400"
+                )}
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="h-4 w-4" />
+                    Pause Tracking
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4" />
+                    Start Tracking
+                  </>
+                )}
+              </button>
+            </div>
+            <p className="text-xs text-neutral-400 mt-2">
+              Press play above, then click &quot;Start Tracking&quot; while you listen
+            </p>
+          </div>
+        )}
+
         {/* Current time and timestamp button for embedded players */}
-        {onAddTimestamp && (
+        {onAddTimestamp && sourceType !== "BANDCAMP" && (
           <div className="bg-white border-2 border-black rounded-xl p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-mono text-neutral-600">

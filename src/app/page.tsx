@@ -155,6 +155,48 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Why Paid Beats Free */}
+      <section className="border-b-2 border-black py-12 bg-neutral-100">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl font-black mb-6 text-center">Why paid reviews beat free feedback</h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="bg-white border-2 border-black p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xl">👋</span>
+                <h3 className="font-bold">Friends</h3>
+              </div>
+              <p className="text-sm text-neutral-600 mb-3">
+                Say &ldquo;sounds good bro&rdquo; because they don&apos;t want to hurt your feelings.
+              </p>
+              <span className="text-xs font-bold text-red-500">NOT USEFUL</span>
+            </div>
+            <div className="bg-white border-2 border-black p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xl">🎲</span>
+                <h3 className="font-bold">Reddit / Discord</h3>
+              </div>
+              <p className="text-sm text-neutral-600 mb-3">
+                Random quality. No accountability. One person&apos;s opinion you can&apos;t trust.
+              </p>
+              <span className="text-xs font-bold text-red-500">HIT OR MISS</span>
+            </div>
+            <div className="bg-white border-2 border-black p-5 ring-2 ring-lime-500">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xl">✓</span>
+                <h3 className="font-bold">MixReflect</h3>
+              </div>
+              <p className="text-sm text-neutral-600 mb-3">
+                You pay. You rate reviewers. Bad ratings = they earn less. They work for <em>you</em>.
+              </p>
+              <span className="text-xs font-bold text-lime-600">ACCOUNTABILITY</span>
+            </div>
+          </div>
+          <p className="text-center text-sm text-neutral-500 mt-6">
+            The money flows from artist → reviewer. That&apos;s why they give you the truth, not validation.
+          </p>
+        </div>
+      </section>
+
       {/* Example Review */}
       <section className="border-b-2 border-black py-16 bg-lime-50">
         <div className="max-w-6xl mx-auto px-4">
@@ -313,9 +355,9 @@ export default async function Home() {
               <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-4">
                 <Star className="h-6 w-6 text-black" />
               </div>
-              <h3 className="font-bold text-lg mb-2">Quality you can trust</h3>
+              <h3 className="font-bold text-lg mb-2">Reviewers work for you</h3>
               <p className="text-sm text-neutral-600">
-                Every reviewer passes a quiz. Must listen 3+ minutes. You rate every review—bad ones get filtered out.
+                You rate every review. Low ratings = they earn less. That&apos;s why they give you real feedback, not empty praise.
               </p>
             </div>
 
@@ -376,8 +418,12 @@ export default async function Home() {
       <section className="border-b-2 border-black py-16 bg-neutral-50">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-black mb-2">More Reviews = More Confidence</h2>
-          <p className="text-neutral-600 mb-10">
+          <p className="text-neutral-600 mb-4">
             One review is a random opinion. Five start showing patterns. Ten give you the full picture.
+          </p>
+          <p className="text-sm text-neutral-500 mb-10 flex items-center justify-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            <span>You pay → reviewers earn. They&apos;re rated by you, so quality is enforced.</span>
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -477,6 +523,10 @@ export default async function Home() {
                 a: "Real people who passed a 10-question onboarding quiz. They're matched by genre and ranked by artist ratings. Top-rated reviewers get more assignments and earn more.",
               },
               {
+                q: "If reviewers are paid, won't they just say nice things?",
+                a: "The opposite. You rate every review. Low ratings = reviewers lose PRO status and earn less ($0.50 vs $1.50/review). The incentive is honest, useful feedback—not empty praise. Plus, with 5-10 reviews, one fake positive can't hide when everyone else disagrees.",
+              },
+              {
                 q: "Is my music private?",
                 a: "Yes. Only assigned reviewers hear your track. We don't share or publish anything.",
               },
@@ -523,7 +573,7 @@ export default async function Home() {
                 <h2 className="text-2xl font-black">Want to get paid for reviewing?</h2>
               </div>
               <p className="text-neutral-600">
-                Earn $0.50–$1.50 per review. Listen to new music, share honest feedback, get paid.
+                Earn $0.50–$1.50 per review. Artists rate your feedback—high ratings unlock PRO tier (3x pay).
               </p>
             </div>
             <Link href="/signup" className="shrink-0">
