@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
-import { ThumbsUp, ThumbsDown, ListMusic, Share2, UserPlus } from "lucide-react";
+import { ThumbsUp, ThumbsDown, ListMusic, Share2, UserPlus, Link2, Check } from "lucide-react";
 import { ReviewRating } from "@/components/artist/review-rating";
 import { ReviewFlag } from "@/components/artist/review-flag";
 import { ReviewGem } from "@/components/artist/review-gem";
@@ -29,6 +30,7 @@ function getInitials(name: string) {
 
 export type ReviewData = {
   id: string;
+  shareId: string | null;
   createdAt: Date;
   firstImpression: string | null;
   productionScore: number | null;
@@ -69,6 +71,16 @@ export function ReviewDisplay({
   index,
   showControls = true,
 }: ReviewDisplayProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    if (!review.shareId) return;
+    const url = `${window.location.origin}/r/${review.shareId}`;
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <article className="p-6">
       {/* Header: Number + Actions */}
@@ -135,6 +147,25 @@ export function ReviewDisplay({
         {/* Action toolbar */}
         {showControls && (
           <div className="flex items-center gap-3">
+            {review.shareId && (
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 border-black bg-white hover:bg-neutral-100 transition-colors"
+                title="Copy share link"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-lime-600" />
+                    <span className="text-lime-600">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Link2 className="h-3.5 w-3.5" />
+                    <span>Share</span>
+                  </>
+                )}
+              </button>
+            )}
             <ReviewRating
               reviewId={review.id}
               initialRating={review.artistRating ?? null}

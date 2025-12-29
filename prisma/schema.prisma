@@ -318,6 +318,9 @@ model Review {
   wasFlagged   Boolean  @default(false)
   flagReason   String?
 
+  // Sharing
+  shareId String? @unique // Short unique ID for public sharing
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

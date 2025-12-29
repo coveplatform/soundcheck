@@ -5,8 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { updateReviewerTier, getTierRateCents, updateReviewerAverageRating } from "@/lib/queue";
 import { sendReviewProgressEmail } from "@/lib/email";
+import { randomBytes } from "crypto";
 
 const MIN_LISTEN_SECONDS = 180;
+
+// Generate a short, URL-safe share ID (8 characters)
+function generateShareId(): string {
+  return randomBytes(6).toString("base64url").slice(0, 8);
+}
 const MIN_WORDS_PER_SECTION = 30;
 
 function extractWords(text: string): string[] {
@@ -297,6 +303,7 @@ export async function POST(request: Request) {
           nextActions: data.nextActions,
           timestamps: data.timestamps,
           paidAmount: earnings,
+          shareId: generateShareId(),
         },
       });
 
