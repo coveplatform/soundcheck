@@ -92,9 +92,23 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
     }
 
     if (source === "YOUTUBE") {
-      // YouTube: extract video ID and use as placeholder
-      const videoId = parsed.searchParams.get("v") || parsed.pathname.slice(1);
+      // Use YouTube's oEmbed API to get the actual video title
+      try {
+        const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+        const response = await fetch(oembedUrl);
+        if (response.ok) {
+          const data = await response.json();
+          return {
+            title: data.title || "Untitled Video",
+            source,
+            artworkUrl: data.thumbnail_url,
+          };
+        }
+      } catch {
+        // Fall back to video ID if oEmbed fails
+      }
 
+      const videoId = parsed.searchParams.get("v") || parsed.pathname.slice(1);
       return {
         title: `YouTube Video (${videoId})`,
         source,
