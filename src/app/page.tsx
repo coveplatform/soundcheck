@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { Button } from "@/components/ui/button";
-import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Users, Target, Clock, ListMusic, Share2, UserPlus, ThumbsUp } from "lucide-react";
+import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Users, Target, Clock, ListMusic, Share2, UserPlus, ThumbsUp, MessageCircle } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { authOptions } from "@/lib/auth";
 import { Logo } from "@/components/ui/logo";
@@ -156,43 +156,63 @@ export default async function Home() {
       </section>
 
       {/* Why Paid Beats Free */}
-      <section className="border-b-2 border-black py-12 bg-neutral-100">
+      <section className="border-b-2 border-black py-16">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-black mb-6 text-center">Why paid reviews beat free feedback</h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-white border-2 border-black p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">👋</span>
-                <h3 className="font-bold">Friends</h3>
+          <h2 className="text-3xl font-black mb-2">Why paid beats free</h2>
+          <p className="text-neutral-600 mb-8">Not all feedback is created equal.</p>
+
+          <div className="space-y-4">
+            {/* Friends - Bad */}
+            <div className="flex gap-4 p-5 bg-neutral-100 border-2 border-neutral-300 opacity-75">
+              <div className="flex-shrink-0 w-14 h-14 bg-neutral-300 border-2 border-neutral-400 flex items-center justify-center">
+                <Users className="h-6 w-6 text-neutral-500" />
               </div>
-              <p className="text-sm text-neutral-600 mb-3">
-                Say &ldquo;sounds good bro&rdquo; because they don&apos;t want to hurt your feelings.
-              </p>
-              <span className="text-xs font-bold text-red-500">NOT USEFUL</span>
+              <div className="flex flex-col justify-center flex-1">
+                <div className="flex items-center gap-3">
+                  <p className="font-bold text-lg text-neutral-500">Friends</p>
+                  <span className="text-xs font-bold bg-neutral-200 text-neutral-500 px-2 py-0.5">NOT USEFUL</span>
+                </div>
+                <p className="text-neutral-400">
+                  &ldquo;Sounds good bro&rdquo; — they don&apos;t want to hurt your feelings
+                </p>
+              </div>
             </div>
-            <div className="bg-white border-2 border-black p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">🎲</span>
-                <h3 className="font-bold">Reddit / Discord</h3>
+
+            {/* Reddit - Bad */}
+            <div className="flex gap-4 p-5 bg-neutral-100 border-2 border-neutral-300 opacity-75">
+              <div className="flex-shrink-0 w-14 h-14 bg-neutral-300 border-2 border-neutral-400 flex items-center justify-center">
+                <MessageCircle className="h-6 w-6 text-neutral-500" />
               </div>
-              <p className="text-sm text-neutral-600 mb-3">
-                Random quality. No accountability. One person&apos;s opinion you can&apos;t trust.
-              </p>
-              <span className="text-xs font-bold text-red-500">HIT OR MISS</span>
+              <div className="flex flex-col justify-center flex-1">
+                <div className="flex items-center gap-3">
+                  <p className="font-bold text-lg text-neutral-500">Reddit / Discord</p>
+                  <span className="text-xs font-bold bg-neutral-200 text-neutral-500 px-2 py-0.5">HIT OR MISS</span>
+                </div>
+                <p className="text-neutral-400">
+                  Random quality, no accountability — one stranger&apos;s opinion
+                </p>
+              </div>
             </div>
-            <div className="bg-white border-2 border-black p-5 ring-2 ring-lime-500">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">✓</span>
-                <h3 className="font-bold">MixReflect</h3>
+
+            {/* MixReflect - Good */}
+            <div className="flex gap-4 p-5 bg-lime-50 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="flex-shrink-0 w-14 h-14 bg-lime-500 border-2 border-black flex items-center justify-center">
+                <Shield className="h-6 w-6 text-black" />
               </div>
-              <p className="text-sm text-neutral-600 mb-3">
-                You pay. You rate reviewers. Bad ratings = they earn less. They work for <em>you</em>.
-              </p>
-              <span className="text-xs font-bold text-lime-600">ACCOUNTABILITY</span>
+              <div className="flex flex-col justify-center flex-1">
+                <div className="flex items-center gap-3">
+                  <p className="font-bold text-lg">MixReflect</p>
+                  <span className="text-xs font-bold bg-lime-500 text-black px-2 py-0.5 border border-black">ACCOUNTABILITY</span>
+                </div>
+                <p className="text-neutral-600">
+                  You pay → reviewers earn. You rate them → bad ratings = they earn less. <strong>They work for you.</strong>
+                </p>
+              </div>
             </div>
           </div>
-          <p className="text-center text-sm text-neutral-500 mt-6">
-            The money flows from artist → reviewer. That&apos;s why they give you the truth, not validation.
+
+          <p className="mt-8 text-sm text-neutral-500 text-center">
+            When reviewers are paid by you and rated by you, they give you the truth — not validation.
           </p>
         </div>
       </section>
