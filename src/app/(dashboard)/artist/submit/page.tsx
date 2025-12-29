@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Music, ExternalLink, Check, Loader2, X, AlertCircle } from "lucide-react";
+import { Music, ExternalLink, Check, Loader2, X, AlertCircle, Upload } from "lucide-react";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, ACTIVE_PACKAGE_TYPES, PACKAGES, PackageType } from "@/lib/metadata";
@@ -30,8 +30,11 @@ export default function SubmitTrackPage() {
   const [inputMode, setInputMode] = useState<"url" | "upload">("url");
   const [url, setUrl] = useState("");
   const [uploadedUrl, setUploadedUrl] = useState<string>("");
+  const [uploadedFileName, setUploadedFileName] = useState<string>("");
   const [uploadedDuration, setUploadedDuration] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("");
   const [bpm, setBpm] = useState<string>("");
   const [feedbackFocus, setFeedbackFocus] = useState("");
@@ -160,6 +163,7 @@ export default function SubmitTrackPage() {
     setUrlError("");
     setIsUploading(true);
     setUploadedDuration(null);
+    setUploadedFileName(file.name);
 
     try {
       let finalUrl = "";
@@ -415,6 +419,7 @@ export default function SubmitTrackPage() {
               onClick={() => {
                 setInputMode("url");
                 setUploadedUrl("");
+                setUploadedFileName("");
               }}
               className={cn(
                 "flex-1 sm:flex-none px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
@@ -457,8 +462,8 @@ export default function SubmitTrackPage() {
               </>
             ) : (
               <>
-                <Input
-                  key="track-upload"
+                <input
+                  ref={fileInputRef}
                   type="file"
                   accept="audio/mpeg,audio/mp3,.mp3"
                   onChange={(e) => {
@@ -467,10 +472,55 @@ export default function SubmitTrackPage() {
                       void handleUpload(file);
                     }
                   }}
+                  className="hidden"
                 />
-                <p className="text-xs text-neutral-600 font-mono">
-                  MP3 only (max 25MB)
-                </p>
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    const file = e.dataTransfer.files?.[0];
+                    if (file && (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))) {
+                      void handleUpload(file);
+                    } else {
+                      setError("Please upload an MP3 file");
+                    }
+                  }}
+                  className={cn(
+                    "border-2 border-dashed border-neutral-300 p-6 text-center cursor-pointer transition-colors",
+                    isDragging && "border-lime-500 bg-lime-50",
+                    !isDragging && "hover:border-black hover:bg-neutral-50",
+                    uploadedFileName && !isUploading && "border-lime-500 bg-lime-50"
+                  )}
+                >
+                  {isUploading ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
+                      <p className="text-sm font-medium text-neutral-600">Uploading...</p>
+                    </div>
+                  ) : uploadedFileName ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="h-10 w-10 rounded-full bg-lime-500 flex items-center justify-center">
+                        <Check className="h-5 w-5 text-white" />
+                      </div>
+                      <p className="text-sm font-bold text-black">{uploadedFileName}</p>
+                      <p className="text-xs text-neutral-500">Click or drag to replace</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="h-10 w-10 rounded-full bg-neutral-100 flex items-center justify-center">
+                        <Upload className="h-5 w-5 text-neutral-500" />
+                      </div>
+                      <p className="text-sm font-bold text-black">Click to upload or drag and drop</p>
+                      <p className="text-xs text-neutral-500">MP3 only (max 25MB)</p>
+                    </div>
+                  )}
+                </div>
               </>
             )}
           </div>
@@ -516,13 +566,6 @@ export default function SubmitTrackPage() {
               </div>
             </div>
           )}
-
-          {inputMode === "upload" && isUploading ? (
-            <div className="flex items-center gap-2 text-sm text-neutral-600 font-medium">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Uploading your track...
-            </div>
-          ) : null}
 
           {inputMode === "upload" && uploadedUrl ? (
             <AudioPlayer
