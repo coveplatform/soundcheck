@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsUp, ThumbsDown, ListMusic, Share2, UserPlus } from "lucide-react";
 import { ReviewRating } from "@/components/artist/review-rating";
 import { ReviewFlag } from "@/components/artist/review-flag";
 import { ReviewGem } from "@/components/artist/review-gem";
@@ -35,6 +35,9 @@ export type ReviewData = {
   vocalScore: number | null;
   originalityScore: number | null;
   wouldListenAgain: boolean | null;
+  wouldAddToPlaylist: boolean | null;
+  wouldShare: boolean | null;
+  wouldFollow: boolean | null;
   addressedArtistNote: string | null;
   bestPart: string | null;
   weakestPart: string | null;
@@ -177,6 +180,42 @@ export function ReviewDisplay({
           </span>
         )}
       </div>
+
+      {/* Listener Signals */}
+      {(review.wouldAddToPlaylist !== null || review.wouldShare !== null || review.wouldFollow !== null) && (
+        <div className="flex flex-wrap items-center gap-2 mb-5">
+          {review.wouldAddToPlaylist !== null && (
+            <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 ${
+              review.wouldAddToPlaylist
+                ? "bg-lime-50 border-lime-500 text-lime-700"
+                : "bg-neutral-50 border-neutral-300 text-neutral-500"
+            }`}>
+              <ListMusic className="h-3 w-3" />
+              {review.wouldAddToPlaylist ? "Would playlist" : "No playlist"}
+            </span>
+          )}
+          {review.wouldShare !== null && (
+            <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 ${
+              review.wouldShare
+                ? "bg-lime-50 border-lime-500 text-lime-700"
+                : "bg-neutral-50 border-neutral-300 text-neutral-500"
+            }`}>
+              <Share2 className="h-3 w-3" />
+              {review.wouldShare ? "Would share" : "No share"}
+            </span>
+          )}
+          {review.wouldFollow !== null && (
+            <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 ${
+              review.wouldFollow
+                ? "bg-lime-50 border-lime-500 text-lime-700"
+                : "bg-neutral-50 border-neutral-300 text-neutral-500"
+            }`}>
+              <UserPlus className="h-3 w-3" />
+              {review.wouldFollow ? "Would follow" : "No follow"}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Main Feedback - The star of the show */}
       <div className="space-y-4 mb-5">

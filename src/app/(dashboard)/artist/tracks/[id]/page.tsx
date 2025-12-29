@@ -15,6 +15,9 @@ import {
   ExternalLink,
   Star,
   ThumbsUp,
+  ListMusic,
+  Share2,
+  UserPlus,
 } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
@@ -76,6 +79,15 @@ export default async function TrackDetailPage({
   const wouldListenAgainPercent = Math.round(
     (wouldListenAgain / (completedReviews || 1)) * 100
   );
+
+  // Listener signals
+  const playlistYes = track.reviews.filter((r) => r.wouldAddToPlaylist === true).length;
+  const playlistTotal = track.reviews.filter((r) => r.wouldAddToPlaylist !== null).length;
+  const shareYes = track.reviews.filter((r) => r.wouldShare === true).length;
+  const shareTotal = track.reviews.filter((r) => r.wouldShare !== null).length;
+  const followYes = track.reviews.filter((r) => r.wouldFollow === true).length;
+  const followTotal = track.reviews.filter((r) => r.wouldFollow !== null).length;
+  const hasListenerSignals = playlistTotal > 0 || shareTotal > 0 || followTotal > 0;
 
   return (
     <div className="space-y-6">
@@ -232,6 +244,84 @@ export default async function TrackDetailPage({
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Listener Signals */}
+      {completedReviews > 0 && hasListenerSignals && (
+        <Card>
+          <CardHeader className="border-b-2 border-black">
+            <CardTitle className="flex items-center gap-2">
+              Listener Signals
+              <span className="text-xs font-normal text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded">
+                How listeners would engage
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid sm:grid-cols-3 gap-6">
+              {playlistTotal > 0 && (
+                <div className="text-center">
+                  <div className="flex justify-center mb-2">
+                    <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                      playlistYes / playlistTotal >= 0.5
+                        ? "bg-lime-100 text-lime-700"
+                        : "bg-neutral-100 text-neutral-500"
+                    }`}>
+                      <ListMusic className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-black">
+                    {Math.round((playlistYes / playlistTotal) * 100)}%
+                  </p>
+                  <p className="text-sm text-neutral-600">Would add to playlist</p>
+                  <p className="text-xs text-neutral-400 font-mono mt-1">
+                    {playlistYes} of {playlistTotal}
+                  </p>
+                </div>
+              )}
+              {shareTotal > 0 && (
+                <div className="text-center">
+                  <div className="flex justify-center mb-2">
+                    <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                      shareYes / shareTotal >= 0.5
+                        ? "bg-lime-100 text-lime-700"
+                        : "bg-neutral-100 text-neutral-500"
+                    }`}>
+                      <Share2 className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-black">
+                    {Math.round((shareYes / shareTotal) * 100)}%
+                  </p>
+                  <p className="text-sm text-neutral-600">Would share with friends</p>
+                  <p className="text-xs text-neutral-400 font-mono mt-1">
+                    {shareYes} of {shareTotal}
+                  </p>
+                </div>
+              )}
+              {followTotal > 0 && (
+                <div className="text-center">
+                  <div className="flex justify-center mb-2">
+                    <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                      followYes / followTotal >= 0.5
+                        ? "bg-lime-100 text-lime-700"
+                        : "bg-neutral-100 text-neutral-500"
+                    }`}>
+                      <UserPlus className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-black">
+                    {Math.round((followYes / followTotal) * 100)}%
+                  </p>
+                  <p className="text-sm text-neutral-600">Would follow artist</p>
+                  <p className="text-xs text-neutral-400 font-mono mt-1">
+                    {followYes} of {followTotal}
+                  </p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {completedReviews > 0 && <AggregateAnalytics reviews={track.reviews} />}

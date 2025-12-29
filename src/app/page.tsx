@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { Button } from "@/components/ui/button";
-import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Users, Target, Clock } from "lucide-react";
+import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Users, Target, Clock, ListMusic, Share2, UserPlus, ThumbsUp } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { authOptions } from "@/lib/auth";
 import { Logo } from "@/components/ui/logo";
@@ -57,12 +57,12 @@ export default async function Home() {
       <section className="border-b-2 border-black">
         <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-28">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight text-black max-w-4xl leading-[1.1]">
-            Get honest feedback on your music.
+            Your music deserves real listeners.
           </h1>
           <p className="mt-6 text-xl text-neutral-600 max-w-xl leading-relaxed">
-            Submit your unreleased tracks and get structured reviews from a curated listener
-            panel matched to your genre. Or become a reviewer—listen to new music and get paid
-            for your honest feedback.
+            Get your tracks heard by a curated listening panel who actually engage—not bots,
+            not algorithms, real people matched to your genre. Find out if your music is
+            release-ready, playlist-worthy, and share-worthy.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/signup">
@@ -165,7 +165,7 @@ export default async function Home() {
             <h2 className="text-3xl font-black">See What You Get</h2>
           </div>
           <p className="text-neutral-600 mb-10">
-            Every review includes structured ratings and detailed written feedback.
+            Real listener engagement signals, structured ratings, and actionable feedback—proof your music was actually heard.
           </p>
 
           <div className="border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
@@ -214,6 +214,25 @@ export default async function Home() {
               <div className="p-4 text-center">
                 <p className="text-xs text-neutral-500 mb-1">Listen Again?</p>
                 <p className="font-bold text-lime-600">Yes</p>
+              </div>
+            </div>
+
+            {/* Listener Signals */}
+            <div className="border-b-2 border-black bg-neutral-50 p-4">
+              <p className="text-xs text-neutral-500 mb-3 font-medium">Listener Signals</p>
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-lime-100 border-2 border-lime-500 text-lime-700">
+                  <ListMusic className="h-3.5 w-3.5" />
+                  Would add to playlist
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-lime-100 border-2 border-lime-500 text-lime-700">
+                  <Share2 className="h-3.5 w-3.5" />
+                  Would share
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-neutral-100 border-2 border-neutral-300 text-neutral-500">
+                  <UserPlus className="h-3.5 w-3.5" />
+                  Wouldn&apos;t follow yet
+                </span>
               </div>
             </div>
 
@@ -423,10 +442,10 @@ export default async function Home() {
       <section className="bg-black text-white py-20 border-b-2 border-black">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-black mb-6">
-            Stop guessing.<br />Get real feedback.
+            Stop wondering.<br />Get your music heard.
           </h2>
           <p className="text-neutral-400 mb-10 text-lg">
-            Your next release deserves honest ears.
+            Find out if your track is playlist-worthy before you release it.
           </p>
           <Link href="/signup">
             <Button

@@ -100,6 +100,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [vocalScore, setVocalScore] = useState<number>(0);
   const [originalityScore, setOriginalityScore] = useState<number>(0);
   const [wouldListenAgain, setWouldListenAgain] = useState<boolean | null>(null);
+  const [wouldAddToPlaylist, setWouldAddToPlaylist] = useState<boolean | null>(null);
+  const [wouldShare, setWouldShare] = useState<boolean | null>(null);
+  const [wouldFollow, setWouldFollow] = useState<boolean | null>(null);
   const [perceivedGenre, setPerceivedGenre] = useState("");
   const [similarArtists, setSimilarArtists] = useState("");
   const [bestPart, setBestPart] = useState("");
@@ -201,6 +204,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     vocalScore > 0 ||
     originalityScore > 0 ||
     wouldListenAgain !== null ||
+    wouldAddToPlaylist !== null ||
+    wouldShare !== null ||
+    wouldFollow !== null ||
     perceivedGenre.trim().length > 0 ||
     similarArtists.trim().length > 0 ||
     bestPart.trim().length > 0 ||
@@ -254,6 +260,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           setWouldListenAgain(
             typeof parsed.wouldListenAgain === "boolean" ? parsed.wouldListenAgain : null
           );
+          setWouldAddToPlaylist(
+            typeof parsed.wouldAddToPlaylist === "boolean" ? parsed.wouldAddToPlaylist : null
+          );
+          setWouldShare(
+            typeof parsed.wouldShare === "boolean" ? parsed.wouldShare : null
+          );
+          setWouldFollow(
+            typeof parsed.wouldFollow === "boolean" ? parsed.wouldFollow : null
+          );
           setPerceivedGenre(typeof parsed.perceivedGenre === "string" ? parsed.perceivedGenre : "");
           setSimilarArtists(typeof parsed.similarArtists === "string" ? parsed.similarArtists : "");
           setBestPart(typeof parsed.bestPart === "string" ? parsed.bestPart : "");
@@ -298,6 +313,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         vocalScore,
         originalityScore,
         wouldListenAgain,
+        wouldAddToPlaylist,
+        wouldShare,
+        wouldFollow,
         perceivedGenre,
         similarArtists,
         bestPart,
@@ -326,6 +344,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     vocalScore,
     originalityScore,
     wouldListenAgain,
+    wouldAddToPlaylist,
+    wouldShare,
+    wouldFollow,
     perceivedGenre,
     similarArtists,
     bestPart,
@@ -388,6 +409,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           vocalScore: vocalScore || null,
           originalityScore,
           wouldListenAgain,
+          wouldAddToPlaylist,
+          wouldShare,
+          wouldFollow,
           perceivedGenre: perceivedGenre || undefined,
           similarArtists: similarArtists || undefined,
           bestPart,
@@ -983,6 +1007,107 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               >
                 No
               </button>
+            </div>
+          </div>
+
+          {/* Listener Signals */}
+          <div className="space-y-4 p-4 bg-neutral-50 border-2 border-black">
+            <Label className="text-base font-bold">Quick Listener Signals</Label>
+            <p className="text-xs text-neutral-600 -mt-2">Help the artist understand how listeners might engage with this track</p>
+
+            <div className="grid sm:grid-cols-3 gap-3">
+              {/* Would add to playlist */}
+              <div className="space-y-2">
+                <Label className="text-sm">Add to playlist?</Label>
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setWouldAddToPlaylist(true)}
+                    className={cn(
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      wouldAddToPlaylist === true
+                        ? "bg-lime-500 text-black"
+                        : "bg-white text-black hover:bg-neutral-100"
+                    )}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWouldAddToPlaylist(false)}
+                    className={cn(
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      wouldAddToPlaylist === false
+                        ? "bg-neutral-800 text-white"
+                        : "bg-white text-black hover:bg-neutral-100"
+                    )}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+
+              {/* Would share */}
+              <div className="space-y-2">
+                <Label className="text-sm">Share with a friend?</Label>
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setWouldShare(true)}
+                    className={cn(
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      wouldShare === true
+                        ? "bg-lime-500 text-black"
+                        : "bg-white text-black hover:bg-neutral-100"
+                    )}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWouldShare(false)}
+                    className={cn(
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      wouldShare === false
+                        ? "bg-neutral-800 text-white"
+                        : "bg-white text-black hover:bg-neutral-100"
+                    )}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+
+              {/* Would follow */}
+              <div className="space-y-2">
+                <Label className="text-sm">Follow this artist?</Label>
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setWouldFollow(true)}
+                    className={cn(
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      wouldFollow === true
+                        ? "bg-lime-500 text-black"
+                        : "bg-white text-black hover:bg-neutral-100"
+                    )}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWouldFollow(false)}
+                    className={cn(
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      wouldFollow === false
+                        ? "bg-neutral-800 text-white"
+                        : "bg-white text-black hover:bg-neutral-100"
+                    )}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
