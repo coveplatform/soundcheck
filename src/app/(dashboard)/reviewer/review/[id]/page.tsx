@@ -1011,9 +1011,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Listener Signals */}
-          <div className="space-y-4 p-4 bg-neutral-50 border-2 border-black">
-            <Label className="text-base font-bold">Quick Listener Signals</Label>
-            <p className="text-xs text-neutral-600 -mt-2">Help the artist understand how listeners might engage with this track</p>
+          <div className="space-y-4 p-4 bg-neutral-50 border-2 border-black mt-4">
+            <div>
+              <Label className="text-base font-bold">Quick Listener Signals</Label>
+              <p className="text-xs text-neutral-600 mt-1">Help the artist understand how listeners might engage with this track</p>
+            </div>
 
             <div className="grid sm:grid-cols-3 gap-3">
               {/* Would add to playlist */}
