@@ -1,23 +1,11 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
 import { Button } from "@/components/ui/button";
 import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Target, Clock, ListMusic, Share2, UserPlus, ThumbsUp, Quote, CheckCircle2 } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
-import { authOptions } from "@/lib/auth";
 import { Logo } from "@/components/ui/logo";
+import { AuthButtons } from "@/components/ui/auth-buttons";
 
-export default async function Home() {
-  const session = await getServerSession(authOptions);
-  const user = session?.user as
-    | { isArtist?: boolean; isReviewer?: boolean }
-    | undefined;
-
-  const dashboardHref = user?.isArtist
-    ? "/artist/dashboard"
-    : user?.isReviewer
-      ? "/reviewer/dashboard"
-      : "/login";
-
+export default function Home() {
   const pricing = ACTIVE_PACKAGE_TYPES.map((key) => ({ key, ...PACKAGES[key] }));
 
   return (
@@ -30,24 +18,7 @@ export default async function Home() {
               <Logo />
             </Link>
             <div className="flex items-center gap-3">
-              {session ? (
-                <Link href={dashboardHref}>
-                  <Button className="bg-black text-white hover:bg-neutral-800 font-medium">
-                    Dashboard
-                  </Button>
-                </Link>
-              ) : (
-                <>
-                  <Link href="/login">
-                    <Button variant="ghost" className="font-medium">Sign in</Button>
-                  </Link>
-                  <Link href="/signup">
-                    <Button className="bg-black text-white hover:bg-neutral-800 font-medium">
-                      Get Started
-                    </Button>
-                  </Link>
-                </>
-              )}
+              <AuthButtons />
             </div>
           </div>
         </div>
@@ -113,8 +84,8 @@ export default async function Home() {
               You ask your friends. They say <span className="font-bold text-black">&ldquo;yeah it&apos;s really good!&rdquo;</span> They always say that.
             </p>
             <p>
-              You post on Reddit. One guy says he loves it. Another says the mix is trash.
-              A third just promotes his own track. You&apos;re back to square one.
+              You post on Reddit. One person says they love it. Another says the mix is trash.
+              A third just promotes their own track. You&apos;re back to square one.
             </p>
             <p className="font-bold text-black text-xl pt-4 pl-4 border-l-4 border-lime-500">
               You just want to know: is this ready to release or not?
@@ -168,29 +139,25 @@ export default async function Home() {
       </section>
 
       {/* Who This Is For */}
-      <section className="border-b-2 border-black py-16 bg-lime-50">
+      <section className="border-b-2 border-black py-16">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-black mb-6">This is for you if...</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3 p-4 bg-white border-2 border-black">
-              <CheckCircle2 className="h-6 w-6 text-lime-600 flex-shrink-0 mt-0.5" />
-              <p className="text-neutral-700">You have a track you&apos;re 80% confident in—but not 100%</p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 pl-4 border-l-4 border-lime-500">
+              <p className="text-lg text-neutral-700">You have a track you&apos;re 80% confident in—but not 100%</p>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-white border-2 border-black">
-              <CheckCircle2 className="h-6 w-6 text-lime-600 flex-shrink-0 mt-0.5" />
-              <p className="text-neutral-700">You&apos;re tired of friends who won&apos;t tell you the truth</p>
+            <div className="flex items-center gap-3 pl-4 border-l-4 border-lime-500">
+              <p className="text-lg text-neutral-700">You&apos;re tired of friends who say <span className="font-bold text-black">&ldquo;yeah it&apos;s great!&rdquo;</span></p>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-white border-2 border-black">
-              <CheckCircle2 className="h-6 w-6 text-lime-600 flex-shrink-0 mt-0.5" />
-              <p className="text-neutral-700">You want real answers before you release, not after</p>
+            <div className="flex items-center gap-3 pl-4 border-l-4 border-lime-500">
+              <p className="text-lg text-neutral-700">You want real answers before you release, not after</p>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-white border-2 border-black">
-              <CheckCircle2 className="h-6 w-6 text-lime-600 flex-shrink-0 mt-0.5" />
-              <p className="text-neutral-700">You value your time more than hunting for feedback on Reddit</p>
+            <div className="flex items-center gap-3 pl-4 border-l-4 border-lime-500">
+              <p className="text-lg text-neutral-700">You value your time more than hunting for feedback on Reddit</p>
             </div>
           </div>
-          <p className="mt-6 text-sm text-neutral-500">
-            Reviewers are music lovers who want you to succeed—not critics trying to tear you down.
+          <p className="mt-8 text-neutral-500 pl-4 border-l-4 border-neutral-200">
+            Our reviewers are music lovers who want you to succeed—not critics trying to tear you down.
             Honest, but on your side.
           </p>
         </div>

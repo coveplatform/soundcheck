@@ -86,6 +86,24 @@ export const metadata: Metadata = {
   },
 };
 
+// JSON-LD structured data for Google
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "MixReflect",
+  url: "https://mixreflect.com",
+  logo: "https://mixreflect.com/logo.png",
+  description: "A private feedback marketplace where artists get structured reviews from genre-matched listeners before release.",
+  sameAs: [
+    "https://twitter.com/mixreflect",
+  ],
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    url: "https://mixreflect.com/support",
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -93,6 +111,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

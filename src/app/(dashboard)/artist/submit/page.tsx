@@ -399,9 +399,9 @@ export default function SubmitTrackPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-black">Submit a Track</h1>
+        <h1 className="text-2xl font-black">Test Your Track</h1>
         <p className="text-neutral-600 mt-1">
-          Get structured feedback from a curated, genre-matched listener panel. Rate reviews (and mark Gems) to keep the panel high-signal.
+          Find out if it&apos;s ready before you release. Get honest feedback from real listeners who love your genre.
         </p>
       </div>
 
@@ -414,9 +414,9 @@ export default function SubmitTrackPage() {
       {/* Track URL */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Track</CardTitle>
+          <CardTitle className="text-lg">Your Track</CardTitle>
           <CardDescription>
-            Submit via URL or upload an MP3
+            Paste a link from SoundCloud, Bandcamp, or YouTube—or upload an MP3 directly
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -435,7 +435,7 @@ export default function SubmitTrackPage() {
                   : "bg-white text-black hover:bg-neutral-100"
               )}
             >
-              Link
+              Paste Link
             </button>
             <button
               type="button"
@@ -460,7 +460,7 @@ export default function SubmitTrackPage() {
               <>
                 <Input
                   key="track-url"
-                  placeholder="https://soundcloud.com/artist/track"
+                  placeholder="SoundCloud, Bandcamp, or YouTube link"
                   value={url}
                   onChange={(e) => handleUrlChange(e.target.value)}
                   className={cn(urlError && "border-red-500")}
@@ -595,9 +595,9 @@ export default function SubmitTrackPage() {
       {/* Genre Selection */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Genres</CardTitle>
+          <CardTitle className="text-lg">Genre</CardTitle>
           <CardDescription>
-            Help us match your track with the right reviewers
+            We&apos;ll match you with listeners who actually love this style
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -614,9 +614,9 @@ export default function SubmitTrackPage() {
       {/* Feedback Focus (Optional) */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Explain Your Track (Optional)</CardTitle>
+          <CardTitle className="text-lg">Context for Reviewers (Optional)</CardTitle>
           <CardDescription>
-            Describe the context in your own words (vibe, inspiration, what you were going for, anything you want them to know).
+            What were you going for? Any areas you want specific feedback on?
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -636,9 +636,9 @@ export default function SubmitTrackPage() {
       {/* Package Selection */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Choose Your Package</CardTitle>
+          <CardTitle className="text-lg">Choose Your Certainty Level</CardTitle>
           <CardDescription>
-            Select how many structured reviews you'd like (higher tiers prioritize top-rated reviewers)
+            More reviews = clearer patterns = more confidence
           </CardDescription>
         </CardHeader>
         <CardContent>

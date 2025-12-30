@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminLoading() {
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-150">
       {/* Header skeleton */}
       <div className="flex items-center justify-between gap-4">
         <Skeleton className="h-8 w-48" />

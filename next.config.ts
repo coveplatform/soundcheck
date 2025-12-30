@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     turbopackFileSystemCacheForDev: false,
+    viewTransition: true,
   },
   async rewrites() {
     return [
