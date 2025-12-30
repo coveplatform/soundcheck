@@ -11,9 +11,11 @@ export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const trackId = searchParams.get("trackId");
   const promoCode = searchParams.get("promo");
+  const useFreeCredit = searchParams.get("useFreeCredit") === "true";
   const [error, setError] = useState("");
 
   const hasPromo = useMemo(() => Boolean(promoCode?.trim()), [promoCode]);
+  const hasFreeCredit = useFreeCredit;
 
   useEffect(() => {
     async function createCheckout() {
@@ -26,7 +28,11 @@ export default function CheckoutPage() {
         const response = await fetch("/api/payments/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ trackId, promoCode: promoCode || undefined }),
+          body: JSON.stringify({
+            trackId,
+            promoCode: promoCode || undefined,
+            useFreeCredit: useFreeCredit || undefined,
+          }),
         });
 
         const data = await response.json();
@@ -80,6 +86,22 @@ export default function CheckoutPage() {
             >
               Back to submission
             </button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (hasFreeCredit) {
+    return (
+      <div className="max-w-md mx-auto mt-20">
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <Gift className="h-8 w-8 mx-auto text-lime-600" />
+            <p className="mt-4 text-neutral-600">Using your free review credit…</p>
+            <p className="mt-2 text-sm text-neutral-500">
+              Your track is being submitted for 1 free review.
+            </p>
           </CardContent>
         </Card>
       </div>

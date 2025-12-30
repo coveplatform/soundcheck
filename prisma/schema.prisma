@@ -118,6 +118,9 @@ model ArtistProfile {
   totalTracks Int @default(0)
   totalSpent  Int @default(0) // in cents
 
+  // Free review credits (new users get 1)
+  freeReviewCredits Int @default(1)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

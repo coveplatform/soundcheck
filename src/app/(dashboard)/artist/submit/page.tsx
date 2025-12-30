@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Music, ExternalLink, Check, Loader2, X, AlertCircle, Upload } from "lucide-react";
+import { Music, ExternalLink, Check, Loader2, X, AlertCircle, Upload, Gift } from "lucide-react";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, ACTIVE_PACKAGE_TYPES, PACKAGES, PackageType } from "@/lib/metadata";
@@ -53,6 +53,10 @@ export default function SubmitTrackPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  // Free credit state
+  const [freeCredits, setFreeCredits] = useState<number>(0);
+  const [isLoadingCredits, setIsLoadingCredits] = useState(true);
+
   useEffect(() => {
     async function fetchGenres() {
       try {
@@ -66,6 +70,24 @@ export default function SubmitTrackPage() {
       }
     }
     fetchGenres();
+  }, []);
+
+  // Fetch free credit balance
+  useEffect(() => {
+    async function fetchCredits() {
+      try {
+        const response = await fetch("/api/artist/profile");
+        if (response.ok) {
+          const data = await response.json();
+          setFreeCredits(data.freeReviewCredits ?? 0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch credits:", error);
+      } finally {
+        setIsLoadingCredits(false);
+      }
+    }
+    fetchCredits();
   }, []);
 
   const validatePromoCode = useCallback(async (code: string) => {
@@ -383,9 +405,13 @@ export default function SubmitTrackPage() {
         return;
       }
 
-      const checkoutUrl = promoCode.trim()
-        ? `/artist/submit/checkout?trackId=${data.id}&promo=${encodeURIComponent(promoCode.trim())}`
-        : `/artist/submit/checkout?trackId=${data.id}`;
+      // Determine checkout URL based on payment method
+      let checkoutUrl = `/artist/submit/checkout?trackId=${data.id}`;
+      if (freeCredits > 0) {
+        checkoutUrl += "&useFreeCredit=true";
+      } else if (promoCode.trim()) {
+        checkoutUrl += `&promo=${encodeURIComponent(promoCode.trim())}`;
+      }
       router.push(checkoutUrl);
     } catch {
       setError("Something went wrong");
@@ -408,6 +434,21 @@ export default function SubmitTrackPage() {
       {error && (
         <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
           {error}
+        </div>
+      )}
+
+      {/* Free Credit Banner */}
+      {!isLoadingCredits && freeCredits > 0 && (
+        <div className="bg-lime-100 border-2 border-lime-500 p-4 flex items-center gap-3">
+          <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
+            <Gift className="h-5 w-5 text-black" />
+          </div>
+          <div>
+            <p className="font-bold text-black">You have a free review!</p>
+            <p className="text-sm text-neutral-700">
+              Submit your track and get 1 review completely free. No payment required.
+            </p>
+          </div>
         </div>
       )}
 
@@ -694,75 +735,98 @@ export default function SubmitTrackPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div className="min-w-0">
               <p className="text-neutral-400 text-sm font-medium">Total</p>
-              <p className="text-3xl font-black">
-                ${(selectedPackageDetails.price / 100).toFixed(2)}
-              </p>
+              {freeCredits > 0 ? (
+                <div className="flex items-center gap-2">
+                  <p className="text-3xl font-black text-lime-500">FREE</p>
+                  <span className="text-neutral-500 line-through text-lg">
+                    ${(selectedPackageDetails.price / 100).toFixed(2)}
+                  </span>
+                </div>
+              ) : (
+                <p className="text-3xl font-black">
+                  ${(selectedPackageDetails.price / 100).toFixed(2)}
+                </p>
+              )}
             </div>
             <div className="text-left sm:text-right">
               <p className="text-neutral-400 text-sm font-mono">
-                {selectedPackageDetails.reviews} reviews
+                {freeCredits > 0 ? "1 review" : `${selectedPackageDetails.reviews} reviews`}
               </p>
               <p className="text-neutral-400 text-sm font-mono">
                 24 hours max (usually shorter)
               </p>
             </div>
           </div>
-          <div className="mb-4 space-y-2">
-            <div className="relative">
-              <Input
-                placeholder="Promo code (optional)"
-                value={promoCode}
-                onChange={(e) => handlePromoCodeChange(e.target.value)}
-                className={cn(
-                  "bg-neutral-900 border-neutral-700 text-white placeholder:text-neutral-500 font-mono pr-10",
-                  promoStatus === "valid" && "border-lime-500",
-                  promoStatus === "invalid" && "border-red-500"
+          {/* Only show promo code input if no free credits */}
+          {freeCredits === 0 && (
+            <div className="mb-4 space-y-2">
+              <div className="relative">
+                <Input
+                  placeholder="Promo code (optional)"
+                  value={promoCode}
+                  onChange={(e) => handlePromoCodeChange(e.target.value)}
+                  className={cn(
+                    "bg-neutral-900 border-neutral-700 text-white placeholder:text-neutral-500 font-mono pr-10",
+                    promoStatus === "valid" && "border-lime-500",
+                    promoStatus === "invalid" && "border-red-500"
+                  )}
+                />
+                {promoCode.trim() && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {promoStatus === "validating" && (
+                      <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
+                    )}
+                    {promoStatus === "valid" && (
+                      <Check className="h-4 w-4 text-lime-500" />
+                    )}
+                    {promoStatus === "invalid" && (
+                      <X className="h-4 w-4 text-red-500" />
+                    )}
+                  </div>
                 )}
-              />
-              {promoCode.trim() && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  {promoStatus === "validating" && (
-                    <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
-                  )}
-                  {promoStatus === "valid" && (
-                    <Check className="h-4 w-4 text-lime-500" />
-                  )}
-                  {promoStatus === "invalid" && (
-                    <X className="h-4 w-4 text-red-500" />
-                  )}
-                </div>
+              </div>
+              {promoStatus === "valid" && (
+                <p className="text-xs text-lime-500 font-medium flex items-center gap-1">
+                  <Check className="h-3 w-3" />
+                  Promo code applied - you&apos;ll receive 1 free review
+                </p>
+              )}
+              {promoStatus === "invalid" && promoError && (
+                <p className="text-xs text-red-400 font-medium flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {promoError}
+                </p>
               )}
             </div>
-            {promoStatus === "valid" && (
-              <p className="text-xs text-lime-500 font-medium flex items-center gap-1">
-                <Check className="h-3 w-3" />
-                Promo code applied - you&apos;ll receive 1 free review
-              </p>
-            )}
-            {promoStatus === "invalid" && promoError && (
-              <p className="text-xs text-red-400 font-medium flex items-center gap-1">
-                <AlertCircle className="h-3 w-3" />
-                {promoError}
-              </p>
-            )}
-          </div>
+          )}
+          {freeCredits > 0 && (
+            <p className="text-xs text-lime-500 font-medium flex items-center gap-1 mb-4">
+              <Gift className="h-3 w-3" />
+              Using your free review credit
+            </p>
+          )}
           <Button
             onClick={handleSubmit}
             isLoading={isSubmitting}
             disabled={
               isUploading ||
               isSubmitting ||
+              isLoadingCredits ||
               !title.trim() ||
               selectedGenres.length === 0 ||
               (inputMode === "url"
                 ? !url || !!urlError
                 : !uploadedUrl) ||
-              (promoCode.trim().length > 0 && promoStatus !== "valid")
+              (freeCredits === 0 && promoCode.trim().length > 0 && promoStatus !== "valid")
             }
             variant="primary"
             className="w-full"
           >
-            {promoStatus === "valid" ? "Submit with Promo Code" : "Continue to Payment"}
+            {freeCredits > 0
+              ? "Use Your Free Review"
+              : promoStatus === "valid"
+                ? "Submit with Promo Code"
+                : "Continue to Payment"}
           </Button>
         </CardContent>
       </Card>

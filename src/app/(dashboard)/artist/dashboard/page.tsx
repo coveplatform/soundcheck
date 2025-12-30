@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Music, Plus, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { Music, Plus, Clock, CheckCircle, AlertCircle, Gift } from "lucide-react";
 import { GenreTagList } from "@/components/ui/genre-tag";
 
 export const dynamic = 'force-dynamic';
@@ -65,6 +65,30 @@ export default async function ArtistDashboardPage() {
           </Button>
         </Link>
       </div>
+
+      {/* Free Credit Banner */}
+      {artistProfile.freeReviewCredits > 0 && (
+        <Card className="bg-lime-100 border-lime-500">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
+                <Gift className="h-6 w-6 text-black" />
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-black">You have {artistProfile.freeReviewCredits} free review{artistProfile.freeReviewCredits > 1 ? "s" : ""}!</p>
+                <p className="text-sm text-neutral-700">
+                  Submit a track to use your free review credit.
+                </p>
+              </div>
+              <Link href="/artist/submit">
+                <Button variant="primary" size="sm">
+                  Use Now
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats */}
       <div className="grid sm:grid-cols-3 gap-4">
