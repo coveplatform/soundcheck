@@ -30,7 +30,10 @@
       "Bash(git log:*)",
       "Bash($env:NEXT_TURBOPACK=0)",
       "WebFetch(domain:www.mixreflect.com)",
-      "Bash(npx vercel logs:*)"
+      "Bash(npx vercel logs:*)",
+      "Bash($env:DATABASE_URL=\"postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\")",
+      "Bash(powershell -Command \"& { [System.IO.File]::Delete\\(''\\\\?\\\\C:\\\\Users\\\\simli\\\\Desktop\\\\review\\\\soundcheck\\\\nul''\\) }\")",
+      "Bash(powershell -Command:*)"
     ]
   }
 }
