@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+
 type ExpandableDetailsProps = {
   productionScore: number | null;
   originalityScore: number | null;
@@ -9,28 +14,37 @@ type ExpandableDetailsProps = {
   reviewDate: string;
 };
 
-function ScoreRow({ label, value }: { label: string; value: number | null }) {
-  if (value === null || Number.isNaN(value)) return null;
+function ScoreRow({ label, score }: { label: string; score: number | null }) {
+  if (score === null) return null;
 
   return (
-    <div className="flex items-center justify-between">
-      <span className="text-neutral-400">{label}</span>
-      <span className="font-semibold text-white">{value}/5</span>
+    <div className="flex items-center justify-between py-2 border-b border-neutral-200 last:border-0">
+      <span className="text-neutral-600 text-sm">{label}</span>
+      <span className="font-bold">{score}/5</span>
     </div>
   );
 }
 
-function TextBlock({ label, value }: { label: string; value: string | null }) {
+function TextBlock({ label, icon, value }: { label: string; icon: string; value: string | null }) {
   if (!value) return null;
 
+  const iconColors: Record<string, string> = {
+    "+": "bg-lime-500",
+    "→": "bg-orange-400",
+    "!": "bg-sky-400",
+  };
+
   return (
-    <div className="space-y-1">
-      <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-        {label}
+    <div className="p-4 border-b-2 border-black last:border-0">
+      <div className="flex items-start gap-2 mb-2">
+        <span className={`w-6 h-6 ${iconColors[icon] || "bg-neutral-200"} border border-black flex items-center justify-center text-xs font-bold flex-shrink-0`}>
+          {icon}
+        </span>
+        <h4 className="font-bold text-sm">{label}</h4>
       </div>
-      <div className="text-sm text-neutral-200 leading-relaxed whitespace-pre-wrap">
+      <p className="text-neutral-600 text-sm leading-relaxed pl-8 whitespace-pre-wrap">
         {value}
-      </div>
+      </p>
     </div>
   );
 }
@@ -45,40 +59,57 @@ export function ExpandableDetails({
   perceivedGenre,
   reviewDate,
 }: ExpandableDetailsProps) {
-  return (
-    <details className="mt-5 rounded-lg border border-neutral-800 bg-neutral-900/30 overflow-hidden">
-      <summary className="cursor-pointer select-none px-4 py-3 text-sm font-semibold text-white">
-        Full review details
-        <span className="ml-2 text-xs font-normal text-neutral-500">
-          ({reviewDate})
-        </span>
-      </summary>
+  const [isExpanded, setIsExpanded] = useState(false);
 
-      <div className="px-4 pb-4 space-y-4">
-        <div className="rounded-lg border border-neutral-800 bg-neutral-950/40 p-3 space-y-2">
-          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-            Scores
-          </div>
-          <div className="space-y-1.5">
-            <ScoreRow label="Production" value={productionScore} />
-            <ScoreRow label="Originality" value={originalityScore} />
-            <ScoreRow label="Vocals" value={vocalScore} />
+  const hasScores = productionScore !== null || originalityScore !== null || vocalScore !== null;
+  const hasDetails = weakestPart || nextActions;
+
+  if (!hasScores && !hasDetails) return null;
+
+  return (
+    <div className="mt-4">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full flex items-center justify-center gap-2 py-3 text-sm font-bold text-neutral-600 hover:text-black transition-colors border-2 border-black bg-white hover:bg-neutral-50"
+      >
+        <span>{isExpanded ? "Hide Details" : "View Full Review"}</span>
+        <ChevronDown
+          className={`h-4 w-4 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {isExpanded && (
+        <div className="mt-4 border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          {/* Score Breakdown */}
+          {hasScores && (
+            <div className="p-4 border-b-2 border-black">
+              <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wide mb-2">Score Breakdown</h3>
+              <ScoreRow label="Production Quality" score={productionScore} />
+              <ScoreRow label="Originality" score={originalityScore} />
+              <ScoreRow label="Vocal Performance" score={vocalScore} />
+            </div>
+          )}
+
+          {/* Genre */}
+          {perceivedGenre && (
+            <div className="p-4 border-b-2 border-black bg-neutral-50">
+              <span className="text-xs font-bold text-neutral-500 uppercase tracking-wide">Sounds Like: </span>
+              <span className="text-sm font-medium">{perceivedGenre}</span>
+            </div>
+          )}
+
+          {/* Areas to Improve */}
+          <TextBlock label="Room to Grow" icon="→" value={weakestPart} />
+
+          {/* Next Steps */}
+          <TextBlock label="Next Steps" icon="!" value={nextActions} />
+
+          {/* Review Date */}
+          <div className="p-3 bg-neutral-100 border-t-2 border-black text-center text-xs text-neutral-500">
+            Reviewed on {reviewDate}
           </div>
         </div>
-
-        {perceivedGenre ? (
-          <div className="rounded-lg border border-neutral-800 bg-neutral-950/40 p-3">
-            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-              Perceived genre
-            </div>
-            <div className="mt-1 text-sm text-neutral-200">{perceivedGenre}</div>
-          </div>
-        ) : null}
-
-        <TextBlock label="Best part" value={bestPart} />
-        <TextBlock label="Weakest part" value={weakestPart} />
-        <TextBlock label="Next actions" value={nextActions} />
-      </div>
-    </details>
+      )}
+    </div>
   );
 }

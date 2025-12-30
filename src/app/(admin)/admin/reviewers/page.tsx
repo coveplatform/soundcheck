@@ -6,10 +6,11 @@ export const dynamic = 'force-dynamic';
 export default async function AdminReviewersPage({
   searchParams,
 }: {
-  searchParams: { restricted?: string; q?: string };
+  searchParams: Promise<{ restricted?: string; q?: string }>;
 }) {
-  const restrictedOnly = searchParams.restricted === "1";
-  const q = typeof searchParams.q === "string" ? searchParams.q.trim() : "";
+  const { restricted, q: query } = await searchParams;
+  const restrictedOnly = restricted === "1";
+  const q = typeof query === "string" ? query.trim() : "";
 
   const reviewers = await prisma.reviewerProfile.findMany({
     where: {

@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export default async function ArtistReviewersPage({
   searchParams,
 }: {
-  searchParams: { q?: string; active?: string };
+  searchParams: Promise<{ q?: string; active?: string }>;
 }) {
   const session = await getServerSession(authOptions);
 
@@ -27,8 +27,9 @@ export default async function ArtistReviewersPage({
     redirect("/artist/onboarding");
   }
 
-  const q = typeof searchParams.q === "string" ? searchParams.q.trim() : "";
-  const active = typeof searchParams.active === "string" ? searchParams.active : "";
+  const { q: query, active: activeParam } = await searchParams;
+  const q = typeof query === "string" ? query.trim() : "";
+  const active = typeof activeParam === "string" ? activeParam : "";
 
   const now = new Date();
   const cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);

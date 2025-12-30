@@ -39,11 +39,11 @@ export default async function AdminReviewPreviewPage({
   return (
     <div className="space-y-6 max-w-3xl">
       <Link
-        href={`/admin/tracks/${review.trackId}`}
+        href="/admin/reviews"
         className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-black"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to Track
+        Back to Reviews
       </Link>
 
       <div>
@@ -51,6 +51,18 @@ export default async function AdminReviewPreviewPage({
         <p className="text-neutral-500">
           This is exactly what the artist sees for this review
         </p>
+      </div>
+
+      {/* Reviewer info */}
+      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+        <div className="text-sm text-neutral-500 mb-1">Reviewed by</div>
+        <div className="font-bold text-lg">{review.reviewer.user.name || "Unknown"}</div>
+        <div className="text-sm text-neutral-600">{review.reviewer.user.email}</div>
+        <div className="flex gap-4 mt-2 text-sm text-neutral-500">
+          <span>Tier: {review.reviewer.tier}</span>
+          <span>Total reviews: {review.reviewer.totalReviews}</span>
+          <span>Avg rating: {review.reviewer.averageRating.toFixed(2)}</span>
+        </div>
       </div>
 
       {/* Admin metadata */}

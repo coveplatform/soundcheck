@@ -6,9 +6,10 @@ export const dynamic = 'force-dynamic';
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: { q?: string };
+  searchParams: Promise<{ q?: string }>;
 }) {
-  const q = typeof searchParams.q === "string" ? searchParams.q.trim() : "";
+  const { q: query } = await searchParams;
+  const q = typeof query === "string" ? query.trim() : "";
 
   const users = await prisma.user.findMany({
     where: q

@@ -6,10 +6,11 @@ export const dynamic = 'force-dynamic';
 export default async function AdminTracksPage({
   searchParams,
 }: {
-  searchParams: { status?: string; q?: string };
+  searchParams: Promise<{ status?: string; q?: string }>;
 }) {
-  const status = typeof searchParams.status === "string" ? searchParams.status : undefined;
-  const q = typeof searchParams.q === "string" ? searchParams.q.trim() : "";
+  const { status: statusParam, q: query } = await searchParams;
+  const status = typeof statusParam === "string" ? statusParam : undefined;
+  const q = typeof query === "string" ? query.trim() : "";
 
   const tracks = await prisma.track.findMany({
     where: {

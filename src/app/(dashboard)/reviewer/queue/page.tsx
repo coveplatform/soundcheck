@@ -14,8 +14,10 @@ export const dynamic = 'force-dynamic';
 export default async function ReviewQueuePage({
   searchParams,
 }: {
-  searchParams?: { notice?: string };
+  searchParams?: Promise<{ notice?: string }>;
 }) {
+  const resolvedParams = searchParams ? await searchParams : {};
+  const notice = resolvedParams.notice;
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -101,7 +103,7 @@ export default async function ReviewQueuePage({
 
   return (
     <div className="space-y-6">
-      {searchParams?.notice === "skipped" ? (
+      {notice === "skipped" ? (
         <div className="border-2 border-black bg-orange-50 p-4">
           <p className="text-sm font-bold text-black">
             Track skipped.
@@ -117,7 +119,7 @@ export default async function ReviewQueuePage({
         </div>
       ) : null}
 
-      {searchParams?.notice === "expired" ? (
+      {notice === "expired" ? (
         <div className="border-2 border-black bg-red-50 p-4">
           <p className="text-sm font-bold text-black">
             Review expired.
