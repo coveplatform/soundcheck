@@ -25,10 +25,12 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="border-b-2 border-black">
-        <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-28">
+      <section className="border-b-2 border-black bg-gradient-to-br from-white via-lime-50/30 to-white relative overflow-hidden">
+        <div className="absolute top-20 right-10 w-32 h-32 bg-lime-200 rounded-full blur-3xl opacity-50" />
+        <div className="absolute bottom-10 left-10 w-24 h-24 bg-orange-200 rounded-full blur-2xl opacity-40" />
+        <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-28 relative">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight text-black max-w-4xl leading-[1.1]">
-            One opinion is taste.<br />Ten opinions is truth.
+            One opinion is taste.<br />Ten opinions is <span className="text-lime-600">truth</span>.
           </h1>
           <p className="mt-6 text-xl text-neutral-600 max-w-xl leading-relaxed">
             That doubt before you hit release? Replace it with certainty.
@@ -139,26 +141,38 @@ export default function Home() {
       </section>
 
       {/* Who This Is For */}
-      <section className="border-b-2 border-black py-16">
+      <section className="border-b-2 border-black py-16 bg-gradient-to-r from-purple-50 via-white to-pink-50">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-black mb-6">This is for you if...</h2>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 pl-4 border-l-4 border-lime-500">
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 p-4 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-8 w-8 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 className="h-4 w-4" />
+              </div>
               <p className="text-lg text-neutral-700">You have a track you&apos;re 80% confident in—but not 100%</p>
             </div>
-            <div className="flex items-center gap-3 pl-4 border-l-4 border-lime-500">
+            <div className="flex items-center gap-4 p-4 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-8 w-8 bg-orange-400 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 className="h-4 w-4" />
+              </div>
               <p className="text-lg text-neutral-700">You&apos;re tired of friends who say <span className="font-bold text-black">&ldquo;yeah it&apos;s great!&rdquo;</span></p>
             </div>
-            <div className="flex items-center gap-3 pl-4 border-l-4 border-lime-500">
+            <div className="flex items-center gap-4 p-4 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-8 w-8 bg-sky-400 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 className="h-4 w-4" />
+              </div>
               <p className="text-lg text-neutral-700">You want real answers before you release, not after</p>
             </div>
-            <div className="flex items-center gap-3 pl-4 border-l-4 border-lime-500">
+            <div className="flex items-center gap-4 p-4 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-8 w-8 bg-purple-400 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 className="h-4 w-4" />
+              </div>
               <p className="text-lg text-neutral-700">You value your time more than hunting for feedback on Reddit</p>
             </div>
           </div>
-          <p className="mt-8 text-neutral-500 pl-4 border-l-4 border-neutral-200">
+          <p className="mt-8 text-neutral-600 p-4 bg-lime-50 border-2 border-lime-200">
             Our reviewers are music lovers who want you to succeed—not critics trying to tear you down.
-            Honest, but on your side.
+            <span className="font-bold text-black"> Honest, but on your side.</span>
           </p>
         </div>
       </section>
@@ -340,12 +354,12 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="border-b-2 border-black py-16">
+      <section className="border-b-2 border-black py-16 bg-gradient-to-b from-white to-sky-50">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-black mb-8 text-center">Artists who stopped guessing</h2>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="border-2 border-black p-6 bg-white">
+            <div className="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
               <Quote className="h-8 w-8 text-lime-500 mb-4" />
               <p className="text-neutral-700 mb-4">
                 &ldquo;I was about to release a track I wasn&apos;t sure about. 7 of 10 reviewers mentioned the intro was too long. Cut it down, and it&apos;s now my best performing release.&rdquo;
@@ -354,8 +368,8 @@ export default function Home() {
               <p className="text-xs text-neutral-500">Electronic Producer</p>
             </div>
 
-            <div className="border-2 border-black p-6 bg-white">
-              <Quote className="h-8 w-8 text-lime-500 mb-4" />
+            <div className="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <Quote className="h-8 w-8 text-orange-400 mb-4" />
               <p className="text-neutral-700 mb-4">
                 &ldquo;Finally, feedback I can actually use. Not &apos;sounds good&apos; or random hate—specific timestamps, specific suggestions. Worth every penny.&rdquo;
               </p>
@@ -363,8 +377,8 @@ export default function Home() {
               <p className="text-xs text-neutral-500">Singer-Songwriter</p>
             </div>
 
-            <div className="border-2 border-black p-6 bg-white">
-              <Quote className="h-8 w-8 text-lime-500 mb-4" />
+            <div className="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <Quote className="h-8 w-8 text-sky-400 mb-4" />
               <p className="text-neutral-700 mb-4">
                 &ldquo;The consensus thing is real. When 8 people independently say the same thing, you stop arguing with yourself and just fix it.&rdquo;
               </p>
@@ -372,8 +386,8 @@ export default function Home() {
               <p className="text-xs text-neutral-500">Hip-Hop Artist</p>
             </div>
 
-            <div className="border-2 border-black p-6 bg-white">
-              <Quote className="h-8 w-8 text-lime-500 mb-4" />
+            <div className="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <Quote className="h-8 w-8 text-purple-400 mb-4" />
               <p className="text-neutral-700 mb-4">
                 &ldquo;I&apos;ve used this for my last 3 releases. The confidence of knowing it&apos;s actually ready before I put it out is priceless.&rdquo;
               </p>
@@ -457,18 +471,16 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section className="border-b-2 border-black py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-2">Choose your certainty level</h2>
-          <p className="text-neutral-600 mb-4">
-            More reviews = clearer patterns = more confidence.
-          </p>
-          <p className="text-sm text-neutral-500 mb-10 flex items-center justify-center gap-2">
-            <DollarSign className="h-4 w-4" />
-            <span>Your payment goes directly to reviewers. Quality is enforced by your ratings.</span>
-          </p>
+      <section className="border-b-2 border-black py-16 bg-gradient-to-br from-lime-50 via-white to-orange-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-black mb-2">Simple pricing. Real results.</h2>
+            <p className="text-neutral-600">
+              More reviews = clearer patterns = more confidence.
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 gap-6">
             {pricing.map((p) => {
               const price = (p.price / 100).toFixed(2);
               const isPopular = p.key === "STANDARD";
@@ -476,48 +488,69 @@ export default function Home() {
               return (
                 <div
                   key={p.key}
-                  className={`border-2 border-black bg-white p-6 ${
-                    isPopular ? "ring-4 ring-lime-500" : ""
+                  className={`relative border-2 border-black bg-white p-8 ${
+                    isPopular
+                      ? "shadow-[8px_8px_0px_0px_rgba(132,204,22,1)] md:-translate-y-2"
+                      : "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                   }`}
                 >
                   {isPopular && (
-                    <span className="inline-block text-xs font-bold bg-lime-500 text-black px-2 py-1 mb-4 border border-black">
-                      MOST POPULAR
+                    <span className="absolute -top-3 left-6 text-xs font-bold bg-lime-500 text-black px-3 py-1 border-2 border-black">
+                      RECOMMENDED
                     </span>
                   )}
-                  <h3 className="font-bold text-lg">{p.name}</h3>
-                  <p className="text-sm text-neutral-500 mt-1">{p.description}</p>
-
-                  <div className="mt-6">
-                    <div className="text-4xl font-black">${price}</div>
-                  </div>
-
-                  <div className="mt-6 space-y-2 text-sm border-t-2 border-black pt-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Reviews</span>
-                      <span className="font-bold">{p.reviews}</span>
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="font-bold text-xl">{p.name}</h3>
+                      <p className="text-sm text-neutral-500 mt-1">{p.description}</p>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Turnaround</span>
-                      <span className="font-bold">24 hours</span>
+                    <div className={`h-12 w-12 ${isPopular ? 'bg-lime-500' : 'bg-neutral-100'} border-2 border-black flex items-center justify-center font-black text-lg`}>
+                      {p.reviews}
                     </div>
                   </div>
 
-                  <div className="mt-6">
-                    <Link href="/signup">
-                      <Button className={`w-full border-2 border-black font-bold ${
-                        isPopular
-                          ? "bg-lime-500 text-black hover:bg-lime-400"
-                          : "bg-black text-white hover:bg-neutral-800"
-                      }`}>
-                        Get started
-                      </Button>
-                    </Link>
+                  <div className="mb-6">
+                    <div className="text-5xl font-black">${price}</div>
+                    <p className="text-sm text-neutral-500 mt-1">${(p.price / p.reviews / 100).toFixed(2)} per review</p>
                   </div>
+
+                  <div className="space-y-3 mb-8">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-lime-600 flex-shrink-0" />
+                      <span className="text-sm">{p.reviews} genre-matched reviewers</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-lime-600 flex-shrink-0" />
+                      <span className="text-sm">Results in 24 hours</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-lime-600 flex-shrink-0" />
+                      <span className="text-sm">Detailed written feedback</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-lime-600 flex-shrink-0" />
+                      <span className="text-sm">Actionable next steps</span>
+                    </div>
+                  </div>
+
+                  <Link href="/signup">
+                    <Button className={`w-full border-2 border-black font-bold py-6 text-base ${
+                      isPopular
+                        ? "bg-lime-500 text-black hover:bg-lime-400"
+                        : "bg-black text-white hover:bg-neutral-800"
+                    }`}>
+                      Get {p.reviews} Reviews
+                    </Button>
+                  </Link>
                 </div>
               );
             })}
           </div>
+
+          <p className="text-center text-sm text-neutral-500 mt-8 flex items-center justify-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            <span>Your payment goes directly to reviewers. Quality enforced by your ratings.</span>
+          </p>
         </div>
       </section>
 
