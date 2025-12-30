@@ -168,28 +168,29 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
 // Package configuration
 export const PACKAGES = {
   STARTER: {
-    name: "Listener Pulse",
+    name: "Quick Check",
     reviews: 5,
     minProReviews: 0,
     price: 495, // cents
-    description: "Structured reactions from genre-matched listeners",
-    mix: "Curated, genre-matched panel",
+    description: "Get a feel for how listeners react",
+    mix: "5 genre-matched reviewers",
   },
   STANDARD: {
-    name: "Release Ready",
+    name: "Full Picture",
     reviews: 10,
-    minProReviews: 2,
+    minProReviews: 0,
     price: 1495,
-    description: "More signal + clearer next steps",
-    mix: "Includes 2+ top-rated (PRO) reviewers",
+    description: "Clearer patterns, more confidence",
+    mix: "10 genre-matched reviewers",
   },
+  // Legacy packages - kept for existing tracks, not shown in UI
   PRO: {
     name: "Maximum Signal",
     reviews: 20,
     minProReviews: 5,
     price: 2995,
     description: "Highest confidence before you release",
-    mix: "Includes 5+ top-rated (PRO) reviewers",
+    mix: "20 reviewers",
   },
   DEEP_DIVE: {
     name: "Deep Dive",
@@ -197,10 +198,10 @@ export const PACKAGES = {
     minProReviews: 5,
     price: 2995,
     description: "Maximum signal from multiple perspectives",
-    mix: "Includes 5+ top-rated (PRO) reviewers",
+    mix: "20 reviewers",
   },
 } as const;
 
-export const ACTIVE_PACKAGE_TYPES = ["STARTER", "STANDARD", "PRO"] as const;
+export const ACTIVE_PACKAGE_TYPES = ["STARTER", "STANDARD"] as const;
 
 export type PackageType = keyof typeof PACKAGES;

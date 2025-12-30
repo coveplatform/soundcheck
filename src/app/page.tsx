@@ -498,10 +498,8 @@ export default function Home() {
                       <span className="font-bold">{p.reviews}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-neutral-600">Top-rated reviewers</span>
-                      <span className="font-bold">
-                        {p.minProReviews === 0 ? "Mixed" : `${p.minProReviews}+ guaranteed`}
-                      </span>
+                      <span className="text-neutral-600">Turnaround</span>
+                      <span className="font-bold">24 hours</span>
                     </div>
                   </div>
 
@@ -559,7 +557,7 @@ export default function Home() {
               },
               {
                 q: "Who are these reviewers?",
-                a: "Real people who passed a quality screening and selected genres they genuinely love. They're ranked by artist ratings—top-rated reviewers get more work and earn more. It's a meritocracy.",
+                a: "Real people who passed a quality screening and selected genres they genuinely love. They're rated by artists after every review, so quality matters.",
               },
               {
                 q: "Is my unreleased music safe?",
