@@ -515,22 +515,20 @@ export default function Home() {
                   </div>
 
                   <div className="space-y-3 mb-8">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-lime-600 flex-shrink-0" />
-                      <span className="text-sm">{p.reviews} genre-matched reviewers</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-lime-600 flex-shrink-0" />
-                      <span className="text-sm">Results in 24 hours</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-lime-600 flex-shrink-0" />
-                      <span className="text-sm">Detailed written feedback</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-lime-600 flex-shrink-0" />
-                      <span className="text-sm">Actionable next steps</span>
-                    </div>
+                    {p.features.map((feature, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <CheckCircle2 className={`h-5 w-5 flex-shrink-0 ${
+                          feature.includes("Consensus") || feature.includes("Pattern")
+                            ? "text-orange-500"
+                            : "text-lime-600"
+                        }`} />
+                        <span className={`text-sm ${
+                          feature.includes("Consensus") || feature.includes("Pattern")
+                            ? "font-semibold"
+                            : ""
+                        }`}>{feature}</span>
+                      </div>
+                    ))}
                   </div>
 
                   <Link href="/signup">

@@ -174,14 +174,16 @@ export const PACKAGES = {
     price: 495, // cents
     description: "Get a feel for how listeners react",
     mix: "5 genre-matched reviewers",
+    features: ["5 detailed reviews", "24-hour turnaround", "Written feedback"],
   },
   STANDARD: {
     name: "Full Picture",
-    reviews: 10,
+    reviews: 20,
     minProReviews: 0,
     price: 1495,
-    description: "Clearer patterns, more confidence",
-    mix: "10 genre-matched reviewers",
+    description: "Maximum clarity with pattern insights",
+    mix: "20 genre-matched reviewers",
+    features: ["20 detailed reviews", "24-hour turnaround", "Written feedback", "Consensus highlights", "Pattern analysis"],
   },
   // Legacy packages - kept for existing tracks, not shown in UI
   PRO: {
@@ -191,6 +193,7 @@ export const PACKAGES = {
     price: 2995,
     description: "Highest confidence before you release",
     mix: "20 reviewers",
+    features: ["20 detailed reviews", "24-hour turnaround", "Written feedback"],
   },
   DEEP_DIVE: {
     name: "Deep Dive",
@@ -199,6 +202,7 @@ export const PACKAGES = {
     price: 2995,
     description: "Maximum signal from multiple perspectives",
     mix: "20 reviewers",
+    features: ["20 detailed reviews", "24-hour turnaround", "Written feedback"],
   },
 } as const;
 
