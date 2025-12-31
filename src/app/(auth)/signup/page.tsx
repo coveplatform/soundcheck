@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Music, Headphones, Users, ArrowLeft, Loader2 } from "lucide-react";
 import { funnels, track } from "@/lib/analytics";
+import { trackTikTokEvent } from "@/components/providers";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import { validatePassword } from "@/lib/password";
 
@@ -120,6 +121,10 @@ export default function SignupPage() {
       const data = await response.json().catch(() => ({}));
       funnels.artistSignup.complete(data.userId || "unknown", role);
       track("email_verification_sent");
+      // TikTok conversion tracking
+      trackTikTokEvent("CompleteRegistration", {
+        content_name: role,
+      });
 
       router.push(`/verify-email?email=${encodeURIComponent(email)}`);
       router.refresh();

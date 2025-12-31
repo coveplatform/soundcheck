@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Clock, ArrowRight, Gift } from "lucide-react";
 import { track } from "@/lib/analytics";
+import { trackTikTokEvent } from "@/components/providers";
 
 type CheckoutStatusResponse = {
   status: "PENDING" | "COMPLETED" | "FAILED";
@@ -68,6 +69,13 @@ export default function SuccessPage() {
               price: payload.amount || 0,
               trackId: payload.trackId,
               bypassed: isBypass,
+            });
+            // TikTok conversion tracking
+            trackTikTokEvent("CompletePayment", {
+              content_type: "product",
+              content_id: payload.packageType || "unknown",
+              currency: "USD",
+              value: (payload.amount || 0) / 100, // Convert cents to dollars
             });
           }
 
