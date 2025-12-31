@@ -1,9 +1,29 @@
 "use client";
 
+import { useEffect } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
+
+// Type for the TikTok pixel
+type TikTokPixelType = {
+  page: () => void;
+  track: (name: string, data?: Record<string, unknown>) => void;
+};
 
 export function TikTokPixel() {
   const pixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Track page views on route changes (for client-side navigation)
+  useEffect(() => {
+    if (pathname && typeof window !== "undefined") {
+      const ttq = (window as unknown as { ttq?: TikTokPixelType }).ttq;
+      if (ttq) {
+        ttq.page();
+      }
+    }
+  }, [pathname, searchParams]);
 
   if (!pixelId) return null;
 
