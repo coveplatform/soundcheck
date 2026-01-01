@@ -168,9 +168,9 @@ export default function SignupPage() {
         <CardContent className="space-y-3">
           <button
             onClick={() => handleRoleSelect("artist")}
-            className="w-full p-4 border-2 border-black bg-white hover:bg-lime-400 transition-colors text-left flex items-start gap-4 group"
+            className="w-full p-4 border-2 border-black bg-white hover:bg-lime-400 active:bg-lime-500 active:scale-[0.98] transition-all active:transition-none text-left flex items-start gap-4 group"
           >
-            <div className="p-2 bg-black text-white group-hover:bg-black">
+            <div className="p-2 bg-black text-white">
               <Music className="h-5 w-5" />
             </div>
             <div>
