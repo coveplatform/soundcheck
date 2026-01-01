@@ -38,7 +38,7 @@ export default function Home() {
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/signup">
-              <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 font-bold text-base px-8 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-8 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
                 Test Your Track <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -534,8 +534,8 @@ export default function Home() {
                   <Link href="/signup">
                     <Button className={`w-full border-2 border-black font-bold py-6 text-base ${
                       isPopular
-                        ? "bg-lime-500 text-black hover:bg-lime-400"
-                        : "bg-black text-white hover:bg-neutral-800"
+                        ? "bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600"
+                        : "bg-black text-white hover:bg-neutral-800 active:bg-neutral-900"
                     }`}>
                       Get {p.reviews} Reviews
                     </Button>
@@ -564,7 +564,7 @@ export default function Home() {
           <Link href="/signup">
             <Button
               size="lg"
-              className="bg-lime-500 text-black hover:bg-lime-400 font-bold text-base px-10 border-2 border-lime-500"
+              className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-lime-500"
             >
               Test Your Track
             </Button>
@@ -637,7 +637,7 @@ export default function Home() {
               </p>
             </div>
             <Link href="/signup" className="shrink-0">
-              <Button className="bg-orange-400 text-black hover:bg-orange-300 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <Button className="bg-orange-400 text-black hover:bg-orange-300 active:bg-orange-500 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
                 Become a Reviewer
               </Button>
             </Link>
