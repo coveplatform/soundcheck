@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Star, Zap, Sparkles, Music } from "lucide-react";
 
 type FirstImpression = "STRONG_HOOK" | "DECENT" | "LOST_INTEREST";
 
@@ -25,19 +25,15 @@ function titleCase(value: string) {
     .join(" ");
 }
 
-function buildScoreDistribution(reviews: ReviewLike[], field: keyof ReviewLike) {
-  const counts = new Array(5).fill(0) as number[];
-  for (const r of reviews) {
-    const v = r[field];
-    if (typeof v === "number" && v >= 1 && v <= 5) {
-      counts[v - 1] += 1;
-    }
-  }
-  const total = counts.reduce((a, b) => a + b, 0);
-  return { counts, total };
+function calculateAverage(reviews: ReviewLike[], field: keyof ReviewLike): number {
+  const scores = reviews
+    .map((r) => r[field])
+    .filter((v): v is number => typeof v === "number" && v >= 1 && v <= 5);
+  if (scores.length === 0) return 0;
+  return scores.reduce((a, b) => a + b, 0) / scores.length;
 }
 
-function topFrequencies(items: string[], limit = 8) {
+function topFrequencies(items: string[], limit: number) {
   const map = new Map<string, number>();
   for (const raw of items) {
     const token = normalizeToken(raw);
@@ -51,57 +47,131 @@ function topFrequencies(items: string[], limit = 8) {
     .map(([k, v]) => ({ label: titleCase(k), count: v }));
 }
 
-function BarRow({ label, count, total }: { label: string; count: number; total: number }) {
-  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+function ScoreCircle({
+  score,
+  label,
+  icon: Icon,
+}: {
+  score: number;
+  label: string;
+  icon: React.ElementType;
+}) {
+  const percentage = (score / 5) * 100;
+  const circumference = 2 * Math.PI * 36;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
   return (
-    <div className="grid grid-cols-[64px_1fr_44px] items-center gap-3">
-      <div className="text-xs text-neutral-500">{label}</div>
-      <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
-        <div className="h-full bg-neutral-900" style={{ width: `${pct}%` }} />
+    <div className="flex flex-col items-center">
+      <div className="relative w-24 h-24">
+        {/* Background circle */}
+        <svg className="w-24 h-24 -rotate-90" viewBox="0 0 80 80">
+          <circle
+            cx="40"
+            cy="40"
+            r="36"
+            fill="none"
+            stroke="#f5f5f5"
+            strokeWidth="6"
+          />
+          <circle
+            cx="40"
+            cy="40"
+            r="36"
+            fill="none"
+            stroke={score >= 4 ? "#84cc16" : score >= 3 ? "#fbbf24" : "#f87171"}
+            strokeWidth="6"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            className="transition-all duration-500"
+          />
+        </svg>
+        {/* Center content */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-2xl font-black">{score.toFixed(1)}</span>
+        </div>
       </div>
-      <div className="text-xs text-neutral-500 text-right">{pct}%</div>
+      <div className="mt-2 flex items-center gap-1.5">
+        <Icon className="h-4 w-4 text-neutral-500" />
+        <span className="text-sm font-bold text-neutral-700">{label}</span>
+      </div>
     </div>
   );
 }
 
-function ScoreDistribution({
-  title,
-  counts,
-  total,
-}: {
-  title: string;
-  counts: number[];
-  total: number;
-}) {
+function ImpressionsBar({ impressions, total }: { impressions: { hook: number; decent: number; lost: number }; total: number }) {
+  if (total === 0) return null;
+
+  const hookPct = Math.round((impressions.hook / total) * 100);
+  const decentPct = Math.round((impressions.decent / total) * 100);
+  const lostPct = Math.round((impressions.lost / total) * 100);
+
   return (
     <div className="space-y-3">
-      <div className="text-sm font-medium">{title}</div>
-      <div className="space-y-2">
-        {[5, 4, 3, 2, 1].map((score) => (
-          <BarRow
-            key={score}
-            label={`${score}`}
-            count={counts[score - 1] ?? 0}
-            total={total}
+      <div className="text-sm font-bold text-neutral-700">First Impressions</div>
+      <div className="h-4 w-full rounded-full overflow-hidden flex bg-neutral-100">
+        {hookPct > 0 && (
+          <div
+            className="h-full bg-lime-500 transition-all"
+            style={{ width: `${hookPct}%` }}
+            title={`Strong Hook: ${hookPct}%`}
           />
-        ))}
+        )}
+        {decentPct > 0 && (
+          <div
+            className="h-full bg-amber-400 transition-all"
+            style={{ width: `${decentPct}%` }}
+            title={`Decent: ${decentPct}%`}
+          />
+        )}
+        {lostPct > 0 && (
+          <div
+            className="h-full bg-neutral-300 transition-all"
+            style={{ width: `${lostPct}%` }}
+            title={`Lost Interest: ${lostPct}%`}
+          />
+        )}
+      </div>
+      <div className="flex justify-between text-xs font-medium">
+        <div className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-lime-500" />
+          <span>Strong Hook {hookPct}%</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+          <span>Decent {decentPct}%</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
+          <span>Lost {lostPct}%</span>
+        </div>
       </div>
     </div>
   );
 }
 
-function Chip({ label, count, max }: { label: string; count: number; max: number }) {
-  const intensity = max > 0 ? Math.max(0.25, count / max) : 0.25;
+function GenreChip({ label, count, isTop }: { label: string; count: number; isTop: boolean }) {
   return (
     <span
-      className={cn(
-        "inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs border",
-        "border-neutral-200"
-      )}
-      style={{ backgroundColor: `rgba(0,0,0,${0.06 + intensity * 0.06})` }}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+        isTop
+          ? "bg-black text-white"
+          : "bg-neutral-100 text-neutral-700 border-2 border-neutral-200"
+      }`}
     >
-      <span className="font-medium">{label}</span>
-      <span className="text-neutral-500">{count}</span>
+      <span>{label}</span>
+      <span className={`text-xs ${isTop ? "text-neutral-400" : "text-neutral-500"}`}>
+        {count}
+      </span>
+    </span>
+  );
+}
+
+function ArtistChip({ label, count }: { label: string; count: number }) {
+  return (
+    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-neutral-50 to-neutral-100 border border-neutral-200 text-sm">
+      <span className="font-semibold text-neutral-800">{label}</span>
+      <span className="text-xs text-neutral-500 bg-white px-1.5 py-0.5 rounded">{count}</span>
     </span>
   );
 }
@@ -109,16 +179,16 @@ function Chip({ label, count, max }: { label: string; count: number; max: number
 export function AggregateAnalytics({ reviews }: { reviews: ReviewLike[] }) {
   const completed = reviews.length;
 
-  const production = buildScoreDistribution(reviews, "productionScore");
-  const vocals = buildScoreDistribution(reviews, "vocalScore");
-  const originality = buildScoreDistribution(reviews, "originalityScore");
+  const avgProduction = calculateAverage(reviews, "productionScore");
+  const avgVocals = calculateAverage(reviews, "vocalScore");
+  const avgOriginality = calculateAverage(reviews, "originalityScore");
 
   const impressions = {
-    STRONG_HOOK: reviews.filter((r) => r.firstImpression === "STRONG_HOOK").length,
-    DECENT: reviews.filter((r) => r.firstImpression === "DECENT").length,
-    LOST_INTEREST: reviews.filter((r) => r.firstImpression === "LOST_INTEREST").length,
+    hook: reviews.filter((r) => r.firstImpression === "STRONG_HOOK").length,
+    decent: reviews.filter((r) => r.firstImpression === "DECENT").length,
+    lost: reviews.filter((r) => r.firstImpression === "LOST_INTEREST").length,
   };
-  const impressionsTotal = impressions.STRONG_HOOK + impressions.DECENT + impressions.LOST_INTEREST;
+  const impressionsTotal = impressions.hook + impressions.decent + impressions.lost;
 
   const genreItems = reviews
     .map((r) => r.perceivedGenre)
@@ -129,62 +199,55 @@ export function AggregateAnalytics({ reviews }: { reviews: ReviewLike[] }) {
     .map((v) => v.trim())
     .filter(Boolean);
 
-  const topGenres = topFrequencies(genreItems, 10);
-  const topArtists = topFrequencies(artistsItems, 12);
-
-  const maxGenre = Math.max(0, ...topGenres.map((g) => g.count));
-  const maxArtist = Math.max(0, ...topArtists.map((a) => a.count));
+  // Limit to top 5 genres and top 6 artists
+  const topGenres = topFrequencies(genreItems, 5);
+  const topArtists = topFrequencies(artistsItems, 6);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Aggregate Analytics</CardTitle>
+    <Card className="overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-neutral-900 to-neutral-800 text-white">
+        <CardTitle className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5" />
+          Pattern Analytics
+        </CardTitle>
+        <p className="text-sm text-neutral-400 mt-1">
+          Insights from {completed} review{completed === 1 ? "" : "s"}
+        </p>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid lg:grid-cols-3 gap-6">
-          <ScoreDistribution title="Production" counts={production.counts} total={production.total} />
-          <ScoreDistribution title="Originality" counts={originality.counts} total={originality.total} />
-          <ScoreDistribution title="Vocals" counts={vocals.counts} total={vocals.total} />
+      <CardContent className="p-6 space-y-8">
+        {/* Score Circles */}
+        <div className="flex justify-center gap-8 sm:gap-12">
+          <ScoreCircle score={avgProduction} label="Production" icon={Zap} />
+          <ScoreCircle score={avgOriginality} label="Originality" icon={Sparkles} />
+          <ScoreCircle score={avgVocals} label="Vocals" icon={Music} />
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        {/* Impressions Bar */}
+        <ImpressionsBar impressions={impressions} total={impressionsTotal} />
+
+        {/* Genre Consensus */}
+        {topGenres.length > 0 && (
           <div className="space-y-3">
-            <div className="text-sm font-medium">First Impression</div>
-            <div className="space-y-2">
-              <BarRow label="Hook" count={impressions.STRONG_HOOK} total={impressionsTotal} />
-              <BarRow label="Decent" count={impressions.DECENT} total={impressionsTotal} />
-              <BarRow label="Lost" count={impressions.LOST_INTEREST} total={impressionsTotal} />
+            <div className="text-sm font-bold text-neutral-700">What Genre Is This?</div>
+            <div className="flex flex-wrap gap-2">
+              {topGenres.map((g, i) => (
+                <GenreChip key={g.label} label={g.label} count={g.count} isTop={i === 0} />
+              ))}
             </div>
           </div>
+        )}
 
-          <div className="space-y-3 lg:col-span-2">
-            <div className="text-sm font-medium">Perceived Genre Consensus</div>
-            {topGenres.length === 0 ? (
-              <div className="text-sm text-neutral-500">No genre notes yet.</div>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {topGenres.map((g) => (
-                  <Chip key={g.label} label={g.label} count={g.count} max={maxGenre} />
-                ))}
-              </div>
-            )}
+        {/* Similar Artists */}
+        {topArtists.length > 0 && (
+          <div className="space-y-3">
+            <div className="text-sm font-bold text-neutral-700">Sounds Like...</div>
+            <div className="flex flex-wrap gap-2">
+              {topArtists.map((a) => (
+                <ArtistChip key={a.label} label={a.label} count={a.count} />
+              ))}
+            </div>
           </div>
-
-          <div className="space-y-3 lg:col-span-3">
-            <div className="text-sm font-medium">Similar Artists (frequency)</div>
-            {topArtists.length === 0 ? (
-              <div className="text-sm text-neutral-500">No similar artists mentioned yet.</div>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {topArtists.map((a) => (
-                  <Chip key={a.label} label={a.label} count={a.count} max={maxArtist} />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="text-xs text-neutral-400">Based on {completed} completed review{completed === 1 ? "" : "s"}.</div>
+        )}
       </CardContent>
     </Card>
   );

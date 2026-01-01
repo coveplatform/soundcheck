@@ -99,7 +99,7 @@ export function ReviewDisplay({
                   href={`/artist/reviewers/${review.reviewer.id}`}
                   className="inline-flex items-center gap-2 text-xs font-bold text-neutral-700 hover:text-black"
                 >
-                  <span className="h-6 w-6 rounded-full bg-neutral-100 border border-black overflow-hidden flex items-center justify-center text-[10px] font-black text-black">
+                  <span className="h-8 w-8 min-w-[2rem] aspect-square flex-shrink-0 rounded-full bg-neutral-100 border-2 border-black overflow-hidden flex items-center justify-center text-xs font-black text-black">
                     {getInitials(review.reviewer.user.name ?? "Reviewer")}
                   </span>
                   <span>
@@ -110,7 +110,7 @@ export function ReviewDisplay({
                 </Link>
               ) : (
                 <span className="inline-flex items-center gap-2 text-xs font-bold text-neutral-700">
-                  <span className="h-6 w-6 rounded-full bg-neutral-100 border border-black overflow-hidden flex items-center justify-center text-[10px] font-black text-black">
+                  <span className="h-8 w-8 min-w-[2rem] aspect-square flex-shrink-0 rounded-full bg-neutral-100 border-2 border-black overflow-hidden flex items-center justify-center text-xs font-black text-black">
                     {getInitials(review.reviewer.user.name ?? "Reviewer")}
                   </span>
                   <span>
