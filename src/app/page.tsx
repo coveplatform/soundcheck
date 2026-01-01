@@ -44,7 +44,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-500 font-mono">
-            <span>From $4.95 • Results in 24 hours</span>
+            <span>From $4.95 AUD • Results in 24 hours</span>
           </div>
         </div>
       </section>
@@ -510,7 +510,7 @@ export default function Home() {
                   </div>
 
                   <div className="mb-6">
-                    <div className="text-5xl font-black">${price}</div>
+                    <div className="text-5xl font-black">${price}<span className="text-lg font-bold text-neutral-400 ml-1">AUD</span></div>
                     <p className="text-sm text-neutral-500 mt-1">${(p.price / p.reviews / 100).toFixed(2)} per review</p>
                   </div>
 
