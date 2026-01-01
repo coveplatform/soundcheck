@@ -102,26 +102,28 @@ export default async function TrackDetailPage({
       </Link>
 
       {/* Track Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="space-y-4">
         <div className="flex items-start gap-4">
-          <div className="h-16 w-16 bg-neutral-100 border-2 border-black flex items-center justify-center">
+          {/* Album art placeholder - stays square */}
+          <div className="h-16 w-16 min-w-[4rem] aspect-square flex-shrink-0 bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black flex items-center justify-center">
             <Music className="h-8 w-8 text-black" />
           </div>
-          <div>
-            <h1 className="text-2xl font-black">{track.title}</h1>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-black truncate">{track.title}</h1>
             <GenreTagList
               genres={track.genres}
               variant="artist"
               size="sm"
             />
             {track.feedbackFocus && (
-              <p className="text-sm text-amber-600 font-medium mt-2">
+              <p className="text-sm text-amber-600 font-medium mt-2 line-clamp-2">
                 Artist note: {track.feedbackFocus}
               </p>
             )}
           </div>
         </div>
-        <div className="flex items-start gap-3">
+        {/* Actions row - separate on mobile */}
+        <div className="flex items-center gap-3 flex-wrap">
           {(track.status === "PENDING_PAYMENT" || track.status === "QUEUED") && (
             <TrackCancelButton
               trackId={track.id}
@@ -135,7 +137,7 @@ export default async function TrackDetailPage({
             className="flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
           >
             <ExternalLink className="h-4 w-4" />
-            {track.sourceType === "UPLOAD" ? "Download audio" : "View Track"}
+            {track.sourceType === "UPLOAD" ? "Download" : "View Track"}
           </a>
         </div>
       </div>
