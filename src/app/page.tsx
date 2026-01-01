@@ -33,8 +33,8 @@ export default function Home() {
             One opinion is taste.<br />Ten opinions is <span className="text-lime-600">truth</span>.
           </h1>
           <p className="mt-6 text-xl text-neutral-600 max-w-xl leading-relaxed">
-            That doubt before you hit release? Replace it with certainty.
-            Get 10 real listeners to tell you if your track is ready—before the world does.
+            Listened to your track so many times you can&apos;t tell if it&apos;s good anymore?
+            Get 10 fresh ears to tell you what&apos;s working and what needs fixing—within 24 hours.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/signup">
