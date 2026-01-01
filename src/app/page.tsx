@@ -283,7 +283,7 @@ export default function Home() {
                   <Share2 className="h-3.5 w-3.5" />
                   Would share
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-neutral-100 border-2 border-neutral-300 text-neutral-500">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-neutral-100 border-2 border-neutral-300 text-neutral-600">
                   <UserPlus className="h-3.5 w-3.5" />
                   Wouldn&apos;t follow yet
                 </span>
@@ -346,7 +346,7 @@ export default function Home() {
 
             {/* Footer */}
             <div className="p-3 bg-neutral-100 border-t-2 border-black flex items-center justify-between">
-              <span className="text-xs text-neutral-500">1 of 5 reviews</span>
+              <span className="text-xs text-neutral-600">1 of 5 reviews</span>
               <span className="text-[10px] font-mono bg-lime-500 border border-black px-2 py-0.5 font-bold">EXAMPLE</span>
             </div>
           </div>
@@ -365,7 +365,7 @@ export default function Home() {
                 &ldquo;I was about to release a track I wasn&apos;t sure about. 4 of 5 reviewers mentioned the intro was too long. Cut it down, and it&apos;s now my best performing release.&rdquo;
               </p>
               <p className="font-bold text-sm">Marcus T.</p>
-              <p className="text-xs text-neutral-500">Electronic Producer</p>
+              <p className="text-xs text-neutral-600">Electronic Producer</p>
             </div>
 
             <div className="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
@@ -374,7 +374,7 @@ export default function Home() {
                 &ldquo;Finally, feedback I can actually use. Not &apos;sounds good&apos; or random hate—specific timestamps, specific suggestions. Worth every penny.&rdquo;
               </p>
               <p className="font-bold text-sm">Jade K.</p>
-              <p className="text-xs text-neutral-500">Singer-Songwriter</p>
+              <p className="text-xs text-neutral-600">Singer-Songwriter</p>
             </div>
 
             <div className="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
@@ -383,7 +383,7 @@ export default function Home() {
                 &ldquo;The consensus thing is real. When 8 people independently say the same thing, you stop arguing with yourself and just fix it.&rdquo;
               </p>
               <p className="font-bold text-sm">Devon R.</p>
-              <p className="text-xs text-neutral-500">Hip-Hop Artist</p>
+              <p className="text-xs text-neutral-600">Hip-Hop Artist</p>
             </div>
 
             <div className="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
@@ -392,7 +392,7 @@ export default function Home() {
                 &ldquo;I&apos;ve used this for my last 3 releases. The confidence of knowing it&apos;s actually ready before I put it out is priceless.&rdquo;
               </p>
               <p className="font-bold text-sm">Alex M.</p>
-              <p className="text-xs text-neutral-500">Indie Rock</p>
+              <p className="text-xs text-neutral-600">Indie Rock</p>
             </div>
           </div>
         </div>
