@@ -34,7 +34,7 @@ export default function Home() {
           </h1>
           <p className="mt-6 text-xl text-neutral-600 max-w-xl leading-relaxed">
             Listened to your track so many times you can&apos;t tell if it&apos;s good anymore?
-            Get 10 fresh ears to tell you what&apos;s working and what needs fixing—within 24 hours.
+            Get fresh ears on your music—real feedback from real listeners, delivered within 24 hours.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/signup">
@@ -346,7 +346,7 @@ export default function Home() {
 
             {/* Footer */}
             <div className="p-3 bg-neutral-100 border-t-2 border-black flex items-center justify-between">
-              <span className="text-xs text-neutral-500">1 of 10 reviews</span>
+              <span className="text-xs text-neutral-500">1 of 5 reviews</span>
               <span className="text-[10px] font-mono bg-lime-500 border border-black px-2 py-0.5 font-bold">EXAMPLE</span>
             </div>
           </div>
@@ -362,7 +362,7 @@ export default function Home() {
             <div className="border-2 border-black p-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
               <Quote className="h-8 w-8 text-lime-500 mb-4" />
               <p className="text-neutral-700 mb-4">
-                &ldquo;I was about to release a track I wasn&apos;t sure about. 7 of 10 reviewers mentioned the intro was too long. Cut it down, and it&apos;s now my best performing release.&rdquo;
+                &ldquo;I was about to release a track I wasn&apos;t sure about. 4 of 5 reviewers mentioned the intro was too long. Cut it down, and it&apos;s now my best performing release.&rdquo;
               </p>
               <p className="font-bold text-sm">Marcus T.</p>
               <p className="text-xs text-neutral-500">Electronic Producer</p>
