@@ -66,11 +66,12 @@ export default async function ArtistReviewersPage({
     take: 50,
   });
 
-  const getInitials = (name: string) => {
-    const parts = name.trim().split(/\s+/g).filter(Boolean);
-    const first = parts[0]?.[0] ?? "?";
-    const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? "" : "";
-    return (first + last).toUpperCase();
+  const getFirstName = (name: string) => {
+    return name.trim().split(/\s+/g)[0] || "Reviewer";
+  };
+
+  const getInitial = (name: string) => {
+    return (name.trim()[0] || "?").toUpperCase();
   };
 
   return (
@@ -120,9 +121,9 @@ export default async function ArtistReviewersPage({
                       className="inline-flex items-center gap-2 font-medium hover:text-black"
                     >
                       <span className="h-7 w-7 rounded-full bg-neutral-100 border border-black overflow-hidden flex items-center justify-center text-[11px] font-black text-black">
-                        {getInitials(r.user.name ?? "Reviewer")}
+                        {getInitial(r.user.name ?? "Reviewer")}
                       </span>
-                      <span>{r.user.name ?? "Reviewer"}</span>
+                      <span>{getFirstName(r.user.name ?? "Reviewer")}</span>
                     </Link>
                   </td>
                   <td className="px-4 py-3">{r.tier}</td>

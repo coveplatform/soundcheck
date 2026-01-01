@@ -123,17 +123,44 @@ export default function VerifyEmailPage() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Verify your email</CardTitle>
+        <CardTitle className="text-2xl">Check your email</CardTitle>
         <CardDescription>
-          We sent you a verification link. Check your inbox.
+          We&apos;ve sent a verification link to{" "}
+          {initialEmail ? <span className="font-semibold text-neutral-800">{initialEmail}</span> : "your email"}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="bg-lime-50 border-2 border-lime-400 p-3 space-y-1">
+          <p className="text-sm font-semibold text-lime-800">Verification email sent!</p>
+          <p className="text-xs text-lime-700">
+            Click the link in the email to verify your account. The link expires in 24 hours.
+          </p>
+        </div>
+
+        <div className="bg-neutral-100 border-2 border-neutral-300 p-3 space-y-1">
+          <p className="text-sm font-semibold text-neutral-700">Can&apos;t find the email?</p>
+          <ul className="text-xs text-neutral-600 list-disc list-inside space-y-0.5">
+            <li>Check your spam or junk folder</li>
+            <li>Make sure you entered the correct email</li>
+            <li>Wait a minute, then try resending below</li>
+          </ul>
+        </div>
+
         {error && (
           <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
             {error}
           </div>
         )}
+
+        {status === "resent" && (
+          <div className="bg-lime-100 border-2 border-lime-400 p-3">
+            <p className="text-sm font-semibold text-lime-800">New email sent!</p>
+            <p className="text-xs text-lime-700">
+              If that email exists in our system, a new verification link has been sent.
+            </p>
+          </div>
+        )}
+
         <div className="space-y-2">
           <Label htmlFor="email" className="font-bold">Email</Label>
           <Input
@@ -144,15 +171,10 @@ export default function VerifyEmailPage() {
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-        {status === "resent" ? (
-          <p className="text-sm text-neutral-600 bg-lime-100 border-2 border-lime-400 p-3">
-            If that email exists, a new verification link has been sent.
-          </p>
-        ) : null}
       </CardContent>
       <CardFooter className="flex flex-col gap-3">
         <Button onClick={resend} className="w-full" isLoading={isResending}>
-          Resend verification
+          Resend verification email
         </Button>
         <Link href="/login" className="text-sm text-neutral-600 hover:text-black font-medium">
           &larr; Back to login

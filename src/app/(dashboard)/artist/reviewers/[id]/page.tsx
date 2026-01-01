@@ -44,11 +44,9 @@ export default async function ArtistReviewerProfilePage({
     notFound();
   }
 
-  const displayName = reviewer.user.name ?? "Reviewer";
-  const parts = displayName.trim().split(/\s+/g).filter(Boolean);
-  const initials = (
-    (parts[0]?.[0] ?? "?") + (parts.length > 1 ? parts[parts.length - 1]?.[0] ?? "" : "")
-  ).toUpperCase();
+  const fullName = reviewer.user.name ?? "Reviewer";
+  const firstName = fullName.trim().split(/\s+/g)[0] || "Reviewer";
+  const initial = (fullName.trim()[0] || "?").toUpperCase();
 
   const lastActive = reviewer.lastReviewDate
     ? new Date(reviewer.lastReviewDate).toLocaleDateString()
@@ -71,10 +69,10 @@ export default async function ArtistReviewerProfilePage({
         <CardContent className="pt-6 space-y-6">
           <div className="flex items-start gap-4">
             <div className="h-14 w-14 rounded-full bg-neutral-100 border-2 border-black flex items-center justify-center text-lg font-black">
-              {initials}
+              {initial}
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-black truncate">{displayName}</h1>
+              <h1 className="text-xl font-black truncate">{firstName}</h1>
               <div className="mt-2 flex flex-wrap gap-2 text-sm">
                 <span className="inline-flex items-center px-2.5 py-1 border-2 border-black bg-white font-bold">
                   Tier: {reviewer.tier}

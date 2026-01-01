@@ -21,11 +21,12 @@ function isTimestampNote(
   );
 }
 
-function getInitials(name: string) {
-  const parts = name.trim().split(/\s+/g).filter(Boolean);
-  const first = parts[0]?.[0] ?? "?";
-  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? "" : "";
-  return (first + last).toUpperCase();
+function getFirstName(name: string) {
+  return name.trim().split(/\s+/g)[0] || "Reviewer";
+}
+
+function getInitial(name: string) {
+  return (name.trim()[0] || "?").toUpperCase();
 }
 
 export type ReviewData = {
@@ -92,11 +93,11 @@ export function ReviewDisplay({
               href={`/artist/reviewers/${review.reviewer.id}`}
               className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black hover:from-neutral-200 hover:to-neutral-300 transition-colors"
             >
-              {getInitials(review.reviewer.user.name ?? "Reviewer")}
+              {getInitial(review.reviewer.user.name ?? "Reviewer")}
             </Link>
           ) : (
             <span className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black">
-              {getInitials(review.reviewer.user.name ?? "Reviewer")}
+              {getInitial(review.reviewer.user.name ?? "Reviewer")}
             </span>
           )}
 
@@ -108,11 +109,11 @@ export function ReviewDisplay({
                   href={`/artist/reviewers/${review.reviewer.id}`}
                   className="font-bold text-sm text-black hover:underline truncate"
                 >
-                  {review.reviewer.user.name || "Anonymous"}
+                  {getFirstName(review.reviewer.user.name ?? "Reviewer")}
                 </Link>
               ) : (
                 <span className="font-bold text-sm text-black truncate">
-                  {review.reviewer.user.name || "Anonymous"}
+                  {getFirstName(review.reviewer.user.name ?? "Reviewer")}
                 </span>
               )}
               {review.firstImpression && (
