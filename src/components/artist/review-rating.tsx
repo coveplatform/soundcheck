@@ -44,9 +44,9 @@ export function ReviewRating({
   }
 
   return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-xs text-neutral-400 hidden sm:inline">Rate</span>
-      <div className="flex items-center">
+    <div className="flex items-center gap-1 flex-shrink-0">
+      <span className="text-[10px] text-neutral-400 hidden sm:inline">Rate:</span>
+      <div className="flex items-center flex-shrink-0">
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
@@ -57,16 +57,16 @@ export function ReviewRating({
             disabled={isSaving}
             title={`Rate ${n}/5`}
             className={cn(
-              "p-0.5 transition-transform hover:scale-110",
+              "p-0.5 transition-transform hover:scale-110 flex-shrink-0",
               isSaving && "opacity-60 cursor-not-allowed"
             )}
           >
             <Star
               className={cn(
-                "h-4 w-4 transition-colors",
+                "h-5 w-5 transition-colors flex-shrink-0",
                 displayRating !== null && n <= displayRating
-                  ? "text-amber-500 fill-amber-500"
-                  : "text-neutral-300 hover:text-neutral-400"
+                  ? "text-amber-400 fill-amber-400"
+                  : "text-neutral-200 hover:text-neutral-300"
               )}
             />
           </button>

@@ -83,94 +83,84 @@ export function ReviewDisplay({
 
   return (
     <article className="p-6">
-      {/* Header: Number + Actions */}
-      <header className="flex items-start justify-between gap-4 mb-5">
+      {/* Clean header: Reviewer info */}
+      <header className="mb-5">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 bg-black text-white font-mono text-sm font-bold flex items-center justify-center">
-            {String(index + 1).padStart(2, "0")}
-          </div>
-          <div>
-            <time className="text-xs text-neutral-500 font-mono">
-              {review.createdAt.toLocaleDateString()}
-            </time>
-            <div className="mt-0.5">
+          {/* Avatar */}
+          {showControls ? (
+            <Link
+              href={`/artist/reviewers/${review.reviewer.id}`}
+              className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black hover:from-neutral-200 hover:to-neutral-300 transition-colors"
+            >
+              {getInitials(review.reviewer.user.name ?? "Reviewer")}
+            </Link>
+          ) : (
+            <span className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black">
+              {getInitials(review.reviewer.user.name ?? "Reviewer")}
+            </span>
+          )}
+
+          {/* Name + Date + Impression */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
               {showControls ? (
                 <Link
                   href={`/artist/reviewers/${review.reviewer.id}`}
-                  className="inline-flex items-center gap-2 text-xs font-bold text-neutral-700 hover:text-black"
+                  className="font-bold text-sm text-black hover:underline truncate"
                 >
-                  <span className="h-8 w-8 min-w-[2rem] aspect-square flex-shrink-0 rounded-full bg-neutral-100 border-2 border-black overflow-hidden flex items-center justify-center text-xs font-black text-black">
-                    {getInitials(review.reviewer.user.name ?? "Reviewer")}
-                  </span>
-                  <span>
-                    {review.reviewer.user.name
-                      ? review.reviewer.user.name
-                      : "Anonymous"}
-                  </span>
+                  {review.reviewer.user.name || "Anonymous"}
                 </Link>
               ) : (
-                <span className="inline-flex items-center gap-2 text-xs font-bold text-neutral-700">
-                  <span className="h-8 w-8 min-w-[2rem] aspect-square flex-shrink-0 rounded-full bg-neutral-100 border-2 border-black overflow-hidden flex items-center justify-center text-xs font-black text-black">
-                    {getInitials(review.reviewer.user.name ?? "Reviewer")}
-                  </span>
-                  <span>
-                    {review.reviewer.user.name
-                      ? review.reviewer.user.name
-                      : "Anonymous"}
-                  </span>
+                <span className="font-bold text-sm text-black truncate">
+                  {review.reviewer.user.name || "Anonymous"}
                 </span>
               )}
-            </div>
-            {/* First Impression inline */}
-            {review.firstImpression && (
-              <div className="mt-0.5">
+              {review.firstImpression && (
                 <span
-                  className={`text-xs font-bold ${
+                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                     review.firstImpression === "STRONG_HOOK"
-                      ? "text-lime-600"
+                      ? "bg-lime-100 text-lime-700"
                       : review.firstImpression === "DECENT"
-                      ? "text-orange-600"
-                      : "text-neutral-500"
+                      ? "bg-amber-100 text-amber-700"
+                      : "bg-neutral-100 text-neutral-600"
                   }`}
                 >
                   {review.firstImpression === "STRONG_HOOK"
                     ? "Strong Hook"
                     : review.firstImpression === "DECENT"
-                    ? "Decent Start"
+                    ? "Decent"
                     : "Lost Interest"}
                 </span>
-              </div>
-            )}
+              )}
+            </div>
+            <time className="text-xs text-neutral-500">
+              {review.createdAt.toLocaleDateString()}
+            </time>
           </div>
         </div>
 
-        {/* Action toolbar */}
+        {/* Action toolbar - separate row, mobile friendly */}
         {showControls && (
-          <div className="flex items-center gap-3">
-            {review.shareId && (
-              <button
-                onClick={handleShare}
-                className="flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 border-black bg-white hover:bg-neutral-100 transition-colors"
-                title="Copy share link"
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-3.5 w-3.5 text-lime-600" />
-                    <span className="text-lime-600">Copied!</span>
-                  </>
-                ) : (
-                  <>
-                    <Link2 className="h-3.5 w-3.5" />
-                    <span>Share</span>
-                  </>
-                )}
-              </button>
-            )}
+          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-100">
             <ReviewRating
               reviewId={review.id}
               initialRating={review.artistRating ?? null}
             />
-            <ReviewGem reviewId={review.id} initialIsGem={review.isGem ?? false} />
+            <div className="flex-1" />
+            <ReviewGem reviewId={review.id} initialIsGem={review.isGem ?? false} compact />
+            {review.shareId && (
+              <button
+                onClick={handleShare}
+                className="p-2 text-neutral-500 hover:text-black hover:bg-neutral-100 rounded transition-colors"
+                title="Copy share link"
+              >
+                {copied ? (
+                  <Check className="h-4 w-4 text-lime-600" />
+                ) : (
+                  <Link2 className="h-4 w-4" />
+                )}
+              </button>
+            )}
           </div>
         )}
       </header>
