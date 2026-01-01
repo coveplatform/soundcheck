@@ -3,8 +3,13 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AudioPlayer } from "@/components/audio/audio-player";
+import { GenreTagList } from "@/components/ui/genre-tag";
 import { ReviewDisplay } from "@/components/reviews/review-display";
-import { ArrowLeft, Star, Flag, Gem } from "lucide-react";
+import {
+  ArrowLeft,
+  Music,
+  ExternalLink,
+} from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +30,7 @@ export default async function AdminReviewPreviewPage({
       },
       track: {
         include: {
-          artist: { include: { user: { select: { email: true } } } },
+          artist: { include: { user: { select: { email: true, name: true } } } },
           genres: true,
         },
       },
@@ -37,108 +42,67 @@ export default async function AdminReviewPreviewPage({
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6">
+      {/* Back Link */}
       <Link
         href="/admin/reviews"
-        className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-black"
+        className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Reviews
       </Link>
 
-      <div>
-        <h1 className="text-2xl font-bold">Review Preview</h1>
-        <p className="text-neutral-500">
-          This is exactly what the artist sees for this review
-        </p>
-      </div>
-
-      {/* Reviewer info */}
-      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-        <div className="text-sm text-neutral-500 mb-1">Reviewed by</div>
-        <div className="font-bold text-lg">{review.reviewer.user.name || "Unknown"}</div>
-        <div className="text-sm text-neutral-600">{review.reviewer.user.email}</div>
-        <div className="flex gap-4 mt-2 text-sm text-neutral-500">
-          <span>Tier: {review.reviewer.tier}</span>
-          <span>Total reviews: {review.reviewer.totalReviews}</span>
-          <span>Avg rating: {review.reviewer.averageRating.toFixed(2)}</span>
-        </div>
-      </div>
-
-      {/* Admin metadata */}
-      <div className="grid md:grid-cols-4 gap-4">
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Status</div>
-          <div className="font-medium">{review.status}</div>
-        </div>
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Artist Rating</div>
-          <div className="font-medium flex items-center gap-1">
-            {review.artistRating ? (
-              <>
-                {review.artistRating}/5
-                <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-              </>
-            ) : (
-              <span className="text-neutral-400">Not rated</span>
+      {/* Track Header - Same as artist view */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-4">
+          <div className="h-16 w-16 bg-neutral-100 border-2 border-black flex items-center justify-center">
+            <Music className="h-8 w-8 text-black" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black">{review.track.title}</h1>
+            <GenreTagList
+              genres={review.track.genres}
+              variant="artist"
+              size="sm"
+            />
+            {review.track.feedbackFocus && (
+              <p className="text-sm text-amber-600 font-medium mt-2">
+                Artist note: {review.track.feedbackFocus}
+              </p>
             )}
           </div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Flagged</div>
-          <div className="font-medium flex items-center gap-1">
-            {review.wasFlagged ? (
-              <>
-                <Flag className="h-4 w-4 text-red-500" />
-                {review.flagReason || "Yes"}
-              </>
-            ) : (
-              <span className="text-neutral-400">No</span>
-            )}
-          </div>
-        </div>
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Is Gem</div>
-          <div className="font-medium flex items-center gap-1">
-            {review.isGem ? (
-              <>
-                <Gem className="h-4 w-4 text-amber-500" />
-                Yes
-              </>
-            ) : (
-              <span className="text-neutral-400">No</span>
-            )}
-          </div>
-        </div>
+        <a
+          href={review.track.sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
+        >
+          <ExternalLink className="h-4 w-4" />
+          {review.track.sourceType === "UPLOAD" ? "Download audio" : "View Track"}
+        </a>
       </div>
 
-      {/* Track info */}
-      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-        <div className="text-sm text-neutral-500 mb-2">Track</div>
-        <div className="font-medium">{review.track.title}</div>
-        <div className="text-sm text-neutral-500">
-          by {review.track.artist.user.email}
-        </div>
-        {review.track.feedbackFocus && (
-          <p className="text-sm text-amber-600 font-medium mt-2">
-            Artist note: {review.track.feedbackFocus}
-          </p>
-        )}
-        <div className="mt-4">
+      {/* Audio Player - Same as artist view */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Listen</CardTitle>
+        </CardHeader>
+        <CardContent>
           <AudioPlayer
             sourceUrl={review.track.sourceUrl}
             sourceType={review.track.sourceType}
             showListenTracker={false}
             showWaveform={review.track.sourceType === "UPLOAD"}
           />
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Review content (what artist sees) */}
+      {/* Review - Same styling as artist view */}
       {review.status === "COMPLETED" ? (
         <Card>
           <CardHeader className="border-b-2 border-black">
-            <CardTitle>Artist View</CardTitle>
+            <CardTitle>Review</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y-2 divide-black">
@@ -151,11 +115,19 @@ export default async function AdminReviewPreviewPage({
           </CardContent>
         </Card>
       ) : (
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-6 text-center">
-          <p className="text-neutral-500">
-            Review is not completed yet (status: {review.status})
-          </p>
-        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center py-12 px-6">
+              <div className="mx-auto w-12 h-12 bg-neutral-100 border-2 border-black flex items-center justify-center mb-4">
+                <Music className="h-6 w-6 text-black" />
+              </div>
+              <h3 className="font-bold text-black">Review not completed</h3>
+              <p className="text-sm text-neutral-600 mt-1">
+                Status: {review.status}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

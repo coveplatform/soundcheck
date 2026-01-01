@@ -9,6 +9,7 @@ import { AggregateAnalytics } from "@/components/feedback/aggregate-analytics";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { GenreTagList } from "@/components/ui/genre-tag";
 import { ReviewDisplay } from "@/components/reviews/review-display";
+import { ReviewCarousel } from "@/components/reviews/review-carousel";
 import {
   ArrowLeft,
   Music,
@@ -326,34 +327,13 @@ export default async function TrackDetailPage({
 
       {completedReviews > 0 && <AggregateAnalytics reviews={track.reviews} />}
 
-      {/* Reviews */}
+      {/* Reviews - Carousel for better presentation */}
       <Card>
-        <CardHeader className="border-b-2 border-black">
-          <CardTitle>Reviews ({completedReviews})</CardTitle>
+        <CardHeader className="border-b-2 border-black p-0">
+          <CardTitle className="sr-only">Reviews ({completedReviews})</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {completedReviews === 0 ? (
-            <div className="text-center py-12 px-6">
-              <div className="mx-auto w-12 h-12 bg-neutral-100 border-2 border-black flex items-center justify-center mb-4">
-                <Music className="h-6 w-6 text-black" />
-              </div>
-              <h3 className="font-bold text-black">No reviews yet</h3>
-              <p className="text-sm text-neutral-600 mt-1">
-                Check back soon!
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y-2 divide-black">
-              {track.reviews.map((review, index) => (
-                <ReviewDisplay
-                  key={review.id}
-                  review={review}
-                  index={index}
-                  showControls={true}
-                />
-              ))}
-            </div>
-          )}
+          <ReviewCarousel reviews={track.reviews} showControls={true} />
         </CardContent>
       </Card>
     </div>

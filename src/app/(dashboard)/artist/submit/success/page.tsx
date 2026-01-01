@@ -33,6 +33,7 @@ export default function SuccessPage() {
 
   const isBypass = useMemo(() => Boolean(sessionId?.startsWith("bypass_")), [sessionId]);
   const isPromo = useMemo(() => Boolean(sessionId?.startsWith("promo_")), [sessionId]);
+  const isFreeCredit = useMemo(() => Boolean(sessionId?.startsWith("free_credit_")), [sessionId]);
 
   // Track checkout completion
   useEffect(() => {
@@ -129,12 +130,14 @@ export default function SuccessPage() {
       <div className="max-w-md mx-auto mt-20">
         <Card>
           <CardHeader className="text-center pb-2">
-            {isPromo ? (
+            {isPromo || isFreeCredit ? (
               <>
                 <div className="mx-auto w-12 h-12 bg-lime-100 rounded-full flex items-center justify-center mb-4">
                   <Gift className="h-6 w-6 text-lime-600" />
                 </div>
-                <CardTitle className="text-xl">Activating your promo…</CardTitle>
+                <CardTitle className="text-xl">
+                  {isFreeCredit ? "Using your free credit…" : "Activating your promo…"}
+                </CardTitle>
               </>
             ) : (
               <CardTitle className="text-xl">Verifying payment…</CardTitle>
@@ -150,9 +153,9 @@ export default function SuccessPage() {
                 <span>What happens next?</span>
               </div>
               <ol className="text-sm text-neutral-500 space-y-2 ml-6">
-                {isPromo ? (
+                {isPromo || isFreeCredit ? (
                   <>
-                    <li>1. Your promo code is applied</li>
+                    <li>1. {isFreeCredit ? "Your free credit is applied" : "Your promo code is applied"}</li>
                     <li>2. Your track is queued for 1 free review</li>
                     <li>3. A genre-matched reviewer will listen and provide feedback</li>
                   </>
@@ -177,13 +180,13 @@ export default function SuccessPage() {
         <Card>
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-xl">
-              {isPromo ? "Something went wrong" : "Payment not confirmed"}
+              {isPromo || isFreeCredit ? "Something went wrong" : "Payment not confirmed"}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-neutral-500">
-              {isPromo
-                ? error || "We couldn't process your promo code. Please try again."
+              {isPromo || isFreeCredit
+                ? error || (isFreeCredit ? "We couldn't apply your free credit. Please try again." : "We couldn't process your promo code. Please try again.")
                 : error || "We couldn't confirm your payment."}
             </p>
             <div className="flex flex-col gap-2">
@@ -211,7 +214,7 @@ export default function SuccessPage() {
     <div className="max-w-md mx-auto mt-20">
       <Card>
         <CardHeader className="text-center pb-2">
-          {isPromo ? (
+          {isPromo || isFreeCredit ? (
             <div className="mx-auto w-12 h-12 bg-lime-100 rounded-full flex items-center justify-center mb-4">
               <Gift className="h-6 w-6 text-lime-600" />
             </div>
@@ -221,13 +224,13 @@ export default function SuccessPage() {
             </div>
           )}
           <CardTitle className="text-xl">
-            {isPromo ? "Promo Applied!" : "Track Submitted!"}
+            {isFreeCredit ? "Free Credit Applied!" : isPromo ? "Promo Applied!" : "Track Submitted!"}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
-          {isPromo ? (
+          {isPromo || isFreeCredit ? (
             <p className="text-neutral-500">
-              Your promo code was applied successfully. Your track is now queued
+              {isFreeCredit ? "Your free credit was applied successfully." : "Your promo code was applied successfully."} Your track is now queued
               for <strong className="text-neutral-700">1 free review</strong> from
               a genre-matched listener.
             </p>
@@ -244,7 +247,7 @@ export default function SuccessPage() {
               <span>What happens next?</span>
             </div>
             <ol className="text-sm text-neutral-500 space-y-2 ml-6">
-              {isPromo ? (
+              {isPromo || isFreeCredit ? (
                 <>
                   <li>1. A reviewer is matched to your track based on genre</li>
                   <li>2. They&apos;ll listen and submit structured notes + scores</li>
