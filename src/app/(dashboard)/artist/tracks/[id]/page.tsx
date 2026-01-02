@@ -19,6 +19,8 @@ import {
   ListMusic,
   Share2,
   UserPlus,
+  CreditCard,
+  AlertCircle,
 } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
@@ -103,6 +105,24 @@ export default async function TrackDetailPage({
 
       {/* Track Header */}
       <div className="space-y-4">
+        {track.status === "PENDING_PAYMENT" && (
+          <div className="bg-orange-50 border-2 border-orange-400 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-orange-600" />
+              <div>
+                <p className="font-bold text-orange-900">Payment Pending</p>
+                <p className="text-sm text-orange-700">Finish submitting this track to start receiving feedback.</p>
+              </div>
+            </div>
+            <Link href={`/artist/submit/checkout?trackId=${track.id}`}>
+              <Button variant="primary" className="bg-orange-500 hover:bg-orange-600 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <CreditCard className="h-4 w-4 mr-2" />
+                Complete Payment
+              </Button>
+            </Link>
+          </div>
+        )}
+
         <div className="flex items-start gap-4">
           {/* Album art placeholder - stays square */}
           <div className="h-16 w-16 min-w-[4rem] aspect-square flex-shrink-0 bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black flex items-center justify-center">

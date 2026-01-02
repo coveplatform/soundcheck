@@ -208,16 +208,23 @@ export async function POST(request: Request) {
         userId: session.user.id,
       },
       success_url: `${baseUrl}/artist/submit/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/artist/submit?trackId=${track.id}`,
+      cancel_url: `${baseUrl}/artist/tracks/${track.id}`,
     });
 
-    // Create payment record
-    await prisma.payment.create({
-      data: {
+    // Create or update payment record
+    await prisma.payment.upsert({
+      where: { trackId: track.id },
+      create: {
         trackId: track.id,
         amount: packageDetails.price,
         stripeSessionId: checkoutSession.id,
         status: "PENDING",
+      },
+      update: {
+        amount: packageDetails.price,
+        stripeSessionId: checkoutSession.id,
+        status: "PENDING",
+        completedAt: null, // Reset if somehow it was set
       },
     });
 

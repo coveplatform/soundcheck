@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Music, Plus, Clock, CheckCircle, AlertCircle, Gift } from "lucide-react";
+import { Music, Plus, Clock, CheckCircle, AlertCircle, Gift, CreditCard } from "lucide-react";
 import { GenreTagList } from "@/components/ui/genre-tag";
 
 export const dynamic = 'force-dynamic';
@@ -185,6 +185,16 @@ export default async function ArtistDashboardPage() {
                       </div>
 
                       <div className="flex items-center gap-4 flex-shrink-0">
+                        {/* Action for pending payment */}
+                        {track.status === "PENDING_PAYMENT" && (
+                          <Link href={`/artist/submit/checkout?trackId=${track.id}`}>
+                            <Button size="sm" variant="outline" className="hidden sm:flex border-orange-400 text-orange-600 hover:bg-orange-50 hover:text-orange-700">
+                              <CreditCard className="h-3.5 w-3.5 mr-1.5" />
+                              Pay Now
+                            </Button>
+                          </Link>
+                        )}
+
                         {/* Progress */}
                         <div className="text-right hidden sm:block">
                           <p className="text-sm font-bold">
