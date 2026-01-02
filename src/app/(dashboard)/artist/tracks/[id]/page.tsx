@@ -4,6 +4,7 @@ import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { TrackCancelButton } from "@/components/artist/track-cancel-button";
 import { AggregateAnalytics } from "@/components/feedback/aggregate-analytics";
 import { AudioPlayer } from "@/components/audio/audio-player";
