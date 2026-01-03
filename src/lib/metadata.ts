@@ -69,97 +69,35 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
   const source = detectSource(url);
   if (!source) return null;
 
-  // For now, we extract basic info from the URL
-  // In production, you'd call oEmbed APIs or use server-side scraping
-
   try {
+    // Use server-side API to fetch metadata (avoids CORS issues)
+    const response = await fetch("/api/metadata", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        title: data.title || "Untitled Track",
+        source,
+        artworkUrl: data.artworkUrl,
+      };
+    }
+
+    // Fallback: extract title from URL slug
     const parsed = new URL(url);
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    const trackSlug = parts[parts.length - 1] || "";
+    const title = trackSlug
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
 
-    if (source === "SOUNDCLOUD") {
-      // Use SoundCloud's oEmbed API to get proper metadata including artwork
-      try {
-        const oembedUrl = `https://soundcloud.com/oembed?url=${encodeURIComponent(url)}&format=json`;
-        const response = await fetch(oembedUrl);
-        if (response.ok) {
-          const data = await response.json();
-          return {
-            title: data.title || "Untitled Track",
-            source,
-            artworkUrl: data.thumbnail_url,
-          };
-        }
-      } catch {
-        // Fall back to URL parsing if oEmbed fails
-      }
-
-      // Fallback: extract title from URL slug
-      const parts = parsed.pathname.split("/").filter(Boolean);
-      const trackSlug = parts[parts.length - 1] || "";
-      const title = trackSlug
-        .replace(/-/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase());
-
-      return {
-        title: title || "Untitled Track",
-        source,
-      };
-    }
-
-    if (source === "BANDCAMP") {
-      // Use Bandcamp's oEmbed API to get proper metadata
-      try {
-        const oembedUrl = `https://bandcamp.com/oembed?url=${encodeURIComponent(url)}&format=json`;
-        const response = await fetch(oembedUrl);
-        if (response.ok) {
-          const data = await response.json();
-          return {
-            title: data.title || "Untitled Track",
-            source,
-            artworkUrl: data.thumbnail_url,
-          };
-        }
-      } catch {
-        // Fall back to URL parsing if oEmbed fails
-      }
-
-      // Fallback: extract title from URL slug
-      const parts = parsed.pathname.split("/").filter(Boolean);
-      const trackSlug = parts[parts.length - 1] || "";
-      const title = trackSlug
-        .replace(/-/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase());
-
-      return {
-        title: title || "Untitled Track",
-        source,
-      };
-    }
-
-    if (source === "YOUTUBE") {
-      // Use YouTube's oEmbed API to get the actual video title
-      try {
-        const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
-        const response = await fetch(oembedUrl);
-        if (response.ok) {
-          const data = await response.json();
-          return {
-            title: data.title || "Untitled Video",
-            source,
-            artworkUrl: data.thumbnail_url,
-          };
-        }
-      } catch {
-        // Fall back to video ID if oEmbed fails
-      }
-
-      const videoId = parsed.searchParams.get("v") || parsed.pathname.slice(1);
-      return {
-        title: `YouTube Video (${videoId})`,
-        source,
-      };
-    }
-
-    return null;
+    return {
+      title: title || "Untitled Track",
+      source,
+    };
   } catch {
     return null;
   }

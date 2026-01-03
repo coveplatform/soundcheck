@@ -472,7 +472,7 @@ export default function SubmitTrackPage() {
             </div>
           )}
 
-          <div className="mt-6">
+          <div className="mt-4">
             <Button
               onClick={() => setStep("details")}
               disabled={!hasTrack}
@@ -549,7 +549,7 @@ export default function SubmitTrackPage() {
             </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-4">
             <Button
               onClick={() => setStep("package")}
               disabled={!hasDetails}
@@ -575,7 +575,7 @@ export default function SubmitTrackPage() {
             <p className="text-neutral-500 mt-1">More opinions = clearer picture</p>
           </div>
 
-          <div className="space-y-3 flex-1">
+          <div className="grid sm:grid-cols-2 gap-3">
             {ACTIVE_PACKAGE_TYPES.map((key) => {
               const pkg = PACKAGES[key];
               const isSelected = selectedPackage === key;
@@ -585,29 +585,41 @@ export default function SubmitTrackPage() {
                   type="button"
                   onClick={() => setSelectedPackage(key)}
                   className={cn(
-                    "w-full p-4 border-2 text-left transition-all flex items-center justify-between",
-                    isSelected ? "border-black bg-lime-400" : "border-neutral-200 hover:border-black"
+                    "p-4 border-2 border-black text-left transition-colors",
+                    isSelected
+                      ? "bg-lime-500"
+                      : "bg-white hover:bg-neutral-50"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "w-5 h-5 rounded-full border-2 flex items-center justify-center",
-                      isSelected ? "border-black bg-black" : "border-neutral-300"
-                    )}>
-                      {isSelected && <Check className="h-3 w-3 text-white" />}
+                  <div className="flex items-start justify-between">
+                    <div className="min-w-0">
+                      <h3 className="font-bold truncate">{pkg.name}</h3>
+                      <p className="text-sm text-neutral-600 mt-0.5">
+                        {pkg.reviews} reviews
+                      </p>
                     </div>
-                    <div>
-                      <p className="font-bold">{pkg.name}</p>
-                      <p className="text-sm text-neutral-600">{pkg.reviews} reviews</p>
+                    <div className="text-right flex-shrink-0">
+                      <p className="font-black text-lg">
+                        ${(pkg.price / 100).toFixed(2)}
+                      </p>
+                      <p className="text-xs text-neutral-600 font-mono">
+                        ${(pkg.price / pkg.reviews / 100).toFixed(2)}/review
+                      </p>
                     </div>
                   </div>
-                  <p className="font-black text-xl">${(pkg.price / 100).toFixed(0)}</p>
+                  <p className="text-xs text-neutral-600 mt-2">{pkg.mix}</p>
+                  {isSelected && (
+                    <div className="flex items-center gap-1.5 mt-2 text-black">
+                      <Check className="h-4 w-4" />
+                      <span className="text-sm font-bold">Selected</span>
+                    </div>
+                  )}
                 </button>
               );
             })}
           </div>
 
-          <div className="mt-6">
+          <div className="mt-4">
             <Button
               onClick={() => setStep("confirm")}
               variant="primary"
@@ -632,7 +644,7 @@ export default function SubmitTrackPage() {
             <p className="text-neutral-500 mt-1">Here&apos;s what you&apos;re getting</p>
           </div>
 
-          <div className="border-2 border-black p-4 space-y-3 flex-1">
+          <div className="border-2 border-black p-4 space-y-3">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm text-neutral-500">Track</p>
@@ -657,32 +669,46 @@ export default function SubmitTrackPage() {
             )}
           </div>
 
-          <div className="mt-6 border-t-2 border-black pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-sm text-neutral-500">Total</p>
+          <div className="mt-4 bg-black text-white border-2 border-black p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+              <div className="min-w-0">
+                <p className="text-neutral-400 text-sm font-medium">Total</p>
                 {freeCredits > 0 ? (
                   <div className="flex items-center gap-2">
-                    <p className="text-3xl font-black text-lime-600">FREE</p>
-                    <span className="text-neutral-400 line-through">${(selectedPackageDetails.price / 100).toFixed(0)}</span>
+                    <p className="text-3xl font-black text-lime-500">FREE</p>
+                    <span className="text-neutral-500 line-through text-lg">
+                      ${(selectedPackageDetails.price / 100).toFixed(2)}
+                    </span>
                   </div>
                 ) : (
-                  <p className="text-3xl font-black">${(selectedPackageDetails.price / 100).toFixed(0)}</p>
+                  <p className="text-3xl font-black">
+                    ${(selectedPackageDetails.price / 100).toFixed(2)}
+                  </p>
                 )}
               </div>
-              <div className="text-right text-sm text-neutral-500">
-                {freeCredits > 0 ? "1 review (free credit)" : `${selectedPackageDetails.reviews} reviews`}
+              <div className="text-left sm:text-right">
+                <p className="text-neutral-400 text-sm font-mono">
+                  {freeCredits > 0 ? "1 review" : `${selectedPackageDetails.reviews} reviews`}
+                </p>
+                <p className="text-neutral-400 text-sm font-mono">
+                  24 hours max (usually shorter)
+                </p>
               </div>
             </div>
-
+            {freeCredits > 0 && (
+              <p className="text-xs text-lime-500 font-medium flex items-center gap-1 mb-4">
+                <Gift className="h-3 w-3" />
+                Using your free review credit
+              </p>
+            )}
             <Button
               onClick={handleSubmit}
               isLoading={isSubmitting}
               disabled={isSubmitting}
               variant="primary"
-              className="w-full h-12 text-base"
+              className="w-full"
             >
-              {freeCredits > 0 ? "Submit for Free" : "Continue to Payment"}
+              {freeCredits > 0 ? "Use Your Free Review" : "Continue to Payment"}
             </Button>
           </div>
         </div>
