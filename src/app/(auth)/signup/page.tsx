@@ -318,7 +318,7 @@ export default function SignupPage() {
               id="referralSource"
               value={referralSource}
               onChange={(e) => setReferralSource(e.target.value)}
-              className="w-full h-10 px-3 border-2 border-black bg-white text-sm focus:outline-none focus:ring-2 focus:ring-lime-400"
+              className="w-full h-10 px-3 border-2 border-black bg-white text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-lime-400"
             >
               <option value="">Select an option...</option>
               <option value="reddit">Reddit</option>
