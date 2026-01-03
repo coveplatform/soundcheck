@@ -75,8 +75,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "session_id is required" }, { status: 400 });
   }
 
-  // Handle bypass_, promo_, and free_credit_ prefixes (no Stripe lookup needed)
-  const specialPrefixes = ["bypass_", "promo_", "free_credit_"] as const;
+  // Handle bypass_ and free_credit_ prefixes (no Stripe lookup needed)
+  const specialPrefixes = ["bypass_", "free_credit_"] as const;
   const matchedPrefix = specialPrefixes.find((p) => stripeSessionId.startsWith(p));
 
   if (matchedPrefix) {

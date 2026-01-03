@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Gift } from "lucide-react";
@@ -10,12 +10,8 @@ export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const trackId = searchParams.get("trackId");
-  const promoCode = searchParams.get("promo");
   const useFreeCredit = searchParams.get("useFreeCredit") === "true";
   const [error, setError] = useState("");
-
-  const hasPromo = useMemo(() => Boolean(promoCode?.trim()), [promoCode]);
-  const hasFreeCredit = useFreeCredit;
 
   useEffect(() => {
     async function createCheckout() {
@@ -30,7 +26,6 @@ export default function CheckoutPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             trackId,
-            promoCode: promoCode || undefined,
             useFreeCredit: useFreeCredit || undefined,
           }),
         });
@@ -72,7 +67,7 @@ export default function CheckoutPage() {
     }
 
     createCheckout();
-  }, [trackId]);
+  }, [trackId, useFreeCredit, router]);
 
   if (error) {
     return (
@@ -92,7 +87,7 @@ export default function CheckoutPage() {
     );
   }
 
-  if (hasFreeCredit) {
+  if (useFreeCredit) {
     return (
       <div className="max-w-md mx-auto mt-20">
         <Card>
@@ -101,22 +96,6 @@ export default function CheckoutPage() {
             <p className="mt-4 text-neutral-600">Using your free review credit…</p>
             <p className="mt-2 text-sm text-neutral-500">
               Your track is being submitted for 1 free review.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (hasPromo) {
-    return (
-      <div className="max-w-md mx-auto mt-20">
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <Gift className="h-8 w-8 mx-auto text-lime-600" />
-            <p className="mt-4 text-neutral-600">Applying your promo code…</p>
-            <p className="mt-2 text-sm text-neutral-500">
-              You&apos;ll receive 1 free review for your track.
             </p>
           </CardContent>
         </Card>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,7 @@ interface Genre {
 
 export default function ArtistOnboardingPage() {
   const router = useRouter();
+  const { update: updateSession } = useSession();
   const [artistName, setArtistName] = useState("");
   const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -91,6 +93,9 @@ export default function ArtistOnboardingPage() {
         return;
       }
 
+      // Refresh the session to update the JWT token with isArtist = true
+      // This prevents middleware from redirecting back due to stale token
+      await updateSession();
       router.push("/artist/dashboard");
       router.refresh();
     } catch {

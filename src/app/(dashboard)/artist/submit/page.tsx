@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Music, ExternalLink, Check, Loader2, X, AlertCircle, Upload, Gift } from "lucide-react";
+import { Music, ExternalLink, Check, Loader2, Upload, Gift } from "lucide-react";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, ACTIVE_PACKAGE_TYPES, PACKAGES, PackageType } from "@/lib/metadata";
@@ -41,10 +41,6 @@ export default function SubmitTrackPage() {
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<PackageType>("STANDARD");
-  const [promoCode, setPromoCode] = useState("");
-  const [promoStatus, setPromoStatus] = useState<"idle" | "validating" | "valid" | "invalid">("idle");
-  const [promoError, setPromoError] = useState("");
-  const promoValidationTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // UI state
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -88,71 +84,6 @@ export default function SubmitTrackPage() {
       }
     }
     fetchCredits();
-  }, []);
-
-  const validatePromoCode = useCallback(async (code: string) => {
-    if (!code.trim()) {
-      setPromoStatus("idle");
-      setPromoError("");
-      return;
-    }
-
-    setPromoStatus("validating");
-    setPromoError("");
-
-    try {
-      const response = await fetch("/api/promo/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: code.trim() }),
-      });
-
-      const data = await response.json();
-
-      if (data.valid) {
-        setPromoStatus("valid");
-        setPromoError("");
-      } else {
-        setPromoStatus("invalid");
-        setPromoError(data.error || "Invalid promo code");
-      }
-    } catch {
-      setPromoStatus("invalid");
-      setPromoError("Failed to validate promo code");
-    }
-  }, []);
-
-  const handlePromoCodeChange = (value: string) => {
-    const upperValue = value.toUpperCase();
-    setPromoCode(upperValue);
-
-    // Clear any pending validation
-    if (promoValidationTimeout.current) {
-      clearTimeout(promoValidationTimeout.current);
-    }
-
-    if (!upperValue.trim()) {
-      setPromoStatus("idle");
-      setPromoError("");
-      return;
-    }
-
-    // Set to validating immediately to show loading state
-    setPromoStatus("validating");
-
-    // Debounce the actual validation
-    promoValidationTimeout.current = setTimeout(() => {
-      validatePromoCode(upperValue);
-    }, 500);
-  };
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (promoValidationTimeout.current) {
-        clearTimeout(promoValidationTimeout.current);
-      }
-    };
   }, []);
 
   const handleUrlChange = async (value: string) => {
@@ -409,8 +340,6 @@ export default function SubmitTrackPage() {
       let checkoutUrl = `/artist/submit/checkout?trackId=${data.id}`;
       if (freeCredits > 0) {
         checkoutUrl += "&useFreeCredit=true";
-      } else if (promoCode.trim()) {
-        checkoutUrl += `&promo=${encodeURIComponent(promoCode.trim())}`;
       }
       router.push(checkoutUrl);
     } catch {
@@ -757,48 +686,6 @@ export default function SubmitTrackPage() {
               </p>
             </div>
           </div>
-          {/* Only show promo code input if no free credits */}
-          {freeCredits === 0 && (
-            <div className="mb-4 space-y-2">
-              <div className="relative">
-                <Input
-                  placeholder="Promo code (optional)"
-                  value={promoCode}
-                  onChange={(e) => handlePromoCodeChange(e.target.value)}
-                  className={cn(
-                    "bg-neutral-900 border-neutral-700 text-white placeholder:text-neutral-500 font-mono pr-10",
-                    promoStatus === "valid" && "border-lime-500",
-                    promoStatus === "invalid" && "border-red-500"
-                  )}
-                />
-                {promoCode.trim() && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    {promoStatus === "validating" && (
-                      <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
-                    )}
-                    {promoStatus === "valid" && (
-                      <Check className="h-4 w-4 text-lime-500" />
-                    )}
-                    {promoStatus === "invalid" && (
-                      <X className="h-4 w-4 text-red-500" />
-                    )}
-                  </div>
-                )}
-              </div>
-              {promoStatus === "valid" && (
-                <p className="text-xs text-lime-500 font-medium flex items-center gap-1">
-                  <Check className="h-3 w-3" />
-                  Promo code applied - you&apos;ll receive 1 free review
-                </p>
-              )}
-              {promoStatus === "invalid" && promoError && (
-                <p className="text-xs text-red-400 font-medium flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {promoError}
-                </p>
-              )}
-            </div>
-          )}
           {freeCredits > 0 && (
             <p className="text-xs text-lime-500 font-medium flex items-center gap-1 mb-4">
               <Gift className="h-3 w-3" />
@@ -816,17 +703,14 @@ export default function SubmitTrackPage() {
               selectedGenres.length === 0 ||
               (inputMode === "url"
                 ? !url || !!urlError
-                : !uploadedUrl) ||
-              (freeCredits === 0 && promoCode.trim().length > 0 && promoStatus !== "valid")
+                : !uploadedUrl)
             }
             variant="primary"
             className="w-full"
           >
             {freeCredits > 0
               ? "Use Your Free Review"
-              : promoStatus === "valid"
-                ? "Submit with Promo Code"
-                : "Continue to Payment"}
+              : "Continue to Payment"}
           </Button>
         </CardContent>
       </Card>

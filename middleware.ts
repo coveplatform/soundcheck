@@ -67,9 +67,9 @@ export async function middleware(request: NextRequest) {
       }
       return NextResponse.next();
     }
-    // Not an artist and not on onboarding? Redirect to home
+    // Not an artist and not on onboarding? Redirect to onboarding to complete setup
     if (!token.isArtist) {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL("/artist/onboarding", request.url));
     }
     return NextResponse.next();
   }

@@ -33,39 +33,10 @@ export async function POST(request: Request) {
 
     const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
 
-    const { trackId, promoCode, useFreeCredit } = await request.json();
+    const { trackId, useFreeCredit } = await request.json();
 
     if (!trackId) {
       return NextResponse.json({ error: "Track ID required" }, { status: 400 });
-    }
-
-    // Check if promo code is valid
-    const validPromoCodes = (process.env.PROMO_CODES ?? "")
-      .split(",")
-      .map((code) => code.trim().toUpperCase())
-      .filter(Boolean);
-    let isValidPromo =
-      promoCode && validPromoCodes.includes(promoCode.toUpperCase());
-
-    // Check if user already used a promo code before
-    if (isValidPromo) {
-      const existingPromoUsage = await prisma.payment.findFirst({
-        where: {
-          stripeSessionId: { startsWith: "promo_" },
-          track: {
-            artist: {
-              userId: session.user.id,
-            },
-          },
-        },
-      });
-
-      if (existingPromoUsage) {
-        return NextResponse.json(
-          { error: "You have already used a promo code" },
-          { status: 400 }
-        );
-      }
     }
 
     // Get track with artist profile (includes freeReviewCredits)
@@ -105,11 +76,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid package" }, { status: 400 });
     }
 
-    if (bypassPayments || isValidPromo || useFreeCreditForPayment) {
+    if (bypassPayments || useFreeCreditForPayment) {
       const paidAt = new Date();
 
-      // Promo codes and free credits get 1 review only
-      const freeReviewCount = (isValidPromo || useFreeCreditForPayment) ? 1 : undefined;
+      // Free credits get 1 review only
+      const freeReviewCount = useFreeCreditForPayment ? 1 : undefined;
 
       const updated = await prisma.track.updateMany({
         where: { id: track.id, status: "PENDING_PAYMENT", paidAt: null },
@@ -117,20 +88,18 @@ export async function POST(request: Request) {
           status: "QUEUED",
           paidAt,
           ...(freeReviewCount && { reviewsRequested: freeReviewCount }),
-          ...(isValidPromo && { promoCode: promoCode.toUpperCase() }),
           ...(useFreeCreditForPayment && { promoCode: "FREE_CREDIT" }),
         },
       });
 
       if (updated.count > 0) {
-        // Create $0 payment record for promo codes or free credits
-        if (isValidPromo || useFreeCreditForPayment) {
-          const sessionIdPrefix = useFreeCreditForPayment ? "free_credit" : `promo_${promoCode.toUpperCase()}`;
+        // Create $0 payment record for free credits
+        if (useFreeCreditForPayment) {
           await prisma.payment.create({
             data: {
               trackId: track.id,
               amount: 0,
-              stripeSessionId: `${sessionIdPrefix}_${track.id}_${paidAt.getTime()}`,
+              stripeSessionId: `free_credit_${track.id}_${paidAt.getTime()}`,
               stripePaymentId: null,
               status: "COMPLETED",
               completedAt: paidAt,
@@ -138,7 +107,7 @@ export async function POST(request: Request) {
           });
         }
 
-        // Decrement free credit if used
+        // Update artist profile
         if (useFreeCreditForPayment) {
           await prisma.artistProfile.update({
             where: { id: track.artistId },
@@ -164,12 +133,12 @@ export async function POST(request: Request) {
           artistEmail: track.artist.user.email,
           packageType: track.packageType,
           reviewsRequested: freeReviewCount ?? packageDetails.reviews,
-          isPromo: isValidPromo,
-          promoCode: isValidPromo ? promoCode.toUpperCase() : useFreeCreditForPayment ? "FREE_CREDIT" : undefined,
+          isPromo: false,
+          promoCode: useFreeCreditForPayment ? "FREE_CREDIT" : undefined,
         });
       }
 
-      const sessionType = useFreeCreditForPayment ? "free_credit" : (isValidPromo ? "promo" : "bypass");
+      const sessionType = useFreeCreditForPayment ? "free_credit" : "bypass";
       return NextResponse.json({
         url: `${baseUrl}/artist/submit/success?session_id=${sessionType}_${track.id}`,
         package: track.packageType,
