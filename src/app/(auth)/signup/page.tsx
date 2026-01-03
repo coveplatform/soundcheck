@@ -20,7 +20,6 @@ import { funnels, track } from "@/lib/analytics";
 import { trackTikTokEvent } from "@/components/providers";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import { validatePassword } from "@/lib/password";
-import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
 
 type Role = "artist" | "reviewer" | "both";
 
@@ -367,7 +366,6 @@ export default function SignupPage() {
           >
             Create account
           </Button>
-          <SocialLoginButtons />
           <p className="text-sm text-neutral-600 text-center">
             Already have an account?{" "}
             <Link href="/login" className="text-black font-bold hover:underline">

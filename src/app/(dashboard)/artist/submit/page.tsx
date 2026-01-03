@@ -742,38 +742,48 @@ export default function SubmitTrackPage() {
             )}>
               <div>
                 <p className="font-black text-lg">{selectedPackageDetails.name}</p>
-                <p className="text-sm font-medium">{freeCredits > 0 ? "1 review" : `${selectedPackageDetails.reviews} reviews`}</p>
+                <p className="text-sm font-medium">{selectedPackageDetails.description}</p>
               </div>
               <div className="text-right">
                 {freeCredits > 0 ? (
                   <div className="flex flex-col items-end">
                     <span className="text-2xl font-black">FREE</span>
-                    <span className="text-sm line-through opacity-60">${(selectedPackageDetails.price / 100).toFixed(0)}</span>
+                    <span className="text-sm line-through opacity-60">${(selectedPackageDetails.price / 100).toFixed(2)} AUD</span>
                   </div>
                 ) : (
-                  <span className="text-3xl font-black">${(selectedPackageDetails.price / 100).toFixed(0)}</span>
+                  <div className="flex flex-col items-end">
+                    <span className="text-3xl font-black">${(selectedPackageDetails.price / 100).toFixed(2)}</span>
+                    <span className="text-xs opacity-70">AUD</span>
+                  </div>
                 )}
               </div>
             </div>
 
-            {/* What you get */}
-            <div className="p-4 bg-white space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
-                <span>{freeCredits > 0 ? "1 detailed written review" : `${selectedPackageDetails.reviews} detailed written reviews`}</span>
+            {/* Price per review */}
+            {!freeCredits && (
+              <div className="px-4 py-2 bg-neutral-100 border-t-2 border-black flex items-center justify-between text-sm">
+                <span className="text-neutral-600">{selectedPackageDetails.reviews} reviews</span>
+                <span className="font-mono text-neutral-500">${(selectedPackageDetails.price / selectedPackageDetails.reviews / 100).toFixed(2)}/review</span>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
-                <span>Genre-matched listeners</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
-                <span>24-hour turnaround (usually faster)</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
-                <span>Honest, constructive feedback</span>
-              </div>
+            )}
+
+            {/* What you get - actual features from package */}
+            <div className="p-4 bg-white border-t-2 border-black space-y-2">
+              {selectedPackageDetails.features.map((feature, i) => (
+                <div key={i} className="flex items-center gap-2 text-sm">
+                  <Check className={cn(
+                    "h-4 w-4 flex-shrink-0",
+                    feature.includes("Consensus") || feature.includes("Pattern")
+                      ? "text-orange-500"
+                      : "text-lime-600"
+                  )} />
+                  <span className={cn(
+                    feature.includes("Consensus") || feature.includes("Pattern")
+                      ? "font-semibold"
+                      : ""
+                  )}>{feature}</span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -803,7 +813,7 @@ export default function SubmitTrackPage() {
                 </>
               ) : (
                 <>
-                  Continue to Payment — ${(selectedPackageDetails.price / 100).toFixed(0)}
+                  Continue to Payment
                 </>
               )}
             </Button>

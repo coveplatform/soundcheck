@@ -8,7 +8,6 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
 import {
   Card,
   CardContent,
@@ -196,7 +195,6 @@ export default function LoginPage() {
           <Button type="submit" className="w-full" isLoading={isLoading}>
             Sign in
           </Button>
-          <SocialLoginButtons />
           <Link
             href="/forgot-password"
             className="text-sm text-neutral-600 hover:text-black font-medium"
