@@ -407,6 +407,29 @@ export default function SubmitTrackPage() {
                   Getting track info...
                 </div>
               )}
+              {/* Track preview when URL is valid */}
+              {url && !urlError && !isLoadingMetadata && title && (
+                <div className="border-2 border-lime-500 bg-lime-50 p-4 flex items-center gap-4">
+                  {artworkUrl ? (
+                    <img 
+                      src={artworkUrl} 
+                      alt="Track artwork" 
+                      className="w-16 h-16 object-cover border-2 border-black"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-neutral-200 border-2 border-black flex items-center justify-center">
+                      <Music className="h-6 w-6 text-neutral-400" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
+                      <span className="text-sm font-medium text-lime-700">Track found</span>
+                    </div>
+                    <p className="font-bold text-black truncate mt-1">{title}</p>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex-1">
@@ -472,17 +495,19 @@ export default function SubmitTrackPage() {
             </div>
           )}
 
-          <div className="mt-4">
-            <Button
-              onClick={() => setStep("details")}
-              disabled={!hasTrack}
-              variant="primary"
-              className="w-full h-12 text-base"
-            >
-              Next
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
+          {/* Only show Next button when track is confirmed */}
+          {hasTrack && (
+            <div className="mt-4">
+              <Button
+                onClick={() => setStep("details")}
+                variant="primary"
+                className="w-full h-12 text-base"
+              >
+                Next
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
