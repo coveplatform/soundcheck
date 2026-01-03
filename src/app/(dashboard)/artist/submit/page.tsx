@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Music, ExternalLink, Check, Loader2, Upload, Gift } from "lucide-react";
+import { Music, ExternalLink, Check, Loader2, Upload, Gift, ArrowRight, ArrowLeft } from "lucide-react";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, ACTIVE_PACKAGE_TYPES, PACKAGES, PackageType } from "@/lib/metadata";
@@ -25,6 +25,10 @@ interface Genre {
 
 export default function SubmitTrackPage() {
   const router = useRouter();
+
+  // Step state
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 4;
 
   // Form state
   const [inputMode, setInputMode] = useState<"url" | "upload">("url");
@@ -351,6 +355,38 @@ export default function SubmitTrackPage() {
 
   const selectedPackageDetails = PACKAGES[selectedPackage];
 
+  const canProceedFromStep1 = () => {
+    if (inputMode === "url") {
+      return url.trim() && !urlError && !isLoadingMetadata;
+    }
+    return uploadedUrl && !isUploading;
+  };
+
+  const canProceedFromStep2 = () => {
+    return title.trim() && selectedGenres.length > 0;
+  };
+
+  const handleNextStep = () => {
+    if (currentStep === 1 && !canProceedFromStep1()) return;
+    if (currentStep === 2 && !canProceedFromStep2()) return;
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const steps = [
+    { number: 1, title: "Upload Track", description: "Share your music" },
+    { number: 2, title: "Track Details", description: "Title & genre" },
+    { number: 3, title: "Add Context", description: "Optional notes" },
+    { number: 4, title: "Choose Package", description: "Select reviews" },
+  ];
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
@@ -358,6 +394,55 @@ export default function SubmitTrackPage() {
         <p className="text-neutral-600 mt-1">
           Find out if it&apos;s ready before you release. Get honest feedback from real listeners who love your genre.
         </p>
+      </div>
+
+      {/* Progress Steps */}
+      <div className="relative">
+        <div className="flex items-center justify-between">
+          {steps.map((step, idx) => (
+            <div key={step.number} className="flex-1 relative">
+              <div className="flex flex-col items-center">
+                <div
+                  className={cn(
+                    "w-10 h-10 rounded-full border-2 border-black flex items-center justify-center font-black text-sm transition-colors z-10",
+                    currentStep > step.number
+                      ? "bg-lime-500 text-black"
+                      : currentStep === step.number
+                        ? "bg-black text-white"
+                        : "bg-white text-neutral-400"
+                  )}
+                >
+                  {currentStep > step.number ? (
+                    <Check className="h-5 w-5" />
+                  ) : (
+                    step.number
+                  )}
+                </div>
+                <div className="mt-2 text-center hidden sm:block">
+                  <p
+                    className={cn(
+                      "text-xs font-bold",
+                      currentStep >= step.number
+                        ? "text-black"
+                        : "text-neutral-400"
+                    )}
+                  >
+                    {step.title}
+                  </p>
+                  <p className="text-xs text-neutral-500">{step.description}</p>
+                </div>
+              </div>
+              {idx < steps.length - 1 && (
+                <div
+                  className={cn(
+                    "absolute top-5 left-1/2 w-full h-0.5 -z-0",
+                    currentStep > step.number ? "bg-lime-500" : "bg-neutral-200"
+                  )}
+                />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {error && (
@@ -381,8 +466,9 @@ export default function SubmitTrackPage() {
         </div>
       )}
 
-      {/* Track URL */}
-      <Card>
+      {/* Step 1: Track URL */}
+      {currentStep === 1 && (
+        <Card>
         <CardHeader>
           <CardTitle className="text-lg">Your Track</CardTitle>
           <CardDescription>
@@ -561,9 +647,50 @@ export default function SubmitTrackPage() {
           )}
         </CardContent>
       </Card>
+      )}
 
-      {/* Genre Selection */}
-      <Card>
+      {/* Step 2: Track Details & Genre Selection */}
+      {currentStep === 2 && (
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Track Details</CardTitle>
+              <CardDescription>
+                Give your track a title and set the BPM if you know it
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label htmlFor="track-title" className="text-sm font-bold text-black block mb-2">
+                  Track Title *
+                </label>
+                <Input
+                  id="track-title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter your track title"
+                  className="text-base"
+                />
+              </div>
+              <div>
+                <label htmlFor="track-bpm" className="text-sm font-bold text-black block mb-2">
+                  BPM (Optional)
+                </label>
+                <Input
+                  id="track-bpm"
+                  type="number"
+                  min={1}
+                  max={999}
+                  value={bpm}
+                  onChange={(e) => setBpm(e.target.value)}
+                  placeholder="e.g., 128"
+                  className="w-32"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
         <CardHeader>
           <CardTitle className="text-lg">Genre</CardTitle>
           <CardDescription>
@@ -580,9 +707,12 @@ export default function SubmitTrackPage() {
           />
         </CardContent>
       </Card>
+        </>
+      )}
 
-      {/* Feedback Focus (Optional) */}
-      <Card>
+      {/* Step 3: Feedback Focus (Optional) */}
+      {currentStep === 3 && (
+        <Card>
         <CardHeader>
           <CardTitle className="text-lg">Context for Reviewers (Optional)</CardTitle>
           <CardDescription>
@@ -602,9 +732,11 @@ export default function SubmitTrackPage() {
           </p>
         </CardContent>
       </Card>
+      )}
 
-      {/* Package Selection */}
-      <Card>
+      {/* Step 4: Package Selection */}
+      {currentStep === 4 && (
+        <Card>
         <CardHeader>
           <CardTitle className="text-lg">Choose Your Certainty Level</CardTitle>
           <CardDescription>
@@ -657,61 +789,97 @@ export default function SubmitTrackPage() {
           </div>
         </CardContent>
       </Card>
+      )}
 
-      {/* Summary & Submit */}
-      <Card className="bg-black text-white border-black">
+      {/* Navigation & Submit */}
+      <Card className={cn(
+        "border-black",
+        currentStep === totalSteps ? "bg-black text-white" : "bg-white"
+      )}>
         <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <div className="min-w-0">
-              <p className="text-neutral-400 text-sm font-medium">Total</p>
-              {freeCredits > 0 ? (
-                <div className="flex items-center gap-2">
-                  <p className="text-3xl font-black text-lime-500">FREE</p>
-                  <span className="text-neutral-500 line-through text-lg">
-                    ${(selectedPackageDetails.price / 100).toFixed(2)}
-                  </span>
+          {currentStep === totalSteps ? (
+            <>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                <div className="min-w-0">
+                  <p className="text-neutral-400 text-sm font-medium">Total</p>
+                  {freeCredits > 0 ? (
+                    <div className="flex items-center gap-2">
+                      <p className="text-3xl font-black text-lime-500">FREE</p>
+                      <span className="text-neutral-500 line-through text-lg">
+                        ${(selectedPackageDetails.price / 100).toFixed(2)}
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="text-3xl font-black">
+                      ${(selectedPackageDetails.price / 100).toFixed(2)}
+                    </p>
+                  )}
                 </div>
-              ) : (
-                <p className="text-3xl font-black">
-                  ${(selectedPackageDetails.price / 100).toFixed(2)}
+                <div className="text-left sm:text-right">
+                  <p className="text-neutral-400 text-sm font-mono">
+                    {freeCredits > 0 ? "1 review" : `${selectedPackageDetails.reviews} reviews`}
+                  </p>
+                  <p className="text-neutral-400 text-sm font-mono">
+                    24 hours max (usually shorter)
+                  </p>
+                </div>
+              </div>
+              {freeCredits > 0 && (
+                <p className="text-xs text-lime-500 font-medium flex items-center gap-1 mb-4">
+                  <Gift className="h-3 w-3" />
+                  Using your free review credit
                 </p>
               )}
-            </div>
-            <div className="text-left sm:text-right">
-              <p className="text-neutral-400 text-sm font-mono">
-                {freeCredits > 0 ? "1 review" : `${selectedPackageDetails.reviews} reviews`}
-              </p>
-              <p className="text-neutral-400 text-sm font-mono">
-                24 hours max (usually shorter)
-              </p>
-            </div>
+            </>
+          ) : null}
+
+          <div className="flex gap-3">
+            {currentStep > 1 && (
+              <Button
+                onClick={handlePrevStep}
+                variant="outline"
+                className="flex-1"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            )}
+            {currentStep < totalSteps ? (
+              <Button
+                onClick={handleNextStep}
+                disabled={
+                  (currentStep === 1 && !canProceedFromStep1()) ||
+                  (currentStep === 2 && !canProceedFromStep2())
+                }
+                variant="primary"
+                className="flex-1"
+              >
+                Continue
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSubmit}
+                isLoading={isSubmitting}
+                disabled={
+                  isUploading ||
+                  isSubmitting ||
+                  isLoadingCredits ||
+                  !title.trim() ||
+                  selectedGenres.length === 0 ||
+                  (inputMode === "url"
+                    ? !url || !!urlError
+                    : !uploadedUrl)
+                }
+                variant="primary"
+                className="flex-1"
+              >
+                {freeCredits > 0
+                  ? "Use Your Free Review"
+                  : "Continue to Payment"}
+              </Button>
+            )}
           </div>
-          {freeCredits > 0 && (
-            <p className="text-xs text-lime-500 font-medium flex items-center gap-1 mb-4">
-              <Gift className="h-3 w-3" />
-              Using your free review credit
-            </p>
-          )}
-          <Button
-            onClick={handleSubmit}
-            isLoading={isSubmitting}
-            disabled={
-              isUploading ||
-              isSubmitting ||
-              isLoadingCredits ||
-              !title.trim() ||
-              selectedGenres.length === 0 ||
-              (inputMode === "url"
-                ? !url || !!urlError
-                : !uploadedUrl)
-            }
-            variant="primary"
-            className="w-full"
-          >
-            {freeCredits > 0
-              ? "Use Your Free Review"
-              : "Continue to Payment"}
-          </Button>
         </CardContent>
       </Card>
     </div>
