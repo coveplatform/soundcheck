@@ -666,75 +666,109 @@ export default function SubmitTrackPage() {
 
           <div className="mb-6">
             <h1 className="text-2xl font-black">Ready to submit?</h1>
-            <p className="text-neutral-500 mt-1">Here&apos;s what you&apos;re getting</p>
+            <p className="text-neutral-500 mt-1">Review your order</p>
           </div>
 
-          <div className="border-2 border-black p-4 space-y-3">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm text-neutral-500">Track</p>
-                <p className="font-bold">{title}</p>
-              </div>
-            </div>
-            <div>
-              <p className="text-sm text-neutral-500">Genres</p>
-              <p className="font-medium">
-                {selectedGenres.map(id => genres.find(g => g.id === id)?.name).filter(Boolean).join(", ")}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-neutral-500">Package</p>
-              <p className="font-medium">{selectedPackageDetails.name} — {selectedPackageDetails.reviews} reviews</p>
-            </div>
-            {feedbackFocus && (
-              <div>
-                <p className="text-sm text-neutral-500">Notes</p>
-                <p className="text-sm">{feedbackFocus}</p>
+          {/* Track Card */}
+          <div className="bg-neutral-50 border-2 border-black p-4 flex gap-4 items-center">
+            {artworkUrl ? (
+              <img 
+                src={artworkUrl} 
+                alt="Track artwork" 
+                className="w-20 h-20 object-cover border-2 border-black flex-shrink-0"
+              />
+            ) : (
+              <div className="w-20 h-20 bg-neutral-200 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <Music className="h-8 w-8 text-neutral-400" />
               </div>
             )}
+            <div className="min-w-0 flex-1">
+              <p className="font-black text-lg truncate">{title}</p>
+              <p className="text-sm text-neutral-600 truncate">
+                {selectedGenres.map(id => genres.find(g => g.id === id)?.name).filter(Boolean).join(" · ")}
+              </p>
+              {feedbackFocus && (
+                <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{feedbackFocus}</p>
+              )}
+            </div>
           </div>
 
-          <div className="mt-4 bg-black text-white border-2 border-black p-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-              <div className="min-w-0">
-                <p className="text-neutral-400 text-sm font-medium">Total</p>
+          {/* Package Selection Summary */}
+          <div className="mt-4 border-2 border-black">
+            <div className={cn(
+              "p-4 flex items-center justify-between",
+              freeCredits > 0 ? "bg-lime-400" : "bg-lime-500"
+            )}>
+              <div>
+                <p className="font-black text-lg">{selectedPackageDetails.name}</p>
+                <p className="text-sm font-medium">{freeCredits > 0 ? "1 review" : `${selectedPackageDetails.reviews} reviews`}</p>
+              </div>
+              <div className="text-right">
                 {freeCredits > 0 ? (
-                  <div className="flex items-center gap-2">
-                    <p className="text-3xl font-black text-lime-500">FREE</p>
-                    <span className="text-neutral-500 line-through text-lg">
-                      ${(selectedPackageDetails.price / 100).toFixed(2)}
-                    </span>
+                  <div className="flex flex-col items-end">
+                    <span className="text-2xl font-black">FREE</span>
+                    <span className="text-sm line-through opacity-60">${(selectedPackageDetails.price / 100).toFixed(0)}</span>
                   </div>
                 ) : (
-                  <p className="text-3xl font-black">
-                    ${(selectedPackageDetails.price / 100).toFixed(2)}
-                  </p>
+                  <span className="text-3xl font-black">${(selectedPackageDetails.price / 100).toFixed(0)}</span>
                 )}
               </div>
-              <div className="text-left sm:text-right">
-                <p className="text-neutral-400 text-sm font-mono">
-                  {freeCredits > 0 ? "1 review" : `${selectedPackageDetails.reviews} reviews`}
-                </p>
-                <p className="text-neutral-400 text-sm font-mono">
-                  24 hours max (usually shorter)
-                </p>
+            </div>
+
+            {/* What you get */}
+            <div className="p-4 bg-white space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
+                <span>{freeCredits > 0 ? "1 detailed written review" : `${selectedPackageDetails.reviews} detailed written reviews`}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
+                <span>Genre-matched listeners</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
+                <span>24-hour turnaround (usually faster)</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
+                <span>Honest, constructive feedback</span>
               </div>
             </div>
-            {freeCredits > 0 && (
-              <p className="text-xs text-lime-500 font-medium flex items-center gap-1 mb-4">
-                <Gift className="h-3 w-3" />
-                Using your free review credit
+          </div>
+
+          {/* Free credit banner */}
+          {freeCredits > 0 && (
+            <div className="mt-4 bg-lime-100 border-2 border-lime-500 p-3 flex items-center gap-3">
+              <Gift className="h-5 w-5 text-lime-700 flex-shrink-0" />
+              <p className="text-sm font-medium text-lime-800">
+                Your free review credit will be applied at checkout
               </p>
-            )}
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <div className="mt-6">
             <Button
               onClick={handleSubmit}
               isLoading={isSubmitting}
               disabled={isSubmitting}
               variant="primary"
-              className="w-full"
+              className="w-full h-14 text-lg font-bold"
             >
-              {freeCredits > 0 ? "Use Your Free Review" : "Continue to Payment"}
+              {freeCredits > 0 ? (
+                <>
+                  <Gift className="h-5 w-5 mr-2" />
+                  Get Your Free Review
+                </>
+              ) : (
+                <>
+                  Continue to Payment — ${(selectedPackageDetails.price / 100).toFixed(0)}
+                </>
+              )}
             </Button>
+            <p className="text-center text-xs text-neutral-500 mt-3">
+              {freeCredits > 0 ? "No payment required" : "Secure payment via Stripe"}
+            </p>
           </div>
         </div>
       )}
