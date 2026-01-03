@@ -597,44 +597,85 @@ export default function SubmitTrackPage() {
 
           <div className="mb-6">
             <h1 className="text-2xl font-black">How many reviews do you want?</h1>
-            <p className="text-neutral-500 mt-1">More opinions = clearer picture</p>
+            <p className="text-neutral-500 mt-1">More opinions = clearer patterns = more confidence</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-3">
+          <div className="space-y-4">
             {ACTIVE_PACKAGE_TYPES.map((key) => {
               const pkg = PACKAGES[key];
               const isSelected = selectedPackage === key;
+              const isPopular = key === "STANDARD";
+              
               return (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setSelectedPackage(key)}
                   className={cn(
-                    "p-4 border-2 border-black text-left transition-colors",
+                    "relative w-full text-left border-2 border-black transition-all",
                     isSelected
-                      ? "bg-lime-500"
-                      : "bg-white hover:bg-neutral-50"
+                      ? "ring-2 ring-lime-500 ring-offset-2"
+                      : "hover:bg-neutral-50",
+                    isPopular && !isSelected && "shadow-[4px_4px_0px_0px_rgba(132,204,22,1)]"
                   )}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="min-w-0">
-                      <h3 className="font-bold truncate">{pkg.name}</h3>
-                      <p className="text-sm text-neutral-600 mt-0.5">
-                        {pkg.reviews} reviews
-                      </p>
+                  {/* Popular badge */}
+                  {isPopular && (
+                    <span className="absolute -top-3 left-4 text-xs font-bold bg-lime-500 text-black px-3 py-1 border-2 border-black">
+                      RECOMMENDED
+                    </span>
+                  )}
+                  
+                  {/* Header */}
+                  <div className={cn(
+                    "p-4 flex items-center justify-between",
+                    isSelected ? "bg-lime-500" : isPopular ? "bg-lime-50" : "bg-white"
+                  )}>
+                    <div>
+                      <h3 className="font-bold text-lg">{pkg.name}</h3>
+                      <p className="text-sm text-neutral-600">{pkg.description}</p>
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="font-black text-lg">
-                        ${(pkg.price / 100).toFixed(2)}
-                      </p>
-                      <p className="text-xs text-neutral-600 font-mono">
-                        ${(pkg.price / pkg.reviews / 100).toFixed(2)}/review
-                      </p>
+                    <div className={cn(
+                      "h-12 w-12 border-2 border-black flex items-center justify-center font-black text-xl flex-shrink-0",
+                      isSelected ? "bg-black text-white" : isPopular ? "bg-lime-500" : "bg-neutral-100"
+                    )}>
+                      {pkg.reviews}
                     </div>
                   </div>
-                  <p className="text-xs text-neutral-600 mt-2">{pkg.mix}</p>
+                  
+                  {/* Price */}
+                  <div className="px-4 py-3 border-t-2 border-black bg-white">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-black">${(pkg.price / 100).toFixed(2)}</span>
+                      <span className="text-sm text-neutral-500">AUD</span>
+                      <span className="text-sm text-neutral-400 ml-auto font-mono">
+                        ${(pkg.price / pkg.reviews / 100).toFixed(2)}/review
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Features */}
+                  <div className="px-4 py-3 border-t-2 border-black bg-neutral-50 space-y-2">
+                    {pkg.features.map((feature, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm">
+                        <Check className={cn(
+                          "h-4 w-4 flex-shrink-0",
+                          feature.includes("Consensus") || feature.includes("Pattern")
+                            ? "text-orange-500"
+                            : "text-lime-600"
+                        )} />
+                        <span className={cn(
+                          feature.includes("Consensus") || feature.includes("Pattern")
+                            ? "font-semibold"
+                            : ""
+                        )}>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Selection indicator */}
                   {isSelected && (
-                    <div className="flex items-center gap-1.5 mt-2 text-black">
+                    <div className="px-4 py-2 bg-lime-500 border-t-2 border-black flex items-center justify-center gap-2">
                       <Check className="h-4 w-4" />
                       <span className="text-sm font-bold">Selected</span>
                     </div>
@@ -644,13 +685,13 @@ export default function SubmitTrackPage() {
             })}
           </div>
 
-          <div className="mt-4">
+          <div className="mt-6">
             <Button
               onClick={() => setStep("confirm")}
               variant="primary"
               className="w-full h-12 text-base"
             >
-              Review & Submit
+              Continue
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
