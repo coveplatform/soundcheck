@@ -70,13 +70,15 @@ export default function SuccessPage() {
               trackId: payload.trackId,
               bypassed: isBypass,
             });
-            // TikTok conversion tracking
-            trackTikTokEvent("CompletePayment", {
-              content_type: "product",
-              content_id: payload.packageType || "unknown",
-              currency: "USD",
-              value: (payload.amount || 0) / 100, // Convert cents to dollars
-            });
+            // TikTok conversion tracking (only for paid purchases, not free credits)
+            if (payload.amount && payload.amount > 0) {
+              trackTikTokEvent("CompletePayment", {
+                content_type: "product",
+                content_id: payload.packageType || "unknown",
+                currency: "USD",
+                value: payload.amount / 100, // Convert cents to dollars
+              });
+            }
           }
 
           return;
