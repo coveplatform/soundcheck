@@ -60,15 +60,18 @@ export async function middleware(request: NextRequest) {
 
   if (isArtistPath) {
     const isArtistOnboarding = pathname === "/artist/onboarding";
+    // Check for actual profile, not just the isArtist flag
+    const hasArtistProfile = Boolean(token.artistProfileId);
+
     if (isArtistOnboarding) {
-      // Already an artist? Redirect to dashboard instead of showing onboarding
-      if (token.isArtist) {
+      // Has a profile? Redirect to dashboard instead of showing onboarding
+      if (hasArtistProfile) {
         return NextResponse.redirect(new URL("/artist/dashboard", request.url));
       }
       return NextResponse.next();
     }
-    // Not an artist and not on onboarding? Redirect to onboarding to complete setup
-    if (!token.isArtist) {
+    // No profile and not on onboarding? Redirect to onboarding to complete setup
+    if (!hasArtistProfile) {
       return NextResponse.redirect(new URL("/artist/onboarding", request.url));
     }
     return NextResponse.next();
@@ -76,16 +79,19 @@ export async function middleware(request: NextRequest) {
 
   if (isReviewerPath) {
     const isReviewerOnboarding = pathname === "/reviewer/onboarding";
+    // Check for actual profile, not just the isReviewer flag
+    const hasReviewerProfile = Boolean(token.reviewerProfileId);
+
     if (isReviewerOnboarding) {
-      // Already a reviewer? Redirect to dashboard instead of showing onboarding
-      if (token.isReviewer) {
+      // Has a profile? Redirect to dashboard instead of showing onboarding
+      if (hasReviewerProfile) {
         return NextResponse.redirect(new URL("/reviewer/dashboard", request.url));
       }
       return NextResponse.next();
     }
-    // Not a reviewer and not on onboarding? Redirect to home
-    if (!token.isReviewer) {
-      return NextResponse.redirect(new URL("/", request.url));
+    // No profile and not on onboarding? Redirect to onboarding to complete setup
+    if (!hasReviewerProfile) {
+      return NextResponse.redirect(new URL("/reviewer/onboarding", request.url));
     }
     return NextResponse.next();
   }
