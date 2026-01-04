@@ -42,6 +42,7 @@ export default function SubmitTrackPage() {
   // UI state
   const [genres, setGenres] = useState<Genre[]>([]);
   const [urlError, setUrlError] = useState("");
+  const [urlWarning, setUrlWarning] = useState("");
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -86,6 +87,7 @@ export default function SubmitTrackPage() {
   const handleUrlChange = async (value: string) => {
     setUrl(value);
     setUrlError("");
+    setUrlWarning("");
     setSourceType(detectSource(value));
 
     if (!value.trim()) return;
@@ -102,13 +104,18 @@ export default function SubmitTrackPage() {
       if (metadata) {
         if (typeof metadata.title === "string" && metadata.title.trim()) {
           setTitle(metadata.title);
+          setUrlWarning(""); // Clear warning if metadata was fetched successfully
         }
         if (metadata.artworkUrl) {
           setArtworkUrl(metadata.artworkUrl);
         }
+      } else {
+        // Metadata fetch returned null - link might be private or invalid
+        setUrlWarning("We couldn't verify this link. Make sure it's public and accessible.");
       }
     } catch {
-      // Silently fail
+      // Metadata fetch failed - link might be private, deleted, or invalid
+      setUrlWarning("We couldn't verify this link. Make sure it's public and accessible.");
     } finally {
       setIsLoadingMetadata(false);
     }
@@ -409,6 +416,14 @@ export default function SubmitTrackPage() {
               />
               <SupportedPlatforms activeSource={sourceType} />
               {urlError && <p className="text-sm text-red-500 font-medium">{urlError}</p>}
+              {!urlError && urlWarning && (
+                <div className="flex items-start gap-2 text-sm text-amber-600 bg-amber-50 border border-amber-200 p-3 rounded">
+                  <svg className="h-4 w-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>{urlWarning}</span>
+                </div>
+              )}
               {isLoadingMetadata && (
                 <div className="flex items-center gap-2 text-sm text-neutral-500">
                   <Loader2 className="h-4 w-4 animate-spin" />
