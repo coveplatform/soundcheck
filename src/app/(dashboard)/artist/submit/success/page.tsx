@@ -75,7 +75,7 @@ export default function SuccessPage() {
               trackTikTokEvent("CompletePayment", {
                 content_type: "product",
                 content_id: payload.packageType || "unknown",
-                currency: "USD",
+                currency: "AUD",
                 value: payload.amount / 100, // Convert cents to dollars
               });
             }

@@ -33,6 +33,7 @@ import { AudioPlayer } from "@/components/audio/audio-player";
 import { Logo } from "@/components/ui/logo";
 import { SupportedPlatforms, PlatformBadge } from "@/components/ui/supported-platforms";
 import Link from "next/link";
+import { trackTikTokEvent } from "@/components/providers";
 
 interface Genre {
   id: string;
@@ -612,12 +613,17 @@ export default function GetFeedbackPage() {
       // Clear saved progress
       clearProgress();
 
-      // If we created an account, sign in
+      // If we created an account, sign in and track registration
       if (!isLoggedIn && data.signIn) {
         await signIn("credentials", {
           redirect: false,
           email: email.trim().toLowerCase(),
           password,
+        });
+
+        // TikTok conversion tracking - new account created
+        trackTikTokEvent("CompleteRegistration", {
+          content_name: "artist",
         });
       }
 
