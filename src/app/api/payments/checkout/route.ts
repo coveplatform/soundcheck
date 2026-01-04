@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import Stripe from "stripe";
 import { getStripe, getStripePlatformDefaults } from "@/lib/stripe";
 import { PACKAGES, PackageType } from "@/lib/metadata";
 import { assignReviewersToTrack } from "@/lib/queue";
@@ -57,22 +58,6 @@ export async function POST(request: Request) {
     // Check if user wants to use free credit and has one available
     const hasFreeCredit = track.artist.freeReviewCredits > 0;
     const useFreeCreditForPayment = useFreeCredit && hasFreeCredit;
-
-    // Email verification is only required for paid purchases (not free credits)
-    // This allows new users to use their free credit without verification friction
-    if (!bypassPayments && !useFreeCreditForPayment) {
-      const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { emailVerified: true },
-      });
-
-      if (!user?.emailVerified) {
-        return NextResponse.json(
-          { error: "Please verify your email to continue" },
-          { status: 403 }
-        );
-      }
-    }
 
     // Get package details
     const packageDetails = PACKAGES[track.packageType as PackageType];
@@ -157,9 +142,13 @@ export async function POST(request: Request) {
 
     const stripe = getStripe();
 
-    // Create Stripe checkout session
+    // Create Stripe checkout session with multiple payment methods
+    // Apple Pay & Google Pay are automatic with "card" on compatible devices
+    // PayPal and Link (one-click checkout) are explicitly enabled
     const checkoutSession = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      automatic_payment_methods: {
+        enabled: true,
+      },
       mode: "payment",
       customer_email: track.artist.user.email,
       line_items: [
@@ -182,7 +171,13 @@ export async function POST(request: Request) {
       },
       success_url: `${baseUrl}/artist/submit/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/artist/tracks/${track.id}`,
-    });
+      // Enable phone number collection for better conversion
+      phone_number_collection: {
+        enabled: false,
+      },
+      // Allow promotion codes
+      allow_promotion_codes: true,
+    } as Stripe.Checkout.SessionCreateParams);
 
     // Create or update payment record
     await prisma.payment.upsert({

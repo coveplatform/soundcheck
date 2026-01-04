@@ -9,29 +9,26 @@ import {
   Check,
   Loader2,
   Upload,
-  Gift,
   Music,
   ArrowRight,
   ArrowLeft,
-  Mail,
-  Lock,
-  User,
+  Link2,
+  Sparkles,
+  Zap,
+  Users,
   Eye,
   EyeOff,
 } from "lucide-react";
-import { GenreSelector } from "@/components/ui/genre-selector";
 import { cn } from "@/lib/utils";
 import {
   validateTrackUrl,
   fetchTrackMetadata,
   detectSource,
-  ACTIVE_PACKAGE_TYPES,
   PACKAGES,
   PackageType,
 } from "@/lib/metadata";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { Logo } from "@/components/ui/logo";
-import { SupportedPlatforms, PlatformBadge } from "@/components/ui/supported-platforms";
 import Link from "next/link";
 import { trackTikTokEvent } from "@/components/providers";
 
@@ -41,16 +38,9 @@ interface Genre {
   slug: string;
 }
 
-type Step =
-  | "track"
-  | "preview"
-  | "email"
-  | "password"
-  | "artist-name"
-  | "genres"
-  | "package";
+type Step = "track" | "details" | "package";
 
-const STORAGE_KEY = "get-feedback-progress";
+const STORAGE_KEY = "get-feedback-progress-v2";
 
 interface StoredProgress {
   trackUrl: string;
@@ -60,6 +50,7 @@ interface StoredProgress {
   title: string;
   artworkUrl: string | null;
   email: string;
+  password: string;
   artistName: string;
   selectedGenres: string[];
   feedbackFocus: string;
@@ -78,7 +69,7 @@ export default function GetFeedbackPage() {
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Track state
-  const [inputMode, setInputMode] = useState<"url" | "upload">("url");
+  const [inputMode, setInputMode] = useState<"url" | "upload">("upload");
   const [trackUrl, setTrackUrl] = useState("");
   const [uploadedUrl, setUploadedUrl] = useState("");
   const [uploadedFileName, setUploadedFileName] = useState("");
@@ -94,34 +85,23 @@ export default function GetFeedbackPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [emailExists, setEmailExists] = useState(false);
-  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
-
-  // Profile state
   const [artistName, setArtistName] = useState("");
+  const [emailExists, setEmailExists] = useState(false);
 
   // Track details state
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [genres, setGenres] = useState<Genre[]>([]);
 
-  // Package state - STARTER for new users (free credit gives 1 review), STANDARD for others
-  const [selectedPackage, setSelectedPackage] = useState<PackageType>("STARTER");
+  // Package state
+  const [selectedPackage, setSelectedPackage] = useState<PackageType>("STANDARD");
 
   // UI state
   const [urlError, setUrlError] = useState("");
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const [fieldError, setFieldError] = useState("");
-
-  // Free credits - new users get 1 free credit, logged in users fetch from API
-  const [freeCredits, setFreeCredits] = useState(0);
-
-  // For new users, they will get a free credit upon account creation
-  const willGetFreeCredit = !isLoggedIn;
-  const hasFreeCredit = freeCredits > 0 || willGetFreeCredit;
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Load genres on mount
   useEffect(() => {
@@ -139,24 +119,23 @@ export default function GetFeedbackPage() {
     fetchGenres();
   }, []);
 
-  // Load free credits for logged in users
+  // Load artist profile data if logged in
   useEffect(() => {
     if (!isLoggedIn) return;
-    async function fetchCredits() {
+    async function fetchProfile() {
       try {
         const response = await fetch("/api/artist/profile");
         if (response.ok) {
           const data = await response.json();
-          setFreeCredits(data.freeReviewCredits ?? 0);
           if (data.artistName) {
             setArtistName(data.artistName);
           }
         }
       } catch (error) {
-        console.error("Failed to fetch credits:", error);
+        console.error("Failed to fetch profile:", error);
       }
     }
-    fetchCredits();
+    fetchProfile();
   }, [isLoggedIn]);
 
   // Load progress from localStorage
@@ -173,6 +152,7 @@ export default function GetFeedbackPage() {
         if (data.title) setTitle(data.title);
         if (data.artworkUrl) setArtworkUrl(data.artworkUrl);
         if (data.email && !isLoggedIn) setEmail(data.email);
+        if (data.password && !isLoggedIn) setPassword(data.password);
         if (data.artistName && !hasArtistProfile) setArtistName(data.artistName);
         if (data.selectedGenres) setSelectedGenres(data.selectedGenres);
         if (data.feedbackFocus) setFeedbackFocus(data.feedbackFocus);
@@ -196,6 +176,7 @@ export default function GetFeedbackPage() {
       title,
       artworkUrl,
       email: isLoggedIn ? "" : email,
+      password: isLoggedIn ? "" : password,
       artistName: hasArtistProfile ? "" : artistName,
       selectedGenres,
       feedbackFocus,
@@ -211,6 +192,7 @@ export default function GetFeedbackPage() {
     title,
     artworkUrl,
     email,
+    password,
     artistName,
     selectedGenres,
     feedbackFocus,
@@ -310,7 +292,7 @@ export default function GetFeedbackPage() {
         });
 
         if (!putRes.ok) {
-          setError("Failed to upload MP3");
+          setError("Failed to upload file");
           return;
         }
 
@@ -322,7 +304,7 @@ export default function GetFeedbackPage() {
       }
 
       if (!finalUrl) {
-        setError("Failed to upload MP3");
+        setError("Failed to upload file");
         return;
       }
 
@@ -349,8 +331,14 @@ export default function GetFeedbackPage() {
         const base = file.name.replace(/\.mp3$/i, "").trim();
         if (base) setTitle(base);
       }
+
+      // Track TikTok event - track uploaded
+      trackTikTokEvent("AddToCart", {
+        content_type: "product",
+        content_id: "track_upload",
+      });
     } catch {
-      setError("Failed to upload MP3");
+      setError("Failed to upload file");
     } finally {
       setIsUploading(false);
     }
@@ -358,7 +346,6 @@ export default function GetFeedbackPage() {
 
   // Check if email exists
   const checkEmailExists = async (emailToCheck: string): Promise<boolean> => {
-    setIsCheckingEmail(true);
     try {
       const response = await fetch("/api/auth/check-email", {
         method: "POST",
@@ -372,63 +359,8 @@ export default function GetFeedbackPage() {
       return false;
     } catch {
       return false;
-    } finally {
-      setIsCheckingEmail(false);
     }
   };
-
-  useEffect(() => {
-    if (step !== "email" || isLoggedIn) return;
-
-    const normalizedEmail = email.trim().toLowerCase();
-    if (!normalizedEmail) {
-      setEmailExists(false);
-      setNotice("");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(normalizedEmail)) {
-      setEmailExists(false);
-      setNotice("");
-      return;
-    }
-
-    let cancelled = false;
-    const handle = window.setTimeout(async () => {
-      try {
-        const response = await fetch("/api/auth/check-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: normalizedEmail }),
-        });
-
-        if (!response.ok) return;
-        const data = (await response.json()) as { exists?: boolean };
-        if (cancelled) return;
-
-        const exists = Boolean(data.exists);
-        setEmailExists(exists);
-        if (exists) {
-          setNotice(
-            `An account already exists for ${normalizedEmail}. You'll log in next.`
-          );
-        } else {
-          setNotice("");
-        }
-      } catch {
-        if (!cancelled) {
-          setEmailExists(false);
-          setNotice("");
-        }
-      }
-    }, 400);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(handle);
-    };
-  }, [email, isLoggedIn, step]);
 
   // Toggle genre
   const toggleGenre = (genreId: string) => {
@@ -446,8 +378,8 @@ export default function GetFeedbackPage() {
     const errors: string[] = [];
     if (password.length > 0) {
       if (password.length < 8) errors.push("8+ characters");
-      if (!/[A-Z]/.test(password)) errors.push("uppercase letter");
-      if (!/[a-z]/.test(password)) errors.push("lowercase letter");
+      if (!/[A-Z]/.test(password)) errors.push("uppercase");
+      if (!/[a-z]/.test(password)) errors.push("lowercase");
       if (!/\d/.test(password)) errors.push("number");
       if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) errors.push("symbol");
     }
@@ -456,109 +388,85 @@ export default function GetFeedbackPage() {
 
   const isPasswordValid = password.length >= 8 && passwordErrors.length === 0;
 
-  // Determine which steps to show based on auth state
-  const getStepsForUser = (): Step[] => {
-    const steps: Step[] = ["track", "preview"];
-
-    if (!isLoggedIn) {
-      steps.push("email", "password");
-    }
-
-    if (!hasArtistProfile && !isLoggedIn) {
-      steps.push("artist-name");
-    }
-
-    steps.push("genres", "package");
-    return steps;
-  };
-
-  const steps = getStepsForUser();
-  const currentStepIndex = steps.indexOf(step);
-  const progress = ((currentStepIndex + 1) / steps.length) * 100;
-
   // Navigation
   const goBack = () => {
-    const currentIndex = steps.indexOf(step);
-    if (currentIndex > 0) {
-      setStep(steps[currentIndex - 1]);
-      setFieldError("");
-    }
+    if (step === "details") setStep("track");
+    if (step === "package") setStep("details");
+    setFieldErrors({});
   };
 
-  const goNext = () => {
-    const currentIndex = steps.indexOf(step);
-    if (currentIndex < steps.length - 1) {
-      setStep(steps[currentIndex + 1]);
-      setFieldError("");
-    }
-  };
+  // Validate and go to details
+  const goToDetails = () => {
+    const hasTrack = inputMode === "url"
+      ? trackUrl && !urlError && !isLoadingMetadata && title
+      : !!uploadedUrl && !isUploading && title;
 
-  // Handle email step continue
-  const handleEmailContinue = async () => {
-    if (!email.trim()) {
-      setFieldError("Please enter your email");
+    if (!hasTrack) {
+      setError("Please add your track first");
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setFieldError("Please enter a valid email");
+    // Track TikTok event
+    trackTikTokEvent("ViewContent", {
+      content_type: "product",
+      content_id: "feedback_flow",
+    });
+
+    setStep("details");
+  };
+
+  // Validate and go to package
+  const goToPackage = async () => {
+    const errors: Record<string, string> = {};
+
+    if (!isLoggedIn) {
+      if (!email.trim()) errors.email = "Required";
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Invalid email";
+
+      if (!password) errors.password = "Required";
+      else if (!isPasswordValid) errors.password = "Password too weak";
+
+      if (!artistName.trim()) errors.artistName = "Required";
+    }
+
+    if (selectedGenres.length === 0) errors.genres = "Select at least one genre";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
-    setNotice("");
-
-    const exists = await checkEmailExists(email);
-    setEmailExists(exists);
-    if (exists) {
-      const normalizedEmail = email.trim().toLowerCase();
-      setNotice(
-        `An account already exists for ${normalizedEmail}. You'll log in next.`
-      );
-    }
-    goNext();
-  };
-
-  // Handle password step (login or signup)
-  const handlePasswordContinue = async () => {
-    if (emailExists) {
-      // Try to log in
-      if (!password) {
-        setFieldError("Please enter your password");
-        return;
-      }
-
-      setIsSubmitting(true);
-      try {
+    // Check if email exists for login flow
+    if (!isLoggedIn && email) {
+      const exists = await checkEmailExists(email.trim().toLowerCase());
+      setEmailExists(exists);
+      if (exists) {
+        // Try to log in with provided credentials
         const result = await signIn("credentials", {
           redirect: false,
-          email,
+          email: email.trim().toLowerCase(),
           password,
         });
 
         if (result?.error) {
-          setFieldError("Incorrect password. Please try again.");
+          setFieldErrors({ password: "Incorrect password for existing account" });
           return;
         }
 
-        // Logged in successfully - refresh session and continue
+        // Successfully logged in
         router.refresh();
-        // Skip to genres step since they now have an account
-        setNotice("");
-        setStep("genres");
-      } catch {
-        setFieldError("Login failed. Please try again.");
-      } finally {
-        setIsSubmitting(false);
       }
-    } else {
-      // Creating new account - validate password
-      if (!isPasswordValid) {
-        setFieldError("Please create a stronger password");
-        return;
-      }
-      goNext();
     }
+
+    // Track TikTok event
+    trackTikTokEvent("InitiateCheckout", {
+      content_type: "product",
+      content_id: selectedPackage,
+      value: PACKAGES[selectedPackage].price / 100,
+      currency: "AUD",
+    });
+
+    setStep("package");
   };
 
   // Handle final submission
@@ -567,19 +475,8 @@ export default function GetFeedbackPage() {
     setIsSubmitting(true);
 
     try {
-      if (!isLoggedIn && email) {
-        const exists = await checkEmailExists(email);
-        if (exists) {
-          setError("An account with this email already exists. Please go back and log in.");
-          setEmailExists(true);
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
       // Build submission data
       const submitData = {
-        // Track info
         sourceUrl: inputMode === "upload" ? uploadedUrl : trackUrl,
         sourceType: inputMode === "upload" ? "UPLOAD" : sourceType,
         title: title.trim(),
@@ -588,8 +485,6 @@ export default function GetFeedbackPage() {
         genreIds: selectedGenres,
         feedbackFocus: feedbackFocus.trim() || undefined,
         packageType: selectedPackage,
-
-        // Account info (only if not logged in)
         ...(!isLoggedIn && {
           email: email.trim().toLowerCase(),
           password,
@@ -613,7 +508,7 @@ export default function GetFeedbackPage() {
       // Clear saved progress
       clearProgress();
 
-      // If we created an account, sign in and track registration
+      // Track registration if new account
       if (!isLoggedIn && data.signIn) {
         await signIn("credentials", {
           redirect: false,
@@ -621,14 +516,13 @@ export default function GetFeedbackPage() {
           password,
         });
 
-        // TikTok conversion tracking - new account created
         trackTikTokEvent("CompleteRegistration", {
           content_name: "artist",
         });
       }
 
-      // Redirect to success (for free credits) or checkout (for paid)
-      router.push(data.successUrl || data.checkoutUrl);
+      // Redirect to checkout
+      router.push(data.checkoutUrl || data.successUrl);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -636,761 +530,577 @@ export default function GetFeedbackPage() {
     }
   };
 
-  // Check if we can proceed from current step
-  const hasTrack =
-    inputMode === "url"
-      ? trackUrl && !urlError && !isLoadingMetadata && title
-      : !!uploadedUrl && !isUploading;
+  // Check if we can proceed from track step
+  const hasTrack = inputMode === "url"
+    ? trackUrl && !urlError && !isLoadingMetadata && title
+    : !!uploadedUrl && !isUploading;
 
   // Show loading while checking session
   if (sessionStatus === "loading" || !isInitialized) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <Loader2 className="h-8 w-8 animate-spin text-lime-500" />
       </div>
     );
   }
 
-  const selectedPackageDetails = PACKAGES[selectedPackage];
+  const progress = step === "track" ? 33 : step === "details" ? 66 : 100;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Progress bar */}
-      <div className="fixed top-0 left-0 right-0 h-1 bg-neutral-100 z-50">
+      <div className="fixed top-0 left-0 right-0 h-1 bg-neutral-800 z-50">
         <div
-          className="h-full bg-lime-500 transition-all duration-300"
+          className="h-full bg-lime-500 transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
 
       {/* Header */}
-      <header className="border-b-2 border-black bg-white">
-        <div className="max-w-6xl mx-auto px-4">
+      <header className="border-b border-neutral-800">
+        <div className="max-w-2xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
             <Link href="/" className="flex items-center gap-2">
               <Logo />
             </Link>
-            {isLoggedIn && (
-              <span className="text-sm text-neutral-500">
-                {session.user?.email}
-              </span>
-            )}
+            <div className="flex items-center gap-2 text-xs font-mono text-neutral-500">
+              <span className={cn(step === "track" && "text-lime-500")}>TRACK</span>
+              <span>→</span>
+              <span className={cn(step === "details" && "text-lime-500")}>DETAILS</span>
+              <span>→</span>
+              <span className={cn(step === "package" && "text-lime-500")}>CHECKOUT</span>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-xl mx-auto px-4 py-8">
+      <main className="max-w-2xl mx-auto px-4 py-8">
         {/* Error banner */}
         {error && (
-          <div className="mb-6 bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
-            <p>{error}</p>
-            {emailExists && !isLoggedIn && (
-              <button
-                onClick={() => setStep("password")}
-                className="mt-2 underline hover:no-underline font-bold"
-              >
-                Go back to log in
-              </button>
-            )}
+          <div className="mb-6 bg-red-500/20 border-2 border-red-500 text-red-400 text-sm p-4 font-medium">
+            {error}
           </div>
         )}
 
-        {/* Free credit banner for logged in users */}
-        {isLoggedIn && freeCredits > 0 && (
-          <div className="mb-6 bg-lime-400 border-2 border-black p-3 flex items-center gap-3">
-            <Gift className="h-5 w-5 text-black flex-shrink-0" />
-            <p className="text-sm font-bold text-black">
-              You have a free review credit!
-            </p>
-          </div>
-        )}
-
-        {/* Step: Track URL/Upload */}
+        {/* ============================================ */}
+        {/* STEP 1: TRACK */}
+        {/* ============================================ */}
         {step === "track" && (
-          <div className="space-y-6">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-lime-400 border-2 border-black px-3 py-1 text-xs font-black uppercase tracking-wide">
-                <Music className="h-4 w-4" />
-                Start here
+          <div className="space-y-8">
+            {/* Hero */}
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 text-sm font-black uppercase tracking-wider">
+                <Zap className="h-4 w-4" />
+                Get Real Feedback
               </div>
-              <h1 className="text-3xl font-black mt-4">
-                What track do you want feedback on?
+              <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
+                Drop your track
               </h1>
-              <p className="text-neutral-500 mt-2">
-                Share a link or upload an MP3
+              <p className="text-neutral-400 text-lg max-w-md mx-auto">
+                Upload a file or paste a link. We&apos;ll match you with listeners who actually love your genre.
               </p>
             </div>
 
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setInputMode("url");
-                  setUploadedUrl("");
-                  setUploadedFileName("");
-                  setError("");
-                }}
-                className={cn(
-                  "flex-1 px-4 py-3 text-sm font-black border-2 border-black transition-colors",
-                  inputMode === "url"
-                    ? "bg-black text-white"
-                    : "bg-white text-black hover:bg-neutral-100"
-                )}
-              >
-                Paste link
-              </button>
+            {/* Input mode toggle */}
+            <div className="flex gap-2 bg-neutral-900 p-1 rounded-none border-2 border-neutral-700">
               <button
                 type="button"
                 onClick={() => {
                   setInputMode("upload");
                   setTrackUrl("");
                   setUrlError("");
-                  setError("");
                 }}
                 className={cn(
-                  "flex-1 px-4 py-3 text-sm font-black border-2 border-black transition-colors",
+                  "flex-1 px-4 py-3 text-sm font-black transition-all flex items-center justify-center gap-2",
                   inputMode === "upload"
-                    ? "bg-black text-white"
-                    : "bg-white text-black hover:bg-neutral-100"
+                    ? "bg-lime-500 text-black"
+                    : "text-neutral-400 hover:text-white"
                 )}
               >
-                Upload MP3
+                <Upload className="h-4 w-4" />
+                Upload File
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setInputMode("url");
+                  setUploadedUrl("");
+                  setUploadedFileName("");
+                }}
+                className={cn(
+                  "flex-1 px-4 py-3 text-sm font-black transition-all flex items-center justify-center gap-2",
+                  inputMode === "url"
+                    ? "bg-lime-500 text-black"
+                    : "text-neutral-400 hover:text-white"
+                )}
+              >
+                <Link2 className="h-4 w-4" />
+                Paste Link
               </button>
             </div>
 
-                {inputMode === "url" ? (
-                  <div className="space-y-4 flex-1">
-                    <Input
-                      placeholder="Paste your SoundCloud, Bandcamp, or YouTube link"
-                      value={trackUrl}
-                      onChange={(e) => handleUrlChange(e.target.value)}
-                      className={cn("text-lg h-14", urlError && "border-red-500")}
-                      autoFocus
-                    />
-                    {isLoadingMetadata && (
-                      <div className="flex items-center gap-2 text-sm text-neutral-500">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Getting track info...
-                      </div>
-                    )}
-                    {urlError && (
-                      <p className="text-sm text-red-500 font-medium">{urlError}</p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex-1">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="audio/mpeg,audio/mp3,.mp3"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) void handleUpload(file);
-                      }}
-                      className="hidden"
-                    />
-                    <div
-                      onClick={() => fileInputRef.current?.click()}
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        setIsDragging(true);
-                      }}
-                      onDragLeave={() => setIsDragging(false)}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        setIsDragging(false);
-                        const file = e.dataTransfer.files?.[0];
-                        if (
-                          file &&
-                          (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))
-                        ) {
-                          void handleUpload(file);
-                        } else {
-                          setError("Please upload an MP3 file");
-                        }
-                      }}
-                      className={cn(
-                        "border-2 border-dashed p-12 text-center cursor-pointer transition-all bg-neutral-50",
-                        isDragging && "border-lime-500 bg-lime-50",
-                        !isDragging &&
-                          !uploadedFileName &&
-                          "border-neutral-300 hover:border-black hover:bg-white",
-                        uploadedFileName && !isUploading && "border-lime-500 bg-lime-50"
-                      )}
-                    >
-                      {isUploading ? (
-                        <div className="flex flex-col items-center gap-3">
-                          <Loader2 className="h-12 w-12 animate-spin text-neutral-400" />
-                          <p className="font-medium text-neutral-600">Uploading...</p>
-                        </div>
-                      ) : uploadedFileName ? (
-                        <div className="flex flex-col items-center gap-3">
-                          <div className="h-14 w-14 bg-lime-500 border-2 border-black flex items-center justify-center">
-                            <Check className="h-7 w-7 text-white" />
-                          </div>
-                          <p className="font-bold text-black">{uploadedFileName}</p>
-                          <p className="text-sm text-neutral-500">Click to change</p>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center gap-3">
-                          <div className="h-14 w-14 bg-neutral-100 border-2 border-black flex items-center justify-center">
-                            <Upload className="h-7 w-7 text-neutral-400" />
-                          </div>
-                          <p className="font-bold text-black text-lg">
-                            Drop your MP3 here
-                          </p>
-                          <p className="text-sm text-neutral-500">or click to browse</p>
-                        </div>
-                      )}
-                    </div>
-                    {uploadedUrl && (
-                      <div className="mt-4">
-                        <AudioPlayer
-                          sourceUrl={uploadedUrl}
-                          sourceType="UPLOAD"
-                          showListenTracker={false}
-                          showWaveform={true}
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {(isLoadingMetadata || title || artworkUrl) && (
-                  <div className="border-2 border-black bg-white p-4 flex items-center gap-4">
-                    {isLoadingMetadata ? (
-                      <div className="w-16 h-16 bg-neutral-100 border-2 border-black flex-shrink-0" />
-                    ) : artworkUrl ? (
-                      <img
-                        src={artworkUrl}
-                        alt="Track artwork"
-                        className="w-16 h-16 object-cover border-2 border-black flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
-                        <Music className="h-7 w-7 text-neutral-400" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      {isLoadingMetadata ? (
-                        <div className="space-y-2">
-                          <div className="h-5 bg-neutral-100" />
-                          <div className="h-4 bg-neutral-100 w-24" />
-                        </div>
-                      ) : (
-                        <>
-                          <Input
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Track title"
-                            className="text-lg font-black border-0 border-b-2 border-neutral-200 rounded-none px-0 focus:border-black"
-                          />
-                          <p className="text-xs text-neutral-500 mt-2 capitalize">
-                            {sourceType ? sourceType.toLowerCase().replace("_", " ") : ""}
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-            {hasTrack && (
-              <div className="pt-2">
-                <Button
-                  onClick={goNext}
-                  variant="primary"
-                  className="w-full h-14 text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
+            {/* Upload area */}
+            {inputMode === "upload" ? (
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="audio/mpeg,audio/mp3,.mp3"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void handleUpload(file);
+                  }}
+                  className="hidden"
+                />
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    const file = e.dataTransfer.files?.[0];
+                    if (file && (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))) {
+                      void handleUpload(file);
+                    } else {
+                      setError("Please upload an MP3 file");
+                    }
+                  }}
+                  className={cn(
+                    "border-2 border-dashed p-12 text-center cursor-pointer transition-all",
+                    isDragging && "border-lime-500 bg-lime-500/10",
+                    !isDragging && !uploadedFileName && "border-neutral-700 hover:border-lime-500 hover:bg-neutral-900",
+                    uploadedFileName && !isUploading && "border-lime-500 bg-lime-500/10"
+                  )}
                 >
-                  Continue
-                  <ArrowRight className="h-5 w-5 ml-2" />
-                </Button>
+                  {isUploading ? (
+                    <div className="flex flex-col items-center gap-4">
+                      <Loader2 className="h-16 w-16 animate-spin text-lime-500" />
+                      <p className="font-bold text-lg">Uploading...</p>
+                    </div>
+                  ) : uploadedFileName ? (
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="h-16 w-16 bg-lime-500 flex items-center justify-center">
+                        <Check className="h-8 w-8 text-black" />
+                      </div>
+                      <div>
+                        <p className="font-black text-xl text-lime-500">{uploadedFileName}</p>
+                        <p className="text-sm text-neutral-500 mt-1">Click to change</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="h-16 w-16 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center">
+                        <Upload className="h-8 w-8 text-neutral-400" />
+                      </div>
+                      <div>
+                        <p className="font-black text-xl">Drop your MP3 here</p>
+                        <p className="text-sm text-neutral-500 mt-1">or click to browse</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {uploadedUrl && (
+                  <div className="mt-4">
+                    <AudioPlayer
+                      sourceUrl={uploadedUrl}
+                      sourceType="UPLOAD"
+                      showListenTracker={false}
+                      showWaveform={true}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <Input
+                  placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
+                  value={trackUrl}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  className={cn(
+                    "text-lg h-14 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                    urlError && "border-red-500"
+                  )}
+                  autoFocus
+                />
+                {isLoadingMetadata && (
+                  <div className="flex items-center gap-2 text-sm text-neutral-500">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Getting track info...
+                  </div>
+                )}
+                {urlError && (
+                  <p className="text-sm text-red-500 font-medium">{urlError}</p>
+                )}
               </div>
             )}
+
+            {/* Track title edit */}
+            {(uploadedUrl || (trackUrl && !urlError && !isLoadingMetadata)) && (
+              <div className="border-2 border-neutral-700 bg-neutral-900 p-4 flex items-center gap-4">
+                {artworkUrl ? (
+                  <img
+                    src={artworkUrl}
+                    alt="Track artwork"
+                    className="w-16 h-16 object-cover border-2 border-neutral-600 flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-16 h-16 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center flex-shrink-0">
+                    <Music className="h-7 w-7 text-neutral-500" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <Input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Track title"
+                    className="text-lg font-bold bg-transparent border-0 border-b-2 border-neutral-700 rounded-none px-0 focus:border-lime-500 text-white"
+                  />
+                  <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wide">
+                    {sourceType ? sourceType.replace("_", " ") : "Ready to submit"}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Continue button */}
+            <Button
+              onClick={goToDetails}
+              disabled={!hasTrack || !title}
+              className={cn(
+                "w-full h-14 text-lg font-black border-2 transition-all",
+                hasTrack && title
+                  ? "bg-lime-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                  : "bg-neutral-800 text-neutral-500 border-neutral-700 cursor-not-allowed"
+              )}
+            >
+              Continue
+              <ArrowRight className="h-5 w-5 ml-2" />
+            </Button>
+
+            {/* Trust badges */}
+            <div className="flex items-center justify-center gap-6 text-xs text-neutral-500">
+              <div className="flex items-center gap-1.5">
+                <Users className="h-4 w-4" />
+                <span>500+ reviews delivered</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Zap className="h-4 w-4" />
+                <span>&lt;12hr turnaround</span>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Step: Track Preview */}
-        {step === "preview" && (
-          <div className="space-y-6">
+        {/* ============================================ */}
+        {/* STEP 2: DETAILS */}
+        {/* ============================================ */}
+        {step === "details" && (
+          <div className="space-y-8">
             <button
               onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
+              className="text-sm text-neutral-500 hover:text-white flex items-center gap-1 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
 
-            <div>
-              <h1 className="text-3xl font-black">Is this your track?</h1>
-              <p className="text-neutral-500 mt-2">
-                Make sure we found the right one
+            <div className="text-center space-y-2">
+              <h1 className="text-3xl sm:text-4xl font-black">Almost there</h1>
+              <p className="text-neutral-400">
+                Tell us where to send your feedback
               </p>
             </div>
 
-            <div className="border-2 border-black bg-white p-6 flex items-center gap-6">
+            {/* Track preview */}
+            <div className="border-2 border-neutral-700 bg-neutral-900 p-4 flex items-center gap-4">
               {artworkUrl ? (
-                <img
-                  src={artworkUrl}
-                  alt="Track artwork"
-                  className="w-24 h-24 object-cover border-2 border-black flex-shrink-0"
-                />
+                <img src={artworkUrl} alt="" className="w-12 h-12 object-cover border border-neutral-600" />
               ) : (
-                <div className="w-24 h-24 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
-                  <Music className="h-10 w-10 text-neutral-400" />
+                <div className="w-12 h-12 bg-neutral-800 border border-neutral-600 flex items-center justify-center">
+                  <Music className="h-5 w-5 text-neutral-500" />
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <Input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Track title"
-                  className="text-xl font-bold border-0 border-b-2 border-neutral-200 rounded-none px-0 focus:border-black"
-                />
-                <p className="text-sm text-neutral-500 mt-2 capitalize">
-                  {sourceType.toLowerCase().replace("_", " ")}
-                </p>
+                <p className="font-bold text-white truncate">{title}</p>
+                <p className="text-xs text-neutral-500 uppercase">{sourceType || "Ready"}</p>
+              </div>
+              <div className="h-8 w-8 bg-lime-500 flex items-center justify-center">
+                <Check className="h-4 w-4 text-black" />
               </div>
             </div>
 
-            <Button
-              onClick={goNext}
-              variant="primary"
-              className="w-full h-14 text-lg"
-            >
-              Yes, that&apos;s my track
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
-          </div>
-        )}
-
-        {/* Step: Email */}
-        {step === "email" && (
-          <div className="space-y-6">
-            <button
-              onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </button>
-
-            <div>
-              <h1 className="text-3xl font-black">What&apos;s your email?</h1>
-              <p className="text-neutral-500 mt-2">
-                We&apos;ll send your feedback here
-              </p>
-            </div>
-
-            <div>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setFieldError("");
-                    setNotice("");
-                  }}
-                  className="text-lg h-14 pl-12"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleEmailContinue();
-                  }}
-                />
-              </div>
-              {fieldError && (
-                <p className="text-sm text-red-500 font-medium mt-2">{fieldError}</p>
-              )}
-              {!fieldError && notice && (
-                <div className="mt-2 bg-neutral-50 border-2 border-black text-black text-sm p-3 font-medium">
-                  {notice}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <Button
-                onClick={handleEmailContinue}
-                isLoading={isCheckingEmail}
-                variant="primary"
-                className="w-full h-14 text-lg"
-              >
-                {emailExists ? "Continue to log in" : "Continue"}
-                <ArrowRight className="h-5 w-5 ml-2" />
-              </Button>
-              <p className="text-center text-xs text-neutral-400 mt-4">
-                Already have an account? We&apos;ll detect it automatically.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Step: Password */}
-        {step === "password" && (
-          <div className="space-y-6">
-            <button
-              onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </button>
-
-            <div>
-              {emailExists ? (
-                <>
-                  <h1 className="text-3xl font-black">This email already has an account</h1>
-                  <p className="text-neutral-500 mt-2">
-                    An account already exists for <span className="font-bold text-black">{email.trim().toLowerCase()}</span>. Enter your password to continue.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <h1 className="text-3xl font-black">Create a password</h1>
-                  <p className="text-neutral-500 mt-2">
-                    To save your feedback and track progress
-                  </p>
-                </>
-              )}
-            </div>
-
-            <div>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder={emailExists ? "Your password" : "Create a password"}
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setFieldError("");
-                  }}
-                  className="text-lg h-14 pl-12 pr-12"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handlePasswordContinue();
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
-
-              {!emailExists && password.length > 0 && (
-                <div className="mt-3 space-y-1">
-                  {passwordErrors.length > 0 ? (
-                    <p className="text-sm text-neutral-500">
-                      Needs: {passwordErrors.join(", ")}
-                    </p>
-                  ) : (
-                    <p className="text-sm text-lime-600 flex items-center gap-1">
-                      <Check className="h-4 w-4" />
-                      Strong password
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {fieldError && (
-                <p className="text-sm text-red-500 font-medium mt-2">{fieldError}</p>
-              )}
-
-              {emailExists && (
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-neutral-500 hover:text-black mt-3 inline-block"
-                >
-                  Forgot your password?
-                </Link>
-              )}
-            </div>
-
-            <Button
-              onClick={handlePasswordContinue}
-              isLoading={isSubmitting}
-              variant="primary"
-              className="w-full h-14 text-lg"
-            >
-              {emailExists ? "Log in" : "Continue"}
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
-          </div>
-        )}
-
-        {/* Step: Artist Name */}
-        {step === "artist-name" && (
-          <div className="space-y-6">
-            <button
-              onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </button>
-
-            <div>
-              <h1 className="text-3xl font-black">What&apos;s your artist name?</h1>
-              <p className="text-neutral-500 mt-2">
-                How reviewers will know you
-              </p>
-            </div>
-
-            <div className="relative">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
-              <Input
-                placeholder="Your artist or project name"
-                value={artistName}
-                onChange={(e) => setArtistName(e.target.value)}
-                className="text-lg h-14 pl-12"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && artistName.trim()) goNext();
-                }}
-              />
-            </div>
-
-            <Button
-              onClick={goNext}
-              disabled={!artistName.trim()}
-              variant="primary"
-              className="w-full h-14 text-lg"
-            >
-              Continue
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
-          </div>
-        )}
-
-        {/* Step: Genres */}
-        {step === "genres" && (
-          <div className="space-y-6">
-            <button
-              onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </button>
-
-            <div>
-              <h1 className="text-3xl font-black">What genre is your track?</h1>
-              <p className="text-neutral-500 mt-2">
-                Pick up to 3 so we match you with the right listeners
-              </p>
-            </div>
-
-            <GenreSelector
-              genres={genres}
-              selectedIds={selectedGenres}
-              onToggle={toggleGenre}
-              maxSelections={3}
-              variant="artist"
-            />
-
-            <Button
-              onClick={goNext}
-              disabled={selectedGenres.length === 0}
-              variant="primary"
-              className="w-full h-14 text-lg"
-            >
-              Continue
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
-          </div>
-        )}
-
-        {/* Step: Package Selection / Free Review Confirmation */}
-        {step === "package" && (
-          <div className="space-y-6">
-            <button
-              onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </button>
-
-            {/* Free review flow for new users or users with credits */}
-            {hasFreeCredit ? (
-              <>
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-lime-500 border-2 border-black mb-4">
-                    <Gift className="h-8 w-8 text-black" />
+            {/* Account fields (only if not logged in) */}
+            {!isLoggedIn && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-bold text-neutral-400 mb-2 block">Email</label>
+                    <Input
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        setFieldErrors((prev) => ({ ...prev, email: "" }));
+                      }}
+                      className={cn(
+                        "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                        fieldErrors.email && "border-red-500"
+                      )}
+                    />
+                    {fieldErrors.email && <p className="text-xs text-red-500 mt-1">{fieldErrors.email}</p>}
                   </div>
-                  <h1 className="text-3xl font-black">Your free review is ready!</h1>
-                  <p className="text-neutral-500 mt-2">
-                    Get honest feedback from a real listener—on us
-                  </p>
-                </div>
-
-                {/* Track summary */}
-                <div className="border-2 border-black bg-lime-50 p-4">
-                  <div className="flex items-center gap-4">
-                    {artworkUrl ? (
-                      <img
-                        src={artworkUrl}
-                        alt="Track artwork"
-                        className="w-16 h-16 object-cover border-2 border-black flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 bg-neutral-200 border-2 border-black flex items-center justify-center flex-shrink-0">
-                        <Music className="h-6 w-6 text-neutral-400" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-black truncate">{title}</p>
-                      <p className="text-sm text-neutral-600">
-                        {selectedGenres.length > 0 && genres.length > 0
-                          ? genres
-                              .filter((g) => selectedGenres.includes(g.id))
-                              .map((g) => g.name)
-                              .join(", ")
-                          : "Your track"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* What you get */}
-                <div className="border-2 border-black bg-white p-5">
-                  <h3 className="font-bold mb-3">What you&apos;ll get:</h3>
-                  <ul className="space-y-2 text-sm text-neutral-600">
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
-                      <span>1 detailed review from a genre-matched listener</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
-                      <span>Ratings on production, originality & more</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
-                      <span>Actionable feedback & suggestions</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
-                      <span>Results in under 12 hours</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div>
-                  <Button
-                    onClick={handleSubmit}
-                    isLoading={isSubmitting}
-                    variant="primary"
-                    className="w-full h-14 text-lg"
-                  >
-                    <Gift className="h-5 w-5 mr-2" />
-                    Get Your Free Review
-                  </Button>
-                  <p className="text-center text-xs text-neutral-500 mt-3">
-                    No payment required • No credit card needed
-                  </p>
-                </div>
-              </>
-            ) : (
-              <>
-                {/* Paid package selection for returning users without credits */}
-                <div>
-                  <h1 className="text-3xl font-black">How many reviews do you want?</h1>
-                  <p className="text-neutral-500 mt-2">
-                    More opinions = clearer patterns
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  {ACTIVE_PACKAGE_TYPES.map((key) => {
-                    const pkg = PACKAGES[key];
-                    const isSelected = selectedPackage === key;
-                    const isPopular = key === "STANDARD";
-
-                    return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => setSelectedPackage(key)}
+                  <div>
+                    <label className="text-sm font-bold text-neutral-400 mb-2 block">Password</label>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Create password"
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          setFieldErrors((prev) => ({ ...prev, password: "" }));
+                        }}
                         className={cn(
-                          "relative w-full text-left border-2 border-black transition-all",
-                          isSelected && "ring-2 ring-lime-500 ring-offset-2",
-                          !isSelected && "hover:bg-neutral-50",
-                          isPopular && !isSelected && "shadow-[4px_4px_0px_0px_rgba(132,204,22,1)]"
+                          "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500 pr-10",
+                          fieldErrors.password && "border-red-500"
                         )}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white"
                       >
-                        {isPopular && (
-                          <span className="absolute -top-3 left-4 text-xs font-bold bg-lime-500 text-black px-3 py-1 border-2 border-black">
-                            MOST POPULAR
-                          </span>
-                        )}
-
-                        <div className={cn(
-                          "p-5",
-                          isSelected ? "bg-lime-400" : isPopular ? "bg-lime-50" : "bg-white"
-                        )}>
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <span className="text-3xl font-black">
-                                  {pkg.reviews}
-                                </span>
-                                <span className="text-lg font-bold text-neutral-700">reviews</span>
-                              </div>
-                              <p className="text-sm text-neutral-600">{pkg.description}</p>
-                            </div>
-                            <div className="text-right flex-shrink-0">
-                              <span className="text-2xl font-black">${(pkg.price / 100).toFixed(2)}</span>
-                              <p className="text-sm text-neutral-500">AUD</p>
-                            </div>
-                          </div>
-                          {isSelected && (
-                            <div className="mt-3 pt-3 border-t border-black/20 flex items-center gap-2">
-                              <Check className="h-4 w-4" />
-                              <span className="text-sm font-bold">Selected</span>
-                            </div>
-                          )}
-                        </div>
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
-                    );
-                  })}
+                    </div>
+                    {fieldErrors.password && <p className="text-xs text-red-500 mt-1">{fieldErrors.password}</p>}
+                    {password && passwordErrors.length > 0 && (
+                      <p className="text-xs text-neutral-500 mt-1">Needs: {passwordErrors.join(", ")}</p>
+                    )}
+                  </div>
                 </div>
-
                 <div>
-                  <Button
-                    onClick={handleSubmit}
-                    isLoading={isSubmitting}
-                    variant="primary"
-                    className="w-full h-14 text-lg"
-                  >
-                    Continue to Payment
-                  </Button>
-                  <p className="text-center text-xs text-neutral-500 mt-3">
-                    Secure payment via Stripe
-                  </p>
+                  <label className="text-sm font-bold text-neutral-400 mb-2 block">Artist / Project Name</label>
+                  <Input
+                    placeholder="Your artist name"
+                    value={artistName}
+                    onChange={(e) => {
+                      setArtistName(e.target.value);
+                      setFieldErrors((prev) => ({ ...prev, artistName: "" }));
+                    }}
+                    className={cn(
+                      "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                      fieldErrors.artistName && "border-red-500"
+                    )}
+                  />
+                  {fieldErrors.artistName && <p className="text-xs text-red-500 mt-1">{fieldErrors.artistName}</p>}
                 </div>
-              </>
+              </div>
             )}
 
-            {/* Terms agreement for new accounts */}
+            {/* Genre selection */}
+            <div>
+              <label className="text-sm font-bold text-neutral-400 mb-3 block">
+                What genre is your track? <span className="text-neutral-600">(up to 3)</span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {genres.map((genre) => {
+                  const isSelected = selectedGenres.includes(genre.id);
+                  return (
+                    <button
+                      key={genre.id}
+                      type="button"
+                      onClick={() => toggleGenre(genre.id)}
+                      className={cn(
+                        "px-4 py-2 text-sm font-bold border-2 transition-all",
+                        isSelected
+                          ? "bg-lime-500 text-black border-lime-500"
+                          : "bg-transparent text-neutral-400 border-neutral-700 hover:border-neutral-500 hover:text-white"
+                      )}
+                    >
+                      {genre.name}
+                    </button>
+                  );
+                })}
+              </div>
+              {fieldErrors.genres && <p className="text-xs text-red-500 mt-2">{fieldErrors.genres}</p>}
+            </div>
+
+            {/* Continue button */}
+            <Button
+              onClick={goToPackage}
+              className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            >
+              Continue
+              <ArrowRight className="h-5 w-5 ml-2" />
+            </Button>
+          </div>
+        )}
+
+        {/* ============================================ */}
+        {/* STEP 3: PACKAGE */}
+        {/* ============================================ */}
+        {step === "package" && (
+          <div className="space-y-8">
+            <button
+              onClick={goBack}
+              className="text-sm text-neutral-500 hover:text-white flex items-center gap-1 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+
+            <div className="text-center space-y-2">
+              <h1 className="text-3xl sm:text-4xl font-black">How many opinions?</h1>
+              <p className="text-neutral-400">
+                More listeners = clearer patterns = better decisions
+              </p>
+            </div>
+
+            {/* Package options */}
+            <div className="space-y-4">
+              {/* Quick Check - 5 reviews */}
+              <button
+                type="button"
+                onClick={() => setSelectedPackage("STARTER")}
+                className={cn(
+                  "w-full text-left border-2 p-6 transition-all",
+                  selectedPackage === "STARTER"
+                    ? "border-lime-500 bg-lime-500/10"
+                    : "border-neutral-700 hover:border-neutral-500"
+                )}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-4xl font-black text-white">5</span>
+                      <span className="text-lg font-bold text-neutral-400">reviews</span>
+                    </div>
+                    <p className="text-neutral-500">Get a feel for how listeners react</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-black text-white">${(PACKAGES.STARTER.price / 100).toFixed(0)}</p>
+                    <p className="text-xs text-neutral-500">AUD</p>
+                  </div>
+                </div>
+                {selectedPackage === "STARTER" && (
+                  <div className="mt-4 pt-4 border-t border-lime-500/30 flex items-center gap-2 text-lime-500">
+                    <Check className="h-4 w-4" />
+                    <span className="text-sm font-bold">Selected</span>
+                  </div>
+                )}
+              </button>
+
+              {/* Full Picture - 20 reviews */}
+              <button
+                type="button"
+                onClick={() => setSelectedPackage("STANDARD")}
+                className={cn(
+                  "w-full text-left border-2 p-6 transition-all relative",
+                  selectedPackage === "STANDARD"
+                    ? "border-lime-500 bg-lime-500/10"
+                    : "border-neutral-700 hover:border-neutral-500"
+                )}
+              >
+                <div className="absolute -top-3 left-4 bg-lime-500 text-black text-xs font-black px-3 py-1 uppercase tracking-wide flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" />
+                  Most Popular
+                </div>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-4xl font-black text-white">20</span>
+                      <span className="text-lg font-bold text-neutral-400">reviews</span>
+                    </div>
+                    <p className="text-neutral-500">Maximum clarity with pattern insights</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-black text-white">${(PACKAGES.STANDARD.price / 100).toFixed(0)}</p>
+                    <p className="text-xs text-neutral-500">AUD</p>
+                  </div>
+                </div>
+                {selectedPackage === "STANDARD" && (
+                  <div className="mt-4 pt-4 border-t border-lime-500/30 flex items-center gap-2 text-lime-500">
+                    <Check className="h-4 w-4" />
+                    <span className="text-sm font-bold">Selected</span>
+                  </div>
+                )}
+              </button>
+            </div>
+
+            {/* What you get */}
+            <div className="border-2 border-neutral-700 bg-neutral-900 p-5">
+              <h3 className="font-bold text-white mb-3">Every review includes:</h3>
+              <ul className="space-y-2 text-sm text-neutral-400">
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
+                  <span>Production, originality & vibe ratings</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
+                  <span>Written feedback with timestamps</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
+                  <span>Actionable suggestions</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
+                  <span>Results in under 12 hours</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Checkout button */}
+            <Button
+              onClick={handleSubmit}
+              isLoading={isSubmitting}
+              className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            >
+              Continue to Payment
+              <ArrowRight className="h-5 w-5 ml-2" />
+            </Button>
+
+            {/* Payment methods */}
+            <div className="text-center space-y-3">
+              <div className="flex items-center justify-center gap-4 text-neutral-500">
+                <div className="flex items-center gap-1.5 text-xs">
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z"/>
+                  </svg>
+                  <span>PayPal</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs">
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
+                  </svg>
+                  <span>Apple Pay</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs">
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm4.285 6.063c-.207 0-.414.063-.586.189l-4.285 3.063V7.5c0-.414-.336-.75-.75-.75s-.75.336-.75.75v9c0 .414.336.75.75.75s.75-.336.75-.75v-3.815l4.285 3.063c.172.126.379.189.586.189.552 0 1-.448 1-1V9.063c0-.552-.448-1-1-1z"/>
+                  </svg>
+                  <span>Google Pay</span>
+                </div>
+              </div>
+              <p className="text-xs text-neutral-600">
+                Secure payment via Stripe • SSL encrypted
+              </p>
+            </div>
+
+            {/* Terms */}
             {!isLoggedIn && (
-              <p className="text-center text-xs text-neutral-400">
+              <p className="text-center text-xs text-neutral-600">
                 By continuing, you agree to our{" "}
-                <Link href="/terms" className="underline hover:text-black">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link href="/privacy" className="underline hover:text-black">
-                  Privacy Policy
-                </Link>
+                <Link href="/terms" className="underline hover:text-white">Terms</Link>
+                {" "}and{" "}
+                <Link href="/privacy" className="underline hover:text-white">Privacy Policy</Link>
               </p>
             )}
           </div>

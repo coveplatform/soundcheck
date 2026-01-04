@@ -4,6 +4,9 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+// Control whether new reviewer signups are allowed
+const REVIEWER_SIGNUPS_OPEN = false;
+
 const countrySchema = z
   .string()
   .trim()
@@ -54,6 +57,14 @@ export async function POST(request: Request) {
     const existingProfile = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
     });
+
+    // Block new reviewer signups if closed
+    if (!existingProfile && !REVIEWER_SIGNUPS_OPEN) {
+      return NextResponse.json(
+        { error: "Reviewer signups are currently closed" },
+        { status: 403 }
+      );
+    }
 
     if (existingProfile) {
       // Update existing profile
@@ -150,6 +161,14 @@ export async function PATCH(request: Request) {
     });
 
     if (!profile) {
+      // Block new reviewer signups if closed
+      if (!REVIEWER_SIGNUPS_OPEN) {
+        return NextResponse.json(
+          { error: "Reviewer signups are currently closed" },
+          { status: 403 }
+        );
+      }
+
       profile = await prisma.reviewerProfile.create({
         data: {
           userId: session.user.id,

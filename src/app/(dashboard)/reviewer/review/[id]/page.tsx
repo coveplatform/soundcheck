@@ -86,6 +86,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSkipping, setIsSkipping] = useState(false);
+  const [isMarkingUnplayable, setIsMarkingUnplayable] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
@@ -549,6 +550,70 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     }
   };
 
+  const handleUnplayable = async () => {
+    if (!review) return;
+
+    if (!confirmLeave()) {
+      return;
+    }
+
+    setError("");
+    setIsMarkingUnplayable(true);
+
+    try {
+      const response = await fetch(`/api/reviews/${review.id}/unplayable`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const message = data?.error || "Failed to mark review unplayable";
+
+        if (response.status === 401) {
+          router.push("/login");
+          router.refresh();
+          return;
+        }
+
+        if (response.status === 403) {
+          if (typeof message === "string" && message.toLowerCase().includes("verify")) {
+            router.push("/verify-email");
+            router.refresh();
+            return;
+          }
+          if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
+            router.push("/reviewer/onboarding");
+            router.refresh();
+            return;
+          }
+          if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
+            router.push("/reviewer/dashboard");
+            router.refresh();
+            return;
+          }
+        }
+
+        setError(message);
+        return;
+      }
+
+      try {
+        localStorage.removeItem(draftKey);
+      } catch {
+      }
+
+      router.push("/reviewer/queue?notice=unplayable");
+      router.refresh();
+    } catch {
+      setError("Failed to mark review unplayable");
+    } finally {
+      setIsMarkingUnplayable(false);
+    }
+  };
+
   const maybeSendHeartbeat = async () => {
     if (!review) return;
     if (heartbeatInFlight.current) return;
@@ -820,15 +885,26 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <ArrowLeft className="h-4 w-4" />
           Back to Queue
         </button>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={handleSkip}
-          isLoading={isSkipping}
-          className="w-full sm:w-auto"
-        >
-          Skip Track
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleUnplayable}
+            isLoading={isMarkingUnplayable}
+            className="w-full sm:w-auto"
+          >
+            Audio not working
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={handleSkip}
+            isLoading={isSkipping}
+            className="w-full sm:w-auto"
+          >
+            Skip Track
+          </Button>
+        </div>
       </div>
 
       {/* Track Info */}

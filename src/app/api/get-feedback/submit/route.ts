@@ -205,12 +205,12 @@ export async function POST(request: Request) {
           },
         });
 
-        // 2. Create artist profile with free credit
+        // 2. Create artist profile (no free credit - they go through paid checkout)
         const artistProfile = await tx.artistProfile.create({
           data: {
             userId: user.id,
             artistName: data.artistName,
-            freeReviewCredits: 1, // Give them the free review
+            freeReviewCredits: 0,
             genres: {
               connect: data.genreIds.map((id) => ({ id })),
             },
@@ -265,61 +265,12 @@ export async function POST(request: Request) {
         // Don't fail the request if email fails - they can resend
       }
 
-      // Process free credit directly (skip checkout page)
-      const paidAt = new Date();
-
-      // Update track status to QUEUED and set to 1 review (free credit limit)
-      await prisma.track.update({
-        where: { id: result.track.id },
-        data: {
-          status: "QUEUED",
-          paidAt,
-          reviewsRequested: 1, // Free credit gives 1 review
-          promoCode: "FREE_CREDIT",
-        },
-      });
-
-      // Create $0 payment record
-      await prisma.payment.create({
-        data: {
-          trackId: result.track.id,
-          amount: 0,
-          stripeSessionId: `free_credit_${result.track.id}_${paidAt.getTime()}`,
-          stripePaymentId: null,
-          status: "COMPLETED",
-          completedAt: paidAt,
-        },
-      });
-
-      // Decrement free credit and increment total tracks
-      await prisma.artistProfile.update({
-        where: { id: result.artistProfile.id },
-        data: {
-          totalTracks: { increment: 1 },
-          freeReviewCredits: { decrement: 1 },
-        },
-      });
-
-      // Assign reviewers
-      await assignReviewersToTrack(result.track.id);
-
-      // Notify admin
-      await sendAdminNewTrackNotification({
-        trackTitle: data.title,
-        artistEmail: normalizedEmail,
-        packageType: data.packageType,
-        reviewsRequested: 1,
-        isPromo: false,
-        promoCode: "FREE_CREDIT",
-      });
-
-      // Return success URL directly (no checkout page flicker)
-      const successUrl = `/artist/submit/success?session_id=free_credit_${result.track.id}`;
+      const checkoutUrl = `/artist/submit/checkout?trackId=${result.track.id}`;
 
       return NextResponse.json({
         success: true,
         trackId: result.track.id,
-        successUrl, // Direct to success page
+        checkoutUrl,
         signIn: true, // Tell client to sign in
       });
     }

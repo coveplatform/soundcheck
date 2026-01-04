@@ -84,6 +84,17 @@ export default async function AdminTrackDetailPage({
             showWaveform={track.sourceType === "UPLOAD"}
           />
         </div>
+        <div className="mt-3 pt-3 border-t border-neutral-100">
+          <div className="text-xs text-neutral-400">Source URL ({track.sourceType})</div>
+          <a
+            href={track.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-blue-600 hover:text-blue-800 underline break-all"
+          >
+            {track.sourceUrl}
+          </a>
+        </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">

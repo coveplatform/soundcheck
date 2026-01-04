@@ -69,8 +69,8 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
   const source = detectSource(url);
   if (!source) return null;
 
+  // Best-effort metadata fetch. If it fails (e.g. unit tests / offline), fall back to URL parsing.
   try {
-    // Use server-side API to fetch metadata (avoids CORS issues)
     const response = await fetch("/api/metadata", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -85,9 +85,22 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
         artworkUrl: data.artworkUrl,
       };
     }
+  } catch {
+    // Ignore and fall back
+  }
 
-    // Fallback: extract title from URL slug
+  // Fallback: extract title from URL slug
+  try {
     const parsed = new URL(url);
+
+    if (source === "YOUTUBE") {
+      const videoId = parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop() || "";
+      return {
+        title: videoId ? `YouTube Video ${videoId}` : "Untitled Track",
+        source,
+      };
+    }
+
     const parts = parsed.pathname.split("/").filter(Boolean);
     const trackSlug = parts[parts.length - 1] || "";
     const title = trackSlug
@@ -99,14 +112,17 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
       source,
     };
   } catch {
-    return null;
+    return {
+      title: "Untitled Track",
+      source,
+    };
   }
 }
 
 // Package configuration
 export const PACKAGES = {
   STARTER: {
-    name: "Quick Check",
+    name: "Listener Pulse",
     reviews: 5,
     minProReviews: 0,
     price: 495, // cents
@@ -115,9 +131,9 @@ export const PACKAGES = {
     features: ["5 detailed reviews", "24-hour turnaround", "Written feedback"],
   },
   STANDARD: {
-    name: "Full Picture",
-    reviews: 20,
-    minProReviews: 0,
+    name: "Release Ready",
+    reviews: 10,
+    minProReviews: 2,
     price: 1495,
     description: "Maximum clarity with pattern insights",
     mix: "20 genre-matched reviewers",

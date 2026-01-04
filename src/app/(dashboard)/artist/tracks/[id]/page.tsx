@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TrackCancelButton } from "@/components/artist/track-cancel-button";
+import { TrackUpdateSourceForm } from "@/components/artist/track-update-source-form";
 import { AggregateAnalytics } from "@/components/feedback/aggregate-analytics";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { GenreTagList } from "@/components/ui/genre-tag";
@@ -174,6 +175,11 @@ export default async function TrackDetailPage({
             showListenTracker={false}
             showWaveform={track.sourceType === "UPLOAD"}
           />
+          {track.status !== "CANCELLED" && completedReviews === 0 ? (
+            <div className="mt-6">
+              <TrackUpdateSourceForm trackId={track.id} initialUrl={track.sourceUrl} />
+            </div>
+          ) : null}
         </CardContent>
       </Card>
 

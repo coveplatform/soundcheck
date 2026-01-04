@@ -135,6 +135,22 @@ export default async function ReviewQueuePage({
         </div>
       ) : null}
 
+      {notice === "unplayable" ? (
+        <div className="border-2 border-black bg-red-50 p-4">
+          <p className="text-sm font-bold text-black">
+            Audio issue reported.
+          </p>
+          <p className="text-sm text-neutral-700 mt-1">
+            We removed it from your queue and reassigned it.
+          </p>
+          <div className="mt-3">
+            <Link href="/reviewer/queue" className="text-sm font-bold hover:underline underline-offset-4">
+              Dismiss
+            </Link>
+          </div>
+        </div>
+      ) : null}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="min-w-0">
