@@ -85,8 +85,7 @@ export async function POST(request: Request) {
     const normalizedContentType =
       typeLower === "audio/mp3" ? "audio/mpeg" : data.contentType;
 
-    // Use 'onboarding' prefix to distinguish from authenticated uploads
-    const key = `onboarding/${randomBytes(16).toString("hex")}.mp3`;
+    const key = `tracks/${randomBytes(16).toString("hex")}.mp3`;
 
     const command = new PutObjectCommand({
       Bucket: bucket,
