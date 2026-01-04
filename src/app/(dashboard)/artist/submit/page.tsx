@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Check, Loader2, Upload, Gift, Music, ArrowRight, ChevronDown } from "lucide-react";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { cn } from "@/lib/utils";
-import { validateTrackUrl, fetchTrackMetadata, ACTIVE_PACKAGE_TYPES, PACKAGES, PackageType } from "@/lib/metadata";
+import { validateTrackUrl, fetchTrackMetadata, detectSource, ACTIVE_PACKAGE_TYPES, PACKAGES, PackageType } from "@/lib/metadata";
 import { AudioPlayer } from "@/components/audio/audio-player";
+import { SupportedPlatforms, PlatformBadge } from "@/components/ui/supported-platforms";
 
 interface Genre {
   id: string;

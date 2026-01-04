@@ -31,6 +31,7 @@ import {
 } from "@/lib/metadata";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { Logo } from "@/components/ui/logo";
+import { SupportedPlatforms, PlatformBadge } from "@/components/ui/supported-platforms";
 import Link from "next/link";
 
 interface Genre {
@@ -710,7 +711,7 @@ export default function GetFeedbackPage() {
               </p>
             </div>
 
-            <div className="rounded-full border-2 border-black bg-neutral-100 p-1 flex gap-1">
+            <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => {
@@ -720,10 +721,10 @@ export default function GetFeedbackPage() {
                   setError("");
                 }}
                 className={cn(
-                  "flex-1 rounded-full px-4 py-2.5 text-sm font-black transition-all",
+                  "flex-1 px-4 py-3 text-sm font-black border-2 border-black transition-colors",
                   inputMode === "url"
-                    ? "bg-lime-400 text-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                    : "bg-transparent text-black hover:bg-white"
+                    ? "bg-black text-white"
+                    : "bg-white text-black hover:bg-neutral-100"
                 )}
               >
                 Paste link
@@ -737,10 +738,10 @@ export default function GetFeedbackPage() {
                   setError("");
                 }}
                 className={cn(
-                  "flex-1 rounded-full px-4 py-2.5 text-sm font-black transition-all",
+                  "flex-1 px-4 py-3 text-sm font-black border-2 border-black transition-colors",
                   inputMode === "upload"
-                    ? "bg-lime-400 text-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                    : "bg-transparent text-black hover:bg-white"
+                    ? "bg-black text-white"
+                    : "bg-white text-black hover:bg-neutral-100"
                 )}
               >
                 Upload MP3
@@ -753,9 +754,15 @@ export default function GetFeedbackPage() {
                       placeholder="Paste your SoundCloud, Bandcamp, or YouTube link"
                       value={trackUrl}
                       onChange={(e) => handleUrlChange(e.target.value)}
-                      className={cn("text-lg h-14 rounded-xl", urlError && "border-red-500")}
+                      className={cn("text-lg h-14", urlError && "border-red-500")}
                       autoFocus
                     />
+                    {isLoadingMetadata && (
+                      <div className="flex items-center gap-2 text-sm text-neutral-500">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Getting track info...
+                      </div>
+                    )}
                     {urlError && (
                       <p className="text-sm text-red-500 font-medium">{urlError}</p>
                     )}
@@ -793,7 +800,7 @@ export default function GetFeedbackPage() {
                         }
                       }}
                       className={cn(
-                        "border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all bg-neutral-50",
+                        "border-2 border-dashed p-12 text-center cursor-pointer transition-all bg-neutral-50",
                         isDragging && "border-lime-500 bg-lime-50",
                         !isDragging &&
                           !uploadedFileName &&
@@ -808,7 +815,7 @@ export default function GetFeedbackPage() {
                         </div>
                       ) : uploadedFileName ? (
                         <div className="flex flex-col items-center gap-3">
-                          <div className="h-14 w-14 rounded-full bg-lime-500 flex items-center justify-center">
+                          <div className="h-14 w-14 bg-lime-500 border-2 border-black flex items-center justify-center">
                             <Check className="h-7 w-7 text-white" />
                           </div>
                           <p className="font-bold text-black">{uploadedFileName}</p>
@@ -816,7 +823,7 @@ export default function GetFeedbackPage() {
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-3">
-                          <div className="h-14 w-14 rounded-full bg-neutral-100 flex items-center justify-center">
+                          <div className="h-14 w-14 bg-neutral-100 border-2 border-black flex items-center justify-center">
                             <Upload className="h-7 w-7 text-neutral-400" />
                           </div>
                           <p className="font-bold text-black text-lg">
@@ -840,25 +847,25 @@ export default function GetFeedbackPage() {
                 )}
 
                 {(isLoadingMetadata || title || artworkUrl) && (
-                  <div className="rounded-2xl border-2 border-black bg-white p-4 flex items-center gap-4">
+                  <div className="border-2 border-black bg-white p-4 flex items-center gap-4">
                     {isLoadingMetadata ? (
                       <div className="w-16 h-16 bg-neutral-100 border-2 border-black flex-shrink-0" />
                     ) : artworkUrl ? (
                       <img
                         src={artworkUrl}
                         alt="Track artwork"
-                        className="w-16 h-16 object-cover border-2 border-black rounded-xl flex-shrink-0"
+                        className="w-16 h-16 object-cover border-2 border-black flex-shrink-0"
                       />
                     ) : (
-                      <div className="w-16 h-16 bg-neutral-100 border-2 border-black rounded-xl flex items-center justify-center flex-shrink-0">
+                      <div className="w-16 h-16 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
                         <Music className="h-7 w-7 text-neutral-400" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
                       {isLoadingMetadata ? (
                         <div className="space-y-2">
-                          <div className="h-5 bg-neutral-100 rounded" />
-                          <div className="h-4 bg-neutral-100 rounded w-24" />
+                          <div className="h-5 bg-neutral-100" />
+                          <div className="h-4 bg-neutral-100 w-24" />
                         </div>
                       ) : (
                         <>
