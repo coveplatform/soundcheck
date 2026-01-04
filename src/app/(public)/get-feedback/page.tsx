@@ -533,6 +533,11 @@ export default function GetFeedbackPage() {
         trackTikTokEvent("CompleteRegistration", {
           content_name: "artist",
         });
+      } else if (isLoggedIn && !hasArtistProfile) {
+        // Logged-in user (e.g., Google OAuth) creating their first artistProfile
+        trackTikTokEvent("CompleteRegistration", {
+          content_name: "artist",
+        });
       }
 
       // Redirect to checkout
