@@ -105,6 +105,7 @@ export async function POST(
         data: {
           sourceUrl: data.sourceUrl,
           sourceType,
+          linkIssueNotifiedAt: null, // Clear the link issue flag when URL is updated
         },
         select: { id: true },
       }),

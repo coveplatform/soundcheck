@@ -232,9 +232,10 @@ model Track {
   promoCode String? // Which promo code was used (null if paid normally)
 
   // Timestamps
-  createdAt   DateTime  @default(now())
-  paidAt      DateTime?
-  completedAt DateTime?
+  createdAt           DateTime  @default(now())
+  paidAt              DateTime?
+  completedAt         DateTime?
+  linkIssueNotifiedAt DateTime? // When admin notified artist about broken link
 
   // Relations
   payment      Payment?

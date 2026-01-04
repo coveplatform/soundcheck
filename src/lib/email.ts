@@ -433,3 +433,50 @@ export async function sendAdminNewTrackNotification(params: {
     html: emailWrapper(content),
   });
 }
+
+export async function sendInvalidTrackLinkEmail(params: {
+  to: string;
+  trackTitle: string;
+  trackId: string;
+  sourceUrl: string;
+}) {
+  if (!params.to) return;
+
+  const trackPageUrl = `https://mixreflect.com/artist/tracks/${params.trackId}`;
+
+  const content = `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-block; background-color: #ef4444; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff;">
+        Action Required
+      </div>
+    </div>
+    <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
+      Your track link needs attention
+    </h1>
+    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
+      <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
+      <p style="margin: 0 0 16px; font-size: 18px; font-weight: 700; color: ${COLORS.black};">${params.trackTitle}</p>
+      <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase; letter-spacing: 0.5px;">Current Link</p>
+      <p style="margin: 0; font-size: 14px; color: #ef4444; word-break: break-all;">${params.sourceUrl}</p>
+    </div>
+    <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray};">
+      We've noticed that your track link appears to be broken, private, or unavailable. Reviewers are unable to listen to your track, which means reviews cannot be completed.
+    </p>
+    <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray};">
+      <strong>Common issues:</strong><br>
+      • The track is set to private on SoundCloud/Bandcamp<br>
+      • The track has been deleted or moved<br>
+      • The link was copied incorrectly
+    </p>
+    ${emailButton("Update Track Link", trackPageUrl)}
+    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
+      Once you update the link, your track will be automatically re-queued for review.
+    </p>
+  `;
+
+  await sendEmail({
+    to: params.to,
+    subject: `⚠️ Action required: Fix your track link - ${params.trackTitle}`,
+    html: emailWrapper(content),
+  });
+}

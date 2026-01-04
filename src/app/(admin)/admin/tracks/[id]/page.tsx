@@ -7,6 +7,7 @@ import { CancelTrackButton } from "@/components/admin/cancel-track-button";
 import { GrantFreeButton } from "@/components/admin/grant-free-button";
 import { DeleteTrackButton } from "@/components/admin/delete-track-button";
 import { DebugAssignButton } from "@/components/admin/debug-assign-button";
+import { NotifyInvalidLinkButton } from "@/components/admin/notify-invalid-link-button";
 import { AudioPlayer } from "@/components/audio/audio-player";
 
 export const dynamic = 'force-dynamic';
@@ -85,15 +86,30 @@ export default async function AdminTrackDetailPage({
           />
         </div>
         <div className="mt-3 pt-3 border-t border-neutral-100">
-          <div className="text-xs text-neutral-400">Source URL ({track.sourceType})</div>
-          <a
-            href={track.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-blue-600 hover:text-blue-800 underline break-all"
-          >
-            {track.sourceUrl}
-          </a>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="text-xs text-neutral-400">Source URL ({track.sourceType})</div>
+              <a
+                href={track.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:text-blue-800 underline break-all"
+              >
+                {track.sourceUrl}
+              </a>
+            </div>
+            {track.sourceType !== "UPLOAD" && (
+              <div className="flex-shrink-0">
+                {track.linkIssueNotifiedAt ? (
+                  <span className="text-xs text-orange-600 font-medium">
+                    Notified {new Date(track.linkIssueNotifiedAt).toLocaleDateString()}
+                  </span>
+                ) : (
+                  <NotifyInvalidLinkButton trackId={track.id} />
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

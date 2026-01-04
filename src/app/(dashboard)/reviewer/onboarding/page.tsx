@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Headphones, DollarSign, TrendingUp, Loader2 } from "lucide-react";
+import { Headphones, DollarSign, TrendingUp, Loader2, XCircle } from "lucide-react";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { cn } from "@/lib/utils";
 
@@ -32,13 +32,14 @@ interface ReviewerProfileState {
 
 export default function ReviewerOnboardingPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"intro" | "quiz" | "genres">("intro");
+  const [step, setStep] = useState<"intro" | "quiz" | "genres" | "closed">("intro");
   const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [country, setCountry] = useState<string>("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingGenres, setIsLoadingGenres] = useState(true);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(true);
 
   const [quizAnswers, setQuizAnswers] = useState({
     compression: "",
@@ -66,9 +67,36 @@ export default function ReviewerOnboardingPage() {
     fetchGenres();
 
     async function fetchProfileState() {
+      setIsCheckingStatus(true);
       try {
         const res = await fetch("/api/reviewer/profile");
-        if (!res.ok) return;
+
+        if (res.status === 403) {
+          // Check if signups are closed
+          const data = await res.json().catch(() => ({}));
+          if (data.error?.includes("closed")) {
+            setStep("closed");
+            return;
+          }
+        }
+
+        if (!res.ok) {
+          // Profile doesn't exist yet, check if we can create one
+          // Try a minimal PATCH to see if signups are closed
+          const checkRes = await fetch("/api/reviewer/profile", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({}),
+          });
+          if (checkRes.status === 403) {
+            const data = await checkRes.json().catch(() => ({}));
+            if (data.error?.includes("closed")) {
+              setStep("closed");
+              return;
+            }
+          }
+          return;
+        }
 
         const data = (await res.json()) as ReviewerProfileState;
         if (data.completedOnboarding) {
@@ -89,6 +117,8 @@ export default function ReviewerOnboardingPage() {
           setCountry(data.country.trim().toUpperCase());
         }
       } catch {
+      } finally {
+        setIsCheckingStatus(false);
       }
     }
 
@@ -194,6 +224,59 @@ export default function ReviewerOnboardingPage() {
       setIsLoading(false);
     }
   };
+
+  // Loading state
+  if (isCheckingStatus) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <Card>
+          <CardContent className="py-12">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
+              <p className="text-neutral-500">Loading...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Applications closed
+  if (step === "closed") {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <Card>
+          <CardHeader className="text-center">
+            <div className="mx-auto w-12 h-12 bg-neutral-200 border-2 border-black flex items-center justify-center mb-4">
+              <XCircle className="h-6 w-6 text-neutral-600" />
+            </div>
+            <CardTitle className="text-2xl">Reviewer Applications Closed</CardTitle>
+            <CardDescription>
+              We&apos;re not accepting new reviewer applications at this time.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="bg-neutral-100 border-2 border-black p-4 text-center">
+              <p className="text-neutral-600">
+                We have reached capacity for reviewers. Check back later or follow us for updates on when applications reopen.
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-neutral-500 mb-4">
+                In the meantime, you can submit your own music for feedback:
+              </p>
+              <Button
+                variant="primary"
+                onClick={() => router.push("/artist/submit")}
+              >
+                Submit Your Music
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (step === "intro") {
     return (

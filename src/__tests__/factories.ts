@@ -109,6 +109,7 @@ export function createMockTrack(overrides: Partial<Track> = {}): Track {
     createdAt: new Date(),
     paidAt: new Date(),
     completedAt: null,
+    linkIssueNotifiedAt: null,
     ...overrides,
   }
 }

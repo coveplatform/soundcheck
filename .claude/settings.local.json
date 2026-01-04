@@ -35,7 +35,8 @@
       "Bash(powershell -Command \"& { [System.IO.File]::Delete\\(''\\\\?\\\\C:\\\\Users\\\\simli\\\\Desktop\\\\review\\\\soundcheck\\\\nul''\\) }\")",
       "Bash(powershell -Command:*)",
       "Bash(npx vercel env pull:*)",
-      "Bash(set \"DATABASE_URL=postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\")"
+      "Bash(set \"DATABASE_URL=postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\")",
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" npx prisma db push:*)"
     ]
   }
 }

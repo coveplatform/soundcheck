@@ -107,6 +107,23 @@ export default async function TrackDetailPage({
 
       {/* Track Header */}
       <div className="space-y-4">
+        {track.linkIssueNotifiedAt && track.status !== "CANCELLED" && (
+          <div className="bg-red-50 border-2 border-red-500 p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-red-900">Track Link Issue</p>
+                <p className="text-sm text-red-700 mt-1">
+                  Your track link appears to be broken, private, or unavailable. Reviewers cannot listen to your track until this is fixed.
+                </p>
+                <p className="text-sm text-red-600 mt-2">
+                  Please update your track link below to continue receiving reviews.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {track.status === "PENDING_PAYMENT" && (
           <div className="bg-orange-50 border-2 border-orange-400 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
