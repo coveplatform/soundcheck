@@ -17,6 +17,7 @@ interface GenreSelectorProps {
   maxSelections?: number;
   minSelections?: number;
   variant?: "artist" | "reviewer";
+  theme?: "light" | "dark";
 }
 
 // Genre categories with their parent slug and sub-genre slugs
@@ -155,7 +156,9 @@ export function GenreSelector({
   maxSelections = 3,
   minSelections = 1,
   variant = "artist",
+  theme = "light",
 }: GenreSelectorProps) {
+  const isDark = theme === "dark";
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
   // Get selected genres for display
@@ -192,28 +195,73 @@ export function GenreSelector({
 
   const variantStyles = {
     artist: {
-      selected: "bg-lime-500 border-black text-black",
-      unselected: "bg-white border-black text-black hover:bg-lime-100",
-      chip: "bg-lime-500 border-black text-black",
-      parentSelected: "bg-lime-500",
-      parentUnselected: "bg-white hover:bg-lime-50",
+      light: {
+        selected: "bg-lime-500 border-black text-black",
+        unselected: "bg-white border-black text-black hover:bg-lime-100",
+        chip: "bg-lime-500 border-black text-black",
+        parentSelected: "bg-lime-500",
+        parentUnselected: "bg-white hover:bg-lime-50",
+        categoryBorder: "border-black",
+        expandedBg: "bg-neutral-50",
+        expandedBorder: "border-black",
+        helperText: "text-neutral-500",
+        counterText: "text-neutral-500",
+        disabledBtn: "bg-neutral-200 border-neutral-300 text-neutral-400",
+      },
+      dark: {
+        selected: "bg-lime-500 border-lime-500 text-black",
+        unselected: "bg-transparent border-neutral-600 text-neutral-300 hover:border-lime-500 hover:text-white",
+        chip: "bg-lime-500 border-lime-500 text-black",
+        parentSelected: "bg-lime-500 text-black",
+        parentUnselected: "bg-neutral-900 hover:bg-neutral-800 text-white",
+        categoryBorder: "border-neutral-700",
+        expandedBg: "bg-neutral-900",
+        expandedBorder: "border-neutral-700",
+        helperText: "text-neutral-400",
+        counterText: "text-neutral-400",
+        disabledBtn: "bg-neutral-800 border-neutral-700 text-neutral-600",
+      },
     },
     reviewer: {
-      selected: "bg-orange-400 border-black text-black",
-      unselected: "bg-white border-black text-black hover:bg-orange-100",
-      chip: "bg-orange-400 border-black text-black",
-      parentSelected: "bg-orange-400",
-      parentUnselected: "bg-white hover:bg-orange-50",
+      light: {
+        selected: "bg-orange-400 border-black text-black",
+        unselected: "bg-white border-black text-black hover:bg-orange-100",
+        chip: "bg-orange-400 border-black text-black",
+        parentSelected: "bg-orange-400",
+        parentUnselected: "bg-white hover:bg-orange-50",
+        categoryBorder: "border-black",
+        expandedBg: "bg-neutral-50",
+        expandedBorder: "border-black",
+        helperText: "text-neutral-500",
+        counterText: "text-neutral-500",
+        disabledBtn: "bg-neutral-200 border-neutral-300 text-neutral-400",
+      },
+      dark: {
+        selected: "bg-orange-400 border-orange-400 text-black",
+        unselected: "bg-transparent border-neutral-600 text-neutral-300 hover:border-orange-400 hover:text-white",
+        chip: "bg-orange-400 border-orange-400 text-black",
+        parentSelected: "bg-orange-400 text-black",
+        parentUnselected: "bg-neutral-900 hover:bg-neutral-800 text-white",
+        categoryBorder: "border-neutral-700",
+        expandedBg: "bg-neutral-900",
+        expandedBorder: "border-neutral-700",
+        helperText: "text-neutral-400",
+        counterText: "text-neutral-400",
+        disabledBtn: "bg-neutral-800 border-neutral-700 text-neutral-600",
+      },
     },
   };
 
-  const styles = variantStyles[variant];
+  const styles = variantStyles[variant][theme];
 
   return (
     <div className="space-y-4">
       {/* Selected genres chips */}
       {selectedGenres.length > 0 && (
-        <div className="flex flex-wrap gap-2 pb-4 border-b-2 border-neutral-200">
+        <div className={cn(
+          "flex flex-wrap gap-2 pb-4 border-b-2",
+          isDark ? "border-neutral-700" : "border-neutral-200"
+        )}>
           {selectedGenres.map((genre) => (
             <button
               key={genre.id}
@@ -228,7 +276,7 @@ export function GenreSelector({
               <X className="h-3.5 w-3.5" />
             </button>
           ))}
-          <span className="inline-flex items-center text-sm text-neutral-500 font-mono">
+          <span className={cn("inline-flex items-center text-sm font-mono", styles.counterText)}>
             {selectedIds.length}/{maxSelections}
           </span>
         </div>
@@ -246,7 +294,7 @@ export function GenreSelector({
           const canSelectParent = !atMax || parentSelected;
 
           return (
-            <div key={categoryKey} className="border-2 border-black">
+            <div key={categoryKey} className={cn("border-2", styles.categoryBorder)}>
               {/* Category header - now has two click zones */}
               <div
                 className={cn(
@@ -268,11 +316,12 @@ export function GenreSelector({
                     {/* Checkbox indicator */}
                     <div
                       className={cn(
-                        "w-5 h-5 border-2 border-black flex items-center justify-center flex-shrink-0",
-                        parentSelected ? "bg-black" : "bg-white"
+                        "w-5 h-5 border-2 flex items-center justify-center flex-shrink-0",
+                        isDark ? "border-neutral-500" : "border-black",
+                        parentSelected ? (isDark ? "bg-lime-500 border-lime-500" : "bg-black") : (isDark ? "bg-neutral-800" : "bg-white")
                       )}
                     >
-                      {parentSelected && <Check className="h-3 w-3 text-white" />}
+                      {parentSelected && <Check className={cn("h-3 w-3", isDark ? "text-black" : "text-white")} />}
                     </div>
                     <span>{category.label}</span>
                     {childCount > 0 && !parentSelected && (
@@ -294,7 +343,10 @@ export function GenreSelector({
                 <button
                   type="button"
                   onClick={() => setExpandedCategory(isExpanded ? null : categoryKey)}
-                  className="px-4 py-3 border-l-2 border-black hover:bg-black/5 transition-colors"
+                  className={cn(
+                    "px-4 py-3 border-l-2 transition-colors",
+                    isDark ? "border-neutral-700 hover:bg-white/5" : "border-black hover:bg-black/5"
+                  )}
                 >
                   <ChevronDown
                     className={cn(
@@ -307,8 +359,12 @@ export function GenreSelector({
 
               {/* Sub-genres */}
               {isExpanded && (
-                <div className="px-4 py-3 border-t-2 border-black bg-neutral-50">
-                  <p className="text-xs text-neutral-500 font-medium mb-3">
+                <div className={cn(
+                  "px-4 py-3 border-t-2",
+                  styles.expandedBorder,
+                  styles.expandedBg
+                )}>
+                  <p className={cn("text-xs font-medium mb-3", styles.helperText)}>
                     {parentSelected
                       ? "You're matched with all sub-genres. Pick specific ones to narrow:"
                       : "Or pick specific sub-genres:"}
@@ -329,7 +385,7 @@ export function GenreSelector({
                             isSelected
                               ? styles.selected
                               : isDisabled
-                                ? "bg-neutral-200 border-neutral-300 text-neutral-400 cursor-not-allowed"
+                                ? cn(styles.disabledBtn, "cursor-not-allowed")
                                 : styles.unselected
                           )}
                         >
@@ -348,7 +404,7 @@ export function GenreSelector({
 
       {/* Helper text */}
       {selectedIds.length === 0 && (
-        <p className="text-sm text-neutral-500">
+        <p className={cn("text-sm", styles.helperText)}>
           Select broad genres or expand to pick specific sub-genres
         </p>
       )}

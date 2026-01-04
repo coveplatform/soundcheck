@@ -69,7 +69,7 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
   const source = detectSource(url);
   if (!source) return null;
 
-  // Best-effort metadata fetch. If it fails (e.g. unit tests / offline), fall back to URL parsing.
+  // Fetch metadata from oEmbed API - this verifies the link is valid/public
   try {
     const response = await fetch("/api/metadata", {
       method: "POST",
@@ -85,37 +85,13 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
         artworkUrl: data.artworkUrl,
       };
     }
+
+    // oEmbed failed - return null to trigger warning
+    // This means the link is likely private, deleted, or invalid
+    return null;
   } catch {
-    // Ignore and fall back
-  }
-
-  // Fallback: extract title from URL slug
-  try {
-    const parsed = new URL(url);
-
-    if (source === "YOUTUBE") {
-      const videoId = parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop() || "";
-      return {
-        title: videoId ? `YouTube Video ${videoId}` : "Untitled Track",
-        source,
-      };
-    }
-
-    const parts = parsed.pathname.split("/").filter(Boolean);
-    const trackSlug = parts[parts.length - 1] || "";
-    const title = trackSlug
-      .replace(/-/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase());
-
-    return {
-      title: title || "Untitled Track",
-      source,
-    };
-  } catch {
-    return {
-      title: "Untitled Track",
-      source,
-    };
+    // Network error or other failure - return null to trigger warning
+    return null;
   }
 }
 

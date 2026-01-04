@@ -932,15 +932,14 @@ export default function GetFeedbackPage() {
               <label className="text-sm font-bold text-neutral-400 mb-3 block">
                 What genre is your track? <span className="text-neutral-600">(up to 3)</span>
               </label>
-              <div className="bg-white rounded-lg p-4 border-2 border-neutral-200">
-                <GenreSelector
-                  genres={genres}
-                  selectedIds={selectedGenres}
-                  onToggle={toggleGenre}
-                  maxSelections={3}
-                  variant="artist"
-                />
-              </div>
+              <GenreSelector
+                genres={genres}
+                selectedIds={selectedGenres}
+                onToggle={toggleGenre}
+                maxSelections={3}
+                variant="artist"
+                theme="dark"
+              />
               {fieldErrors.genres && <p className="text-xs text-red-500 mt-2">{fieldErrors.genres}</p>}
             </div>
 
