@@ -48,9 +48,9 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
-        if (!user.emailVerified) {
-          throw new Error("EmailNotVerified");
-        }
+        // Note: Email verification is NOT checked at login.
+        // Instead, it's enforced at specific actions that require it (e.g., paid checkout).
+        // This allows new users to sign in and use their free credit without friction.
 
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
