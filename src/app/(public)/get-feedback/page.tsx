@@ -714,7 +714,7 @@ export default function GetFeedbackPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 border-2 border-black bg-white">
+                <div className="rounded-full border-2 border-black bg-neutral-100 p-1 flex gap-1">
                   <button
                     type="button"
                     onClick={() => {
@@ -724,10 +724,10 @@ export default function GetFeedbackPage() {
                       setError("");
                     }}
                     className={cn(
-                      "px-4 py-3 text-sm font-black transition-colors border-r-2 border-black",
+                      "flex-1 rounded-full px-4 py-2.5 text-sm font-black transition-all",
                       inputMode === "url"
-                        ? "bg-lime-400 text-black"
-                        : "bg-white text-black hover:bg-neutral-100"
+                        ? "bg-lime-400 text-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                        : "bg-transparent text-black hover:bg-white"
                     )}
                   >
                     Paste link
@@ -741,10 +741,10 @@ export default function GetFeedbackPage() {
                       setError("");
                     }}
                     className={cn(
-                      "px-4 py-3 text-sm font-black transition-colors",
+                      "flex-1 rounded-full px-4 py-2.5 text-sm font-black transition-all",
                       inputMode === "upload"
-                        ? "bg-lime-400 text-black"
-                        : "bg-white text-black hover:bg-neutral-100"
+                        ? "bg-lime-400 text-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                        : "bg-transparent text-black hover:bg-white"
                     )}
                   >
                     Upload MP3
@@ -757,17 +757,11 @@ export default function GetFeedbackPage() {
                       placeholder="Paste your SoundCloud, Bandcamp, or YouTube link"
                       value={trackUrl}
                       onChange={(e) => handleUrlChange(e.target.value)}
-                      className={cn("text-lg h-14", urlError && "border-red-500")}
+                      className={cn("text-lg h-14 rounded-xl", urlError && "border-red-500")}
                       autoFocus
                     />
                     {urlError && (
                       <p className="text-sm text-red-500 font-medium">{urlError}</p>
-                    )}
-                    {isLoadingMetadata && (
-                      <div className="flex items-center gap-2 text-sm text-neutral-500">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Getting track info...
-                      </div>
                     )}
                   </div>
                 ) : (
@@ -803,7 +797,7 @@ export default function GetFeedbackPage() {
                         }
                       }}
                       className={cn(
-                        "border-2 border-dashed p-12 text-center cursor-pointer transition-all bg-neutral-50",
+                        "border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all bg-neutral-50",
                         isDragging && "border-lime-500 bg-lime-50",
                         !isDragging &&
                           !uploadedFileName &&
@@ -846,6 +840,44 @@ export default function GetFeedbackPage() {
                         />
                       </div>
                     )}
+                  </div>
+                )}
+
+                {(isLoadingMetadata || title || artworkUrl) && (
+                  <div className="rounded-2xl border-2 border-black bg-white p-4 flex items-center gap-4">
+                    {isLoadingMetadata ? (
+                      <div className="w-16 h-16 bg-neutral-100 border-2 border-black flex-shrink-0" />
+                    ) : artworkUrl ? (
+                      <img
+                        src={artworkUrl}
+                        alt="Track artwork"
+                        className="w-16 h-16 object-cover border-2 border-black rounded-xl flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-neutral-100 border-2 border-black rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Music className="h-7 w-7 text-neutral-400" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      {isLoadingMetadata ? (
+                        <div className="space-y-2">
+                          <div className="h-5 bg-neutral-100 rounded" />
+                          <div className="h-4 bg-neutral-100 rounded w-24" />
+                        </div>
+                      ) : (
+                        <>
+                          <Input
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="Track title"
+                            className="text-lg font-black border-0 border-b-2 border-neutral-200 rounded-none px-0 focus:border-black"
+                          />
+                          <p className="text-xs text-neutral-500 mt-2 capitalize">
+                            {sourceType ? sourceType.toLowerCase().replace("_", " ") : ""}
+                          </p>
+                        </>
+                      )}
+                    </div>
                   </div>
                 )}
 
