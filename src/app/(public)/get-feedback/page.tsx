@@ -621,8 +621,8 @@ export default function GetFeedbackPage() {
         });
       }
 
-      // Redirect to checkout
-      router.push(data.checkoutUrl);
+      // Redirect to success (for free credits) or checkout (for paid)
+      router.push(data.successUrl || data.checkoutUrl);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {

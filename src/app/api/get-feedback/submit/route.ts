@@ -5,10 +5,11 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { createHash, randomBytes } from "crypto";
-import { sendEmailVerificationEmail } from "@/lib/email";
+import { sendEmailVerificationEmail, sendAdminNewTrackNotification } from "@/lib/email";
 import { PASSWORD_REGEX } from "@/lib/password";
 import { detectSource, PACKAGES, PackageType, TrackSource } from "@/lib/metadata";
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
+import { assignReviewersToTrack } from "@/lib/queue";
 
 export const runtime = "nodejs";
 
@@ -264,13 +265,61 @@ export async function POST(request: Request) {
         // Don't fail the request if email fails - they can resend
       }
 
-      // Return checkout URL with free credit
-      const checkoutUrl = `/artist/submit/checkout?trackId=${result.track.id}&useFreeCredit=true`;
+      // Process free credit directly (skip checkout page)
+      const paidAt = new Date();
+
+      // Update track status to QUEUED and set to 1 review (free credit limit)
+      await prisma.track.update({
+        where: { id: result.track.id },
+        data: {
+          status: "QUEUED",
+          paidAt,
+          reviewsRequested: 1, // Free credit gives 1 review
+          promoCode: "FREE_CREDIT",
+        },
+      });
+
+      // Create $0 payment record
+      await prisma.payment.create({
+        data: {
+          trackId: result.track.id,
+          amount: 0,
+          stripeSessionId: `free_credit_${result.track.id}_${paidAt.getTime()}`,
+          stripePaymentId: null,
+          status: "COMPLETED",
+          completedAt: paidAt,
+        },
+      });
+
+      // Decrement free credit and increment total tracks
+      await prisma.artistProfile.update({
+        where: { id: result.artistProfile.id },
+        data: {
+          totalTracks: { increment: 1 },
+          freeReviewCredits: { decrement: 1 },
+        },
+      });
+
+      // Assign reviewers
+      await assignReviewersToTrack(result.track.id);
+
+      // Notify admin
+      await sendAdminNewTrackNotification({
+        trackTitle: data.title,
+        artistEmail: normalizedEmail,
+        packageType: data.packageType,
+        reviewsRequested: 1,
+        isPromo: false,
+        promoCode: "FREE_CREDIT",
+      });
+
+      // Return success URL directly (no checkout page flicker)
+      const successUrl = `/artist/submit/success?session_id=free_credit_${result.track.id}`;
 
       return NextResponse.json({
         success: true,
         trackId: result.track.id,
-        checkoutUrl,
+        successUrl, // Direct to success page
         signIn: true, // Tell client to sign in
       });
     }
