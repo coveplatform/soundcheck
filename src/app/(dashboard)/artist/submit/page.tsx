@@ -116,7 +116,8 @@ export default function SubmitTrackPage() {
     setUrlError("");
     setIsUploading(true);
     setUploadedDuration(null);
-    setUploadedFileName(file.name);
+    setUploadedUrl("");
+    const fileName = file.name;
 
     try {
       let finalUrl = "";
@@ -199,6 +200,7 @@ export default function SubmitTrackPage() {
       }
 
       setUploadedUrl(finalUrl);
+      setUploadedFileName(fileName);
 
       await new Promise<void>((resolve) => {
         const audio = new Audio();
@@ -367,6 +369,7 @@ export default function SubmitTrackPage() {
                 setInputMode("url");
                 setUploadedUrl("");
                 setUploadedFileName("");
+                setError("");
               }}
               className={cn(
                 "px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
@@ -381,6 +384,7 @@ export default function SubmitTrackPage() {
                 setInputMode("upload");
                 setUrl("");
                 setUrlError("");
+                setError("");
               }}
               className={cn(
                 "px-4 py-2 text-sm font-bold border-2 border-black transition-colors",

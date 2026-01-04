@@ -267,8 +267,9 @@ export default function GetFeedbackPage() {
     setUrlError("");
     setIsUploading(true);
     setUploadedDuration(null);
-    setUploadedFileName(file.name);
+    setUploadedUrl("");
     setSourceType("UPLOAD");
+    const fileName = file.name;
 
     try {
       let finalUrl = "";
@@ -319,6 +320,7 @@ export default function GetFeedbackPage() {
       }
 
       setUploadedUrl(finalUrl);
+      setUploadedFileName(fileName);
 
       // Get duration
       await new Promise<void>((resolve) => {
@@ -649,6 +651,7 @@ export default function GetFeedbackPage() {
                   setInputMode("url");
                   setUploadedUrl("");
                   setUploadedFileName("");
+                  setError("");
                 }}
                 className={cn(
                   "px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
@@ -665,6 +668,7 @@ export default function GetFeedbackPage() {
                   setInputMode("upload");
                   setTrackUrl("");
                   setUrlError("");
+                  setError("");
                 }}
                 className={cn(
                   "px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
@@ -916,9 +920,9 @@ export default function GetFeedbackPage() {
             <div>
               {emailExists ? (
                 <>
-                  <h1 className="text-3xl font-black">Welcome back!</h1>
+                  <h1 className="text-3xl font-black">This email already has an account</h1>
                   <p className="text-neutral-500 mt-2">
-                    Enter your password to continue
+                    An account already exists for <span className="font-bold text-black">{email.trim().toLowerCase()}</span>. Enter your password to continue.
                   </p>
                 </>
               ) : (
