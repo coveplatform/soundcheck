@@ -338,7 +338,8 @@ export default function SubmitTrackPage() {
     }
   };
 
-  const hasTrack = inputMode === "url" ? (url && !urlError && !isLoadingMetadata) : (!!uploadedUrl && !isUploading);
+  // For URL mode: require verified link (no warning)
+  const hasTrack = inputMode === "url" ? (url && !urlError && !urlWarning && !isLoadingMetadata && title) : (!!uploadedUrl && !isUploading);
   const hasDetails = title.trim() && selectedGenres.length > 0;
   const selectedPackageDetails = PACKAGES[selectedPackage];
 

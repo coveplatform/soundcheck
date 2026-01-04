@@ -28,6 +28,7 @@ import {
   PackageType,
 } from "@/lib/metadata";
 import { AudioPlayer } from "@/components/audio/audio-player";
+import { GenreSelector } from "@/components/ui/genre-selector";
 import { Logo } from "@/components/ui/logo";
 import Link from "next/link";
 import { trackTikTokEvent } from "@/components/providers";
@@ -404,12 +405,18 @@ export default function GetFeedbackPage() {
 
   // Validate and go to details
   const goToDetails = () => {
+    // For URL mode: require verified link (no warning) and title
+    // For upload mode: just need uploaded URL and title
     const hasTrack = inputMode === "url"
-      ? trackUrl && !urlError && !isLoadingMetadata && title
+      ? trackUrl && !urlError && !urlWarning && !isLoadingMetadata && title
       : !!uploadedUrl && !isUploading && title;
 
     if (!hasTrack) {
-      setError("Please add your track first");
+      if (inputMode === "url" && urlWarning) {
+        setError("We couldn't verify your link. Please check it's public and accessible, or upload an MP3 instead.");
+      } else {
+        setError("Please add your track first");
+      }
       return;
     }
 
@@ -538,8 +545,9 @@ export default function GetFeedbackPage() {
   };
 
   // Check if we can proceed from track step
+  // For URL mode: require verified link (no warning) and title
   const hasTrack = inputMode === "url"
-    ? trackUrl && !urlError && !isLoadingMetadata && title
+    ? trackUrl && !urlError && !urlWarning && !isLoadingMetadata && title
     : !!uploadedUrl && !isUploading;
 
   // Show loading while checking session
@@ -924,25 +932,14 @@ export default function GetFeedbackPage() {
               <label className="text-sm font-bold text-neutral-400 mb-3 block">
                 What genre is your track? <span className="text-neutral-600">(up to 3)</span>
               </label>
-              <div className="flex flex-wrap gap-2">
-                {genres.map((genre) => {
-                  const isSelected = selectedGenres.includes(genre.id);
-                  return (
-                    <button
-                      key={genre.id}
-                      type="button"
-                      onClick={() => toggleGenre(genre.id)}
-                      className={cn(
-                        "px-4 py-2 text-sm font-bold border-2 transition-all",
-                        isSelected
-                          ? "bg-lime-500 text-black border-lime-500"
-                          : "bg-transparent text-neutral-400 border-neutral-700 hover:border-neutral-500 hover:text-white"
-                      )}
-                    >
-                      {genre.name}
-                    </button>
-                  );
-                })}
+              <div className="bg-white rounded-lg p-4 border-2 border-neutral-200">
+                <GenreSelector
+                  genres={genres}
+                  selectedIds={selectedGenres}
+                  onToggle={toggleGenre}
+                  maxSelections={3}
+                  variant="artist"
+                />
               </div>
               {fieldErrors.genres && <p className="text-xs text-red-500 mt-2">{fieldErrors.genres}</p>}
             </div>
