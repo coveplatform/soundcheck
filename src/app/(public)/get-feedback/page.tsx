@@ -496,6 +496,17 @@ export default function GetFeedbackPage() {
     setIsSubmitting(true);
 
     try {
+      // For new users, re-verify email doesn't exist (in case of stale state)
+      if (!isLoggedIn && email) {
+        const exists = await checkEmailExists(email);
+        if (exists) {
+          setError("An account with this email already exists. Please go back and log in.");
+          setEmailExists(true);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // Build submission data
       const submitData = {
         // Track info
@@ -597,7 +608,15 @@ export default function GetFeedbackPage() {
         {/* Error banner */}
         {error && (
           <div className="mb-6 bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
-            {error}
+            <p>{error}</p>
+            {emailExists && !isLoggedIn && (
+              <button
+                onClick={() => setStep("password")}
+                className="mt-2 underline hover:no-underline font-bold"
+              >
+                Go back to log in
+              </button>
+            )}
           </div>
         )}
 
