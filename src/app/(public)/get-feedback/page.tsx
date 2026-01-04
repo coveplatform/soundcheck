@@ -104,8 +104,8 @@ export default function GetFeedbackPage() {
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [genres, setGenres] = useState<Genre[]>([]);
 
-  // Package state
-  const [selectedPackage, setSelectedPackage] = useState<PackageType>("STANDARD");
+  // Package state - STARTER for new users (free credit gives 1 review), STANDARD for others
+  const [selectedPackage, setSelectedPackage] = useState<PackageType>("STARTER");
 
   // UI state
   const [urlError, setUrlError] = useState("");
@@ -115,8 +115,12 @@ export default function GetFeedbackPage() {
   const [notice, setNotice] = useState("");
   const [fieldError, setFieldError] = useState("");
 
-  // Free credits (for logged in users)
+  // Free credits - new users get 1 free credit, logged in users fetch from API
   const [freeCredits, setFreeCredits] = useState(0);
+
+  // For new users, they will get a free credit upon account creation
+  const willGetFreeCredit = !isLoggedIn;
+  const hasFreeCredit = freeCredits > 0 || willGetFreeCredit;
 
   // Load genres on mount
   useEffect(() => {
@@ -1199,7 +1203,7 @@ export default function GetFeedbackPage() {
           </div>
         )}
 
-        {/* Step: Package Selection */}
+        {/* Step: Package Selection / Free Review Confirmation */}
         {step === "package" && (
           <div className="space-y-6">
             <button
@@ -1210,103 +1214,165 @@ export default function GetFeedbackPage() {
               Back
             </button>
 
-            <div>
-              <h1 className="text-3xl font-black">How many reviews do you want?</h1>
-              <p className="text-neutral-500 mt-2">
-                More opinions = clearer patterns
-              </p>
-            </div>
+            {/* Free review flow for new users or users with credits */}
+            {hasFreeCredit ? (
+              <>
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-lime-500 border-2 border-black mb-4">
+                    <Gift className="h-8 w-8 text-black" />
+                  </div>
+                  <h1 className="text-3xl font-black">Your free review is ready!</h1>
+                  <p className="text-neutral-500 mt-2">
+                    Get honest feedback from a real listener—on us
+                  </p>
+                </div>
 
-            <div className="space-y-4">
-              {ACTIVE_PACKAGE_TYPES.map((key) => {
-                const pkg = PACKAGES[key];
-                const isSelected = selectedPackage === key;
-                const isPopular = key === "STANDARD";
-                const showFree = freeCredits > 0;
-
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setSelectedPackage(key)}
-                    className={cn(
-                      "relative w-full text-left border-2 border-black transition-all",
-                      isSelected && "ring-2 ring-lime-500 ring-offset-2",
-                      !isSelected && "hover:bg-neutral-50",
-                      isPopular && !isSelected && "shadow-[4px_4px_0px_0px_rgba(132,204,22,1)]"
+                {/* Track summary */}
+                <div className="border-2 border-black bg-lime-50 p-4">
+                  <div className="flex items-center gap-4">
+                    {artworkUrl ? (
+                      <img
+                        src={artworkUrl}
+                        alt="Track artwork"
+                        className="w-16 h-16 object-cover border-2 border-black flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-neutral-200 border-2 border-black flex items-center justify-center flex-shrink-0">
+                        <Music className="h-6 w-6 text-neutral-400" />
+                      </div>
                     )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-black truncate">{title}</p>
+                      <p className="text-sm text-neutral-600">
+                        {selectedGenres.length > 0 && genres.length > 0
+                          ? genres
+                              .filter((g) => selectedGenres.includes(g.id))
+                              .map((g) => g.name)
+                              .join(", ")
+                          : "Your track"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* What you get */}
+                <div className="border-2 border-black bg-white p-5">
+                  <h3 className="font-bold mb-3">What you&apos;ll get:</h3>
+                  <ul className="space-y-2 text-sm text-neutral-600">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
+                      <span>1 detailed review from a genre-matched listener</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
+                      <span>Ratings on production, originality & more</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
+                      <span>Actionable feedback & suggestions</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
+                      <span>Results in under 12 hours</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <Button
+                    onClick={handleSubmit}
+                    isLoading={isSubmitting}
+                    variant="primary"
+                    className="w-full h-14 text-lg"
                   >
-                    {isPopular && (
-                      <span className="absolute -top-3 left-4 text-xs font-bold bg-lime-500 text-black px-3 py-1 border-2 border-black">
-                        MOST POPULAR
-                      </span>
-                    )}
+                    <Gift className="h-5 w-5 mr-2" />
+                    Get Your Free Review
+                  </Button>
+                  <p className="text-center text-xs text-neutral-500 mt-3">
+                    No payment required • No credit card needed
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Paid package selection for returning users without credits */}
+                <div>
+                  <h1 className="text-3xl font-black">How many reviews do you want?</h1>
+                  <p className="text-neutral-500 mt-2">
+                    More opinions = clearer patterns
+                  </p>
+                </div>
 
-                    <div className={cn(
-                      "p-5",
-                      isSelected ? "bg-lime-400" : isPopular ? "bg-lime-50" : "bg-white"
-                    )}>
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className={cn(
-                              "text-3xl font-black",
-                              isSelected ? "text-black" : "text-black"
-                            )}>
-                              {pkg.reviews}
-                            </span>
-                            <span className="text-lg font-bold text-neutral-700">reviews</span>
-                          </div>
-                          <p className="text-sm text-neutral-600">{pkg.description}</p>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          {showFree ? (
-                            <div>
-                              <span className="text-2xl font-black text-lime-600">FREE</span>
-                              <p className="text-sm text-neutral-400 line-through">
-                                ${(pkg.price / 100).toFixed(2)}
-                              </p>
+                <div className="space-y-4">
+                  {ACTIVE_PACKAGE_TYPES.map((key) => {
+                    const pkg = PACKAGES[key];
+                    const isSelected = selectedPackage === key;
+                    const isPopular = key === "STANDARD";
+
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => setSelectedPackage(key)}
+                        className={cn(
+                          "relative w-full text-left border-2 border-black transition-all",
+                          isSelected && "ring-2 ring-lime-500 ring-offset-2",
+                          !isSelected && "hover:bg-neutral-50",
+                          isPopular && !isSelected && "shadow-[4px_4px_0px_0px_rgba(132,204,22,1)]"
+                        )}
+                      >
+                        {isPopular && (
+                          <span className="absolute -top-3 left-4 text-xs font-bold bg-lime-500 text-black px-3 py-1 border-2 border-black">
+                            MOST POPULAR
+                          </span>
+                        )}
+
+                        <div className={cn(
+                          "p-5",
+                          isSelected ? "bg-lime-400" : isPopular ? "bg-lime-50" : "bg-white"
+                        )}>
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="text-3xl font-black">
+                                  {pkg.reviews}
+                                </span>
+                                <span className="text-lg font-bold text-neutral-700">reviews</span>
+                              </div>
+                              <p className="text-sm text-neutral-600">{pkg.description}</p>
                             </div>
-                          ) : (
-                            <div>
+                            <div className="text-right flex-shrink-0">
                               <span className="text-2xl font-black">${(pkg.price / 100).toFixed(2)}</span>
                               <p className="text-sm text-neutral-500">AUD</p>
                             </div>
+                          </div>
+                          {isSelected && (
+                            <div className="mt-3 pt-3 border-t border-black/20 flex items-center gap-2">
+                              <Check className="h-4 w-4" />
+                              <span className="text-sm font-bold">Selected</span>
+                            </div>
                           )}
                         </div>
-                      </div>
-                      {isSelected && (
-                        <div className="mt-3 pt-3 border-t border-black/20 flex items-center gap-2">
-                          <Check className="h-4 w-4" />
-                          <span className="text-sm font-bold">Selected</span>
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                      </button>
+                    );
+                  })}
+                </div>
 
-            <div>
-              <Button
-                onClick={handleSubmit}
-                isLoading={isSubmitting}
-                variant="primary"
-                className="w-full h-14 text-lg"
-              >
-                {freeCredits > 0 ? (
-                  <>
-                    <Gift className="h-5 w-5 mr-2" />
-                    Get Your Free Review
-                  </>
-                ) : (
-                  <>Continue to Payment</>
-                )}
-              </Button>
-              <p className="text-center text-xs text-neutral-500 mt-3">
-                {freeCredits > 0 ? "No payment required" : "Secure payment via Stripe"}
-              </p>
-            </div>
+                <div>
+                  <Button
+                    onClick={handleSubmit}
+                    isLoading={isSubmitting}
+                    variant="primary"
+                    className="w-full h-14 text-lg"
+                  >
+                    Continue to Payment
+                  </Button>
+                  <p className="text-center text-xs text-neutral-500 mt-3">
+                    Secure payment via Stripe
+                  </p>
+                </div>
+              </>
+            )}
 
             {/* Terms agreement for new accounts */}
             {!isLoggedIn && (

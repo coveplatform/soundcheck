@@ -44,9 +44,9 @@ export default function Home() {
               </Button>
             </Link>
           </div>
-          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-500 font-mono">
-            <span>From $4.95 AUD • Results in under 12 hours</span>
-          </div>
+          <p className="mt-6 text-sm text-neutral-500 font-mono">
+            Results in under 12 hours
+          </p>
         </div>
       </section>
 
