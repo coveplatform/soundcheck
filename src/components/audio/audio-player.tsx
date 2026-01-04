@@ -10,6 +10,8 @@ interface SoundCloudWidget {
   unbind: (event: string) => void;
   getPosition: (callback: (position: number) => void) => void;
   getDuration: (callback: (duration: number) => void) => void;
+  pause: () => void;
+  seekTo: (milliseconds: number) => void;
 }
 
 interface SoundCloudWidgetAPI {
@@ -363,7 +365,11 @@ export function AudioPlayer({
       });
 
       widget.bind(window.SC.Widget.Events.FINISH, () => {
-        if (mounted) setIsPlaying(false);
+        if (mounted) {
+          setIsPlaying(false);
+          // Pause the widget to prevent auto-advancing to the next track
+          widget.pause();
+        }
       });
     };
 
