@@ -697,162 +697,172 @@ export default function GetFeedbackPage() {
         {/* Step: Track URL/Upload */}
         {step === "track" && (
           <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-black">
-                What track do you want feedback on?
-              </h1>
-              <p className="text-neutral-500 mt-2">
-                Share a link or upload an MP3
-              </p>
-            </div>
-
-            <div className="flex gap-2 mb-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setInputMode("url");
-                  setUploadedUrl("");
-                  setUploadedFileName("");
-                  setError("");
-                }}
-                className={cn(
-                  "px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
-                  inputMode === "url"
-                    ? "bg-black text-white"
-                    : "bg-white text-black hover:bg-neutral-100"
-                )}
-              >
-                Paste link
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setInputMode("upload");
-                  setTrackUrl("");
-                  setUrlError("");
-                  setError("");
-                }}
-                className={cn(
-                  "px-4 py-2 text-sm font-bold border-2 border-black transition-colors",
-                  inputMode === "upload"
-                    ? "bg-black text-white"
-                    : "bg-white text-black hover:bg-neutral-100"
-                )}
-              >
-                Upload MP3
-              </button>
-            </div>
-
-            {inputMode === "url" ? (
-              <div className="space-y-4 flex-1">
-                <Input
-                  placeholder="Paste your SoundCloud, Bandcamp, or YouTube link"
-                  value={trackUrl}
-                  onChange={(e) => handleUrlChange(e.target.value)}
-                  className={cn("text-lg h-14", urlError && "border-red-500")}
-                  autoFocus
-                />
-                {urlError && (
-                  <p className="text-sm text-red-500 font-medium">{urlError}</p>
-                )}
-                {isLoadingMetadata && (
-                  <div className="flex items-center gap-2 text-sm text-neutral-500">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Getting track info...
+            <div className="border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
+              <div className="absolute top-10 right-10 w-32 h-32 bg-lime-200 rounded-full blur-3xl opacity-50" />
+              <div className="absolute bottom-10 left-10 w-24 h-24 bg-lime-200 rounded-full blur-2xl opacity-40" />
+              <div className="p-6 space-y-6 relative">
+                <div>
+                  <div className="inline-flex items-center gap-2 bg-lime-400 border-2 border-black px-3 py-1 text-xs font-black uppercase tracking-wide">
+                    <Music className="h-4 w-4" />
+                    Start here
                   </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex-1">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="audio/mpeg,audio/mp3,.mp3"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void handleUpload(file);
-                  }}
-                  className="hidden"
-                />
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setIsDragging(true);
-                  }}
-                  onDragLeave={() => setIsDragging(false)}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    setIsDragging(false);
-                    const file = e.dataTransfer.files?.[0];
-                    if (
-                      file &&
-                      (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))
-                    ) {
-                      void handleUpload(file);
-                    } else {
-                      setError("Please upload an MP3 file");
-                    }
-                  }}
-                  className={cn(
-                    "border-2 border-dashed p-12 text-center cursor-pointer transition-all",
-                    isDragging && "border-lime-500 bg-lime-50",
-                    !isDragging &&
-                      !uploadedFileName &&
-                      "border-neutral-300 hover:border-black",
-                    uploadedFileName && !isUploading && "border-lime-500 bg-lime-50"
-                  )}
-                >
-                  {isUploading ? (
-                    <div className="flex flex-col items-center gap-3">
-                      <Loader2 className="h-12 w-12 animate-spin text-neutral-400" />
-                      <p className="font-medium text-neutral-600">Uploading...</p>
-                    </div>
-                  ) : uploadedFileName ? (
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="h-14 w-14 rounded-full bg-lime-500 flex items-center justify-center">
-                        <Check className="h-7 w-7 text-white" />
-                      </div>
-                      <p className="font-bold text-black">{uploadedFileName}</p>
-                      <p className="text-sm text-neutral-500">Click to change</p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="h-14 w-14 rounded-full bg-neutral-100 flex items-center justify-center">
-                        <Upload className="h-7 w-7 text-neutral-400" />
-                      </div>
-                      <p className="font-bold text-black text-lg">
-                        Drop your MP3 here
-                      </p>
-                      <p className="text-sm text-neutral-500">or click to browse</p>
-                    </div>
-                  )}
+                  <h1 className="text-3xl font-black mt-4">
+                    What track do you want feedback on?
+                  </h1>
+                  <p className="text-neutral-500 mt-2">
+                    Share a link or upload an MP3
+                  </p>
                 </div>
-                {uploadedUrl && (
-                  <div className="mt-4">
-                    <AudioPlayer
-                      sourceUrl={uploadedUrl}
-                      sourceType="UPLOAD"
-                      showListenTracker={false}
-                      showWaveform={true}
+
+                <div className="grid grid-cols-2 border-2 border-black bg-white">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputMode("url");
+                      setUploadedUrl("");
+                      setUploadedFileName("");
+                      setError("");
+                    }}
+                    className={cn(
+                      "px-4 py-3 text-sm font-black transition-colors border-r-2 border-black",
+                      inputMode === "url"
+                        ? "bg-lime-400 text-black"
+                        : "bg-white text-black hover:bg-neutral-100"
+                    )}
+                  >
+                    Paste link
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputMode("upload");
+                      setTrackUrl("");
+                      setUrlError("");
+                      setError("");
+                    }}
+                    className={cn(
+                      "px-4 py-3 text-sm font-black transition-colors",
+                      inputMode === "upload"
+                        ? "bg-lime-400 text-black"
+                        : "bg-white text-black hover:bg-neutral-100"
+                    )}
+                  >
+                    Upload MP3
+                  </button>
+                </div>
+
+                {inputMode === "url" ? (
+                  <div className="space-y-4 flex-1">
+                    <Input
+                      placeholder="Paste your SoundCloud, Bandcamp, or YouTube link"
+                      value={trackUrl}
+                      onChange={(e) => handleUrlChange(e.target.value)}
+                      className={cn("text-lg h-14", urlError && "border-red-500")}
+                      autoFocus
                     />
+                    {urlError && (
+                      <p className="text-sm text-red-500 font-medium">{urlError}</p>
+                    )}
+                    {isLoadingMetadata && (
+                      <div className="flex items-center gap-2 text-sm text-neutral-500">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Getting track info...
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex-1">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="audio/mpeg,audio/mp3,.mp3"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) void handleUpload(file);
+                      }}
+                      className="hidden"
+                    />
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setIsDragging(true);
+                      }}
+                      onDragLeave={() => setIsDragging(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setIsDragging(false);
+                        const file = e.dataTransfer.files?.[0];
+                        if (
+                          file &&
+                          (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))
+                        ) {
+                          void handleUpload(file);
+                        } else {
+                          setError("Please upload an MP3 file");
+                        }
+                      }}
+                      className={cn(
+                        "border-2 border-dashed p-12 text-center cursor-pointer transition-all bg-neutral-50",
+                        isDragging && "border-lime-500 bg-lime-50",
+                        !isDragging &&
+                          !uploadedFileName &&
+                          "border-neutral-300 hover:border-black hover:bg-white",
+                        uploadedFileName && !isUploading && "border-lime-500 bg-lime-50"
+                      )}
+                    >
+                      {isUploading ? (
+                        <div className="flex flex-col items-center gap-3">
+                          <Loader2 className="h-12 w-12 animate-spin text-neutral-400" />
+                          <p className="font-medium text-neutral-600">Uploading...</p>
+                        </div>
+                      ) : uploadedFileName ? (
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="h-14 w-14 rounded-full bg-lime-500 flex items-center justify-center">
+                            <Check className="h-7 w-7 text-white" />
+                          </div>
+                          <p className="font-bold text-black">{uploadedFileName}</p>
+                          <p className="text-sm text-neutral-500">Click to change</p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="h-14 w-14 rounded-full bg-neutral-100 flex items-center justify-center">
+                            <Upload className="h-7 w-7 text-neutral-400" />
+                          </div>
+                          <p className="font-bold text-black text-lg">
+                            Drop your MP3 here
+                          </p>
+                          <p className="text-sm text-neutral-500">or click to browse</p>
+                        </div>
+                      )}
+                    </div>
+                    {uploadedUrl && (
+                      <div className="mt-4">
+                        <AudioPlayer
+                          sourceUrl={uploadedUrl}
+                          sourceType="UPLOAD"
+                          showListenTracker={false}
+                          showWaveform={true}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {hasTrack && (
+                  <div className="pt-2">
+                    <Button
+                      onClick={goNext}
+                      variant="primary"
+                      className="w-full h-14 text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
+                    >
+                      Continue
+                      <ArrowRight className="h-5 w-5 ml-2" />
+                    </Button>
                   </div>
                 )}
               </div>
-            )}
-
-            {hasTrack && (
-              <div className="mt-8">
-                <Button
-                  onClick={goNext}
-                  variant="primary"
-                  className="w-full h-14 text-lg"
-                >
-                  Continue
-                  <ArrowRight className="h-5 w-5 ml-2" />
-                </Button>
-              </div>
-            )}
+            </div>
           </div>
         )}
 

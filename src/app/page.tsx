@@ -34,7 +34,7 @@ export default function Home() {
           </h1>
           <p className="mt-6 text-xl text-neutral-600 max-w-xl leading-relaxed">
             Listened to your track so many times you can&apos;t tell if it&apos;s good anymore?
-            Get fresh ears on your music—real feedback from real listeners, delivered within 24 hours.
+            Get fresh ears on your music—real feedback from real listeners, delivered in under 12 hours.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/get-feedback">
@@ -44,7 +44,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-neutral-500 font-mono">
-            <span>From $4.95 AUD • Results in 24 hours</span>
+            <span>From $4.95 AUD • Results in under 12 hours</span>
           </div>
         </div>
       </section>
@@ -58,7 +58,7 @@ export default function Home() {
               <p className="text-xs md:text-sm text-neutral-400 mt-1">Reviews Delivered</p>
             </div>
             <div className="p-4 md:p-6 text-center">
-              <p className="text-2xl md:text-3xl font-black text-lime-400">&lt;24h</p>
+              <p className="text-2xl md:text-3xl font-black text-lime-400">&lt;12h</p>
               <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Turnaround</p>
             </div>
             <div className="p-4 md:p-6 text-center">
