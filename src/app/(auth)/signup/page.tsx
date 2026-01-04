@@ -73,6 +73,13 @@ export default function SignupPage() {
 
   const handleRoleSelect = (selectedRole: Role) => {
     funnels.artistSignup.selectRole(selectedRole);
+
+    // Redirect artists to the new step-by-step flow
+    if (selectedRole === "artist") {
+      router.push("/get-feedback");
+      return;
+    }
+
     setRole(selectedRole);
     setStep("details");
   };

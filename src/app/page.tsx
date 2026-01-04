@@ -37,7 +37,7 @@ export default function Home() {
             Get fresh ears on your music—real feedback from real listeners, delivered within 24 hours.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
-            <Link href="/signup">
+            <Link href="/get-feedback">
               <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-8 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
                 Test Your Track <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -531,7 +531,7 @@ export default function Home() {
                     ))}
                   </div>
 
-                  <Link href="/signup">
+                  <Link href="/get-feedback">
                     <Button className={`w-full border-2 border-black font-bold py-6 text-base ${
                       isPopular
                         ? "bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600"
@@ -561,7 +561,7 @@ export default function Home() {
           <p className="text-neutral-400 mb-10 text-lg">
             Your next release deserves more than a guess. Find out if it&apos;s ready.
           </p>
-          <Link href="/signup">
+          <Link href="/get-feedback">
             <Button
               size="lg"
               className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-lime-500"
