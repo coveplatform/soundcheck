@@ -25,6 +25,7 @@ interface YouTubePlayer {
   destroy: () => void;
   getCurrentTime: () => number;
   getDuration: () => number;
+  getPlayerState: () => number;
 }
 
 declare global {
@@ -92,6 +93,7 @@ export function AudioPlayer({
   const ytPlayerRef = useRef<YouTubePlayer | null>(null);
   const ytContainerId = useRef(`yt-player-${Math.random().toString(36).slice(2, 9)}`);
   const bcIframeRef = useRef<HTMLIFrameElement | null>(null);
+  const ytPlayerReady = useRef(false);
 
   // Store callbacks in refs to avoid effect dependency issues
   const onListenProgressRef = useRef(onListenProgress);
@@ -169,8 +171,15 @@ export function AudioPlayer({
       return `https://w.soundcloud.com/player/?url=${encodeURIComponent(sourceUrl)}&color=%23000000&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`;
     }
     if (sourceType === "YOUTUBE") {
-      const videoId = new URL(sourceUrl).searchParams.get("v") || sourceUrl.split("/").pop();
-      return `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+      const url = new URL(sourceUrl);
+      let videoId = url.searchParams.get("v");
+      if (!videoId) {
+        // Handle youtu.be URLs: extract path without query params
+        const pathPart = url.pathname.split("/").pop() || "";
+        videoId = pathPart;
+      }
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      return `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${encodeURIComponent(origin)}`;
     }
     if (sourceType === "BANDCAMP") {
       return bandcampEmbedUrl || "";
@@ -387,6 +396,7 @@ export function AudioPlayer({
     if (sourceType !== "YOUTUBE" || !showListenTracker) return;
 
     let mounted = true;
+    ytPlayerReady.current = false;
 
     const initPlayer = () => {
       if (!window.YT?.Player || !mounted) return;
@@ -394,9 +404,22 @@ export function AudioPlayer({
       try {
         const player = new window.YT.Player(ytContainerId.current, {
           events: {
+            onReady: () => {
+              if (!mounted) return;
+              ytPlayerReady.current = true;
+              // Check initial state in case video is already playing
+              try {
+                const state = player.getPlayerState();
+                if (state === 1) {
+                  setIsPlaying(true);
+                }
+              } catch {
+                // Player might not be fully ready yet
+              }
+            },
             onStateChange: (event: { data: number }) => {
               if (!mounted) return;
-              // YT.PlayerState: PLAYING = 1, PAUSED = 2, ENDED = 0
+              // YT.PlayerState: PLAYING = 1, PAUSED = 2, ENDED = 0, BUFFERING = 3
               if (event.data === 1) {
                 setIsPlaying(true);
               } else if (event.data === 2 || event.data === 0) {
@@ -417,7 +440,12 @@ export function AudioPlayer({
       return () => {
         mounted = false;
         clearTimeout(timer);
-        ytPlayerRef.current?.destroy();
+        ytPlayerReady.current = false;
+        try {
+          ytPlayerRef.current?.destroy();
+        } catch {
+          // Ignore destroy errors
+        }
       };
     }
 
@@ -435,7 +463,12 @@ export function AudioPlayer({
 
     return () => {
       mounted = false;
-      ytPlayerRef.current?.destroy();
+      ytPlayerReady.current = false;
+      try {
+        ytPlayerRef.current?.destroy();
+      } catch {
+        // Ignore destroy errors
+      }
     };
   }, [sourceType, showListenTracker, sourceUrl]);
 
@@ -459,12 +492,18 @@ export function AudioPlayer({
         scWidgetRef.current.getDuration((durationMs) => {
           setDuration(Math.floor(durationMs / 1000));
         });
-      } else if (sourceType === "YOUTUBE" && ytPlayerRef.current) {
+      } else if (sourceType === "YOUTUBE" && ytPlayerRef.current && ytPlayerReady.current) {
         try {
-          const seconds = Math.floor(ytPlayerRef.current.getCurrentTime());
-          setCurrentTime(seconds);
-          onTimeUpdateRef.current?.(seconds);
-          setDuration(Math.floor(ytPlayerRef.current.getDuration()));
+          const currentSeconds = ytPlayerRef.current.getCurrentTime();
+          const totalDuration = ytPlayerRef.current.getDuration();
+          if (typeof currentSeconds === "number" && !isNaN(currentSeconds)) {
+            const seconds = Math.floor(currentSeconds);
+            setCurrentTime(seconds);
+            onTimeUpdateRef.current?.(seconds);
+          }
+          if (typeof totalDuration === "number" && !isNaN(totalDuration) && totalDuration > 0) {
+            setDuration(Math.floor(totalDuration));
+          }
         } catch {
           // Player may not be ready yet
         }
