@@ -111,6 +111,7 @@ export default function GetFeedbackPage() {
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [fieldError, setFieldError] = useState("");
 
   // Free credits (for logged in users)
@@ -370,6 +371,59 @@ export default function GetFeedbackPage() {
     }
   };
 
+  useEffect(() => {
+    if (step !== "email" || isLoggedIn) return;
+
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      setEmailExists(false);
+      setNotice("");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      setEmailExists(false);
+      setNotice("");
+      return;
+    }
+
+    let cancelled = false;
+    const handle = window.setTimeout(async () => {
+      try {
+        const response = await fetch("/api/auth/check-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: normalizedEmail }),
+        });
+
+        if (!response.ok) return;
+        const data = (await response.json()) as { exists?: boolean };
+        if (cancelled) return;
+
+        const exists = Boolean(data.exists);
+        setEmailExists(exists);
+        if (exists) {
+          setNotice(
+            `An account already exists for ${normalizedEmail}. You'll log in next.`
+          );
+        } else {
+          setNotice("");
+        }
+      } catch {
+        if (!cancelled) {
+          setEmailExists(false);
+          setNotice("");
+        }
+      }
+    }, 400);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(handle);
+    };
+  }, [email, isLoggedIn, step]);
+
   // Toggle genre
   const toggleGenre = (genreId: string) => {
     setSelectedGenres((prev) => {
@@ -446,8 +500,16 @@ export default function GetFeedbackPage() {
       return;
     }
 
+    setNotice("");
+
     const exists = await checkEmailExists(email);
     setEmailExists(exists);
+    if (exists) {
+      const normalizedEmail = email.trim().toLowerCase();
+      setNotice(
+        `An account already exists for ${normalizedEmail}. You'll log in next.`
+      );
+    }
     goNext();
   };
 
@@ -476,6 +538,7 @@ export default function GetFeedbackPage() {
         // Logged in successfully - refresh session and continue
         router.refresh();
         // Skip to genres step since they now have an account
+        setNotice("");
         setStep("genres");
       } catch {
         setFieldError("Login failed. Please try again.");
@@ -875,6 +938,7 @@ export default function GetFeedbackPage() {
                   onChange={(e) => {
                     setEmail(e.target.value);
                     setFieldError("");
+                    setNotice("");
                   }}
                   className="text-lg h-14 pl-12"
                   autoFocus
@@ -886,6 +950,11 @@ export default function GetFeedbackPage() {
               {fieldError && (
                 <p className="text-sm text-red-500 font-medium mt-2">{fieldError}</p>
               )}
+              {!fieldError && notice && (
+                <div className="mt-2 bg-neutral-50 border-2 border-black text-black text-sm p-3 font-medium">
+                  {notice}
+                </div>
+              )}
             </div>
 
             <div>
@@ -895,7 +964,7 @@ export default function GetFeedbackPage() {
                 variant="primary"
                 className="w-full h-14 text-lg"
               >
-                Continue
+                {emailExists ? "Continue to log in" : "Continue"}
                 <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
               <p className="text-center text-xs text-neutral-400 mt-4">
