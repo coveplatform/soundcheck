@@ -52,9 +52,17 @@ export function DashboardNav({ user }: DashboardNavProps) {
 
   const isArtistPath = pathname.startsWith("/artist");
   const isReviewerPath = pathname.startsWith("/reviewer");
+  const isReviewerOnboarding = pathname === "/reviewer/onboarding";
 
   const currentSection = isArtistPath ? "artist" : isReviewerPath ? "reviewer" : null;
-  const links = isArtistPath ? artistLinks : isReviewerPath ? reviewerLinks : [];
+
+  // Don't show reviewer nav links if user isn't actually a reviewer (e.g., on onboarding)
+  // Only show links if they have the corresponding role
+  const links = isArtistPath
+    ? artistLinks
+    : (isReviewerPath && user.isReviewer && !isReviewerOnboarding)
+      ? reviewerLinks
+      : [];
 
   const accountHref = isArtistPath
     ? "/artist/account"
@@ -87,7 +95,9 @@ export function DashboardNav({ user }: DashboardNavProps) {
     },
   };
 
-  const config = currentSection ? sectionConfig[currentSection] : null;
+  // Don't show section bar on reviewer onboarding if user isn't a reviewer
+  const showSectionBar = currentSection && !(isReviewerOnboarding && !user.isReviewer);
+  const config = showSectionBar ? sectionConfig[currentSection] : null;
 
   return (
     <header className="sticky top-0 z-50">
