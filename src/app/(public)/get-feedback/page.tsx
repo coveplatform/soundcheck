@@ -498,7 +498,6 @@ export default function GetFeedbackPage() {
     setIsSubmitting(true);
 
     try {
-      // For new users, re-verify email doesn't exist (in case of stale state)
       if (!isLoggedIn && email) {
         const exists = await checkEmailExists(email);
         if (exists) {
