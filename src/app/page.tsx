@@ -110,21 +110,18 @@ export default function Home() {
               </span>
               <div className="flex flex-col justify-center">
                 <p className="font-bold text-lg">Drop your link</p>
-                <p className="text-neutral-500 mb-2">
+                <p className="text-neutral-500 mb-3">
                   Paste a link from any of these platforms. Takes 30 seconds.
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5 text-xs font-medium text-neutral-600">
-                    <SoundCloudIcon className="h-4 w-4 text-[#ff5500]" />
-                    <span>SoundCloud</span>
+                  <div className="p-2 rounded-lg bg-orange-50" title="SoundCloud">
+                    <SoundCloudIcon className="h-5 w-5 text-[#ff5500]" />
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs font-medium text-neutral-600">
-                    <BandcampIcon className="h-4 w-4 text-[#1da0c3]" />
-                    <span>Bandcamp</span>
+                  <div className="p-2 rounded-lg bg-cyan-50" title="Bandcamp">
+                    <BandcampIcon className="h-5 w-5 text-[#1da0c3]" />
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs font-medium text-neutral-600">
-                    <YouTubeIcon className="h-4 w-4 text-[#ff0000]" />
-                    <span>YouTube</span>
+                  <div className="p-2 rounded-lg bg-red-50" title="YouTube">
+                    <YouTubeIcon className="h-5 w-5 text-[#ff0000]" />
                   </div>
                 </div>
               </div>

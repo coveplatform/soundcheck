@@ -45,6 +45,7 @@ export default function SubmitTrackPage() {
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [sourceType, setSourceType] = useState<"SOUNDCLOUD" | "BANDCAMP" | "YOUTUBE" | null>(null);
 
   // Free credit state
   const [freeCredits, setFreeCredits] = useState<number>(0);
@@ -85,6 +86,7 @@ export default function SubmitTrackPage() {
   const handleUrlChange = async (value: string) => {
     setUrl(value);
     setUrlError("");
+    setSourceType(detectSource(value));
 
     if (!value.trim()) return;
 
@@ -405,6 +407,7 @@ export default function SubmitTrackPage() {
                 className={cn("text-base h-12", urlError && "border-red-500")}
                 autoFocus
               />
+              <SupportedPlatforms activeSource={sourceType} />
               {urlError && <p className="text-sm text-red-500 font-medium">{urlError}</p>}
               {isLoadingMetadata && (
                 <div className="flex items-center gap-2 text-sm text-neutral-500">

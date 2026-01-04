@@ -20,7 +20,7 @@ const platforms = [
     Icon: SoundCloudIcon,
     color: "#ff5500",
     bgActive: "bg-orange-50",
-    borderActive: "border-orange-300"
+    borderActive: "border-orange-400"
   },
   {
     id: "BANDCAMP" as const,
@@ -28,7 +28,7 @@ const platforms = [
     Icon: BandcampIcon,
     color: "#1da0c3",
     bgActive: "bg-cyan-50",
-    borderActive: "border-cyan-300"
+    borderActive: "border-cyan-400"
   },
   {
     id: "YOUTUBE" as const,
@@ -36,13 +36,14 @@ const platforms = [
     Icon: YouTubeIcon,
     color: "#ff0000",
     bgActive: "bg-red-50",
-    borderActive: "border-red-300"
+    borderActive: "border-red-400"
   },
 ];
 
 /**
  * Shows supported platforms with optional active state highlighting.
  * Use below URL input fields to guide users on what links are accepted.
+ * Icons only - no text labels.
  */
 export function SupportedPlatforms({
   activeSource,
@@ -51,58 +52,44 @@ export function SupportedPlatforms({
 }: SupportedPlatformsProps) {
   if (variant === "compact") {
     return (
-      <div className={cn("flex items-center gap-3 text-neutral-400", className)}>
-        <span className="text-xs">Works with</span>
-        <div className="flex items-center gap-2">
-          {platforms.map((platform) => {
-            const isActive = activeSource === platform.id;
-            return (
-              <div
-                key={platform.id}
-                className={cn(
-                  "transition-all duration-200",
-                  isActive ? "scale-110" : "opacity-60"
-                )}
-                title={platform.name}
-              >
-                <platform.Icon
-                  className="h-4 w-4"
-                  style={{ color: isActive ? platform.color : "currentColor" }}
-                />
-              </div>
-            );
-          })}
-        </div>
+      <div className={cn("flex items-center gap-4", className)}>
+        {platforms.map((platform) => {
+          const isActive = activeSource === platform.id;
+          return (
+            <div
+              key={platform.id}
+              className={cn(
+                "transition-all duration-200",
+                isActive ? "scale-125" : "opacity-50 hover:opacity-75"
+              )}
+              title={platform.name}
+              style={{ color: isActive ? platform.color : "#9ca3af" }}
+            >
+              <platform.Icon className="h-6 w-6" />
+            </div>
+          );
+        })}
       </div>
     );
   }
 
   return (
-    <div className={cn("flex items-center justify-center gap-2 flex-wrap", className)}>
+    <div className={cn("flex items-center justify-center gap-3", className)}>
       {platforms.map((platform) => {
         const isActive = activeSource === platform.id;
         return (
           <div
             key={platform.id}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-200",
+              "p-2.5 rounded-xl border-2 transition-all duration-200",
               isActive
-                ? cn(platform.bgActive, platform.borderActive, "border-2")
-                : "border-neutral-200 bg-neutral-50"
+                ? cn(platform.bgActive, platform.borderActive, "scale-110")
+                : "border-neutral-200 bg-neutral-50 hover:border-neutral-300"
             )}
+            title={platform.name}
+            style={{ color: isActive ? platform.color : "#9ca3af" }}
           >
-            <platform.Icon
-              className={cn("h-4 w-4 transition-colors", isActive && "scale-110")}
-              style={{ color: isActive ? platform.color : "#9ca3af" }}
-            />
-            <span
-              className={cn(
-                "text-xs font-medium transition-colors",
-                isActive ? "text-neutral-700" : "text-neutral-400"
-              )}
-            >
-              {platform.name}
-            </span>
+            <platform.Icon className="h-6 w-6 transition-transform" />
           </div>
         );
       })}
@@ -117,6 +104,7 @@ interface PlatformBadgeProps {
 
 /**
  * Single platform badge for showing detected source in track previews.
+ * Icon only with colored background.
  */
 export function PlatformBadge({ source, className }: PlatformBadgeProps) {
   if (!source) return null;
@@ -127,13 +115,14 @@ export function PlatformBadge({ source, className }: PlatformBadgeProps) {
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium",
+        "inline-flex items-center justify-center p-1.5 rounded-lg",
         platform.bgActive,
         className
       )}
+      title={platform.name}
+      style={{ color: platform.color }}
     >
-      <platform.Icon className="h-3.5 w-3.5" style={{ color: platform.color }} />
-      <span className="text-neutral-600">{platform.name}</span>
+      <platform.Icon className="h-5 w-5" />
     </div>
   );
 }
