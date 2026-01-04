@@ -697,59 +697,55 @@ export default function GetFeedbackPage() {
         {/* Step: Track URL/Upload */}
         {step === "track" && (
           <div className="space-y-6">
-            <div className="border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
-              <div className="absolute top-10 right-10 w-32 h-32 bg-lime-200 rounded-full blur-3xl opacity-50" />
-              <div className="absolute bottom-10 left-10 w-24 h-24 bg-lime-200 rounded-full blur-2xl opacity-40" />
-              <div className="p-6 space-y-6 relative">
-                <div>
-                  <div className="inline-flex items-center gap-2 bg-lime-400 border-2 border-black px-3 py-1 text-xs font-black uppercase tracking-wide">
-                    <Music className="h-4 w-4" />
-                    Start here
-                  </div>
-                  <h1 className="text-3xl font-black mt-4">
-                    What track do you want feedback on?
-                  </h1>
-                  <p className="text-neutral-500 mt-2">
-                    Share a link or upload an MP3
-                  </p>
-                </div>
+            <div>
+              <div className="inline-flex items-center gap-2 bg-lime-400 border-2 border-black px-3 py-1 text-xs font-black uppercase tracking-wide">
+                <Music className="h-4 w-4" />
+                Start here
+              </div>
+              <h1 className="text-3xl font-black mt-4">
+                What track do you want feedback on?
+              </h1>
+              <p className="text-neutral-500 mt-2">
+                Share a link or upload an MP3
+              </p>
+            </div>
 
-                <div className="rounded-full border-2 border-black bg-neutral-100 p-1 flex gap-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInputMode("url");
-                      setUploadedUrl("");
-                      setUploadedFileName("");
-                      setError("");
-                    }}
-                    className={cn(
-                      "flex-1 rounded-full px-4 py-2.5 text-sm font-black transition-all",
-                      inputMode === "url"
-                        ? "bg-lime-400 text-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                        : "bg-transparent text-black hover:bg-white"
-                    )}
-                  >
-                    Paste link
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInputMode("upload");
-                      setTrackUrl("");
-                      setUrlError("");
-                      setError("");
-                    }}
-                    className={cn(
-                      "flex-1 rounded-full px-4 py-2.5 text-sm font-black transition-all",
-                      inputMode === "upload"
-                        ? "bg-lime-400 text-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                        : "bg-transparent text-black hover:bg-white"
-                    )}
-                  >
-                    Upload MP3
-                  </button>
-                </div>
+            <div className="rounded-full border-2 border-black bg-neutral-100 p-1 flex gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setInputMode("url");
+                  setUploadedUrl("");
+                  setUploadedFileName("");
+                  setError("");
+                }}
+                className={cn(
+                  "flex-1 rounded-full px-4 py-2.5 text-sm font-black transition-all",
+                  inputMode === "url"
+                    ? "bg-lime-400 text-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    : "bg-transparent text-black hover:bg-white"
+                )}
+              >
+                Paste link
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setInputMode("upload");
+                  setTrackUrl("");
+                  setUrlError("");
+                  setError("");
+                }}
+                className={cn(
+                  "flex-1 rounded-full px-4 py-2.5 text-sm font-black transition-all",
+                  inputMode === "upload"
+                    ? "bg-lime-400 text-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    : "bg-transparent text-black hover:bg-white"
+                )}
+              >
+                Upload MP3
+              </button>
+            </div>
 
                 {inputMode === "url" ? (
                   <div className="space-y-4 flex-1">
@@ -881,20 +877,18 @@ export default function GetFeedbackPage() {
                   </div>
                 )}
 
-                {hasTrack && (
-                  <div className="pt-2">
-                    <Button
-                      onClick={goNext}
-                      variant="primary"
-                      className="w-full h-14 text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
-                    >
-                      Continue
-                      <ArrowRight className="h-5 w-5 ml-2" />
-                    </Button>
-                  </div>
-                )}
+            {hasTrack && (
+              <div className="pt-2">
+                <Button
+                  onClick={goNext}
+                  variant="primary"
+                  className="w-full h-14 text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
+                >
+                  Continue
+                  <ArrowRight className="h-5 w-5 ml-2" />
+                </Button>
               </div>
-            </div>
+            )}
           </div>
         )}
 
