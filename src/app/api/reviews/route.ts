@@ -112,7 +112,7 @@ const submitReviewSchema = z.object({
   weakestPart: z.string().min(1, "Please describe the weakest part"),
   weakestTimestamp: z.number().optional().nullable(),
   additionalNotes: z.string().optional(),
-  addressedArtistNote: z.enum(["YES", "PARTIALLY", "NO"]),
+  addressedArtistNote: z.enum(["YES", "PARTIALLY", "NO"]).optional().nullable(),
   nextActions: z.string().min(1, "Please provide next actions"),
   timestamps: z
     .array(
