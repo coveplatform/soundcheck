@@ -45,7 +45,7 @@ export default function SubmitTrackPage() {
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [sourceType, setSourceType] = useState<"SOUNDCLOUD" | "BANDCAMP" | "YOUTUBE" | null>(null);
+  const [sourceType, setSourceType] = useState<"SOUNDCLOUD" | "BANDCAMP" | "YOUTUBE" | "UPLOAD" | null>(null);
 
   // Free credit state
   const [freeCredits, setFreeCredits] = useState<number>(0);
@@ -419,9 +419,9 @@ export default function SubmitTrackPage() {
               {url && !urlError && !isLoadingMetadata && title && (
                 <div className="border-2 border-lime-500 bg-lime-50 p-4 flex items-center gap-4">
                   {artworkUrl ? (
-                    <img 
-                      src={artworkUrl} 
-                      alt="Track artwork" 
+                    <img
+                      src={artworkUrl}
+                      alt="Track artwork"
                       className="w-16 h-16 object-cover border-2 border-black"
                     />
                   ) : (
@@ -433,6 +433,7 @@ export default function SubmitTrackPage() {
                     <div className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-lime-600 flex-shrink-0" />
                       <span className="text-sm font-medium text-lime-700">Track found</span>
+                      {sourceType && <PlatformBadge source={sourceType} />}
                     </div>
                     <p className="font-bold text-black truncate mt-1">{title}</p>
                   </div>

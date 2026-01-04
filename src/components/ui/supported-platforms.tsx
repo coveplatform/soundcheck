@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { SoundCloudIcon, BandcampIcon, YouTubeIcon } from "./platform-icons";
 
-type SourceType = "SOUNDCLOUD" | "BANDCAMP" | "YOUTUBE" | null;
+type SourceType = "SOUNDCLOUD" | "BANDCAMP" | "YOUTUBE" | "UPLOAD" | null;
 
 interface SupportedPlatformsProps {
   /** Currently detected source from URL, if any */
