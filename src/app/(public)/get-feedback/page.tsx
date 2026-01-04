@@ -30,6 +30,7 @@ import {
   PackageType,
 } from "@/lib/metadata";
 import { AudioPlayer } from "@/components/audio/audio-player";
+import { Logo } from "@/components/ui/logo";
 import Link from "next/link";
 
 interface Genre {
@@ -272,7 +273,12 @@ export default function GetFeedbackPage() {
     try {
       let finalUrl = "";
 
-      const presignRes = await fetch("/api/uploads/track/presign", {
+      // Use the onboarding-specific upload endpoint (doesn't require auth)
+      const presignEndpoint = isLoggedIn
+        ? "/api/uploads/track/presign"
+        : "/api/get-feedback/upload-presign";
+
+      const presignRes = await fetch(presignEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -302,22 +308,9 @@ export default function GetFeedbackPage() {
 
         finalUrl = presignData.fileUrl;
       } else {
-        // Try fallback local upload
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const res = await fetch("/api/uploads/track", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await res.json();
-        if (!res.ok || !data.url) {
-          setError(data.error || "Failed to upload MP3");
-          return;
-        }
-
-        finalUrl = data.url;
+        const errorData = await presignRes.json().catch(() => ({}));
+        setError(errorData.error || "Failed to prepare upload");
+        return;
       }
 
       if (!finalUrl) {
@@ -586,19 +579,21 @@ export default function GetFeedbackPage() {
 
       {/* Header */}
       <header className="border-b-2 border-black bg-white">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="font-black text-xl">
-            MixReflect
-          </Link>
-          {isLoggedIn && (
-            <span className="text-sm text-neutral-500">
-              Logged in as {session.user?.email}
-            </span>
-          )}
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-center justify-between h-14">
+            <Link href="/" className="flex items-center gap-2">
+              <Logo />
+            </Link>
+            {isLoggedIn && (
+              <span className="text-sm text-neutral-500">
+                {session.user?.email}
+              </span>
+            )}
+          </div>
         </div>
       </header>
 
-      <main className="max-w-xl mx-auto px-4 py-8 min-h-[calc(100vh-73px)] flex flex-col">
+      <main className="max-w-xl mx-auto px-4 py-8">
         {/* Error banner */}
         {error && (
           <div className="mb-6 bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
@@ -618,8 +613,8 @@ export default function GetFeedbackPage() {
 
         {/* Step: Track URL/Upload */}
         {step === "track" && (
-          <div className="flex-1 flex flex-col">
-            <div className="mb-8">
+          <div className="space-y-6">
+            <div>
               <h1 className="text-3xl font-black">
                 What track do you want feedback on?
               </h1>
@@ -778,16 +773,16 @@ export default function GetFeedbackPage() {
 
         {/* Step: Track Preview */}
         {step === "preview" && (
-          <div className="flex-1 flex flex-col">
+          <div className="space-y-6">
             <button
               onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black mb-6 self-start flex items-center gap-1"
+              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
 
-            <div className="mb-8">
+            <div>
               <h1 className="text-3xl font-black">Is this your track?</h1>
               <p className="text-neutral-500 mt-2">
                 Make sure we found the right one
@@ -819,8 +814,6 @@ export default function GetFeedbackPage() {
               </div>
             </div>
 
-            <div className="mt-8 flex-1" />
-
             <Button
               onClick={goNext}
               variant="primary"
@@ -834,73 +827,74 @@ export default function GetFeedbackPage() {
 
         {/* Step: Email */}
         {step === "email" && (
-          <div className="flex-1 flex flex-col">
+          <div className="space-y-6">
             <button
               onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black mb-6 self-start flex items-center gap-1"
+              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
 
-            <div className="mb-8">
+            <div>
               <h1 className="text-3xl font-black">What&apos;s your email?</h1>
               <p className="text-neutral-500 mt-2">
                 We&apos;ll send your feedback here
               </p>
             </div>
 
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
-              <Input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setFieldError("");
-                }}
-                className="text-lg h-14 pl-12"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleEmailContinue();
-                }}
-              />
+            <div>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                <Input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setFieldError("");
+                  }}
+                  className="text-lg h-14 pl-12"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleEmailContinue();
+                  }}
+                />
+              </div>
+              {fieldError && (
+                <p className="text-sm text-red-500 font-medium mt-2">{fieldError}</p>
+              )}
             </div>
-            {fieldError && (
-              <p className="text-sm text-red-500 font-medium mt-2">{fieldError}</p>
-            )}
 
-            <div className="mt-8 flex-1" />
-
-            <Button
-              onClick={handleEmailContinue}
-              isLoading={isCheckingEmail}
-              variant="primary"
-              className="w-full h-14 text-lg"
-            >
-              Continue
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
-
-            <p className="text-center text-xs text-neutral-400 mt-4">
-              Already have an account? We&apos;ll detect it automatically.
-            </p>
+            <div>
+              <Button
+                onClick={handleEmailContinue}
+                isLoading={isCheckingEmail}
+                variant="primary"
+                className="w-full h-14 text-lg"
+              >
+                Continue
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </Button>
+              <p className="text-center text-xs text-neutral-400 mt-4">
+                Already have an account? We&apos;ll detect it automatically.
+              </p>
+            </div>
           </div>
         )}
 
         {/* Step: Password */}
         {step === "password" && (
-          <div className="flex-1 flex flex-col">
+          <div className="space-y-6">
             <button
               onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black mb-6 self-start flex items-center gap-1"
+              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
 
-            <div className="mb-8">
+            <div>
               {emailExists ? (
                 <>
                   <h1 className="text-3xl font-black">Welcome back!</h1>
@@ -918,64 +912,64 @@ export default function GetFeedbackPage() {
               )}
             </div>
 
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
-              <Input
-                type={showPassword ? "text" : "password"}
-                placeholder={emailExists ? "Your password" : "Create a password"}
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setFieldError("");
-                }}
-                className="text-lg h-14 pl-12 pr-12"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handlePasswordContinue();
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-
-            {!emailExists && password.length > 0 && (
-              <div className="mt-3 space-y-1">
-                {passwordErrors.length > 0 ? (
-                  <p className="text-sm text-neutral-500">
-                    Needs: {passwordErrors.join(", ")}
-                  </p>
-                ) : (
-                  <p className="text-sm text-lime-600 flex items-center gap-1">
-                    <Check className="h-4 w-4" />
-                    Strong password
-                  </p>
-                )}
+            <div>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder={emailExists ? "Your password" : "Create a password"}
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setFieldError("");
+                  }}
+                  className="text-lg h-14 pl-12 pr-12"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handlePasswordContinue();
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
-            )}
 
-            {fieldError && (
-              <p className="text-sm text-red-500 font-medium mt-2">{fieldError}</p>
-            )}
+              {!emailExists && password.length > 0 && (
+                <div className="mt-3 space-y-1">
+                  {passwordErrors.length > 0 ? (
+                    <p className="text-sm text-neutral-500">
+                      Needs: {passwordErrors.join(", ")}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-lime-600 flex items-center gap-1">
+                      <Check className="h-4 w-4" />
+                      Strong password
+                    </p>
+                  )}
+                </div>
+              )}
 
-            {emailExists && (
-              <Link
-                href="/forgot-password"
-                className="text-sm text-neutral-500 hover:text-black mt-3 self-start"
-              >
-                Forgot your password?
-              </Link>
-            )}
+              {fieldError && (
+                <p className="text-sm text-red-500 font-medium mt-2">{fieldError}</p>
+              )}
 
-            <div className="mt-8 flex-1" />
+              {emailExists && (
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-neutral-500 hover:text-black mt-3 inline-block"
+                >
+                  Forgot your password?
+                </Link>
+              )}
+            </div>
 
             <Button
               onClick={handlePasswordContinue}
@@ -991,16 +985,16 @@ export default function GetFeedbackPage() {
 
         {/* Step: Artist Name */}
         {step === "artist-name" && (
-          <div className="flex-1 flex flex-col">
+          <div className="space-y-6">
             <button
               onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black mb-6 self-start flex items-center gap-1"
+              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
 
-            <div className="mb-8">
+            <div>
               <h1 className="text-3xl font-black">What&apos;s your artist name?</h1>
               <p className="text-neutral-500 mt-2">
                 How reviewers will know you
@@ -1021,8 +1015,6 @@ export default function GetFeedbackPage() {
               />
             </div>
 
-            <div className="mt-8 flex-1" />
-
             <Button
               onClick={goNext}
               disabled={!artistName.trim()}
@@ -1037,16 +1029,16 @@ export default function GetFeedbackPage() {
 
         {/* Step: Genres */}
         {step === "genres" && (
-          <div className="flex-1 flex flex-col">
+          <div className="space-y-6">
             <button
               onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black mb-6 self-start flex items-center gap-1"
+              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
 
-            <div className="mb-8">
+            <div>
               <h1 className="text-3xl font-black">What genre is your track?</h1>
               <p className="text-neutral-500 mt-2">
                 Pick up to 3 so we match you with the right listeners
@@ -1060,8 +1052,6 @@ export default function GetFeedbackPage() {
               maxSelections={3}
               variant="artist"
             />
-
-            <div className="mt-8 flex-1" />
 
             <Button
               onClick={goNext}
@@ -1077,16 +1067,16 @@ export default function GetFeedbackPage() {
 
         {/* Step: Package Selection */}
         {step === "package" && (
-          <div className="flex-1 flex flex-col">
+          <div className="space-y-6">
             <button
               onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-black mb-6 self-start flex items-center gap-1"
+              className="text-sm text-neutral-500 hover:text-black flex items-center gap-1"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
 
-            <div className="mb-8">
+            <div>
               <h1 className="text-3xl font-black">How many reviews do you want?</h1>
               <p className="text-neutral-500 mt-2">
                 More opinions = clearer patterns
@@ -1107,82 +1097,63 @@ export default function GetFeedbackPage() {
                     onClick={() => setSelectedPackage(key)}
                     className={cn(
                       "relative w-full text-left border-2 border-black transition-all",
-                      isSelected
-                        ? "ring-2 ring-lime-500 ring-offset-2"
-                        : "hover:bg-neutral-50",
-                      isPopular &&
-                        !isSelected &&
-                        "shadow-[4px_4px_0px_0px_rgba(132,204,22,1)]"
+                      isSelected && "ring-2 ring-lime-500 ring-offset-2",
+                      !isSelected && "hover:bg-neutral-50",
+                      isPopular && !isSelected && "shadow-[4px_4px_0px_0px_rgba(132,204,22,1)]"
                     )}
                   >
                     {isPopular && (
                       <span className="absolute -top-3 left-4 text-xs font-bold bg-lime-500 text-black px-3 py-1 border-2 border-black">
-                        RECOMMENDED
+                        MOST POPULAR
                       </span>
                     )}
 
-                    <div
-                      className={cn(
-                        "p-4 flex items-center justify-between",
-                        isSelected
-                          ? "bg-lime-500"
-                          : isPopular
-                          ? "bg-lime-50"
-                          : "bg-white"
+                    <div className={cn(
+                      "p-5",
+                      isSelected ? "bg-lime-400" : isPopular ? "bg-lime-50" : "bg-white"
+                    )}>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className={cn(
+                              "text-3xl font-black",
+                              isSelected ? "text-black" : "text-black"
+                            )}>
+                              {pkg.reviews}
+                            </span>
+                            <span className="text-lg font-bold text-neutral-700">reviews</span>
+                          </div>
+                          <p className="text-sm text-neutral-600">{pkg.description}</p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          {showFree ? (
+                            <div>
+                              <span className="text-2xl font-black text-lime-600">FREE</span>
+                              <p className="text-sm text-neutral-400 line-through">
+                                ${(pkg.price / 100).toFixed(2)}
+                              </p>
+                            </div>
+                          ) : (
+                            <div>
+                              <span className="text-2xl font-black">${(pkg.price / 100).toFixed(2)}</span>
+                              <p className="text-sm text-neutral-500">AUD</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {isSelected && (
+                        <div className="mt-3 pt-3 border-t border-black/20 flex items-center gap-2">
+                          <Check className="h-4 w-4" />
+                          <span className="text-sm font-bold">Selected</span>
+                        </div>
                       )}
-                    >
-                      <div>
-                        <h3 className="font-bold text-lg">{pkg.name}</h3>
-                        <p className="text-sm text-neutral-600">{pkg.description}</p>
-                      </div>
-                      <div
-                        className={cn(
-                          "h-12 w-12 border-2 border-black flex items-center justify-center font-black text-xl flex-shrink-0",
-                          isSelected
-                            ? "bg-black text-white"
-                            : isPopular
-                            ? "bg-lime-500"
-                            : "bg-neutral-100"
-                        )}
-                      >
-                        {pkg.reviews}
-                      </div>
                     </div>
-
-                    <div className="px-4 py-3 border-t-2 border-black bg-white">
-                      <div className="flex items-baseline gap-2">
-                        {showFree ? (
-                          <>
-                            <span className="text-2xl font-black text-lime-600">
-                              FREE
-                            </span>
-                            <span className="text-sm text-neutral-400 line-through">
-                              ${(pkg.price / 100).toFixed(2)}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-2xl font-black">
-                              ${(pkg.price / 100).toFixed(2)}
-                            </span>
-                            <span className="text-sm text-neutral-500">AUD</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {isSelected && (
-                      <div className="px-4 py-2 bg-lime-500 border-t-2 border-black flex items-center justify-center gap-2">
-                        <Check className="h-4 w-4" />
-                        <span className="text-sm font-bold">Selected</span>
-                      </div>
-                    )}
                   </button>
                 );
               })}
             </div>
 
-            <div className="mt-8">
+            <div>
               <Button
                 onClick={handleSubmit}
                 isLoading={isSubmitting}
@@ -1205,7 +1176,7 @@ export default function GetFeedbackPage() {
 
             {/* Terms agreement for new accounts */}
             {!isLoggedIn && (
-              <p className="text-center text-xs text-neutral-400 mt-4">
+              <p className="text-center text-xs text-neutral-400">
                 By continuing, you agree to our{" "}
                 <Link href="/terms" className="underline hover:text-black">
                   Terms of Service
