@@ -30,10 +30,8 @@ import {
   PACKAGES,
   PackageType,
 } from "@/lib/metadata";
-import { AudioPlayer } from "@/components/audio/audio-player";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { Logo } from "@/components/ui/logo";
-import { BandcampIcon, SoundCloudIcon, YouTubeIcon } from "@/components/ui/platform-icons";
 import Link from "next/link";
 import { trackTikTokEvent } from "@/components/providers";
 
@@ -850,13 +848,6 @@ export default function GetFeedbackPage() {
               >
                 <Link2 className="h-4 w-4" />
                 Paste Link
-                {inputMode === "url" && (
-                  <span className="flex items-center gap-1.5 ml-1">
-                    <SoundCloudIcon className="h-4 w-4 text-[#ff5500]" />
-                    <BandcampIcon className="h-4 w-4 text-[#1da0c3]" />
-                    <YouTubeIcon className="h-4 w-4 text-[#ff0000]" />
-                  </span>
-                )}
               </button>
             </div>
 
@@ -925,16 +916,6 @@ export default function GetFeedbackPage() {
                   )}
                 </div>
 
-                {uploadedUrl && (
-                  <div className="mt-4">
-                    <AudioPlayer
-                      sourceUrl={uploadedUrl}
-                      sourceType="UPLOAD"
-                      showListenTracker={false}
-                      showWaveform={true}
-                    />
-                  </div>
-                )}
               </div>
             ) : (
               <div className="space-y-4">
