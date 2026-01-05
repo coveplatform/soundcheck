@@ -42,19 +42,14 @@ export async function POST(request: Request) {
       where: { email: { equals: normalizedEmail, mode: "insensitive" } },
     });
 
-    if (existingUser) {
-      return NextResponse.json({ success: true, message: "has_account" });
-    }
-
     if (existing) {
-      if (artistName && !existing.artistName) {
-        await leadCapture.update({
-          where: { id: existing.id },
-          data: { artistName },
-        });
-      }
+      // Update with any new info and mark converted if they have an account
+      const updateData: Record<string, unknown> = {};
+      if (artistName && !existing.artistName) updateData.artistName = artistName;
+      if (existingUser && !existing.converted) updateData.converted = true;
 
-      if (data.sendEmail && !existing.reminded) {
+      // Send email if requested and not already reminded (and no account yet)
+      if (data.sendEmail && !existing.reminded && !existingUser) {
         const baseUrl =
           process.env.NEXTAUTH_URL ??
           process.env.NEXT_PUBLIC_SITE_URL ??
@@ -65,35 +60,40 @@ export async function POST(request: Request) {
             to: normalizedEmail,
             resumeUrl: `${baseUrl}/get-feedback`,
           });
+          updateData.reminded = true;
         } catch (emailError) {
           console.error("Lead capture finish-later email error:", emailError);
         }
+      }
 
+      if (Object.keys(updateData).length > 0) {
         await leadCapture.update({
           where: { id: existing.id },
-          data: { reminded: true, ...(artistName ? { artistName } : {}) },
+          data: updateData,
         });
-
-        return NextResponse.json({ success: true, message: "reminded" });
       }
 
       return NextResponse.json({
         success: true,
-        message: existing.reminded ? "already_reminded" : "already_captured",
+        message: existingUser ? "has_account" : existing.reminded ? "already_reminded" : "already_captured",
       });
     }
 
     // Create lead capture
+    // If user already has an account (e.g. Google signup), mark as converted and skip email
+    const shouldSendEmail = data.sendEmail && !existingUser;
+
     await leadCapture.create({
       data: {
         email: normalizedEmail,
         artistName,
         source: data.source,
-        reminded: data.sendEmail,
+        reminded: shouldSendEmail,
+        converted: !!existingUser,
       },
     });
 
-    if (data.sendEmail) {
+    if (shouldSendEmail) {
       const baseUrl =
         process.env.NEXTAUTH_URL ??
         process.env.NEXT_PUBLIC_SITE_URL ??
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, message: existingUser ? "has_account" : "captured" });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
