@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
+import { sendFinishLaterEmail } from "@/lib/email";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
@@ -25,8 +26,10 @@ export async function POST(request: Request) {
     const data = schema.parse(body);
     const normalizedEmail = data.email.trim().toLowerCase();
 
+    const leadCapture = (prisma as unknown as { leadCapture: typeof prisma.user }).leadCapture;
+
     // Check if this email was already captured
-    const existing = await prisma.leadCapture.findFirst({
+    const existing = await leadCapture.findFirst({
       where: { email: normalizedEmail, source: data.source },
     });
 
@@ -45,12 +48,26 @@ export async function POST(request: Request) {
     }
 
     // Create lead capture
-    await prisma.leadCapture.create({
+    await leadCapture.create({
       data: {
         email: normalizedEmail,
         source: data.source,
       },
     });
+
+    const baseUrl =
+      process.env.NEXTAUTH_URL ??
+      process.env.NEXT_PUBLIC_SITE_URL ??
+      new URL(request.url).origin;
+
+    try {
+      await sendFinishLaterEmail({
+        to: normalizedEmail,
+        resumeUrl: `${baseUrl}/get-feedback`,
+      });
+    } catch (emailError) {
+      console.error("Lead capture finish-later email error:", emailError);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

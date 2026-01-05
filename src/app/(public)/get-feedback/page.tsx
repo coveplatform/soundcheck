@@ -140,6 +140,7 @@ export default function GetFeedbackPage() {
   const [isSubmittingReminder, setIsSubmittingReminder] = useState(false);
   const [reminderSubmitted, setReminderSubmitted] = useState(false);
   const [reminderError, setReminderError] = useState("");
+  const [reminderLinkCopied, setReminderLinkCopied] = useState(false);
 
   // Load genres on mount
   useEffect(() => {
@@ -595,6 +596,27 @@ export default function GetFeedbackPage() {
     }
   };
 
+  const handleCopyFinishLaterLink = async () => {
+    try {
+      const url = `${window.location.origin}/get-feedback`;
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const input = document.createElement("input");
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        input.remove();
+      }
+
+      setReminderLinkCopied(true);
+      window.setTimeout(() => setReminderLinkCopied(false), 2000);
+    } catch {
+      setReminderError("Couldn't copy link. Please try again.");
+    }
+  };
+
   // Handle final submission
   const handleSubmit = async () => {
     setError("");
@@ -721,9 +743,9 @@ export default function GetFeedbackPage() {
         {/* STEP 1: TRACK */}
         {/* ============================================ */}
         {step === "track" && (
-          <div className="space-y-6">
+          <div className="flex flex-col gap-6">
             {/* Hero */}
-            <div className="text-center space-y-3">
+            <div className="text-center space-y-3 order-[10]">
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
                 Real feedback. Real fast.
               </h1>
@@ -813,8 +835,60 @@ export default function GetFeedbackPage() {
               </div>
             </div>
 
+            {/* Email capture for users not ready */}
+            <div className="bg-neutral-900/80 border-2 border-neutral-700 p-4 order-[20] sm:order-[60]">
+              {reminderSubmitted ? (
+                <div className="flex items-center justify-center gap-2 text-lime-500">
+                  <Check className="h-4 w-4" />
+                  <span className="text-sm font-medium">We&apos;ll remind you when you&apos;re ready!</span>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-center gap-2">
+                    <Mail className="h-4 w-4 text-neutral-300" />
+                    <p className="text-sm text-neutral-300">No link/MP3 on your phone? Send yourself this page.</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={reminderEmail}
+                      onChange={(e) => {
+                        setReminderEmail(e.target.value);
+                        setReminderError("");
+                      }}
+                      className="h-10 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500"
+                    />
+                    <Button
+                      onClick={handleReminderSubmit}
+                      disabled={!reminderEmail.trim() || isSubmittingReminder}
+                      className="h-10 px-4 bg-lime-500 text-black font-bold hover:bg-lime-400 disabled:opacity-50 disabled:bg-neutral-700 disabled:text-neutral-500"
+                    >
+                      {isSubmittingReminder ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Send"
+                      )}
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={handleCopyFinishLaterLink}
+                      className="text-sm font-bold text-neutral-300 underline hover:text-white"
+                    >
+                      {reminderLinkCopied ? "Link copied" : "Copy link instead"}
+                    </button>
+                  </div>
+                  {reminderError && (
+                    <p className="text-center text-sm text-red-500">{reminderError}</p>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Input mode toggle */}
-            <div className="flex gap-2 bg-neutral-900 p-1 rounded-none border-2 border-neutral-700">
+            <div className="flex gap-2 bg-neutral-900 p-1 rounded-none border-2 border-neutral-700 order-[30] sm:order-[20]">
               <button
                 type="button"
                 onClick={() => {
@@ -852,8 +926,9 @@ export default function GetFeedbackPage() {
             </div>
 
             {/* Upload area */}
-            {inputMode === "upload" ? (
-              <div>
+            <div className="order-[40] sm:order-[30]">
+              {inputMode === "upload" ? (
+                <div>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -916,9 +991,9 @@ export default function GetFeedbackPage() {
                   )}
                 </div>
 
-              </div>
-            ) : (
-              <div className="space-y-4">
+                </div>
+              ) : (
+                <div className="space-y-4">
                 <Input
                   placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
                   value={trackUrl}
@@ -946,8 +1021,9 @@ export default function GetFeedbackPage() {
                     <span>{urlWarning}</span>
                   </div>
                 )}
-              </div>
-            )}
+                </div>
+              )}
+            </div>
 
             {/* Track title edit */}
             {(uploadedUrl || (trackUrl && !urlError && !isLoadingMetadata)) && (
@@ -982,7 +1058,7 @@ export default function GetFeedbackPage() {
               onClick={goToDetails}
               disabled={!hasTrack || !title}
               className={cn(
-                "w-full h-14 text-lg font-black border-2 transition-all",
+                "w-full h-14 text-lg font-black border-2 transition-all order-[60] sm:order-[50]",
                 hasTrack && title
                   ? "bg-lime-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
                   : "bg-neutral-800 text-neutral-500 border-neutral-700 cursor-not-allowed"
@@ -991,51 +1067,6 @@ export default function GetFeedbackPage() {
               Continue
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
-
-            {/* Email capture for users not ready */}
-            <div className="bg-neutral-900/80 border-2 border-neutral-700 p-4">
-              {reminderSubmitted ? (
-                <div className="flex items-center justify-center gap-2 text-lime-500">
-                  <Check className="h-4 w-4" />
-                  <span className="text-sm font-medium">We&apos;ll remind you when you&apos;re ready!</span>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-center gap-2">
-                    <Mail className="h-4 w-4 text-neutral-300" />
-                    <p className="text-sm text-neutral-300">
-                      On your phone? We&apos;ll remind you later.
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Input
-                      type="email"
-                      placeholder="your@email.com"
-                      value={reminderEmail}
-                      onChange={(e) => {
-                        setReminderEmail(e.target.value);
-                        setReminderError("");
-                      }}
-                      className="h-10 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500"
-                    />
-                    <Button
-                      onClick={handleReminderSubmit}
-                      disabled={!reminderEmail.trim() || isSubmittingReminder}
-                      className="h-10 px-4 bg-lime-500 text-black font-bold hover:bg-lime-400 disabled:opacity-50 disabled:bg-neutral-700 disabled:text-neutral-500"
-                    >
-                      {isSubmittingReminder ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        "Remind me"
-                      )}
-                    </Button>
-                  </div>
-                  {reminderError && (
-                    <p className="text-center text-sm text-red-500">{reminderError}</p>
-                  )}
-                </div>
-              )}
-            </div>
           </div>
         )}
 

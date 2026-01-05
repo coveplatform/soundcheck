@@ -278,6 +278,39 @@ export async function sendEmailVerificationEmail(params: {
   });
 }
 
+export async function sendFinishLaterEmail(params: {
+  to: string;
+  resumeUrl: string;
+}) {
+  if (!params.to) return;
+
+  const content = `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+        Finish later
+      </div>
+    </div>
+    <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
+      Pick this up when you’re back at your computer
+    </h1>
+    <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
+      Here’s a link back to MixReflect so you can submit your track and get feedback.
+    </p>
+    ${emailButton("Continue on MixReflect", params.resumeUrl)}
+    <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
+      <p style="margin: 0; font-size: 12px; color: ${COLORS.gray}; word-break: break-all; text-align: center;">
+        <a href="${params.resumeUrl}" style="color: ${COLORS.black};">${params.resumeUrl}</a>
+      </p>
+    </div>
+  `;
+
+  await sendEmail({
+    to: params.to,
+    subject: "Finish your MixReflect submission",
+    html: emailWrapper(content),
+  });
+}
+
 export async function sendTrackQueuedEmail(artistEmail: string, trackTitle: string) {
   if (!artistEmail) return;
 
