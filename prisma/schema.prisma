@@ -492,3 +492,18 @@ model StripeWebhookEvent {
 
   @@index([expiresAt])
 }
+
+// Lead capture for users who aren't ready to submit
+model LeadCapture {
+  id        String   @id @default(cuid())
+  email     String
+  source    String   @default("get-feedback") // where they signed up
+  reminded  Boolean  @default(false)
+  converted Boolean  @default(false) // did they come back and submit?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([reminded, createdAt])
+}

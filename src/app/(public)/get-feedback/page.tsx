@@ -18,6 +18,9 @@ import {
   Users,
   Eye,
   EyeOff,
+  Mail,
+  ThumbsUp,
+  Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -133,6 +136,12 @@ export default function GetFeedbackPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [matchingIndex, setMatchingIndex] = useState(0);
   const [matchingDone, setMatchingDone] = useState(false);
+
+  // Email reminder capture state
+  const [reminderEmail, setReminderEmail] = useState("");
+  const [isSubmittingReminder, setIsSubmittingReminder] = useState(false);
+  const [reminderSubmitted, setReminderSubmitted] = useState(false);
+  const [reminderError, setReminderError] = useState("");
 
   // Load genres on mount
   useEffect(() => {
@@ -556,6 +565,38 @@ export default function GetFeedbackPage() {
     setStep("package");
   };
 
+  // Handle reminder email submission
+  const handleReminderSubmit = async () => {
+    if (!reminderEmail.trim()) return;
+
+    setReminderError("");
+    setIsSubmittingReminder(true);
+
+    try {
+      const response = await fetch("/api/lead-capture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: reminderEmail.trim().toLowerCase(),
+          source: "get-feedback"
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setReminderError(data.error || "Something went wrong");
+        return;
+      }
+
+      setReminderSubmitted(true);
+    } catch {
+      setReminderError("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmittingReminder(false);
+    }
+  };
+
   // Handle final submission
   const handleSubmit = async () => {
     setError("");
@@ -708,12 +749,37 @@ export default function GetFeedbackPage() {
                 </div>
               </div>
 
-              {/* Micro-testimonial */}
-              <div className="max-w-sm mx-auto bg-neutral-900/50 border border-neutral-800 p-3 text-left">
-                <p className="text-sm text-neutral-300 italic">
-                  &ldquo;4 of 5 reviewers said my intro was too long. Cut it down—now it&apos;s my best release.&rdquo;
-                </p>
-                <p className="text-xs text-neutral-500 mt-1">— Marcus T., Electronic Producer</p>
+              {/* Example review preview - shows what you get */}
+              <div className="max-w-md mx-auto bg-neutral-900 border-2 border-neutral-700 text-left overflow-hidden">
+                <div className="bg-neutral-800 px-4 py-2 border-b border-neutral-700 flex items-center justify-between">
+                  <span className="text-xs font-bold text-neutral-400 uppercase tracking-wide">Example Review</span>
+                  <span className="text-[10px] text-neutral-500">Electronic/House listener</span>
+                </div>
+                <div className="p-4 space-y-3">
+                  {/* Ratings row */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                    <span className="text-neutral-400">Production <span className="text-lime-500 font-bold">●●●●</span><span className="text-neutral-600">●</span></span>
+                    <span className="text-neutral-400">Originality <span className="text-lime-500 font-bold">●●●●●</span></span>
+                  </div>
+                  {/* Key feedback */}
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <ThumbsUp className="h-3.5 w-3.5 text-lime-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-neutral-300">&ldquo;The synth lead at <span className="text-lime-500 font-mono text-xs">1:45</span> is incredible—really distinctive sound.&rdquo;</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Clock className="h-3.5 w-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-neutral-300">&ldquo;Consider tightening the intro—first 20 sec could hook harder.&rdquo;</p>
+                    </div>
+                  </div>
+                  {/* Would listen again */}
+                  <div className="flex items-center gap-2 pt-1 text-xs text-neutral-500">
+                    <Check className="h-3.5 w-3.5 text-lime-500" />
+                    <span>Would listen again</span>
+                    <span className="text-neutral-600">•</span>
+                    <span>Similar to: Flume, ODESZA</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -912,6 +978,51 @@ export default function GetFeedbackPage() {
               Continue
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
+
+            {/* Email capture for users not ready */}
+            <div className="pt-4 border-t border-neutral-800">
+              {reminderSubmitted ? (
+                <div className="flex items-center justify-center gap-2 text-lime-500 py-2">
+                  <Check className="h-4 w-4" />
+                  <span className="text-sm font-medium">We&apos;ll remind you when you&apos;re ready!</span>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-center text-sm text-neutral-500">
+                    On your phone? Get a reminder to finish later.
+                  </p>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+                      <Input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={reminderEmail}
+                        onChange={(e) => {
+                          setReminderEmail(e.target.value);
+                          setReminderError("");
+                        }}
+                        className="pl-10 h-11 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleReminderSubmit}
+                      disabled={!reminderEmail.trim() || isSubmittingReminder}
+                      className="h-11 px-4 bg-neutral-800 border-2 border-neutral-700 text-white hover:bg-neutral-700 hover:border-neutral-600 disabled:opacity-50"
+                    >
+                      {isSubmittingReminder ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <ArrowRight className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  {reminderError && (
+                    <p className="text-center text-sm text-red-500">{reminderError}</p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
