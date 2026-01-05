@@ -153,10 +153,7 @@ export async function POST(request: Request) {
     // Create Stripe checkout session with multiple payment methods
     // Apple Pay & Google Pay are automatic with "card" on compatible devices
     // PayPal and Link (one-click checkout) are explicitly enabled
-    const checkoutSession = await stripe.checkout.sessions.create({
-      automatic_payment_methods: {
-        enabled: true,
-      },
+    const baseCheckoutParams: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
       customer_email: track.artist.user.email,
       line_items: [
@@ -185,7 +182,39 @@ export async function POST(request: Request) {
       },
       // Allow promotion codes
       allow_promotion_codes: true,
-    } as Stripe.Checkout.SessionCreateParams);
+    };
+
+    let checkoutSession: Stripe.Checkout.Session;
+    try {
+      const checkoutParamsWithAutomaticPaymentMethods: Stripe.Checkout.SessionCreateParams & {
+        automatic_payment_methods: { enabled: true };
+      } = {
+        ...baseCheckoutParams,
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      };
+
+      checkoutSession = await stripe.checkout.sessions.create(
+        checkoutParamsWithAutomaticPaymentMethods
+      );
+    } catch (err) {
+      if (
+        err instanceof Stripe.errors.StripeError &&
+        err.code === "parameter_unknown" &&
+        typeof err.message === "string" &&
+        err.message.includes("automatic_payment_methods")
+      ) {
+        // Older Stripe API versions don't support automatic_payment_methods.
+        // Fallback to card. Apple Pay / Google Pay can still appear automatically on card.
+        checkoutSession = await stripe.checkout.sessions.create({
+          ...baseCheckoutParams,
+          payment_method_types: ["card"],
+        });
+      } else {
+        throw err;
+      }
+    }
 
     // Create or update payment record
     await prisma.payment.upsert({
