@@ -127,12 +127,7 @@ export async function POST(request: Request) {
         },
       });
 
-      // Check for free credits
-      const hasFreeCredit = artistProfile.freeReviewCredits > 0;
-      let checkoutUrl = `/artist/submit/checkout?trackId=${track.id}`;
-      if (hasFreeCredit) {
-        checkoutUrl += "&useFreeCredit=true";
-      }
+      const checkoutUrl = `/artist/submit/checkout?trackId=${track.id}`;
 
       return NextResponse.json({
         success: true,

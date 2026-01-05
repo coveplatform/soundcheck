@@ -137,8 +137,16 @@ export async function POST(request: Request) {
       });
     }
 
-    const defaults = await getStripePlatformDefaults();
-    const currency = (process.env.STRIPE_CURRENCY ?? defaults.currency).toLowerCase();
+    const envCurrency = process.env.STRIPE_CURRENCY;
+    let currency = envCurrency?.toLowerCase();
+    if (!currency) {
+      try {
+        const defaults = await getStripePlatformDefaults();
+        currency = defaults.currency.toLowerCase();
+      } catch {
+        currency = "aud";
+      }
+    }
 
     const stripe = getStripe();
 
@@ -199,6 +207,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: checkoutSession.url });
   } catch (error) {
     console.error("Error creating checkout session:", error);
+
+    if (error instanceof Error && error.message) {
+      const safeMessage = error.message;
+      if (safeMessage.includes("STRIPE_SECRET_KEY is not defined")) {
+        return NextResponse.json(
+          { error: safeMessage },
+          { status: 500 }
+        );
+      }
+    }
+
+    if (error instanceof Stripe.errors.StripeError) {
+      return NextResponse.json(
+        {
+          error: "Failed to create checkout session",
+          stripe: {
+            type: error.type,
+            code: error.code,
+            message: error.message,
+          },
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to create checkout session" },
       { status: 500 }
