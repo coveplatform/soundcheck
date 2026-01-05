@@ -121,6 +121,8 @@ export default function GetFeedbackPage() {
   // Package state
   const [selectedPackage, setSelectedPackage] = useState<PackageType>("STANDARD");
 
+  const estimatedListenerPool = 25;
+
   // UI state
   const [urlError, setUrlError] = useState("");
   const [urlWarning, setUrlWarning] = useState("");
@@ -692,6 +694,18 @@ export default function GetFeedbackPage() {
               <p className="text-neutral-400 text-lg max-w-md mx-auto">
                 Upload a file or paste a link. We&apos;ll match you with listeners who actually love your genre.
               </p>
+
+              {/* Trust badges */}
+              <div className="flex items-center justify-center gap-6 text-xs text-neutral-500">
+                <div className="flex items-center gap-1.5">
+                  <Users className="h-4 w-4" />
+                  <span>500+ reviews delivered</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Zap className="h-4 w-4" />
+                  <span>&lt;12hr turnaround</span>
+                </div>
+              </div>
             </div>
 
             {/* Input mode toggle */}
@@ -882,18 +896,6 @@ export default function GetFeedbackPage() {
               Continue
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
-
-            {/* Trust badges */}
-            <div className="flex items-center justify-center gap-6 text-xs text-neutral-500">
-              <div className="flex items-center gap-1.5">
-                <Users className="h-4 w-4" />
-                <span>500+ reviews delivered</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Zap className="h-4 w-4" />
-                <span>&lt;12hr turnaround</span>
-              </div>
-            </div>
           </div>
         )}
 
@@ -1017,6 +1019,9 @@ export default function GetFeedbackPage() {
 
             <div className="text-center space-y-2">
               <h1 className="text-3xl sm:text-4xl font-black">Almost there</h1>
+              <p className="text-sm font-bold text-lime-500">
+                We found {estimatedListenerPool}+ good-fit listeners for your genre.
+              </p>
               <p className="text-neutral-400">
                 Tell us where to send your feedback
               </p>
