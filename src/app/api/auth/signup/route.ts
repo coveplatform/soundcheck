@@ -75,7 +75,7 @@ export async function POST(request: Request) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "User already exists" },
+        { error: "This email is already in use. Try logging in instead." },
         { status: 400 }
       );
     }

@@ -159,6 +159,9 @@ export default function TikTokLandingPage() {
           email: trimmedEmail,
           password,
           name: trimmedEmail.split("@")[0], // Use email prefix as name
+          role: "artist", // TikTok traffic is artists looking to submit tracks
+          acceptedTerms: true, // Implicit acceptance by signing up
+          referralSource: "tiktok",
         }),
       });
 
@@ -393,6 +396,11 @@ export default function TikTokLandingPage() {
 
               <p className="text-center text-[10px] text-neutral-600">
                 Already have an account? <Link href="/login" className="text-lime-500">Log in</Link>
+              </p>
+              <p className="text-center text-[10px] text-neutral-600">
+                By signing up, you agree to our{" "}
+                <Link href="/terms" className="underline hover:text-neutral-400">Terms</Link> and{" "}
+                <Link href="/privacy" className="underline hover:text-neutral-400">Privacy Policy</Link>
               </p>
             </div>
 
