@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const data = schema.parse(body);
     const normalizedEmail = data.email.trim().toLowerCase();
 
-    const leadCapture = (prisma as unknown as { leadCapture: typeof prisma.user }).leadCapture;
+    const leadCapture = (prisma as any).leadCapture as any;
 
     // Check if this email was already captured
     const existing = await leadCapture.findFirst({

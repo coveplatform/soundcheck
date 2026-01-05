@@ -1392,7 +1392,7 @@ export default function GetFeedbackPage() {
             <div className="text-center space-y-2">
               <h1 className="text-3xl sm:text-4xl font-black">How many opinions?</h1>
               <p className="text-neutral-400">
-                More listeners = clearer patterns = better decisions
+                Choose a quick gut-check or full clarity before you release.
               </p>
             </div>
 
@@ -1411,15 +1411,36 @@ export default function GetFeedbackPage() {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="inline-flex items-center bg-neutral-900 border border-neutral-700 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-neutral-300">
+                        Quick Check
+                      </span>
+                      <span className="text-xs text-neutral-500">Best for: getting unstuck</span>
+                    </div>
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-4xl font-black text-white">5</span>
+                      <span className="text-4xl font-black text-white">{PACKAGES.STARTER.reviews}</span>
                       <span className="text-lg font-bold text-neutral-400">reviews</span>
                     </div>
-                    <p className="text-neutral-500">Get a feel for how listeners react</p>
+                    <p className="text-neutral-500">Fast signal on what&apos;s working vs what to fix first</p>
+                    <ul className="mt-4 space-y-2 text-sm text-neutral-400">
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
+                        <span>Sanity-check your hook, intro, and overall vibe</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
+                        <span>Catch 1-2 big issues before you waste more time polishing</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
+                        <span>Perfect if you&apos;re early in the process or testing a demo</span>
+                      </li>
+                    </ul>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-black text-white">${(PACKAGES.STARTER.price / 100).toFixed(2)}</p>
                     <p className="text-xs text-neutral-500">AUD</p>
+                    <p className="text-xs text-neutral-500 mt-2">${(PACKAGES.STARTER.price / 100 / PACKAGES.STARTER.reviews).toFixed(2)}/review</p>
                   </div>
                 </div>
                 {selectedPackage === "STARTER" && (
@@ -1447,15 +1468,36 @@ export default function GetFeedbackPage() {
                 </div>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="inline-flex items-center bg-lime-500 text-black px-2 py-1 text-[10px] font-black uppercase tracking-wide">
+                        Full Signal
+                      </span>
+                      <span className="text-xs text-neutral-500">Best for: release decisions</span>
+                    </div>
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-4xl font-black text-white">20</span>
+                      <span className="text-4xl font-black text-white">{PACKAGES.STANDARD.reviews}</span>
                       <span className="text-lg font-bold text-neutral-400">reviews</span>
                     </div>
-                    <p className="text-neutral-500">Maximum clarity with pattern insights</p>
+                    <p className="text-neutral-500">High-confidence patterns so you know what to change (and what not to)</p>
+                    <ul className="mt-4 space-y-2 text-sm text-neutral-400">
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
+                        <span>See real consensus (not just one person&apos;s taste)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
+                        <span>More timestamps and specifics = more actionable edits</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
+                        <span>Best choice if you&apos;re about to release and want certainty</span>
+                      </li>
+                    </ul>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-black text-white">${(PACKAGES.STANDARD.price / 100).toFixed(2)}</p>
                     <p className="text-xs text-neutral-500">AUD</p>
+                    <p className="text-xs text-neutral-500 mt-2">${(PACKAGES.STANDARD.price / 100 / PACKAGES.STANDARD.reviews).toFixed(2)}/review</p>
                   </div>
                 </div>
                 {selectedPackage === "STANDARD" && (
@@ -1496,7 +1538,9 @@ export default function GetFeedbackPage() {
               isLoading={isSubmitting}
               className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
-              Continue to Payment
+              Continue to Payment ({PACKAGES[selectedPackage].reviews} reviews • ${
+                (PACKAGES[selectedPackage].price / 100).toFixed(2)
+              } AUD)
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
 
