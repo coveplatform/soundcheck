@@ -10,10 +10,6 @@ import {
   Loader2,
   Upload,
   Music,
-  Headphones,
-  ListMusic,
-  Share2,
-  UserPlus,
   Star,
   ArrowRight,
   ArrowLeft,
@@ -96,6 +92,7 @@ export default function GetFeedbackPage() {
   const hasTrackedViewContentRef = useRef(false);
   const hasTrackedEarlyCheckoutRef = useRef(false);
   const lastTrackedLinkRef = useRef<string>("");
+  const lastCapturedLeadRef = useRef<string>("");
 
   // Step state
   const [step, setStep] = useState<Step>("track");
@@ -138,10 +135,17 @@ export default function GetFeedbackPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [finishLaterMessage, setFinishLaterMessage] = useState("");
+  const [isSendingFinishLater, setIsSendingFinishLater] = useState(false);
   const [matchingIndex, setMatchingIndex] = useState(0);
   const [matchingDone, setMatchingDone] = useState(false);
 
   const [trackStartStage, setTrackStartStage] = useState<"start" | "connect" | "track">("start");
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    setTrackStartStage("track");
+  }, [isLoggedIn]);
 
   // Load genres on mount
   useEffect(() => {
@@ -221,10 +225,12 @@ export default function GetFeedbackPage() {
         if (data.packageType) setSelectedPackage(data.packageType);
         if (data.sourceType) setSourceType(data.sourceType);
 
-        if (data.uploadedUrl || data.trackUrl || data.uploadedFileName) {
+        if (isLoggedIn) {
           setTrackStartStage("track");
-        } else if (data.artistName) {
-          setTrackStartStage("connect");
+        } else if (data.uploadedUrl || data.trackUrl || data.uploadedFileName || data.email) {
+          setTrackStartStage("track");
+        } else {
+          setTrackStartStage("start");
         }
       }
     } catch {
@@ -250,7 +256,7 @@ export default function GetFeedbackPage() {
     if (inputMode !== "url") return;
     const trimmed = trackUrl.trim();
     if (!trimmed) return;
-    if (isLoadingMetadata || urlError || urlWarning) return;
+    if (isLoadingMetadata || urlError) return;
     if (lastTrackedLinkRef.current === trimmed) return;
     lastTrackedLinkRef.current = trimmed;
 
@@ -259,6 +265,47 @@ export default function GetFeedbackPage() {
       content_id: "track_link",
     });
   }, [trackStartStage, inputMode, trackUrl, isLoadingMetadata, urlError, urlWarning]);
+
+  const captureLead = useCallback(
+    async (params?: { sendEmail?: boolean }) => {
+      if (isLoggedIn) return;
+
+      const normalizedEmail = email.trim().toLowerCase();
+      if (!normalizedEmail) return;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) return;
+
+      const normalizedArtistName = artistName.trim();
+      if (!normalizedArtistName) return;
+
+      const key = `${normalizedEmail}:${params?.sendEmail ? "1" : "0"}`;
+      if (lastCapturedLeadRef.current === key) return;
+      lastCapturedLeadRef.current = key;
+
+      try {
+        await fetch("/api/lead-capture", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: normalizedEmail,
+            artistName: normalizedArtistName,
+            source: "get-feedback",
+            sendEmail: Boolean(params?.sendEmail),
+          }),
+        });
+      } catch {
+        // Best-effort only
+      }
+    },
+    [email, artistName, isLoggedIn]
+  );
+
+  useEffect(() => {
+    if (isLoggedIn) return;
+    if (trackStartStage !== "track") return;
+    if (!email.trim()) return;
+    if (!artistName.trim()) return;
+    void captureLead();
+  }, [trackStartStage, email, artistName, isLoggedIn, captureLead]);
 
   // Save progress to localStorage
   const saveProgress = useCallback(() => {
@@ -503,15 +550,11 @@ export default function GetFeedbackPage() {
     // For URL mode: require verified link (no warning) and title
     // For upload mode: just need uploaded URL and title
     const hasTrack = inputMode === "url"
-      ? trackUrl && !urlError && !urlWarning && !isLoadingMetadata && title
+      ? trackUrl && !urlError && !isLoadingMetadata && title
       : !!uploadedUrl && !isUploading && title;
 
     if (!hasTrack) {
-      if (inputMode === "url" && urlWarning) {
-        setError("We couldn't verify your link. Please check it's public and accessible, or upload an MP3 instead.");
-      } else {
-        setError("Please add your track first");
-      }
+      setError("Please add your track first");
       return;
     }
 
@@ -686,7 +729,7 @@ export default function GetFeedbackPage() {
   // Check if we can proceed from track step
   // For URL mode: require verified link (no warning) and title
   const hasTrack = inputMode === "url"
-    ? trackUrl && !urlError && !urlWarning && !isLoadingMetadata && title
+    ? trackUrl && !urlError && !isLoadingMetadata && title
     : !!uploadedUrl && !isUploading;
 
   // Show loading while checking session
@@ -767,258 +810,142 @@ export default function GetFeedbackPage() {
               </div>
             </div>
 
-            {trackStartStage !== "track" && (
+            {trackStartStage !== "track" && !isLoggedIn && (
               <div id="get-feedback-start" className="border-2 border-neutral-700 bg-neutral-900 p-5 order-[15]">
                 <div className="space-y-4">
                   <div className="text-center">
                     <p className="text-xs font-black uppercase tracking-wide text-neutral-400">Get feedback</p>
                     <h2 className="text-xl font-black text-white">
-                      {trackStartStage === "start"
-                        ? "What should we call you?"
-                        : "Where should we send your feedback?"}
+                      Start with your details
                     </h2>
                   </div>
 
-                  {trackStartStage === "start" ? (
-                    <>
-                      <div className="space-y-2">
-                        <Input
-                          placeholder="Artist name"
-                          value={artistName}
-                          onChange={(e) => {
-                            setArtistName(e.target.value);
-                            setFieldErrors((prev) => ({ ...prev, artistName: "" }));
-                          }}
-                          className={cn(
-                            "h-12 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
-                            fieldErrors.artistName && "border-red-500"
-                          )}
-                        />
-                        {fieldErrors.artistName && (
-                          <p className="text-sm text-red-500 font-medium">{fieldErrors.artistName}</p>
-                        )}
-                      </div>
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="Artist name"
+                      value={artistName}
+                      onChange={(e) => {
+                        setArtistName(e.target.value);
+                        setFieldErrors((prev) => ({ ...prev, artistName: "" }));
+                      }}
+                      className={cn(
+                        "h-12 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                        fieldErrors.artistName && "border-red-500"
+                      )}
+                    />
+                    {fieldErrors.artistName && (
+                      <p className="text-sm text-red-500 font-medium">{fieldErrors.artistName}</p>
+                    )}
+                  </div>
 
-                      <Button
-                        onClick={() => {
-                          if (!artistName.trim()) {
-                            setFieldErrors((prev) => ({ ...prev, artistName: "Required" }));
-                            return;
-                          }
+                  <div className="space-y-2">
+                    <Input
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        setFieldErrors((prev) => ({ ...prev, email: "" }));
+                      }}
+                      className={cn(
+                        "h-12 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                        fieldErrors.email && "border-red-500"
+                      )}
+                    />
+                    {fieldErrors.email && (
+                      <p className="text-sm text-red-500 font-medium">{fieldErrors.email}</p>
+                    )}
+                  </div>
 
-                          if (!hasTrackedEarlyCheckoutRef.current) {
-                            hasTrackedEarlyCheckoutRef.current = true;
-                            trackTikTokEvent("InitiateCheckout", {
-                              content_type: "product",
-                              content_id: "get_feedback_start",
-                              value: PACKAGES.STARTER.price / 100,
-                              currency: "AUD",
-                            });
-                          }
+                  <Button
+                    type="button"
+                    onClick={async () => {
+                      setFinishLaterMessage("");
 
-                          setTrackStartStage("connect");
-                        }}
-                        className="w-full h-12 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
-                      >
-                        Get feedback
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Button>
+                      const nextArtistName = artistName.trim();
+                      const nextEmail = email.trim().toLowerCase();
 
-                      <div className="flex items-center justify-center gap-2 text-xs text-neutral-400">
-                        <div className="flex items-center gap-0.5">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star key={i} className="h-3.5 w-3.5 text-lime-500 fill-lime-500" />
-                          ))}
-                        </div>
-                        <span className="font-bold">Verified reviews</span>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="space-y-4">
-                      <Button
-                        type="button"
-                        onClick={() => signIn("google", { callbackUrl: "/get-feedback" })}
-                        className="w-full h-12 text-base font-black bg-white text-black border-2 border-white hover:bg-neutral-100"
-                      >
-                        <GoogleIcon className="h-5 w-5 mr-2" />
-                        Continue with Google
-                      </Button>
+                      const errors: Record<string, string> = {};
+                      if (!nextArtistName) errors.artistName = "Required";
+                      if (!nextEmail) errors.email = "Required";
+                      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) errors.email = "Invalid email";
 
-                      <div className="flex items-center gap-3">
-                        <div className="h-px flex-1 bg-neutral-800" />
-                        <span className="text-xs text-neutral-500">or</span>
-                        <div className="h-px flex-1 bg-neutral-800" />
-                      </div>
+                      if (Object.keys(errors).length > 0) {
+                        setFieldErrors((prev) => ({ ...prev, ...errors }));
+                        return;
+                      }
 
-                      <div className="space-y-2">
-                        <Input
-                          type="email"
-                          placeholder="you@example.com"
-                          value={email}
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                            setFieldErrors((prev) => ({ ...prev, email: "" }));
-                          }}
-                          className={cn(
-                            "h-12 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
-                            fieldErrors.email && "border-red-500"
-                          )}
-                        />
-                        {fieldErrors.email && (
-                          <p className="text-sm text-red-500 font-medium">{fieldErrors.email}</p>
-                        )}
-                      </div>
+                      setArtistName(nextArtistName);
+                      setEmail(nextEmail);
+                      await captureLead();
 
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          const nextEmail = email.trim().toLowerCase();
-                          if (!nextEmail) {
-                            setFieldErrors((prev) => ({ ...prev, email: "Required" }));
-                            return;
-                          }
-                          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) {
-                            setFieldErrors((prev) => ({ ...prev, email: "Invalid email" }));
-                            return;
-                          }
-                          setEmail(nextEmail);
-                          setTrackStartStage("track");
-                        }}
-                        className="w-full h-12 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
-                      >
-                        Continue
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Button>
-                    </div>
+                      trackTikTokEvent("SubmitForm", {
+                        content_type: "lead",
+                        content_id: "get_feedback_lead",
+                      });
+
+                      setTrackStartStage("track");
+                    }}
+                    className="w-full h-12 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
+                  >
+                    Continue
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+
+                  <button
+                    type="button"
+                    disabled={isSendingFinishLater}
+                    onClick={async () => {
+                      setFinishLaterMessage("");
+
+                      const nextArtistName = artistName.trim();
+                      const nextEmail = email.trim().toLowerCase();
+
+                      const errors: Record<string, string> = {};
+                      if (!nextArtistName) errors.artistName = "Required";
+                      if (!nextEmail) errors.email = "Required";
+                      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) errors.email = "Invalid email";
+
+                      if (Object.keys(errors).length > 0) {
+                        setFieldErrors((prev) => ({ ...prev, ...errors }));
+                        return;
+                      }
+
+                      setArtistName(nextArtistName);
+                      setEmail(nextEmail);
+
+                      setIsSendingFinishLater(true);
+                      try {
+                        await captureLead({ sendEmail: true });
+                        setFinishLaterMessage("Sent. Check your email for a link to finish this later.");
+                      } catch {
+                        setFinishLaterMessage("Couldn't send email right now. Please try again.");
+                      } finally {
+                        setIsSendingFinishLater(false);
+                      }
+                    }}
+                    className={cn(
+                      "w-full text-sm font-bold border-2 h-11",
+                      isSendingFinishLater
+                        ? "bg-neutral-900 text-neutral-500 border-neutral-700"
+                        : "bg-neutral-900 text-neutral-200 border-neutral-700 hover:border-neutral-500"
+                    )}
+                  >
+                    Email me a link to finish later
+                  </button>
+
+                  {finishLaterMessage && (
+                    <p className="text-xs text-neutral-400 text-center">{finishLaterMessage}</p>
                   )}
-                </div>
-              </div>
-            )}
 
-            {trackStartStage !== "track" && (
-              <div className="order-[20]">
-                <div className="flex items-center justify-between max-w-lg mx-auto mb-2">
-                  <span className="text-xs font-black uppercase tracking-wide text-neutral-400">Example review</span>
-                  <span className="text-xs text-neutral-600">This is what you get</span>
-                </div>
-
-                <div className="max-w-lg mx-auto border-2 border-neutral-700 bg-neutral-900 shadow-[0_0_0_2px_rgba(0,0,0,1)]">
-                <div className="p-4 border-b-2 border-neutral-700 bg-black flex items-center gap-4">
-                  <div className="h-14 w-14 bg-lime-500 border-2 border-black flex items-center justify-center shrink-0">
-                    <Music className="h-6 w-6 text-black" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-bold text-white truncate">Midnight Frequency</p>
-                    <p className="text-neutral-400 text-sm truncate">Electronic • 3:42</p>
-                  </div>
-                </div>
-
-                <div className="p-4 border-b-2 border-neutral-700 bg-neutral-950/30 flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center font-bold text-black">
-                      S
+                  <div className="flex items-center justify-center gap-2 text-xs text-neutral-400">
+                    <div className="flex items-center gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className="h-3.5 w-3.5 text-lime-500 fill-lime-500" />
+                      ))}
                     </div>
-                    <div>
-                      <p className="font-bold text-sm text-white">Sarah M.</p>
-                      <p className="text-xs text-neutral-400">Electronic • Indie • Alternative</p>
-                    </div>
+                    <span className="font-bold">Verified reviews</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
-                    <Headphones className="h-4 w-4" />
-                    <span>Listened 4:32</span>
-                  </div>
-                </div>
-
-                <div className="border-b-2 border-neutral-700 grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-neutral-800">
-                  <div className="p-4 text-center">
-                    <p className="text-xs text-neutral-500 mb-1">First Impression</p>
-                    <p className="font-bold text-lime-500">Strong Hook</p>
-                  </div>
-                  <div className="p-4 text-center">
-                    <p className="text-xs text-neutral-500 mb-1">Production</p>
-                    <p className="font-bold text-white">4/5</p>
-                  </div>
-                  <div className="p-4 text-center">
-                    <p className="text-xs text-neutral-500 mb-1">Originality</p>
-                    <p className="font-bold text-white">4/5</p>
-                  </div>
-                  <div className="p-4 text-center">
-                    <p className="text-xs text-neutral-500 mb-1">Listen Again?</p>
-                    <p className="font-bold text-lime-500">Yes</p>
-                  </div>
-                </div>
-
-                <div className="border-b-2 border-neutral-700 bg-neutral-950/30 p-4">
-                  <p className="text-xs text-neutral-500 mb-3 font-medium">Listener Signals</p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-lime-500/10 border border-lime-500/30 text-lime-500">
-                      <ListMusic className="h-3.5 w-3.5" />
-                      Would add to playlist
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-lime-500/10 border border-lime-500/30 text-lime-500">
-                      <Share2 className="h-3.5 w-3.5" />
-                      Would share
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-neutral-900 border border-neutral-700 text-neutral-300">
-                      <UserPlus className="h-3.5 w-3.5" />
-                      Wouldn&apos;t follow yet
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-6 space-y-6">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="w-6 h-6 bg-lime-500 border border-black flex items-center justify-center text-xs font-bold text-black">+</span>
-                      <h4 className="font-bold text-sm text-white">What&apos;s Working</h4>
-                    </div>
-                    <p className="text-neutral-300 leading-relaxed text-sm pl-8">
-                      The synth melody around 0:45 is genuinely catchy—got stuck in my head. The interplay with the drums creates a driving energy that makes you want to move. Low end is tight, punchy kick that cuts through without being muddy. The breakdown at 2:15 was unexpected and added a nice dynamic shift.
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="w-6 h-6 bg-orange-400 border border-black flex items-center justify-center text-xs font-bold text-black">→</span>
-                      <h4 className="font-bold text-sm text-white">Room to Grow</h4>
-                    </div>
-                    <p className="text-neutral-300 leading-relaxed text-sm pl-8">
-                      The intro feels long before the hook hits—consider trimming 8-10 seconds. Hi-hats get repetitive in verse 2; some variation or filter sweep would help. The vocal sample at 1:30 sits too loud and clashes with lead synth frequencies.
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="w-6 h-6 bg-sky-400 border border-black flex items-center justify-center text-xs font-bold text-black">!</span>
-                      <h4 className="font-bold text-sm text-white">Next Steps</h4>
-                    </div>
-                    <ul className="text-neutral-300 text-sm pl-8 space-y-1">
-                      <li className="flex items-start gap-2">
-                        <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">01</span>
-                        <span>Cut the intro by 8-10 seconds to hook listeners faster</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">02</span>
-                        <span>Add hi-hat variations or automate a filter in verse 2</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">03</span>
-                        <span>EQ the vocal sample to carve space for the lead synth</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="pt-4 border-t border-neutral-800">
-                    <p className="text-sm text-neutral-400">
-                      <span className="font-bold text-neutral-200">Sounds like:</span> Bonobo meets Four Tet, with some Tycho influence in the atmospheric pads.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-neutral-950/40 border-t-2 border-neutral-700 flex items-center justify-between">
-                  <span className="text-xs text-neutral-400">1 of 5 reviews</span>
-                  <span className="text-[10px] font-mono bg-lime-500 border border-black px-2 py-0.5 font-bold text-black">EXAMPLE</span>
-                </div>
                 </div>
               </div>
             )}

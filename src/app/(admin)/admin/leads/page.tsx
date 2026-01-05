@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 type LeadCaptureRow = {
   id: string;
   email: string;
+  artistName: string | null;
   source: string;
   reminded: boolean;
   converted: boolean;
@@ -37,7 +38,7 @@ export default async function AdminLeadsPage({
 
   const leads = await prisma.$queryRaw<LeadCaptureRow[]>(
     Prisma.sql`
-      SELECT id, email, source, reminded, converted, "createdAt"
+      SELECT id, email, "artistName", source, reminded, converted, "createdAt"
       FROM "LeadCapture"
       ${whereSql}
       ORDER BY "createdAt" DESC
@@ -79,6 +80,7 @@ export default async function AdminLeadsPage({
             <thead className="bg-neutral-50 text-neutral-600">
               <tr>
                 <th className="text-left font-medium px-4 py-3">Email</th>
+                <th className="text-left font-medium px-4 py-3">Artist</th>
                 <th className="text-left font-medium px-4 py-3">Source</th>
                 <th className="text-left font-medium px-4 py-3">Reminded</th>
                 <th className="text-left font-medium px-4 py-3">Converted</th>
@@ -89,6 +91,7 @@ export default async function AdminLeadsPage({
               {leads.map((l) => (
                 <tr key={l.id} className="text-neutral-700">
                   <td className="px-4 py-3 font-mono text-xs sm:text-sm">{l.email}</td>
+                  <td className="px-4 py-3">{l.artistName || ""}</td>
                   <td className="px-4 py-3">{l.source}</td>
                   <td className="px-4 py-3">{l.reminded ? "Yes" : "No"}</td>
                   <td className="px-4 py-3">{l.converted ? "Yes" : "No"}</td>
@@ -98,7 +101,7 @@ export default async function AdminLeadsPage({
 
               {leads.length === 0 && (
                 <tr>
-                  <td className="px-4 py-8 text-neutral-500" colSpan={5}>
+                  <td className="px-4 py-8 text-neutral-500" colSpan={6}>
                     No leads found.
                   </td>
                 </tr>

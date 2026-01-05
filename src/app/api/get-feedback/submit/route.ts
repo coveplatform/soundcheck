@@ -129,6 +129,21 @@ export async function POST(request: Request) {
 
       const checkoutUrl = `/artist/submit/checkout?trackId=${track.id}`;
 
+      // Best-effort: mark lead as converted (if we have an email)
+      const sessionEmail = (session?.user as { email?: string } | undefined)?.email;
+      if (sessionEmail) {
+        try {
+          const normalizedEmail = sessionEmail.trim().toLowerCase();
+          const leadCapture = (prisma as any).leadCapture as any;
+          await leadCapture.updateMany({
+            where: { email: normalizedEmail, source: "get-feedback" },
+            data: { converted: true },
+          });
+        } catch {
+          // Best-effort only
+        }
+      }
+
       return NextResponse.json({
         success: true,
         trackId: track.id,
@@ -149,6 +164,19 @@ export async function POST(request: Request) {
 
       const data = newUserSchema.parse(body);
       const normalizedEmail = data.email.trim().toLowerCase();
+
+      // Best-effort: mark lead as converted
+      {
+        try {
+          const leadCapture = (prisma as any).leadCapture as any;
+          await leadCapture.updateMany({
+            where: { email: normalizedEmail, source: "get-feedback" },
+            data: { converted: true },
+          });
+        } catch {
+          // Best-effort only
+        }
+      }
 
       // Check if user already exists
       const existingUser = await prisma.user.findFirst({

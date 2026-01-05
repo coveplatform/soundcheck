@@ -67,11 +67,18 @@ export default function TikTokLandingPage() {
     });
   }, []);
 
-  // Track registration and capture lead if just came back from Google auth
+  // Track registration, capture lead, and ensure artist flag is set for Google auth
   useEffect(() => {
     if (justRegistered && isLoggedIn && session?.user?.email) {
       trackTikTokEvent("CompleteRegistration", {
         content_name: "tiktok_google_signup",
+      });
+
+      // Ensure user is marked as artist (Google OAuth doesn't set this automatically)
+      fetch("/api/auth/set-artist", {
+        method: "POST",
+      }).catch(() => {
+        // Ignore errors - they can still complete onboarding
       });
 
       // Capture lead for tracking (will be marked as converted since they have account)
@@ -422,11 +429,11 @@ export default function TikTokLandingPage() {
               </p>
             </div>
             <div className="border border-neutral-800 p-4 max-w-xs mx-auto text-left">
-              <p className="text-sm text-neutral-300 mb-2">When you're at your computer:</p>
+              <p className="text-sm text-neutral-300 mb-2">Next steps:</p>
               <ol className="text-sm text-neutral-400 space-y-1">
                 <li className="flex items-start gap-2">
                   <span className="text-lime-500 font-bold">1.</span>
-                  <span>Go to mixreflect.com and log in</span>
+                  <span>Set up your artist profile (1 min)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-lime-500 font-bold">2.</span>
@@ -438,8 +445,13 @@ export default function TikTokLandingPage() {
                 </li>
               </ol>
             </div>
+            <Link href="/artist/dashboard">
+              <Button className="bg-lime-500 text-black hover:bg-lime-400 font-bold">
+                Continue to Dashboard <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
             <p className="text-xs text-neutral-500">
-              We'll send you a reminder email too.
+              On mobile? We'll email you a reminder to finish on desktop.
             </p>
           </div>
         )}
