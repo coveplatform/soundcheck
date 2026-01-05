@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Target, Clock, ListMusic, Share2, UserPlus, ThumbsUp, Quote, CheckCircle2, Lock } from "lucide-react";
+import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Target, Clock, ListMusic, Share2, UserPlus, ThumbsUp, Quote, CheckCircle2, Lock, Gift } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
@@ -30,6 +30,12 @@ export default function Home() {
         <div className="absolute top-20 right-10 w-32 h-32 bg-lime-200 rounded-full blur-3xl opacity-50" />
         <div className="absolute bottom-10 left-10 w-24 h-24 bg-orange-200 rounded-full blur-2xl opacity-40" />
         <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-28 relative">
+          {/* FREE badge */}
+          <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 mb-6 border-2 border-black">
+            <Gift className="h-5 w-5" />
+            <span className="font-black text-sm uppercase tracking-wide">First review FREE</span>
+          </div>
+
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight text-black max-w-4xl leading-[1.1]">
             Real feedback.<br /><span className="text-lime-600">Real fast.</span>
           </h1>
@@ -40,12 +46,13 @@ export default function Home() {
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/get-feedback">
               <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-8 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
-                Get Feedback <ArrowRight className="ml-2 h-4 w-4" />
+                <Gift className="mr-2 h-4 w-4" />
+                Get Your Free Review <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </div>
           <p className="mt-6 text-sm text-neutral-500 font-mono">
-            First review on us • Results in under 12 hours
+            No credit card required • Results in under 12 hours
           </p>
         </div>
       </section>
@@ -486,12 +493,16 @@ export default function Home() {
       <section className="border-b-2 border-black py-16 bg-gradient-to-br from-lime-50 via-white to-orange-50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-3 py-1.5 mb-4 border-2 border-black">
+              <Gift className="h-4 w-4" />
+              <span className="font-black text-xs uppercase tracking-wide">First review FREE</span>
+            </div>
             <h2 className="text-3xl font-black mb-2">Simple pricing. Real results.</h2>
             <p className="text-neutral-600 mb-2">
               More reviews = clearer patterns = more confidence.
             </p>
-            <p className="text-sm text-lime-600 font-medium">
-              First review on us — no card required
+            <p className="text-sm text-neutral-500">
+              No credit card required for your first review
             </p>
           </div>
 
@@ -569,6 +580,10 @@ export default function Home() {
       {/* CTA */}
       <section className="bg-black text-white py-20 border-b-2 border-black">
         <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-3 py-1.5 mb-6">
+            <Gift className="h-4 w-4" />
+            <span className="font-black text-xs uppercase tracking-wide">First review FREE</span>
+          </div>
           <h2 className="text-4xl md:text-5xl font-black mb-6">
             Stop wondering.<br />Start knowing.
           </h2>
@@ -580,11 +595,12 @@ export default function Home() {
               size="lg"
               className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-lime-500"
             >
-              Get Feedback
+              <Gift className="mr-2 h-4 w-4" />
+              Get Your Free Review
             </Button>
           </Link>
           <p className="mt-4 text-sm text-neutral-500">
-            First review on us • No card required
+            No credit card required • Results in under 12 hours
           </p>
         </div>
       </section>

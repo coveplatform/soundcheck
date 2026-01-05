@@ -850,6 +850,12 @@ export default function GetFeedbackPage() {
           <div className="flex flex-col gap-6">
             {/* Hero */}
             <div className="text-center space-y-3 order-[10]">
+              {/* FREE badge */}
+              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 mb-2">
+                <Gift className="h-5 w-5" />
+                <span className="font-black text-sm uppercase tracking-wide">First review FREE</span>
+              </div>
+
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
                 Real feedback.<span className="text-lime-500"> Real fast.</span>
               </h1>
@@ -868,14 +874,14 @@ export default function GetFeedbackPage() {
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Turnaround</p>
                 </div>
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-xl font-black text-lime-500">$4.95</p>
-                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">From (AUD)</p>
+                  <p className="text-xl font-black text-lime-500">FREE</p>
+                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">First review</p>
                 </div>
               </div>
 
-              {/* Subtle first review free note */}
-              <p className="text-sm text-lime-500 font-medium pt-1">
-                First review on us — no card required
+              {/* No card required note */}
+              <p className="text-sm text-neutral-500 font-medium pt-1">
+                No credit card required
               </p>
             </div>
 
@@ -1545,14 +1551,18 @@ export default function GetFeedbackPage() {
             </button>
 
             <div className="text-center space-y-2">
-              <h1 className="text-3xl sm:text-4xl font-black">Ready to submit</h1>
+              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-3 py-1.5 mb-2">
+                <Gift className="h-4 w-4" />
+                <span className="font-black text-xs uppercase tracking-wide">Free Review</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-black">Your free review is ready</h1>
               <p className="text-neutral-400">
-                Your first review is on us — no payment required.
+                No payment required — just hit submit.
               </p>
             </div>
 
             {/* Track preview */}
-            <div className="border-2 border-neutral-700 bg-neutral-900 p-6">
+            <div className="border-2 border-lime-500 bg-neutral-900 p-6">
               <div className="flex items-center gap-4 mb-4">
                 {artworkUrl ? (
                   <img src={artworkUrl} alt="" className="w-16 h-16 object-cover border-2 border-neutral-600" />
@@ -1566,13 +1576,14 @@ export default function GetFeedbackPage() {
                   <p className="text-sm text-neutral-500">Ready for review</p>
                 </div>
                 <div className="h-10 w-10 bg-lime-500 flex items-center justify-center flex-shrink-0">
-                  <Check className="h-5 w-5 text-black" />
+                  <Gift className="h-5 w-5 text-black" />
                 </div>
               </div>
               <div className="flex items-center justify-between pt-4 border-t border-neutral-700">
-                <span className="text-neutral-400">First review</span>
+                <span className="text-neutral-400">Your first review</span>
                 <div className="text-right">
-                  <span className="text-lg font-black text-lime-500">On us</span>
+                  <span className="text-2xl font-black text-lime-500">FREE</span>
+                  <span className="text-xs text-neutral-500 ml-2 line-through">$4.95</span>
                 </div>
               </div>
             </div>
@@ -1606,7 +1617,8 @@ export default function GetFeedbackPage() {
               isLoading={isSubmitting}
               className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
-              Get My Review
+              <Gift className="h-5 w-5 mr-2" />
+              Get My Free Review
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
 

@@ -278,12 +278,15 @@ export async function POST(request: Request) {
           where: { userId: existingUser.id },
         });
 
+        const isNewArtistProfile = !artistProfile;
+
         if (!artistProfile) {
           const profileName = data.artistName.trim() || existingUser.name || "Artist";
           artistProfile = await prisma.artistProfile.create({
             data: {
               userId: existingUser.id,
               artistName: profileName,
+              freeReviewCredits: 1, // New artist profiles get 1 free review
               genres: {
                 connect: data.genreIds.map((id) => ({ id })),
               },
@@ -319,6 +322,85 @@ export async function POST(request: Request) {
           }
         }
 
+        // Check if user has free review credits
+        const hasFreeCredit = artistProfile.freeReviewCredits > 0;
+
+        if (hasFreeCredit) {
+          // Use free credit - no payment needed
+          const paidAt = new Date();
+          const track = await prisma.track.create({
+            data: {
+              artistId: artistProfile.id,
+              sourceUrl: data.sourceUrl,
+              sourceType,
+              title: data.title,
+              artworkUrl: data.artworkUrl,
+              duration: data.duration,
+              feedbackFocus: data.feedbackFocus,
+              packageType: "STARTER",
+              reviewsRequested: 1,
+              status: "QUEUED",
+              paidAt,
+              promoCode: "FREE_FIRST_REVIEW",
+              genres: {
+                connect: data.genreIds.map((id) => ({ id })),
+              },
+            },
+          });
+
+          // Create $0 payment record
+          await prisma.payment.create({
+            data: {
+              trackId: track.id,
+              amount: 0,
+              stripeSessionId: `free_first_review_${track.id}_${paidAt.getTime()}`,
+              stripePaymentId: null,
+              status: "COMPLETED",
+              completedAt: paidAt,
+            },
+          });
+
+          // Decrement free credit and increment total tracks
+          await prisma.artistProfile.update({
+            where: { id: artistProfile.id },
+            data: {
+              freeReviewCredits: { decrement: 1 },
+              totalTracks: { increment: 1 },
+            },
+          });
+
+          // Assign reviewers
+          try {
+            await assignReviewersToTrack(track.id);
+          } catch (assignError) {
+            console.error("Failed to assign reviewers:", assignError);
+          }
+
+          // Notify admin
+          try {
+            await sendAdminNewTrackNotification({
+              trackTitle: track.title,
+              artistEmail: normalizedEmail,
+              packageType: "STARTER",
+              reviewsRequested: 1,
+              isPromo: false,
+              promoCode: "FREE_FIRST_REVIEW",
+            });
+          } catch (notifyError) {
+            console.error("Failed to send admin notification:", notifyError);
+          }
+
+          await markLeadConverted(normalizedEmail);
+
+          return NextResponse.json({
+            success: true,
+            trackId: track.id,
+            successUrl: `/artist/submit/success?session_id=free_first_review_${track.id}`,
+            signIn: true,
+          });
+        }
+
+        // No free credit - go through paid checkout
         const packageDetails = PACKAGES[data.packageType];
 
         const track = await prisma.track.create({
