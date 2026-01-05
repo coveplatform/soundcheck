@@ -122,7 +122,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const wouldListenAgainRef = useRef<HTMLDivElement>(null);
   const bestPartRef = useRef<HTMLDivElement>(null);
   const weakestPartRef = useRef<HTMLDivElement>(null);
-  const nextActionsRef = useRef<HTMLDivElement>(null);
 
   const scrollToSection = useCallback((sectionId: string) => {
     const refs: Record<string, React.RefObject<HTMLDivElement | null>> = {
@@ -131,7 +130,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       wouldListenAgain: wouldListenAgainRef,
       bestPart: bestPartRef,
       weakestPart: weakestPartRef,
-      nextActions: nextActionsRef,
     };
     const ref = refs[sectionId];
     if (ref?.current) {
@@ -380,11 +378,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     }
     if (countWords(weakestPart) < MIN_WORDS_PER_SECTION) {
       issues.push({ id: "weakestPart", message: `Weakest part needs ${MIN_WORDS_PER_SECTION - countWords(weakestPart)} more words`, section: "weakestPart" });
-    }
-
-    const actionLines = nextActions.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-    if (actionLines.length < 3) {
-      issues.push({ id: "nextActions", message: `Need ${3 - actionLines.length} more action item${3 - actionLines.length === 1 ? "" : "s"}`, section: "nextActions" });
     }
 
     if (issues.length > 0) {
@@ -840,11 +833,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   const bestPartWords = countWords(bestPart);
   const weakestPartWords = countWords(weakestPart);
-  const nextActionCount = nextActions.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).length;
   const meetsTextMinimum =
     bestPartWords >= MIN_WORDS_PER_SECTION &&
     weakestPartWords >= MIN_WORDS_PER_SECTION;
-  const hasNextActions = nextActionCount >= 3;
 
   if (success) {
     return (
@@ -1274,20 +1265,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             />
           </div>
 
-          {/* Next Actions */}
-          <div ref={nextActionsRef} className={cn("space-y-3 p-4 -m-4 rounded-lg transition-colors", validationIssues.some((i) => i.section === "nextActions") && "bg-red-50 border-2 border-red-300")}>
-            <Label htmlFor="next-actions" className="text-base font-bold">Next actions (3+ actionable items) *</Label>
-            {validationIssues.some((i) => i.section === "nextActions") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "nextActions")?.message}</p>)}
-            <textarea
-              id="next-actions"
-              placeholder={`- Lower the vocal 1-2 dB in the hook\n- Reduce reverb tail on the snare\n- Tighten the drop by shortening the pre-drop fill`}
-              value={nextActions}
-              onChange={(e) => setNextActions(e.target.value)}
-              className={cn("w-full px-3 py-2 border-2 text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2", validationIssues.some((i) => i.section === "nextActions") ? "border-red-400" : "border-black")}
-            />
-            <p className="text-xs text-neutral-500">One actionable suggestion per line (e.g. &quot;Lower the vocal 1-2 dB in the hook&quot;)</p>
-          </div>
-
           {/* Timestamped notes */}
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
@@ -1388,17 +1365,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-sm mt-1 flex-wrap">
-                {hasNextActions ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-lime-500 text-black font-bold text-xs">
-                    <Check className="h-3 w-3" /> Next actions ready
-                  </span>
-                ) : (
-                  <span className="text-neutral-400 font-mono">
-                    Next actions: {nextActionCount}/3 items
-                  </span>
-                )}
-              </div>
             </div>
           </div>
 
@@ -1428,11 +1394,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <Button
             onClick={handleSubmit}
             isLoading={isSubmitting}
-            disabled={!canSubmit || !meetsTextMinimum || !hasNextActions}
+            disabled={!canSubmit || !meetsTextMinimum}
             variant="primary"
             className="w-full"
           >
-            {canSubmit && meetsTextMinimum && hasNextActions
+            {canSubmit && meetsTextMinimum
               ? `Submit Review & Earn ${formatCurrency(getTierEarningsCents(review.reviewer.tier))}`
               : "Complete requirements to submit"}
           </Button>

@@ -113,7 +113,7 @@ const submitReviewSchema = z.object({
   weakestTimestamp: z.number().optional().nullable(),
   additionalNotes: z.string().optional(),
   addressedArtistNote: z.enum(["YES", "PARTIALLY", "NO"]).optional().nullable(),
-  nextActions: z.string().min(1, "Please provide next actions"),
+  nextActions: z.string().optional(), // Optional - no longer required
   timestamps: z
     .array(
       z.object({
@@ -234,35 +234,6 @@ export async function POST(request: Request) {
     const weakestPartError = validateReviewText("Weakest part", data.weakestPart);
     if (weakestPartError) {
       return NextResponse.json({ error: weakestPartError }, { status: 400 });
-    }
-
-    const nextActionsWords = extractWords(data.nextActions);
-    const nextActionsUnique = new Set(nextActionsWords);
-    const nextActionsUniqueRatio =
-      nextActionsWords.length > 0 ? nextActionsUnique.size / nextActionsWords.length : 0;
-
-    if (countActionLines(data.nextActions) < 3) {
-      return NextResponse.json(
-        { error: "Next actions must include at least 3 lines (one actionable step per line)." },
-        { status: 400 }
-      );
-    }
-
-    if (nextActionsUnique.size < 6 || nextActionsUniqueRatio < 0.35) {
-      return NextResponse.json(
-        { error: "Next actions seems too repetitive. Please be more specific." },
-        { status: 400 }
-      );
-    }
-
-    if (!hasSpecificSignals(data.nextActions, nextActionsWords)) {
-      return NextResponse.json(
-        {
-          error:
-            "Next actions needs more specific, actionable details (e.g. mention an element like vocals/kick, a section like the drop, or a timestamp).",
-        },
-        { status: 400 }
-      );
     }
 
     // Calculate earnings based on tier
