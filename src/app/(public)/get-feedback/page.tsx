@@ -537,6 +537,14 @@ export default function GetFeedbackPage() {
 
   const isPasswordValid = password.length >= 8 && passwordErrors.length === 0;
 
+  const passwordChecklist = [
+    { label: "8+ characters", met: password.length >= 8 },
+    { label: "Uppercase letter", met: /[A-Z]/.test(password) },
+    { label: "Lowercase letter", met: /[a-z]/.test(password) },
+    { label: "Number", met: /\d/.test(password) },
+    { label: "Symbol", met: /[!@#$%^&*(),.?":{}|<>]/.test(password) },
+  ];
+
   // Navigation
   const goBack = () => {
     if (step === "matching") setStep("track");
@@ -637,7 +645,10 @@ export default function GetFeedbackPage() {
         });
 
         if (result?.error) {
-          setFieldErrors({ password: "Incorrect password for existing account" });
+          setFieldErrors({
+            password:
+              "This email is already registered. That password doesn’t match — try signing in or reset your password.",
+          });
           return;
         }
 
@@ -1387,8 +1398,24 @@ export default function GetFeedbackPage() {
                       </button>
                     </div>
                     {fieldErrors.password && <p className="text-xs text-red-500 mt-1">{fieldErrors.password}</p>}
-                    {password && passwordErrors.length > 0 && (
-                      <p className="text-xs text-neutral-500 mt-1">Needs: {passwordErrors.join(", ")}</p>
+                    {password && (
+                      <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+                        {passwordChecklist.map((item) => (
+                          <div key={item.label} className="flex items-center gap-2 text-xs">
+                            <span
+                              className={cn(
+                                "h-4 w-4 flex items-center justify-center border",
+                                item.met
+                                  ? "bg-lime-500 border-lime-500 text-black"
+                                  : "bg-neutral-900 border-neutral-700 text-neutral-400"
+                              )}
+                            >
+                              {item.met ? "✓" : ""}
+                            </span>
+                            <span className={cn(item.met ? "text-neutral-300" : "text-neutral-500")}>{item.label}</span>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>

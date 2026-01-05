@@ -185,7 +185,7 @@ export async function POST(request: Request) {
         const isPasswordValid = await bcrypt.compare(data.password, existingUser.password);
         if (!isPasswordValid) {
           return NextResponse.json(
-            { error: "Incorrect password for existing account" },
+            { error: "This email is already registered. That password doesn’t match — try signing in or reset your password." },
             { status: 400 }
           );
         }
