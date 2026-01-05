@@ -685,27 +685,35 @@ export default function GetFeedbackPage() {
           <div className="space-y-8">
             {/* Hero */}
             <div className="text-center space-y-4">
-              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 text-sm font-black uppercase tracking-wider">
-                <Zap className="h-4 w-4" />
-                Get Real Feedback
-              </div>
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
-                Drop your track
+                Real feedback. Real fast.
               </h1>
-              <p className="text-neutral-400 text-lg max-w-md mx-auto">
-                Upload a file or paste a link. We&apos;ll match you with listeners who actually love your genre.
+              <p className="text-neutral-400 text-lg max-w-lg mx-auto">
+                5-10 genre-matched listeners review your track and tell you exactly what&apos;s working and what needs fixing.
               </p>
 
-              {/* Trust badges */}
-              <div className="flex items-center justify-center gap-6 text-xs text-neutral-500">
-                <div className="flex items-center gap-1.5">
-                  <Users className="h-4 w-4" />
-                  <span>500+ reviews delivered</span>
+              {/* What you get - visual summary */}
+              <div className="grid grid-cols-3 gap-3 max-w-md mx-auto pt-2">
+                <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
+                  <p className="text-xl font-black text-lime-500">5-10</p>
+                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Reviews</p>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Zap className="h-4 w-4" />
-                  <span>&lt;12hr turnaround</span>
+                <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
+                  <p className="text-xl font-black text-lime-500">&lt;12h</p>
+                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Turnaround</p>
                 </div>
+                <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
+                  <p className="text-xl font-black text-lime-500">$4.95</p>
+                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">From (AUD)</p>
+                </div>
+              </div>
+
+              {/* Micro-testimonial */}
+              <div className="max-w-sm mx-auto bg-neutral-900/50 border border-neutral-800 p-3 text-left">
+                <p className="text-sm text-neutral-300 italic">
+                  &ldquo;4 of 5 reviewers said my intro was too long. Cut it down—now it&apos;s my best release.&rdquo;
+                </p>
+                <p className="text-xs text-neutral-500 mt-1">— Marcus T., Electronic Producer</p>
               </div>
             </div>
 
@@ -1255,7 +1263,7 @@ export default function GetFeedbackPage() {
                     <p className="text-neutral-500">Get a feel for how listeners react</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-black text-white">${(PACKAGES.STARTER.price / 100).toFixed(0)}</p>
+                    <p className="text-2xl font-black text-white">${(PACKAGES.STARTER.price / 100).toFixed(2)}</p>
                     <p className="text-xs text-neutral-500">AUD</p>
                   </div>
                 </div>
@@ -1291,7 +1299,7 @@ export default function GetFeedbackPage() {
                     <p className="text-neutral-500">Maximum clarity with pattern insights</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-black text-white">${(PACKAGES.STANDARD.price / 100).toFixed(0)}</p>
+                    <p className="text-2xl font-black text-white">${(PACKAGES.STANDARD.price / 100).toFixed(2)}</p>
                     <p className="text-xs text-neutral-500">AUD</p>
                   </div>
                 </div>

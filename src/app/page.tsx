@@ -31,7 +31,7 @@ export default function Home() {
         <div className="absolute bottom-10 left-10 w-24 h-24 bg-orange-200 rounded-full blur-2xl opacity-40" />
         <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-28 relative">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight text-black max-w-4xl leading-[1.1]">
-            One opinion is taste.<br />Ten opinions is <span className="text-lime-600">truth</span>.
+            Real feedback.<br /><span className="text-lime-600">Real fast.</span>
           </h1>
           <p className="mt-6 text-xl text-neutral-600 max-w-xl leading-relaxed">
             Listened to your track so many times you can&apos;t tell if it&apos;s good anymore?
@@ -101,7 +101,7 @@ export default function Home() {
       <section className="border-b-2 border-black py-16">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-black mb-2">Here&apos;s a better way</h2>
-          <p className="text-neutral-600 mb-8">Get 10 opinions. See what patterns emerge. Know for sure.</p>
+          <p className="text-neutral-600 mb-8">Get multiple opinions. See what patterns emerge. Know for sure.</p>
 
           <div className="space-y-4">
             <div className="flex gap-4 p-5 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
@@ -144,7 +144,7 @@ export default function Home() {
               <div className="flex flex-col justify-center">
                 <p className="font-bold text-lg">Patterns reveal truth</p>
                 <p className="text-neutral-500">
-                  When 8/10 say the intro is too long, that&apos;s not taste—that&apos;s consensus. Now you know what to fix.
+                  When most listeners say the intro is too long, that&apos;s not taste—that&apos;s consensus. Now you know what to fix.
                 </p>
               </div>
             </div>
@@ -216,7 +216,7 @@ export default function Home() {
           </div>
 
           <p className="mt-6 text-sm text-neutral-500 text-center">
-            Plus, with 5-10 reviews, one lazy opinion can&apos;t hide. The truth emerges from consensus.
+            Plus, with multiple reviews, one lazy opinion can&apos;t hide. The truth emerges from consensus.
           </p>
         </div>
       </section>
@@ -465,7 +465,7 @@ export default function Home() {
               </div>
               <h3 className="font-bold text-lg mb-2">Truth through consensus</h3>
               <p className="text-sm text-neutral-600">
-                If 7/10 say the intro is too long, that&apos;s not taste—it&apos;s truth. Multiple opinions reveal what actually needs fixing.
+                If most reviewers say the intro is too long, that&apos;s not taste—it&apos;s truth. Multiple opinions reveal what actually needs fixing.
               </p>
             </div>
 
@@ -592,11 +592,11 @@ export default function Home() {
             {[
               {
                 q: "Why do I need multiple reviews instead of just one?",
-                a: "One person's feedback is just their taste. With 5-10 reviews, patterns emerge. If one person says your intro is too long, maybe they're wrong. If 7 out of 10 say it, that's something to fix. Consensus separates taste from truth.",
+                a: "One person's feedback is just their taste. With multiple reviews, patterns emerge. If one person says your intro is too long, maybe they're wrong. If most reviewers say it, that's something to fix. Consensus separates taste from truth.",
               },
               {
                 q: "If reviewers are paid, won't they just say nice things?",
-                a: "The opposite. You rate every review. Low ratings = reviewers earn less ($0.50 vs $1.50/review) and lose access to future work. The incentive is honest, useful feedback—not empty praise. Plus, with 5-10 reviews, one fake positive can't hide when everyone else disagrees.",
+                a: "The opposite. You rate every review. Low ratings = reviewers earn less ($0.50 vs $1.50/review) and lose access to future work. The incentive is honest, useful feedback—not empty praise. Plus, with multiple reviews, one fake positive can't hide when everyone else disagrees.",
               },
               {
                 q: "Who are these reviewers?",
@@ -612,7 +612,7 @@ export default function Home() {
               },
               {
                 q: "What if I disagree with the feedback?",
-                a: "That's fine—and expected sometimes. The power is in patterns: if only 1 person mentions something, it might be taste. If 7 do, it's worth considering. You always make the final call.",
+                a: "That's fine—and expected sometimes. The power is in patterns: if only 1 person mentions something, it might be taste. If multiple reviewers mention it, it's worth considering. You always make the final call.",
               },
               {
                 q: "Can I get a refund?",
