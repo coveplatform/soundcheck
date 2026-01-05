@@ -30,6 +30,7 @@ import {
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { Logo } from "@/components/ui/logo";
+import { BandcampIcon, SoundCloudIcon, YouTubeIcon } from "@/components/ui/platform-icons";
 import Link from "next/link";
 import { trackTikTokEvent } from "@/components/providers";
 
@@ -656,7 +657,7 @@ export default function GetFeedbackPage() {
         <div className="max-w-2xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
             <Link href="/" className="flex items-center gap-2">
-              <Logo />
+              <Logo className="text-white" />
             </Link>
             <div className="flex items-center gap-2 text-xs font-mono text-neutral-500">
               <span className={cn(step === "track" && "text-lime-500")}>TRACK</span>
@@ -743,6 +744,13 @@ export default function GetFeedbackPage() {
               >
                 <Link2 className="h-4 w-4" />
                 Paste Link
+                {inputMode === "url" && (
+                  <span className="flex items-center gap-1.5 ml-1">
+                    <SoundCloudIcon className="h-4 w-4 text-[#ff5500]" />
+                    <BandcampIcon className="h-4 w-4 text-[#1da0c3]" />
+                    <YouTubeIcon className="h-4 w-4 text-[#ff0000]" />
+                  </span>
+                )}
               </button>
             </div>
 
@@ -1020,7 +1028,7 @@ export default function GetFeedbackPage() {
             <div className="text-center space-y-2">
               <h1 className="text-3xl sm:text-4xl font-black">Almost there</h1>
               <p className="text-sm font-bold text-lime-500">
-                We found {estimatedListenerPool}+ good-fit listeners for your genre.
+                We found {estimatedListenerPool}+ good-fit listeners for your track.
               </p>
               <p className="text-neutral-400">
                 Tell us where to send your feedback

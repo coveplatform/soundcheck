@@ -86,6 +86,7 @@ export function AudioPlayer({
   const [isWaveformLoading, setIsWaveformLoading] = useState(false);
   const [timestampAdded, setTimestampAdded] = useState(false);
   const [bandcampEmbedUrl, setBandcampEmbedUrl] = useState<string | null>(null);
+  const [isEmbedInteractive, setIsEmbedInteractive] = useState(true);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -135,6 +136,22 @@ export function AudioPlayer({
 
   // For embedded players (SoundCloud, YouTube, Bandcamp)
   const isEmbedded = sourceType === "SOUNDCLOUD" || sourceType === "YOUTUBE" || sourceType === "BANDCAMP";
+
+  // On touch devices, embedded iframes can capture touch gestures and make the page feel like it won't scroll.
+  // Default to non-interactive embeds and let the user tap to enable.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isTouch =
+      "ontouchstart" in window ||
+      (typeof navigator !== "undefined" && navigator.maxTouchPoints > 0);
+    const isCoarsePointer =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(pointer: coarse)").matches;
+
+    if (isTouch || isCoarsePointer) {
+      setIsEmbedInteractive(false);
+    }
+  }, []);
 
   // Fetch Bandcamp embed URL via oEmbed
   useEffect(() => {
@@ -525,10 +542,16 @@ export function AudioPlayer({
   }, [isEmbedded, isPlaying, sourceType]);
 
   if (isEmbedded) {
+    const showEnableOverlay =
+      !isEmbedInteractive &&
+      (sourceType === "SOUNDCLOUD" ||
+        sourceType === "YOUTUBE" ||
+        (sourceType === "BANDCAMP" && !!bandcampEmbedUrl));
+
     return (
       <div className="space-y-4">
         {/* Embedded Player */}
-        <div className="rounded-xl overflow-hidden bg-neutral-950 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <div className="relative rounded-xl overflow-hidden bg-neutral-950 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           {sourceType === "SOUNDCLOUD" ? (
             <iframe
               ref={scIframeRef}
@@ -536,7 +559,7 @@ export function AudioPlayer({
               width="100%"
               height={166}
               allow="autoplay; encrypted-media"
-              className="border-0"
+              className={cn("border-0", !isEmbedInteractive && "pointer-events-none")}
             />
           ) : sourceType === "YOUTUBE" ? (
             <iframe
@@ -545,7 +568,7 @@ export function AudioPlayer({
               width="100%"
               height={315}
               allow="autoplay; encrypted-media"
-              className="border-0"
+              className={cn("border-0", !isEmbedInteractive && "pointer-events-none")}
             />
           ) : sourceType === "BANDCAMP" ? (
             bandcampEmbedUrl ? (
@@ -555,7 +578,7 @@ export function AudioPlayer({
                 width="100%"
                 height={120}
                 allow="autoplay; encrypted-media"
-                className="border-0"
+                className={cn("border-0", !isEmbedInteractive && "pointer-events-none")}
                 style={{ border: 0 }}
               />
             ) : (
@@ -565,6 +588,19 @@ export function AudioPlayer({
               </div>
             )
           ) : null}
+
+          {showEnableOverlay && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+              <button
+                type="button"
+                onClick={() => setIsEmbedInteractive(true)}
+                className="inline-flex items-center gap-2 px-4 py-3 bg-lime-500 text-black border-2 border-black font-black text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              >
+                <Play className="h-4 w-4" />
+                Tap to enable player
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Manual tracking toggle for Bandcamp (no JS API available) */}
