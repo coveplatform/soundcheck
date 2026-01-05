@@ -17,11 +17,8 @@ import {
   Clock,
   Users,
   X,
-  Mail,
-  Quote,
   Eye,
   EyeOff,
-  Gift,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
@@ -227,16 +224,14 @@ export default function TikTokLandingPage() {
           <div className="space-y-5">
             {/* Hero */}
             <div className="text-center space-y-2">
-              {/* Free review badge */}
-              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-3 py-1.5 mb-2">
-                <Gift className="h-4 w-4" />
-                <span className="font-black text-xs uppercase tracking-wide">First review FREE</span>
-              </div>
               <h1 className="text-3xl font-black tracking-tight">
-                Get real feedback. Free.
+                Real feedback. <span className="text-lime-500">Real fast.</span>
               </h1>
               <p className="text-neutral-400 text-sm">
-                Genre-matched listeners tell you what's working and what needs fixing. No credit card required.
+                Genre-matched listeners tell you what's working and what needs fixing.
+              </p>
+              <p className="text-xs text-lime-500 font-medium">
+                First review on us — no card required
               </p>
               <div className="flex items-center justify-center gap-3 text-xs text-neutral-500">
                 <span className="flex items-center gap-1">
@@ -328,10 +323,9 @@ export default function TikTokLandingPage() {
                 </span>
               </div>
 
-              <div className="px-2.5 pb-2 pt-1.5 border-t border-neutral-800 flex items-center justify-center gap-3">
-                <p className="text-[10px] text-neutral-500">Get your first review FREE</p>
+              <div className="px-2.5 pb-2 pt-1.5 border-t border-neutral-800 flex items-center justify-center">
                 <span className="text-[10px] font-bold text-lime-500 flex items-center gap-1">
-                  <Clock className="h-3 w-3" /> in under 12 hours
+                  <Clock className="h-3 w-3" /> Results in under 12 hours
                 </span>
               </div>
             </div>
@@ -431,7 +425,7 @@ export default function TikTokLandingPage() {
             <div>
               <h1 className="text-xl font-black mb-1">You're in!</h1>
               <p className="text-neutral-400 text-sm">
-                Your free review is waiting.
+                Ready to get feedback on your track.
               </p>
             </div>
             <div className="border border-neutral-800 p-4 max-w-xs mx-auto text-left">
@@ -443,14 +437,13 @@ export default function TikTokLandingPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-lime-500 font-bold">2.</span>
-                  <span>Get your FREE review in under 12 hours</span>
+                  <span>Get your review in under 12 hours</span>
                 </li>
               </ol>
             </div>
             <Link href="/get-feedback">
               <Button className="bg-lime-500 text-black hover:bg-lime-400 font-bold">
-                <Gift className="h-4 w-4 mr-2" />
-                Get Your Free Review <ArrowRight className="h-4 w-4 ml-2" />
+                Submit Your Track <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>
             <p className="text-xs text-neutral-500">
@@ -467,8 +460,8 @@ export default function TikTokLandingPage() {
             onClick={handleGoogleSignIn}
             className="w-full h-11 bg-lime-500 text-black font-black border-2 border-lime-500"
           >
-            <Gift className="h-4 w-4 mr-2" />
-            Get Your Free Review
+            <GoogleIcon className="h-4 w-4 mr-2" />
+            Continue with Google
           </Button>
         </div>
       )}
@@ -486,9 +479,9 @@ export default function TikTokLandingPage() {
 
             <div className="flex items-center gap-2 mb-3">
               <div className="h-8 w-8 bg-lime-500 flex items-center justify-center">
-                <Gift className="h-4 w-4 text-black" />
+                <Headphones className="h-4 w-4 text-black" />
               </div>
-              <h2 className="text-lg font-black">Don't miss your free review</h2>
+              <h2 className="text-lg font-black">Get real feedback</h2>
             </div>
             <p className="text-neutral-400 text-sm mb-3">
               Create a free account now—upload your track when you're at your computer.
@@ -498,7 +491,7 @@ export default function TikTokLandingPage() {
               onClick={() => { setShowExitIntent(false); handleGoogleSignIn(); }}
               className="w-full h-10 bg-lime-500 hover:bg-lime-400 text-black font-bold"
             >
-              Get My Free Review
+              Continue with Google
             </Button>
 
             <button

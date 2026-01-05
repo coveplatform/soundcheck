@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Target, Clock, ListMusic, Share2, UserPlus, ThumbsUp, Quote, CheckCircle2, Lock, Gift } from "lucide-react";
+import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Target, Clock, ListMusic, Share2, UserPlus, ThumbsUp, Quote, CheckCircle2, Lock } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
@@ -30,11 +30,6 @@ export default function Home() {
         <div className="absolute top-20 right-10 w-32 h-32 bg-lime-200 rounded-full blur-3xl opacity-50" />
         <div className="absolute bottom-10 left-10 w-24 h-24 bg-orange-200 rounded-full blur-2xl opacity-40" />
         <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-28 relative">
-          {/* Free review badge */}
-          <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] mb-6">
-            <Gift className="h-5 w-5" />
-            <span className="font-black text-sm uppercase tracking-wide">First review FREE</span>
-          </div>
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight text-black max-w-4xl leading-[1.1]">
             Real feedback.<br /><span className="text-lime-600">Real fast.</span>
           </h1>
@@ -45,12 +40,12 @@ export default function Home() {
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/get-feedback">
               <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-8 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
-                Get Your Free Review <ArrowRight className="ml-2 h-4 w-4" />
+                Get Feedback <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </div>
           <p className="mt-6 text-sm text-neutral-500 font-mono">
-            No credit card required • Results in under 12 hours
+            First review on us • Results in under 12 hours
           </p>
         </div>
       </section>
@@ -490,30 +485,13 @@ export default function Home() {
       {/* Pricing */}
       <section className="border-b-2 border-black py-16 bg-gradient-to-br from-lime-50 via-white to-orange-50">
         <div className="max-w-4xl mx-auto px-4">
-          {/* Free review callout */}
-          <div className="mb-8 p-6 bg-lime-500 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 bg-white border-2 border-black flex items-center justify-center">
-                  <Gift className="h-6 w-6 text-black" />
-                </div>
-                <div>
-                  <h3 className="font-black text-xl text-black">Your first review is FREE</h3>
-                  <p className="text-black/70 text-sm">No credit card required. See what real feedback looks like.</p>
-                </div>
-              </div>
-              <Link href="/get-feedback">
-                <Button className="bg-black text-white hover:bg-neutral-800 font-bold border-2 border-black whitespace-nowrap">
-                  Get Free Review
-                </Button>
-              </Link>
-            </div>
-          </div>
-
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-black mb-2">Want more reviews? Simple pricing.</h2>
-            <p className="text-neutral-600">
+            <h2 className="text-3xl font-black mb-2">Simple pricing. Real results.</h2>
+            <p className="text-neutral-600 mb-2">
               More reviews = clearer patterns = more confidence.
+            </p>
+            <p className="text-sm text-lime-600 font-medium">
+              First review on us — no card required
             </p>
           </div>
 
@@ -591,26 +569,22 @@ export default function Home() {
       {/* CTA */}
       <section className="bg-black text-white py-20 border-b-2 border-black">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 border-2 border-lime-500 mb-6">
-            <Gift className="h-5 w-5" />
-            <span className="font-black text-sm uppercase tracking-wide">First review FREE</span>
-          </div>
           <h2 className="text-4xl md:text-5xl font-black mb-6">
             Stop wondering.<br />Start knowing.
           </h2>
           <p className="text-neutral-400 mb-10 text-lg">
-            Your next release deserves more than a guess. Get your free review now.
+            Your next release deserves more than a guess. Find out if it&apos;s ready.
           </p>
           <Link href="/get-feedback">
             <Button
               size="lg"
               className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-lime-500"
             >
-              Get Your Free Review
+              Get Feedback
             </Button>
           </Link>
           <p className="mt-4 text-sm text-neutral-500">
-            No credit card required
+            First review on us • No card required
           </p>
         </div>
       </section>

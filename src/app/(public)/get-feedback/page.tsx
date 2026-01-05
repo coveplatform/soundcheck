@@ -829,7 +829,7 @@ export default function GetFeedbackPage() {
               <span>→</span>
               <span className={cn((step === "matching" || step === "details") && "text-lime-500")}>DETAILS</span>
               <span>→</span>
-              <span className={cn(step === "package" && "text-lime-500")}>FREE REVIEW</span>
+              <span className={cn(step === "package" && "text-lime-500")}>CONFIRM</span>
             </div>
           </div>
         </div>
@@ -850,33 +850,33 @@ export default function GetFeedbackPage() {
           <div className="flex flex-col gap-6">
             {/* Hero */}
             <div className="text-center space-y-3 order-[10]">
-              {/* Free review badge */}
-              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 mb-2">
-                <Gift className="h-5 w-5" />
-                <span className="font-black text-sm uppercase tracking-wide">First review FREE</span>
-              </div>
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
-                Get real feedback. Free.
+                Real feedback.<span className="text-lime-500"> Real fast.</span>
               </h1>
               <p className="text-neutral-400 text-lg max-w-lg mx-auto">
-                A genre-matched listener reviews your track and tells you exactly what&apos;s working and what needs fixing.
+                Genre-matched listeners review your track and tell you exactly what&apos;s working and what needs fixing.
               </p>
 
               {/* What you get - visual summary */}
               <div className="grid grid-cols-3 gap-3 max-w-md mx-auto pt-2">
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-xl font-black text-lime-500">FREE</p>
-                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">First Review</p>
+                  <p className="text-xl font-black text-lime-500">5-20</p>
+                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Reviews</p>
                 </div>
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
                   <p className="text-xl font-black text-lime-500">&lt;12h</p>
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Turnaround</p>
                 </div>
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-xl font-black text-lime-500">100%</p>
-                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Human</p>
+                  <p className="text-xl font-black text-lime-500">$4.95</p>
+                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">From (AUD)</p>
                 </div>
               </div>
+
+              {/* Subtle first review free note */}
+              <p className="text-sm text-lime-500 font-medium pt-1">
+                First review on us — no card required
+              </p>
             </div>
 
             {trackStartStage !== "track" && !isLoggedIn && (
@@ -1326,17 +1326,12 @@ export default function GetFeedbackPage() {
             </button>
 
             <div className="text-center space-y-2">
-              {/* Free review reminder */}
-              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-3 py-1.5 mb-2">
-                <Gift className="h-4 w-4" />
-                <span className="font-black text-xs uppercase tracking-wide">Your free review</span>
-              </div>
               <h1 className="text-3xl sm:text-4xl font-black">Almost there</h1>
               <p className="text-sm font-bold text-lime-500">
                 We found {estimatedListenerPool}+ good-fit listeners for your track.
               </p>
               <p className="text-neutral-400">
-                Tell us where to send your free feedback
+                Tell us where to send your feedback
               </p>
             </div>
 
@@ -1537,7 +1532,7 @@ export default function GetFeedbackPage() {
         )}
 
         {/* ============================================ */}
-        {/* STEP 3: CONFIRM FREE REVIEW */}
+        {/* STEP 3: CONFIRM SUBMISSION */}
         {/* ============================================ */}
         {step === "package" && (
           <div className="space-y-8">
@@ -1550,40 +1545,41 @@ export default function GetFeedbackPage() {
             </button>
 
             <div className="text-center space-y-2">
-              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 mb-2">
-                <Gift className="h-5 w-5" />
-                <span className="font-black text-sm uppercase tracking-wide">FREE</span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-black">Get your free review</h1>
+              <h1 className="text-3xl sm:text-4xl font-black">Ready to submit</h1>
               <p className="text-neutral-400">
-                No credit card required. Your first review is on us.
+                Your first review is on us — no payment required.
               </p>
             </div>
 
             {/* Track preview */}
-            <div className="border-2 border-lime-500 bg-lime-500/10 p-6">
+            <div className="border-2 border-neutral-700 bg-neutral-900 p-6">
               <div className="flex items-center gap-4 mb-4">
                 {artworkUrl ? (
-                  <img src={artworkUrl} alt="" className="w-16 h-16 object-cover border-2 border-lime-500" />
+                  <img src={artworkUrl} alt="" className="w-16 h-16 object-cover border-2 border-neutral-600" />
                 ) : (
-                  <div className="w-16 h-16 bg-lime-500 border-2 border-lime-500 flex items-center justify-center">
-                    <Music className="h-8 w-8 text-black" />
+                  <div className="w-16 h-16 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center">
+                    <Music className="h-8 w-8 text-neutral-400" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="font-black text-xl text-white truncate">{title}</p>
-                  <p className="text-sm text-lime-400">Ready for review</p>
+                  <p className="text-sm text-neutral-500">Ready for review</p>
+                </div>
+                <div className="h-10 w-10 bg-lime-500 flex items-center justify-center flex-shrink-0">
+                  <Check className="h-5 w-5 text-black" />
                 </div>
               </div>
-              <div className="flex items-center justify-between pt-4 border-t border-lime-500/30">
-                <span className="text-neutral-400">Your free review</span>
-                <span className="text-2xl font-black text-lime-500">$0.00</span>
+              <div className="flex items-center justify-between pt-4 border-t border-neutral-700">
+                <span className="text-neutral-400">First review</span>
+                <div className="text-right">
+                  <span className="text-lg font-black text-lime-500">On us</span>
+                </div>
               </div>
             </div>
 
             {/* What you get */}
             <div className="border-2 border-neutral-700 bg-neutral-900 p-5">
-              <h3 className="font-bold text-white mb-3">Your free review includes:</h3>
+              <h3 className="font-bold text-white mb-3">Every review includes:</h3>
               <ul className="space-y-2 text-sm text-neutral-400">
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
@@ -1610,8 +1606,7 @@ export default function GetFeedbackPage() {
               isLoading={isSubmitting}
               className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
-              <Gift className="h-5 w-5 mr-2" />
-              Get My Free Review
+              Get My Review
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
 
