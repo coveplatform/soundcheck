@@ -901,33 +901,101 @@ export default function GetFeedbackPage() {
           <div className="space-y-8">
             <div className="text-center space-y-4">
               <div className="inline-flex items-center gap-2 bg-neutral-900 border-2 border-neutral-700 px-4 py-2 text-sm font-black uppercase tracking-wider">
-                <Users className="h-4 w-4 text-lime-500" />
+                <Sparkles className="h-4 w-4 text-lime-500" />
                 Matching Reviewers
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black">One sec…</h1>
-              <p className="text-neutral-400">We&apos;re lining up listeners who actually love your genre.</p>
+              <h1 className="text-3xl sm:text-4xl font-black">Finding your best listeners</h1>
+              <p className="text-neutral-400">This is where the signal gets good.</p>
             </div>
 
-            <div className="border-2 border-neutral-700 bg-neutral-900 p-6">
-              <div className="flex items-center gap-3">
-                {matchingDone ? (
-                  <div className="h-10 w-10 bg-lime-500 flex items-center justify-center flex-shrink-0">
-                    <Check className="h-5 w-5 text-black" />
-                  </div>
-                ) : (
-                  <Loader2 className="h-10 w-10 animate-spin text-lime-500 flex-shrink-0" />
-                )}
+            <div className="relative border-2 border-neutral-700 bg-neutral-900 overflow-hidden">
+              <div className="absolute inset-0 opacity-30 pointer-events-none">
+                <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-lime-500/25 blur-3xl" />
+                <div className="absolute -bottom-24 left-1/3 h-72 w-72 -translate-x-1/2 rounded-full bg-lime-500/10 blur-3xl" />
+              </div>
 
-                <div className="text-left">
-                  <p className="font-black text-white">
-                    {[
-                      "Analyzing your track…",
-                      "Matching genres & vibes…",
-                      "Checking reviewer availability…",
-                      "Reviewers found.",
-                    ][matchingIndex]}
-                  </p>
-                  <p className="text-sm text-neutral-500">This usually takes a few seconds.</p>
+              <div className="relative p-6 space-y-6">
+                <div className="flex items-start gap-4">
+                  {matchingDone ? (
+                    <div className="h-12 w-12 bg-lime-500 flex items-center justify-center flex-shrink-0 shadow-[0_0_0_2px_rgba(132,204,22,1),0_0_40px_rgba(132,204,22,0.25)]">
+                      <Check className="h-6 w-6 text-black" />
+                    </div>
+                  ) : (
+                    <div className="h-12 w-12 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center flex-shrink-0">
+                      <Loader2 className="h-6 w-6 animate-spin text-lime-500" />
+                    </div>
+                  )}
+
+                  <div className="flex-1">
+                    <p className="font-black text-white text-lg">
+                      {[
+                        "Analyzing your track…",
+                        "Matching genres & vibes…",
+                        "Checking reviewer availability…",
+                        "Reviewers found.",
+                      ][matchingIndex]}
+                    </p>
+                    <p className="text-sm text-neutral-500 mt-1">
+                      {matchingDone ? "Locked in. Sending you to the next step…" : "This usually takes a few seconds."}
+                    </p>
+
+                    <div className="mt-4">
+                      <div className="flex items-center justify-between text-xs font-mono text-neutral-500 mb-2">
+                        <span>PROGRESS</span>
+                        <span>{matchingDone ? 100 : Math.round((matchingIndex / 3) * 100)}%</span>
+                      </div>
+                      <div className="h-2 bg-neutral-800 border border-neutral-700">
+                        <div
+                          className="h-full bg-lime-500 transition-all duration-500"
+                          style={{ width: `${matchingDone ? 100 : Math.round((matchingIndex / 3) * 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    "Audio fingerprint",
+                    "Genre fit",
+                    "Listener quality",
+                    "Queue ready",
+                  ].map((label, idx) => {
+                    const isComplete = matchingDone || idx < matchingIndex;
+                    const isActive = !matchingDone && idx === matchingIndex;
+                    return (
+                      <div
+                        key={label}
+                        className={cn(
+                          "flex items-center gap-3 border-2 p-3",
+                          isActive ? "border-lime-500 bg-lime-500/10" : "border-neutral-700 bg-neutral-950/30"
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "h-7 w-7 flex items-center justify-center flex-shrink-0 border-2",
+                            isComplete
+                              ? "bg-lime-500 border-lime-500"
+                              : isActive
+                                ? "border-lime-500 bg-neutral-900"
+                                : "border-neutral-700 bg-neutral-900"
+                          )}
+                        >
+                          {isComplete ? (
+                            <Check className="h-4 w-4 text-black" />
+                          ) : (
+                            <span className={cn("text-xs font-mono", isActive ? "text-lime-500" : "text-neutral-500")}>
+                              {idx + 1}
+                            </span>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className={cn("text-sm font-black truncate", isActive ? "text-white" : "text-neutral-300")}>{label}</p>
+                          <p className="text-xs text-neutral-500">{isComplete ? "Done" : isActive ? "Running" : "Queued"}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
