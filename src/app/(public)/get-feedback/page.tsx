@@ -643,6 +643,43 @@ export default function GetFeedbackPage() {
 
         // Successfully logged in
         router.refresh();
+      } else {
+        // Create account immediately (matches Google behavior)
+        const normalizedEmail = email.trim().toLowerCase();
+
+        const createRes = await fetch("/api/get-feedback/create-account", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: normalizedEmail,
+            password,
+            artistName: artistName.trim(),
+            genreIds: selectedGenres,
+          }),
+        });
+
+        const createData = await createRes.json().catch(() => ({}));
+        if (!createRes.ok) {
+          setError(createData.error || "Couldn't create account");
+          return;
+        }
+
+        const signInRes = await signIn("credentials", {
+          redirect: false,
+          email: normalizedEmail,
+          password,
+        });
+
+        if (signInRes?.error) {
+          setError("Account created, but we couldn't sign you in. Please log in.");
+          return;
+        }
+
+        trackTikTokEvent("CompleteRegistration", {
+          content_name: "artist",
+        });
+
+        router.refresh();
       }
     }
 

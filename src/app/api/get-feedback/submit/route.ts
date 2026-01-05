@@ -53,6 +53,18 @@ export async function POST(request: Request) {
 
     const body = await request.json();
 
+    const markLeadConverted = async (normalizedEmail: string) => {
+      try {
+        const leadCapture = (prisma as any).leadCapture as any;
+        await leadCapture.updateMany({
+          where: { email: normalizedEmail, source: "get-feedback" },
+          data: { converted: true },
+        });
+      } catch {
+        // Best-effort only
+      }
+    };
+
     if (isLoggedIn) {
       // Logged-in user flow
       const data = loggedInSchema.parse(body);
@@ -132,16 +144,8 @@ export async function POST(request: Request) {
       // Best-effort: mark lead as converted (if we have an email)
       const sessionEmail = (session?.user as { email?: string } | undefined)?.email;
       if (sessionEmail) {
-        try {
-          const normalizedEmail = sessionEmail.trim().toLowerCase();
-          const leadCapture = (prisma as any).leadCapture as any;
-          await leadCapture.updateMany({
-            where: { email: normalizedEmail, source: "get-feedback" },
-            data: { converted: true },
-          });
-        } catch {
-          // Best-effort only
-        }
+        const normalizedEmail = sessionEmail.trim().toLowerCase();
+        await markLeadConverted(normalizedEmail);
       }
 
       return NextResponse.json({
@@ -165,29 +169,102 @@ export async function POST(request: Request) {
       const data = newUserSchema.parse(body);
       const normalizedEmail = data.email.trim().toLowerCase();
 
-      // Best-effort: mark lead as converted
-      {
-        try {
-          const leadCapture = (prisma as any).leadCapture as any;
-          await leadCapture.updateMany({
-            where: { email: normalizedEmail, source: "get-feedback" },
-            data: { converted: true },
-          });
-        } catch {
-          // Best-effort only
-        }
-      }
-
       // Check if user already exists
       const existingUser = await prisma.user.findFirst({
         where: { email: { equals: normalizedEmail, mode: "insensitive" } },
       });
 
       if (existingUser) {
-        return NextResponse.json(
-          { error: "An account with this email already exists. Please log in." },
-          { status: 400 }
-        );
+        if (!existingUser.password) {
+          return NextResponse.json(
+            { error: "This email is linked to a Google account. Please continue with Google." },
+            { status: 400 }
+          );
+        }
+
+        const isPasswordValid = await bcrypt.compare(data.password, existingUser.password);
+        if (!isPasswordValid) {
+          return NextResponse.json(
+            { error: "Incorrect password for existing account" },
+            { status: 400 }
+          );
+        }
+
+        // Get or create artist profile
+        let artistProfile = await prisma.artistProfile.findUnique({
+          where: { userId: existingUser.id },
+        });
+
+        if (!artistProfile) {
+          const profileName = data.artistName.trim() || existingUser.name || "Artist";
+          artistProfile = await prisma.artistProfile.create({
+            data: {
+              userId: existingUser.id,
+              artistName: profileName,
+              genres: {
+                connect: data.genreIds.map((id) => ({ id })),
+              },
+            },
+          });
+
+          await prisma.user.update({
+            where: { id: existingUser.id },
+            data: { isArtist: true },
+          });
+        }
+
+        // Determine source type
+        let sourceType: TrackSource = data.sourceType;
+        if (sourceType === "UPLOAD") {
+          const isLocalUpload = data.sourceUrl.startsWith("/uploads/");
+          let isRemoteUpload = false;
+          if (!isLocalUpload) {
+            try {
+              const parsed = new URL(data.sourceUrl);
+              isRemoteUpload = parsed.protocol === "https:" || parsed.protocol === "http:";
+            } catch {
+              isRemoteUpload = false;
+            }
+          }
+          if (!isLocalUpload && !isRemoteUpload) {
+            return NextResponse.json({ error: "Invalid upload URL" }, { status: 400 });
+          }
+        } else {
+          const detected = detectSource(data.sourceUrl);
+          if (detected) {
+            sourceType = detected;
+          }
+        }
+
+        const packageDetails = PACKAGES[data.packageType];
+
+        const track = await prisma.track.create({
+          data: {
+            artistId: artistProfile.id,
+            sourceUrl: data.sourceUrl,
+            sourceType,
+            title: data.title,
+            artworkUrl: data.artworkUrl,
+            duration: data.duration,
+            feedbackFocus: data.feedbackFocus,
+            packageType: data.packageType,
+            reviewsRequested: packageDetails.reviews,
+            genres: {
+              connect: data.genreIds.map((id) => ({ id })),
+            },
+          },
+        });
+
+        await markLeadConverted(normalizedEmail);
+
+        const checkoutUrl = `/artist/submit/checkout?trackId=${track.id}`;
+
+        return NextResponse.json({
+          success: true,
+          trackId: track.id,
+          checkoutUrl,
+          signIn: true,
+        });
       }
 
       // Determine source type
@@ -277,6 +354,8 @@ export async function POST(request: Request) {
 
         return { user, artistProfile, track, verificationToken: token };
       });
+
+      await markLeadConverted(normalizedEmail);
 
       // Send verification email (outside transaction)
       const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
