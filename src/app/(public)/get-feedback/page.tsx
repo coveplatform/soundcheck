@@ -62,7 +62,7 @@ interface Genre {
   slug: string;
 }
 
-type Step = "track" | "details" | "package";
+type Step = "track" | "matching" | "details" | "package";
 
 const STORAGE_KEY = "get-feedback-progress-v2";
 
@@ -128,6 +128,8 @@ export default function GetFeedbackPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [matchingIndex, setMatchingIndex] = useState(0);
+  const [matchingDone, setMatchingDone] = useState(false);
 
   // Load genres on mount
   useEffect(() => {
@@ -173,7 +175,7 @@ export default function GetFeedbackPage() {
         const data: StoredProgress = JSON.parse(stored);
         // Restore step - but only if we have track data to support it
         if (data.step && (data.uploadedUrl || data.trackUrl)) {
-          setStep(data.step);
+          setStep(data.step === "matching" ? "details" : data.step);
         }
         if (data.trackUrl) setTrackUrl(data.trackUrl);
         if (data.inputMode) setInputMode(data.inputMode);
@@ -198,8 +200,9 @@ export default function GetFeedbackPage() {
   // Save progress to localStorage
   const saveProgress = useCallback(() => {
     if (typeof window === "undefined" || !isInitialized) return;
+    const stepToStore: Step = step === "matching" ? "details" : step;
     const data: StoredProgress = {
-      step,
+      step: stepToStore,
       trackUrl,
       inputMode,
       uploadedUrl,
@@ -428,6 +431,7 @@ export default function GetFeedbackPage() {
 
   // Navigation
   const goBack = () => {
+    if (step === "matching") setStep("track");
     if (step === "details") setStep("track");
     if (step === "package") setStep("details");
     setFieldErrors({});
@@ -456,8 +460,44 @@ export default function GetFeedbackPage() {
       content_id: "feedback_flow",
     });
 
-    setStep("details");
+    setMatchingIndex(0);
+    setMatchingDone(false);
+    setStep("matching");
   };
+
+  useEffect(() => {
+    if (step !== "matching") return;
+
+    const messages = 4;
+    const timers: Array<ReturnType<typeof setTimeout>> = [];
+
+    setMatchingIndex(0);
+    setMatchingDone(false);
+
+    for (let i = 1; i < messages; i++) {
+      timers.push(
+        setTimeout(() => {
+          setMatchingIndex(i);
+        }, i * 650)
+      );
+    }
+
+    timers.push(
+      setTimeout(() => {
+        setMatchingDone(true);
+      }, messages * 650)
+    );
+
+    timers.push(
+      setTimeout(() => {
+        setStep("details");
+      }, messages * 650 + 600)
+    );
+
+    return () => {
+      timers.forEach(clearTimeout);
+    };
+  }, [step]);
 
   // Validate and go to package
   const goToPackage = async () => {
@@ -597,7 +637,7 @@ export default function GetFeedbackPage() {
     );
   }
 
-  const progress = step === "track" ? 33 : step === "details" ? 66 : 100;
+  const progress = step === "track" ? 33 : step === "matching" ? 50 : step === "details" ? 66 : 100;
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -619,7 +659,7 @@ export default function GetFeedbackPage() {
             <div className="flex items-center gap-2 text-xs font-mono text-neutral-500">
               <span className={cn(step === "track" && "text-lime-500")}>TRACK</span>
               <span>→</span>
-              <span className={cn(step === "details" && "text-lime-500")}>DETAILS</span>
+              <span className={cn((step === "matching" || step === "details") && "text-lime-500")}>DETAILS</span>
               <span>→</span>
               <span className={cn(step === "package" && "text-lime-500")}>CHECKOUT</span>
             </div>
@@ -852,6 +892,43 @@ export default function GetFeedbackPage() {
               <div className="flex items-center gap-1.5">
                 <Zap className="h-4 w-4" />
                 <span>&lt;12hr turnaround</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === "matching" && (
+          <div className="space-y-8">
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center gap-2 bg-neutral-900 border-2 border-neutral-700 px-4 py-2 text-sm font-black uppercase tracking-wider">
+                <Users className="h-4 w-4 text-lime-500" />
+                Matching Reviewers
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-black">One sec…</h1>
+              <p className="text-neutral-400">We&apos;re lining up listeners who actually love your genre.</p>
+            </div>
+
+            <div className="border-2 border-neutral-700 bg-neutral-900 p-6">
+              <div className="flex items-center gap-3">
+                {matchingDone ? (
+                  <div className="h-10 w-10 bg-lime-500 flex items-center justify-center flex-shrink-0">
+                    <Check className="h-5 w-5 text-black" />
+                  </div>
+                ) : (
+                  <Loader2 className="h-10 w-10 animate-spin text-lime-500 flex-shrink-0" />
+                )}
+
+                <div className="text-left">
+                  <p className="font-black text-white">
+                    {[
+                      "Analyzing your track…",
+                      "Matching genres & vibes…",
+                      "Checking reviewer availability…",
+                      "Reviewers found.",
+                    ][matchingIndex]}
+                  </p>
+                  <p className="text-sm text-neutral-500">This usually takes a few seconds.</p>
+                </div>
               </div>
             </div>
           </div>
