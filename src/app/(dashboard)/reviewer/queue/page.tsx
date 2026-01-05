@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { expireAndReassignExpiredQueueEntries, assignReviewersToRecentTracks } from "@/lib/queue";
+import { expireAndReassignExpiredQueueEntries, assignReviewersToRecentTracks, assignTracksToTestReviewer } from "@/lib/queue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Music, ArrowRight, Clock, Headphones } from "lucide-react";
@@ -47,6 +47,11 @@ export default async function ReviewQueuePage({
   const reviewerProfile = await prisma.reviewerProfile.findUnique({
     where: { userId: session.user.id },
   });
+
+  // For test reviewers, assign all available tracks to them
+  if (reviewerProfile && user?.email) {
+    await assignTracksToTestReviewer(reviewerProfile.id, user.email);
+  }
 
   if (!reviewerProfile) {
     redirect("/reviewer/onboarding");

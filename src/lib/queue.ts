@@ -8,6 +8,20 @@ const MIN_REVIEWER_ACCOUNT_AGE_HOURS = Number(
   process.env.MIN_REVIEWER_ACCOUNT_AGE_HOURS ?? "24"
 );
 
+// Test reviewer emails that bypass genre matching and wait time
+const TEST_REVIEWER_EMAILS = [
+  "davo2@mixreflect.com",
+  "simli@mixreflect.com",
+  "roserncliff@mixreflect.com",
+  "marcust@mixreflect.com",
+  "beatsbyjay@mixreflect.com",
+  "synthqueen@mixreflect.com",
+  "kiram@mixreflect.com",
+  "deepgroove@mixreflect.com",
+  "tomwilson@mixreflect.com",
+  "nightowl99@mixreflect.com",
+];
+
 // Parent genre slugs mapped to their child slugs for hierarchical matching
 const GENRE_HIERARCHY: Record<string, string[]> = {
   electronic: [
@@ -118,7 +132,8 @@ export async function getEligibleReviewers(
       (Number.isFinite(minAccountAgeHours) ? minAccountAgeHours : 24)
   );
 
-  const where: Prisma.ReviewerProfileWhereInput = {
+  // Regular reviewers: must match genre and meet account age requirement
+  const regularWhere: Prisma.ReviewerProfileWhereInput = {
     completedOnboarding: true,
     onboardingQuizPassed: true,
     isRestricted: false,
@@ -128,6 +143,10 @@ export async function getEligibleReviewers(
       },
       emailVerified: {
         not: null,
+      },
+      // Exclude test accounts from this query (they're handled separately)
+      email: {
+        notIn: TEST_REVIEWER_EMAILS,
       },
     },
     genres: {
@@ -147,19 +166,64 @@ export async function getEligibleReviewers(
     },
   };
 
-  // Base query for eligible reviewers
-  const eligibleReviewers = await prisma.reviewerProfile.findMany({
-    where,
-    include: {
-      genres: true,
-      user: { select: { id: true, email: true } },
+  // Test reviewers: NO genre restriction, NO account age requirement
+  const testWhere: Prisma.ReviewerProfileWhereInput = {
+    completedOnboarding: true,
+    onboardingQuizPassed: true,
+    isRestricted: false,
+    user: {
+      emailVerified: {
+        not: null,
+      },
+      email: {
+        in: TEST_REVIEWER_EMAILS,
+      },
     },
-    orderBy: [
-      // Prioritize by tier
-      { tier: "desc" },
-      // Then by rating
-      { averageRating: "desc" },
-    ],
+    // Still exclude if they've already reviewed this track
+    reviews: {
+      none: {
+        trackId: track.id,
+      },
+    },
+    queueEntries: {
+      none: {
+        trackId: track.id,
+      },
+    },
+  };
+
+  // Fetch both regular and test reviewers
+  const [regularReviewers, testReviewers] = await Promise.all([
+    prisma.reviewerProfile.findMany({
+      where: regularWhere,
+      include: {
+        genres: true,
+        user: { select: { id: true, email: true } },
+      },
+      orderBy: [
+        { tier: "desc" },
+        { averageRating: "desc" },
+      ],
+    }),
+    prisma.reviewerProfile.findMany({
+      where: testWhere,
+      include: {
+        genres: true,
+        user: { select: { id: true, email: true } },
+      },
+      orderBy: [
+        { tier: "desc" },
+        { averageRating: "desc" },
+      ],
+    }),
+  ]);
+
+  // Combine and deduplicate (test reviewers first for priority)
+  const seenIds = new Set<string>();
+  const eligibleReviewers = [...testReviewers, ...regularReviewers].filter((r) => {
+    if (seenIds.has(r.id)) return false;
+    seenIds.add(r.id);
+    return true;
   });
 
   const sortedByQuality = eligibleReviewers.sort((a, b) => {
@@ -382,6 +446,72 @@ export async function expireAndReassignExpiredQueueEntries(): Promise<{
     expiredCount: expired.length,
     affectedTrackCount: affectedTrackIds.length,
   };
+}
+
+// Assign all available tracks to a test reviewer (bypasses genre matching)
+export async function assignTracksToTestReviewer(reviewerId: string, email: string) {
+  // Only run for test accounts
+  if (!TEST_REVIEWER_EMAILS.includes(email.toLowerCase())) {
+    return;
+  }
+
+  // Get all queued/in-progress tracks that this reviewer hasn't been assigned to
+  const availableTracks = await prisma.track.findMany({
+    where: {
+      status: { in: ["QUEUED", "IN_PROGRESS"] },
+      reviews: {
+        none: {
+          reviewerId,
+        },
+      },
+      queueEntries: {
+        none: {
+          reviewerId,
+        },
+      },
+    },
+    select: { id: true, reviewsRequested: true },
+    orderBy: { createdAt: "desc" },
+    take: 20, // Limit to 20 tracks at a time
+  });
+
+  if (availableTracks.length === 0) return;
+
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 48);
+
+  // Assign test reviewer to each available track
+  for (const track of availableTracks) {
+    try {
+      await prisma.$transaction(async (tx) => {
+        // Check if already assigned (race condition protection)
+        const existing = await tx.review.findFirst({
+          where: { trackId: track.id, reviewerId },
+        });
+        if (existing) return;
+
+        // Create queue entry and review
+        await tx.reviewQueue.create({
+          data: {
+            trackId: track.id,
+            reviewerId,
+            expiresAt,
+            priority: 10, // High priority for test reviewers
+          },
+        });
+
+        await tx.review.create({
+          data: {
+            trackId: track.id,
+            reviewerId,
+            status: "ASSIGNED",
+          },
+        });
+      });
+    } catch {
+      // Skip if duplicate or other error
+    }
+  }
 }
 
 // Get queue for a reviewer
