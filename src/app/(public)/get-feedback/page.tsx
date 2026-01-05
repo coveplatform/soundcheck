@@ -723,9 +723,9 @@ export default function GetFeedbackPage() {
         {/* STEP 1: TRACK */}
         {/* ============================================ */}
         {step === "track" && (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Hero */}
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-3">
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
                 Real feedback. Real fast.
               </h1>
@@ -749,35 +749,67 @@ export default function GetFeedbackPage() {
                 </div>
               </div>
 
-              {/* Example review preview - shows what you get */}
-              <div className="max-w-md mx-auto bg-neutral-900 border-2 border-neutral-700 text-left overflow-hidden">
-                <div className="bg-neutral-800 px-4 py-2 border-b border-neutral-700 flex items-center justify-between">
-                  <span className="text-xs font-bold text-neutral-400 uppercase tracking-wide">Example Review</span>
-                  <span className="text-[10px] text-neutral-500">Electronic/House listener</span>
+              {/* Example review preview - matches actual review display */}
+              <div className="max-w-lg mx-auto bg-white text-left overflow-hidden border-2 border-neutral-200 shadow-lg">
+                {/* Label */}
+                <div className="bg-lime-500 px-4 py-1.5">
+                  <span className="text-xs font-black text-black uppercase tracking-wide">Example Review</span>
                 </div>
-                <div className="p-4 space-y-3">
-                  {/* Ratings row */}
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-                    <span className="text-neutral-400">Production <span className="text-lime-500 font-bold">●●●●</span><span className="text-neutral-600">●</span></span>
-                    <span className="text-neutral-400">Originality <span className="text-lime-500 font-bold">●●●●●</span></span>
-                  </div>
-                  {/* Key feedback */}
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                      <ThumbsUp className="h-3.5 w-3.5 text-lime-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm text-neutral-300">&ldquo;The synth lead at <span className="text-lime-500 font-mono text-xs">1:45</span> is incredible—really distinctive sound.&rdquo;</p>
+
+                <div className="p-5">
+                  {/* Reviewer header */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black flex items-center justify-center text-sm font-black text-black">
+                      J
                     </div>
-                    <div className="flex items-start gap-2">
-                      <Clock className="h-3.5 w-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm text-neutral-300">&ldquo;Consider tightening the intro—first 20 sec could hook harder.&rdquo;</p>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-sm text-black">Jordan</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-lime-100 text-lime-700">Strong Hook</span>
+                      </div>
+                      <span className="text-xs text-neutral-500">Electronic / House listener</span>
                     </div>
                   </div>
-                  {/* Would listen again */}
-                  <div className="flex items-center gap-2 pt-1 text-xs text-neutral-500">
-                    <Check className="h-3.5 w-3.5 text-lime-500" />
-                    <span>Would listen again</span>
-                    <span className="text-neutral-600">•</span>
-                    <span>Similar to: Flume, ODESZA</span>
+
+                  {/* Scores - inline like real reviews */}
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-neutral-600 mb-4">
+                    <span>Production <strong className="text-black">4/5</strong></span>
+                    <span>Originality <strong className="text-black">5/5</strong></span>
+                    <span className="flex items-center gap-1">
+                      <ThumbsUp className="h-3.5 w-3.5 text-lime-600" />
+                      <strong className="text-lime-600">Would listen again</strong>
+                    </span>
+                  </div>
+
+                  {/* Listener signals */}
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 bg-lime-50 border-lime-500 text-lime-700">
+                      <Check className="h-3 w-3" /> Would playlist
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 bg-lime-50 border-lime-500 text-lime-700">
+                      <Check className="h-3 w-3" /> Would share
+                    </span>
+                  </div>
+
+                  {/* What Worked - with left border like real reviews */}
+                  <div className="mb-4">
+                    <h4 className="text-xs font-bold text-lime-700 uppercase tracking-wide mb-1.5">What Worked</h4>
+                    <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-lime-500">
+                      The synth lead that comes in at 1:45 is incredible—really distinctive sound design that sets this apart. The drop hits exactly when expected and delivers. Great energy throughout the second half.
+                    </p>
+                  </div>
+
+                  {/* To Improve - with left border like real reviews */}
+                  <div className="mb-4">
+                    <h4 className="text-xs font-bold text-red-600 uppercase tracking-wide mb-1.5">To Improve</h4>
+                    <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-red-400">
+                      The intro (0:00-0:22) feels slow compared to the energy of the drop. Consider cutting it down or adding an element earlier to hook listeners faster—you might lose people before the good stuff hits.
+                    </p>
+                  </div>
+
+                  {/* Similar artists */}
+                  <div className="text-xs text-neutral-500">
+                    Similar to <strong className="text-neutral-700">Flume, ODESZA</strong>
                   </div>
                 </div>
               </div>
@@ -859,35 +891,35 @@ export default function GetFeedbackPage() {
                     }
                   }}
                   className={cn(
-                    "border-2 border-dashed p-12 text-center cursor-pointer transition-all",
+                    "border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-all",
                     isDragging && "border-lime-500 bg-lime-500/10",
                     !isDragging && !uploadedFileName && "border-neutral-700 hover:border-lime-500 hover:bg-neutral-900",
                     uploadedFileName && !isUploading && "border-lime-500 bg-lime-500/10"
                   )}
                 >
                   {isUploading ? (
-                    <div className="flex flex-col items-center gap-4">
-                      <Loader2 className="h-16 w-16 animate-spin text-lime-500" />
-                      <p className="font-bold text-lg">Uploading...</p>
+                    <div className="flex flex-col items-center gap-3">
+                      <Loader2 className="h-10 w-10 animate-spin text-lime-500" />
+                      <p className="font-bold">Uploading...</p>
                     </div>
                   ) : uploadedFileName ? (
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="h-16 w-16 bg-lime-500 flex items-center justify-center">
-                        <Check className="h-8 w-8 text-black" />
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-10 w-10 bg-lime-500 flex items-center justify-center">
+                        <Check className="h-5 w-5 text-black" />
                       </div>
                       <div>
-                        <p className="font-black text-xl text-lime-500">{uploadedFileName}</p>
-                        <p className="text-sm text-neutral-500 mt-1">Click to change</p>
+                        <p className="font-black text-lg text-lime-500">{uploadedFileName}</p>
+                        <p className="text-xs text-neutral-500 mt-1">Click to change</p>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="h-16 w-16 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center">
-                        <Upload className="h-8 w-8 text-neutral-400" />
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-10 w-10 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center">
+                        <Upload className="h-5 w-5 text-neutral-400" />
                       </div>
                       <div>
-                        <p className="font-black text-xl">Drop your MP3 here</p>
-                        <p className="text-sm text-neutral-500 mt-1">or click to browse</p>
+                        <p className="font-black text-lg">Drop your MP3 here</p>
+                        <p className="text-xs text-neutral-500 mt-1">or click to browse</p>
                       </div>
                     </div>
                   )}
@@ -980,40 +1012,40 @@ export default function GetFeedbackPage() {
             </Button>
 
             {/* Email capture for users not ready */}
-            <div className="pt-4 border-t border-neutral-800">
+            <div className="bg-neutral-900/80 border-2 border-neutral-700 p-4">
               {reminderSubmitted ? (
-                <div className="flex items-center justify-center gap-2 text-lime-500 py-2">
+                <div className="flex items-center justify-center gap-2 text-lime-500">
                   <Check className="h-4 w-4" />
                   <span className="text-sm font-medium">We&apos;ll remind you when you&apos;re ready!</span>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-center text-sm text-neutral-500">
-                    On your phone? Get a reminder to finish later.
-                  </p>
+                  <div className="flex items-center justify-center gap-2">
+                    <Mail className="h-4 w-4 text-neutral-300" />
+                    <p className="text-sm text-neutral-300">
+                      On your phone? We&apos;ll remind you later.
+                    </p>
+                  </div>
                   <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
-                      <Input
-                        type="email"
-                        placeholder="your@email.com"
-                        value={reminderEmail}
-                        onChange={(e) => {
-                          setReminderEmail(e.target.value);
-                          setReminderError("");
-                        }}
-                        className="pl-10 h-11 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500"
-                      />
-                    </div>
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={reminderEmail}
+                      onChange={(e) => {
+                        setReminderEmail(e.target.value);
+                        setReminderError("");
+                      }}
+                      className="h-10 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500"
+                    />
                     <Button
                       onClick={handleReminderSubmit}
                       disabled={!reminderEmail.trim() || isSubmittingReminder}
-                      className="h-11 px-4 bg-neutral-800 border-2 border-neutral-700 text-white hover:bg-neutral-700 hover:border-neutral-600 disabled:opacity-50"
+                      className="h-10 px-4 bg-lime-500 text-black font-bold hover:bg-lime-400 disabled:opacity-50 disabled:bg-neutral-700 disabled:text-neutral-500"
                     >
                       {isSubmittingReminder ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <ArrowRight className="h-4 w-4" />
+                        "Remind me"
                       )}
                     </Button>
                   </div>
