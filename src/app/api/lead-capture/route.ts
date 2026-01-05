@@ -6,7 +6,9 @@ import { sendFinishLaterEmail } from "@/lib/email";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
-  source: z.string().max(50).default("get-feedback"),
+  artistName: z.string().max(100).optional(),
+  source: z.string().max(200).default("get-feedback"),
+  sendEmail: z.boolean().optional().default(false),
 });
 
 export async function POST(request: Request) {
@@ -25,6 +27,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const data = schema.parse(body);
     const normalizedEmail = data.email.trim().toLowerCase();
+    const normalizedArtistName = data.artistName?.trim();
+    const artistName = normalizedArtistName ? normalizedArtistName : undefined;
 
     const leadCapture = (prisma as any).leadCapture as any;
 
@@ -32,11 +36,6 @@ export async function POST(request: Request) {
     const existing = await leadCapture.findFirst({
       where: { email: normalizedEmail, source: data.source },
     });
-
-    if (existing) {
-      // Already captured - just return success
-      return NextResponse.json({ success: true, message: "already_captured" });
-    }
 
     // Check if they already have an account
     const existingUser = await prisma.user.findFirst({
@@ -47,26 +46,67 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: "has_account" });
     }
 
+    if (existing) {
+      if (artistName && !existing.artistName) {
+        await leadCapture.update({
+          where: { id: existing.id },
+          data: { artistName },
+        });
+      }
+
+      if (data.sendEmail && !existing.reminded) {
+        const baseUrl =
+          process.env.NEXTAUTH_URL ??
+          process.env.NEXT_PUBLIC_SITE_URL ??
+          new URL(request.url).origin;
+
+        try {
+          await sendFinishLaterEmail({
+            to: normalizedEmail,
+            resumeUrl: `${baseUrl}/get-feedback`,
+          });
+        } catch (emailError) {
+          console.error("Lead capture finish-later email error:", emailError);
+        }
+
+        await leadCapture.update({
+          where: { id: existing.id },
+          data: { reminded: true, ...(artistName ? { artistName } : {}) },
+        });
+
+        return NextResponse.json({ success: true, message: "reminded" });
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: existing.reminded ? "already_reminded" : "already_captured",
+      });
+    }
+
     // Create lead capture
     await leadCapture.create({
       data: {
         email: normalizedEmail,
+        artistName,
         source: data.source,
+        reminded: data.sendEmail,
       },
     });
 
-    const baseUrl =
-      process.env.NEXTAUTH_URL ??
-      process.env.NEXT_PUBLIC_SITE_URL ??
-      new URL(request.url).origin;
+    if (data.sendEmail) {
+      const baseUrl =
+        process.env.NEXTAUTH_URL ??
+        process.env.NEXT_PUBLIC_SITE_URL ??
+        new URL(request.url).origin;
 
-    try {
-      await sendFinishLaterEmail({
-        to: normalizedEmail,
-        resumeUrl: `${baseUrl}/get-feedback`,
-      });
-    } catch (emailError) {
-      console.error("Lead capture finish-later email error:", emailError);
+      try {
+        await sendFinishLaterEmail({
+          to: normalizedEmail,
+          resumeUrl: `${baseUrl}/get-feedback`,
+        });
+      } catch (emailError) {
+        console.error("Lead capture finish-later email error:", emailError);
+      }
     }
 
     return NextResponse.json({ success: true });

@@ -497,6 +497,7 @@ model StripeWebhookEvent {
 model LeadCapture {
   id        String   @id @default(cuid())
   email     String
+  artistName String?
   source    String   @default("get-feedback") // where they signed up
   reminded  Boolean  @default(false)
   converted Boolean  @default(false) // did they come back and submit?

@@ -10,6 +10,11 @@ import {
   Loader2,
   Upload,
   Music,
+  Headphones,
+  ListMusic,
+  Share2,
+  UserPlus,
+  Star,
   ArrowRight,
   ArrowLeft,
   Link2,
@@ -18,9 +23,6 @@ import {
   Users,
   Eye,
   EyeOff,
-  Mail,
-  ThumbsUp,
-  Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -90,6 +92,10 @@ export default function GetFeedbackPage() {
   const { data: session, status: sessionStatus } = useSession();
   const isLoggedIn = !!session?.user;
   const hasArtistProfile = !!(session?.user as { artistProfileId?: string })?.artistProfileId;
+  const prevLoggedInRef = useRef(isLoggedIn);
+  const hasTrackedViewContentRef = useRef(false);
+  const hasTrackedEarlyCheckoutRef = useRef(false);
+  const lastTrackedLinkRef = useRef<string>("");
 
   // Step state
   const [step, setStep] = useState<Step>("track");
@@ -135,12 +141,7 @@ export default function GetFeedbackPage() {
   const [matchingIndex, setMatchingIndex] = useState(0);
   const [matchingDone, setMatchingDone] = useState(false);
 
-  // Email reminder capture state
-  const [reminderEmail, setReminderEmail] = useState("");
-  const [isSubmittingReminder, setIsSubmittingReminder] = useState(false);
-  const [reminderSubmitted, setReminderSubmitted] = useState(false);
-  const [reminderError, setReminderError] = useState("");
-  const [reminderLinkCopied, setReminderLinkCopied] = useState(false);
+  const [trackStartStage, setTrackStartStage] = useState<"start" | "connect" | "track">("start");
 
   // Load genres on mount
   useEffect(() => {
@@ -156,6 +157,15 @@ export default function GetFeedbackPage() {
       }
     }
     fetchGenres();
+  }, []);
+
+  useEffect(() => {
+    if (hasTrackedViewContentRef.current) return;
+    hasTrackedViewContentRef.current = true;
+    trackTikTokEvent("ViewContent", {
+      content_type: "product",
+      content_id: "get_feedback",
+    });
   }, []);
 
   // Load artist profile data if logged in
@@ -180,6 +190,15 @@ export default function GetFeedbackPage() {
   // Load progress from localStorage
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("reset") === "1") {
+      localStorage.removeItem(STORAGE_KEY);
+      setTrackStartStage("start");
+      setIsInitialized(true);
+      return;
+    }
+
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -201,12 +220,45 @@ export default function GetFeedbackPage() {
         if (data.feedbackFocus) setFeedbackFocus(data.feedbackFocus);
         if (data.packageType) setSelectedPackage(data.packageType);
         if (data.sourceType) setSourceType(data.sourceType);
+
+        if (data.uploadedUrl || data.trackUrl || data.uploadedFileName) {
+          setTrackStartStage("track");
+        } else if (data.artistName) {
+          setTrackStartStage("connect");
+        }
       }
     } catch {
       // Ignore parse errors
     }
     setIsInitialized(true);
   }, [isLoggedIn, hasArtistProfile]);
+
+  useEffect(() => {
+    if (sessionStatus === "loading") return;
+    const wasLoggedIn = prevLoggedInRef.current;
+    prevLoggedInRef.current = isLoggedIn;
+
+    // Only auto-advance after a NEW login event (e.g. user taps "Continue with Google").
+    // If the user is already logged in when the page loads, keep the progressive UI visible.
+    if (!wasLoggedIn && isLoggedIn) {
+      setTrackStartStage("track");
+    }
+  }, [isLoggedIn, sessionStatus]);
+
+  useEffect(() => {
+    if (trackStartStage !== "track") return;
+    if (inputMode !== "url") return;
+    const trimmed = trackUrl.trim();
+    if (!trimmed) return;
+    if (isLoadingMetadata || urlError || urlWarning) return;
+    if (lastTrackedLinkRef.current === trimmed) return;
+    lastTrackedLinkRef.current = trimmed;
+
+    trackTikTokEvent("AddToCart", {
+      content_type: "product",
+      content_id: "track_link",
+    });
+  }, [trackStartStage, inputMode, trackUrl, isLoadingMetadata, urlError, urlWarning]);
 
   // Save progress to localStorage
   const saveProgress = useCallback(() => {
@@ -285,17 +337,15 @@ export default function GetFeedbackPage() {
       if (metadata) {
         if (typeof metadata.title === "string" && metadata.title.trim()) {
           setTitle(metadata.title);
-          setUrlWarning(""); // Clear warning if metadata was fetched successfully
+          setUrlWarning("");
         }
         if (metadata.artworkUrl) {
           setArtworkUrl(metadata.artworkUrl);
         }
       } else {
-        // Metadata fetch returned null - link might be private or invalid
         setUrlWarning("We couldn't verify this link. Make sure it's public and accessible.");
       }
     } catch {
-      // Metadata fetch failed - link might be private, deleted, or invalid
       setUrlWarning("We couldn't verify this link. Make sure it's public and accessible.");
     } finally {
       setIsLoadingMetadata(false);
@@ -564,59 +614,6 @@ export default function GetFeedbackPage() {
     setStep("package");
   };
 
-  // Handle reminder email submission
-  const handleReminderSubmit = async () => {
-    if (!reminderEmail.trim()) return;
-
-    setReminderError("");
-    setIsSubmittingReminder(true);
-
-    try {
-      const response = await fetch("/api/lead-capture", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: reminderEmail.trim().toLowerCase(),
-          source: "get-feedback"
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setReminderError(data.error || "Something went wrong");
-        return;
-      }
-
-      setReminderSubmitted(true);
-    } catch {
-      setReminderError("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmittingReminder(false);
-    }
-  };
-
-  const handleCopyFinishLaterLink = async () => {
-    try {
-      const url = `${window.location.origin}/get-feedback`;
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(url);
-      } else {
-        const input = document.createElement("input");
-        input.value = url;
-        document.body.appendChild(input);
-        input.select();
-        document.execCommand("copy");
-        input.remove();
-      }
-
-      setReminderLinkCopied(true);
-      window.setTimeout(() => setReminderLinkCopied(false), 2000);
-    } catch {
-      setReminderError("Couldn't copy link. Please try again.");
-    }
-  };
-
   // Handle final submission
   const handleSubmit = async () => {
     setError("");
@@ -768,262 +765,404 @@ export default function GetFeedbackPage() {
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">From (AUD)</p>
                 </div>
               </div>
+            </div>
 
-              {/* Example review preview - matches actual review display */}
-              <div className="max-w-lg mx-auto bg-white text-left overflow-hidden border-2 border-neutral-200 shadow-lg">
-                {/* Label */}
-                <div className="bg-lime-500 px-4 py-1.5">
-                  <span className="text-xs font-black text-black uppercase tracking-wide">Example Review</span>
-                </div>
+            {trackStartStage !== "track" && (
+              <div id="get-feedback-start" className="border-2 border-neutral-700 bg-neutral-900 p-5 order-[15]">
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <p className="text-xs font-black uppercase tracking-wide text-neutral-400">Get feedback</p>
+                    <h2 className="text-xl font-black text-white">
+                      {trackStartStage === "start"
+                        ? "What should we call you?"
+                        : "Where should we send your feedback?"}
+                    </h2>
+                  </div>
 
-                <div className="p-5">
-                  {/* Reviewer header */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black flex items-center justify-center text-sm font-black text-black">
-                      J
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-black">Jordan</span>
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-lime-100 text-lime-700">Strong Hook</span>
+                  {trackStartStage === "start" ? (
+                    <>
+                      <div className="space-y-2">
+                        <Input
+                          placeholder="Artist name"
+                          value={artistName}
+                          onChange={(e) => {
+                            setArtistName(e.target.value);
+                            setFieldErrors((prev) => ({ ...prev, artistName: "" }));
+                          }}
+                          className={cn(
+                            "h-12 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                            fieldErrors.artistName && "border-red-500"
+                          )}
+                        />
+                        {fieldErrors.artistName && (
+                          <p className="text-sm text-red-500 font-medium">{fieldErrors.artistName}</p>
+                        )}
                       </div>
-                      <span className="text-xs text-neutral-500">Electronic / House listener</span>
+
+                      <Button
+                        onClick={() => {
+                          if (!artistName.trim()) {
+                            setFieldErrors((prev) => ({ ...prev, artistName: "Required" }));
+                            return;
+                          }
+
+                          if (!hasTrackedEarlyCheckoutRef.current) {
+                            hasTrackedEarlyCheckoutRef.current = true;
+                            trackTikTokEvent("InitiateCheckout", {
+                              content_type: "product",
+                              content_id: "get_feedback_start",
+                              value: PACKAGES.STARTER.price / 100,
+                              currency: "AUD",
+                            });
+                          }
+
+                          setTrackStartStage("connect");
+                        }}
+                        className="w-full h-12 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
+                      >
+                        Get feedback
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+
+                      <div className="flex items-center justify-center gap-2 text-xs text-neutral-400">
+                        <div className="flex items-center gap-0.5">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star key={i} className="h-3.5 w-3.5 text-lime-500 fill-lime-500" />
+                          ))}
+                        </div>
+                        <span className="font-bold">Verified reviews</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-4">
+                      <Button
+                        type="button"
+                        onClick={() => signIn("google", { callbackUrl: "/get-feedback" })}
+                        className="w-full h-12 text-base font-black bg-white text-black border-2 border-white hover:bg-neutral-100"
+                      >
+                        <GoogleIcon className="h-5 w-5 mr-2" />
+                        Continue with Google
+                      </Button>
+
+                      <div className="flex items-center gap-3">
+                        <div className="h-px flex-1 bg-neutral-800" />
+                        <span className="text-xs text-neutral-500">or</span>
+                        <div className="h-px flex-1 bg-neutral-800" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Input
+                          type="email"
+                          placeholder="you@example.com"
+                          value={email}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                            setFieldErrors((prev) => ({ ...prev, email: "" }));
+                          }}
+                          className={cn(
+                            "h-12 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                            fieldErrors.email && "border-red-500"
+                          )}
+                        />
+                        {fieldErrors.email && (
+                          <p className="text-sm text-red-500 font-medium">{fieldErrors.email}</p>
+                        )}
+                      </div>
+
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          const nextEmail = email.trim().toLowerCase();
+                          if (!nextEmail) {
+                            setFieldErrors((prev) => ({ ...prev, email: "Required" }));
+                            return;
+                          }
+                          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) {
+                            setFieldErrors((prev) => ({ ...prev, email: "Invalid email" }));
+                            return;
+                          }
+                          setEmail(nextEmail);
+                          setTrackStartStage("track");
+                        }}
+                        className="w-full h-12 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
+                      >
+                        Continue
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
                     </div>
-                  </div>
-
-                  {/* Scores - inline like real reviews */}
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-neutral-600 mb-4">
-                    <span>Production <strong className="text-black">4/5</strong></span>
-                    <span>Originality <strong className="text-black">5/5</strong></span>
-                    <span className="flex items-center gap-1">
-                      <ThumbsUp className="h-3.5 w-3.5 text-lime-600" />
-                      <strong className="text-lime-600">Would listen again</strong>
-                    </span>
-                  </div>
-
-                  {/* Listener signals */}
-                  <div className="flex flex-wrap items-center gap-2 mb-4">
-                    <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 bg-lime-50 border-lime-500 text-lime-700">
-                      <Check className="h-3 w-3" /> Would playlist
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 bg-lime-50 border-lime-500 text-lime-700">
-                      <Check className="h-3 w-3" /> Would share
-                    </span>
-                  </div>
-
-                  {/* What Worked - with left border like real reviews */}
-                  <div className="mb-4">
-                    <h4 className="text-xs font-bold text-lime-700 uppercase tracking-wide mb-1.5">What Worked</h4>
-                    <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-lime-500">
-                      The synth lead that comes in at 1:45 is incredible—really distinctive sound design that sets this apart. The drop hits exactly when expected and delivers. Great energy throughout the second half.
-                    </p>
-                  </div>
-
-                  {/* To Improve - with left border like real reviews */}
-                  <div className="mb-4">
-                    <h4 className="text-xs font-bold text-red-600 uppercase tracking-wide mb-1.5">To Improve</h4>
-                    <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-red-400">
-                      The intro (0:00-0:22) feels slow compared to the energy of the drop. Consider cutting it down or adding an element earlier to hook listeners faster—you might lose people before the good stuff hits.
-                    </p>
-                  </div>
-
-                  {/* Similar artists */}
-                  <div className="text-xs text-neutral-500">
-                    Similar to <strong className="text-neutral-700">Flume, ODESZA</strong>
-                  </div>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Email capture for users not ready */}
-            <div className="bg-neutral-900/80 border-2 border-neutral-700 p-4 order-[20] sm:order-[60]">
-              {reminderSubmitted ? (
-                <div className="flex items-center justify-center gap-2 text-lime-500">
-                  <Check className="h-4 w-4" />
-                  <span className="text-sm font-medium">We&apos;ll remind you when you&apos;re ready!</span>
+            {trackStartStage !== "track" && (
+              <div className="order-[20]">
+                <div className="flex items-center justify-between max-w-lg mx-auto mb-2">
+                  <span className="text-xs font-black uppercase tracking-wide text-neutral-400">Example review</span>
+                  <span className="text-xs text-neutral-600">This is what you get</span>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-center gap-2">
-                    <Mail className="h-4 w-4 text-neutral-300" />
-                    <p className="text-sm text-neutral-300">No link/MP3 on your phone? Send yourself this page.</p>
+
+                <div className="max-w-lg mx-auto border-2 border-neutral-700 bg-neutral-900 shadow-[0_0_0_2px_rgba(0,0,0,1)]">
+                <div className="p-4 border-b-2 border-neutral-700 bg-black flex items-center gap-4">
+                  <div className="h-14 w-14 bg-lime-500 border-2 border-black flex items-center justify-center shrink-0">
+                    <Music className="h-6 w-6 text-black" />
                   </div>
-                  <div className="flex gap-2">
-                    <Input
-                      type="email"
-                      placeholder="your@email.com"
-                      value={reminderEmail}
-                      onChange={(e) => {
-                        setReminderEmail(e.target.value);
-                        setReminderError("");
-                      }}
-                      className="h-10 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500"
-                    />
-                    <Button
-                      onClick={handleReminderSubmit}
-                      disabled={!reminderEmail.trim() || isSubmittingReminder}
-                      className="h-10 px-4 bg-lime-500 text-black font-bold hover:bg-lime-400 disabled:opacity-50 disabled:bg-neutral-700 disabled:text-neutral-500"
-                    >
-                      {isSubmittingReminder ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        "Send"
-                      )}
-                    </Button>
+                  <div className="min-w-0">
+                    <p className="font-bold text-white truncate">Midnight Frequency</p>
+                    <p className="text-neutral-400 text-sm truncate">Electronic • 3:42</p>
                   </div>
-                  <div className="flex items-center justify-center">
-                    <button
-                      type="button"
-                      onClick={handleCopyFinishLaterLink}
-                      className="text-sm font-bold text-neutral-300 underline hover:text-white"
-                    >
-                      {reminderLinkCopied ? "Link copied" : "Copy link instead"}
-                    </button>
-                  </div>
-                  {reminderError && (
-                    <p className="text-center text-sm text-red-500">{reminderError}</p>
-                  )}
                 </div>
-              )}
-            </div>
 
-            {/* Input mode toggle */}
-            <div className="flex gap-2 bg-neutral-900 p-1 rounded-none border-2 border-neutral-700 order-[30] sm:order-[20]">
-              <button
-                type="button"
-                onClick={() => {
-                  setInputMode("upload");
-                  setTrackUrl("");
-                  setUrlError("");
-                }}
-                className={cn(
-                  "flex-1 px-4 py-3 text-sm font-black transition-all flex items-center justify-center gap-2",
-                  inputMode === "upload"
-                    ? "bg-lime-500 text-black"
-                    : "text-neutral-400 hover:text-white"
-                )}
-              >
-                <Upload className="h-4 w-4" />
-                Upload File
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setInputMode("url");
-                  setUploadedUrl("");
-                  setUploadedFileName("");
-                }}
-                className={cn(
-                  "flex-1 px-4 py-3 text-sm font-black transition-all flex items-center justify-center gap-2",
-                  inputMode === "url"
-                    ? "bg-lime-500 text-black"
-                    : "text-neutral-400 hover:text-white"
-                )}
-              >
-                <Link2 className="h-4 w-4" />
-                Paste Link
-              </button>
-            </div>
-
-            {/* Upload area */}
-            <div className="order-[40] sm:order-[30]">
-              {inputMode === "upload" ? (
-                <div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="audio/mpeg,audio/mp3,.mp3"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void handleUpload(file);
-                  }}
-                  className="hidden"
-                />
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setIsDragging(true);
-                  }}
-                  onDragLeave={() => setIsDragging(false)}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    setIsDragging(false);
-                    const file = e.dataTransfer.files?.[0];
-                    if (file && (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))) {
-                      void handleUpload(file);
-                    } else {
-                      setError("Please upload an MP3 file");
-                    }
-                  }}
-                  className={cn(
-                    "border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-all",
-                    isDragging && "border-lime-500 bg-lime-500/10",
-                    !isDragging && !uploadedFileName && "border-neutral-700 hover:border-lime-500 hover:bg-neutral-900",
-                    uploadedFileName && !isUploading && "border-lime-500 bg-lime-500/10"
-                  )}
-                >
-                  {isUploading ? (
-                    <div className="flex flex-col items-center gap-3">
-                      <Loader2 className="h-10 w-10 animate-spin text-lime-500" />
-                      <p className="font-bold">Uploading...</p>
+                <div className="p-4 border-b-2 border-neutral-700 bg-neutral-950/30 flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center font-bold text-black">
+                      S
                     </div>
-                  ) : uploadedFileName ? (
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="h-10 w-10 bg-lime-500 flex items-center justify-center">
-                        <Check className="h-5 w-5 text-black" />
-                      </div>
-                      <div>
-                        <p className="font-black text-lg text-lime-500">{uploadedFileName}</p>
-                        <p className="text-xs text-neutral-500 mt-1">Click to change</p>
+                    <div>
+                      <p className="font-bold text-sm text-white">Sarah M.</p>
+                      <p className="text-xs text-neutral-400">Electronic • Indie • Alternative</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
+                    <Headphones className="h-4 w-4" />
+                    <span>Listened 4:32</span>
+                  </div>
+                </div>
+
+                <div className="border-b-2 border-neutral-700 grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-neutral-800">
+                  <div className="p-4 text-center">
+                    <p className="text-xs text-neutral-500 mb-1">First Impression</p>
+                    <p className="font-bold text-lime-500">Strong Hook</p>
+                  </div>
+                  <div className="p-4 text-center">
+                    <p className="text-xs text-neutral-500 mb-1">Production</p>
+                    <p className="font-bold text-white">4/5</p>
+                  </div>
+                  <div className="p-4 text-center">
+                    <p className="text-xs text-neutral-500 mb-1">Originality</p>
+                    <p className="font-bold text-white">4/5</p>
+                  </div>
+                  <div className="p-4 text-center">
+                    <p className="text-xs text-neutral-500 mb-1">Listen Again?</p>
+                    <p className="font-bold text-lime-500">Yes</p>
+                  </div>
+                </div>
+
+                <div className="border-b-2 border-neutral-700 bg-neutral-950/30 p-4">
+                  <p className="text-xs text-neutral-500 mb-3 font-medium">Listener Signals</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-lime-500/10 border border-lime-500/30 text-lime-500">
+                      <ListMusic className="h-3.5 w-3.5" />
+                      Would add to playlist
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-lime-500/10 border border-lime-500/30 text-lime-500">
+                      <Share2 className="h-3.5 w-3.5" />
+                      Would share
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-neutral-900 border border-neutral-700 text-neutral-300">
+                      <UserPlus className="h-3.5 w-3.5" />
+                      Wouldn&apos;t follow yet
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6 space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-6 h-6 bg-lime-500 border border-black flex items-center justify-center text-xs font-bold text-black">+</span>
+                      <h4 className="font-bold text-sm text-white">What&apos;s Working</h4>
+                    </div>
+                    <p className="text-neutral-300 leading-relaxed text-sm pl-8">
+                      The synth melody around 0:45 is genuinely catchy—got stuck in my head. The interplay with the drums creates a driving energy that makes you want to move. Low end is tight, punchy kick that cuts through without being muddy. The breakdown at 2:15 was unexpected and added a nice dynamic shift.
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-6 h-6 bg-orange-400 border border-black flex items-center justify-center text-xs font-bold text-black">→</span>
+                      <h4 className="font-bold text-sm text-white">Room to Grow</h4>
+                    </div>
+                    <p className="text-neutral-300 leading-relaxed text-sm pl-8">
+                      The intro feels long before the hook hits—consider trimming 8-10 seconds. Hi-hats get repetitive in verse 2; some variation or filter sweep would help. The vocal sample at 1:30 sits too loud and clashes with lead synth frequencies.
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-6 h-6 bg-sky-400 border border-black flex items-center justify-center text-xs font-bold text-black">!</span>
+                      <h4 className="font-bold text-sm text-white">Next Steps</h4>
+                    </div>
+                    <ul className="text-neutral-300 text-sm pl-8 space-y-1">
+                      <li className="flex items-start gap-2">
+                        <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">01</span>
+                        <span>Cut the intro by 8-10 seconds to hook listeners faster</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">02</span>
+                        <span>Add hi-hat variations or automate a filter in verse 2</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">03</span>
+                        <span>EQ the vocal sample to carve space for the lead synth</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="pt-4 border-t border-neutral-800">
+                    <p className="text-sm text-neutral-400">
+                      <span className="font-bold text-neutral-200">Sounds like:</span> Bonobo meets Four Tet, with some Tycho influence in the atmospheric pads.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-neutral-950/40 border-t-2 border-neutral-700 flex items-center justify-between">
+                  <span className="text-xs text-neutral-400">1 of 5 reviews</span>
+                  <span className="text-[10px] font-mono bg-lime-500 border border-black px-2 py-0.5 font-bold text-black">EXAMPLE</span>
+                </div>
+                </div>
+              </div>
+            )}
+
+            {trackStartStage === "track" && (
+              <>
+                {/* Input mode toggle */}
+                <div className="flex gap-2 bg-neutral-900 p-1 rounded-none border-2 border-neutral-700 order-[30] sm:order-[20]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputMode("upload");
+                      setTrackUrl("");
+                      setUrlError("");
+                    }}
+                    className={cn(
+                      "flex-1 px-4 py-3 text-sm font-black transition-all flex items-center justify-center gap-2",
+                      inputMode === "upload"
+                        ? "bg-lime-500 text-black"
+                        : "text-neutral-400 hover:text-white"
+                    )}
+                  >
+                    <Upload className="h-4 w-4" />
+                    Upload File
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputMode("url");
+                      setUploadedUrl("");
+                      setUploadedFileName("");
+                    }}
+                    className={cn(
+                      "flex-1 px-4 py-3 text-sm font-black transition-all flex items-center justify-center gap-2",
+                      inputMode === "url"
+                        ? "bg-lime-500 text-black"
+                        : "text-neutral-400 hover:text-white"
+                    )}
+                  >
+                    <Link2 className="h-4 w-4" />
+                    Paste Link
+                  </button>
+                </div>
+
+                {/* Upload area */}
+                <div className="order-[40] sm:order-[30]">
+                  {inputMode === "upload" ? (
+                    <div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="audio/mpeg,audio/mp3,.mp3"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) void handleUpload(file);
+                        }}
+                        className="hidden"
+                      />
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          setIsDragging(true);
+                        }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          setIsDragging(false);
+                          const file = e.dataTransfer.files?.[0];
+                          if (file && (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))) {
+                            void handleUpload(file);
+                          } else {
+                            setError("Please upload an MP3 file");
+                          }
+                        }}
+                        className={cn(
+                          "border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-all",
+                          isDragging && "border-lime-500 bg-lime-500/10",
+                          !isDragging && !uploadedFileName && "border-neutral-700 hover:border-lime-500 hover:bg-neutral-900",
+                          uploadedFileName && !isUploading && "border-lime-500 bg-lime-500/10"
+                        )}
+                      >
+                        {isUploading ? (
+                          <div className="flex flex-col items-center gap-3">
+                            <Loader2 className="h-10 w-10 animate-spin text-lime-500" />
+                            <p className="font-bold">Uploading...</p>
+                          </div>
+                        ) : uploadedFileName ? (
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="h-10 w-10 bg-lime-500 flex items-center justify-center">
+                              <Check className="h-5 w-5 text-black" />
+                            </div>
+                            <div>
+                              <p className="font-black text-lg text-lime-500">{uploadedFileName}</p>
+                              <p className="text-xs text-neutral-500 mt-1">Click to change</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="h-10 w-10 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center">
+                              <Upload className="h-5 w-5 text-neutral-400" />
+                            </div>
+                            <div>
+                              <p className="font-black text-lg">Drop your MP3 here</p>
+                              <p className="text-xs text-neutral-500 mt-1">or click to browse</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="h-10 w-10 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center">
-                        <Upload className="h-5 w-5 text-neutral-400" />
-                      </div>
-                      <div>
-                        <p className="font-black text-lg">Drop your MP3 here</p>
-                        <p className="text-xs text-neutral-500 mt-1">or click to browse</p>
-                      </div>
+                    <div className="space-y-4">
+                      <Input
+                        placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
+                        value={trackUrl}
+                        onChange={(e) => handleUrlChange(e.target.value)}
+                        className={cn(
+                          "text-lg h-14 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                          urlError && "border-red-500"
+                        )}
+                        autoFocus
+                      />
+                      {isLoadingMetadata && (
+                        <div className="flex items-center gap-2 text-sm text-neutral-500">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Getting track info...
+                        </div>
+                      )}
+                      {urlError && (
+                        <p className="text-sm text-red-500 font-medium">{urlError}</p>
+                      )}
+                      {!urlError && urlWarning && (
+                        <div className="flex items-start gap-2 text-sm text-amber-400 bg-amber-400/10 border border-amber-400/30 p-3 rounded">
+                          <svg className="h-4 w-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                          <span>{urlWarning}</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-
-                </div>
-              ) : (
-                <div className="space-y-4">
-                <Input
-                  placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
-                  value={trackUrl}
-                  onChange={(e) => handleUrlChange(e.target.value)}
-                  className={cn(
-                    "text-lg h-14 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
-                    urlError && "border-red-500"
-                  )}
-                  autoFocus
-                />
-                {isLoadingMetadata && (
-                  <div className="flex items-center gap-2 text-sm text-neutral-500">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Getting track info...
-                  </div>
-                )}
-                {urlError && (
-                  <p className="text-sm text-red-500 font-medium">{urlError}</p>
-                )}
-                {!urlError && urlWarning && (
-                  <div className="flex items-start gap-2 text-sm text-amber-400 bg-amber-400/10 border border-amber-400/30 p-3 rounded">
-                    <svg className="h-4 w-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <span>{urlWarning}</span>
-                  </div>
-                )}
-                </div>
-              )}
-            </div>
+              </>
+            )}
 
             {/* Track title edit */}
             {(uploadedUrl || (trackUrl && !urlError && !isLoadingMetadata)) && (
@@ -1054,19 +1193,21 @@ export default function GetFeedbackPage() {
             )}
 
             {/* Continue button */}
-            <Button
-              onClick={goToDetails}
-              disabled={!hasTrack || !title}
-              className={cn(
-                "w-full h-14 text-lg font-black border-2 transition-all order-[60] sm:order-[50]",
-                hasTrack && title
-                  ? "bg-lime-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
-                  : "bg-neutral-800 text-neutral-500 border-neutral-700 cursor-not-allowed"
-              )}
-            >
-              Continue
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
+            {trackStartStage === "track" && (
+              <Button
+                onClick={goToDetails}
+                disabled={!hasTrack || !title}
+                className={cn(
+                  "w-full h-14 text-lg font-black border-2 transition-all order-[60] sm:order-[50]",
+                  hasTrack && title
+                    ? "bg-lime-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                    : "bg-neutral-800 text-neutral-500 border-neutral-700 cursor-not-allowed"
+                )}
+              >
+                Continue
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </Button>
+            )}
           </div>
         )}
 
@@ -1583,6 +1724,34 @@ export default function GetFeedbackPage() {
           </div>
         )}
       </main>
+
+      {step === "track" && (
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-neutral-800 bg-black/90 backdrop-blur">
+          <div className="max-w-2xl mx-auto px-4 py-3">
+            <button
+              type="button"
+              onClick={() => {
+                if (!hasTrackedEarlyCheckoutRef.current) {
+                  hasTrackedEarlyCheckoutRef.current = true;
+                  trackTikTokEvent("InitiateCheckout", {
+                    content_type: "product",
+                    content_id: "get_feedback_sticky",
+                    value: PACKAGES.STARTER.price / 100,
+                    currency: "AUD",
+                  });
+                }
+
+                if (trackStartStage === "track") return;
+                const el = document.getElementById("get-feedback-start");
+                el?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+              className="w-full h-12 bg-lime-500 text-black font-black border-2 border-lime-500"
+            >
+              Get Feedback Now – ${(PACKAGES.STARTER.price / 100).toFixed(2)}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
