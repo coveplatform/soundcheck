@@ -33,6 +33,8 @@ export default function SuccessPage() {
 
   const isBypass = useMemo(() => Boolean(sessionId?.startsWith("bypass_")), [sessionId]);
   const isFreeCredit = useMemo(() => Boolean(sessionId?.startsWith("free_credit_")), [sessionId]);
+  const isFreeFirstReview = useMemo(() => Boolean(sessionId?.startsWith("free_first_review_")), [sessionId]);
+  const isFreeReview = isFreeCredit || isFreeFirstReview;
 
   // Track checkout completion
   useEffect(() => {
@@ -131,12 +133,14 @@ export default function SuccessPage() {
       <div className="max-w-md mx-auto mt-20">
         <Card>
           <CardHeader className="text-center pb-2">
-            {isFreeCredit ? (
+            {isFreeReview ? (
               <>
                 <div className="mx-auto w-12 h-12 bg-lime-100 rounded-full flex items-center justify-center mb-4">
                   <Gift className="h-6 w-6 text-lime-600" />
                 </div>
-                <CardTitle className="text-xl">Using your free credit…</CardTitle>
+                <CardTitle className="text-xl">
+                  {isFreeFirstReview ? "Submitting your free review…" : "Using your free credit…"}
+                </CardTitle>
               </>
             ) : (
               <CardTitle className="text-xl">Verifying payment…</CardTitle>
@@ -152,10 +156,10 @@ export default function SuccessPage() {
                 <span>What happens next?</span>
               </div>
               <ol className="text-sm text-neutral-500 space-y-2 ml-6">
-                {isFreeCredit ? (
+                {isFreeReview ? (
                   <>
-                    <li>1. Your free credit is applied</li>
-                    <li>2. Your track is queued for 1 free review</li>
+                    <li>1. Your free review is being set up</li>
+                    <li>2. Your track is queued for review</li>
                     <li>3. A genre-matched reviewer will listen and provide feedback</li>
                   </>
                 ) : (
@@ -179,13 +183,13 @@ export default function SuccessPage() {
         <Card>
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-xl">
-              {isFreeCredit ? "Something went wrong" : "Payment not confirmed"}
+              {isFreeReview ? "Something went wrong" : "Payment not confirmed"}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-neutral-500">
-              {isFreeCredit
-                ? error || "We couldn't apply your free credit. Please try again."
+              {isFreeReview
+                ? error || "We couldn't submit your free review. Please try again."
                 : error || "We couldn't confirm your payment."}
             </p>
             <div className="flex flex-col gap-2">
@@ -213,7 +217,7 @@ export default function SuccessPage() {
     <div className="max-w-md mx-auto mt-20">
       <Card>
         <CardHeader className="text-center pb-2">
-          {isFreeCredit ? (
+          {isFreeReview ? (
             <div className="mx-auto w-12 h-12 bg-lime-100 rounded-full flex items-center justify-center mb-4">
               <Gift className="h-6 w-6 text-lime-600" />
             </div>
@@ -223,15 +227,16 @@ export default function SuccessPage() {
             </div>
           )}
           <CardTitle className="text-xl">
-            {isFreeCredit ? "Free Credit Applied!" : "Track Submitted!"}
+            {isFreeFirstReview ? "Your Free Review is Queued!" : isFreeCredit ? "Free Credit Applied!" : "Track Submitted!"}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
-          {isFreeCredit ? (
+          {isFreeReview ? (
             <p className="text-neutral-500">
-              Your free credit was applied successfully. Your track is now queued
-              for <strong className="text-neutral-700">1 free review</strong> from
-              a genre-matched listener.
+              {isFreeFirstReview
+                ? "Congrats! Your track is now queued for your free review from a genre-matched listener."
+                : "Your free credit was applied successfully. Your track is now queued for 1 free review from a genre-matched listener."
+              }
             </p>
           ) : (
             <p className="text-neutral-500">
@@ -246,11 +251,11 @@ export default function SuccessPage() {
               <span>What happens next?</span>
             </div>
             <ol className="text-sm text-neutral-500 space-y-2 ml-6">
-              {isFreeCredit ? (
+              {isFreeReview ? (
                 <>
                   <li>1. A reviewer is matched to your track based on genre</li>
                   <li>2. They&apos;ll listen and submit structured notes + scores</li>
-                  <li>3. You&apos;ll be notified when the review is ready</li>
+                  <li>3. You&apos;ll be notified when the review is ready (usually &lt;12h)</li>
                   <li>4. View feedback on your dashboard</li>
                 </>
               ) : (
@@ -263,6 +268,14 @@ export default function SuccessPage() {
               )}
             </ol>
           </div>
+
+          {isFreeFirstReview && (
+            <div className="bg-lime-50 border border-lime-200 rounded-lg p-4 text-left">
+              <p className="text-sm text-lime-800">
+                <strong>Love your free review?</strong> Get more reviews on your next track to see patterns emerge and know exactly what to fix.
+              </p>
+            </div>
+          )}
 
           <div className="pt-2">
             <Link href="/artist/dashboard">

@@ -75,12 +75,17 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "session_id is required" }, { status: 400 });
   }
 
-  // Handle bypass_ and free_credit_ prefixes (no Stripe lookup needed)
-  const specialPrefixes = ["bypass_", "free_credit_"] as const;
+  // Handle bypass_, free_credit_, and free_first_review_ prefixes (no Stripe lookup needed)
+  const specialPrefixes = ["bypass_", "free_credit_", "free_first_review_"] as const;
   const matchedPrefix = specialPrefixes.find((p) => stripeSessionId.startsWith(p));
 
   if (matchedPrefix) {
-    const trackId = stripeSessionId.slice(matchedPrefix.length);
+    // Extract trackId - format is prefix_trackId or prefix_trackId_timestamp
+    const remainder = stripeSessionId.slice(matchedPrefix.length);
+    // For free_first_review_ format: trackId_timestamp, extract just the trackId
+    const trackId = matchedPrefix === "free_first_review_"
+      ? remainder.split("_")[0]
+      : remainder.split("_")[0]; // Handle both cases consistently
 
     const track = await prisma.track.findUnique({
       where: { id: trackId },

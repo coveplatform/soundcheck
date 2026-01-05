@@ -19,6 +19,7 @@ import {
   Users,
   Eye,
   EyeOff,
+  Gift,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -780,8 +781,8 @@ export default function GetFeedbackPage() {
         });
       }
 
-      // Redirect to checkout
-      router.push(data.checkoutUrl || data.successUrl);
+      // Redirect to success page (for free review) or checkout (for paid)
+      router.push(data.successUrl || data.checkoutUrl);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -828,7 +829,7 @@ export default function GetFeedbackPage() {
               <span>→</span>
               <span className={cn((step === "matching" || step === "details") && "text-lime-500")}>DETAILS</span>
               <span>→</span>
-              <span className={cn(step === "package" && "text-lime-500")}>CHECKOUT</span>
+              <span className={cn(step === "package" && "text-lime-500")}>FREE REVIEW</span>
             </div>
           </div>
         </div>
@@ -849,26 +850,31 @@ export default function GetFeedbackPage() {
           <div className="flex flex-col gap-6">
             {/* Hero */}
             <div className="text-center space-y-3 order-[10]">
+              {/* Free review badge */}
+              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 mb-2">
+                <Gift className="h-5 w-5" />
+                <span className="font-black text-sm uppercase tracking-wide">First review FREE</span>
+              </div>
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
-                Real feedback. Real fast.
+                Get real feedback. Free.
               </h1>
               <p className="text-neutral-400 text-lg max-w-lg mx-auto">
-                5-10 genre-matched listeners review your track and tell you exactly what&apos;s working and what needs fixing.
+                A genre-matched listener reviews your track and tells you exactly what&apos;s working and what needs fixing.
               </p>
 
               {/* What you get - visual summary */}
               <div className="grid grid-cols-3 gap-3 max-w-md mx-auto pt-2">
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-xl font-black text-lime-500">5-10</p>
-                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Reviews</p>
+                  <p className="text-xl font-black text-lime-500">FREE</p>
+                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">First Review</p>
                 </div>
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
                   <p className="text-xl font-black text-lime-500">&lt;12h</p>
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Turnaround</p>
                 </div>
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-xl font-black text-lime-500">$4.95</p>
-                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">From (AUD)</p>
+                  <p className="text-xl font-black text-lime-500">100%</p>
+                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Human</p>
                 </div>
               </div>
             </div>
@@ -1320,12 +1326,17 @@ export default function GetFeedbackPage() {
             </button>
 
             <div className="text-center space-y-2">
+              {/* Free review reminder */}
+              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-3 py-1.5 mb-2">
+                <Gift className="h-4 w-4" />
+                <span className="font-black text-xs uppercase tracking-wide">Your free review</span>
+              </div>
               <h1 className="text-3xl sm:text-4xl font-black">Almost there</h1>
               <p className="text-sm font-bold text-lime-500">
                 We found {estimatedListenerPool}+ good-fit listeners for your track.
               </p>
               <p className="text-neutral-400">
-                Tell us where to send your feedback
+                Tell us where to send your free feedback
               </p>
             </div>
 
@@ -1526,7 +1537,7 @@ export default function GetFeedbackPage() {
         )}
 
         {/* ============================================ */}
-        {/* STEP 3: PACKAGE */}
+        {/* STEP 3: CONFIRM FREE REVIEW */}
         {/* ============================================ */}
         {step === "package" && (
           <div className="space-y-8">
@@ -1539,126 +1550,40 @@ export default function GetFeedbackPage() {
             </button>
 
             <div className="text-center space-y-2">
-              <h1 className="text-3xl sm:text-4xl font-black">How many opinions?</h1>
+              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 mb-2">
+                <Gift className="h-5 w-5" />
+                <span className="font-black text-sm uppercase tracking-wide">FREE</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-black">Get your free review</h1>
               <p className="text-neutral-400">
-                Choose a quick gut-check or full clarity before you release.
+                No credit card required. Your first review is on us.
               </p>
             </div>
 
-            {/* Package options */}
-            <div className="space-y-4">
-              {/* Quick Check - 5 reviews */}
-              <button
-                type="button"
-                onClick={() => setSelectedPackage("STARTER")}
-                className={cn(
-                  "w-full text-left border-2 p-6 transition-all",
-                  selectedPackage === "STARTER"
-                    ? "border-lime-500 bg-lime-500/10"
-                    : "border-neutral-700 hover:border-neutral-500"
+            {/* Track preview */}
+            <div className="border-2 border-lime-500 bg-lime-500/10 p-6">
+              <div className="flex items-center gap-4 mb-4">
+                {artworkUrl ? (
+                  <img src={artworkUrl} alt="" className="w-16 h-16 object-cover border-2 border-lime-500" />
+                ) : (
+                  <div className="w-16 h-16 bg-lime-500 border-2 border-lime-500 flex items-center justify-center">
+                    <Music className="h-8 w-8 text-black" />
+                  </div>
                 )}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="inline-flex items-center bg-neutral-900 border border-neutral-700 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-neutral-300">
-                        Quick Check
-                      </span>
-                      <span className="text-xs text-neutral-500">Best for: getting unstuck</span>
-                    </div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-4xl font-black text-white">{PACKAGES.STARTER.reviews}</span>
-                      <span className="text-lg font-bold text-neutral-400">reviews</span>
-                    </div>
-                    <p className="text-neutral-500">Fast signal on what&apos;s working vs what to fix first</p>
-                    <ul className="mt-4 space-y-2 text-sm text-neutral-400">
-                      <li className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
-                        <span>Sanity-check your hook, intro, and overall vibe</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
-                        <span>Catch 1-2 big issues before you waste more time polishing</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
-                        <span>Perfect if you&apos;re early in the process or testing a demo</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-black text-white">${(PACKAGES.STARTER.price / 100).toFixed(2)}</p>
-                    <p className="text-xs text-neutral-500">AUD</p>
-                  </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-black text-xl text-white truncate">{title}</p>
+                  <p className="text-sm text-lime-400">Ready for review</p>
                 </div>
-                {selectedPackage === "STARTER" && (
-                  <div className="mt-4 pt-4 border-t border-lime-500/30 flex items-center gap-2 text-lime-500">
-                    <Check className="h-4 w-4" />
-                    <span className="text-sm font-bold">Selected</span>
-                  </div>
-                )}
-              </button>
-
-              {/* Full Picture - 20 reviews */}
-              <button
-                type="button"
-                onClick={() => setSelectedPackage("STANDARD")}
-                className={cn(
-                  "w-full text-left border-2 p-6 transition-all relative",
-                  selectedPackage === "STANDARD"
-                    ? "border-lime-500 bg-lime-500/10"
-                    : "border-neutral-700 hover:border-neutral-500"
-                )}
-              >
-                <div className="absolute -top-3 left-4 bg-lime-500 text-black text-xs font-black px-3 py-1 uppercase tracking-wide flex items-center gap-1">
-                  <Sparkles className="h-3 w-3" />
-                  Most Popular
-                </div>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="inline-flex items-center bg-lime-500 text-black px-2 py-1 text-[10px] font-black uppercase tracking-wide">
-                        Full Signal
-                      </span>
-                      <span className="text-xs text-neutral-500">Best for: release decisions</span>
-                    </div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-4xl font-black text-white">{PACKAGES.STANDARD.reviews}</span>
-                      <span className="text-lg font-bold text-neutral-400">reviews</span>
-                    </div>
-                    <p className="text-neutral-500">High-confidence patterns so you know what to change (and what not to)</p>
-                    <ul className="mt-4 space-y-2 text-sm text-neutral-400">
-                      <li className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
-                        <span>See real consensus (not just one person&apos;s taste)</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
-                        <span>More timestamps and specifics = more actionable edits</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
-                        <span>Best choice if you&apos;re about to release and want certainty</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-black text-white">${(PACKAGES.STANDARD.price / 100).toFixed(2)}</p>
-                    <p className="text-xs text-neutral-500">AUD</p>
-                  </div>
-                </div>
-                {selectedPackage === "STANDARD" && (
-                  <div className="mt-4 pt-4 border-t border-lime-500/30 flex items-center gap-2 text-lime-500">
-                    <Check className="h-4 w-4" />
-                    <span className="text-sm font-bold">Selected</span>
-                  </div>
-                )}
-              </button>
+              </div>
+              <div className="flex items-center justify-between pt-4 border-t border-lime-500/30">
+                <span className="text-neutral-400">Your free review</span>
+                <span className="text-2xl font-black text-lime-500">$0.00</span>
+              </div>
             </div>
 
             {/* What you get */}
             <div className="border-2 border-neutral-700 bg-neutral-900 p-5">
-              <h3 className="font-bold text-white mb-3">Every review includes:</h3>
+              <h3 className="font-bold text-white mb-3">Your free review includes:</h3>
               <ul className="space-y-2 text-sm text-neutral-400">
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
@@ -1679,44 +1604,20 @@ export default function GetFeedbackPage() {
               </ul>
             </div>
 
-            {/* Checkout button */}
+            {/* Submit button */}
             <Button
               onClick={handleSubmit}
               isLoading={isSubmitting}
               className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
-              Continue to Payment ({PACKAGES[selectedPackage].reviews} reviews • ${
-                (PACKAGES[selectedPackage].price / 100).toFixed(2)
-              } AUD)
+              <Gift className="h-5 w-5 mr-2" />
+              Get My Free Review
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
 
-            {/* Payment methods */}
-            <div className="text-center space-y-3">
-              <div className="flex items-center justify-center gap-4 text-neutral-500">
-                <div className="flex items-center gap-1.5 text-xs">
-                  <svg className="h-5 w-5 text-[#003087]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z"/>
-                  </svg>
-                  <span className="text-neutral-500">PayPal</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-xs">
-                  <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
-                  </svg>
-                  <span className="text-neutral-500">Apple Pay</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-xs">
-                  <svg className="h-5 w-5 text-[#4285F4]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
-                  </svg>
-                  <span className="text-neutral-500">Google Pay</span>
-                </div>
-              </div>
-              <p className="text-xs text-neutral-600">
-                Secure payment via Stripe • SSL encrypted
-              </p>
-            </div>
+            <p className="text-center text-xs text-neutral-500">
+              No credit card required • Results in under 12 hours
+            </p>
 
             {/* Terms */}
             {!isLoggedIn && (
