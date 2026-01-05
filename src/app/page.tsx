@@ -523,7 +523,6 @@ export default function Home() {
 
                   <div className="mb-6">
                     <div className="text-5xl font-black">${price}<span className="text-lg font-bold text-neutral-400 ml-1">AUD</span></div>
-                    <p className="text-sm text-neutral-500 mt-1">${(p.price / p.reviews / 100).toFixed(2)} per review</p>
                   </div>
 
                   <div className="space-y-3 mb-8">

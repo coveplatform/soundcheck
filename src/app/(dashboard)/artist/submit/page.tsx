@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, Loader2, Upload, Gift, Music, ArrowRight, ChevronDown } from "lucide-react";
@@ -10,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, detectSource, ACTIVE_PACKAGE_TYPES, PACKAGES, PackageType } from "@/lib/metadata";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { SupportedPlatforms, PlatformBadge } from "@/components/ui/supported-platforms";
+import { VerifyEmailBanner } from "@/components/ui/verify-email-banner";
 
 interface Genre {
   id: string;
@@ -21,6 +23,7 @@ type Step = "track" | "details" | "package" | "confirm";
 
 export default function SubmitTrackPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [step, setStep] = useState<Step>("track");
 
   // Form state
@@ -51,6 +54,7 @@ export default function SubmitTrackPage() {
   // Free credit state
   const [freeCredits, setFreeCredits] = useState<number>(0);
   const [isLoadingCredits, setIsLoadingCredits] = useState(true);
+  const [requiresEmailVerification, setRequiresEmailVerification] = useState(false);
 
   useEffect(() => {
     async function fetchGenres() {
@@ -124,6 +128,7 @@ export default function SubmitTrackPage() {
   const handleUpload = async (file: File) => {
     setError("");
     setUrlError("");
+    setRequiresEmailVerification(false);
     setIsUploading(true);
     setUploadedDuration(null);
     setUploadedUrl("");
@@ -169,6 +174,12 @@ export default function SubmitTrackPage() {
 
         finalUrl = presignData.fileUrl;
       } else {
+        if (presignRes.status === 403) {
+          setRequiresEmailVerification(true);
+          setError("Please verify your email to upload tracks");
+          return;
+        }
+
         const presignError = (await presignRes.json().catch(() => null)) as
           | { error?: string; missing?: string[] }
           | null;
@@ -266,6 +277,7 @@ export default function SubmitTrackPage() {
 
   const handleSubmit = async () => {
     setError("");
+    setRequiresEmailVerification(false);
 
     if (inputMode === "url") {
       const validation = validateTrackUrl(url);
@@ -318,8 +330,8 @@ export default function SubmitTrackPage() {
           typeof data?.error === "string" &&
           data.error.toLowerCase().includes("verify")
         ) {
-          router.push("/verify-email");
-          router.refresh();
+          setRequiresEmailVerification(true);
+          setError("Please verify your email to submit tracks");
           return;
         }
         setError(data.error || "Something went wrong");
@@ -351,6 +363,10 @@ export default function SubmitTrackPage() {
 
   return (
     <div className="max-w-xl mx-auto min-h-[60vh] flex flex-col">
+      {session?.user?.email && !session.user.emailVerified && (
+        <VerifyEmailBanner className="mb-6" />
+      )}
+
       {/* Free Credit Banner - always visible */}
       {!isLoadingCredits && freeCredits > 0 && (
         <div className="mb-6 bg-lime-400 border-2 border-black p-3 flex items-center gap-3">

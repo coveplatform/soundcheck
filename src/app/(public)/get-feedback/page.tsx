@@ -137,6 +137,7 @@ export default function GetFeedbackPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [finishLaterMessage, setFinishLaterMessage] = useState("");
   const [isSendingFinishLater, setIsSendingFinishLater] = useState(false);
+  const [isContinuingToPackage, setIsContinuingToPackage] = useState(false);
   const [matchingIndex, setMatchingIndex] = useState(0);
   const [matchingDone, setMatchingDone] = useState(false);
 
@@ -613,6 +614,9 @@ export default function GetFeedbackPage() {
 
   // Validate and go to package
   const goToPackage = async () => {
+    setError("");
+    setIsContinuingToPackage(true);
+
     const errors: Record<string, string> = {};
 
     if (!isLoggedIn) {
@@ -629,6 +633,7 @@ export default function GetFeedbackPage() {
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
+      setIsContinuingToPackage(false);
       return;
     }
 
@@ -649,11 +654,15 @@ export default function GetFeedbackPage() {
             password:
               "This email is already registered. That password doesn’t match — try signing in or reset your password.",
           });
+          setIsContinuingToPackage(false);
           return;
         }
 
         // Successfully logged in
-        router.refresh();
+        setStep("package");
+        void router.refresh();
+        setIsContinuingToPackage(false);
+        return;
       } else {
         // Create account immediately (matches Google behavior)
         const normalizedEmail = email.trim().toLowerCase();
@@ -672,6 +681,7 @@ export default function GetFeedbackPage() {
         const createData = await createRes.json().catch(() => ({}));
         if (!createRes.ok) {
           setError(createData.error || "Couldn't create account");
+          setIsContinuingToPackage(false);
           return;
         }
 
@@ -683,6 +693,7 @@ export default function GetFeedbackPage() {
 
         if (signInRes?.error) {
           setError("Account created, but we couldn't sign you in. Please log in.");
+          setIsContinuingToPackage(false);
           return;
         }
 
@@ -690,7 +701,10 @@ export default function GetFeedbackPage() {
           content_name: "artist",
         });
 
-        router.refresh();
+        setStep("package");
+        void router.refresh();
+        setIsContinuingToPackage(false);
+        return;
       }
     }
 
@@ -703,6 +717,7 @@ export default function GetFeedbackPage() {
     });
 
     setStep("package");
+    setIsContinuingToPackage(false);
   };
 
   // Handle final submission
@@ -1500,6 +1515,8 @@ export default function GetFeedbackPage() {
             {/* Continue button */}
             <Button
               onClick={goToPackage}
+              isLoading={isContinuingToPackage}
+              disabled={isContinuingToPackage}
               className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
               Continue
@@ -1572,7 +1589,6 @@ export default function GetFeedbackPage() {
                   <div className="text-right">
                     <p className="text-2xl font-black text-white">${(PACKAGES.STARTER.price / 100).toFixed(2)}</p>
                     <p className="text-xs text-neutral-500">AUD</p>
-                    <p className="text-xs text-neutral-500 mt-2">${(PACKAGES.STARTER.price / 100 / PACKAGES.STARTER.reviews).toFixed(2)}/review</p>
                   </div>
                 </div>
                 {selectedPackage === "STARTER" && (
@@ -1629,7 +1645,6 @@ export default function GetFeedbackPage() {
                   <div className="text-right">
                     <p className="text-2xl font-black text-white">${(PACKAGES.STANDARD.price / 100).toFixed(2)}</p>
                     <p className="text-xs text-neutral-500">AUD</p>
-                    <p className="text-xs text-neutral-500 mt-2">${(PACKAGES.STANDARD.price / 100 / PACKAGES.STANDARD.reviews).toFixed(2)}/review</p>
                   </div>
                 </div>
                 {selectedPackage === "STANDARD" && (
@@ -1716,33 +1731,6 @@ export default function GetFeedbackPage() {
         )}
       </main>
 
-      {step === "track" && (
-        <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-neutral-800 bg-black/90 backdrop-blur">
-          <div className="max-w-2xl mx-auto px-4 py-3">
-            <button
-              type="button"
-              onClick={() => {
-                if (!hasTrackedEarlyCheckoutRef.current) {
-                  hasTrackedEarlyCheckoutRef.current = true;
-                  trackTikTokEvent("InitiateCheckout", {
-                    content_type: "product",
-                    content_id: "get_feedback_sticky",
-                    value: PACKAGES.STARTER.price / 100,
-                    currency: "AUD",
-                  });
-                }
-
-                if (trackStartStage === "track") return;
-                const el = document.getElementById("get-feedback-start");
-                el?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-              className="w-full h-12 bg-lime-500 text-black font-black border-2 border-lime-500"
-            >
-              Get Feedback Now – ${(PACKAGES.STARTER.price / 100).toFixed(2)}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

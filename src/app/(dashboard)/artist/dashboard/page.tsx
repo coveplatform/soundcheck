@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Music, Plus, Clock, CheckCircle, AlertCircle, Gift, CreditCard } from "lucide-react";
 import { GenreTagList } from "@/components/ui/genre-tag";
+import { VerifyEmailBanner } from "@/components/ui/verify-email-banner";
 
 export const dynamic = 'force-dynamic';
 
@@ -41,6 +42,11 @@ export default async function ArtistDashboardPage() {
     redirect("/artist/onboarding");
   }
 
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { emailVerified: true },
+  });
+
   // Calculate stats
   const totalTracks = artistProfile.tracks.length;
   const activeSubmissions = artistProfile.tracks.filter(
@@ -52,6 +58,10 @@ export default async function ArtistDashboardPage() {
 
   return (
     <div className="space-y-6">
+      {!user?.emailVerified && (
+        <VerifyEmailBanner />
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="min-w-0">

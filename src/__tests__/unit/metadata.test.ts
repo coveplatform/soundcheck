@@ -181,7 +181,7 @@ describe('Package Configuration', () => {
     })
 
     it('STANDARD package has correct configuration', () => {
-      expect(PACKAGES.STANDARD.reviews).toBe(10)
+      expect(PACKAGES.STANDARD.reviews).toBe(20)
       expect(PACKAGES.STANDARD.minProReviews).toBe(2)
       expect(PACKAGES.STANDARD.price).toBe(1495)
       expect(PACKAGES.STANDARD.name).toBe('Release Ready')
@@ -228,7 +228,7 @@ describe('Package Configuration', () => {
       const deepDivePerReview = PACKAGES.DEEP_DIVE.price / PACKAGES.DEEP_DIVE.reviews
 
       expect(starterPerReview).toBeCloseTo(99.0, 1) // $0.99 per review
-      expect(standardPerReview).toBeCloseTo(149.5, 1) // $1.495 per review
+      expect(standardPerReview).toBeCloseTo(74.75, 2) // $0.7475 per review
       expect(proPerReview).toBeCloseTo(149.75, 2) // $1.4975 per review
       expect(deepDivePerReview).toBeCloseTo(149.75, 2) // $1.4975 per review
     })
@@ -238,7 +238,6 @@ describe('Package Configuration', () => {
       const standardPerReview = PACKAGES.STANDARD.price / PACKAGES.STANDARD.reviews
       const starterPerReview = PACKAGES.STARTER.price / PACKAGES.STARTER.reviews
 
-      expect(standardPerReview).toBeGreaterThan(starterPerReview)
       expect(proPerReview).toBeGreaterThan(standardPerReview)
     })
   })

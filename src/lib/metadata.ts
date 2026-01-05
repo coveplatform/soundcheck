@@ -108,7 +108,7 @@ export const PACKAGES = {
   },
   STANDARD: {
     name: "Release Ready",
-    reviews: 10,
+    reviews: 20,
     minProReviews: 2,
     price: 1495,
     description: "Maximum clarity with pattern insights",

@@ -119,6 +119,7 @@ export const authOptions: NextAuthOptions = {
             id: true,
             isArtist: true,
             isReviewer: true,
+            emailVerified: true,
             artistProfile: { select: { id: true } },
             reviewerProfile: { select: { id: true } },
           },
@@ -129,6 +130,9 @@ export const authOptions: NextAuthOptions = {
           token.isReviewer = dbUser.isReviewer;
           token.artistProfileId = dbUser.artistProfile?.id;
           token.reviewerProfileId = dbUser.reviewerProfile?.id;
+          token.emailVerified = dbUser.emailVerified
+            ? dbUser.emailVerified.toISOString()
+            : null;
         }
       }
       return token;
@@ -140,6 +144,7 @@ export const authOptions: NextAuthOptions = {
         session.user.isReviewer = token.isReviewer as boolean;
         session.user.artistProfileId = token.artistProfileId as string | undefined;
         session.user.reviewerProfileId = token.reviewerProfileId as string | undefined;
+        session.user.emailVerified = (token.emailVerified as string | null) ?? null;
       }
       return session;
     },
