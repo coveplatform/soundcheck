@@ -67,6 +67,7 @@ type Step = "track" | "details" | "package";
 const STORAGE_KEY = "get-feedback-progress-v2";
 
 interface StoredProgress {
+  step: Step;
   trackUrl: string;
   inputMode: "url" | "upload";
   uploadedUrl: string;
@@ -170,6 +171,10 @@ export default function GetFeedbackPage() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const data: StoredProgress = JSON.parse(stored);
+        // Restore step - but only if we have track data to support it
+        if (data.step && (data.uploadedUrl || data.trackUrl)) {
+          setStep(data.step);
+        }
         if (data.trackUrl) setTrackUrl(data.trackUrl);
         if (data.inputMode) setInputMode(data.inputMode);
         if (data.uploadedUrl) setUploadedUrl(data.uploadedUrl);
@@ -194,6 +199,7 @@ export default function GetFeedbackPage() {
   const saveProgress = useCallback(() => {
     if (typeof window === "undefined" || !isInitialized) return;
     const data: StoredProgress = {
+      step,
       trackUrl,
       inputMode,
       uploadedUrl,
@@ -210,6 +216,7 @@ export default function GetFeedbackPage() {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }, [
+    step,
     trackUrl,
     inputMode,
     uploadedUrl,
@@ -522,10 +529,13 @@ export default function GetFeedbackPage() {
         genreIds: selectedGenres,
         feedbackFocus: feedbackFocus.trim() || undefined,
         packageType: selectedPackage,
+        // Include artistName for logged-in users without a profile too
+        ...((!isLoggedIn || !hasArtistProfile) && artistName.trim() && {
+          artistName: artistName.trim(),
+        }),
         ...(!isLoggedIn && {
           email: email.trim().toLowerCase(),
           password,
-          artistName: artistName.trim(),
         }),
       };
 
@@ -982,6 +992,42 @@ export default function GetFeedbackPage() {
               </div>
             )}
 
+            {/* Logged in user confirmation + artist name if needed */}
+            {isLoggedIn && (
+              <div className="space-y-4">
+                {/* Signed in confirmation */}
+                <div className="border-2 border-lime-500/30 bg-lime-500/10 p-4 flex items-center gap-3">
+                  <div className="h-8 w-8 bg-lime-500 flex items-center justify-center flex-shrink-0">
+                    <Check className="h-4 w-4 text-black" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-white">Signed in as {session?.user?.email}</p>
+                    <p className="text-sm text-neutral-400">Your feedback will be sent to this email</p>
+                  </div>
+                </div>
+
+                {/* Artist name field for logged-in users without a profile */}
+                {!hasArtistProfile && (
+                  <div>
+                    <label className="text-sm font-bold text-neutral-400 mb-2 block">Artist / Project Name</label>
+                    <Input
+                      placeholder="Your artist name"
+                      value={artistName}
+                      onChange={(e) => {
+                        setArtistName(e.target.value);
+                        setFieldErrors((prev) => ({ ...prev, artistName: "" }));
+                      }}
+                      className={cn(
+                        "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                        fieldErrors.artistName && "border-red-500"
+                      )}
+                    />
+                    {fieldErrors.artistName && <p className="text-xs text-red-500 mt-1">{fieldErrors.artistName}</p>}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Genre selection */}
             <div>
               <label className="text-sm font-bold text-neutral-400 mb-3 block">
@@ -1137,22 +1183,22 @@ export default function GetFeedbackPage() {
             <div className="text-center space-y-3">
               <div className="flex items-center justify-center gap-4 text-neutral-500">
                 <div className="flex items-center gap-1.5 text-xs">
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="h-5 w-5 text-[#003087]" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z"/>
                   </svg>
-                  <span>PayPal</span>
+                  <span className="text-neutral-500">PayPal</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
                   </svg>
-                  <span>Apple Pay</span>
+                  <span className="text-neutral-500">Apple Pay</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="h-5 w-5 text-[#4285F4]" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
                   </svg>
-                  <span>Google Pay</span>
+                  <span className="text-neutral-500">Google Pay</span>
                 </div>
               </div>
               <p className="text-xs text-neutral-600">

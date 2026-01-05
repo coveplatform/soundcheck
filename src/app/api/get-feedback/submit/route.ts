@@ -42,6 +42,8 @@ const loggedInSchema = z.object({
   genreIds: z.array(z.string()).min(1, "Select at least one genre").max(3),
   feedbackFocus: z.string().max(1000).optional(),
   packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE"]),
+  // Optional artist name for users without a profile
+  artistName: z.string().min(1).max(100).optional(),
 });
 
 export async function POST(request: Request) {
@@ -62,10 +64,12 @@ export async function POST(request: Request) {
 
       if (!artistProfile) {
         // Create profile with genres from the track
+        // Use provided artistName, fall back to user name, then "Artist"
+        const profileName = data.artistName?.trim() || session.user.name || "Artist";
         artistProfile = await prisma.artistProfile.create({
           data: {
             userId: session.user.id,
-            artistName: session.user.name || "Artist",
+            artistName: profileName,
             genres: {
               connect: data.genreIds.map((id) => ({ id })),
             },

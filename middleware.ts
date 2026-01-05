@@ -60,6 +60,10 @@ export async function middleware(request: NextRequest) {
 
   if (isArtistPath) {
     const isArtistOnboarding = pathname === "/artist/onboarding";
+    // Checkout and success pages are accessed immediately after profile creation,
+    // before the JWT token is refreshed - allow them through
+    const isCheckoutFlow = pathname.startsWith("/artist/submit/checkout") ||
+                           pathname.startsWith("/artist/submit/success");
     // Check for actual profile, not just the isArtist flag
     const hasArtistProfile = Boolean(token.artistProfileId);
 
@@ -70,6 +74,13 @@ export async function middleware(request: NextRequest) {
       }
       return NextResponse.next();
     }
+
+    // Allow checkout flow through even without profile in JWT
+    // (profile is created by API before redirect, but JWT not yet refreshed)
+    if (isCheckoutFlow) {
+      return NextResponse.next();
+    }
+
     // No profile and not on onboarding? Redirect to onboarding to complete setup
     if (!hasArtistProfile) {
       return NextResponse.redirect(new URL("/artist/onboarding", request.url));
