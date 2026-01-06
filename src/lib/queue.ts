@@ -20,6 +20,10 @@ const TEST_REVIEWER_EMAILS = [
   "deepgroove@mixreflect.com",
   "tomwilson@mixreflect.com",
   "nightowl99@mixreflect.com",
+  "lilly81095@gmail.com",
+  "imogengravina@gmail.com",
+  "a.engelhardt101@gmail.com",
+  "millersport98@gmail.com",
 ];
 
 // Parent genre slugs mapped to their child slugs for hierarchical matching
