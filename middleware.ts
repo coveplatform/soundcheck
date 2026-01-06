@@ -94,10 +94,8 @@ export async function middleware(request: NextRequest) {
     const hasReviewerProfile = Boolean(token.reviewerProfileId);
 
     if (isReviewerOnboarding) {
-      // Has a profile? Redirect to dashboard instead of showing onboarding
-      if (hasReviewerProfile) {
-        return NextResponse.redirect(new URL("/reviewer/dashboard", request.url));
-      }
+      // Always allow access to onboarding so partially-onboarded reviewers
+      // (e.g. admin-enabled accounts) don't get stuck in a redirect loop.
       return NextResponse.next();
     }
     // No profile and not on onboarding? Redirect to onboarding to complete setup
