@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-
 import { authOptions } from "@/lib/auth";
-import { isAdminEmail } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
-import { getEligibleReviewers, assignReviewersToTrack } from "@/lib/queue";
+import { isAdminEmail } from "@/lib/admin";
+import { assignReviewersToTrack, getEligibleReviewers, TEST_REVIEWER_EMAILS } from "@/lib/queue";
 
 export async function DELETE(
   request: Request,
@@ -98,19 +97,33 @@ export async function POST(
     const reviewerDebug = allReviewers.map((r) => {
       const reasons: string[] = [];
 
+      const reviewerEmail = (r.user.email ?? "").trim().toLowerCase();
+      const isTestBypass = TEST_REVIEWER_EMAILS.includes(reviewerEmail);
+
       if (!r.completedOnboarding) reasons.push("onboarding not completed");
       if (!r.onboardingQuizPassed) reasons.push("quiz not passed");
       if (r.isRestricted) reasons.push("restricted");
       if (!r.user.emailVerified) reasons.push("email not verified");
 
-      const hoursSinceCreation = (Date.now() - new Date(r.user.createdAt).getTime()) / (1000 * 60 * 60);
-      const minAge = Number(process.env.MIN_REVIEWER_ACCOUNT_AGE_HOURS ?? "24");
-      if (hoursSinceCreation < minAge) reasons.push(`account too new (${Math.round(hoursSinceCreation)}h < ${minAge}h)`);
+      if (!isTestBypass) {
+        const hoursSinceCreation =
+          (Date.now() - new Date(r.user.createdAt).getTime()) / (1000 * 60 * 60);
+        const minAge = Number(process.env.MIN_REVIEWER_ACCOUNT_AGE_HOURS ?? "24");
+        if (hoursSinceCreation < minAge) {
+          reasons.push(`account too new (${Math.round(hoursSinceCreation)}h < ${minAge}h)`);
+        }
+      }
 
       const trackGenreSlugs = track.genres.map(g => g.slug);
       const reviewerGenreSlugs = r.genres.map(g => g.slug);
-      const hasGenreMatch = trackGenreSlugs.some(tg => reviewerGenreSlugs.includes(tg));
-      if (!hasGenreMatch) reasons.push(`no genre match (track: ${trackGenreSlugs.join(", ")} | reviewer: ${reviewerGenreSlugs.join(", ")})`);
+      if (!isTestBypass) {
+        const hasGenreMatch = trackGenreSlugs.some(tg => reviewerGenreSlugs.includes(tg));
+        if (!hasGenreMatch) {
+          reasons.push(
+            `no genre match (track: ${trackGenreSlugs.join(", ")} | reviewer: ${reviewerGenreSlugs.join(", ")})`
+          );
+        }
+      }
 
       const hasExistingReview = track.reviews.some(rev => rev.reviewerId === r.id);
       if (hasExistingReview) reasons.push("already has review entry for this track");

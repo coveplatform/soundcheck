@@ -9,7 +9,7 @@ const MIN_REVIEWER_ACCOUNT_AGE_HOURS = Number(
 );
 
 // Test reviewer emails that bypass genre matching and wait time
-const TEST_REVIEWER_EMAILS = [
+export const TEST_REVIEWER_EMAILS = [
   "davo2@mixreflect.com",
   "simli@mixreflect.com",
   "roserncliff@mixreflect.com",
