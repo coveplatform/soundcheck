@@ -24,6 +24,7 @@ export const TEST_REVIEWER_EMAILS = [
   "imogengravina@gmail.com",
   "a.engelhardt101@gmail.com",
   "millersport98@gmail.com",
+  "pash.tzaikos@gmail.com",
 ];
 
 // Parent genre slugs mapped to their child slugs for hierarchical matching

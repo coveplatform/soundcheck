@@ -33,6 +33,7 @@ interface ReviewerProfileState {
 export default function ReviewerOnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState<"intro" | "quiz" | "genres" | "closed">("intro");
+  const [isAlreadyComplete, setIsAlreadyComplete] = useState(false);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [country, setCountry] = useState<string>("");
@@ -100,8 +101,7 @@ export default function ReviewerOnboardingPage() {
 
         const data = (await res.json()) as ReviewerProfileState;
         if (data.completedOnboarding) {
-          router.push("/reviewer/dashboard");
-          router.refresh();
+          setIsAlreadyComplete(true);
           return;
         }
 
@@ -216,8 +216,7 @@ export default function ReviewerOnboardingPage() {
         body: JSON.stringify({ completedOnboarding: true }),
       });
 
-      router.push("/reviewer/dashboard");
-      router.refresh();
+      setIsAlreadyComplete(true);
     } catch {
       setError("Something went wrong");
     } finally {
@@ -235,6 +234,45 @@ export default function ReviewerOnboardingPage() {
               <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
               <p className="text-neutral-500">Loading...</p>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isAlreadyComplete) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Onboarding complete</CardTitle>
+            <CardDescription>
+              You&apos;re set up as a reviewer. If you just got enabled, you may need to refresh once.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {error && (
+              <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
+                {error}
+              </div>
+            )}
+            <Button
+              variant="primary"
+              className="w-full"
+              onClick={() => {
+                router.push("/reviewer/dashboard");
+                router.refresh();
+              }}
+            >
+              Go to Reviewer Dashboard
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => window.location.reload()}
+            >
+              Refresh
+            </Button>
           </CardContent>
         </Card>
       </div>
