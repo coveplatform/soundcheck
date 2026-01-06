@@ -46,6 +46,7 @@ export async function POST(request: Request) {
       data: {
         userId: session.user.id,
         artistName,
+        freeReviewCredits: 1,
         genres: {
           connect: genreIds.map((id) => ({ id })),
         },

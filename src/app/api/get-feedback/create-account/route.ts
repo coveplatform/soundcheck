@@ -63,7 +63,7 @@ export async function POST(request: Request) {
         data: {
           userId: user.id,
           artistName: data.artistName,
-          freeReviewCredits: 0,
+          freeReviewCredits: 1,
           genres: {
             connect: data.genreIds.map((id) => ({ id })),
           },
