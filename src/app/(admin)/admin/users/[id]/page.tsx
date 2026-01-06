@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ForceVerifyEmailButton } from "@/components/admin/force-verify-email-button";
 import { ReviewerRestrictionToggle } from "@/components/admin/reviewer-restriction-toggle";
+import { EnableReviewerButton } from "@/components/admin/enable-reviewer-button";
 
 export const dynamic = 'force-dynamic';
 
@@ -48,6 +49,7 @@ export default async function AdminUserDetailPage({
         </div>
         <div className="flex items-center gap-2">
           {!user.emailVerified ? <ForceVerifyEmailButton userId={user.id} /> : null}
+          {!user.reviewerProfile ? <EnableReviewerButton userId={user.id} /> : null}
         </div>
       </div>
 
