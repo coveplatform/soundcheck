@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 
 export function ReviewRating({
   reviewId,
@@ -34,6 +35,8 @@ export function ReviewRating({
       if (!res.ok) {
         setError(data?.error || "Failed to save rating");
         setRating(initialRating);
+      } else {
+        track("artist_review_rated", { reviewId, rating: next });
       }
     } catch {
       setError("Failed to save rating");

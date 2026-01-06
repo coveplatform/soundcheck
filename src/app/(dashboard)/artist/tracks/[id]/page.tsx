@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TrackCancelButton } from "@/components/artist/track-cancel-button";
 import { TrackUpdateSourceForm } from "@/components/artist/track-update-source-form";
+import { TrackFeedbackViewTracker } from "@/components/artist/track-feedback-view-tracker";
 import { AggregateAnalytics } from "@/components/feedback/aggregate-analytics";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { GenreTagList } from "@/components/ui/genre-tag";
@@ -96,6 +97,7 @@ export default async function TrackDetailPage({
 
   return (
     <div className="space-y-6">
+      <TrackFeedbackViewTracker trackId={track.id} reviewCount={completedReviews} />
       {/* Back Link */}
       <Link
         href="/artist/dashboard"

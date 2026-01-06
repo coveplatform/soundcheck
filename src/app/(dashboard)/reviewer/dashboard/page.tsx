@@ -85,7 +85,33 @@ export default async function ReviewerDashboardPage() {
   }
 
   if (!baseReviewer.completedOnboarding || !baseReviewer.onboardingQuizPassed) {
-    redirect("/reviewer/onboarding");
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-black">Reviewer Dashboard</h1>
+          <p className="text-neutral-600">Finish onboarding to start reviewing.</p>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Finish onboarding</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-neutral-600">
+              You still need to complete the quiz and select your genres before you can access the review queue.
+            </p>
+            <div className="mt-4">
+              <Link href="/reviewer/onboarding">
+                <Button className="w-full" variant="primary">
+                  Continue onboarding
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   await expireAndReassignExpiredQueueEntries();

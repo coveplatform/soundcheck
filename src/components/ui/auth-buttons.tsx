@@ -22,7 +22,7 @@ export function AuthButtons() {
       ? "/artist/dashboard"
       : user?.isReviewer
         ? "/reviewer/dashboard"
-        : "/login";
+        : "/artist/onboarding";
 
     return (
       <Link href={dashboardHref}>
