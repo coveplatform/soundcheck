@@ -29,7 +29,7 @@ export async function POST(
       );
     }
 
-    const review = (await prisma.review.findUnique({
+    const review = await prisma.review.findUnique({
       where: { id },
       select: {
         id: true,
@@ -41,8 +41,8 @@ export async function POST(
             artist: { select: { userId: true } },
           },
         },
-      } as any,
-    })) as any;
+      },
+    });
 
     if (!review) {
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
@@ -66,14 +66,14 @@ export async function POST(
     const result = await prisma.$transaction(async (tx) => {
       const updatedReview = await tx.review.update({
         where: { id: review.id },
-        data: { isGem: true } as any,
-        select: { id: true, isGem: true, reviewerId: true } as any,
+        data: { isGem: true },
+        select: { id: true, isGem: true, reviewerId: true },
       });
 
       await tx.reviewerProfile.update({
         where: { id: updatedReview.reviewerId },
-        data: { gemCount: { increment: 1 } } as any,
-        select: { id: true } as any,
+        data: { gemCount: { increment: 1 } },
+        select: { id: true },
       });
 
       return updatedReview;
@@ -115,7 +115,7 @@ export async function DELETE(
       );
     }
 
-    const review = (await prisma.review.findUnique({
+    const review = await prisma.review.findUnique({
       where: { id },
       select: {
         id: true,
@@ -127,8 +127,8 @@ export async function DELETE(
             artist: { select: { userId: true } },
           },
         },
-      } as any,
-    })) as any;
+      },
+    });
 
     if (!review) {
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
@@ -152,14 +152,14 @@ export async function DELETE(
     const result = await prisma.$transaction(async (tx) => {
       const updatedReview = await tx.review.update({
         where: { id: review.id },
-        data: { isGem: false } as any,
-        select: { id: true, isGem: true, reviewerId: true } as any,
+        data: { isGem: false },
+        select: { id: true, isGem: true, reviewerId: true },
       });
 
       await tx.reviewerProfile.update({
         where: { id: updatedReview.reviewerId },
-        data: { gemCount: { decrement: 1 } } as any,
-        select: { id: true } as any,
+        data: { gemCount: { decrement: 1 } },
+        select: { id: true },
       });
 
       return updatedReview;
