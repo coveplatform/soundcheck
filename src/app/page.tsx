@@ -637,7 +637,7 @@ export default function Home() {
                 Get Feedback <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <span className="text-sm font-bold text-white">First one&apos;s free</span>
+            <span className="text-sm font-bold text-black bg-lime-400 px-3 py-1">First one&apos;s free</span>
           </div>
           <p className="mt-6 text-sm text-neutral-500">
             No card required • Results in under 12 hours
