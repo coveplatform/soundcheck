@@ -859,7 +859,7 @@ export default function GetFeedbackPage() {
       <main
         className={cn(
           "mx-auto px-4",
-          step === "track" ? "py-10 max-w-6xl" : "py-8 max-w-2xl"
+          step === "track" ? "py-10 max-w-4xl" : "py-8 max-w-2xl"
         )}
       >
         {/* Error banner */}
@@ -874,10 +874,7 @@ export default function GetFeedbackPage() {
         {/* ============================================ */}
         {step === "track" && (
           <div
-            className={cn(
-              "flex flex-col gap-10",
-              trackStartStage === "track" && "lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start"
-            )}
+            className="flex flex-col gap-10"
           >
             {/* Hero */}
             <div className="text-center space-y-6 order-[10]">
@@ -1057,7 +1054,7 @@ export default function GetFeedbackPage() {
             )}
 
             {trackStartStage === "track" && (
-              <div className="lg:order-[20] space-y-8">
+              <div className="order-[20] space-y-8">
                 {/* Input mode toggle */}
                 <div className="flex gap-2 bg-neutral-900 p-1 rounded-none border-2 border-neutral-700">
                   <button
