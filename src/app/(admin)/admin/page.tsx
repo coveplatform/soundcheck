@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
+import { DevToolsPreview } from "./dev-tools-preview";
 
 export const dynamic = 'force-dynamic';
 
@@ -69,6 +70,8 @@ export default async function AdminPage() {
           </Link>
         </div>
       </div>
+
+      <DevToolsPreview />
     </div>
   );
 }
