@@ -111,6 +111,7 @@ export default function GetFeedbackPage() {
   const [artworkUrl, setArtworkUrl] = useState<string | null>(null);
   const [sourceType, setSourceType] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const trackPreviewRef = useRef<HTMLDivElement>(null);
 
   // Account state
   const [email, setEmail] = useState("");
@@ -250,8 +251,14 @@ export default function GetFeedbackPage() {
     // If the user is already logged in when the page loads, keep the progressive UI visible.
     if (!wasLoggedIn && isLoggedIn) {
       setTrackStartStage("track");
+
+      // If user just logged in (e.g., Google OAuth) and is on details step with genres selected,
+      // auto-advance to package step so they don't just see "Signed in as..." message
+      if (step === "details" && selectedGenres.length > 0) {
+        setStep("package");
+      }
     }
-  }, [isLoggedIn, sessionStatus]);
+  }, [isLoggedIn, sessionStatus, step, selectedGenres.length]);
 
   useEffect(() => {
     if (trackStartStage !== "track") return;
@@ -360,6 +367,17 @@ export default function GetFeedbackPage() {
       localStorage.removeItem(STORAGE_KEY);
     }
   };
+
+  // Scroll to track preview when it appears
+  const hasTrackPreview = uploadedUrl || (trackUrl && !urlError && !isLoadingMetadata);
+  useEffect(() => {
+    if (hasTrackPreview && trackPreviewRef.current) {
+      // Small delay to ensure the element is rendered
+      setTimeout(() => {
+        trackPreviewRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  }, [hasTrackPreview]);
 
   // Handle URL input
   const handleUrlChange = async (value: string) => {
@@ -1168,7 +1186,7 @@ export default function GetFeedbackPage() {
 
             {/* Track title edit */}
             {(uploadedUrl || (trackUrl && !urlError && !isLoadingMetadata)) && (
-              <div className="border-2 border-neutral-700 bg-neutral-900 p-4 flex items-center gap-4">
+              <div ref={trackPreviewRef} className="border-2 border-neutral-700 bg-neutral-900 p-4 flex items-center gap-4">
                 {artworkUrl ? (
                   <img
                     src={artworkUrl}
@@ -1473,9 +1491,9 @@ export default function GetFeedbackPage() {
             )}
 
             {/* Logged in user confirmation + artist name if needed */}
-            {isLoggedIn && (
+            {isLoggedIn && !isContinuingToPackage && (
               <div className="space-y-4">
-                {/* Signed in confirmation */}
+                {/* Signed in confirmation - only show if not transitioning */}
                 <div className="border-2 border-lime-500/30 bg-lime-500/10 p-4 flex items-center gap-3">
                   <div className="h-8 w-8 bg-lime-500 flex items-center justify-center flex-shrink-0">
                     <Check className="h-4 w-4 text-black" />

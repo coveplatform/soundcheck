@@ -113,11 +113,14 @@ export default async function ReviewQueuePage({
     );
   }
 
-  // Get pending reviews
+  // Get pending reviews (exclude reviews for completed tracks)
   const pendingReviews = await prisma.review.findMany({
     where: {
       reviewerId: reviewerProfile.id,
       status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+      track: {
+        status: { not: "COMPLETED" },
+      },
     },
     include: {
       track: {

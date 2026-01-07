@@ -98,7 +98,7 @@ export default function Home() {
               A third just promotes their own track. You&apos;re back to square one.
             </p>
             <p className="font-bold text-black text-xl pt-4 pl-4 border-l-4 border-lime-500">
-              You just want to know: is this ready to release or not?
+              You just want honest feedback you can actually use.
             </p>
           </div>
         </div>
@@ -138,9 +138,9 @@ export default function Home() {
                 2
               </span>
               <div className="flex flex-col justify-center">
-                <p className="font-bold text-lg">Real listeners react</p>
+                <p className="font-bold text-lg">Paid reviewers listen</p>
                 <p className="text-neutral-500">
-                  5-20 people who actually like your genre listen to the full track and write detailed feedback.
+                  5-20 reviewers who match your genre listen to the full track and write detailed feedback. They&apos;re paid per review and rated by you—so quality matters.
                 </p>
               </div>
             </div>
@@ -168,7 +168,7 @@ export default function Home() {
               <div className="h-8 w-8 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
                 <CheckCircle2 className="h-4 w-4" />
               </div>
-              <p className="text-lg text-neutral-700">You have a track you&apos;re 80% confident in—but not 100%</p>
+              <p className="text-lg text-neutral-700">You have a track and you want to know what&apos;s working (and what isn&apos;t)</p>
             </div>
             <div className="flex items-center gap-4 p-4 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               <div className="h-8 w-8 bg-orange-400 border-2 border-black flex items-center justify-center flex-shrink-0">
@@ -180,7 +180,7 @@ export default function Home() {
               <div className="h-8 w-8 bg-sky-400 border-2 border-black flex items-center justify-center flex-shrink-0">
                 <CheckCircle2 className="h-4 w-4" />
               </div>
-              <p className="text-lg text-neutral-700">You want real answers before you release, not after</p>
+              <p className="text-lg text-neutral-700">You want real answers, not empty praise or random hate</p>
             </div>
             <div className="flex items-center gap-4 p-4 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               <div className="h-8 w-8 bg-purple-400 border-2 border-black flex items-center justify-center flex-shrink-0">
