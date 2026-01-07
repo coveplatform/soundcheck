@@ -365,8 +365,12 @@ export default function GetFeedbackPage() {
     }
   };
 
+  const isUrlTrackReady = Boolean(
+    inputMode === "url" && trackUrl && !urlError && !isLoadingMetadata && title
+  );
+
   // Scroll to track preview when it appears
-  const hasTrackPreview = uploadedUrl || (trackUrl && !urlError && !isLoadingMetadata);
+  const hasTrackPreview = Boolean(uploadedUrl || isUrlTrackReady);
   useEffect(() => {
     if (hasTrackPreview && trackPreviewRef.current) {
       // Small delay to ensure the element is rendered
@@ -854,8 +858,8 @@ export default function GetFeedbackPage() {
 
       <main
         className={cn(
-          "mx-auto px-4 py-8",
-          step === "track" ? "max-w-4xl" : "max-w-2xl"
+          "mx-auto px-4",
+          step === "track" ? "py-6 max-w-4xl" : "py-8 max-w-2xl"
         )}
       >
         {/* Error banner */}
@@ -871,40 +875,56 @@ export default function GetFeedbackPage() {
         {step === "track" && (
           <div className="flex flex-col gap-6">
             {/* Hero */}
-            <div className="text-center space-y-3 order-[10]">
+            <div className="text-center space-y-3 lg:space-y-2 order-[10]">
               {/* FREE badge */}
-              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 mb-2">
+              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2 mb-2 lg:mb-1">
                 <Gift className="h-5 w-5" />
                 <span className="font-black text-sm uppercase tracking-wide">First review FREE</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-4xl font-black tracking-tight">
                 Real feedback.<span className="text-lime-500"> Real fast.</span>
               </h1>
-              <p className="text-neutral-400 text-lg max-w-lg mx-auto">
+              <p className="text-neutral-400 text-base sm:text-lg lg:text-base max-w-lg mx-auto">
                 Genre-matched listeners review your track and tell you exactly what&apos;s working and what needs fixing.
               </p>
 
-              {/* What you get - visual summary */}
-              <div className="grid grid-cols-3 gap-3 max-w-md mx-auto pt-2">
-                <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-xl font-black text-lime-500">5-20</p>
-                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Reviews</p>
-                </div>
-                <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-xl font-black text-lime-500">&lt;12h</p>
-                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Turnaround</p>
-                </div>
-                <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-xl font-black text-lime-500">FREE</p>
-                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">First review</p>
-                </div>
-              </div>
+              {trackStartStage !== "track" ? (
+                <>
+                  {/* What you get - visual summary */}
+                  <div className="grid grid-cols-3 gap-3 max-w-md mx-auto pt-2">
+                    <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
+                      <p className="text-xl font-black text-lime-500">5-20</p>
+                      <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Reviews</p>
+                    </div>
+                    <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
+                      <p className="text-xl font-black text-lime-500">&lt;12h</p>
+                      <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Turnaround</p>
+                    </div>
+                    <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
+                      <p className="text-xl font-black text-lime-500">FREE</p>
+                      <p className="text-[10px] text-neutral-500 uppercase tracking-wide">First review</p>
+                    </div>
+                  </div>
 
-              {/* No card required note */}
-              <p className="text-sm text-neutral-500 font-medium pt-1">
-                No credit card required
-              </p>
+                  {/* No card required note */}
+                  <p className="text-sm text-neutral-500 font-medium pt-1">
+                    No credit card required
+                  </p>
+                </>
+              ) : (
+                <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                  <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
+                    5–20 reviews
+                  </span>
+                  <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
+                    &lt;12h turnaround
+                  </span>
+                  <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
+                    No card required
+                  </span>
+                </div>
+              )}
             </div>
 
             {trackStartStage !== "track" && !isLoggedIn && (
@@ -1155,31 +1175,83 @@ export default function GetFeedbackPage() {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <Input
-                        placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
-                        value={trackUrl}
-                        onChange={(e) => handleUrlChange(e.target.value)}
-                        className={cn(
-                          "text-lg h-14 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
-                          urlError && "border-red-500"
-                        )}
-                        autoFocus
-                      />
-                      {isLoadingMetadata && (
-                        <div className="flex items-center gap-2 text-sm text-neutral-500">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Getting track info...
-                        </div>
-                      )}
-                      {urlError && (
-                        <p className="text-sm text-red-500 font-medium">{urlError}</p>
-                      )}
-                      {!urlError && urlWarning && (
-                        <div className="flex items-start gap-2 text-sm text-amber-400 bg-amber-400/10 border border-amber-400/30 p-3 rounded">
-                          <svg className="h-4 w-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                          </svg>
-                          <span>{urlWarning}</span>
+                      {!isUrlTrackReady ? (
+                        <>
+                          <Input
+                            placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
+                            value={trackUrl}
+                            onChange={(e) => handleUrlChange(e.target.value)}
+                            className={cn(
+                              "text-lg h-14 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                              urlError && "border-red-500"
+                            )}
+                            autoFocus
+                          />
+                          {isLoadingMetadata && (
+                            <div className="flex items-center gap-2 text-sm text-neutral-500">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Getting track info...
+                            </div>
+                          )}
+                          {urlError && (
+                            <p className="text-sm text-red-500 font-medium">{urlError}</p>
+                          )}
+                          {!urlError && urlWarning && (
+                            <div className="flex items-start gap-2 text-sm text-amber-400 bg-amber-400/10 border border-amber-400/30 p-3 rounded">
+                              <svg className="h-4 w-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                              </svg>
+                              <span>{urlWarning}</span>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div
+                          ref={trackPreviewRef}
+                          className="border-2 border-neutral-700 bg-neutral-900 p-4 space-y-3"
+                        >
+                          <div className="flex items-center gap-4">
+                            {artworkUrl ? (
+                              <img
+                                src={artworkUrl}
+                                alt="Track artwork"
+                                className="w-16 h-16 object-cover border-2 border-neutral-600 flex-shrink-0"
+                              />
+                            ) : (
+                              <div className="w-16 h-16 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center flex-shrink-0">
+                                <Music className="h-7 w-7 text-neutral-500" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <Input
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="Track title"
+                                className="text-lg font-bold bg-transparent border-0 border-b-2 border-neutral-700 rounded-none px-0 focus:border-lime-500 text-white"
+                              />
+                              <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wide">
+                                {sourceType ? sourceType.replace("_", " ") : "Ready"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <p className="text-xs text-neutral-500 break-all">
+                              {trackUrl}
+                            </p>
+                            <button
+                              type="button"
+                              className="text-sm font-bold text-lime-500 hover:text-lime-400"
+                              onClick={() => {
+                                setTrackUrl("");
+                                setTitle("");
+                                setArtworkUrl(null);
+                                setSourceType("");
+                              }}
+                            >
+                              Change link
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1189,7 +1261,7 @@ export default function GetFeedbackPage() {
             )}
 
             {/* Track title edit */}
-            {(uploadedUrl || (trackUrl && !urlError && !isLoadingMetadata)) && (
+            {inputMode === "upload" && uploadedUrl && (
               <div ref={trackPreviewRef} className="border-2 border-neutral-700 bg-neutral-900 p-4 flex items-center gap-4">
                 {artworkUrl ? (
                   <img
@@ -1236,7 +1308,7 @@ export default function GetFeedbackPage() {
               </p>
             )}
 
-            {trackStartStage === "track" && canContinueFromTrackStep && (
+            {trackStartStage === "track" && (
               <div
                 id="get-feedback-proof"
                 className="order-[80] space-y-6 pt-6 mt-2 border-t border-neutral-800"
