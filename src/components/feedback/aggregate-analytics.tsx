@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Star, Zap, Sparkles, Music } from "lucide-react";
+import { Zap, Sparkles, Music, TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 type FirstImpression = "STRONG_HOOK" | "DECENT" | "LOST_INTEREST";
 
@@ -11,6 +11,15 @@ type ReviewLike = {
   perceivedGenre: string | null;
   similarArtists: string | null;
   firstImpression: FirstImpression | null;
+  wouldAddToPlaylist: boolean | null;
+  wouldShare: boolean | null;
+  wouldFollow: boolean | null;
+};
+
+type PlatformAverages = {
+  production: number;
+  originality: number;
+  vocals: number;
 };
 
 function normalizeToken(value: string) {
@@ -47,14 +56,46 @@ function topFrequencies(items: string[], limit: number) {
     .map(([k, v]) => ({ label: titleCase(k), count: v }));
 }
 
+function ComparisonIndicator({ score, platformAvg }: { score: number; platformAvg?: number }) {
+  if (!platformAvg || platformAvg === 0) return null;
+
+  const diff = score - platformAvg;
+  const threshold = 0.3; // Need to be 0.3+ above/below to show trend
+
+  if (diff > threshold) {
+    return (
+      <div className="flex items-center gap-1 text-xs text-lime-600 font-medium">
+        <TrendingUp className="h-3 w-3" />
+        <span>Above avg</span>
+      </div>
+    );
+  } else if (diff < -threshold) {
+    return (
+      <div className="flex items-center gap-1 text-xs text-amber-600 font-medium">
+        <TrendingDown className="h-3 w-3" />
+        <span>Below avg</span>
+      </div>
+    );
+  } else {
+    return (
+      <div className="flex items-center gap-1 text-xs text-neutral-500 font-medium">
+        <Minus className="h-3 w-3" />
+        <span>Average</span>
+      </div>
+    );
+  }
+}
+
 function ScoreCircle({
   score,
   label,
   icon: Icon,
+  platformAvg,
 }: {
   score: number;
   label: string;
   icon: React.ElementType;
+  platformAvg?: number;
 }) {
   const percentage = (score / 5) * 100;
   const circumference = 2 * Math.PI * 36;
@@ -95,6 +136,7 @@ function ScoreCircle({
         <Icon className="h-4 w-4 text-neutral-500" />
         <span className="text-sm font-bold text-neutral-700">{label}</span>
       </div>
+      <ComparisonIndicator score={score} platformAvg={platformAvg} />
     </div>
   );
 }
@@ -150,20 +192,101 @@ function ImpressionsBar({ impressions, total }: { impressions: { hook: number; d
   );
 }
 
-function GenreChip({ label, count, isTop }: { label: string; count: number; isTop: boolean }) {
+function EngagementRow({
+  label,
+  percentage,
+  count,
+  total
+}: {
+  label: string;
+  percentage: number;
+  count: number;
+  total: number;
+}) {
   return (
-    <span
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
-        isTop
-          ? "bg-black text-white"
-          : "bg-neutral-100 text-neutral-700 border-2 border-neutral-200"
-      }`}
-    >
-      <span>{label}</span>
-      <span className={`text-xs ${isTop ? "text-neutral-400" : "text-neutral-500"}`}>
-        {count}
-      </span>
-    </span>
+    <div className="flex items-center justify-between">
+      <span className="text-sm text-neutral-600">{label}</span>
+      <div className="flex items-center gap-2">
+        <div className="w-24 h-2 bg-neutral-100 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-lime-500 rounded-full transition-all"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+        <span className="text-sm font-bold text-neutral-800 w-12 text-right">
+          {percentage}%
+        </span>
+        <span className="text-xs text-neutral-400 w-10">
+          {count}/{total}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function EngagementSection({ reviews }: { reviews: ReviewLike[] }) {
+  const validReviews = reviews.filter(r => r.wouldListenAgain !== null);
+  const total = validReviews.length;
+
+  if (total === 0) return null;
+
+  const listenAgainCount = validReviews.filter(r => r.wouldListenAgain === true).length;
+  const playlistCount = reviews.filter(r => r.wouldAddToPlaylist === true).length;
+  const shareCount = reviews.filter(r => r.wouldShare === true).length;
+  const followCount = reviews.filter(r => r.wouldFollow === true).length;
+
+  const listenAgainPct = Math.round((listenAgainCount / total) * 100);
+  const playlistPct = Math.round((playlistCount / total) * 100);
+  const sharePct = Math.round((shareCount / total) * 100);
+  const followPct = Math.round((followCount / total) * 100);
+
+  // Overall engagement score (weighted average)
+  const overallEngagement = Math.round(
+    (listenAgainPct * 0.4 + playlistPct * 0.3 + sharePct * 0.2 + followPct * 0.1)
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="text-sm font-bold text-neutral-700">Listener Engagement</div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-neutral-500">Overall</span>
+          <span className={`text-sm font-black px-2 py-0.5 rounded ${
+            overallEngagement >= 60 ? 'bg-lime-100 text-lime-700' :
+            overallEngagement >= 40 ? 'bg-amber-100 text-amber-700' :
+            'bg-neutral-100 text-neutral-600'
+          }`}>
+            {overallEngagement}%
+          </span>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <EngagementRow
+          label="Would listen again"
+          percentage={listenAgainPct}
+          count={listenAgainCount}
+          total={total}
+        />
+        <EngagementRow
+          label="Would add to playlist"
+          percentage={playlistPct}
+          count={playlistCount}
+          total={total}
+        />
+        <EngagementRow
+          label="Would share with friends"
+          percentage={sharePct}
+          count={shareCount}
+          total={total}
+        />
+        <EngagementRow
+          label="Would follow artist"
+          percentage={followPct}
+          count={followCount}
+          total={total}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -176,7 +299,13 @@ function ArtistChip({ label, count }: { label: string; count: number }) {
   );
 }
 
-export function AggregateAnalytics({ reviews }: { reviews: ReviewLike[] }) {
+export function AggregateAnalytics({
+  reviews,
+  platformAverages
+}: {
+  reviews: ReviewLike[];
+  platformAverages?: PlatformAverages;
+}) {
   const completed = reviews.length;
 
   const avgProduction = calculateAverage(reviews, "productionScore");
@@ -190,17 +319,12 @@ export function AggregateAnalytics({ reviews }: { reviews: ReviewLike[] }) {
   };
   const impressionsTotal = impressions.hook + impressions.decent + impressions.lost;
 
-  const genreItems = reviews
-    .map((r) => r.perceivedGenre)
-    .filter((v): v is string => Boolean(v && v.trim().length));
-
   const artistsItems = reviews
     .flatMap((r) => (r.similarArtists ?? "").split(","))
     .map((v) => v.trim())
     .filter(Boolean);
 
-  // Limit to top 5 genres and top 6 artists
-  const topGenres = topFrequencies(genreItems, 5);
+  // Limit to top 6 artists
   const topArtists = topFrequencies(artistsItems, 6);
 
   return (
@@ -215,27 +339,33 @@ export function AggregateAnalytics({ reviews }: { reviews: ReviewLike[] }) {
         </p>
       </CardHeader>
       <CardContent className="p-6 space-y-8">
-        {/* Score Circles */}
+        {/* Score Circles with Platform Comparison */}
         <div className="flex justify-center gap-8 sm:gap-12">
-          <ScoreCircle score={avgProduction} label="Production" icon={Zap} />
-          <ScoreCircle score={avgOriginality} label="Originality" icon={Sparkles} />
-          <ScoreCircle score={avgVocals} label="Vocals" icon={Music} />
+          <ScoreCircle
+            score={avgProduction}
+            label="Production"
+            icon={Zap}
+            platformAvg={platformAverages?.production}
+          />
+          <ScoreCircle
+            score={avgOriginality}
+            label="Originality"
+            icon={Sparkles}
+            platformAvg={platformAverages?.originality}
+          />
+          <ScoreCircle
+            score={avgVocals}
+            label="Vocals"
+            icon={Music}
+            platformAvg={platformAverages?.vocals}
+          />
         </div>
 
         {/* Impressions Bar */}
         <ImpressionsBar impressions={impressions} total={impressionsTotal} />
 
-        {/* Genre Consensus */}
-        {topGenres.length > 0 && (
-          <div className="space-y-3">
-            <div className="text-sm font-bold text-neutral-700">What Genre Is This?</div>
-            <div className="flex flex-wrap gap-2">
-              {topGenres.map((g, i) => (
-                <GenreChip key={g.label} label={g.label} count={g.count} isTop={i === 0} />
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Listener Engagement */}
+        <EngagementSection reviews={reviews} />
 
         {/* Similar Artists */}
         {topArtists.length > 0 && (

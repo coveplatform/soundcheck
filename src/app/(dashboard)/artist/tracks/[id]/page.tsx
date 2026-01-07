@@ -40,27 +40,42 @@ export default async function TrackDetailPage({
     redirect("/login");
   }
 
-  const track = await prisma.track.findUnique({
-    where: { id },
-    include: {
-      artist: {
-        include: { user: true },
-      },
-      genres: true,
-      payment: true,
-      reviews: {
-        where: { status: "COMPLETED" },
-        include: {
-          reviewer: {
-            include: {
-              user: { select: { name: true } },
+  // Fetch track and platform averages in parallel
+  const [track, platformStats] = await Promise.all([
+    prisma.track.findUnique({
+      where: { id },
+      include: {
+        artist: {
+          include: { user: true },
+        },
+        genres: true,
+        payment: true,
+        reviews: {
+          where: { status: "COMPLETED" },
+          include: {
+            reviewer: {
+              include: {
+                user: { select: { name: true } },
+              },
             },
           },
+          orderBy: { createdAt: "desc" },
         },
-        orderBy: { createdAt: "desc" },
       },
-    },
-  });
+    }),
+    // Get platform-wide averages for context
+    prisma.review.aggregate({
+      where: {
+        status: "COMPLETED",
+        countsTowardAnalytics: true,
+      },
+      _avg: {
+        productionScore: true,
+        originalityScore: true,
+        vocalScore: true,
+      },
+    }),
+  ]);
 
   if (!track) {
     notFound();
@@ -380,7 +395,16 @@ export default async function TrackDetailPage({
         </Card>
       )}
 
-      {analyticsReviews.length > 0 && <AggregateAnalytics reviews={analyticsReviews} />}
+      {analyticsReviews.length > 0 && (
+        <AggregateAnalytics
+          reviews={analyticsReviews}
+          platformAverages={{
+            production: platformStats._avg.productionScore ?? 0,
+            originality: platformStats._avg.originalityScore ?? 0,
+            vocals: platformStats._avg.vocalScore ?? 0,
+          }}
+        />
+      )}
 
       {/* Reviews - Carousel for better presentation */}
       <Card>
