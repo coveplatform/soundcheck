@@ -10,9 +10,11 @@ export async function POST() {
   // Require admin access
   const session = await getServerSession(authOptions);
 
-  if (!session?.user?.email || !isAdminEmail(session.user.email)) {
+  if (!session?.user?.email || !isAdminEmail(session.user.email) || !session.user.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const adminUserId = session.user.id;
 
   try {
     // Get a genre for the test data
@@ -26,7 +28,7 @@ export async function POST() {
 
     const passwordHash = await hash("test123456", 12);
 
-    // Create or get test artist
+    // Create or get test artist (separate from admin)
     const artistUser = await prisma.user.upsert({
       where: { email: "test-artist@soundcheck.com" },
       update: {},
@@ -49,24 +51,17 @@ export async function POST() {
       },
     });
 
-    // Create or get test reviewer
-    const reviewerUser = await prisma.user.upsert({
-      where: { email: "test-reviewer@soundcheck.com" },
-      update: {},
-      create: {
-        email: "test-reviewer@soundcheck.com",
-        password: passwordHash,
-        name: "Test Reviewer",
-        isReviewer: true,
-        emailVerified: new Date(),
-      },
+    // Enable reviewer mode on admin's account and create reviewer profile
+    await prisma.user.update({
+      where: { id: adminUserId },
+      data: { isReviewer: true },
     });
 
     const reviewerProfile = await prisma.reviewerProfile.upsert({
-      where: { userId: reviewerUser.id },
+      where: { userId: adminUserId },
       update: {},
       create: {
-        userId: reviewerUser.id,
+        userId: adminUserId,
         tier: "PRO",
         completedOnboarding: true,
         onboardingQuizPassed: true,
@@ -74,7 +69,7 @@ export async function POST() {
       },
     });
 
-    // Check for existing assigned/in-progress review for this reviewer
+    // Check for existing assigned/in-progress review for admin
     let review = await prisma.review.findFirst({
       where: {
         reviewerId: reviewerProfile.id,
@@ -100,7 +95,7 @@ export async function POST() {
         },
       });
 
-      // Create assigned review
+      // Create review assigned to admin
       review = await prisma.review.create({
         data: {
           trackId: track.id,
@@ -112,8 +107,6 @@ export async function POST() {
 
     return NextResponse.json({
       reviewId: review.id,
-      reviewerEmail: "test-reviewer@soundcheck.com",
-      reviewerPassword: "test123456",
     });
   } catch (error) {
     console.error("Failed to create preview review:", error);

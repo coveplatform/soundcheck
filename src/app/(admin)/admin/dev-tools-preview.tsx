@@ -61,7 +61,7 @@ export function DevToolsPreview() {
 
         {reviewUrl && (
           <p className="text-xs text-amber-600">
-            Tip: Log in as test-reviewer@soundcheck.com (password: test123456) first
+            Opens with your current account (reviewer profile auto-created)
           </p>
         )}
       </div>
