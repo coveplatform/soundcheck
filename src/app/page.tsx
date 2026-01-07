@@ -82,52 +82,52 @@ export default function Home() {
       </section>
 
       {/* Quality Guarantee Flow - Quick Visual */}
-      <section className="border-b-2 border-black py-5 bg-gradient-to-r from-lime-50 via-white to-lime-50">
+      <section className="border-b-2 border-black py-10 bg-gradient-to-r from-lime-50 via-white to-lime-50">
         <div className="max-w-4xl mx-auto px-4">
-          <p className="text-xs font-bold text-neutral-500 text-center mb-4 uppercase tracking-wider">Why our reviews are actually useful</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-1">
+          <h3 className="text-lg sm:text-xl font-black text-center mb-6">Why our feedback is actually useful</h3>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             {/* Step 1 */}
-            <div className="flex items-center gap-2 bg-white border-2 border-black px-3 py-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-8 w-8 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <DollarSign className="h-4 w-4" />
+            <div className="flex items-center gap-3 bg-white border-2 border-black px-4 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <DollarSign className="h-5 w-5" />
               </div>
-              <span className="font-bold text-sm">You pay</span>
+              <span className="font-bold">You pay</span>
             </div>
 
-            <ArrowRight className="h-5 w-5 text-lime-600 hidden sm:block flex-shrink-0" />
-            <div className="h-5 w-px bg-lime-600 sm:hidden" />
+            <ArrowRight className="h-6 w-6 text-lime-600 hidden sm:block flex-shrink-0" />
+            <div className="h-6 w-0.5 bg-lime-500 sm:hidden" />
 
             {/* Step 2 */}
-            <div className="flex items-center gap-2 bg-white border-2 border-black px-3 py-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-8 w-8 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <Headphones className="h-4 w-4" />
+            <div className="flex items-center gap-3 bg-white border-2 border-black px-4 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <Headphones className="h-5 w-5" />
               </div>
-              <span className="font-bold text-sm">Reviewers earn</span>
+              <span className="font-bold">Reviewers earn</span>
             </div>
 
-            <ArrowRight className="h-5 w-5 text-lime-600 hidden sm:block flex-shrink-0" />
-            <div className="h-5 w-px bg-lime-600 sm:hidden" />
+            <ArrowRight className="h-6 w-6 text-lime-600 hidden sm:block flex-shrink-0" />
+            <div className="h-6 w-0.5 bg-lime-500 sm:hidden" />
 
             {/* Step 3 */}
-            <div className="flex items-center gap-2 bg-white border-2 border-black px-3 py-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-8 w-8 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <Star className="h-4 w-4" />
+            <div className="flex items-center gap-3 bg-white border-2 border-black px-4 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <Star className="h-5 w-5" />
               </div>
-              <span className="font-bold text-sm">You rate them</span>
+              <span className="font-bold">You rate them</span>
             </div>
 
-            <ArrowRight className="h-5 w-5 text-lime-600 hidden sm:block flex-shrink-0" />
-            <div className="h-5 w-px bg-lime-600 sm:hidden" />
+            <ArrowRight className="h-6 w-6 text-lime-600 hidden sm:block flex-shrink-0" />
+            <div className="h-6 w-0.5 bg-lime-500 sm:hidden" />
 
             {/* Result */}
-            <div className="flex items-center gap-2 bg-black border-2 border-black px-3 py-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-8 w-8 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <Shield className="h-4 w-4" />
+            <div className="flex items-center gap-3 bg-black border-2 border-black px-4 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <Shield className="h-5 w-5" />
               </div>
-              <span className="font-bold text-sm text-white">Quality enforced</span>
+              <span className="font-bold text-white">Quality enforced</span>
             </div>
           </div>
-          <p className="text-xs text-neutral-500 text-center mt-4">
+          <p className="text-sm text-neutral-600 text-center mt-6">
             Bad ratings = reviewers earn less. They&apos;re incentivized to be genuinely helpful, not lazy.
           </p>
         </div>
