@@ -73,6 +73,32 @@ function formatFirstImpression(value: FirstImpression | null | undefined) {
   return "Lost Interest";
 }
 
+function makeClientId(): string {
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function firstImpressionLabel(score: number) {
+  if (score <= 1) return "Skipped ahead / Lost interest";
+  if (score === 2) return "Kept listening, but not grabbed";
+  if (score === 3) return "Solid intro, curious to hear more";
+  if (score === 4) return "This is catching my attention";
+  return "Hooked - I need to hear the rest";
+}
+
+function firstImpressionColor(score: number) {
+  if (score <= 1) return "bg-red-100 border-red-400 text-red-800";
+  if (score === 2) return "bg-orange-100 border-orange-400 text-orange-800";
+  if (score === 3) return "bg-yellow-100 border-yellow-400 text-yellow-800";
+  if (score === 4) return "bg-lime-100 border-lime-400 text-lime-800";
+  return "bg-green-100 border-green-400 text-green-800";
+}
+
+function firstImpressionEnumFromScore(score: number): FirstImpression {
+  if (score <= 2) return "LOST_INTEREST";
+  if (score === 3) return "DECENT";
+  return "STRONG_HOOK";
+}
+
 export default function ReviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
@@ -97,6 +123,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [listenTime, setListenTime] = useState(0);
   const [canSubmit, setCanSubmit] = useState(false);
   const [firstImpression, setFirstImpression] = useState<FirstImpression | null>(null);
+  const [firstImpressionScore, setFirstImpressionScore] = useState<number>(3);
+  const [firstImpressionTouched, setFirstImpressionTouched] = useState(false);
   const [productionScore, setProductionScore] = useState<number>(0);
   const [vocalScore, setVocalScore] = useState<number>(0);
   const [originalityScore, setOriginalityScore] = useState<number>(0);
@@ -111,9 +139,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [additionalNotes, setAdditionalNotes] = useState("");
   const [nextActions, setNextActions] = useState("");
   const [timestampNotes, setTimestampNotes] = useState<
-    Array<{ seconds: number; note: string }>
+    Array<{ id: string; seconds: number; note: string }>
   >([]);
   const [playerSeconds, setPlayerSeconds] = useState(0);
+  const [pendingTimestampFocusId, setPendingTimestampFocusId] = useState<string | null>(null);
   const [validationIssues, setValidationIssues] = useState<Array<{ id: string; message: string; section: string }>>([]);
 
   // Section refs for scroll-to functionality
@@ -122,6 +151,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const wouldListenAgainRef = useRef<HTMLDivElement>(null);
   const bestPartRef = useRef<HTMLDivElement>(null);
   const weakestPartRef = useRef<HTMLDivElement>(null);
+  const timestampNotesRef = useRef<HTMLDivElement>(null);
+  const timestampInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const scrollToSection = useCallback((sectionId: string) => {
     const refs: Record<string, React.RefObject<HTMLDivElement | null>> = {
@@ -130,12 +161,33 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       wouldListenAgain: wouldListenAgainRef,
       bestPart: bestPartRef,
       weakestPart: weakestPartRef,
+      timestamps: timestampNotesRef,
     };
     const ref = refs[sectionId];
     if (ref?.current) {
       ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }, []);
+
+  const addTimestampNote = useCallback((seconds: number) => {
+    const id = makeClientId();
+    setTimestampNotes((prev) => {
+      const next = [...prev, { id, seconds: Math.max(0, Math.floor(seconds)), note: "" }];
+      next.sort((a, b) => (a.seconds - b.seconds) || a.id.localeCompare(b.id));
+      return next;
+    });
+    setPendingTimestampFocusId(id);
+    setTimeout(() => scrollToSection("timestamps"), 0);
+  }, [scrollToSection]);
+
+  useEffect(() => {
+    if (!pendingTimestampFocusId) return;
+    const el = timestampInputRefs.current[pendingTimestampFocusId];
+    if (el) {
+      el.focus();
+    }
+    setPendingTimestampFocusId(null);
+  }, [pendingTimestampFocusId]);
 
   useEffect(() => {
     async function fetchReview() {
@@ -253,6 +305,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             setCanSubmit(true);
           }
           setFirstImpression(parsed.firstImpression ?? null);
+          const restoredScore = typeof parsed.firstImpressionScore === "number" ? parsed.firstImpressionScore : null;
+          if (restoredScore && restoredScore >= 1 && restoredScore <= 5) {
+            setFirstImpressionScore(restoredScore);
+            setFirstImpressionTouched(true);
+            setFirstImpression(firstImpressionEnumFromScore(restoredScore));
+          } else if (parsed.firstImpression) {
+            setFirstImpressionTouched(true);
+            setFirstImpressionScore(parsed.firstImpression === "STRONG_HOOK" ? 5 : parsed.firstImpression === "DECENT" ? 3 : 1);
+          }
           setProductionScore(typeof parsed.productionScore === "number" ? parsed.productionScore : 0);
           setVocalScore(typeof parsed.vocalScore === "number" ? parsed.vocalScore : 0);
           setOriginalityScore(typeof parsed.originalityScore === "number" ? parsed.originalityScore : 0);
@@ -274,23 +335,45 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           setWeakestPart(typeof parsed.weakestPart === "string" ? parsed.weakestPart : "");
           setAdditionalNotes(typeof parsed.additionalNotes === "string" ? parsed.additionalNotes : "");
           setNextActions(typeof parsed.nextActions === "string" ? parsed.nextActions : "");
-          setTimestampNotes(Array.isArray(parsed.timestampNotes) ? parsed.timestampNotes : []);
+          const restoredTimestamps = Array.isArray(parsed.timestampNotes) ? parsed.timestampNotes : [];
+          const normalized = restoredTimestamps
+            .map((t: unknown) => {
+              if (!t || typeof t !== "object") return null;
+              const rec = t as Record<string, unknown>;
+              const seconds = typeof rec.seconds === "number" ? rec.seconds : null;
+              const note = typeof rec.note === "string" ? rec.note : "";
+              if (seconds === null) return null;
+              return { id: typeof rec.id === "string" ? rec.id : makeClientId(), seconds, note };
+            })
+            .filter(Boolean) as Array<{ id: string; seconds: number; note: string }>;
+          normalized.sort((a, b) => (a.seconds - b.seconds) || a.id.localeCompare(b.id));
+          setTimestampNotes(normalized);
           setDraftSavedAt(typeof parsed.savedAt === "number" ? parsed.savedAt : null);
           setDraftReady(true);
           return;
         }
       }
     } catch {
+      // Draft parse failed, fall through to restore from server
     }
 
-    // No draft found, restore from server
-    if (serverListenTime > 0) {
-      setListenTime(serverListenTime);
-      if (serverListenTime >= MIN_LISTEN_SECONDS) {
-        setCanSubmit(true);
-      }
+    // No draft found or draft didn't match, restore from server
+    setListenTime(serverListenTime);
+    if (serverListenTime >= MIN_LISTEN_SECONDS) {
+      setCanSubmit(true);
     }
-    setTimestampNotes(Array.isArray(review.timestamps) ? review.timestamps : []);
+
+    const initialTimestamps = Array.isArray(review.timestamps) ? review.timestamps : [];
+    const normalized = initialTimestamps
+      .map((t) => ({ id: makeClientId(), seconds: t.seconds, note: t.note }))
+      .sort((a, b) => (a.seconds - b.seconds) || a.id.localeCompare(b.id));
+    setTimestampNotes(normalized);
+
+    if (review.firstImpression) {
+      setFirstImpressionTouched(true);
+      setFirstImpressionScore(review.firstImpression === "STRONG_HOOK" ? 5 : review.firstImpression === "DECENT" ? 3 : 1);
+      setFirstImpression(review.firstImpression);
+    }
     setDraftReady(true);
   }, [draftKey, review]);
 
@@ -308,6 +391,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         savedAt,
         listenTime,
         firstImpression,
+        firstImpressionScore,
         productionScore,
         vocalScore,
         originalityScore,
@@ -361,7 +445,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     // Build validation issues
     const issues: Array<{ id: string; message: string; section: string }> = [];
 
-    if (!firstImpression) {
+    if (!firstImpression || !firstImpressionTouched) {
       issues.push({ id: "firstImpression", message: "Select your first impression", section: "firstImpression" });
     }
     if (productionScore === 0) {
@@ -920,7 +1004,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           )}
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 space-y-4">
           <AudioPlayer
             sourceUrl={review.track.sourceUrl}
             sourceType={review.track.sourceType}
@@ -937,12 +1021,61 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               funnels.review.minimumReached(review.track.id, MIN_LISTEN_SECONDS);
             }}
             onAddTimestamp={(seconds) => {
-              setTimestampNotes((prev) => [
-                ...prev,
-                { seconds, note: "" },
-              ]);
+              addTimestampNote(seconds);
             }}
           />
+
+          {/* Inline timestamp controls */}
+          <div className="border-t-2 border-neutral-200 pt-4">
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <span className="text-sm font-bold text-neutral-700">
+                Timestamp Notes
+                {timestampNotes.length > 0 && (
+                  <span className="ml-2 px-1.5 py-0.5 text-xs bg-black text-white">
+                    {timestampNotes.length}
+                  </span>
+                )}
+              </span>
+              <button
+                type="button"
+                onClick={() => addTimestampNote(playerSeconds)}
+                className="px-3 py-1.5 text-xs font-bold border-2 border-black bg-white hover:bg-neutral-100 transition-colors"
+              >
+                + Add at {formatTimestamp(playerSeconds)}
+              </button>
+            </div>
+
+            {timestampNotes.length === 0 ? (
+              <p className="text-xs text-neutral-500">
+                Click the button above to mark moments in the track
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {timestampNotes.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => {
+                      scrollToSection("timestamps");
+                      setTimeout(() => {
+                        const el = timestampInputRefs.current[t.id];
+                        if (el) el.focus();
+                      }, 300);
+                    }}
+                    className={cn(
+                      "px-2 py-1 text-xs font-mono border-2 transition-colors",
+                      t.note.trim()
+                        ? "border-lime-500 bg-lime-50 text-lime-800 hover:bg-lime-100"
+                        : "border-amber-400 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                    )}
+                  >
+                    {formatTimestamp(t.seconds)}
+                    {!t.note.trim() && <span className="ml-1 text-amber-600">•</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -973,30 +1106,44 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                 {validationIssues.find((i) => i.section === "firstImpression")?.message}
               </p>
             )}
-            <div className="flex gap-2">
-              {[
-                { value: "STRONG_HOOK", label: "Strong Hook", color: "lime" },
-                { value: "DECENT", label: "Decent", color: "orange" },
-                { value: "LOST_INTEREST", label: "Lost Interest", color: "neutral" },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setFirstImpression(option.value as FirstImpression)}
-                  className={cn(
-                    "flex-1 py-2.5 px-3 text-sm font-bold transition-colors border-2 border-black",
-                    firstImpression === option.value
-                      ? option.color === "lime"
-                        ? "bg-lime-500 text-black"
-                        : option.color === "orange"
-                        ? "bg-orange-400 text-black"
-                        : "bg-neutral-800 text-white"
-                      : "bg-white text-black hover:bg-neutral-100"
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
+            <div className="space-y-3">
+              {/* Current selection display */}
+              {firstImpressionTouched ? (
+                <div className={cn("px-3 py-2 border-2 text-sm font-bold transition-colors", firstImpressionColor(firstImpressionScore))}>
+                  {firstImpressionLabel(firstImpressionScore)}
+                </div>
+              ) : (
+                <div className="px-3 py-2 border-2 border-dashed border-neutral-300 text-sm text-neutral-500">
+                  Tap a point below to rate your first impression
+                </div>
+              )}
+
+              {/* Clickable scale */}
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((score) => (
+                  <button
+                    key={score}
+                    type="button"
+                    onClick={() => {
+                      setFirstImpressionScore(score);
+                      setFirstImpressionTouched(true);
+                      setFirstImpression(firstImpressionEnumFromScore(score));
+                    }}
+                    className={cn(
+                      "flex-1 py-3 text-xs font-bold transition-all border-2",
+                      firstImpressionTouched && firstImpressionScore === score
+                        ? firstImpressionColor(score)
+                        : "border-neutral-200 bg-neutral-50 hover:border-neutral-400 hover:bg-white text-neutral-600"
+                    )}
+                  >
+                    {score}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center justify-between text-xs font-medium text-neutral-500">
+                <span>Lost interest</span>
+                <span>Hooked</span>
+              </div>
             </div>
           </div>
 
@@ -1266,65 +1413,62 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             />
           </div>
 
-          {/* Timestamped notes */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between gap-3">
-              <Label className="text-base font-bold">Timestamped notes (optional)</Label>
-              {review.track.sourceType === "UPLOAD" && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTimestampNotes((prev) => [
-                      ...prev,
-                      { seconds: Math.floor(playerSeconds), note: "" },
-                    ]);
-                  }}
-                  className="px-3 py-2 text-xs font-bold border-2 border-black bg-white hover:bg-neutral-100"
-                >
-                  Add current time ({formatTimestamp(playerSeconds)})
-                </button>
-              )}
-            </div>
+          {/* Timestamped notes - edit section */}
+          {timestampNotes.length > 0 && (
+            <div ref={timestampNotesRef} className="space-y-3 p-4 bg-neutral-50 border-2 border-neutral-200">
+              <div className="flex items-center justify-between gap-3">
+                <Label className="text-base font-bold">
+                  Timestamp Notes
+                  <span className="ml-2 text-xs font-normal text-neutral-500">
+                    {timestampNotes.filter(t => t.note.trim()).length}/{timestampNotes.length} filled
+                  </span>
+                </Label>
+              </div>
 
-            {timestampNotes.length === 0 ? (
-              <p className="text-xs text-neutral-600 font-mono">
-                {review.track.sourceType === "UPLOAD"
-                  ? "Tip: click the waveform to jump to a moment, then add a timestamp note."
-                  : "Tip: use the \"Add timestamp\" button while playing to mark specific moments."}
-              </p>
-            ) : (
               <div className="space-y-2">
-                {timestampNotes.map((t, idx) => (
-                  <div key={`${t.seconds}-${idx}`} className="border-2 border-black p-3">
+                {timestampNotes.map((t) => (
+                  <div
+                    key={t.id}
+                    className={cn(
+                      "border-2 p-3 bg-white transition-colors",
+                      t.note.trim() ? "border-lime-400" : "border-amber-400"
+                    )}
+                  >
                     <div className="flex items-center justify-between gap-3 mb-2">
-                      <span className="text-xs font-mono text-neutral-600">
+                      <span className={cn(
+                        "px-2 py-0.5 text-xs font-mono font-bold",
+                        t.note.trim() ? "bg-lime-100 text-lime-800" : "bg-amber-100 text-amber-800"
+                      )}>
                         {formatTimestamp(t.seconds)}
                       </span>
                       <button
                         type="button"
                         onClick={() =>
-                          setTimestampNotes((prev) => prev.filter((_, i) => i !== idx))
+                          setTimestampNotes((prev) => prev.filter((p) => p.id !== t.id))
                         }
-                        className="text-xs font-bold text-neutral-600 hover:text-black"
+                        className="text-xs font-bold text-neutral-400 hover:text-red-600 transition-colors"
                       >
                         Remove
                       </button>
                     </div>
                     <Input
+                      ref={(el) => {
+                        timestampInputRefs.current[t.id] = el;
+                      }}
                       value={t.note}
                       onChange={(e) => {
                         const v = e.target.value;
                         setTimestampNotes((prev) =>
-                          prev.map((p, i) => (i === idx ? { ...p, note: v } : p))
+                          prev.map((p) => (p.id === t.id ? { ...p, note: v } : p))
                         );
                       }}
-                      placeholder="What happens here? (e.g. drop hits hard, vocal gets buried, etc.)"
+                      placeholder="What happens here? (e.g. drop hits hard, vocal gets buried)"
                     />
                   </div>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
