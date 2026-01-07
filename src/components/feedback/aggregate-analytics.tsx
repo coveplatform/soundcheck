@@ -56,31 +56,60 @@ function topFrequencies(items: string[], limit: number) {
     .map(([k, v]) => ({ label: titleCase(k), count: v }));
 }
 
+function getScoreLabel(score: number): { label: string; color: string } {
+  // Absolute quality labels based on 1-5 scale
+  if (score >= 4.5) return { label: "Exceptional", color: "text-lime-600" };
+  if (score >= 4.0) return { label: "Strong", color: "text-lime-600" };
+  if (score >= 3.5) return { label: "Solid", color: "text-neutral-600" };
+  if (score >= 3.0) return { label: "Average", color: "text-neutral-500" };
+  if (score >= 2.5) return { label: "Developing", color: "text-amber-600" };
+  return { label: "Needs work", color: "text-amber-600" };
+}
+
 function ComparisonIndicator({ score, platformAvg }: { score: number; platformAvg?: number }) {
-  if (!platformAvg || platformAvg === 0) return null;
-
-  const diff = score - platformAvg;
-  const threshold = 0.3; // Need to be 0.3+ above/below to show trend
-
-  if (diff > threshold) {
+  // If no platform average available, just show the quality label
+  if (!platformAvg || platformAvg === 0) {
+    const { label, color } = getScoreLabel(score);
     return (
-      <div className="flex items-center gap-1 text-xs text-lime-600 font-medium">
-        <TrendingUp className="h-3 w-3" />
-        <span>Above avg</span>
+      <div className={`text-xs font-medium ${color}`}>
+        {label}
       </div>
     );
-  } else if (diff < -threshold) {
+  }
+
+  const diff = score - platformAvg;
+  const absDiff = Math.abs(diff).toFixed(1);
+  const { label } = getScoreLabel(score);
+
+  // Show: "Strong · +0.8 vs avg" or "Developing · -0.5 vs avg"
+  if (diff > 0.2) {
     return (
-      <div className="flex items-center gap-1 text-xs text-amber-600 font-medium">
+      <div
+        className="flex items-center gap-1 text-xs text-lime-600 font-medium"
+        title={`Platform average: ${platformAvg.toFixed(1)}`}
+      >
+        <TrendingUp className="h-3 w-3" />
+        <span>{label} · +{absDiff}</span>
+      </div>
+    );
+  } else if (diff < -0.2) {
+    return (
+      <div
+        className="flex items-center gap-1 text-xs text-amber-600 font-medium"
+        title={`Platform average: ${platformAvg.toFixed(1)}`}
+      >
         <TrendingDown className="h-3 w-3" />
-        <span>Below avg</span>
+        <span>{label} · -{absDiff}</span>
       </div>
     );
   } else {
     return (
-      <div className="flex items-center gap-1 text-xs text-neutral-500 font-medium">
+      <div
+        className="flex items-center gap-1 text-xs text-neutral-500 font-medium"
+        title={`Platform average: ${platformAvg.toFixed(1)}`}
+      >
         <Minus className="h-3 w-3" />
-        <span>Average</span>
+        <span>{label} · avg</span>
       </div>
     );
   }
