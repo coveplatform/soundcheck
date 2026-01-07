@@ -1228,6 +1228,226 @@ export default function GetFeedbackPage() {
                 <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
             )}
+
+            {trackStartStage === "track" && (
+              <div id="get-feedback-proof" className="order-[80] space-y-6 pt-2">
+                <div className="border-2 border-neutral-700 bg-neutral-950/30 p-5">
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 bg-lime-500 text-black flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="h-5 w-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-lg font-black text-white">Want to see what you’ll get?</p>
+                      <p className="text-sm text-neutral-400">
+                        Here’s a real-world example of the kind of feedback and pattern insights you’ll receive.
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 pt-2">
+                        <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
+                          <Check className="h-3.5 w-3.5 text-lime-500" />
+                          Specific timestamps
+                        </span>
+                        <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
+                          <Check className="h-3.5 w-3.5 text-lime-500" />
+                          Actionable fixes
+                        </span>
+                        <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
+                          <Check className="h-3.5 w-3.5 text-lime-500" />
+                          Consensus signal
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <details className="group border-2 border-neutral-700 bg-neutral-900">
+                    <summary className="cursor-pointer select-none p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center">
+                          <Zap className="h-4 w-4 text-lime-500" />
+                        </div>
+                        <div>
+                          <p className="font-black text-white">Example analytics</p>
+                          <p className="text-xs text-neutral-500">See patterns from multiple reviews</p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">VIEW</span>
+                    </summary>
+                    <div className="border-t border-neutral-800 p-4">
+                      <div className="border border-neutral-700 bg-black/30 overflow-hidden">
+                        <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 p-3 flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-lime-500" />
+                          <span className="font-bold text-sm text-white">Pattern Analytics</span>
+                          <span className="text-xs text-neutral-500">from 12 reviews</span>
+                        </div>
+
+                        <div className="p-4 space-y-4">
+                          <div className="grid grid-cols-3 gap-3">
+                            <div className="border border-neutral-800 bg-neutral-950/40 p-3 text-center">
+                              <div className="text-2xl font-black text-lime-500">4.2</div>
+                              <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide">Production</div>
+                            </div>
+                            <div className="border border-neutral-800 bg-neutral-950/40 p-3 text-center">
+                              <div className="text-2xl font-black text-white">3.8</div>
+                              <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide">Originality</div>
+                            </div>
+                            <div className="border border-neutral-800 bg-neutral-950/40 p-3 text-center">
+                              <div className="text-2xl font-black text-lime-500">4.5</div>
+                              <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide">Vocals</div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-neutral-400 uppercase tracking-wide">First impressions</span>
+                              <span className="text-xs font-mono text-neutral-500">Example</span>
+                            </div>
+                            <div className="h-3 w-full rounded-full overflow-hidden flex bg-neutral-800">
+                              <div className="h-full bg-lime-500" style={{ width: "67%" }} />
+                              <div className="h-full bg-amber-400" style={{ width: "25%" }} />
+                              <div className="h-full bg-neutral-500" style={{ width: "8%" }} />
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 text-[11px] text-neutral-400">
+                              <div className="flex items-center gap-2">
+                                <span className="h-2 w-2 rounded-full bg-lime-500" />
+                                Strong hook
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="h-2 w-2 rounded-full bg-amber-400" />
+                                Decent
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="h-2 w-2 rounded-full bg-neutral-500" />
+                                Lost
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="border border-neutral-800 bg-neutral-950/40 p-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-bold text-neutral-400 uppercase tracking-wide">Would listen again</span>
+                              <span className="text-xs font-black px-2 py-0.5 rounded bg-lime-500 text-black">83%</span>
+                            </div>
+                            <div className="h-2 bg-neutral-800 overflow-hidden">
+                              <div className="h-full bg-lime-500" style={{ width: "83%" }} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </details>
+
+                  <details className="group border-2 border-neutral-700 bg-neutral-900">
+                    <summary className="cursor-pointer select-none p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center">
+                          <Star className="h-4 w-4 text-lime-500" />
+                        </div>
+                        <div>
+                          <p className="font-black text-white">Example feedback</p>
+                          <p className="text-xs text-neutral-500">One review (your package includes more)</p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">VIEW</span>
+                    </summary>
+                    <div className="border-t border-neutral-800 p-4">
+                      <div className="border border-neutral-700 bg-black/30 p-4 space-y-4">
+                        <div className="flex items-center gap-3">
+                          <span className="h-10 w-10 rounded-full bg-neutral-900 border-2 border-neutral-700 flex items-center justify-center text-sm font-black text-white">
+                            S
+                          </span>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-bold text-white">Sarah</span>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-lime-500 text-black">Strong hook</span>
+                            </div>
+                            <p className="text-xs text-neutral-500">Example review</p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-neutral-300">
+                          <span>Production <strong className="text-white">4/5</strong></span>
+                          <span>Vocals <strong className="text-white">5/5</strong></span>
+                          <span>Originality <strong className="text-white">4/5</strong></span>
+                          <span className="text-lime-400 font-bold">Would listen again</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3">
+                          <div className="border-l-4 border-lime-500 pl-3">
+                            <p className="text-xs font-bold text-lime-400 uppercase tracking-wide">What worked</p>
+                            <p className="text-sm text-neutral-200 leading-relaxed">
+                              The synth hook around 0:45 is genuinely catchy. Low end is tight and punchy.
+                              The breakdown at 2:15 adds a great dynamic shift.
+                            </p>
+                          </div>
+                          <div className="border-l-4 border-red-400 pl-3">
+                            <p className="text-xs font-bold text-red-300 uppercase tracking-wide">To improve</p>
+                            <p className="text-sm text-neutral-200 leading-relaxed">
+                              The intro feels long before the hook hits—consider trimming 8–10 seconds.
+                              The vocal sample at 1:30 sits too loud and clashes with the lead synth.
+                            </p>
+                          </div>
+                          <div className="border-l-4 border-neutral-200 pl-3">
+                            <p className="text-xs font-bold text-neutral-200 uppercase tracking-wide">Next actions</p>
+                            <p className="text-sm text-neutral-200 leading-relaxed">
+                              1) Tighten intro length. 2) Add hat variation. 3) EQ vocal sample.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-neutral-500 mt-3">
+                        You’ll receive multiple reviews like this, plus pattern analytics that summarize the consensus.
+                      </p>
+                    </div>
+                  </details>
+                </div>
+
+                <div className="border-2 border-neutral-700 bg-neutral-900 p-5">
+                  <p className="font-black text-white mb-3">FAQ</p>
+                  <div className="space-y-2">
+                    <details className="group border border-neutral-800 bg-neutral-950/40 p-3">
+                      <summary className="cursor-pointer select-none font-bold text-sm text-neutral-200 flex items-center justify-between">
+                        What platforms do you support?
+                        <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">OPEN</span>
+                      </summary>
+                      <p className="text-sm text-neutral-400 mt-2">
+                        SoundCloud, Bandcamp, YouTube, or an MP3 upload.
+                      </p>
+                    </details>
+
+                    <details className="group border border-neutral-800 bg-neutral-950/40 p-3">
+                      <summary className="cursor-pointer select-none font-bold text-sm text-neutral-200 flex items-center justify-between">
+                        Is my track private?
+                        <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">OPEN</span>
+                      </summary>
+                      <p className="text-sm text-neutral-400 mt-2">
+                        Yes. Only assigned reviewers can access your track. It isn’t publicly shared by default.
+                      </p>
+                    </details>
+
+                    <details className="group border border-neutral-800 bg-neutral-950/40 p-3">
+                      <summary className="cursor-pointer select-none font-bold text-sm text-neutral-200 flex items-center justify-between">
+                        Do I need a credit card?
+                        <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">OPEN</span>
+                      </summary>
+                      <p className="text-sm text-neutral-400 mt-2">
+                        Your first review is free with no card required. You only pay if you choose a larger package.
+                      </p>
+                    </details>
+
+                    <details className="group border border-neutral-800 bg-neutral-950/40 p-3">
+                      <summary className="cursor-pointer select-none font-bold text-sm text-neutral-200 flex items-center justify-between">
+                        How do you ensure quality?
+                        <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">OPEN</span>
+                      </summary>
+                      <p className="text-sm text-neutral-400 mt-2">
+                        Reviews require minimum listening and detailed feedback. Reviewers are also rated, which helps maintain standards.
+                      </p>
+                    </details>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
