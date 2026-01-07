@@ -318,7 +318,7 @@ export default function Home() {
 
       {/* Example Review */}
       <section className="border-b-2 border-black py-16 bg-neutral-50">
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-3xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
               <Star className="h-6 w-6 text-black" />
@@ -330,126 +330,113 @@ export default function Home() {
           </p>
 
           <div className="border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            {/* Track Header */}
-            <div className="p-4 border-b-2 border-black bg-black flex items-center gap-4">
-              <div className="h-14 w-14 bg-lime-500 border-2 border-black flex items-center justify-center shrink-0">
-                <Music className="h-6 w-6 text-black" />
-              </div>
-              <div className="min-w-0">
-                <p className="font-bold text-white truncate">Midnight Frequency</p>
-                <p className="text-neutral-400 text-sm truncate">Electronic • 3:42</p>
-              </div>
-            </div>
-
-            {/* Reviewer */}
-            <div className="p-4 border-b-2 border-black bg-neutral-50 flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center font-bold">
-                  S
+            {/* Review Content - Matches ReviewDisplay component */}
+            <article className="p-6">
+              {/* Header: Avatar + Name + First Impression + Date */}
+              <header className="mb-5">
+                <div className="flex items-center gap-3">
+                  {/* Rounded avatar with initial */}
+                  <span className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black">
+                    S
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-sm text-black">Sarah</span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-lime-100 text-lime-700">
+                        Strong Hook
+                      </span>
+                    </div>
+                    <time className="text-xs text-neutral-500">Jan 8, 2026</time>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-sm">Sarah M.</p>
-                  <p className="text-xs text-neutral-500">Electronic • Indie • Alternative</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-xs font-mono text-neutral-500">
-                <Headphones className="h-4 w-4" />
-                <span>Listened 4:32</span>
-              </div>
-            </div>
+              </header>
 
-            {/* Quick Ratings */}
-            <div className="border-b-2 border-black grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-neutral-200">
-              <div className="p-4 text-center">
-                <p className="text-xs text-neutral-500 mb-1">First Impression</p>
-                <p className="font-bold text-lime-600">Strong Hook</p>
-              </div>
-              <div className="p-4 text-center">
-                <p className="text-xs text-neutral-500 mb-1">Production</p>
-                <p className="font-bold">4/5</p>
-              </div>
-              <div className="p-4 text-center">
-                <p className="text-xs text-neutral-500 mb-1">Originality</p>
-                <p className="font-bold">4/5</p>
-              </div>
-              <div className="p-4 text-center">
-                <p className="text-xs text-neutral-500 mb-1">Listen Again?</p>
-                <p className="font-bold text-lime-600">Yes</p>
-              </div>
-            </div>
-
-            {/* Listener Signals */}
-            <div className="border-b-2 border-black bg-neutral-50 p-4">
-              <p className="text-xs text-neutral-500 mb-3 font-medium">Listener Signals</p>
-              <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-lime-100 border-2 border-lime-500 text-lime-700">
-                  <ListMusic className="h-3.5 w-3.5" />
-                  Would add to playlist
+              {/* Scores - Inline format */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-neutral-600 mb-5">
+                <span>Production <strong className="text-black">4/5</strong></span>
+                <span>Vocals <strong className="text-black">5/5</strong></span>
+                <span>Originality <strong className="text-black">4/5</strong></span>
+                <span className="flex items-center gap-1">
+                  <svg className="h-3.5 w-3.5 text-lime-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                  <strong className="text-lime-600">Would listen again</strong>
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-lime-100 border-2 border-lime-500 text-lime-700">
-                  <Share2 className="h-3.5 w-3.5" />
+              </div>
+
+              {/* Listener Signals - Exact badge styling */}
+              <div className="flex flex-wrap items-center gap-2 mb-5">
+                <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 bg-lime-50 border-lime-500 text-lime-700">
+                  <ListMusic className="h-3 w-3" />
+                  Would playlist
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 bg-lime-50 border-lime-500 text-lime-700">
+                  <Share2 className="h-3 w-3" />
                   Would share
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-neutral-100 border-2 border-neutral-300 text-neutral-600">
-                  <UserPlus className="h-3.5 w-3.5" />
-                  Wouldn&apos;t follow yet
+                <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 bg-neutral-50 border-neutral-300 text-neutral-500">
+                  <UserPlus className="h-3 w-3" />
+                  No follow
                 </span>
               </div>
-            </div>
 
-            {/* Written Feedback */}
-            <div className="p-6 space-y-6">
-              {/* The Good */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="w-6 h-6 bg-lime-500 border border-black flex items-center justify-center text-xs font-bold">+</span>
-                  <h4 className="font-bold text-sm">What&apos;s Working</h4>
+              {/* Main Feedback - Colored left-border sections with uppercase labels */}
+              <div className="space-y-4 mb-5">
+                {/* What Worked */}
+                <div>
+                  <h4 className="text-xs font-bold text-lime-700 uppercase tracking-wide mb-1.5">
+                    What Worked
+                  </h4>
+                  <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-lime-500">
+                    The synth melody around 0:45 is genuinely catchy—got stuck in my head. The interplay with the drums creates a driving energy that makes you want to move. Low end is tight, punchy kick that cuts through without being muddy. The breakdown at 2:15 was unexpected and added a nice dynamic shift.
+                  </p>
                 </div>
-                <p className="text-neutral-600 leading-relaxed text-sm pl-8">
-                  The synth melody around 0:45 is genuinely catchy—got stuck in my head. The interplay with the drums creates a driving energy that makes you want to move. Low end is tight, punchy kick that cuts through without being muddy. The breakdown at 2:15 was unexpected and added a nice dynamic shift.
-                </p>
-              </div>
 
-              {/* To Improve */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="w-6 h-6 bg-orange-400 border border-black flex items-center justify-center text-xs font-bold">→</span>
-                  <h4 className="font-bold text-sm">Room to Grow</h4>
+                {/* To Improve */}
+                <div>
+                  <h4 className="text-xs font-bold text-red-600 uppercase tracking-wide mb-1.5">
+                    To Improve
+                  </h4>
+                  <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-red-400">
+                    The intro feels long before the hook hits—consider trimming 8-10 seconds. Hi-hats get repetitive in verse 2; some variation or filter sweep would help. The vocal sample at 1:30 sits too loud and clashes with lead synth frequencies.
+                  </p>
                 </div>
-                <p className="text-neutral-600 leading-relaxed text-sm pl-8">
-                  The intro feels long before the hook hits—consider trimming 8-10 seconds. Hi-hats get repetitive in verse 2; some variation or filter sweep would help. The vocal sample at 1:30 sits too loud and clashes with lead synth frequencies.
-                </p>
-              </div>
 
-              {/* Next Steps */}
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="w-6 h-6 bg-sky-400 border border-black flex items-center justify-center text-xs font-bold">!</span>
-                  <h4 className="font-bold text-sm">Next Steps</h4>
+                {/* Next Actions */}
+                <div>
+                  <h4 className="text-xs font-bold text-black uppercase tracking-wide mb-1.5">
+                    Next Actions
+                  </h4>
+                  <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-black whitespace-pre-wrap">1. Cut the intro by 8-10 seconds to hook listeners faster{"\n"}2. Add hi-hat variations or automate a filter in verse 2{"\n"}3. EQ the vocal sample to carve space for the lead synth</p>
                 </div>
-                <ul className="text-neutral-600 text-sm pl-8 space-y-1">
-                  <li className="flex items-start gap-2">
-                    <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">01</span>
-                    <span>Cut the intro by 8-10 seconds to hook listeners faster</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">02</span>
-                    <span>Add hi-hat variations or automate a filter in verse 2</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="font-mono text-xs bg-black text-white px-1.5 py-0.5 mt-0.5">03</span>
-                    <span>EQ the vocal sample to carve space for the lead synth</span>
-                  </li>
-                </ul>
+
+                {/* Timestamps */}
+                <div>
+                  <h4 className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-1.5">
+                    Timestamps
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="pl-3 border-l-4 border-purple-400">
+                      <p className="text-xs font-mono text-neutral-600">0:45</p>
+                      <p className="text-sm text-neutral-800 leading-relaxed">This synth hook is the strongest moment in the track</p>
+                    </div>
+                    <div className="pl-3 border-l-4 border-purple-400">
+                      <p className="text-xs font-mono text-neutral-600">1:30</p>
+                      <p className="text-sm text-neutral-800 leading-relaxed">Vocal sample clashes with lead synth here</p>
+                    </div>
+                    <div className="pl-3 border-l-4 border-purple-400">
+                      <p className="text-xs font-mono text-neutral-600">2:15</p>
+                      <p className="text-sm text-neutral-800 leading-relaxed">Love this breakdown—great dynamic contrast</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Similar Artists */}
-              <div className="pt-4 border-t border-neutral-200">
-                <p className="text-sm text-neutral-500">
-                  <span className="font-bold text-neutral-700">Sounds like:</span> Bonobo meets Four Tet, with some Tycho influence in the atmospheric pads.
-                </p>
+              {/* Similar artists - inline text format */}
+              <div className="text-xs text-neutral-500 mb-4">
+                <span>Sounds like <strong className="text-neutral-700">Electronic / Downtempo</strong></span>
+                <span className="mx-2">·</span>
+                <span>Similar to <strong className="text-neutral-700">Bonobo, Four Tet, Tycho</strong></span>
               </div>
-            </div>
+            </article>
 
             {/* Footer */}
             <div className="p-3 bg-neutral-100 border-t-2 border-black flex items-center justify-between">
