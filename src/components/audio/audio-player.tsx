@@ -57,6 +57,7 @@ interface AudioPlayerProps {
   sourceUrl: string;
   sourceType: string;
   minListenTime?: number; // seconds required before can submit
+  initialListenTime?: number; // restored listen time from draft/server
   onListenProgress?: (seconds: number) => void;
   onMinimumReached?: () => void;
   onTimeUpdate?: (seconds: number) => void;
@@ -69,6 +70,7 @@ export function AudioPlayer({
   sourceUrl,
   sourceType,
   minListenTime = 90,
+  initialListenTime = 0,
   onListenProgress,
   onMinimumReached,
   onTimeUpdate,
@@ -80,8 +82,8 @@ export function AudioPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
-  const [totalListenTime, setTotalListenTime] = useState(0);
-  const [hasReachedMinimum, setHasReachedMinimum] = useState(false);
+  const [totalListenTime, setTotalListenTime] = useState(initialListenTime);
+  const [hasReachedMinimum, setHasReachedMinimum] = useState(initialListenTime >= minListenTime);
   const [waveformPeaks, setWaveformPeaks] = useState<number[] | null>(null);
   const [isWaveformLoading, setIsWaveformLoading] = useState(false);
   const [timestampAdded, setTimestampAdded] = useState(false);
@@ -115,6 +117,17 @@ export function AudioPlayer({
   useEffect(() => {
     onTimeUpdateRef.current = onTimeUpdate;
   }, [onTimeUpdate]);
+
+  // Sync initialListenTime when it changes (e.g., after draft restore)
+  // Only update if the new value is greater to avoid resetting progress
+  useEffect(() => {
+    if (initialListenTime > 0 && initialListenTime > totalListenTime) {
+      setTotalListenTime(initialListenTime);
+      if (initialListenTime >= minListenTime && !hasReachedMinimum) {
+        setHasReachedMinimum(true);
+      }
+    }
+  }, [initialListenTime, minListenTime]);
 
   const seekToRatio = (ratio: number) => {
     const audio = audioRef.current;

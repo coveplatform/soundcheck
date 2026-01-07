@@ -926,6 +926,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             sourceType={review.track.sourceType}
             showWaveform={review.track.sourceType === "UPLOAD"}
             minListenTime={MIN_LISTEN_SECONDS}
+            initialListenTime={listenTime}
             onTimeUpdate={(seconds) => setPlayerSeconds(seconds)}
             onListenProgress={(seconds) => {
               setListenTime((prev) => Math.max(prev, seconds));
