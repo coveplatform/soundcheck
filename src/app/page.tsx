@@ -75,65 +75,46 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Quality Guarantee Flow - Quick Visual */}
-      <section className="border-b-2 border-black py-14 bg-gradient-to-r from-lime-50 via-white to-lime-50">
+      {/* Quality Guarantee Flow */}
+      <section className="border-b-2 border-black py-12 bg-gradient-to-r from-lime-50 via-white to-lime-50">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-black text-center mb-3">The accountability loop</h2>
-          <p className="text-neutral-600 text-center mb-10 max-w-xl mx-auto">
-            Reviewers earn based on your ratings. That&apos;s why they give you real feedback, not empty praise.
+          <h2 className="text-2xl sm:text-3xl font-black text-center mb-2">The accountability loop</h2>
+          <p className="text-neutral-600 text-center mb-10 max-w-lg mx-auto text-sm sm:text-base">
+            Reviewers earn based on your ratings—so they give you real feedback, not empty praise.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-            {/* Step 1 */}
-            <div className="flex items-center gap-3 bg-white border-2 border-black px-5 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
+
+          {/* 4-column grid on desktop, 2x2 on tablet, stacked on mobile */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+            <div className="flex flex-col items-center p-4 bg-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-3">
                 <DollarSign className="h-6 w-6" />
               </div>
-              <div>
-                <span className="font-black text-lg">You pay</span>
-                <p className="text-xs text-neutral-500">One-time fee</p>
-              </div>
+              <span className="font-black text-lg">You pay</span>
+              <span className="text-xs text-neutral-500">One-time fee</span>
             </div>
 
-            <ArrowRight className="h-6 w-6 text-lime-600 hidden sm:block flex-shrink-0" />
-            <div className="h-6 w-0.5 bg-lime-500 sm:hidden" />
-
-            {/* Step 2 */}
-            <div className="flex items-center gap-3 bg-white border-2 border-black px-5 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center flex-shrink-0">
+            <div className="flex flex-col items-center p-4 bg-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center mb-3">
                 <Headphones className="h-6 w-6" />
               </div>
-              <div>
-                <span className="font-black text-lg">They review</span>
-                <p className="text-xs text-neutral-500">Detailed feedback</p>
-              </div>
+              <span className="font-black text-lg">They review</span>
+              <span className="text-xs text-neutral-500">Detailed feedback</span>
             </div>
 
-            <ArrowRight className="h-6 w-6 text-lime-600 hidden sm:block flex-shrink-0" />
-            <div className="h-6 w-0.5 bg-lime-500 sm:hidden" />
-
-            {/* Step 3 */}
-            <div className="flex items-center gap-3 bg-white border-2 border-black px-5 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-12 w-12 bg-sky-400 border-2 border-black flex items-center justify-center flex-shrink-0">
+            <div className="flex flex-col items-center p-4 bg-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-12 w-12 bg-sky-400 border-2 border-black flex items-center justify-center mb-3">
                 <Star className="h-6 w-6" />
               </div>
-              <div>
-                <span className="font-black text-lg">You rate</span>
-                <p className="text-xs text-neutral-500">1-5 stars</p>
-              </div>
+              <span className="font-black text-lg">You rate</span>
+              <span className="text-xs text-neutral-500">1-5 stars</span>
             </div>
 
-            <ArrowRight className="h-6 w-6 text-lime-600 hidden sm:block flex-shrink-0" />
-            <div className="h-6 w-0.5 bg-lime-500 sm:hidden" />
-
-            {/* Result */}
-            <div className="flex items-center gap-3 bg-black border-2 border-black px-5 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
+            <div className="flex flex-col items-center p-4 bg-black border-2 border-black shadow-[3px_3px_0px_0px_rgba(132,204,22,1)]">
+              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-3">
                 <Shield className="h-6 w-6" />
               </div>
-              <div>
-                <span className="font-black text-lg text-white">Quality</span>
-                <p className="text-xs text-neutral-400">Enforced</p>
-              </div>
+              <span className="font-black text-lg text-white">Quality</span>
+              <span className="text-xs text-lime-400">Enforced</span>
             </div>
           </div>
         </div>
