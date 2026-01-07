@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Target, Clock, ListMusic, Share2, UserPlus, ThumbsUp, Quote, CheckCircle2, Lock } from "lucide-react";
+import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Target, Clock, ListMusic, Share2, UserPlus, Quote, CheckCircle2, Lock, Sparkles } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
@@ -76,54 +76,66 @@ export default function Home() {
       </section>
 
       {/* Quality Guarantee Flow - Quick Visual */}
-      <section className="border-b-2 border-black py-10 bg-gradient-to-r from-lime-50 via-white to-lime-50">
+      <section className="border-b-2 border-black py-14 bg-gradient-to-r from-lime-50 via-white to-lime-50">
         <div className="max-w-4xl mx-auto px-4">
-          <h3 className="text-lg sm:text-xl font-black text-center mb-6">Why our feedback is actually useful</h3>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+          <h2 className="text-2xl sm:text-3xl font-black text-center mb-3">The accountability loop</h2>
+          <p className="text-neutral-600 text-center mb-10 max-w-xl mx-auto">
+            Reviewers earn based on your ratings. That&apos;s why they give you real feedback, not empty praise.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
             {/* Step 1 */}
-            <div className="flex items-center gap-3 bg-white border-2 border-black px-4 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <DollarSign className="h-5 w-5" />
+            <div className="flex items-center gap-3 bg-white border-2 border-black px-5 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <DollarSign className="h-6 w-6" />
               </div>
-              <span className="font-bold">You pay</span>
+              <div>
+                <span className="font-black text-lg">You pay</span>
+                <p className="text-xs text-neutral-500">One-time fee</p>
+              </div>
             </div>
 
             <ArrowRight className="h-6 w-6 text-lime-600 hidden sm:block flex-shrink-0" />
             <div className="h-6 w-0.5 bg-lime-500 sm:hidden" />
 
             {/* Step 2 */}
-            <div className="flex items-center gap-3 bg-white border-2 border-black px-4 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <Headphones className="h-5 w-5" />
+            <div className="flex items-center gap-3 bg-white border-2 border-black px-5 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <Headphones className="h-6 w-6" />
               </div>
-              <span className="font-bold">Reviewers earn</span>
+              <div>
+                <span className="font-black text-lg">They review</span>
+                <p className="text-xs text-neutral-500">Detailed feedback</p>
+              </div>
             </div>
 
             <ArrowRight className="h-6 w-6 text-lime-600 hidden sm:block flex-shrink-0" />
             <div className="h-6 w-0.5 bg-lime-500 sm:hidden" />
 
             {/* Step 3 */}
-            <div className="flex items-center gap-3 bg-white border-2 border-black px-4 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <Star className="h-5 w-5" />
+            <div className="flex items-center gap-3 bg-white border-2 border-black px-5 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-12 w-12 bg-sky-400 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <Star className="h-6 w-6" />
               </div>
-              <span className="font-bold">You rate them</span>
+              <div>
+                <span className="font-black text-lg">You rate</span>
+                <p className="text-xs text-neutral-500">1-5 stars</p>
+              </div>
             </div>
 
             <ArrowRight className="h-6 w-6 text-lime-600 hidden sm:block flex-shrink-0" />
             <div className="h-6 w-0.5 bg-lime-500 sm:hidden" />
 
             {/* Result */}
-            <div className="flex items-center gap-3 bg-black border-2 border-black px-4 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-10 w-10 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <Shield className="h-5 w-5" />
+            <div className="flex items-center gap-3 bg-black border-2 border-black px-5 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
+                <Shield className="h-6 w-6" />
               </div>
-              <span className="font-bold text-white">Quality enforced</span>
+              <div>
+                <span className="font-black text-lg text-white">Quality</span>
+                <p className="text-xs text-neutral-400">Enforced</p>
+              </div>
             </div>
           </div>
-          <p className="text-sm text-neutral-600 text-center mt-6">
-            Bad ratings = reviewers earn less. They&apos;re incentivized to be genuinely helpful, not lazy.
-          </p>
         </div>
       </section>
 
@@ -205,71 +217,101 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Who This Is For */}
-      <section className="border-b-2 border-black py-16 bg-gradient-to-r from-purple-50 via-white to-pink-50">
-        <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-6">This is for you if...</h2>
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-8 w-8 bg-lime-500 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <CheckCircle2 className="h-4 w-4" />
-              </div>
-              <p className="text-lg text-neutral-700">You have a track and you want to know what&apos;s working (and what isn&apos;t)</p>
-            </div>
-            <div className="flex items-center gap-4 p-4 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-8 w-8 bg-orange-400 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <CheckCircle2 className="h-4 w-4" />
-              </div>
-              <p className="text-lg text-neutral-700">You&apos;re tired of friends who say <span className="font-bold text-black">&ldquo;yeah it&apos;s great!&rdquo;</span></p>
-            </div>
-            <div className="flex items-center gap-4 p-4 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-8 w-8 bg-sky-400 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <CheckCircle2 className="h-4 w-4" />
-              </div>
-              <p className="text-lg text-neutral-700">You want real answers, not empty praise or random hate</p>
-            </div>
-            <div className="flex items-center gap-4 p-4 bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-8 w-8 bg-purple-400 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <CheckCircle2 className="h-4 w-4" />
-              </div>
-              <p className="text-lg text-neutral-700">You value your time more than hunting for feedback on Reddit</p>
-            </div>
-          </div>
-          <p className="mt-8 text-neutral-600 p-4 bg-lime-50 border-2 border-lime-200">
-            Our reviewers are music lovers who want you to succeed—not critics trying to tear you down.
-            <span className="font-bold text-black"> Honest, but on your side.</span>
-          </p>
-        </div>
-      </section>
-
-      {/* Why Paid Works */}
-      <section className="border-b-2 border-black py-16">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-2">Why this works when free doesn&apos;t</h2>
-          <p className="text-neutral-600 mb-8">The secret: reviewers are accountable to you.</p>
-
-          <div className="border-2 border-black bg-lime-50 p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
-                <Shield className="h-6 w-6 text-black" />
-              </div>
-              <h3 className="font-bold text-xl">The accountability loop</h3>
-            </div>
-            <div className="space-y-3 text-neutral-700">
-              <p>
-                <strong>You pay → reviewers earn.</strong> They&apos;re not doing you a favor. This is their job.
-              </p>
-              <p>
-                <strong>You rate every review.</strong> Low ratings = they earn less ($0.50 vs $1.50). High ratings = they get more work.
-              </p>
-              <p>
-                <strong>Result:</strong> They give you the truth—not empty praise. Because their income depends on being genuinely useful to you.
-              </p>
-            </div>
+      {/* Real Product Screenshots - Pattern Analytics */}
+      <section className="border-b-2 border-black py-16 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-black mb-2">See the patterns. Know what to fix.</h2>
+            <p className="text-neutral-600">
+              Multiple reviews reveal what&apos;s actually working—and what isn&apos;t.
+            </p>
           </div>
 
-          <p className="mt-6 text-sm text-neutral-500 text-center">
-            Plus, with multiple reviews, one lazy opinion can&apos;t hide. The truth emerges from consensus.
+          {/* Analytics Preview - This would ideally be a real screenshot */}
+          <div className="border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 text-white p-4 flex items-center gap-2">
+              <Sparkles className="h-5 w-5" />
+              <span className="font-bold">Pattern Analytics</span>
+              <span className="text-sm text-neutral-400 ml-2">from 12 reviews</span>
+            </div>
+
+            {/* Scores Row */}
+            <div className="p-6 border-b border-neutral-200">
+              <div className="grid grid-cols-3 gap-8 max-w-md mx-auto">
+                <div className="text-center">
+                  <div className="text-4xl font-black text-lime-600">4.2</div>
+                  <div className="text-sm font-bold text-neutral-600 mt-1">Production</div>
+                  <div className="text-xs text-lime-600">↑ Strong</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-black">3.8</div>
+                  <div className="text-sm font-bold text-neutral-600 mt-1">Originality</div>
+                  <div className="text-xs text-neutral-500">→ Solid</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-black text-lime-600">4.5</div>
+                  <div className="text-sm font-bold text-neutral-600 mt-1">Vocals</div>
+                  <div className="text-xs text-lime-600">↑ Strong</div>
+                </div>
+              </div>
+            </div>
+
+            {/* First Impressions */}
+            <div className="p-6 border-b border-neutral-200">
+              <div className="text-sm font-bold text-neutral-700 mb-3">First Impressions</div>
+              <div className="h-4 w-full rounded-full overflow-hidden flex bg-neutral-100 max-w-lg">
+                <div className="h-full bg-lime-500" style={{ width: '67%' }} />
+                <div className="h-full bg-amber-400" style={{ width: '25%' }} />
+                <div className="h-full bg-neutral-300" style={{ width: '8%' }} />
+              </div>
+              <div className="flex gap-6 mt-3 text-xs">
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-lime-500" />Strong Hook 67%</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-amber-400" />Decent 25%</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />Lost Interest 8%</span>
+              </div>
+            </div>
+
+            {/* Listener Engagement */}
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-sm font-bold text-neutral-700">Listener Engagement</div>
+                <span className="text-sm font-black px-2 py-0.5 rounded bg-lime-100 text-lime-700">72%</span>
+              </div>
+              <div className="space-y-2 max-w-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-neutral-600">Would listen again</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-24 h-2 bg-neutral-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-lime-500 rounded-full" style={{ width: '83%' }} />
+                    </div>
+                    <span className="text-sm font-bold w-12 text-right">83%</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-neutral-600">Would add to playlist</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-24 h-2 bg-neutral-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-lime-500 rounded-full" style={{ width: '67%' }} />
+                    </div>
+                    <span className="text-sm font-bold w-12 text-right">67%</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-neutral-600">Would share with friends</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-24 h-2 bg-neutral-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-lime-500 rounded-full" style={{ width: '50%' }} />
+                    </div>
+                    <span className="text-sm font-bold w-12 text-right">50%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-center text-sm text-neutral-500 mt-6">
+            When most reviewers agree on something, that&apos;s not taste—that&apos;s signal.
           </p>
         </div>
       </section>
@@ -463,72 +505,37 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* Features - Compact 3-column */}
       <section className="border-b-2 border-black py-16 bg-neutral-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-2">Why MixReflect?</h2>
-          <p className="text-neutral-600 mb-10">
-            Built specifically for the pre-release moment when you need to know if it&apos;s ready.
-          </p>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-black border-2 border-black">
-            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
-              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-4">
-                <Star className="h-6 w-6 text-black" />
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="grid sm:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="h-14 w-14 bg-orange-400 border-2 border-black flex items-center justify-center mb-4 mx-auto">
+                <Target className="h-7 w-7 text-black" />
               </div>
-              <h3 className="font-bold text-lg mb-2">They work for you</h3>
+              <h3 className="font-bold text-lg mb-2">Genre-matched</h3>
               <p className="text-sm text-neutral-600">
-                You rate every review. Low ratings = they earn less. That&apos;s why they give you real feedback, not empty praise.
+                Your trap beat won&apos;t be reviewed by someone who only listens to country.
               </p>
             </div>
 
-            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
-              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center mb-4">
-                <Target className="h-6 w-6 text-black" />
+            <div className="text-center">
+              <div className="h-14 w-14 bg-sky-400 border-2 border-black flex items-center justify-center mb-4 mx-auto">
+                <Clock className="h-7 w-7 text-black" />
               </div>
-              <h3 className="font-bold text-lg mb-2">People who get your genre</h3>
+              <h3 className="font-bold text-lg mb-2">Fast turnaround</h3>
               <p className="text-sm text-neutral-600">
-                Your trap beat won&apos;t be reviewed by someone who only listens to country. Reviewers pick genres they actually love.
+                All reviews delivered within 24 hours. Usually much faster.
               </p>
             </div>
 
-            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
-              <div className="h-12 w-12 bg-sky-400 border-2 border-black flex items-center justify-center mb-4">
-                <Clock className="h-6 w-6 text-black" />
+            <div className="text-center">
+              <div className="h-14 w-14 bg-purple-400 border-2 border-black flex items-center justify-center mb-4 mx-auto">
+                <Shield className="h-7 w-7 text-black" />
               </div>
-              <h3 className="font-bold text-lg mb-2">Fast when you need it</h3>
+              <h3 className="font-bold text-lg mb-2">Private & secure</h3>
               <p className="text-sm text-neutral-600">
-                All reviews in 24 hours max (usually faster). No waiting weeks for feedback on a track you&apos;re excited about.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
-              <div className="h-12 w-12 bg-purple-400 border-2 border-black flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-black" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Your music stays private</h3>
-              <p className="text-sm text-neutral-600">
-                Only assigned reviewers hear your track. We never share, publish, or leak your unreleased work.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
-              <div className="h-12 w-12 bg-pink-400 border-2 border-black flex items-center justify-center mb-4">
-                <ThumbsUp className="h-6 w-6 text-black" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Truth through consensus</h3>
-              <p className="text-sm text-neutral-600">
-                If most reviewers say the intro is too long, that&apos;s not taste—it&apos;s truth. Multiple opinions reveal what actually needs fixing.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 hover:bg-neutral-50 transition-colors">
-              <div className="h-12 w-12 bg-emerald-400 border-2 border-black flex items-center justify-center mb-4">
-                <CheckCircle2 className="h-6 w-6 text-black" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Release with confidence</h3>
-              <p className="text-sm text-neutral-600">
-                Stop second-guessing. When most reviewers say it&apos;s ready, you can hit publish knowing it&apos;s not just you.
+                Only assigned reviewers hear your track. We never share or leak your work.
               </p>
             </div>
           </div>
