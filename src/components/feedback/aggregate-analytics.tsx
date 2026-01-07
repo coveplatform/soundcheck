@@ -225,66 +225,96 @@ function EngagementRow({
 }
 
 function EngagementSection({ reviews }: { reviews: ReviewLike[] }) {
-  const validReviews = reviews.filter(r => r.wouldListenAgain !== null);
-  const total = validReviews.length;
+  // Calculate each metric with its OWN denominator (reviews that have that field answered)
+  // This handles old reviews that may not have newer fields
+  const listenAgainTotal = reviews.filter(r => r.wouldListenAgain !== null).length;
+  const listenAgainYes = reviews.filter(r => r.wouldListenAgain === true).length;
 
-  if (total === 0) return null;
+  const playlistTotal = reviews.filter(r => r.wouldAddToPlaylist !== null).length;
+  const playlistYes = reviews.filter(r => r.wouldAddToPlaylist === true).length;
 
-  const listenAgainCount = validReviews.filter(r => r.wouldListenAgain === true).length;
-  const playlistCount = reviews.filter(r => r.wouldAddToPlaylist === true).length;
-  const shareCount = reviews.filter(r => r.wouldShare === true).length;
-  const followCount = reviews.filter(r => r.wouldFollow === true).length;
+  const shareTotal = reviews.filter(r => r.wouldShare !== null).length;
+  const shareYes = reviews.filter(r => r.wouldShare === true).length;
 
-  const listenAgainPct = Math.round((listenAgainCount / total) * 100);
-  const playlistPct = Math.round((playlistCount / total) * 100);
-  const sharePct = Math.round((shareCount / total) * 100);
-  const followPct = Math.round((followCount / total) * 100);
+  const followTotal = reviews.filter(r => r.wouldFollow !== null).length;
+  const followYes = reviews.filter(r => r.wouldFollow === true).length;
 
-  // Overall engagement score (weighted average)
-  const overallEngagement = Math.round(
-    (listenAgainPct * 0.4 + playlistPct * 0.3 + sharePct * 0.2 + followPct * 0.1)
-  );
+  // Only show if at least one metric has data
+  const hasAnyData = listenAgainTotal > 0 || playlistTotal > 0 || shareTotal > 0 || followTotal > 0;
+  if (!hasAnyData) return null;
+
+  // Calculate percentages safely
+  const listenAgainPct = listenAgainTotal > 0 ? Math.round((listenAgainYes / listenAgainTotal) * 100) : null;
+  const playlistPct = playlistTotal > 0 ? Math.round((playlistYes / playlistTotal) * 100) : null;
+  const sharePct = shareTotal > 0 ? Math.round((shareYes / shareTotal) * 100) : null;
+  const followPct = followTotal > 0 ? Math.round((followYes / followTotal) * 100) : null;
+
+  // Overall engagement: weighted average of available metrics only
+  // Normalizes to account for missing metrics (old reviews without newer fields)
+  let overallEngagement: number | null = null;
+  const weights: { pct: number | null; weight: number }[] = [
+    { pct: listenAgainPct, weight: 0.4 },
+    { pct: playlistPct, weight: 0.3 },
+    { pct: sharePct, weight: 0.2 },
+    { pct: followPct, weight: 0.1 },
+  ];
+  const availableMetrics = weights.filter(w => w.pct !== null);
+  if (availableMetrics.length > 0) {
+    const totalWeight = availableMetrics.reduce((sum, w) => sum + w.weight, 0);
+    const weightedSum = availableMetrics.reduce((sum, w) => sum + (w.pct! * w.weight), 0);
+    overallEngagement = Math.round(weightedSum / totalWeight);
+  }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="text-sm font-bold text-neutral-700">Listener Engagement</div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-neutral-500">Overall</span>
-          <span className={`text-sm font-black px-2 py-0.5 rounded ${
-            overallEngagement >= 60 ? 'bg-lime-100 text-lime-700' :
-            overallEngagement >= 40 ? 'bg-amber-100 text-amber-700' :
-            'bg-neutral-100 text-neutral-600'
-          }`}>
-            {overallEngagement}%
-          </span>
-        </div>
+        {overallEngagement !== null && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-neutral-500">Overall</span>
+            <span className={`text-sm font-black px-2 py-0.5 rounded ${
+              overallEngagement >= 60 ? 'bg-lime-100 text-lime-700' :
+              overallEngagement >= 40 ? 'bg-amber-100 text-amber-700' :
+              'bg-neutral-100 text-neutral-600'
+            }`}>
+              {overallEngagement}%
+            </span>
+          </div>
+        )}
       </div>
       <div className="space-y-2">
-        <EngagementRow
-          label="Would listen again"
-          percentage={listenAgainPct}
-          count={listenAgainCount}
-          total={total}
-        />
-        <EngagementRow
-          label="Would add to playlist"
-          percentage={playlistPct}
-          count={playlistCount}
-          total={total}
-        />
-        <EngagementRow
-          label="Would share with friends"
-          percentage={sharePct}
-          count={shareCount}
-          total={total}
-        />
-        <EngagementRow
-          label="Would follow artist"
-          percentage={followPct}
-          count={followCount}
-          total={total}
-        />
+        {listenAgainPct !== null && (
+          <EngagementRow
+            label="Would listen again"
+            percentage={listenAgainPct}
+            count={listenAgainYes}
+            total={listenAgainTotal}
+          />
+        )}
+        {playlistPct !== null && (
+          <EngagementRow
+            label="Would add to playlist"
+            percentage={playlistPct}
+            count={playlistYes}
+            total={playlistTotal}
+          />
+        )}
+        {sharePct !== null && (
+          <EngagementRow
+            label="Would share with friends"
+            percentage={sharePct}
+            count={shareYes}
+            total={shareTotal}
+          />
+        )}
+        {followPct !== null && (
+          <EngagementRow
+            label="Would follow artist"
+            percentage={followPct}
+            count={followYes}
+            total={followTotal}
+          />
+        )}
       </div>
     </div>
   );
