@@ -16,7 +16,6 @@ import {
   Link2,
   Sparkles,
   Zap,
-  Users,
   Eye,
   EyeOff,
   Gift,
@@ -91,7 +90,6 @@ export default function GetFeedbackPage() {
   const hasArtistProfile = !!(session?.user as { artistProfileId?: string })?.artistProfileId;
   const prevLoggedInRef = useRef(isLoggedIn);
   const hasTrackedViewContentRef = useRef(false);
-  const hasTrackedEarlyCheckoutRef = useRef(false);
   const lastTrackedLinkRef = useRef<string>("");
   const lastCapturedLeadRef = useRef<string>("");
 
@@ -118,7 +116,6 @@ export default function GetFeedbackPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [artistName, setArtistName] = useState("");
-  const [emailExists, setEmailExists] = useState(false);
 
   // Track details state
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -659,7 +656,6 @@ export default function GetFeedbackPage() {
     // Check if email exists for login flow
     if (!isLoggedIn && email) {
       const exists = await checkEmailExists(email.trim().toLowerCase());
-      setEmailExists(exists);
       if (exists) {
         // Try to log in with provided credentials
         const result = await signIn("credentials", {
@@ -810,9 +806,12 @@ export default function GetFeedbackPage() {
 
   // Check if we can proceed from track step
   // For URL mode: require verified link (no warning) and title
-  const hasTrack = inputMode === "url"
-    ? trackUrl && !urlError && !isLoadingMetadata && title
-    : !!uploadedUrl && !isUploading;
+  const canContinueFromTrackStep = Boolean(
+    title &&
+      (inputMode === "url"
+        ? trackUrl && !urlError && !isLoadingMetadata
+        : uploadedUrl && !isUploading)
+  );
 
   // Show loading while checking session
   if (sessionStatus === "loading" || !isInitialized) {
@@ -853,7 +852,12 @@ export default function GetFeedbackPage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main
+        className={cn(
+          "mx-auto px-4 py-8",
+          step === "track" ? "max-w-4xl" : "max-w-2xl"
+        )}
+      >
         {/* Error banner */}
         {error && (
           <div className="mb-6 bg-red-500/20 border-2 border-red-500 text-red-400 text-sm p-4 font-medium">
@@ -1213,15 +1217,12 @@ export default function GetFeedbackPage() {
             )}
 
             {/* Continue button */}
-            {trackStartStage === "track" && (
+            {trackStartStage === "track" && canContinueFromTrackStep && (
               <Button
                 onClick={goToDetails}
-                disabled={!hasTrack || !title}
                 className={cn(
                   "w-full h-14 text-lg font-black border-2 transition-all order-[60] sm:order-[50]",
-                  hasTrack && title
-                    ? "bg-lime-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
-                    : "bg-neutral-800 text-neutral-500 border-neutral-700 cursor-not-allowed"
+                  "bg-lime-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
                 )}
               >
                 Continue
@@ -1229,15 +1230,24 @@ export default function GetFeedbackPage() {
               </Button>
             )}
 
-            {trackStartStage === "track" && (
-              <div id="get-feedback-proof" className="order-[80] space-y-6 pt-2">
+            {trackStartStage === "track" && !canContinueFromTrackStep && (
+              <p className="order-[60] sm:order-[50] text-center text-sm text-neutral-500">
+                Add your track to unlock the next step.
+              </p>
+            )}
+
+            {trackStartStage === "track" && canContinueFromTrackStep && (
+              <div
+                id="get-feedback-proof"
+                className="order-[80] space-y-6 pt-6 mt-2 border-t border-neutral-800"
+              >
                 <div className="border-2 border-neutral-700 bg-neutral-950/30 p-5">
                   <div className="flex items-start gap-3">
                     <div className="h-10 w-10 bg-lime-500 text-black flex items-center justify-center flex-shrink-0">
                       <Sparkles className="h-5 w-5" />
                     </div>
                     <div className="space-y-1">
-                      <p className="text-lg font-black text-white">Want to see what you’ll get?</p>
+                      <p className="text-lg font-black text-white">What you’ll get</p>
                       <p className="text-sm text-neutral-400">
                         Here’s a real-world example of the kind of feedback and pattern insights you’ll receive.
                       </p>
