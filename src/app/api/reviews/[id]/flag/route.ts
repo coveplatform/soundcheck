@@ -69,12 +69,15 @@ export async function POST(
         data: {
           wasFlagged: true,
           flagReason: reason,
+          countsTowardCompletion: false,
+          countsTowardAnalytics: false,
         },
         select: {
           id: true,
           wasFlagged: true,
           flagReason: true,
           reviewerId: true,
+          trackId: true,
         },
       });
 
@@ -125,10 +128,52 @@ export async function POST(
         });
       }
 
+      // Recalculate track status based on counted completed reviews.
+      // IN_PROGRESS means at least 1 counted review submitted.
+      const track = await tx.track.findUnique({
+        where: { id: updatedReview.trackId },
+        select: {
+          id: true,
+          status: true,
+          reviewsRequested: true,
+        },
+      });
+
+      if (track && track.status !== "CANCELLED") {
+        const countedCompletedReviews = await tx.review.count({
+          where: {
+            trackId: track.id,
+            status: "COMPLETED",
+            countsTowardCompletion: true,
+          },
+        });
+
+        const nextStatus =
+          countedCompletedReviews >= track.reviewsRequested
+            ? ("COMPLETED" as const)
+            : countedCompletedReviews > 0
+              ? ("IN_PROGRESS" as const)
+              : ("QUEUED" as const);
+
+        await tx.track.update({
+          where: { id: track.id },
+          data: {
+            status: nextStatus,
+            ...(nextStatus === "COMPLETED"
+              ? { completedAt: new Date() }
+              : { completedAt: null }),
+          },
+          select: { id: true },
+        });
+      }
+
+      // Ensure the flagged review's track gets a replacement review assigned.
+      affectedTrackIds = Array.from(new Set([...affectedTrackIds, updatedReview.trackId]));
+
       return { updatedReview, reviewer: reviewerAfter, affectedTrackIds };
     });
 
-    if (result.reviewer.isRestricted && result.affectedTrackIds.length > 0) {
+    if (result.affectedTrackIds.length > 0) {
       for (const trackId of result.affectedTrackIds) {
         await assignReviewersToTrack(trackId);
       }

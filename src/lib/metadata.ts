@@ -69,6 +69,39 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
   const source = detectSource(url);
   if (!source) return null;
 
+  const fallback = (): TrackMetadata => {
+    try {
+      const parsed = new URL(url);
+
+      if (source === "YOUTUBE") {
+        const v = parsed.searchParams.get("v");
+        const id = v || (parsed.hostname.toLowerCase().includes("youtu.be")
+          ? parsed.pathname.replace(/^\//, "")
+          : "");
+        const safeId = (id || "").trim();
+        return {
+          source,
+          title: safeId ? `YouTube Video (${safeId})` : "Untitled Track",
+        };
+      }
+
+      const pathParts = parsed.pathname.split("/").filter(Boolean);
+      const last = pathParts[pathParts.length - 1] || "";
+      const title = last
+        ? last
+            .replace(/[-_]+/g, " ")
+            .trim()
+            .split(/\s+/g)
+            .map((w) => w.slice(0, 1).toUpperCase() + w.slice(1))
+            .join(" ")
+        : "Untitled Track";
+
+      return { source, title };
+    } catch {
+      return { source, title: "Untitled Track" };
+    }
+  };
+
   // Fetch metadata from oEmbed API - this verifies the link is valid/public
   try {
     const response = await fetch("/api/metadata", {
@@ -86,12 +119,11 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
       };
     }
 
-    // oEmbed failed - return null to trigger warning
-    // This means the link is likely private, deleted, or invalid
-    return null;
+    // oEmbed failed - fall back to a best-effort derived title
+    return fallback();
   } catch {
-    // Network error or other failure - return null to trigger warning
-    return null;
+    // Network error or other failure - fall back to a best-effort derived title
+    return fallback();
   }
 }
 

@@ -260,31 +260,16 @@ describe('Queue Assignment Integration', () => {
   })
 
   describe('Track Status Updates', () => {
-    it('updates track to IN_PROGRESS when reviewers are assigned', async () => {
-      const track = createMockTrack({ status: 'QUEUED' })
-      const updatedTrack = { ...track, status: 'IN_PROGRESS' as const }
-
-      prismaMock.track.update.mockResolvedValue(updatedTrack)
-
-      const updated = await prismaMock.track.update({
-        where: { id: track.id },
-        data: { status: 'IN_PROGRESS' },
-      })
-
-      expect(updated.status).toBe('IN_PROGRESS')
-    })
-
     it('calculates remaining reviews needed', async () => {
       const track = createMockTrack({
         reviewsRequested: 10,
-        reviewsCompleted: 3,
       })
 
       // Simulate 2 active assignments
-      const completedReviews = 3
+      const countedCompletedReviews = 3
       const activeAssignments = 2
       const neededReviews =
-        track.reviewsRequested - completedReviews - activeAssignments
+        track.reviewsRequested - countedCompletedReviews - activeAssignments
 
       expect(neededReviews).toBe(5) // Need 5 more reviewers
     })

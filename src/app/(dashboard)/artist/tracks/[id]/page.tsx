@@ -72,27 +72,34 @@ export default async function TrackDetailPage({
   }
 
   const completedReviews = track.reviews.length;
-  const progress = Math.round((completedReviews / track.reviewsRequested) * 100);
+  const countedCompletedReviews = track.reviews.filter(
+    (r) => r.countsTowardCompletion !== false
+  ).length;
+  const progress = Math.round((countedCompletedReviews / track.reviewsRequested) * 100);
 
   // Calculate averages
+  const analyticsReviews = track.reviews.filter(
+    (r) => r.countsTowardAnalytics !== false
+  );
+
   const avgProduction =
-    track.reviews.reduce((sum, r) => sum + (r.productionScore || 0), 0) /
-    (completedReviews || 1);
+    analyticsReviews.reduce((sum, r) => sum + (r.productionScore || 0), 0) /
+    (analyticsReviews.length || 1);
   const avgOriginality =
-    track.reviews.reduce((sum, r) => sum + (r.originalityScore || 0), 0) /
-    (completedReviews || 1);
-  const wouldListenAgain = track.reviews.filter((r) => r.wouldListenAgain).length;
+    analyticsReviews.reduce((sum, r) => sum + (r.originalityScore || 0), 0) /
+    (analyticsReviews.length || 1);
+  const wouldListenAgain = analyticsReviews.filter((r) => r.wouldListenAgain).length;
   const wouldListenAgainPercent = Math.round(
-    (wouldListenAgain / (completedReviews || 1)) * 100
+    (wouldListenAgain / (analyticsReviews.length || 1)) * 100
   );
 
   // Listener signals
-  const playlistYes = track.reviews.filter((r) => r.wouldAddToPlaylist === true).length;
-  const playlistTotal = track.reviews.filter((r) => r.wouldAddToPlaylist !== null).length;
-  const shareYes = track.reviews.filter((r) => r.wouldShare === true).length;
-  const shareTotal = track.reviews.filter((r) => r.wouldShare !== null).length;
-  const followYes = track.reviews.filter((r) => r.wouldFollow === true).length;
-  const followTotal = track.reviews.filter((r) => r.wouldFollow !== null).length;
+  const playlistYes = analyticsReviews.filter((r) => r.wouldAddToPlaylist === true).length;
+  const playlistTotal = analyticsReviews.filter((r) => r.wouldAddToPlaylist !== null).length;
+  const shareYes = analyticsReviews.filter((r) => r.wouldShare === true).length;
+  const shareTotal = analyticsReviews.filter((r) => r.wouldShare !== null).length;
+  const followYes = analyticsReviews.filter((r) => r.wouldFollow === true).length;
+  const followTotal = analyticsReviews.filter((r) => r.wouldFollow !== null).length;
   const hasListenerSignals = playlistTotal > 0 || shareTotal > 0 || followTotal > 0;
 
   return (
@@ -228,7 +235,7 @@ export default async function TrackDetailPage({
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2">
               <span className="text-sm font-bold">Review Progress</span>
               <span className="text-sm text-neutral-600 font-mono">
-                {completedReviews} of {track.reviewsRequested} reviews
+                {countedCompletedReviews} of {track.reviewsRequested} reviews
               </span>
             </div>
             <div className="w-full h-3 bg-neutral-200 border-2 border-black">
@@ -242,7 +249,7 @@ export default async function TrackDetailPage({
       ) : null}
 
       {/* Stats */}
-      {completedReviews > 0 && (
+      {analyticsReviews.length > 0 && (
         <div className="grid sm:grid-cols-3 gap-4">
           <Card>
             <CardContent className="pt-6 text-center">
@@ -287,7 +294,7 @@ export default async function TrackDetailPage({
               <div className="flex justify-center items-center gap-2 mt-2">
                 <ThumbsUp className="h-4 w-4 text-lime-600" />
                 <span className="text-sm text-neutral-600 font-mono">
-                  {wouldListenAgain} of {completedReviews}
+                  {wouldListenAgain} of {analyticsReviews.length}
                 </span>
               </div>
             </CardContent>
@@ -296,7 +303,7 @@ export default async function TrackDetailPage({
       )}
 
       {/* Listener Signals */}
-      {completedReviews > 0 && hasListenerSignals && (
+      {analyticsReviews.length > 0 && hasListenerSignals && (
         <Card>
           <CardHeader className="border-b-2 border-black">
             <CardTitle className="flex items-center gap-2">
@@ -373,7 +380,7 @@ export default async function TrackDetailPage({
         </Card>
       )}
 
-      {completedReviews > 0 && <AggregateAnalytics reviews={track.reviews} />}
+      {analyticsReviews.length > 0 && <AggregateAnalytics reviews={analyticsReviews} />}
 
       {/* Reviews - Carousel for better presentation */}
       <Card>

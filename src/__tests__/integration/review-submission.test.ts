@@ -246,34 +246,32 @@ describe('Review Submission Integration', () => {
   })
 
   describe('Track Progress Update', () => {
-    it('increments completed reviews count on track', async () => {
+    it('sets track to IN_PROGRESS after first counted review is submitted', async () => {
       const track = createMockTrack({
         reviewsRequested: 10,
-        reviewsCompleted: 5,
+        status: 'QUEUED',
       })
-      const updatedTrack = { ...track, reviewsCompleted: 6 }
+      const updatedTrack = { ...track, status: 'IN_PROGRESS' as const }
 
       prismaMock.track.update.mockResolvedValue(updatedTrack)
 
       const updated = await prismaMock.track.update({
         where: { id: track.id },
-        data: { reviewsCompleted: 6 },
+        data: { status: 'IN_PROGRESS' },
       })
 
-      expect(updated.reviewsCompleted).toBe(6)
+      expect(updated.status).toBe('IN_PROGRESS')
     })
 
     it('marks track as COMPLETED when all reviews are done', async () => {
       const track = createMockTrack({
         reviewsRequested: 10,
-        reviewsCompleted: 9,
         status: 'IN_PROGRESS',
       })
 
       // After this review completes, all 10 are done
       const completedTrack = {
         ...track,
-        reviewsCompleted: 10,
         status: 'COMPLETED' as const,
         completedAt: new Date(),
       }
@@ -283,7 +281,6 @@ describe('Review Submission Integration', () => {
       const updated = await prismaMock.track.update({
         where: { id: track.id },
         data: {
-          reviewsCompleted: 10,
           status: 'COMPLETED',
           completedAt: new Date(),
         },

@@ -87,12 +87,11 @@ describe('Stripe Webhook Integration', () => {
       const track = createMockTrack({
         status: 'QUEUED',
         reviewsRequested: 10,
-        reviewsCompleted: 0,
       })
 
       // This would trigger assignReviewersToTrack(track.id)
       expect(track.status).toBe('QUEUED')
-      expect(track.reviewsRequested - track.reviewsCompleted).toBe(10)
+      expect(track.reviewsRequested).toBe(10)
     })
   })
 
@@ -255,19 +254,17 @@ describe('Refund Processing', () => {
   it('only allows refund if no reviews have started', async () => {
     const trackNoReviews = createMockTrack({
       status: 'QUEUED',
-      reviewsCompleted: 0,
     })
 
     const trackWithReviews = createMockTrack({
       status: 'IN_PROGRESS',
-      reviewsCompleted: 3,
     })
 
-    // Can refund if no reviews completed
-    expect(trackNoReviews.reviewsCompleted).toBe(0)
+    // Can refund if nothing has started
+    expect(trackNoReviews.status).toBe('QUEUED')
 
     // Cannot refund if reviews have started
-    expect(trackWithReviews.reviewsCompleted).toBeGreaterThan(0)
+    expect(trackWithReviews.status).toBe('IN_PROGRESS')
   })
 
   it('updates payment status to REFUNDED', async () => {

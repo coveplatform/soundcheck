@@ -58,8 +58,15 @@ for (const [parent, children] of Object.entries(GENRE_HIERARCHY)) {
  * so reviewers with either will match.
  */
 async function expandGenresForMatching(genreIds: string[]): Promise<string[]> {
+  return expandGenresForMatchingWithDb(prisma, genreIds);
+}
+
+async function expandGenresForMatchingWithDb(
+  db: Prisma.TransactionClient | typeof prisma,
+  genreIds: string[]
+): Promise<string[]> {
   // Get the genres from the database to know their slugs
-  const genres = await prisma.genre.findMany({
+  const genres = await db.genre.findMany({
     where: { id: { in: genreIds } },
     select: { id: true, slug: true },
   });
@@ -85,7 +92,7 @@ async function expandGenresForMatching(genreIds: string[]): Promise<string[]> {
   }
 
   // Get IDs for all expanded slugs
-  const expandedGenres = await prisma.genre.findMany({
+  const expandedGenres = await db.genre.findMany({
     where: { slug: { in: Array.from(expandedSlugs) } },
     select: { id: true },
   });
@@ -111,9 +118,10 @@ export function getTierRateCents(tier: ReviewerTier): number {
 // Get eligible reviewers for a track
 export async function getEligibleReviewers(
   trackId: string,
-  _packageType: PackageType
+  _packageType: PackageType,
+  db: Prisma.TransactionClient | typeof prisma = prisma
 ) {
-  const track = await prisma.track.findUnique({
+  const track = await db.track.findUnique({
     where: { id: trackId },
     include: { genres: true },
   });
@@ -124,7 +132,7 @@ export async function getEligibleReviewers(
 
   // Expand genres to include parent/child relationships for matching
   // e.g., track with "deep-house" will match reviewers with "electronic" OR "deep-house"
-  const genreIds = await expandGenresForMatching(trackGenreIds);
+  const genreIds = await expandGenresForMatchingWithDb(db, trackGenreIds);
 
   const bypassPayments =
     process.env.NODE_ENV !== "production" &&
@@ -200,7 +208,7 @@ export async function getEligibleReviewers(
 
   // Fetch both regular and test reviewers
   const [regularReviewers, testReviewers] = await Promise.all([
-    prisma.reviewerProfile.findMany({
+    db.reviewerProfile.findMany({
       where: regularWhere,
       include: {
         genres: true,
@@ -211,7 +219,7 @@ export async function getEligibleReviewers(
         { averageRating: "desc" },
       ],
     }),
-    prisma.reviewerProfile.findMany({
+    db.reviewerProfile.findMany({
       where: testWhere,
       include: {
         genres: true,
@@ -268,91 +276,112 @@ export async function assignReviewersToRecentTracks(limit = 20) {
 
 // Assign reviewers to a track
 export async function assignReviewersToTrack(trackId: string) {
-  const track = await prisma.track.findUnique({
-    where: { id: trackId },
-    include: {
-      reviews: {
-        include: {
-          reviewer: {
-            select: {
-              tier: true,
+  await prisma.$transaction(async (tx) => {
+    // Prevent concurrent assignments for the same track
+    // (uses transaction-scoped advisory lock)
+    await tx.$executeRaw`
+      SELECT pg_advisory_xact_lock(hashtext(${trackId}), hashtext(${trackId} || ':assign'))
+    `;
+
+    const track = await tx.track.findUnique({
+      where: { id: trackId },
+      include: {
+        reviews: {
+          select: {
+            reviewerId: true,
+            status: true,
+            reviewer: {
+              select: {
+                tier: true,
+              },
             },
           },
         },
+        queueEntries: true,
       },
-      queueEntries: true,
-    },
-  });
+    });
 
-  if (!track || (track.status !== "QUEUED" && track.status !== "IN_PROGRESS")) {
-    return;
-  }
+    if (!track || (track.status !== "QUEUED" && track.status !== "IN_PROGRESS")) {
+      return;
+    }
 
-  const completedReviews = track.reviews.filter(
-    (r) => r.status === "COMPLETED"
-  ).length;
-  const activeAssignments = track.reviews.filter(
-    (r) => r.status === "ASSIGNED" || r.status === "IN_PROGRESS"
-  ).length;
+    const [countedCompletedReviews, activeAssignments] = await Promise.all([
+      tx.review.count({
+        where: {
+          trackId,
+          status: "COMPLETED",
+          countsTowardCompletion: true,
+        },
+      }),
+      tx.review.count({
+        where: { trackId, status: { in: ["ASSIGNED", "IN_PROGRESS"] } },
+      }),
+    ]);
 
-  const countedStatuses = new Set(["ASSIGNED", "IN_PROGRESS", "COMPLETED"]);
-  const existingProCount = track.reviews.filter(
-    (r) => countedStatuses.has(r.status) && r.reviewer?.tier === "PRO"
-  ).length;
+    const countedStatuses = new Set(["ASSIGNED", "IN_PROGRESS", "COMPLETED"]);
+    const existingProCount = track.reviews.filter(
+      (r) => countedStatuses.has(r.status) && r.reviewer?.tier === "PRO"
+    ).length;
 
-  const neededReviews = track.reviewsRequested - completedReviews - activeAssignments;
+    const neededReviews =
+      track.reviewsRequested - countedCompletedReviews - activeAssignments;
 
-  if (neededReviews <= 0) return;
+    if (neededReviews <= 0) return;
 
-  const eligibleReviewers = await getEligibleReviewers(
-    trackId,
-    track.packageType
-  );
+    const eligibleReviewers = await getEligibleReviewers(
+      trackId,
+      track.packageType,
+      tx
+    );
 
-  const existingReviewerIds = new Set(track.reviews.map((r) => r.reviewerId));
-  const eligibleUnique = eligibleReviewers.filter((r) => !existingReviewerIds.has(r.id));
+    const existingReviewerIds = new Set(track.reviews.map((r) => r.reviewerId));
+    const eligibleUnique = eligibleReviewers.filter(
+      (r) => !existingReviewerIds.has(r.id)
+    );
 
-  const packageConfig = (PACKAGES as unknown as Record<string, { minProReviews?: number }>)[
-    track.packageType
-  ];
-  const proReviewCap = Math.max(0, packageConfig?.minProReviews ?? 0);
+    const packageConfig = (PACKAGES as unknown as Record<string, { minProReviews?: number }>)[
+      track.packageType
+    ];
+    const proReviewCap = Math.max(0, packageConfig?.minProReviews ?? 0);
 
-  const proShortfall = Math.max(
-    0,
-    Math.min(proReviewCap, track.reviewsRequested) - existingProCount
-  );
-  const proSlotsToReserve = Math.min(proShortfall, neededReviews);
+    const proShortfall = Math.max(
+      0,
+      Math.min(proReviewCap, track.reviewsRequested) - existingProCount
+    );
+    const proSlotsToReserve = Math.min(proShortfall, neededReviews);
 
-  const proCandidates = eligibleUnique.filter((r) => r.tier === "PRO");
-  const proToAssign = proCandidates.slice(0, Math.min(proSlotsToReserve, proCandidates.length));
-  const proToAssignIds = new Set(proToAssign.map((r) => r.id));
+    const proCandidates = eligibleUnique.filter((r) => r.tier === "PRO");
+    const proToAssign = proCandidates.slice(
+      0,
+      Math.min(proSlotsToReserve, proCandidates.length)
+    );
+    const proToAssignIds = new Set(proToAssign.map((r) => r.id));
 
-  // If we couldn't fill all PRO slots, make remaining slots available to NORMAL reviewers
-  const unfilledProSlots = proSlotsToReserve - proToAssign.length;
-  const nonProSlots = neededReviews - proSlotsToReserve + unfilledProSlots;
+    // If we couldn't fill all PRO slots, make remaining slots available to NORMAL reviewers
+    const unfilledProSlots = proSlotsToReserve - proToAssign.length;
+    const nonProSlots = neededReviews - proSlotsToReserve + unfilledProSlots;
 
-  const additionalCandidates = eligibleUnique.filter(
-    (r) => !proToAssignIds.has(r.id) && r.tier !== "PRO"
-  );
-  const additionalToAssign = additionalCandidates.slice(
-    0,
-    Math.min(nonProSlots, additionalCandidates.length)
-  );
+    const additionalCandidates = eligibleUnique.filter(
+      (r) => !proToAssignIds.has(r.id) && r.tier !== "PRO"
+    );
+    const additionalToAssign = additionalCandidates.slice(
+      0,
+      Math.min(nonProSlots, additionalCandidates.length)
+    );
 
-  const reviewersToAssign = [...proToAssign, ...additionalToAssign];
+    const reviewersToAssign = [...proToAssign, ...additionalToAssign];
 
-  // Create queue entries
-  const expiresAt = new Date();
-  expiresAt.setHours(expiresAt.getHours() + 48); // 48 hour expiration
+    // Create queue entries
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 48); // 48 hour expiration
 
-  const priority =
-    track.packageType === "PRO" || track.packageType === "DEEP_DIVE"
-      ? 10
-      : track.packageType === "STANDARD"
-        ? 5
-        : 0;
+    const priority =
+      track.packageType === "PRO" || track.packageType === "DEEP_DIVE"
+        ? 10
+        : track.packageType === "STANDARD"
+          ? 5
+          : 0;
 
-  await prisma.$transaction(async (tx) => {
     if (reviewersToAssign.length > 0) {
       await tx.reviewQueue.createMany({
         data: reviewersToAssign.map((reviewer) => ({
@@ -374,21 +403,8 @@ export async function assignReviewersToTrack(trackId: string) {
       });
     }
 
-    const [completed, active] = await Promise.all([
-      tx.review.count({ where: { trackId, status: "COMPLETED" } }),
-      tx.review.count({
-        where: { trackId, status: { in: ["ASSIGNED", "IN_PROGRESS"] } },
-      }),
-    ]);
-
-    const remaining = track.reviewsRequested - completed - active;
-
-    if (remaining <= 0) {
-      await tx.track.update({
-        where: { id: trackId },
-        data: { status: "IN_PROGRESS" },
-      });
-    }
+    // Track.status is not updated here.
+    // IN_PROGRESS means at least one review has been submitted.
   });
 }
 

@@ -282,6 +282,10 @@ model Review {
 
   status ReviewStatus @default(ASSIGNED)
 
+  reviewSchemaVersion Int     @default(1)
+  countsTowardCompletion Boolean @default(true)
+  countsTowardAnalytics  Boolean @default(true)
+
   // Listen tracking
   listenDuration Int @default(0) // seconds actually listened
   lastHeartbeat  DateTime?
@@ -313,6 +317,8 @@ model Review {
   nextActions         String?
   timestamps          Json?
 
+  timestampNotes ReviewTimestamp[]
+
   // Earnings
   paidAmount Int @default(0) // cents
 
@@ -332,6 +338,20 @@ model Review {
   @@index([reviewerId, status])
   @@index([trackId])
   @@index([status])
+}
+
+model ReviewTimestamp {
+  id       String @id @default(cuid())
+  reviewId String
+  review   Review  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  seconds Int
+  note    String
+
+  createdAt DateTime @default(now())
+
+  @@index([reviewId])
+  @@index([reviewId, seconds])
 }
 
 enum ReviewStatus {

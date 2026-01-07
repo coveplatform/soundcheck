@@ -42,6 +42,10 @@ export default async function AdminTrackDetailPage({
     notFound();
   }
 
+  const countedCompletedReviews = track.reviews.filter(
+    (r) => r.status === "COMPLETED" && r.countsTowardCompletion !== false
+  ).length;
+
   const hasStartedReviews = track.reviews.some(
     (r) => r.status === "IN_PROGRESS" || r.status === "COMPLETED"
   );
@@ -152,7 +156,7 @@ export default async function AdminTrackDetailPage({
           <div>
             <div className="text-neutral-500">Reviews</div>
             <div className="font-medium">
-              {track.reviewsCompleted} / {track.reviewsRequested}
+              {countedCompletedReviews} / {track.reviewsRequested}
             </div>
           </div>
           <div>

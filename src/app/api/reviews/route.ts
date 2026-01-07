@@ -9,6 +9,13 @@ import { randomBytes } from "crypto";
 
 const MIN_LISTEN_SECONDS = 180;
 
+function isUniqueConstraintError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const e = error as Record<string, unknown>;
+  // Prisma: P2002 = Unique constraint failed
+  return e["code"] === "P2002";
+}
+
 // Generate a short, URL-safe share ID (8 characters)
 function generateShareId(): string {
   return randomBytes(6).toString("base64url").slice(0, 8);
@@ -245,40 +252,62 @@ export async function POST(request: Request) {
     const heartbeatCutoff = new Date(now.getTime() - 2 * 60 * 1000);
 
     const result = await prisma.$transaction(async (tx) => {
-      const updated = await tx.review.updateMany({
-        where: {
-          id: data.reviewId,
-          reviewerId: review.reviewerId,
-          status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-          listenDuration: { gte: MIN_LISTEN_SECONDS },
-          lastHeartbeat: { gte: heartbeatCutoff },
-        },
-        data: {
-          status: "COMPLETED",
-          firstImpression: data.firstImpression,
-          productionScore: data.productionScore,
-          vocalScore: data.vocalScore,
-          originalityScore: data.originalityScore,
-          wouldListenAgain: data.wouldListenAgain,
-          wouldAddToPlaylist: data.wouldAddToPlaylist,
-          wouldShare: data.wouldShare,
-          wouldFollow: data.wouldFollow,
-          perceivedGenre: data.perceivedGenre,
-          similarArtists: data.similarArtists,
-          bestPart: data.bestPart,
-          bestPartTimestamp: data.bestPartTimestamp,
-          weakestPart: data.weakestPart,
-          weakestTimestamp: data.weakestTimestamp,
-          additionalNotes: data.additionalNotes,
-          addressedArtistNote: data.addressedArtistNote,
-          nextActions: data.nextActions,
-          timestamps: data.timestamps,
-          paidAmount: earnings,
-          shareId: generateShareId(),
-        },
-      });
+      let updatedCount = 0;
+      let lastError: unknown = null;
 
-      if (updated.count === 0) {
+      for (let attempt = 0; attempt < 5; attempt++) {
+        try {
+          const updated = await tx.review.updateMany({
+            where: {
+              id: data.reviewId,
+              reviewerId: review.reviewerId,
+              status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+              listenDuration: { gte: MIN_LISTEN_SECONDS },
+              lastHeartbeat: { gte: heartbeatCutoff },
+            },
+            data: {
+              status: "COMPLETED",
+              reviewSchemaVersion: 1,
+              countsTowardCompletion: true,
+              countsTowardAnalytics: true,
+              firstImpression: data.firstImpression,
+              productionScore: data.productionScore,
+              vocalScore: data.vocalScore,
+              originalityScore: data.originalityScore,
+              wouldListenAgain: data.wouldListenAgain,
+              wouldAddToPlaylist: data.wouldAddToPlaylist,
+              wouldShare: data.wouldShare,
+              wouldFollow: data.wouldFollow,
+              perceivedGenre: data.perceivedGenre,
+              similarArtists: data.similarArtists,
+              bestPart: data.bestPart,
+              bestPartTimestamp: data.bestPartTimestamp,
+              weakestPart: data.weakestPart,
+              weakestTimestamp: data.weakestTimestamp,
+              additionalNotes: data.additionalNotes,
+              addressedArtistNote: data.addressedArtistNote,
+              nextActions: data.nextActions,
+              timestamps: data.timestamps,
+              paidAmount: earnings,
+              shareId: generateShareId(),
+            },
+          });
+          updatedCount = updated.count;
+          lastError = null;
+          break;
+        } catch (e) {
+          lastError = e;
+          if (!isUniqueConstraintError(e)) {
+            throw e;
+          }
+        }
+      }
+
+      if (lastError) {
+        throw lastError;
+      }
+
+      if (updatedCount === 0) {
         const current = await tx.review.findUnique({
           where: { id: data.reviewId },
           select: { status: true, listenDuration: true, lastHeartbeat: true },
@@ -322,19 +351,36 @@ export async function POST(request: Request) {
         },
       });
 
-      const completedReviews = await tx.review.count({
+      // Persist timestamp notes in normalized form (best-effort)
+      if (data.timestamps && data.timestamps.length > 0) {
+        await tx.reviewTimestamp.createMany({
+          data: data.timestamps.map((t) => ({
+            reviewId: data.reviewId,
+            seconds: t.seconds,
+            note: t.note,
+          })),
+          skipDuplicates: false,
+        });
+      }
+
+      const countedCompletedReviews = await tx.review.count({
         where: {
           trackId: review.trackId,
           status: "COMPLETED",
+          countsTowardCompletion: true,
         },
       });
+
+      const nextTrackStatus =
+        countedCompletedReviews >= review.track.reviewsRequested
+          ? ("COMPLETED" as const)
+          : ("IN_PROGRESS" as const);
 
       const updatedTrack = await tx.track.update({
         where: { id: review.trackId },
         data: {
-          reviewsCompleted: completedReviews,
-          ...(completedReviews >= review.track.reviewsRequested && {
-            status: "COMPLETED",
+          status: nextTrackStatus,
+          ...(nextTrackStatus === "COMPLETED" && {
             completedAt: new Date(),
           }),
         },
@@ -359,7 +405,7 @@ export async function POST(request: Request) {
       return {
         updated: true as const,
         updatedReview,
-        completedReviews,
+        completedReviews: countedCompletedReviews,
         track: {
           title: updatedTrack.title,
           reviewsRequested: updatedTrack.reviewsRequested,
