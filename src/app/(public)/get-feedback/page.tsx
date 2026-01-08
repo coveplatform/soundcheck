@@ -1238,11 +1238,39 @@ export default function GetFeedbackPage() {
             {/* Hero */}
             <div className="text-center space-y-5 order-[10]">
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
-                Feedback that&apos;s actually usable.<span className="text-lime-500"> From real listeners.</span>
+                Get a listener feedback report on your track.
               </h1>
               <p className="text-neutral-400 text-base sm:text-lg max-w-lg mx-auto">
-                Get structured feedback from genre-matched listeners, plus aggregated insights so you can spot patterns quickly.
+                Genre-matched listeners leave structured reviews. MixReflect aggregates the patterns into a clear summary so you know what to fix.
               </p>
+
+              <div className="max-w-lg mx-auto">
+                <div className="grid gap-2 text-sm text-neutral-300">
+                  <div className="flex items-start gap-2">
+                    <Check className="h-4 w-4 text-lime-500 mt-0.5 flex-shrink-0" />
+                    <span>Submit a track from your dashboard</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="h-4 w-4 text-lime-500 mt-0.5 flex-shrink-0" />
+                    <span>Get feedback from multiple genre-fit listeners</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="h-4 w-4 text-lime-500 mt-0.5 flex-shrink-0" />
+                    <span>See an aggregated summary + analytics (so you can spot patterns)</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="mt-3 text-sm font-bold text-lime-500 hover:text-lime-400"
+                  onClick={() => {
+                    const el = document.getElementById("get-feedback-proof");
+                    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  See example feedback
+                </button>
+              </div>
 
               {/* What you get - visual summary */}
               <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto pt-1">
@@ -1364,7 +1392,7 @@ export default function GetFeedbackPage() {
             )}
 
             {trackStartStage !== "track" && (
-              <div className="order-[20]">
+              <div id="get-feedback-proof" className="order-[20]">
                 {getFeedbackProofSection}
               </div>
             )}
