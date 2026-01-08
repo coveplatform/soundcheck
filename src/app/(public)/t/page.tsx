@@ -37,9 +37,7 @@ export default function TrialLandingPage() {
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05]">
             Get feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
           </h1>
-          <p className="mt-5 text-neutral-300 text-base sm:text-lg max-w-2xl mx-auto">
-            From genre-matched artists + listeners in your music community.
-            <br />
+          <p className="mt-6 text-neutral-200 text-lg sm:text-xl font-bold leading-snug max-w-3xl mx-auto">
             MixReflect is a private feedback marketplace — reviewers earn more for higher-quality reviews, and you rate every review to keep quality high.
           </p>
 
