@@ -1695,7 +1695,8 @@ export default function GetFeedbackPage() {
           <div className="space-y-8">
             <button
               onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-white flex items-center gap-1 transition-colors"
+              disabled={isContinuingToPackage}
+              className="text-sm text-neutral-500 hover:text-white flex items-center gap-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
@@ -1728,6 +1729,23 @@ export default function GetFeedbackPage() {
                 <Check className="h-4 w-4 text-black" />
               </div>
             </div>
+
+            {isContinuingToPackage ? (
+              <div className="border-2 border-neutral-700 bg-neutral-900 p-6">
+                <div className="flex items-start gap-4">
+                  <div className="h-12 w-12 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center flex-shrink-0">
+                    <Loader2 className="h-6 w-6 animate-spin text-lime-500" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-black text-white text-lg">Setting things up…</p>
+                    <p className="text-sm text-neutral-500 mt-1">
+                      Creating your account and preparing your review. This usually takes a few seconds.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
 
             {/* Account fields (only if not logged in) */}
             {!isLoggedIn && (
@@ -1935,6 +1953,8 @@ export default function GetFeedbackPage() {
               Continue
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
+              </>
+            )}
           </div>
         )}
 
