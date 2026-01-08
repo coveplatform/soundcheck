@@ -139,7 +139,7 @@ export default function TrialLandingPage() {
                 </div>
                 <div className="flex-shrink-0">
                   <span className="inline-flex items-center px-3 py-1 border-2 border-black bg-white text-black font-black">
-                    Based on 20 listeners
+                    Based on 20 reviews
                   </span>
                 </div>
               </div>
