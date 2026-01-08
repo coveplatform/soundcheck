@@ -5,6 +5,7 @@ import { SessionProvider as NextAuthSessionProvider } from "next-auth/react";
 import { AnalyticsProvider } from "./analytics-provider";
 import { ClarityScript } from "./clarity-script";
 import { TikTokPixel } from "./tiktok-pixel";
+import { RedditPixel } from "./reddit-pixel";
 import { NavigationProgress } from "@/components/ui/navigation-progress";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -15,6 +16,7 @@ export function Providers({ children }: { children: ReactNode }) {
         <AnalyticsProvider>
           <ClarityScript />
           <TikTokPixel />
+          <RedditPixel />
           {children}
         </AnalyticsProvider>
       </Suspense>
@@ -26,3 +28,4 @@ export function Providers({ children }: { children: ReactNode }) {
 export { AnalyticsProvider } from "./analytics-provider";
 export { ClarityScript } from "./clarity-script";
 export { TikTokPixel, trackTikTokEvent } from "./tiktok-pixel";
+export { RedditPixel, trackRedditEvent, redditEvents } from "./reddit-pixel";

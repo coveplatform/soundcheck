@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Clock, ArrowRight, Gift } from "lucide-react";
 import { track } from "@/lib/analytics";
-import { trackTikTokEvent } from "@/components/providers";
+import { trackTikTokEvent, redditEvents } from "@/components/providers";
 
 type CheckoutStatusResponse = {
   status: "PENDING" | "COMPLETED" | "FAILED";
@@ -72,14 +72,21 @@ export default function SuccessPage() {
               trackId: payload.trackId,
               bypassed: isBypass,
             });
-            // TikTok conversion tracking (only for paid purchases, not free credits)
+            // Conversion tracking (only for paid purchases, not free credits)
             if (payload.amount && payload.amount > 0) {
+              // TikTok
               trackTikTokEvent("CompletePayment", {
                 content_type: "product",
                 content_id: payload.packageType || "unknown",
                 currency: "AUD",
                 value: payload.amount / 100, // Convert cents to dollars
               });
+              // Reddit
+              redditEvents.purchase(
+                payload.packageType || "unknown",
+                payload.amount,
+                payload.trackId
+              );
             }
           }
 

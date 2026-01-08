@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Gift } from "lucide-react";
 import { funnels, track } from "@/lib/analytics";
+import { redditEvents } from "@/components/providers";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -51,6 +52,8 @@ export default function CheckoutPage() {
         // Track checkout started
         if (data.package && data.amount) {
           funnels.checkout.start(data.package, data.amount, trackId);
+          // Reddit AddToCart event
+          redditEvents.initiateCheckout(data.package, data.amount);
         }
 
         // Redirect to Stripe checkout

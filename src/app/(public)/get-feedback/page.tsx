@@ -31,7 +31,7 @@ import {
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { Logo } from "@/components/ui/logo";
 import Link from "next/link";
-import { trackTikTokEvent } from "@/components/providers";
+import { trackTikTokEvent, redditEvents } from "@/components/providers";
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -168,10 +168,13 @@ export default function GetFeedbackPage() {
   useEffect(() => {
     if (hasTrackedViewContentRef.current) return;
     hasTrackedViewContentRef.current = true;
+    // TikTok
     trackTikTokEvent("ViewContent", {
       content_type: "product",
       content_id: "get_feedback",
     });
+    // Reddit
+    redditEvents.viewFeedbackPage();
   }, []);
 
   // Load artist profile data if logged in
@@ -720,9 +723,12 @@ export default function GetFeedbackPage() {
           return;
         }
 
+        // TikTok
         trackTikTokEvent("CompleteRegistration", {
           content_name: "artist",
         });
+        // Reddit
+        redditEvents.signUp();
 
         setShouldAutoSubmit(true);
         setStep("package");
@@ -795,14 +801,20 @@ export default function GetFeedbackPage() {
           password,
         });
 
+        // TikTok
         trackTikTokEvent("CompleteRegistration", {
           content_name: "artist",
         });
+        // Reddit
+        redditEvents.signUp();
       } else if (isLoggedIn && !hasArtistProfile) {
         // Logged-in user (e.g., Google OAuth) creating their first artistProfile
+        // TikTok
         trackTikTokEvent("CompleteRegistration", {
           content_name: "artist",
         });
+        // Reddit
+        redditEvents.signUp();
       }
 
       // Redirect to success page (for free review) or checkout (for paid)
@@ -1224,10 +1236,13 @@ export default function GetFeedbackPage() {
                       setEmail(nextEmail);
                       await captureLead();
 
+                      // TikTok
                       trackTikTokEvent("SubmitForm", {
                         content_type: "lead",
                         content_id: "get_feedback_lead",
                       });
+                      // Reddit
+                      redditEvents.startSubmission();
 
                       setTrackStartStage("track");
                     }}
