@@ -549,7 +549,7 @@ export default function GetFeedbackPage() {
     }
   };
 
-  // Toggle genre
+  // Toggle genre - keep selector open while selecting
   const toggleGenre = (genreId: string) => {
     setSelectedGenres((prev) => {
       if (prev.includes(genreId)) {
@@ -558,6 +558,10 @@ export default function GetFeedbackPage() {
       if (prev.length >= 3) return prev;
       return [...prev, genreId];
     });
+    // Keep the selector open while selecting
+    if (!isEditingGenres) {
+      setIsEditingGenres(true);
+    }
   };
 
   // Password validation
@@ -1838,23 +1842,10 @@ export default function GetFeedbackPage() {
               </div>
             )}
 
-            {/* Logged in user confirmation + artist name if needed */}
-            {isLoggedIn && !isContinuingToPackage && (
+            {/* Artist name field for logged-in users without a profile */}
+            {isLoggedIn && !isContinuingToPackage && !hasArtistProfile && (
               <div className="space-y-4">
-                {/* Signed in confirmation - only show if not transitioning */}
-                <div className="border-2 border-lime-500/30 bg-lime-500/10 p-4 flex items-center gap-3">
-                  <div className="h-8 w-8 bg-lime-500 flex items-center justify-center flex-shrink-0">
-                    <Check className="h-4 w-4 text-black" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-white">Signed in as {session?.user?.email}</p>
-                    <p className="text-sm text-neutral-400">Your feedback will be sent to this email</p>
-                  </div>
-                </div>
-
-                {/* Artist name field for logged-in users without a profile */}
-                {!hasArtistProfile && (
-                  <div>
+                <div>
                     <label className="text-sm font-bold text-neutral-400 mb-2 block">Artist / Project Name</label>
                     <Input
                       placeholder="Your artist name"
@@ -1869,8 +1860,7 @@ export default function GetFeedbackPage() {
                       )}
                     />
                     {fieldErrors.artistName && <p className="text-xs text-red-500 mt-1">{fieldErrors.artistName}</p>}
-                  </div>
-                )}
+                </div>
               </div>
             )}
 
