@@ -604,7 +604,7 @@ export default function Home() {
             Your track deserves more than a guess. Get real feedback from real listeners.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/t">
+            <Link href="/signup">
               <Button
                 size="lg"
                 className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-lime-500"
