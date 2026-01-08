@@ -742,6 +742,8 @@ export default function GetFeedbackPage() {
         // Reddit
         redditEvents.signUp();
 
+        // New account = has free review credit
+        setHasFreeReviewCredit(true);
         setShouldAutoSubmit(true);
         setStep("package");
         void router.refresh();
@@ -844,9 +846,19 @@ export default function GetFeedbackPage() {
     if (!isLoggedIn) return;
     if (isSubmitting) return;
 
+    // Still loading - wait for hasFreeReviewCredit to be determined
+    if (hasFreeReviewCredit === null) return;
+
+    // User doesn't have free credit - let them choose a package
+    if (hasFreeReviewCredit === false) {
+      setShouldAutoSubmit(false);
+      return;
+    }
+
+    // User has free credit - auto-submit
     setShouldAutoSubmit(false);
     void handleSubmit();
-  }, [handleSubmit, isLoggedIn, isSubmitting, shouldAutoSubmit, step]);
+  }, [handleSubmit, hasFreeReviewCredit, isLoggedIn, isSubmitting, shouldAutoSubmit, step]);
 
   // Check if we can proceed from track step
   // For URL mode: require verified link (no warning) and title
@@ -1949,8 +1961,16 @@ export default function GetFeedbackPage() {
               Back
             </button>
 
+            {/* Loading state while checking free credit */}
+            {hasFreeReviewCredit === null && isLoggedIn && (
+              <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                <div className="h-8 w-8 border-2 border-lime-500 border-t-transparent rounded-full animate-spin" />
+                <p className="text-neutral-400">Loading your account...</p>
+              </div>
+            )}
+
             {/* FREE REVIEW FLOW */}
-            {hasFreeReviewCredit && (
+            {hasFreeReviewCredit === true && (
               <>
                 <div className="text-center space-y-2">
                   <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-3 py-1.5 mb-2">
