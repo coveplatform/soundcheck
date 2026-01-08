@@ -1863,7 +1863,7 @@ export default function GetFeedbackPage() {
                       <div className="flex flex-wrap gap-2 mt-2">
                         {selectedGenres
                           .map((id) => genres.find((g) => g.id === id)?.name)
-                          .filter(Boolean)
+                          .filter((name): name is string => Boolean(name))
                           .map((name) => (
                             <span
                               key={name}
