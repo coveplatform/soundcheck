@@ -1245,10 +1245,13 @@ export default function GetFeedbackPage() {
               </div>
 
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
-                Real feedback.<span className="text-lime-500"> Real fast.</span>
+                Submit a track.<span className="text-lime-500"> Get genre-matched reviews fast.</span>
               </h1>
               <p className="text-neutral-400 text-base sm:text-lg max-w-lg mx-auto">
-                Genre-matched listeners review your track and tell you exactly what&apos;s working and what needs fixing.
+                Upload or paste a link. We match your track to listeners in your genre and send back aggregated feedback + analytics.
+              </p>
+              <p className="text-neutral-500 text-sm max-w-lg mx-auto">
+                What happens next: enter your email → add your track → choose a package.
               </p>
 
               {/* What you get - visual summary */}
@@ -1273,12 +1276,12 @@ export default function GetFeedbackPage() {
                 <div id="get-feedback-start" className="border-2 border-neutral-700 bg-neutral-900 p-4">
                   <div className="space-y-3">
                     <div className="text-center">
-                      <p className="text-xs font-black uppercase tracking-wide text-neutral-400">Get feedback</p>
+                      <p className="text-xs font-black uppercase tracking-wide text-neutral-400">Step 1 of 3</p>
                       <h2 className="text-xl font-black text-white">
-                        Start with your details
+                        Create your project
                       </h2>
                       <p className="text-sm text-neutral-400 mt-1">
-                        We&apos;ll use this to send your feedback and save your progress.
+                        Next you&apos;ll add your track (upload or link). We&apos;ll use this to send your feedback and save your progress.
                       </p>
                     </div>
 
@@ -1353,7 +1356,7 @@ export default function GetFeedbackPage() {
                     }}
                     className="w-full h-11 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
                   >
-                    Continue
+                    Next: add your track
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
 
@@ -1416,6 +1419,14 @@ export default function GetFeedbackPage() {
             {trackStartStage === "track" && (
               <div className="order-[20] space-y-10">
                 <div className="w-full sm:max-w-lg sm:mx-auto space-y-8">
+                  <div className="text-center space-y-1">
+                    <p className="text-xs font-black uppercase tracking-wide text-neutral-400">Step 2 of 3</p>
+                    <h2 className="text-xl font-black text-white">Add your track</h2>
+                    <p className="text-sm text-neutral-400">
+                      Upload an MP3 or paste a link. Next you&apos;ll confirm details and choose a package.
+                    </p>
+                  </div>
+
                   {/* Input mode toggle */}
                   <div className="flex gap-2 bg-neutral-900 p-1 rounded-none border-2 border-neutral-700">
                     <button
@@ -1642,7 +1653,7 @@ export default function GetFeedbackPage() {
                         "bg-lime-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
                       )}
                     >
-                      Continue
+                      Next: confirm details
                       <ArrowRight className="h-5 w-5 ml-2" />
                     </Button>
                   )}
