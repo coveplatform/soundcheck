@@ -7,13 +7,13 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-black via-neutral-950 to-black text-white">
       {/* Header */}
-      <header className="border-b-2 border-black">
+      <header className="border-b border-neutral-800 bg-black/40 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center h-14">
             <Link href="/" className="flex items-center gap-2 w-fit">
-              <Logo />
+              <Logo className="text-white" />
             </Link>
           </div>
         </div>
