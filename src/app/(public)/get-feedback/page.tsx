@@ -860,8 +860,8 @@ export default function GetFeedbackPage() {
     }
 
     // User has free credit - auto-submit
-    setShouldAutoSubmit(false);
     void handleSubmit();
+    setShouldAutoSubmit(false);
   }, [handleSubmit, hasFreeReviewCredit, isLoggedIn, isSubmitting, shouldAutoSubmit, step]);
 
   // Check if we can proceed from track step
@@ -1988,201 +1988,186 @@ export default function GetFeedbackPage() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-black text-white text-lg">Submitting your track…</p>
-                    <p className="text-sm text-neutral-500 mt-1">Finalizing your review request and sending you to your results page.</p>
+                    <p className="text-sm text-neutral-500 mt-1">
+                      Finalizing your review request and sending you to your results page.
+                    </p>
                   </div>
                 </div>
               </div>
             ) : (
               <>
-
-            {/* Loading state while checking free credit */}
-            {hasFreeReviewCredit === null && isLoggedIn && (
-              <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                <div className="h-8 w-8 border-2 border-lime-500 border-t-transparent rounded-full animate-spin" />
-                <p className="text-neutral-400">Loading your account...</p>
-              </div>
-            )}
-
-            {/* FREE REVIEW FLOW */}
-            {hasFreeReviewCredit === true && (
-              <>
-                <div className="text-center space-y-2">
-                  <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-3 py-1.5 mb-2">
-                    <Gift className="h-4 w-4" />
-                    <span className="font-black text-xs uppercase tracking-wide">Free Review</span>
+                {hasFreeReviewCredit === null && isLoggedIn && (
+                  <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                    <div className="h-8 w-8 border-2 border-lime-500 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-neutral-400">Loading your account...</p>
                   </div>
-                  <h1 className="text-3xl sm:text-4xl font-black">Your free review is ready</h1>
-                  <p className="text-neutral-400">
-                    No payment required — just hit submit.
-                  </p>
-                </div>
+                )}
 
-                {/* Track preview */}
-                <div className="border-2 border-lime-500 bg-neutral-900 p-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    {artworkUrl ? (
-                      <img src={artworkUrl} alt="" className="w-16 h-16 object-cover border-2 border-neutral-600" />
-                    ) : (
-                      <div className="w-16 h-16 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center">
-                        <Music className="h-8 w-8 text-neutral-400" />
+                {hasFreeReviewCredit === true && (
+                  <>
+                    <div className="text-center space-y-2">
+                      <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-3 py-1.5 mb-2">
+                        <Gift className="h-4 w-4" />
+                        <span className="font-black text-xs uppercase tracking-wide">Free Review</span>
                       </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-black text-xl text-white truncate">{title}</p>
-                      <p className="text-sm text-neutral-500">Ready for review</p>
+                      <h1 className="text-3xl sm:text-4xl font-black">Your free review is ready</h1>
+                      <p className="text-neutral-400">No payment required — just hit submit.</p>
                     </div>
-                    <div className="h-10 w-10 bg-lime-500 flex items-center justify-center flex-shrink-0">
-                      <Gift className="h-5 w-5 text-black" />
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-4 border-t border-neutral-700">
-                    <span className="text-neutral-400">Your first review</span>
-                    <div className="text-right">
-                      <span className="text-2xl font-black text-lime-500">FREE</span>
-                      <span className="text-xs text-neutral-500 ml-2 line-through">$4.95</span>
-                    </div>
-                  </div>
-                </div>
 
-                {/* What you get */}
-                <div className="border-2 border-neutral-700 bg-neutral-900 p-5">
-                  <h3 className="font-bold text-white mb-3">Every review includes:</h3>
-                  <ul className="space-y-2 text-sm text-neutral-400">
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
-                      <span>Production, originality & vibe ratings</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
-                      <span>Written feedback with timestamps</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
-                      <span>Actionable suggestions</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
-                      <span>Results in under 12 hours</span>
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Submit button */}
-                <Button
-                  onClick={handleSubmit}
-                  isLoading={isSubmitting}
-                  className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-                >
-                  <Gift className="h-5 w-5 mr-2" />
-                  {isSubmitting ? "Submitting…" : "Get My Free Review"}
-                  <ArrowRight className="h-5 w-5 ml-2" />
-                </Button>
-
-                <p className="text-center text-xs text-neutral-500">
-                  Results in under 12 hours
-                </p>
-              </>
-            )}
-
-            {/* PAID FLOW - User already used free review */}
-            {hasFreeReviewCredit === false && (
-              <>
-                <div className="text-center space-y-2">
-                  <h1 className="text-3xl sm:text-4xl font-black">Choose your package</h1>
-                  <p className="text-neutral-400">
-                    More reviews = clearer patterns. See what resonates across listeners.
-                  </p>
-                </div>
-
-                {/* Track preview */}
-                <div className="border-2 border-neutral-700 bg-neutral-900 p-4 flex items-center gap-4">
-                  {artworkUrl ? (
-                    <img src={artworkUrl} alt="" className="w-12 h-12 object-cover border border-neutral-600" />
-                  ) : (
-                    <div className="w-12 h-12 bg-neutral-800 border border-neutral-600 flex items-center justify-center">
-                      <Music className="h-5 w-5 text-neutral-500" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-white truncate">{title}</p>
-                    <p className="text-xs text-neutral-500 uppercase">{sourceType || "Ready"}</p>
-                  </div>
-                  <div className="h-8 w-8 bg-lime-500 flex items-center justify-center">
-                    <Check className="h-4 w-4 text-black" />
-                  </div>
-                </div>
-
-                {/* Package options */}
-                <div className="space-y-3">
-                  {(["STARTER", "STANDARD", "PRO"] as PackageType[]).map((pkg) => {
-                    const details = PACKAGES[pkg];
-                    const isSelected = selectedPackage === pkg;
-                    return (
-                      <button
-                        key={pkg}
-                        type="button"
-                        onClick={() => setSelectedPackage(pkg)}
-                        className={cn(
-                          "w-full p-4 border-2 text-left transition-all",
-                          isSelected
-                            ? "border-lime-500 bg-lime-500/10"
-                            : "border-neutral-700 bg-neutral-900 hover:border-neutral-500"
+                    <div className="border-2 border-lime-500 bg-neutral-900 p-6">
+                      <div className="flex items-center gap-4 mb-4">
+                        {artworkUrl ? (
+                          <img src={artworkUrl} alt="" className="w-16 h-16 object-cover border-2 border-neutral-600" />
+                        ) : (
+                          <div className="w-16 h-16 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center">
+                            <Music className="h-8 w-8 text-neutral-400" />
+                          </div>
                         )}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-black text-white">{details.name}</span>
-                              {pkg === "STANDARD" && (
-                                <span className="text-[10px] font-bold px-2 py-0.5 bg-lime-500 text-black uppercase">
-                                  Popular
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-neutral-400 mt-1">
-                              {details.reviews} review{details.reviews > 1 ? "s" : ""} • {details.description}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-xl font-black text-white">
-                              ${(details.price / 100).toFixed(0)}
-                            </span>
-                            <span className="text-xs text-neutral-500 ml-1">AUD</span>
-                          </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-black text-xl text-white truncate">{title}</p>
+                          <p className="text-sm text-neutral-500">Ready for review</p>
                         </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                        <div className="h-10 w-10 bg-lime-500 flex items-center justify-center flex-shrink-0">
+                          <Gift className="h-5 w-5 text-black" />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between pt-4 border-t border-neutral-700">
+                        <span className="text-neutral-400">Your first review</span>
+                        <div className="text-right">
+                          <span className="text-2xl font-black text-lime-500">FREE</span>
+                          <span className="text-xs text-neutral-500 ml-2 line-through">$4.95</span>
+                        </div>
+                      </div>
+                    </div>
 
-                {/* Submit button */}
-                <Button
-                  onClick={handleSubmit}
-                  isLoading={isSubmitting}
-                  className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-                >
-                  {isSubmitting ? "Submitting…" : `Continue to Checkout`}
-                  <ArrowRight className="h-5 w-5 ml-2" />
-                </Button>
+                    <div className="border-2 border-neutral-700 bg-neutral-900 p-5">
+                      <h3 className="font-bold text-white mb-3">Every review includes:</h3>
+                      <ul className="space-y-2 text-sm text-neutral-400">
+                        <li className="flex items-center gap-2">
+                          <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
+                          <span>Production, originality & vibe ratings</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
+                          <span>Written feedback with timestamps</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
+                          <span>Actionable suggestions</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="h-4 w-4 text-lime-500 flex-shrink-0" />
+                          <span>Results in under 12 hours</span>
+                        </li>
+                      </ul>
+                    </div>
 
-                <p className="text-center text-xs text-neutral-500">
-                  Secure payment via Stripe • Results in under 12 hours
-                </p>
+                    <Button
+                      onClick={handleSubmit}
+                      isLoading={isSubmitting}
+                      className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                    >
+                      <Gift className="h-5 w-5 mr-2" />
+                      {isSubmitting ? "Submitting…" : "Get My Free Review"}
+                      <ArrowRight className="h-5 w-5 ml-2" />
+                    </Button>
+
+                    <p className="text-center text-xs text-neutral-500">Results in under 12 hours</p>
+                  </>
+                )}
+
+                {hasFreeReviewCredit === false && (
+                  <>
+                    <div className="text-center space-y-2">
+                      <h1 className="text-3xl sm:text-4xl font-black">Choose your package</h1>
+                      <p className="text-neutral-400">
+                        More reviews = clearer patterns. See what resonates across listeners.
+                      </p>
+                    </div>
+
+                    <div className="border-2 border-neutral-700 bg-neutral-900 p-4 flex items-center gap-4">
+                      {artworkUrl ? (
+                        <img src={artworkUrl} alt="" className="w-12 h-12 object-cover border border-neutral-600" />
+                      ) : (
+                        <div className="w-12 h-12 bg-neutral-800 border border-neutral-600 flex items-center justify-center">
+                          <Music className="h-5 w-5 text-neutral-500" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-white truncate">{title}</p>
+                        <p className="text-xs text-neutral-500 uppercase">{sourceType || "Ready"}</p>
+                      </div>
+                      <div className="h-8 w-8 bg-lime-500 flex items-center justify-center">
+                        <Check className="h-4 w-4 text-black" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      {(["STARTER", "STANDARD", "PRO"] as PackageType[]).map((pkg) => {
+                        const details = PACKAGES[pkg];
+                        const isSelected = selectedPackage === pkg;
+                        return (
+                          <button
+                            key={pkg}
+                            type="button"
+                            onClick={() => setSelectedPackage(pkg)}
+                            className={cn(
+                              "w-full p-4 border-2 text-left transition-all",
+                              isSelected
+                                ? "border-lime-500 bg-lime-500/10"
+                                : "border-neutral-700 bg-neutral-900 hover:border-neutral-500"
+                            )}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-black text-white">{details.name}</span>
+                                  {pkg === "STANDARD" && (
+                                    <span className="text-[10px] font-bold px-2 py-0.5 bg-lime-500 text-black uppercase">
+                                      Popular
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-sm text-neutral-400 mt-1">
+                                  {details.reviews} review{details.reviews > 1 ? "s" : ""} • {details.description}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-xl font-black text-white">${(details.price / 100).toFixed(0)}</span>
+                                <span className="text-xs text-neutral-500 ml-1">AUD</span>
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <Button
+                      onClick={handleSubmit}
+                      isLoading={isSubmitting}
+                      className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                    >
+                      {isSubmitting ? "Submitting…" : "Continue to Checkout"}
+                      <ArrowRight className="h-5 w-5 ml-2" />
+                    </Button>
+
+                    <p className="text-center text-xs text-neutral-500">Secure payment via Stripe • Results in under 12 hours</p>
+                  </>
+                )}
+
+                {!isLoggedIn && (
+                  <p className="text-[10px] text-neutral-600 text-center">
+                    By continuing, you agree to our{" "}
+                    <Link href="/terms" className="text-neutral-400 hover:text-white">Terms</Link> and{" "}
+                    <Link href="/privacy" className="text-neutral-400 hover:text-white">Privacy Policy</Link>.
+                  </p>
+                )}
               </>
             )}
+          </div>
+        )}
 
-            {/* Terms */}
-            {!isLoggedIn && (
-              <p className="text-[10px] text-neutral-600 text-center">
-                By continuing, you agree to our{" "}
-                <Link href="/terms" className="text-neutral-400 hover:text-white">Terms</Link> and{" "}
-                <Link href="/privacy" className="text-neutral-400 hover:text-white">Privacy Policy</Link>.
-              </p>
-            )}
-
-              </>
-            )}
-          </main>
+      </main>
 
     </div>
   );
