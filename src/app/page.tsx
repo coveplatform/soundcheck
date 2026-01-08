@@ -321,7 +321,7 @@ export default function Home() {
       {/* The Solution */}
       <section className="border-b border-neutral-800 py-16 bg-sky-400 text-black">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-2">A better way to improve a track</h2>
+          <h2 className="text-3xl font-black mb-2">How feedback works</h2>
           <p className="text-black/80 mb-8">Fast, structured feedback—so you know what to change next.</p>
 
           <div className="mt-8 grid md:grid-cols-4 gap-6">
@@ -329,28 +329,28 @@ export default function Home() {
               <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
                 <Target className="h-6 w-6" />
               </div>
-              <div className="mt-4 text-2xl font-black">Submit your track</div>
+              <div className="mt-4 text-xl sm:text-2xl font-black">1. Submit your track</div>
               <div className="mt-2 text-base font-medium">Paste a link or upload.</div>
             </div>
             <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
               <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
                 <Users className="h-6 w-6" />
               </div>
-              <div className="mt-4 text-2xl font-black">We match reviewers</div>
-              <div className="mt-2 text-base font-medium">Artists + listeners who actually listen to that genre.</div>
+              <div className="mt-4 text-xl sm:text-2xl font-black">2. We match reviewers</div>
+              <div className="mt-2 text-base font-medium">Genre-picked artists + listeners review your track.</div>
             </div>
             <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
               <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
                 <MessageCircle className="h-6 w-6" />
               </div>
-              <div className="mt-4 text-2xl font-black">They review</div>
+              <div className="mt-4 text-xl sm:text-2xl font-black">3. They review</div>
               <div className="mt-2 text-base font-medium">Structured notes + timestamps. Artists rate every review.</div>
             </div>
             <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
               <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
                 <Flame className="h-6 w-6" />
               </div>
-              <div className="mt-4 text-2xl font-black">You get clarity</div>
+              <div className="mt-4 text-xl sm:text-2xl font-black">4. You get clarity</div>
               <div className="mt-2 text-base font-medium">Patterns show what to change next.</div>
             </div>
           </div>
@@ -402,52 +402,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Real Product Screenshots - Pattern Analytics */}
-      <section className="border-b border-neutral-800 py-16 bg-lime-500 text-black">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-black text-center mb-2 text-black">The accountability loop</h2>
-          <p className="text-black/80 text-center mb-10 max-w-lg mx-auto text-sm sm:text-base">
-            Reviewers earn based on artists&apos; ratings—so they give real feedback, not empty praise.
-          </p>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-            <div className="flex flex-col items-center p-4 bg-black/80 backdrop-blur text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-3">
-                <DollarSign className="h-6 w-6" />
-              </div>
-              <span className="font-black text-lg">Artist pays</span>
-              <span className="text-xs text-neutral-200">One-time fee</span>
-            </div>
-
-            <div className="flex flex-col items-center p-4 bg-black/80 backdrop-blur text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center mb-3">
-                <Headphones className="h-6 w-6" />
-              </div>
-              <span className="font-black text-lg">They review</span>
-              <span className="text-xs text-neutral-200">Structured feedback</span>
-            </div>
-
-            <div className="flex flex-col items-center p-4 bg-black/80 backdrop-blur text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-12 w-12 bg-sky-400 border-2 border-black flex items-center justify-center mb-3">
-                <Star className="h-6 w-6" />
-              </div>
-              <span className="font-black text-lg">Artist rates</span>
-              <span className="text-xs text-neutral-200">1-5 stars</span>
-            </div>
-
-            <div className="flex flex-col items-center p-4 bg-black border-2 border-black shadow-[3px_3px_0px_0px_rgba(132,204,22,1)]">
-              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-3">
-                <Shield className="h-6 w-6" />
-              </div>
-              <span className="font-black text-lg text-white">Quality</span>
-              <span className="text-xs text-lime-400">Enforced</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Features - Compact 3-column */}
-      <section className="border-b border-neutral-800 py-16 bg-lime-500 text-black">
+      <section className="border-b border-neutral-800 py-16 bg-black text-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid sm:grid-cols-3 gap-6">
             <div className="text-center">
@@ -455,7 +411,7 @@ export default function Home() {
                 <Target className="h-7 w-7 text-black" />
               </div>
               <h3 className="font-bold text-lg mb-2">Genre-matched</h3>
-              <p className="text-sm text-black/80">
+              <p className="text-sm text-neutral-300">
                 Your trap beat won&apos;t be reviewed by someone who only listens to country.
               </p>
             </div>
@@ -465,7 +421,7 @@ export default function Home() {
                 <Clock className="h-7 w-7 text-black" />
               </div>
               <h3 className="font-bold text-lg mb-2">Fast turnaround</h3>
-              <p className="text-sm text-black/80">
+              <p className="text-sm text-neutral-300">
                 All reviews delivered within 24 hours. Usually much faster.
               </p>
             </div>
@@ -475,7 +431,7 @@ export default function Home() {
                 <Shield className="h-7 w-7 text-black" />
               </div>
               <h3 className="font-bold text-lg mb-2">Private & secure</h3>
-              <p className="text-sm text-black/80">
+              <p className="text-sm text-neutral-300">
                 Only assigned reviewers hear your track. We never share or leak your work.
               </p>
             </div>
