@@ -31,7 +31,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-28 relative">
           <div className="text-center min-h-[52vh] flex flex-col justify-center">
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight text-white max-w-5xl mx-auto leading-[1.08]">
-              Get feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
+              Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
             </h1>
             <p className="mt-6 text-neutral-200 text-lg sm:text-xl font-bold leading-snug max-w-3xl mx-auto">
               MixReflect is a <span className="text-orange-400">private feedback marketplace</span> — reviewers earn more for higher-quality reviews, and artists rate every review to keep quality high.
@@ -43,7 +43,7 @@ export default function Home() {
                   Start trial <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="#examples" className="text-sm font-bold text-black bg-white px-3 py-1 border-2 border-black hover:bg-neutral-50">
+              <Link href="#examples" className="text-sm font-bold text-black bg-white px-3 py-1 border-2 border-black hover:bg-neutral-50 active:bg-neutral-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
                 View examples
               </Link>
             </div>

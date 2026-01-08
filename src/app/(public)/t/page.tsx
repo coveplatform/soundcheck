@@ -41,7 +41,7 @@ export default function TrialLandingPage() {
       <main className="max-w-5xl mx-auto px-4 py-16 sm:py-24">
         <section className="text-center min-h-[62vh] flex flex-col justify-center">
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05]">
-            Get feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
+            Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
           </h1>
           <p className="mt-6 text-neutral-200 text-lg sm:text-xl font-bold leading-snug max-w-3xl mx-auto">
             MixReflect is a <span className="text-orange-400">private feedback marketplace</span> — reviewers earn more for higher-quality reviews, and artists rate every review to keep quality high.
@@ -50,7 +50,7 @@ export default function TrialLandingPage() {
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
               <Button
-                className="w-full sm:w-auto h-11 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
+                className="w-full sm:w-auto h-11 text-base font-black bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
               >
                 Start trial
                 <ArrowRight className="h-4 w-4 ml-2" />
