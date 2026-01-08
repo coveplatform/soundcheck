@@ -6,7 +6,7 @@ import { z } from "zod";
 
 const createProfileSchema = z.object({
   artistName: z.string().min(1, "Artist name is required").max(100),
-  genreIds: z.array(z.string()).min(1, "Select at least one genre").max(5),
+  genreIds: z.array(z.string()).max(5).optional(),
 });
 
 export async function POST(request: Request) {
@@ -31,9 +31,13 @@ export async function POST(request: Request) {
         where: { userId: session.user.id },
         data: {
           artistName,
-          genres: {
-            set: genreIds.map((id) => ({ id })),
-          },
+          ...(genreIds !== undefined
+            ? {
+                genres: {
+                  set: genreIds.map((id) => ({ id })),
+                },
+              }
+            : {}),
         },
         include: { genres: true },
       });
@@ -47,9 +51,13 @@ export async function POST(request: Request) {
         userId: session.user.id,
         artistName,
         freeReviewCredits: 1,
-        genres: {
-          connect: genreIds.map((id) => ({ id })),
-        },
+        ...(genreIds && genreIds.length > 0
+          ? {
+              genres: {
+                connect: genreIds.map((id) => ({ id })),
+              },
+            }
+          : {}),
       },
       include: { genres: true },
     });

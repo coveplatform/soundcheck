@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -14,52 +14,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { GenreSelector } from "@/components/ui/genre-selector";
-
-interface Genre {
-  id: string;
-  name: string;
-  slug: string;
-}
 
 export default function ArtistOnboardingPage() {
   const router = useRouter();
   const { update: updateSession } = useSession();
   const [artistName, setArtistName] = useState("");
-  const [genres, setGenres] = useState<Genre[]>([]);
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingGenres, setIsLoadingGenres] = useState(true);
-
-  useEffect(() => {
-    async function fetchGenres() {
-      try {
-        const response = await fetch("/api/genres");
-        if (response.ok) {
-          const data = await response.json();
-          setGenres(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch genres:", error);
-      } finally {
-        setIsLoadingGenres(false);
-      }
-    }
-    fetchGenres();
-  }, []);
-
-  const toggleGenre = (genreId: string) => {
-    setSelectedGenres((prev) => {
-      if (prev.includes(genreId)) {
-        return prev.filter((id) => id !== genreId);
-      }
-      if (prev.length >= 5) {
-        return prev;
-      }
-      return [...prev, genreId];
-    });
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,11 +28,6 @@ export default function ArtistOnboardingPage() {
 
     if (!artistName.trim()) {
       setError("Please enter your artist name");
-      return;
-    }
-
-    if (selectedGenres.length === 0) {
-      setError("Please select at least one genre");
       return;
     }
 
@@ -83,7 +39,6 @@ export default function ArtistOnboardingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           artistName: artistName.trim(),
-          genreIds: selectedGenres,
         }),
       });
 
@@ -111,7 +66,7 @@ export default function ArtistOnboardingPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Set Up Your Artist Profile</CardTitle>
           <CardDescription>
-            Tell us about yourself so we can match you with the right reviewers
+            Add your artist / project name. You can pick genres later when you submit a track.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -134,38 +89,13 @@ export default function ArtistOnboardingPage() {
                 This is how you&apos;ll appear to reviewers
               </p>
             </div>
-
-            <div className="space-y-3">
-              <Label>
-                Your Genres{" "}
-                <span className="text-neutral-500 font-normal">
-                  (select up to 5)
-                </span>
-              </Label>
-              {isLoadingGenres ? (
-                <div className="text-sm text-neutral-500">Loading genres...</div>
-              ) : (
-                <GenreSelector
-                  genres={genres}
-                  selectedIds={selectedGenres}
-                  onToggle={toggleGenre}
-                  minSelections={1}
-                  maxSelections={5}
-                  variant="artist"
-                />
-              )}
-              <p className="text-sm text-neutral-500">
-                These help us match your tracks with reviewers who understand
-                your sound
-              </p>
-            </div>
           </CardContent>
           <CardFooter>
             <Button
               type="submit"
               className="w-full"
               isLoading={isLoading}
-              disabled={!artistName.trim() || selectedGenres.length === 0}
+              disabled={!artistName.trim()}
             >
               Complete Setup
             </Button>

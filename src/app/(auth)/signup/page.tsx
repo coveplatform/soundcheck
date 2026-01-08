@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Music, Headphones, Users, ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { funnels, track } from "@/lib/analytics";
 import { trackTikTokEvent } from "@/components/providers";
 import { PasswordStrength } from "@/components/ui/password-strength";
@@ -27,19 +27,12 @@ export default function SignupPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const roleParam = searchParams.get("role");
-  const initialRole: Role | null =
-    roleParam === "artist" || roleParam === "reviewer" || roleParam === "both" ? roleParam : null;
-
   const callbackUrl = searchParams.get("callbackUrl") || "";
+  const role: Role = "artist";
 
-  const [step, setStep] = useState<"role" | "details">(initialRole ? "details" : "role");
-  const [role, setRole] = useState<Role | null>(initialRole);
   const [name, setName] = useState(searchParams.get("name") || "");
   const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [referralSource, setReferralSource] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -79,28 +72,13 @@ export default function SignupPage() {
     funnels.artistSignup.start();
   }, [isCheckingSession]);
 
-  const handleRoleSelect = (selectedRole: Role) => {
-    funnels.artistSignup.selectRole(selectedRole);
-
-    // Keep artists in the normal signup flow (email/password) instead of the get-feedback funnel
-    setRole(selectedRole);
-    setStep("details");
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!role) return;
 
     // Validate password requirements
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.valid) {
       setError("Password doesn't meet requirements: " + passwordValidation.errors[0]);
-      return;
-    }
-
-    // Validate password confirmation
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
       return;
     }
 
@@ -117,7 +95,7 @@ export default function SignupPage() {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name, role, acceptedTerms, referralSource: referralSource || undefined }),
+        body: JSON.stringify({ email, password, name, role, acceptedTerms }),
       });
 
       if (!response.ok) {
@@ -162,105 +140,18 @@ export default function SignupPage() {
     );
   }
 
-  if (step === "role") {
-    return (
-      <Card>
-        <CardHeader className="text-center">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-black transition-colors mb-4 self-start"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Home
-          </Link>
-          <CardTitle className="text-2xl">Join MixReflect</CardTitle>
-          <CardDescription>
-            How do you want to use MixReflect?
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <button
-            onClick={() => handleRoleSelect("artist")}
-            className="w-full p-4 border-2 border-black bg-white hover:bg-lime-400 active:bg-lime-500 active:scale-[0.98] transition-all active:transition-none text-left flex items-start gap-4 group"
-          >
-            <div className="p-2 bg-black text-white">
-              <Music className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="font-bold">I&apos;m an Artist</h3>
-              <p className="text-sm text-neutral-600">
-                Get genuine feedback on your tracks before release
-              </p>
-            </div>
-          </button>
-
-          <div
-            className="w-full p-4 border-2 border-neutral-300 bg-neutral-50 text-left flex items-start gap-4 cursor-not-allowed opacity-60"
-          >
-            <div className="p-2 bg-neutral-400 text-white">
-              <Headphones className="h-5 w-5" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h3 className="font-bold text-neutral-500">I&apos;m a Reviewer</h3>
-                <span className="text-xs font-bold bg-neutral-200 text-neutral-500 px-2 py-0.5">
-                  WAITLIST FULL
-                </span>
-              </div>
-              <p className="text-sm text-neutral-400">
-                We&apos;re not accepting new reviewers right now
-              </p>
-            </div>
-          </div>
-
-          <div
-            className="w-full p-4 border-2 border-neutral-300 bg-neutral-50 text-left flex items-start gap-4 cursor-not-allowed opacity-60"
-          >
-            <div className="p-2 bg-neutral-400 text-white">
-              <Users className="h-5 w-5" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h3 className="font-bold text-neutral-500">Both</h3>
-                <span className="text-xs font-bold bg-neutral-200 text-neutral-500 px-2 py-0.5">
-                  WAITLIST FULL
-                </span>
-              </div>
-              <p className="text-sm text-neutral-400">
-                Reviewer signups paused — artist signups open
-              </p>
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <p className="text-sm text-neutral-600 text-center w-full">
-            Already have an account?{" "}
-            <Link href="/login" className="text-black font-bold hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </CardFooter>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardHeader className="text-center">
-        <button
-          type="button"
-          onClick={() => setStep("role")}
+        <Link
+          href="/"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-black transition-colors mb-4 self-start"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back
-        </button>
-        <CardTitle className="text-2xl">Create your account</CardTitle>
-        <CardDescription>
-          {role === "artist" && "Start getting feedback on your music"}
-          {role === "reviewer" && "Start discovering and reviewing music"}
-          {role === "both" && "Submit tracks and review music"}
-        </CardDescription>
+          Home
+        </Link>
+        <CardTitle className="text-2xl">Start your trial</CardTitle>
+        <CardDescription>Artist name, email, and password. That&apos;s it.</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
@@ -271,11 +162,11 @@ export default function SignupPage() {
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="font-bold">First name</Label>
+              <Label htmlFor="name" className="font-bold">Artist / Project name</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Sarah"
+                placeholder="Your artist name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -293,57 +184,17 @@ export default function SignupPage() {
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="password" className="font-bold">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Create a strong password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <PasswordStrength password={password} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="font-bold">Confirm</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Re-enter password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-              {confirmPassword && password !== confirmPassword && (
-                <p className="text-xs text-red-500 font-medium">Passwords do not match</p>
-              )}
-              {confirmPassword && password === confirmPassword && password.length > 0 && (
-                <p className="text-xs text-green-600 font-medium">Passwords match</p>
-              )}
-            </div>
-          </div>
           <div className="space-y-2">
-            <Label htmlFor="referralSource" className="font-bold">How did you hear about us? <span className="font-normal text-neutral-400">(optional)</span></Label>
-            <select
-              id="referralSource"
-              value={referralSource}
-              onChange={(e) => setReferralSource(e.target.value)}
-              className="w-full h-10 px-3 border-2 border-black bg-white text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-lime-400"
-            >
-              <option value="">Select an option...</option>
-              <option value="reddit">Reddit</option>
-              <option value="twitter">Twitter / X</option>
-              <option value="instagram">Instagram</option>
-              <option value="tiktok">TikTok</option>
-              <option value="youtube">YouTube</option>
-              <option value="discord">Discord</option>
-              <option value="forum">Music forum</option>
-              <option value="friend">Friend or colleague</option>
-              <option value="search">Google search</option>
-              <option value="other">Other</option>
-            </select>
+            <Label htmlFor="password" className="font-bold">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Create a strong password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <PasswordStrength password={password} />
           </div>
           <div className="flex items-start gap-3">
             <input
@@ -373,8 +224,7 @@ export default function SignupPage() {
             isLoading={isLoading}
             disabled={
               !acceptedTerms ||
-              !validatePassword(password).valid ||
-              password !== confirmPassword
+              !validatePassword(password).valid
             }
           >
             Create account

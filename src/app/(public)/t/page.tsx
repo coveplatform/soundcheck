@@ -57,18 +57,13 @@ export default function TrialLandingPage() {
     []
   );
 
-  const [activeKind, setActiveKind] = useState<Slide["kind"]>("analytics");
   const [index, setIndex] = useState(0);
 
-  const filteredSlides = useMemo(
-    () => slides.filter((s) => s.kind === activeKind),
-    [slides, activeKind]
-  );
-
-  const current = filteredSlides[Math.min(index, Math.max(0, filteredSlides.length - 1))];
+  const safeIndex = Math.min(Math.max(index, 0), Math.max(0, slides.length - 1));
+  const current = slides[safeIndex];
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gradient-to-b from-black via-neutral-950 to-black text-white">
       <header className="border-b border-neutral-800">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
@@ -81,6 +76,9 @@ export default function TrialLandingPage() {
 
       <main className="max-w-5xl mx-auto px-4 py-12">
         <section className="text-center">
+          <div className="inline-flex items-center gap-2 bg-orange-400 text-black border-2 border-black px-3 py-1 font-black text-xs sm:text-sm">
+            Stop guessing
+          </div>
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05]">
             Get real listener feedback on your track.
           </h1>
@@ -89,7 +87,7 @@ export default function TrialLandingPage() {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/signup">
+            <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
               <Button
                 className="w-full sm:w-auto h-11 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
               >
@@ -99,10 +97,11 @@ export default function TrialLandingPage() {
             </Link>
             <Button
               type="button"
-              variant="outline"
-              className="w-full sm:w-auto h-11 text-base font-black border-2 border-neutral-600 text-white hover:bg-neutral-900"
+              className="w-full sm:w-auto h-11 text-base font-black bg-orange-400 text-black border-2 border-black hover:bg-orange-300"
               onClick={() => {
-                document.getElementById("examples")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                document
+                  .getElementById("examples")
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
             >
               Learn more
@@ -113,71 +112,56 @@ export default function TrialLandingPage() {
         <section id="examples" className="mt-14">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-black">What you get</h2>
+              <h2 className="text-2xl sm:text-3xl font-black">
+                Know what to fix next (with proof)
+              </h2>
               <p className="text-neutral-300 mt-2 max-w-2xl">
-                Big, bold summaries + clean reviews that make it obvious what to fix.
+                See exactly how MixReflect turns opinions into a clear plan.
               </p>
-            </div>
-
-            <div className="inline-flex border-2 border-neutral-700 bg-neutral-900">
-              <button
-                type="button"
-                className={`px-3 py-2 text-sm font-black ${
-                  activeKind === "analytics" ? "bg-lime-500 text-black" : "text-white"
-                }`}
-                onClick={() => {
-                  setActiveKind("analytics");
-                  setIndex(0);
-                }}
-              >
-                Analytics
-              </button>
-              <button
-                type="button"
-                className={`px-3 py-2 text-sm font-black border-l-2 border-neutral-700 ${
-                  activeKind === "review" ? "bg-lime-500 text-black" : "text-white"
-                }`}
-                onClick={() => {
-                  setActiveKind("review");
-                  setIndex(0);
-                }}
-              >
-                Reviews
-              </button>
             </div>
           </div>
 
-          <div className="mt-6 border-2 border-neutral-700 bg-neutral-900">
+          <div className="mt-6 border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(251,146,60,1)]">
             <div className="p-5 sm:p-7">
               <div className="flex items-center justify-between gap-4">
                 <div className="min-w-0">
                   <div className="text-xs font-black text-neutral-400">EXAMPLE</div>
                   <div className="text-xl sm:text-2xl font-black mt-1 truncate">{current?.title}</div>
                   <div className="text-neutral-300 mt-2">{current?.subtitle}</div>
+                  <div className="mt-3 inline-flex items-center gap-2 text-xs font-black">
+                    <span className="px-2 py-1 border-2 border-neutral-700 bg-black text-white">
+                      {safeIndex + 1}/{slides.length}
+                    </span>
+                    <span
+                      className={`px-2 py-1 border-2 border-black ${
+                        current?.kind === "analytics" ? "bg-lime-500 text-black" : "bg-orange-400 text-black"
+                      }`}
+                    >
+                      {current?.kind === "analytics" ? "Analytics" : "Review"}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <Button
                     type="button"
-                    variant="outline"
-                    className="h-10 w-10 p-0 border-2 border-neutral-700 text-white hover:bg-neutral-800"
+                    className="h-10 w-10 p-0 border-2 border-black bg-orange-400 text-black hover:bg-orange-300"
                     onClick={() => setIndex((i) => Math.max(0, i - 1))}
-                    disabled={index <= 0}
+                    disabled={safeIndex <= 0}
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                   <Button
                     type="button"
-                    variant="outline"
-                    className="h-10 w-10 p-0 border-2 border-neutral-700 text-white hover:bg-neutral-800"
-                    onClick={() => setIndex((i) => Math.min(filteredSlides.length - 1, i + 1))}
-                    disabled={index >= filteredSlides.length - 1}
+                    className="h-10 w-10 p-0 border-2 border-black bg-orange-400 text-black hover:bg-orange-300"
+                    onClick={() => setIndex((i) => Math.min(slides.length - 1, i + 1))}
+                    disabled={safeIndex >= slides.length - 1}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
 
-              {activeKind === "analytics" ? (
+              {current?.kind === "analytics" ? (
                 <div className="mt-6 grid md:grid-cols-3 gap-4">
                   <div className="border-2 border-neutral-700 bg-black p-4">
                     <div className="text-xs font-black text-neutral-400">TOP PATTERNS</div>
@@ -301,7 +285,7 @@ export default function TrialLandingPage() {
           </div>
 
           <div className="mt-10 flex items-center justify-center">
-            <Link href="/signup">
+            <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
               <Button className="h-11 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400">
                 Start trial
                 <ArrowRight className="h-4 w-4 ml-2" />
