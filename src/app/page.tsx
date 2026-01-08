@@ -413,137 +413,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Example Review */}
-      <section className="border-b border-neutral-800 py-16 bg-black">
-        <div className="max-w-3xl mx-auto px-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
-              <Star className="h-6 w-6 text-black" />
-            </div>
-            <h2 className="text-3xl font-black text-white">Here&apos;s what you get</h2>
-          </div>
-          <p className="text-neutral-300 mb-10">
-            Each review includes scores, signals, and written feedback. You get 5-20 of these.
-          </p>
-
-          <div className="border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            {/* Review Content - Matches ReviewDisplay component */}
-            <article className="p-6">
-              {/* Header: Avatar + Name + First Impression + Date */}
-              <header className="mb-5">
-                <div className="flex items-center gap-3">
-                  {/* Rounded avatar with initial */}
-                  <span className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black">
-                    S
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-sm text-black">Sarah</span>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-lime-100 text-lime-700">
-                        Strong Hook
-                      </span>
-                    </div>
-                    <time className="text-xs text-neutral-500">Jan 8, 2026</time>
-                  </div>
-                </div>
-              </header>
-
-              {/* Scores - Inline format */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-neutral-600 mb-5">
-                <span>Production <strong className="text-black">4/5</strong></span>
-                <span>Vocals <strong className="text-black">5/5</strong></span>
-                <span>Originality <strong className="text-black">4/5</strong></span>
-                <span className="flex items-center gap-1">
-                  <svg className="h-3.5 w-3.5 text-lime-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-                  <strong className="text-lime-600">Would listen again</strong>
-                </span>
-              </div>
-
-              {/* Listener Signals - Exact badge styling */}
-              <div className="flex flex-wrap items-center gap-2 mb-5">
-                <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 bg-lime-50 border-lime-500 text-lime-700">
-                  <ListMusic className="h-3 w-3" />
-                  Would playlist
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 bg-lime-50 border-lime-500 text-lime-700">
-                  <Share2 className="h-3 w-3" />
-                  Would share
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 bg-neutral-50 border-neutral-300 text-neutral-500">
-                  <UserPlus className="h-3 w-3" />
-                  No follow
-                </span>
-              </div>
-
-              {/* Main Feedback - Colored left-border sections with uppercase labels */}
-              <div className="space-y-4 mb-5">
-                {/* What Worked */}
-                <div>
-                  <h4 className="text-xs font-bold text-lime-700 uppercase tracking-wide mb-1.5">
-                    What Worked
-                  </h4>
-                  <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-lime-500">
-                    The synth melody around 0:45 is genuinely catchy—got stuck in my head. The interplay with the drums creates a driving energy that makes you want to move. Low end is tight, punchy kick that cuts through without being muddy. The breakdown at 2:15 was unexpected and added a nice dynamic shift.
-                  </p>
-                </div>
-
-                {/* To Improve */}
-                <div>
-                  <h4 className="text-xs font-bold text-red-600 uppercase tracking-wide mb-1.5">
-                    To Improve
-                  </h4>
-                  <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-red-400">
-                    The intro feels long before the hook hits—consider trimming 8-10 seconds. Hi-hats get repetitive in verse 2; some variation or filter sweep would help. The vocal sample at 1:30 sits too loud and clashes with lead synth frequencies.
-                  </p>
-                </div>
-
-                {/* Next Actions */}
-                <div>
-                  <h4 className="text-xs font-bold text-black uppercase tracking-wide mb-1.5">
-                    Next Actions
-                  </h4>
-                  <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-black whitespace-pre-wrap">1. Cut the intro by 8-10 seconds to hook listeners faster{"\n"}2. Add hi-hat variations or automate a filter in verse 2{"\n"}3. EQ the vocal sample to carve space for the lead synth</p>
-                </div>
-
-                {/* Timestamps */}
-                <div>
-                  <h4 className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-1.5">
-                    Timestamps
-                  </h4>
-                  <div className="space-y-2">
-                    <div className="pl-3 border-l-4 border-purple-400">
-                      <p className="text-xs font-mono text-neutral-600">0:45</p>
-                      <p className="text-sm text-neutral-800 leading-relaxed">This synth hook is the strongest moment in the track</p>
-                    </div>
-                    <div className="pl-3 border-l-4 border-purple-400">
-                      <p className="text-xs font-mono text-neutral-600">1:30</p>
-                      <p className="text-sm text-neutral-800 leading-relaxed">Vocal sample clashes with lead synth here</p>
-                    </div>
-                    <div className="pl-3 border-l-4 border-purple-400">
-                      <p className="text-xs font-mono text-neutral-600">2:15</p>
-                      <p className="text-sm text-neutral-800 leading-relaxed">Love this breakdown—great dynamic contrast</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Similar artists - inline text format */}
-              <div className="text-xs text-neutral-500 mb-4">
-                <span>Sounds like <strong className="text-neutral-700">Electronic / Downtempo</strong></span>
-                <span className="mx-2">·</span>
-                <span>Similar to <strong className="text-neutral-700">Bonobo, Four Tet, Tycho</strong></span>
-              </div>
-            </article>
-
-            {/* Footer */}
-            <div className="p-3 bg-neutral-100 border-t-2 border-black flex items-center justify-between">
-              <span className="text-xs text-neutral-600">1 of 5 reviews</span>
-              <span className="text-[10px] font-mono bg-lime-500 border border-black px-2 py-0.5 font-bold">EXAMPLE</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Testimonials */}
       <section className="border-b border-neutral-800 py-16 bg-neutral-950">
         <div className="max-w-4xl mx-auto px-4">
@@ -584,6 +453,50 @@ export default function Home() {
               </p>
               <p className="font-bold text-sm">Alex M.</p>
               <p className="text-xs text-neutral-300">Indie Rock</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Real Product Screenshots - Pattern Analytics */}
+      <section className="border-b border-neutral-800 py-16 bg-lime-500 text-black">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-black text-center mb-2 text-black">The accountability loop</h2>
+          <p className="text-black/80 text-center mb-10 max-w-lg mx-auto text-sm sm:text-base">
+            Reviewers earn based on artists&apos; ratings—so they give real feedback, not empty praise.
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+            <div className="flex flex-col items-center p-4 bg-black/80 backdrop-blur text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-3">
+                <DollarSign className="h-6 w-6" />
+              </div>
+              <span className="font-black text-lg">Artist pays</span>
+              <span className="text-xs text-neutral-200">One-time fee</span>
+            </div>
+
+            <div className="flex flex-col items-center p-4 bg-black/80 backdrop-blur text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center mb-3">
+                <Headphones className="h-6 w-6" />
+              </div>
+              <span className="font-black text-lg">They review</span>
+              <span className="text-xs text-neutral-200">Structured feedback</span>
+            </div>
+
+            <div className="flex flex-col items-center p-4 bg-black/80 backdrop-blur text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div className="h-12 w-12 bg-sky-400 border-2 border-black flex items-center justify-center mb-3">
+                <Star className="h-6 w-6" />
+              </div>
+              <span className="font-black text-lg">Artist rates</span>
+              <span className="text-xs text-neutral-200">1-5 stars</span>
+            </div>
+
+            <div className="flex flex-col items-center p-4 bg-black border-2 border-black shadow-[3px_3px_0px_0px_rgba(132,204,22,1)]">
+              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-3">
+                <Shield className="h-6 w-6" />
+              </div>
+              <span className="font-black text-lg text-white">Quality</span>
+              <span className="text-xs text-lime-400">Enforced</span>
             </div>
           </div>
         </div>
