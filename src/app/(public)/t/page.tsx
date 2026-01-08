@@ -35,12 +35,12 @@ export default function TrialLandingPage() {
       <main className="max-w-5xl mx-auto px-4 py-16 sm:py-24">
         <section className="text-center min-h-[62vh] flex flex-col justify-center">
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05]">
-            Get <span className="text-lime-500">real listener feedback</span> on your tracks.
+            Get up to <span className="text-lime-500">20</span> clean, structured reviews.
           </h1>
           <p className="mt-5 text-neutral-300 text-base sm:text-lg max-w-2xl mx-auto">
-            MixReflect is a private feedback marketplace.
+            From genre-matched artists + listeners in your music community.
             <br />
-            5–20 genre-matched artists + listeners leave structured reviews with timestamps.
+            MixReflect is a private feedback marketplace — you rate every review to keep quality high.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -72,7 +72,7 @@ export default function TrialLandingPage() {
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                 <div>
                   <h3 className="mt-2 text-2xl sm:text-3xl font-black">
-                    What listeners would do after hearing it.
+                    What people do after they hear your track.
                   </h3>
                   <p className="mt-3 text-neutral-300 max-w-2xl">
                     Plain numbers. Plain meaning. No fluff.
@@ -80,7 +80,7 @@ export default function TrialLandingPage() {
                 </div>
                 <div className="flex-shrink-0">
                   <span className="inline-flex items-center px-3 py-1 border-2 border-black bg-white text-black font-black">
-                    Based on 20 listeners
+                    Based on 20 reviews
                   </span>
                 </div>
               </div>
@@ -320,19 +320,31 @@ export default function TrialLandingPage() {
               {[
                 {
                   q: "Why do I need multiple reviews instead of just one?",
-                  a: "One person&apos;s feedback is just their taste. With multiple reviews, patterns emerge. Consensus separates taste from signal.",
+                  a: "One person's feedback is just their taste. With multiple reviews, patterns emerge. If one person says your intro is too long, maybe they're wrong. If most reviewers say it, that's something to fix. Consensus separates taste from truth.",
+                },
+                {
+                  q: "If reviewers are paid, won't they just say nice things?",
+                  a: "The opposite. You rate every review. Low ratings = reviewers earn less ($0.50 vs $1.50/review) and lose access to future work. The incentive is honest, useful feedback—not empty praise. Plus, with multiple reviews, one fake positive can't hide when everyone else disagrees.",
                 },
                 {
                   q: "Who are these reviewers?",
-                  a: "Real people who chose genres they genuinely love. You rate every review, so quality matters.",
+                  a: "Real people who passed a quality screening and selected genres they genuinely love. They're rated by artists after every review, so quality matters.",
                 },
                 {
                   q: "Is my unreleased music safe?",
-                  a: "Yes. Only assigned reviewers hear your track. We never publish or share your music.",
+                  a: "Yes. Only assigned reviewers hear your track. We never share, publish, or leak anything. Your music stays private.",
                 },
                 {
                   q: "How fast do I get results?",
-                  a: "All reviews within 24 hours, usually faster.",
+                  a: "All reviews within 24 hours, usually faster. No waiting weeks.",
+                },
+                {
+                  q: "What if I disagree with the feedback?",
+                  a: "That's fine—and expected sometimes. The power is in patterns: if only 1 person mentions something, it might be taste. If multiple reviewers mention it, it's worth considering. You always make the final call.",
+                },
+                {
+                  q: "Can I get a refund?",
+                  a: "If reviews haven't started, yes. Contact support.",
                 },
               ].map((item, i, arr) => (
                 <details
@@ -374,7 +386,10 @@ export default function TrialLandingPage() {
                   </div>
                 </div>
                 <div className="mt-3 font-black">We match listeners</div>
-                <div className="mt-2 text-sm text-neutral-200">Genre-aware matching for better signal.</div>
+                <div className="mt-2 text-sm text-neutral-200">
+                  Your reviewers come from the MixReflect community marketplace (artists + listeners).
+                  They pick the genres they actually listen to, then we match your track to them.
+                </div>
               </div>
               <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center justify-between">
@@ -384,7 +399,9 @@ export default function TrialLandingPage() {
                   </div>
                 </div>
                 <div className="mt-3 font-black">They review (with timestamps)</div>
-                <div className="mt-2 text-sm text-neutral-200">Clear sections: what worked / what to fix.</div>
+                <div className="mt-2 text-sm text-neutral-200">
+                  Clear sections: what worked / what to fix — and you rate the review so quality stays high.
+                </div>
               </div>
               <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center justify-between">
