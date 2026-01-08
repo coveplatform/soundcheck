@@ -1,64 +1,24 @@
 "use client";
 
-import { useMemo } from "react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import {
   ArrowRight,
-  Clock,
+  Ear,
   Flame,
-  LineChart,
   ListMusic,
   MessageCircle,
+  Sparkles,
   Target,
+  TrendingUp,
   Users,
   Share2,
   Star,
 } from "lucide-react";
 
 export default function TrialLandingPage() {
-  const Donut = useMemo(() => {
-    return function Donut({ percent, label, color }: { percent: number; label: string; color: string }) {
-      const size = 112;
-      const stroke = 12;
-      const r = (size - stroke) / 2;
-      const c = 2 * Math.PI * r;
-      const p = Math.max(0, Math.min(100, percent));
-      const dash = (p / 100) * c;
-
-      return (
-        <div className="border-2 border-black bg-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div className="text-xs font-black text-neutral-400">{label}</div>
-          <div className="mt-3 flex items-center justify-between gap-4">
-            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-              <circle cx={size / 2} cy={size / 2} r={r} stroke="#262626" strokeWidth={stroke} fill="none" />
-              <circle
-                cx={size / 2}
-                cy={size / 2}
-                r={r}
-                stroke={color}
-                strokeWidth={stroke}
-                fill="none"
-                strokeLinecap="round"
-                strokeDasharray={`${dash} ${c - dash}`}
-                transform={`rotate(-90 ${size / 2} ${size / 2})`}
-              />
-              <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="#ffffff" fontSize="20" fontWeight="900">
-                {Math.round(p)}%
-              </text>
-            </svg>
-            <div className="min-w-0">
-              <div className="text-xl font-black">{Math.round(p)}%</div>
-              <div className="text-sm text-neutral-300">of listeners</div>
-            </div>
-          </div>
-        </div>
-      );
-    };
-  }, []);
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-neutral-950 to-black text-white">
       <header className="border-b border-neutral-800">
@@ -103,12 +63,11 @@ export default function TrialLandingPage() {
           </div>
         </section>
 
-        <section id="examples" className="mt-14 space-y-10">
+        <section id="examples" className="mt-12 space-y-7">
           <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
-            <div className="p-6 sm:p-10">
+            <div className="p-5 sm:p-7">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                 <div>
-                  <div className="text-xs font-black text-neutral-400">ANALYTICS</div>
                   <h3 className="mt-2 text-2xl sm:text-3xl font-black">
                     What listeners would do after hearing it.
                   </h3>
@@ -165,10 +124,9 @@ export default function TrialLandingPage() {
           </div>
 
           <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(56,189,248,1)]">
-            <div className="p-6 sm:p-10">
+            <div className="p-5 sm:p-7">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                 <div>
-                  <div className="text-xs font-black text-neutral-400">ANALYTICS</div>
                   <h3 className="mt-2 text-2xl sm:text-3xl font-black">
                     The “most mentioned moments”.
                   </h3>
@@ -228,10 +186,9 @@ export default function TrialLandingPage() {
           </div>
 
           <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-            <div className="p-6 sm:p-10">
+            <div className="p-5 sm:p-7">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                 <div>
-                  <div className="text-xs font-black text-neutral-400">REVIEWS</div>
                   <h3 className="mt-2 text-2xl sm:text-3xl font-black">
                     Get a clean, structured review.
                   </h3>
@@ -316,74 +273,75 @@ export default function TrialLandingPage() {
         <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-lime-500 text-black border-y-2 border-black py-12">
           <div className="max-w-5xl mx-auto px-4">
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center">
-              Why use feedback?
+              Why get feedback on your music?
             </h2>
 
-            <div className="mt-8 grid md:grid-cols-3 gap-4">
-              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-center justify-between">
-                  <div className="text-xs font-black text-neutral-300">PROBLEM</div>
-                  <div className="h-10 w-10 border-2 border-black bg-orange-400 text-black flex items-center justify-center">
-                    <Clock className="h-5 w-5" />
-                  </div>
+            <div className="mt-8 grid md:grid-cols-3 gap-6">
+              <div className="border-2 border-black p-6">
+                <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
+                  <Sparkles className="h-6 w-6" />
                 </div>
-                <div className="mt-3 text-xl font-black">You can&apos;t hear it objectively.</div>
-                <div className="mt-3 text-sm text-neutral-200">
-                  After 200 listens, your brain fills in the gaps.
+                <div className="mt-4 text-2xl font-black">Get noticed</div>
+                <div className="mt-2 text-base font-medium">
+                  Make the track stronger before you release.
                 </div>
               </div>
 
-              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-center justify-between">
-                  <div className="text-xs font-black text-neutral-300">PROBLEM</div>
-                  <div className="h-10 w-10 border-2 border-black bg-orange-400 text-black flex items-center justify-center">
-                    <MessageCircle className="h-5 w-5" />
-                  </div>
+              <div className="border-2 border-black p-6">
+                <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6" />
                 </div>
-                <div className="mt-3 text-xl font-black">Friends are too nice.</div>
-                <div className="mt-3 text-sm text-neutral-200">
-                  You get “sounds good” — not what to fix.
+                <div className="mt-4 text-2xl font-black">Improve</div>
+                <div className="mt-2 text-base font-medium">
+                  Get clear fixes you can actually apply.
                 </div>
               </div>
 
-              <div className="border-2 border-black bg-black text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-center justify-between">
-                  <div className="text-xs font-black text-neutral-300">SOLUTION</div>
-                  <div className="h-10 w-10 border-2 border-black bg-white text-black flex items-center justify-center">
-                    <LineChart className="h-5 w-5" />
-                  </div>
+              <div className="border-2 border-black p-6">
+                <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
+                  <Ear className="h-6 w-6" />
                 </div>
-                <div className="mt-3 text-xl font-black">Patterns beat opinions.</div>
-                <div className="mt-3 text-sm text-neutral-200">
-                  When multiple listeners say the same thing, it&apos;s signal.
+                <div className="mt-4 text-2xl font-black">Fresh ears</div>
+                <div className="mt-2 text-base font-medium">
+                  Hear what listeners hear, not what you hope.
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-orange-400 text-black border-y-2 border-black py-10">
-          <div className="max-w-5xl mx-auto px-4">
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center">
-              Why trust MixReflect?
-            </h2>
-
-            <div className="mt-8 grid md:grid-cols-3 gap-4">
-              <div className="border-2 border-black bg-black text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="text-xs font-black text-neutral-300">QUALITY</div>
-                <div className="mt-2 text-xl font-black">Reviewers are rated.</div>
-                <div className="mt-3 text-sm text-neutral-200">Bad feedback gets flagged. High-quality reviewers earn more.</div>
-              </div>
-              <div className="border-2 border-black bg-black text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="text-xs font-black text-neutral-300">PRIVACY</div>
-                <div className="mt-2 text-xl font-black">Private by default.</div>
-                <div className="mt-3 text-sm text-neutral-200">Only assigned reviewers can access your track.</div>
-              </div>
-              <div className="border-2 border-black bg-black text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="text-xs font-black text-neutral-300">SPEED</div>
-                <div className="mt-2 text-xl font-black">Fast turnaround.</div>
-                <div className="mt-3 text-sm text-neutral-200">Get feedback in hours, not weeks.</div>
-              </div>
+        <section className="mt-12">
+          <div className="max-w-5xl mx-auto px-0">
+            <h2 className="text-3xl font-black mb-8">FAQ</h2>
+            <div className="space-y-0 border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(251,146,60,1)]">
+              {[
+                {
+                  q: "Why do I need multiple reviews instead of just one?",
+                  a: "One person&apos;s feedback is just their taste. With multiple reviews, patterns emerge. Consensus separates taste from signal.",
+                },
+                {
+                  q: "Who are these reviewers?",
+                  a: "Real people who chose genres they genuinely love. You rate every review, so quality matters.",
+                },
+                {
+                  q: "Is my unreleased music safe?",
+                  a: "Yes. Only assigned reviewers hear your track. We never publish or share your music.",
+                },
+                {
+                  q: "How fast do I get results?",
+                  a: "All reviews within 24 hours, usually faster.",
+                },
+              ].map((item, i, arr) => (
+                <details
+                  key={item.q}
+                  className={`p-5 ${i < arr.length - 1 ? "border-b-2 border-black" : ""}`}
+                >
+                  <summary className="font-black cursor-pointer hover:text-neutral-300">
+                    {item.q}
+                  </summary>
+                  <p className="mt-3 text-neutral-300">{item.a}</p>
+                </details>
+              ))}
             </div>
           </div>
         </section>
@@ -439,6 +397,28 @@ export default function TrialLandingPage() {
           </div>
         </section>
       </main>
+
+      <footer className="border-t border-neutral-800 py-8">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <Logo />
+            </div>
+            <p className="text-neutral-500">&copy; {new Date().getFullYear()} MixReflect</p>
+            <div className="flex items-center gap-4 text-neutral-400">
+              <Link href="/terms" className="hover:text-white font-medium">
+                Terms
+              </Link>
+              <Link href="/privacy" className="hover:text-white font-medium">
+                Privacy
+              </Link>
+              <Link href="/support" className="hover:text-white font-medium">
+                Support
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
