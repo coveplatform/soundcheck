@@ -100,8 +100,8 @@ export default function TrialLandingPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-12">
-        <section className="text-center">
+      <main className="max-w-5xl mx-auto px-4 py-16 sm:py-24">
+        <section className="text-center min-h-[62vh] flex flex-col justify-center">
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05]">
             Get <span className="text-lime-500">real listener feedback</span> on your tracks.
           </h1>
@@ -139,7 +139,7 @@ export default function TrialLandingPage() {
                 <div>
                   <div className="text-xs font-black text-neutral-400">ANALYTICS</div>
                   <h3 className="mt-2 text-2xl sm:text-3xl font-black">
-                    Find the moment listeners drop off.
+                    See how your track holds attention.
                   </h3>
                   <p className="mt-3 text-neutral-300 max-w-2xl">
                     A simple timeline makes it obvious where attention dips — so you can fix the exact section.
@@ -257,6 +257,76 @@ export default function TrialLandingPage() {
           </div>
 
           <div className="pt-2 flex items-center justify-center">
+            <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
+              <Button className="h-11 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400">
+                Start trial
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </section>
+
+        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-lime-500 text-black border-y-2 border-black py-10">
+          <div className="max-w-5xl mx-auto px-4">
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center">
+              Why use feedback?
+            </h2>
+          </div>
+        </section>
+
+        <section className="mt-10">
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="border-2 border-black bg-neutral-900 p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="text-xs font-black text-neutral-400">PROBLEM</div>
+              <div className="mt-2 text-xl font-black">You can&apos;t hear it objectively.</div>
+              <div className="mt-3 text-neutral-300 text-sm">After 200 listens, your brain fills in the gaps.</div>
+            </div>
+            <div className="border-2 border-black bg-neutral-900 p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="text-xs font-black text-neutral-400">PROBLEM</div>
+              <div className="mt-2 text-xl font-black">Friends are too nice.</div>
+              <div className="mt-3 text-neutral-300 text-sm">You get “sounds good” — not what to fix.</div>
+            </div>
+            <div className="border-2 border-black bg-neutral-900 p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="text-xs font-black text-neutral-400">SOLUTION</div>
+              <div className="mt-2 text-xl font-black">Patterns beat opinions.</div>
+              <div className="mt-3 text-neutral-300 text-sm">When multiple listeners say the same thing, it&apos;s signal.</div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-sky-400 text-black border-y-2 border-black py-10">
+          <div className="max-w-5xl mx-auto px-4">
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center">
+              How it works
+            </h2>
+          </div>
+        </section>
+
+        <section className="mt-10">
+          <div className="grid md:grid-cols-4 gap-4">
+            <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="text-3xl font-black">1</div>
+              <div className="mt-2 font-black">Submit your track</div>
+              <div className="mt-2 text-sm text-neutral-700">Upload or paste a link from your dashboard.</div>
+            </div>
+            <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="text-3xl font-black">2</div>
+              <div className="mt-2 font-black">We match listeners</div>
+              <div className="mt-2 text-sm text-neutral-700">Genre-aware matching for better signal.</div>
+            </div>
+            <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="text-3xl font-black">3</div>
+              <div className="mt-2 font-black">They review (with timestamps)</div>
+              <div className="mt-2 text-sm text-neutral-700">Clear sections: what worked / what to fix.</div>
+            </div>
+            <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="text-3xl font-black">4</div>
+              <div className="mt-2 font-black">You get clarity</div>
+              <div className="mt-2 text-sm text-neutral-700">Charts + patterns to guide your next session.</div>
+            </div>
+          </div>
+
+          <div className="mt-10 flex items-center justify-center">
             <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
               <Button className="h-11 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400">
                 Start trial
