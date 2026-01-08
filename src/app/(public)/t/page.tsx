@@ -59,41 +59,6 @@ export default function TrialLandingPage() {
     };
   }, []);
 
-  const Line = useMemo(() => {
-    return function Line({ points, label }: { points: number[]; label: string }) {
-      const w = 520;
-      const h = 140;
-      const padding = 16;
-      const max = Math.max(...points, 1);
-      const min = Math.min(...points, 0);
-      const range = Math.max(max - min, 1);
-      const step = (w - padding * 2) / Math.max(points.length - 1, 1);
-      const d = points
-        .map((v, i) => {
-          const x = padding + i * step;
-          const y = padding + (h - padding * 2) * (1 - (v - min) / range);
-          return `${x},${y}`;
-        })
-        .join(" ");
-
-      return (
-        <div className="border-2 border-black bg-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div className="text-xs font-black text-neutral-400">{label}</div>
-          <div className="mt-3 overflow-x-auto">
-            <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
-              <line x1="0" y1={h - 1} x2={w} y2={h - 1} stroke="#262626" strokeWidth="2" />
-              <polyline points={d} fill="none" stroke="#fb923c" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-              <polyline points={d} fill="none" stroke="#84cc16" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
-            </svg>
-          </div>
-          <div className="mt-3 text-sm text-neutral-300">
-            See where attention drops. Fix the moment that loses people.
-          </div>
-        </div>
-      );
-    };
-  }, []);
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-neutral-950 to-black text-white">
       <header className="border-b border-neutral-800">
@@ -139,31 +104,6 @@ export default function TrialLandingPage() {
         </section>
 
         <section id="examples" className="mt-14 space-y-10">
-          <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(251,146,60,1)]">
-            <div className="p-6 sm:p-10">
-              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-                <div>
-                  <div className="text-xs font-black text-neutral-400">ANALYTICS</div>
-                  <h3 className="mt-2 text-2xl sm:text-3xl font-black">
-                    See how your track holds attention.
-                  </h3>
-                  <p className="mt-3 text-neutral-300 max-w-2xl">
-                    A simple timeline makes it obvious where attention dips — so you can fix the exact section.
-                  </p>
-                </div>
-                <div className="flex-shrink-0">
-                  <span className="inline-flex items-center px-3 py-1 border-2 border-black bg-lime-500 text-black font-black">
-                    Example
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <Line points={[95, 88, 76, 40, 52, 70, 82, 78, 84]} label="ENGAGEMENT OVER TIME" />
-              </div>
-            </div>
-          </div>
-
           <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
             <div className="p-6 sm:p-10">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
@@ -175,6 +115,11 @@ export default function TrialLandingPage() {
                   <p className="mt-3 text-neutral-300 max-w-2xl">
                     Plain numbers. Plain meaning. No fluff.
                   </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <span className="inline-flex items-center px-3 py-1 border-2 border-black bg-white text-black font-black">
+                    Based on 20 listeners
+                  </span>
                 </div>
               </div>
 
@@ -212,7 +157,7 @@ export default function TrialLandingPage() {
                 <div className="border-2 border-black bg-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                   <div className="text-xs font-black text-neutral-400">WHAT THIS MEANS</div>
                   <div className="mt-2 text-sm text-neutral-300">
-                    High replay means the core idea works. Playlist/share tells you whether it feels like something people would actually keep.
+                    Replay shows the core idea works. Playlist/share shows if it&apos;s something people would keep.
                   </div>
                 </div>
               </div>
@@ -228,8 +173,13 @@ export default function TrialLandingPage() {
                     The “most mentioned moments”.
                   </h3>
                   <p className="mt-3 text-neutral-300 max-w-2xl">
-                    Instead of 12 different opinions, you get a ranked list of what people keep pointing at.
+                    A ranked list of what people keep pointing at.
                   </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <span className="inline-flex items-center px-3 py-1 border-2 border-black bg-white text-black font-black">
+                    Based on 20 listeners
+                  </span>
                 </div>
               </div>
 
@@ -242,14 +192,14 @@ export default function TrialLandingPage() {
                         <div className="font-black">0:45 Hook hits hard</div>
                         <div className="text-sm text-neutral-300">Melody lands + drums feel confident here.</div>
                       </div>
-                      <span className="px-2 py-1 border-2 border-black bg-lime-500 text-black text-xs font-black">9/12</span>
+                      <span className="px-2 py-1 border-2 border-black bg-lime-500 text-black text-xs font-black">15/20</span>
                     </div>
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="font-black">2:15 Breakdown feels fresh</div>
                         <div className="text-sm text-neutral-300">Nice contrast, keeps attention.</div>
                       </div>
-                      <span className="px-2 py-1 border-2 border-black bg-lime-500 text-black text-xs font-black">7/12</span>
+                      <span className="px-2 py-1 border-2 border-black bg-lime-500 text-black text-xs font-black">12/20</span>
                     </div>
                   </div>
                 </div>
@@ -262,14 +212,14 @@ export default function TrialLandingPage() {
                         <div className="font-black">0:00 Intro too long</div>
                         <div className="text-sm text-neutral-300">People want the hook sooner.</div>
                       </div>
-                      <span className="px-2 py-1 border-2 border-black bg-orange-400 text-black text-xs font-black">8/12</span>
+                      <span className="px-2 py-1 border-2 border-black bg-orange-400 text-black text-xs font-black">14/20</span>
                     </div>
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="font-black">1:30 Vocal too loud</div>
                         <div className="text-sm text-neutral-300">Clashes with the lead synth.</div>
                       </div>
-                      <span className="px-2 py-1 border-2 border-black bg-orange-400 text-black text-xs font-black">6/12</span>
+                      <span className="px-2 py-1 border-2 border-black bg-orange-400 text-black text-xs font-black">10/20</span>
                     </div>
                   </div>
                 </div>
@@ -325,13 +275,13 @@ export default function TrialLandingPage() {
                     <div>
                       <div className="text-xs font-black text-lime-500 uppercase tracking-wide mb-1">What worked</div>
                       <div className="pl-3 border-l-4 border-lime-500 text-neutral-200">
-                        The hook at 0:45 is instantly memorable — it&apos;s the kind of melody you can hum after one listen. The kick/snare balance feels tight and confident, and the bass is controlled (no mud), which makes the drop feel bigger. The breakdown at 2:15 is a great reset that keeps the track from feeling repetitive.
+                        The hook at 0:45 is instantly memorable. Drums and bass feel tight and controlled, which makes the drop hit harder. The 2:15 breakdown is a great reset that keeps the track from feeling repetitive.
                       </div>
                     </div>
                     <div>
                       <div className="text-xs font-black text-red-400 uppercase tracking-wide mb-1">To improve</div>
                       <div className="pl-3 border-l-4 border-red-400 text-neutral-200">
-                        The intro takes a little too long to reward the listener — I&apos;d try cutting 8–12 seconds so the hook arrives faster. Around 1:30 the vocal sits a touch loud and masks the lead synth; a small level dip or EQ carve would help. Verse 2 hats feel a bit static — even one extra variation or automation would keep the energy rising.
+                        The intro is a bit long — cut 8–12 seconds so the hook arrives sooner. Around 1:30 the vocal is slightly loud and masks the lead synth. Verse 2 hats feel static — add a small variation or automation.
                       </div>
                     </div>
                     <div>
@@ -370,28 +320,28 @@ export default function TrialLandingPage() {
             </h2>
 
             <div className="mt-8 grid md:grid-cols-3 gap-4">
-              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs font-black">PROBLEM</div>
-                  <div className="h-10 w-10 border-2 border-black bg-orange-400 flex items-center justify-center">
+                  <div className="text-xs font-black text-neutral-300">PROBLEM</div>
+                  <div className="h-10 w-10 border-2 border-black bg-orange-400 text-black flex items-center justify-center">
                     <Clock className="h-5 w-5" />
                   </div>
                 </div>
                 <div className="mt-3 text-xl font-black">You can&apos;t hear it objectively.</div>
-                <div className="mt-3 text-sm text-neutral-700">
+                <div className="mt-3 text-sm text-neutral-200">
                   After 200 listens, your brain fills in the gaps.
                 </div>
               </div>
 
-              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs font-black">PROBLEM</div>
-                  <div className="h-10 w-10 border-2 border-black bg-orange-400 flex items-center justify-center">
+                  <div className="text-xs font-black text-neutral-300">PROBLEM</div>
+                  <div className="h-10 w-10 border-2 border-black bg-orange-400 text-black flex items-center justify-center">
                     <MessageCircle className="h-5 w-5" />
                   </div>
                 </div>
                 <div className="mt-3 text-xl font-black">Friends are too nice.</div>
-                <div className="mt-3 text-sm text-neutral-700">
+                <div className="mt-3 text-sm text-neutral-200">
                   You get “sounds good” — not what to fix.
                 </div>
               </div>
@@ -412,6 +362,32 @@ export default function TrialLandingPage() {
           </div>
         </section>
 
+        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-orange-400 text-black border-y-2 border-black py-10">
+          <div className="max-w-5xl mx-auto px-4">
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center">
+              Why trust MixReflect?
+            </h2>
+
+            <div className="mt-8 grid md:grid-cols-3 gap-4">
+              <div className="border-2 border-black bg-black text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="text-xs font-black text-neutral-300">QUALITY</div>
+                <div className="mt-2 text-xl font-black">Reviewers are rated.</div>
+                <div className="mt-3 text-sm text-neutral-200">Bad feedback gets flagged. High-quality reviewers earn more.</div>
+              </div>
+              <div className="border-2 border-black bg-black text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="text-xs font-black text-neutral-300">PRIVACY</div>
+                <div className="mt-2 text-xl font-black">Private by default.</div>
+                <div className="mt-3 text-sm text-neutral-200">Only assigned reviewers can access your track.</div>
+              </div>
+              <div className="border-2 border-black bg-black text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="text-xs font-black text-neutral-300">SPEED</div>
+                <div className="mt-2 text-xl font-black">Fast turnaround.</div>
+                <div className="mt-3 text-sm text-neutral-200">Get feedback in hours, not weeks.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-sky-400 text-black border-y-2 border-black py-12">
           <div className="max-w-5xl mx-auto px-4">
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center">
@@ -419,7 +395,7 @@ export default function TrialLandingPage() {
             </h2>
 
             <div className="mt-8 grid md:grid-cols-4 gap-4">
-              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center justify-between">
                   <div className="text-3xl font-black">1</div>
                   <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
@@ -427,9 +403,9 @@ export default function TrialLandingPage() {
                   </div>
                 </div>
                 <div className="mt-3 font-black">Submit your track</div>
-                <div className="mt-2 text-sm text-neutral-700">Upload or paste a link from your dashboard.</div>
+                <div className="mt-2 text-sm text-neutral-200">Upload or paste a link from your dashboard.</div>
               </div>
-              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center justify-between">
                   <div className="text-3xl font-black">2</div>
                   <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
@@ -437,9 +413,9 @@ export default function TrialLandingPage() {
                   </div>
                 </div>
                 <div className="mt-3 font-black">We match listeners</div>
-                <div className="mt-2 text-sm text-neutral-700">Genre-aware matching for better signal.</div>
+                <div className="mt-2 text-sm text-neutral-200">Genre-aware matching for better signal.</div>
               </div>
-              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center justify-between">
                   <div className="text-3xl font-black">3</div>
                   <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
@@ -447,9 +423,9 @@ export default function TrialLandingPage() {
                   </div>
                 </div>
                 <div className="mt-3 font-black">They review (with timestamps)</div>
-                <div className="mt-2 text-sm text-neutral-700">Clear sections: what worked / what to fix.</div>
+                <div className="mt-2 text-sm text-neutral-200">Clear sections: what worked / what to fix.</div>
               </div>
-              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center justify-between">
                   <div className="text-3xl font-black">4</div>
                   <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
@@ -457,7 +433,7 @@ export default function TrialLandingPage() {
                   </div>
                 </div>
                 <div className="mt-3 font-black">You get clarity</div>
-                <div className="mt-2 text-sm text-neutral-700">Charts + patterns to guide your next session.</div>
+                <div className="mt-2 text-sm text-neutral-200">Charts + patterns to guide your next session.</div>
               </div>
             </div>
           </div>
