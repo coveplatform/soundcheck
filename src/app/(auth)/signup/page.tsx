@@ -133,7 +133,7 @@ export default function SignupPage() {
 
   if (isCheckingSession) {
     return (
-      <Card className="w-full border-2 border-black bg-neutral-900 text-white shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
+      <Card className="w-full rounded-2xl border border-neutral-800 bg-neutral-950/60 text-white backdrop-blur shadow-[0_18px_60px_-20px_rgba(132,204,22,0.35)]">
         <CardContent className="py-12">
           <div className="flex flex-col items-center justify-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-neutral-300" />
@@ -145,7 +145,7 @@ export default function SignupPage() {
   }
 
   return (
-    <Card className="w-full border-2 border-black bg-neutral-900 text-white shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
+    <Card className="w-full rounded-2xl border border-neutral-800 bg-neutral-950/60 text-white backdrop-blur shadow-[0_18px_60px_-20px_rgba(132,204,22,0.35)]">
       <CardHeader className="text-center">
         <Link
           href="/"
@@ -160,7 +160,7 @@ export default function SignupPage() {
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="bg-red-500/15 border-2 border-red-500 text-red-200 text-sm p-3 font-bold">
+            <div className="bg-red-500/10 border border-red-500/40 text-red-200 text-sm p-3 rounded-lg">
               {error}
             </div>
           )}
@@ -174,7 +174,7 @@ export default function SignupPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="border-2 border-black bg-black text-white placeholder:text-neutral-500"
+                className="h-11 rounded-xl border border-neutral-800 bg-neutral-950/70 text-white placeholder:text-neutral-500 focus-visible:ring-2 focus-visible:ring-lime-500/30 focus-visible:ring-offset-0"
               />
             </div>
             <div className="space-y-2">
@@ -186,7 +186,7 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="border-2 border-black bg-black text-white placeholder:text-neutral-500"
+                className="h-11 rounded-xl border border-neutral-800 bg-neutral-950/70 text-white placeholder:text-neutral-500 focus-visible:ring-2 focus-visible:ring-lime-500/30 focus-visible:ring-offset-0"
               />
             </div>
           </div>
@@ -199,7 +199,7 @@ export default function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="border-2 border-black bg-black text-white placeholder:text-neutral-500"
+              className="h-11 rounded-xl border border-neutral-800 bg-neutral-950/70 text-white placeholder:text-neutral-500 focus-visible:ring-2 focus-visible:ring-lime-500/30 focus-visible:ring-offset-0"
             />
             <PasswordStrength password={password} />
           </div>
@@ -209,7 +209,7 @@ export default function SignupPage() {
               type="checkbox"
               checked={acceptedTerms}
               onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className="mt-1 h-4 w-4 border-2 border-black accent-lime-400"
+              className="mt-1 h-4 w-4 border border-neutral-700 bg-neutral-950 accent-lime-400"
             />
             <label htmlFor="terms" className="text-sm text-neutral-300">
               I agree to the{" "}
@@ -227,7 +227,7 @@ export default function SignupPage() {
         <CardFooter className="flex flex-col gap-4">
           <Button
             type="submit"
-            className="w-full bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
+            className="w-full h-11 rounded-xl bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black border border-black/60 shadow-[0_10px_30px_-14px_rgba(132,204,22,0.55)] hover:shadow-[0_10px_26px_-14px_rgba(132,204,22,0.45)] active:shadow-none hover:translate-y-[1px] active:translate-y-[2px] transition-all active:transition-none"
             isLoading={isLoading}
             disabled={!acceptedTerms || !validatePassword(password).valid}
           >
