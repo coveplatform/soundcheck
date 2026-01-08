@@ -6,6 +6,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 function GoogleIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24">
@@ -28,17 +40,6 @@ function GoogleIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -147,11 +148,11 @@ export default function LoginPage() {
 
   if (isCheckingSession) {
     return (
-      <Card>
+      <Card className="w-full rounded-2xl border border-neutral-800 bg-neutral-950/60 text-white backdrop-blur shadow-[0_18px_60px_-20px_rgba(132,204,22,0.25)]">
         <CardContent className="py-12">
           <div className="flex flex-col items-center justify-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
-            <p className="text-sm text-neutral-500">Loading...</p>
+            <Loader2 className="h-8 w-8 animate-spin text-neutral-300" />
+            <p className="text-sm text-neutral-400">Loading...</p>
           </div>
         </CardContent>
       </Card>
@@ -159,16 +160,16 @@ export default function LoginPage() {
   }
 
   return (
-    <Card>
+    <Card className="w-full rounded-2xl border border-neutral-800 bg-neutral-950/60 text-white backdrop-blur shadow-[0_18px_60px_-20px_rgba(132,204,22,0.25)]">
       <CardHeader className="text-center">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-black transition-colors mb-4 self-start"
+          className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-300 hover:text-white transition-colors mb-4 self-start"
         >
           <ArrowLeft className="h-4 w-4" />
           Home
         </Link>
-        <CardTitle className="text-2xl">Welcome back</CardTitle>
+        <CardTitle className="text-2xl font-black">Welcome back</CardTitle>
         <CardDescription>
           Sign in to your MixReflect account
         </CardDescription>
@@ -176,7 +177,7 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
+            <div className="bg-red-500/10 border border-red-500/40 text-red-200 text-sm p-3 rounded-lg">
               {error}
               {needsVerificationEmail ? (
                 <div className="mt-2">
@@ -184,7 +185,7 @@ export default function LoginPage() {
                     href={`/verify-email?email=${encodeURIComponent(
                       needsVerificationEmail
                     )}`}
-                    className="underline underline-offset-4 hover:text-red-800"
+                    className="underline underline-offset-4 hover:text-red-100"
                   >
                     Resend verification email
                   </Link>
@@ -193,7 +194,7 @@ export default function LoginPage() {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email" className="font-bold">Email</Label>
+            <Label htmlFor="email" className="font-bold text-white">Email</Label>
             <Input
               id="email"
               type="email"
@@ -201,37 +202,43 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="h-11 rounded-xl border border-neutral-800 bg-neutral-950/70 text-white placeholder:text-neutral-500 focus-visible:ring-2 focus-visible:ring-lime-500/30 focus-visible:ring-offset-0"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className="font-bold">Password</Label>
+            <Label htmlFor="password" className="font-bold text-white">Password</Label>
             <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="h-11 rounded-xl border border-neutral-800 bg-neutral-950/70 text-white placeholder:text-neutral-500 focus-visible:ring-2 focus-visible:ring-lime-500/30 focus-visible:ring-offset-0"
             />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button type="submit" className="w-full" isLoading={isLoading}>
+          <Button
+            type="submit"
+            className="w-full h-11 rounded-xl bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black border border-black/60 shadow-[0_10px_30px_-14px_rgba(132,204,22,0.55)] hover:shadow-[0_10px_26px_-14px_rgba(132,204,22,0.45)] active:shadow-none hover:translate-y-[1px] active:translate-y-[2px] transition-all active:transition-none"
+            isLoading={isLoading}
+          >
             Sign in
           </Button>
 
           <div className="relative w-full">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-neutral-300" />
+              <span className="w-full border-t border-neutral-800" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-neutral-500">or</span>
+              <span className="bg-transparent px-2 text-neutral-400">or</span>
             </div>
           </div>
 
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full h-11 rounded-xl border border-neutral-800 bg-neutral-950/70 text-white hover:bg-neutral-900 hover:text-white"
             onClick={() => signIn("google", { callbackUrl })}
           >
             <GoogleIcon className="h-5 w-5 mr-2" />
@@ -240,13 +247,13 @@ export default function LoginPage() {
 
           <Link
             href="/forgot-password"
-            className="text-sm text-neutral-600 hover:text-black font-medium"
+            className="text-sm text-neutral-300 hover:text-white font-bold"
           >
             Forgot password?
           </Link>
           <p className="text-sm text-neutral-600 text-center">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-black font-bold hover:underline">
+            <Link href="/signup" className="text-white font-bold hover:underline">
               Sign up
             </Link>
           </p>
