@@ -705,7 +705,7 @@ export default function GetFeedbackPage() {
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Invalid email";
 
       if (!password) errors.password = "Required";
-      else if (!isPasswordValid) errors.password = "Password too weak";
+      else if (emailExists !== true && !isPasswordValid) errors.password = "Password too weak";
 
       if (!artistName.trim()) errors.artistName = "Required";
     }
@@ -1865,7 +1865,7 @@ export default function GetFeedbackPage() {
                       <div className="mt-2 border border-neutral-700 bg-neutral-950/40 p-3">
                         <p className="text-xs font-bold text-neutral-200">Account found</p>
                         <p className="text-xs text-neutral-500 mt-1">
-                          Enter your password to continue, or use Google.
+                          Enter your password to continue, then confirm your artist / project name and choose your genres.
                         </p>
                         <p className="text-xs text-neutral-500 mt-2">
                           Prefer the full sign-in page?{" "}
