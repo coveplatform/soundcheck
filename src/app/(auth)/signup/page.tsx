@@ -129,114 +129,118 @@ export default function SignupPage() {
 
   if (isCheckingSession) {
     return (
-      <Card>
-        <CardContent className="py-12">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
-            <p className="text-sm text-neutral-500">Loading...</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="min-h-screen bg-gradient-to-b from-black via-neutral-950 to-black text-white flex items-center justify-center px-4 py-10">
+        <Card className="w-full max-w-md border-2 border-black bg-neutral-900 text-white shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
+          <CardContent className="py-12">
+            <div className="flex flex-col items-center justify-center gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-neutral-300" />
+              <p className="text-sm text-neutral-400">Loading...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 hover:text-black transition-colors mb-4 self-start"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Home
-        </Link>
-        <CardTitle className="text-2xl">Start your trial</CardTitle>
-        <CardDescription>Artist name, email, and password. That&apos;s it.</CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          {error && (
-            <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
-              {error}
-            </div>
-          )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name" className="font-bold">Artist / Project name</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Your artist name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email" className="font-bold">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="font-bold">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Create a strong password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <PasswordStrength password={password} />
-          </div>
-          <div className="flex items-start gap-3">
-            <input
-              id="terms"
-              type="checkbox"
-              checked={acceptedTerms}
-              onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className="mt-1 h-4 w-4 border-2 border-black accent-lime-400"
-            />
-            <label htmlFor="terms" className="text-sm text-neutral-600">
-              I agree to the{" "}
-              <Link href="/terms" className="text-black font-bold hover:underline">
-                Terms of Service
-              </Link>
-              {" "}and{" "}
-              <Link href="/privacy" className="text-black font-bold hover:underline">
-                Privacy Policy
-              </Link>
-              .
-            </label>
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <Button
-            type="submit"
-            className="w-full"
-            isLoading={isLoading}
-            disabled={
-              !acceptedTerms ||
-              !validatePassword(password).valid
-            }
+    <div className="min-h-screen bg-gradient-to-b from-black via-neutral-950 to-black text-white flex items-center justify-center px-4 py-10">
+      <Card className="w-full max-w-md border-2 border-black bg-neutral-900 text-white shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
+        <CardHeader className="text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-300 hover:text-white transition-colors mb-4 self-start"
           >
-            Create account
-          </Button>
-          <p className="text-sm text-neutral-600 text-center">
-            Already have an account?{" "}
-            <Link href="/login" className="text-black font-bold hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </CardFooter>
-      </form>
-    </Card>
+            <ArrowLeft className="h-4 w-4" />
+            Home
+          </Link>
+          <CardTitle className="text-2xl font-black">Start your trial</CardTitle>
+          <CardDescription className="text-neutral-300">Artist name, email, and password. That&apos;s it.</CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            {error && (
+              <div className="bg-red-500/15 border-2 border-red-500 text-red-200 text-sm p-3 font-bold">
+                {error}
+              </div>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="font-bold text-white">Artist / Project name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Your artist name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="border-2 border-black bg-black text-white placeholder:text-neutral-500"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="font-bold text-white">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="border-2 border-black bg-black text-white placeholder:text-neutral-500"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="font-bold text-white">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Create a strong password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="border-2 border-black bg-black text-white placeholder:text-neutral-500"
+              />
+              <PasswordStrength password={password} />
+            </div>
+            <div className="flex items-start gap-3">
+              <input
+                id="terms"
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className="mt-1 h-4 w-4 border-2 border-black accent-lime-400"
+              />
+              <label htmlFor="terms" className="text-sm text-neutral-300">
+                I agree to the{" "}
+                <Link href="/terms" className="text-white font-bold hover:underline">
+                  Terms of Service
+                </Link>
+                {" "}and{" "}
+                <Link href="/privacy" className="text-white font-bold hover:underline">
+                  Privacy Policy
+                </Link>
+                .
+              </label>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4">
+            <Button
+              type="submit"
+              className="w-full bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
+              isLoading={isLoading}
+              disabled={!acceptedTerms || !validatePassword(password).valid}
+            >
+              Create account
+            </Button>
+            <p className="text-sm text-neutral-300 text-center">
+              Already have an account?{" "}
+              <Link href="/login" className="text-white font-bold hover:underline">
+                Sign in
+              </Link>
+            </p>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
   );
 }
