@@ -329,29 +329,29 @@ export default function Home() {
               <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
                 <Target className="h-6 w-6" />
               </div>
-              <div className="mt-4 text-xl sm:text-2xl font-black">1. Submit your track</div>
-              <div className="mt-2 text-sm sm:text-base font-medium">Paste a link or upload.</div>
+              <div className="mt-4 text-2xl font-black">Submit your track</div>
+              <div className="mt-2 text-base font-medium">Paste a link or upload.</div>
             </div>
             <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
               <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
                 <Users className="h-6 w-6" />
               </div>
-              <div className="mt-4 text-xl sm:text-2xl font-black">2. We match reviewers</div>
-              <div className="mt-2 text-sm sm:text-base font-medium">Genre-picked artists + listeners review your track.</div>
+              <div className="mt-4 text-2xl font-black">We match reviewers</div>
+              <div className="mt-2 text-base font-medium">Artists + listeners who actually listen to that genre.</div>
             </div>
             <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
               <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
                 <MessageCircle className="h-6 w-6" />
               </div>
-              <div className="mt-4 text-xl sm:text-2xl font-black">3. They review</div>
-              <div className="mt-2 text-sm sm:text-base font-medium">Structured notes + timestamps. Artists rate every review.</div>
+              <div className="mt-4 text-2xl font-black">They review</div>
+              <div className="mt-2 text-base font-medium">Structured notes + timestamps. Artists rate every review.</div>
             </div>
             <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
               <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
                 <Flame className="h-6 w-6" />
               </div>
-              <div className="mt-4 text-xl sm:text-2xl font-black">4. You get clarity</div>
-              <div className="mt-2 text-sm sm:text-base font-medium">Patterns show what to change next.</div>
+              <div className="mt-4 text-2xl font-black">You get clarity</div>
+              <div className="mt-2 text-base font-medium">Patterns show what to change next.</div>
             </div>
           </div>
         </div>
