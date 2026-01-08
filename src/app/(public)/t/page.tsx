@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 import {
   ArrowRight,
+  Clock,
+  Flame,
+  LineChart,
   ListMusic,
+  MessageCircle,
+  Target,
+  Users,
   Share2,
   Star,
 } from "lucide-react";
@@ -164,18 +170,109 @@ export default function TrialLandingPage() {
                 <div>
                   <div className="text-xs font-black text-neutral-400">ANALYTICS</div>
                   <h3 className="mt-2 text-2xl sm:text-3xl font-black">
-                    See if it&apos;s replay-worthy.
+                    What listeners would do after hearing it.
                   </h3>
                   <p className="mt-3 text-neutral-300 max-w-2xl">
-                    Donut charts show intent at a glance — replay, playlist, share.
+                    Plain numbers. Plain meaning. No fluff.
                   </p>
                 </div>
               </div>
 
-              <div className="mt-8 grid md:grid-cols-3 gap-4">
-                <Donut percent={83} label="WOULD LISTEN AGAIN" color="#84cc16" />
-                <Donut percent={67} label="WOULD PLAYLIST" color="#fb923c" />
-                <Donut percent={52} label="WOULD SHARE" color="#38bdf8" />
+              <div className="mt-8 grid gap-4">
+                <div className="border-2 border-black bg-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="text-xs font-black text-neutral-400">WOULD LISTEN AGAIN</div>
+                      <div className="mt-1 text-2xl font-black text-white">83%</div>
+                    </div>
+                    <div className="text-xs font-black bg-lime-500 text-black border-2 border-black px-2 py-1">STRONG</div>
+                  </div>
+                  <div className="mt-3 h-3 border-2 border-black bg-neutral-800">
+                    <div className="h-full bg-lime-500" style={{ width: "83%" }} />
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="border-2 border-black bg-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="text-xs font-black text-neutral-400">WOULD ADD TO PLAYLIST</div>
+                    <div className="mt-1 text-2xl font-black text-white">67%</div>
+                    <div className="mt-3 h-3 border-2 border-black bg-neutral-800">
+                      <div className="h-full bg-orange-400" style={{ width: "67%" }} />
+                    </div>
+                  </div>
+                  <div className="border-2 border-black bg-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="text-xs font-black text-neutral-400">WOULD SHARE</div>
+                    <div className="mt-1 text-2xl font-black text-white">52%</div>
+                    <div className="mt-3 h-3 border-2 border-black bg-neutral-800">
+                      <div className="h-full bg-sky-400" style={{ width: "52%" }} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-2 border-black bg-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="text-xs font-black text-neutral-400">WHAT THIS MEANS</div>
+                  <div className="mt-2 text-sm text-neutral-300">
+                    High replay means the core idea works. Playlist/share tells you whether it feels like something people would actually keep.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(56,189,248,1)]">
+            <div className="p-6 sm:p-10">
+              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                <div>
+                  <div className="text-xs font-black text-neutral-400">ANALYTICS</div>
+                  <h3 className="mt-2 text-2xl sm:text-3xl font-black">
+                    The “most mentioned moments”.
+                  </h3>
+                  <p className="mt-3 text-neutral-300 max-w-2xl">
+                    Instead of 12 different opinions, you get a ranked list of what people keep pointing at.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-8 grid md:grid-cols-2 gap-4">
+                <div className="border-2 border-black bg-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="text-xs font-black text-neutral-400">TOP PRAISE</div>
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="font-black">0:45 Hook hits hard</div>
+                        <div className="text-sm text-neutral-300">Melody lands + drums feel confident here.</div>
+                      </div>
+                      <span className="px-2 py-1 border-2 border-black bg-lime-500 text-black text-xs font-black">9/12</span>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="font-black">2:15 Breakdown feels fresh</div>
+                        <div className="text-sm text-neutral-300">Nice contrast, keeps attention.</div>
+                      </div>
+                      <span className="px-2 py-1 border-2 border-black bg-lime-500 text-black text-xs font-black">7/12</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-2 border-black bg-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="text-xs font-black text-neutral-400">TOP FIXES</div>
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="font-black">0:00 Intro too long</div>
+                        <div className="text-sm text-neutral-300">People want the hook sooner.</div>
+                      </div>
+                      <span className="px-2 py-1 border-2 border-black bg-orange-400 text-black text-xs font-black">8/12</span>
+                    </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="font-black">1:30 Vocal too loud</div>
+                        <div className="text-sm text-neutral-300">Clashes with the lead synth.</div>
+                      </div>
+                      <span className="px-2 py-1 border-2 border-black bg-orange-400 text-black text-xs font-black">6/12</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -228,13 +325,13 @@ export default function TrialLandingPage() {
                     <div>
                       <div className="text-xs font-black text-lime-500 uppercase tracking-wide mb-1">What worked</div>
                       <div className="pl-3 border-l-4 border-lime-500 text-neutral-200">
-                        The hook hits hard and feels memorable. Drums feel punchy and clean.
+                        The hook at 0:45 is instantly memorable — it&apos;s the kind of melody you can hum after one listen. The kick/snare balance feels tight and confident, and the bass is controlled (no mud), which makes the drop feel bigger. The breakdown at 2:15 is a great reset that keeps the track from feeling repetitive.
                       </div>
                     </div>
                     <div>
                       <div className="text-xs font-black text-red-400 uppercase tracking-wide mb-1">To improve</div>
                       <div className="pl-3 border-l-4 border-red-400 text-neutral-200">
-                        Intro drags a bit — I wanted the hook earlier. Vocal sits slightly loud at 1:30.
+                        The intro takes a little too long to reward the listener — I&apos;d try cutting 8–12 seconds so the hook arrives faster. Around 1:30 the vocal sits a touch loud and masks the lead synth; a small level dip or EQ carve would help. Verse 2 hats feel a bit static — even one extra variation or automation would keep the energy rising.
                       </div>
                     </div>
                     <div>
@@ -266,73 +363,103 @@ export default function TrialLandingPage() {
           </div>
         </section>
 
-        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-lime-500 text-black border-y-2 border-black py-10">
+        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-lime-500 text-black border-y-2 border-black py-12">
           <div className="max-w-5xl mx-auto px-4">
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center">
               Why use feedback?
             </h2>
+
+            <div className="mt-8 grid md:grid-cols-3 gap-4">
+              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-black">PROBLEM</div>
+                  <div className="h-10 w-10 border-2 border-black bg-orange-400 flex items-center justify-center">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-3 text-xl font-black">You can&apos;t hear it objectively.</div>
+                <div className="mt-3 text-sm text-neutral-700">
+                  After 200 listens, your brain fills in the gaps.
+                </div>
+              </div>
+
+              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-black">PROBLEM</div>
+                  <div className="h-10 w-10 border-2 border-black bg-orange-400 flex items-center justify-center">
+                    <MessageCircle className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-3 text-xl font-black">Friends are too nice.</div>
+                <div className="mt-3 text-sm text-neutral-700">
+                  You get “sounds good” — not what to fix.
+                </div>
+              </div>
+
+              <div className="border-2 border-black bg-black text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-black text-neutral-300">SOLUTION</div>
+                  <div className="h-10 w-10 border-2 border-black bg-white text-black flex items-center justify-center">
+                    <LineChart className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-3 text-xl font-black">Patterns beat opinions.</div>
+                <div className="mt-3 text-sm text-neutral-200">
+                  When multiple listeners say the same thing, it&apos;s signal.
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
-        <section className="mt-10">
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="border-2 border-black bg-neutral-900 p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="text-xs font-black text-neutral-400">PROBLEM</div>
-              <div className="mt-2 text-xl font-black">You can&apos;t hear it objectively.</div>
-              <div className="mt-3 text-neutral-300 text-sm">After 200 listens, your brain fills in the gaps.</div>
-            </div>
-            <div className="border-2 border-black bg-neutral-900 p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="text-xs font-black text-neutral-400">PROBLEM</div>
-              <div className="mt-2 text-xl font-black">Friends are too nice.</div>
-              <div className="mt-3 text-neutral-300 text-sm">You get “sounds good” — not what to fix.</div>
-            </div>
-            <div className="border-2 border-black bg-neutral-900 p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="text-xs font-black text-neutral-400">SOLUTION</div>
-              <div className="mt-2 text-xl font-black">Patterns beat opinions.</div>
-              <div className="mt-3 text-neutral-300 text-sm">When multiple listeners say the same thing, it&apos;s signal.</div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-sky-400 text-black border-y-2 border-black py-10">
+        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-sky-400 text-black border-y-2 border-black py-12">
           <div className="max-w-5xl mx-auto px-4">
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center">
               How it works
             </h2>
-          </div>
-        </section>
 
-        <section className="mt-10">
-          <div className="grid md:grid-cols-4 gap-4">
-            <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="text-3xl font-black">1</div>
-              <div className="mt-2 font-black">Submit your track</div>
-              <div className="mt-2 text-sm text-neutral-700">Upload or paste a link from your dashboard.</div>
+            <div className="mt-8 grid md:grid-cols-4 gap-4">
+              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex items-center justify-between">
+                  <div className="text-3xl font-black">1</div>
+                  <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
+                    <Target className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-3 font-black">Submit your track</div>
+                <div className="mt-2 text-sm text-neutral-700">Upload or paste a link from your dashboard.</div>
+              </div>
+              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex items-center justify-between">
+                  <div className="text-3xl font-black">2</div>
+                  <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
+                    <Users className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-3 font-black">We match listeners</div>
+                <div className="mt-2 text-sm text-neutral-700">Genre-aware matching for better signal.</div>
+              </div>
+              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex items-center justify-between">
+                  <div className="text-3xl font-black">3</div>
+                  <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
+                    <MessageCircle className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-3 font-black">They review (with timestamps)</div>
+                <div className="mt-2 text-sm text-neutral-700">Clear sections: what worked / what to fix.</div>
+              </div>
+              <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex items-center justify-between">
+                  <div className="text-3xl font-black">4</div>
+                  <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
+                    <Flame className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-3 font-black">You get clarity</div>
+                <div className="mt-2 text-sm text-neutral-700">Charts + patterns to guide your next session.</div>
+              </div>
             </div>
-            <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="text-3xl font-black">2</div>
-              <div className="mt-2 font-black">We match listeners</div>
-              <div className="mt-2 text-sm text-neutral-700">Genre-aware matching for better signal.</div>
-            </div>
-            <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="text-3xl font-black">3</div>
-              <div className="mt-2 font-black">They review (with timestamps)</div>
-              <div className="mt-2 text-sm text-neutral-700">Clear sections: what worked / what to fix.</div>
-            </div>
-            <div className="border-2 border-black bg-white text-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="text-3xl font-black">4</div>
-              <div className="mt-2 font-black">You get clarity</div>
-              <div className="mt-2 text-sm text-neutral-700">Charts + patterns to guide your next session.</div>
-            </div>
-          </div>
-
-          <div className="mt-10 flex items-center justify-center">
-            <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
-              <Button className="h-11 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400">
-                Start trial
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
           </div>
         </section>
       </main>
