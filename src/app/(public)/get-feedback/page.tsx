@@ -137,11 +137,10 @@ export default function GetFeedbackPage() {
   const [urlError, setUrlError] = useState("");
   const [urlWarning, setUrlWarning] = useState("");
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
+  const [isUrlPreviewExpanded, setIsUrlPreviewExpanded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [finishLaterMessage, setFinishLaterMessage] = useState("");
-  const [isSendingFinishLater, setIsSendingFinishLater] = useState(false);
   const [isContinuingToPackage, setIsContinuingToPackage] = useState(false);
   const [matchingIndex, setMatchingIndex] = useState(0);
   const [matchingDone, setMatchingDone] = useState(false);
@@ -1238,20 +1237,11 @@ export default function GetFeedbackPage() {
           >
             {/* Hero */}
             <div className="text-center space-y-5 order-[10]">
-              {/* FREE badge */}
-              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2.5 mb-3">
-                <Gift className="h-5 w-5" />
-                <span className="font-black text-sm uppercase tracking-wide">First review FREE</span>
-              </div>
-
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
                 Feedback that&apos;s actually usable.<span className="text-lime-500"> From real listeners.</span>
               </h1>
               <p className="text-neutral-400 text-base sm:text-lg max-w-lg mx-auto">
                 Get structured feedback from genre-matched listeners, plus aggregated insights so you can spot patterns quickly.
-              </p>
-              <p className="text-neutral-500 text-sm max-w-lg mx-auto">
-                What happens next: enter your email → create your account → open your dashboard.
               </p>
 
               {/* What you get - visual summary */}
@@ -1265,8 +1255,8 @@ export default function GetFeedbackPage() {
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Turnaround</p>
                 </div>
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-lg font-black text-lime-500">FREE</p>
-                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">First review</p>
+                  <p className="text-lg font-black text-lime-500">TRIAL</p>
+                  <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Get started</p>
                 </div>
               </div>
             </div>
@@ -1281,7 +1271,7 @@ export default function GetFeedbackPage() {
                         Create your project
                       </h2>
                       <p className="text-sm text-neutral-400 mt-1">
-                        Next you&apos;ll create your account and we&apos;ll take you to your dashboard.
+                        Next you&apos;ll create your account and start your trial in the dashboard.
                       </p>
                     </div>
 
@@ -1325,8 +1315,6 @@ export default function GetFeedbackPage() {
                   <Button
                     type="button"
                     onClick={async () => {
-                      setFinishLaterMessage("");
-
                       const nextArtistName = artistName.trim();
                       const nextEmail = email.trim().toLowerCase();
 
@@ -1367,55 +1355,9 @@ export default function GetFeedbackPage() {
                     }}
                     className="w-full h-11 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
                   >
-                    Continue to dashboard
+                    Start trial
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
-
-                  <button
-                    type="button"
-                    disabled={isSendingFinishLater}
-                    onClick={async () => {
-                      setFinishLaterMessage("");
-
-                      const nextArtistName = artistName.trim();
-                      const nextEmail = email.trim().toLowerCase();
-
-                      const errors: Record<string, string> = {};
-                      if (!nextArtistName) errors.artistName = "Required";
-                      if (!nextEmail) errors.email = "Required";
-                      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) errors.email = "Invalid email";
-
-                      if (Object.keys(errors).length > 0) {
-                        setFieldErrors((prev) => ({ ...prev, ...errors }));
-                        return;
-                      }
-
-                      setArtistName(nextArtistName);
-                      setEmail(nextEmail);
-
-                      setIsSendingFinishLater(true);
-                      try {
-                        await captureLead({ sendEmail: true });
-                        setFinishLaterMessage("Sent. Check your email for a link to finish this later.");
-                      } catch {
-                        setFinishLaterMessage("Couldn't send email right now. Please try again.");
-                      } finally {
-                        setIsSendingFinishLater(false);
-                      }
-                    }}
-                    className={cn(
-                      "w-full text-sm font-bold border-2 h-11",
-                      isSendingFinishLater
-                        ? "bg-neutral-900 text-neutral-500 border-neutral-700"
-                        : "bg-neutral-900 text-neutral-200 border-neutral-700 hover:border-neutral-500"
-                    )}
-                  >
-                    Email me a link to finish later
-                  </button>
-
-                  {finishLaterMessage && (
-                    <p className="text-xs text-neutral-400 text-center">{finishLaterMessage}</p>
-                  )}
                 </div>
               </div>
               </div>
