@@ -35,12 +35,12 @@ export default function TrialLandingPage() {
       <main className="max-w-5xl mx-auto px-4 py-16 sm:py-24">
         <section className="text-center min-h-[62vh] flex flex-col justify-center">
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05]">
-            Get up to <span className="text-lime-500">20</span> clean, structured reviews.
+            Get feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
           </h1>
           <p className="mt-5 text-neutral-300 text-base sm:text-lg max-w-2xl mx-auto">
             From genre-matched artists + listeners in your music community.
             <br />
-            MixReflect is a private feedback marketplace — you rate every review to keep quality high.
+            MixReflect is a private feedback marketplace — reviewers earn more for higher-quality reviews, and you rate every review to keep quality high.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -193,7 +193,7 @@ export default function TrialLandingPage() {
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                 <div>
                   <h3 className="mt-2 text-2xl sm:text-3xl font-black">
-                    Get a clean, structured review.
+                    Get up to 20 clean, structured reviews.
                   </h3>
                   <p className="mt-3 text-neutral-300 max-w-2xl">
                     Not “sounds good”. Real notes, clear sections, and timestamps.
