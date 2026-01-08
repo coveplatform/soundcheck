@@ -58,7 +58,7 @@ export async function POST(request: Request) {
         try {
           await sendFinishLaterEmail({
             to: normalizedEmail,
-            resumeUrl: `${baseUrl}/get-feedback`,
+            resumeUrl: `${baseUrl}/t`,
           });
           updateData.reminded = true;
         } catch (emailError) {
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
       try {
         await sendFinishLaterEmail({
           to: normalizedEmail,
-          resumeUrl: `${baseUrl}/get-feedback`,
+          resumeUrl: `${baseUrl}/t`,
         });
       } catch (emailError) {
         console.error("Lead capture finish-later email error:", emailError);

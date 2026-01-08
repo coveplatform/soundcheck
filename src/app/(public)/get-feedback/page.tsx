@@ -1826,7 +1826,7 @@ export default function GetFeedbackPage() {
                   type="button"
                   variant="outline"
                   className="w-full h-12 bg-white hover:bg-neutral-100 text-black border-2 border-neutral-300"
-                  onClick={() => signIn("google", { callbackUrl: "/get-feedback" })}
+                  onClick={() => signIn("google", { callbackUrl: "/t" })}
                 >
                   <GoogleIcon className="h-5 w-5 mr-2" />
                   Continue with Google
@@ -1870,7 +1870,7 @@ export default function GetFeedbackPage() {
                         <p className="text-xs text-neutral-500 mt-2">
                           Prefer the full sign-in page?{" "}
                           <Link
-                            href={`/login?callbackUrl=${encodeURIComponent("/get-feedback")}`}
+                            href={`/login?callbackUrl=${encodeURIComponent("/t")}`}
                             className="text-lime-500 hover:text-lime-400 font-bold"
                           >
                             Sign in here
@@ -1945,7 +1945,7 @@ export default function GetFeedbackPage() {
 
                 <p className="text-sm text-neutral-500 text-center">
                   Already have an account?{" "}
-                  <Link href={`/login?callbackUrl=${encodeURIComponent("/get-feedback")}`} className="text-lime-500 hover:text-lime-400 font-medium">
+                  <Link href={`/login?callbackUrl=${encodeURIComponent("/t")}`} className="text-lime-500 hover:text-lime-400 font-medium">
                     Sign in
                   </Link>
                 </p>
