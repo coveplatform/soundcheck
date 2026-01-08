@@ -993,7 +993,7 @@ export default function GetFeedbackPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        <details className="details-no-marker group border-2 border-neutral-700 bg-neutral-900">
+        <details open className="details-no-marker group border-2 border-neutral-700 bg-neutral-900">
           <summary className="cursor-pointer select-none p-4 flex items-center justify-between text-left">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center">
@@ -1004,7 +1004,10 @@ export default function GetFeedbackPage() {
                 <p className="text-xs text-neutral-500">Averages + distributions from multiple listeners</p>
               </div>
             </div>
-            <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">VIEW</span>
+            <div className="text-xs font-mono text-neutral-500 group-open:text-lime-500">
+              <span className="group-open:hidden">VIEW</span>
+              <span className="hidden group-open:inline">HIDE</span>
+            </div>
           </summary>
           <div className="border-t border-neutral-800 p-4">
             <div className="border border-neutral-700 bg-black/30 overflow-hidden">
@@ -1070,7 +1073,7 @@ export default function GetFeedbackPage() {
           </div>
         </details>
 
-        <details className="details-no-marker group border-2 border-neutral-700 bg-neutral-900">
+        <details open className="details-no-marker group border-2 border-neutral-700 bg-neutral-900">
           <summary className="cursor-pointer select-none p-4 flex items-center justify-between text-left">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center">
@@ -1081,7 +1084,10 @@ export default function GetFeedbackPage() {
                 <p className="text-xs text-neutral-500">One review (your package includes more)</p>
               </div>
             </div>
-            <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">VIEW</span>
+            <div className="text-xs font-mono text-neutral-500 group-open:text-lime-500">
+              <span className="group-open:hidden">VIEW</span>
+              <span className="hidden group-open:inline">HIDE</span>
+            </div>
           </summary>
           <div className="border-t border-neutral-800 p-4">
             <div className="border border-neutral-700 bg-black/30 p-4 space-y-4">
@@ -1228,12 +1234,12 @@ export default function GetFeedbackPage() {
         {/* ============================================ */}
         {step === "track" && (
           <div
-            className="flex flex-col gap-10"
+            className="flex flex-col gap-8"
           >
             {/* Hero */}
-            <div className="text-center space-y-6 order-[10]">
+            <div className="text-center space-y-5 order-[10]">
               {/* FREE badge */}
-              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-5 py-3 mb-4">
+              <div className="inline-flex items-center gap-2 bg-lime-500 text-black px-4 py-2.5 mb-3">
                 <Gift className="h-5 w-5" />
                 <span className="font-black text-sm uppercase tracking-wide">First review FREE</span>
               </div>
@@ -1246,17 +1252,17 @@ export default function GetFeedbackPage() {
               </p>
 
               {/* What you get - visual summary */}
-              <div className="grid grid-cols-3 gap-4 max-w-md mx-auto pt-2">
-                <div className="bg-neutral-900 border border-neutral-700 p-4 text-center">
-                  <p className="text-xl font-black text-lime-500">5-20</p>
+              <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto pt-1">
+                <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
+                  <p className="text-lg font-black text-lime-500">5-20</p>
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Reviews</p>
                 </div>
-                <div className="bg-neutral-900 border border-neutral-700 p-4 text-center">
-                  <p className="text-xl font-black text-lime-500">&lt;12h</p>
+                <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
+                  <p className="text-lg font-black text-lime-500">&lt;12h</p>
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Turnaround</p>
                 </div>
-                <div className="bg-neutral-900 border border-neutral-700 p-4 text-center">
-                  <p className="text-xl font-black text-lime-500">FREE</p>
+                <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
+                  <p className="text-lg font-black text-lime-500">FREE</p>
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">First review</p>
                 </div>
               </div>
@@ -1264,14 +1270,14 @@ export default function GetFeedbackPage() {
 
             {trackStartStage !== "track" && !isLoggedIn && (
               <div className="order-[15] w-full sm:max-w-lg sm:mx-auto">
-                <div id="get-feedback-start" className="border-2 border-neutral-700 bg-neutral-900 p-5">
-                  <div className="space-y-6">
+                <div id="get-feedback-start" className="border-2 border-neutral-700 bg-neutral-900 p-4">
+                  <div className="space-y-3">
                     <div className="text-center">
                       <p className="text-xs font-black uppercase tracking-wide text-neutral-400">Get feedback</p>
                       <h2 className="text-xl font-black text-white">
                         Start with your details
                       </h2>
-                      <p className="text-sm text-neutral-400 mt-2">
+                      <p className="text-sm text-neutral-400 mt-1">
                         We&apos;ll use this to send your feedback and save your progress.
                       </p>
                     </div>
@@ -1285,7 +1291,7 @@ export default function GetFeedbackPage() {
                           setFieldErrors((prev) => ({ ...prev, artistName: "" }));
                         }}
                         className={cn(
-                          "h-12 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                          "h-11 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
                           fieldErrors.artistName && "border-red-500"
                         )}
                       />
@@ -1304,7 +1310,7 @@ export default function GetFeedbackPage() {
                           setFieldErrors((prev) => ({ ...prev, email: "" }));
                         }}
                         className={cn(
-                          "h-12 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                          "h-11 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
                           fieldErrors.email && "border-red-500"
                         )}
                       />
@@ -1345,7 +1351,7 @@ export default function GetFeedbackPage() {
 
                       setTrackStartStage("track");
                     }}
-                    className="w-full h-12 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
+                    className="w-full h-11 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
                   >
                     Continue
                     <ArrowRight className="h-4 w-4 ml-2" />
