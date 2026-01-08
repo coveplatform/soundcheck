@@ -121,6 +121,7 @@ export default function GetFeedbackPage() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [genres, setGenres] = useState<Genre[]>([]);
+  const [isEditingGenres, setIsEditingGenres] = useState(false);
 
   // Package state
   const [selectedPackage, setSelectedPackage] = useState<PackageType>("STANDARD");
@@ -1853,14 +1854,59 @@ export default function GetFeedbackPage() {
               <label className="text-sm font-bold text-neutral-400 mb-3 block">
                 What genre is your track? <span className="text-neutral-600">(up to 3)</span>
               </label>
-              <GenreSelector
-                genres={genres}
-                selectedIds={selectedGenres}
-                onToggle={toggleGenre}
-                maxSelections={3}
-                variant="artist"
-                theme="dark"
-              />
+
+              {selectedGenres.length > 0 && !isEditingGenres ? (
+                <div className="border-2 border-neutral-700 bg-neutral-900 p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="text-sm font-black text-white">Selected</p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {selectedGenres
+                          .map((id) => genres.find((g) => g.id === id)?.name)
+                          .filter(Boolean)
+                          .map((name) => (
+                            <span
+                              key={name}
+                              className="inline-flex items-center border border-neutral-700 bg-neutral-950/40 px-3 py-1 text-xs font-bold text-neutral-200"
+                            >
+                              {name}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="text-sm font-bold text-lime-500 hover:text-lime-400 flex-shrink-0"
+                      onClick={() => setIsEditingGenres(true)}
+                    >
+                      Change
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <GenreSelector
+                    genres={genres}
+                    selectedIds={selectedGenres}
+                    onToggle={toggleGenre}
+                    maxSelections={3}
+                    variant="artist"
+                    theme="dark"
+                  />
+
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      className="text-sm font-bold text-lime-500 hover:text-lime-400"
+                      onClick={() => setIsEditingGenres(false)}
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {fieldErrors.genres && <p className="text-xs text-red-500 mt-2">{fieldErrors.genres}</p>}
             </div>
 
