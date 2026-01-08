@@ -33,20 +33,28 @@ export default function Home() {
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight text-black max-w-4xl leading-[1.1]">
             Real feedback.<br /><span className="text-lime-600">Real fast.</span>
           </h1>
-          <p className="mt-6 text-xl text-neutral-600 max-w-xl leading-relaxed">
-            Listened to your track so many times you can&apos;t tell if it&apos;s good anymore?
-            Get fresh ears on your music—real feedback from real listeners, delivered in under 12 hours.
+          <p className="mt-6 text-xl text-neutral-600 max-w-2xl leading-relaxed">
+            Get 5–20 structured reviews from genre-matched listeners—so you know what to fix before you release.
           </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-bold text-black bg-white px-3 py-1 border-2 border-black">From $4.95 AUD</span>
+            <span className="text-sm font-bold text-black bg-white px-3 py-1 border-2 border-black">Typically &lt;12h</span>
+            <span className="text-sm font-bold text-black bg-white px-3 py-1 border-2 border-black">Human reviewers</span>
+          </div>
+
           <div className="mt-10 flex flex-wrap items-center gap-4">
-            <Link href="/t">
+            <Link href="/signup">
               <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-8 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
                 Get Feedback <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <span className="text-sm font-bold text-black bg-lime-200 px-3 py-1">First one&apos;s free</span>
+            <Link href="#example" className="text-sm font-bold text-black bg-white px-3 py-1 border-2 border-black hover:bg-neutral-50">
+              View example
+            </Link>
           </div>
           <p className="mt-4 text-sm text-neutral-500 font-mono">
-            No card required • Results in under 12 hours
+            One-time payment • No subscription
           </p>
         </div>
       </section>
@@ -124,21 +132,23 @@ export default function Home() {
       <section className="border-b-2 border-black py-16 bg-neutral-50">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-black mb-6">Sound familiar?</h2>
-          <div className="space-y-4 text-lg text-neutral-600">
-            <p>
-              You&apos;ve been working on this track for weeks. You&apos;ve listened to it 200 times.
-              You can&apos;t tell if it&apos;s good anymore.
-            </p>
-            <p>
-              You ask your friends. They say <span className="font-bold text-black">&ldquo;yeah it&apos;s really good!&rdquo;</span> They always say that.
-            </p>
-            <p>
-              You post on Reddit. One person says they love it. Another says the mix is trash.
-              A third just promotes their own track. You&apos;re back to square one.
-            </p>
-            <p className="font-bold text-black text-xl pt-4 pl-4 border-l-4 border-lime-500">
-              You just want honest feedback you can actually use.
-            </p>
+          <div className="grid gap-3 text-lg text-neutral-600">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-lime-600 mt-1" />
+              <p>You&apos;ve listened to your track so many times you can&apos;t hear it objectively anymore.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-lime-600 mt-1" />
+              <p>Friends say “it&apos;s good” (but you still don&apos;t know what to change).</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-lime-600 mt-1" />
+              <p>Online feedback is inconsistent—praise, hate, and spam in the same thread.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-lime-600 mt-1" />
+              <p className="font-bold text-black">You want signal—not noise.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -146,8 +156,8 @@ export default function Home() {
       {/* The Solution */}
       <section className="border-b-2 border-black py-16">
         <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-2">Here&apos;s a better way</h2>
-          <p className="text-neutral-600 mb-8">Get multiple opinions. See what patterns emerge. Know for sure.</p>
+          <h2 className="text-3xl font-black mb-2">A better way to improve a track</h2>
+          <p className="text-neutral-600 mb-8">Fast, structured feedback—so you can ship with confidence.</p>
 
           <div className="space-y-4">
             <div className="flex gap-4 p-5 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
@@ -156,9 +166,7 @@ export default function Home() {
               </span>
               <div className="flex flex-col justify-center">
                 <p className="font-bold text-lg">Drop your link</p>
-                <p className="text-neutral-500 mb-3">
-                  Paste a link from any of these platforms. Takes 30 seconds.
-                </p>
+                <p className="text-neutral-500 mb-3">Paste a SoundCloud / Bandcamp / YouTube link. Takes ~30 seconds.</p>
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-orange-50" title="SoundCloud">
                     <SoundCloudIcon className="h-5 w-5 text-[#ff5500]" />
@@ -178,9 +186,7 @@ export default function Home() {
               </span>
               <div className="flex flex-col justify-center">
                 <p className="font-bold text-lg">Paid reviewers listen</p>
-                <p className="text-neutral-500">
-                  5-20 reviewers who match your genre listen to the full track and write detailed feedback. They&apos;re paid per review and rated by you—so quality matters.
-                </p>
+                <p className="text-neutral-500">Genre-matched listeners write structured feedback. You rate quality.</p>
               </div>
             </div>
             <div className="flex gap-4 p-5 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
@@ -189,9 +195,7 @@ export default function Home() {
               </span>
               <div className="flex flex-col justify-center">
                 <p className="font-bold text-lg">Patterns reveal truth</p>
-                <p className="text-neutral-500">
-                  When most listeners say the intro is too long, that&apos;s not taste—that&apos;s consensus. Now you know what to fix.
-                </p>
+                <p className="text-neutral-500">When multiple people say the same thing, you know what to fix next.</p>
               </div>
             </div>
           </div>
@@ -573,7 +577,7 @@ export default function Home() {
                     ))}
                   </div>
 
-                  <Link href="/t">
+                  <Link href="/signup">
                     <Button className={`w-full border-2 border-black font-bold py-6 text-base ${
                       isPopular
                         ? "bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600"
