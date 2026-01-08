@@ -857,7 +857,7 @@ export default function GetFeedbackPage() {
           <div className="space-y-1">
             <p className="text-lg font-black text-white">What you’ll get</p>
             <p className="text-sm text-neutral-400">
-              Here’s a real-world example of the kind of feedback and pattern insights you’ll receive.
+              We combine multiple listener reviews into aggregated scores, distributions, and consensus highlights—so you can see what’s consistently landing (and what isn’t).
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-2">
               <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
@@ -866,11 +866,15 @@ export default function GetFeedbackPage() {
               </span>
               <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
                 <Check className="h-3.5 w-3.5 text-lime-500" />
-                Actionable fixes
+                Actionable next steps
               </span>
               <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
                 <Check className="h-3.5 w-3.5 text-lime-500" />
-                Consensus signal
+                Aggregated scores
+              </span>
+              <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
+                <Check className="h-3.5 w-3.5 text-lime-500" />
+                Consensus highlights
               </span>
             </div>
           </div>
@@ -885,8 +889,8 @@ export default function GetFeedbackPage() {
                 <Zap className="h-4 w-4 text-lime-500" />
               </div>
               <div>
-                <p className="font-black text-white">Example analytics</p>
-                <p className="text-xs text-neutral-500">See patterns from multiple reviews</p>
+                <p className="font-black text-white">Aggregated analytics</p>
+                <p className="text-xs text-neutral-500">Averages + distributions from multiple listeners</p>
               </div>
             </div>
             <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">VIEW</span>
@@ -895,8 +899,8 @@ export default function GetFeedbackPage() {
             <div className="border border-neutral-700 bg-black/30 overflow-hidden">
               <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 p-3 flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-lime-500" />
-                <span className="font-bold text-sm text-white">Pattern Analytics</span>
-                <span className="text-xs text-neutral-500">from 12 reviews</span>
+                <span className="font-bold text-sm text-white">Aggregated Results</span>
+                <span className="text-xs text-neutral-500">from 12 listeners</span>
               </div>
 
               <div className="p-4 space-y-4">
