@@ -1145,11 +1145,6 @@ export default function GetFeedbackPage() {
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">First review</p>
                 </div>
               </div>
-
-              {/* No card required note */}
-              <p className="text-sm text-neutral-500 font-medium pt-1">
-                No credit card required
-              </p>
             </div>
 
             {trackStartStage !== "track" && !isLoggedIn && (
@@ -1283,19 +1278,6 @@ export default function GetFeedbackPage() {
                   {finishLaterMessage && (
                     <p className="text-xs text-neutral-400 text-center">{finishLaterMessage}</p>
                   )}
-
-                  <p className="text-center text-xs text-neutral-500">
-                    No spam. Unsubscribe anytime.
-                  </p>
-
-                  <div className="flex items-center justify-center gap-2 text-xs text-neutral-400">
-                    <div className="flex items-center gap-0.5">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star key={i} className="h-3.5 w-3.5 text-lime-500" />
-                      ))}
-                    </div>
-                    <span className="font-bold">Verified reviews</span>
-                  </div>
                 </div>
               </div>
               </div>
@@ -2009,7 +1991,7 @@ export default function GetFeedbackPage() {
             </Button>
 
             <p className="text-center text-xs text-neutral-500">
-              No credit card required • Results in under 12 hours
+              Results in under 12 hours
             </p>
 
             {/* Terms */}
