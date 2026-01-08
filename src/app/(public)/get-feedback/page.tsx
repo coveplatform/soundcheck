@@ -884,6 +884,14 @@ export default function GetFeedbackPage() {
 
   const progress = step === "track" ? 33 : step === "matching" ? 50 : step === "details" ? 66 : 100;
 
+  const isAutoSubmittingFreeReview =
+    step === "package" &&
+    shouldAutoSubmit &&
+    isLoggedIn &&
+    hasFreeReviewCredit === true;
+
+  const isBlockingPackageUi = isSubmitting || isAutoSubmittingFreeReview;
+
   const getFeedbackProofSection = (
     <div
       id="get-feedback-proof"
@@ -1965,11 +1973,27 @@ export default function GetFeedbackPage() {
           <div className="space-y-8">
             <button
               onClick={goBack}
-              className="text-sm text-neutral-500 hover:text-white flex items-center gap-1 transition-colors"
+              disabled={isBlockingPackageUi}
+              className="text-sm text-neutral-500 hover:text-white flex items-center gap-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
+
+            {isBlockingPackageUi ? (
+              <div className="border-2 border-neutral-700 bg-neutral-900 p-6">
+                <div className="flex items-start gap-4">
+                  <div className="h-12 w-12 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center flex-shrink-0">
+                    <Loader2 className="h-6 w-6 animate-spin text-lime-500" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-black text-white text-lg">Submitting your track…</p>
+                    <p className="text-sm text-neutral-500 mt-1">Finalizing your review request and sending you to your results page.</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
 
             {/* Loading state while checking free credit */}
             {hasFreeReviewCredit === null && isLoggedIn && (
@@ -2149,16 +2173,16 @@ export default function GetFeedbackPage() {
 
             {/* Terms */}
             {!isLoggedIn && (
-              <p className="text-center text-xs text-neutral-600">
+              <p className="text-[10px] text-neutral-600 text-center">
                 By continuing, you agree to our{" "}
-                <Link href="/terms" className="underline hover:text-white">Terms</Link>
-                {" "}and{" "}
-                <Link href="/privacy" className="underline hover:text-white">Privacy Policy</Link>
+                <Link href="/terms" className="text-neutral-400 hover:text-white">Terms</Link> and{" "}
+                <Link href="/privacy" className="text-neutral-400 hover:text-white">Privacy Policy</Link>.
               </p>
             )}
-          </div>
-        )}
-      </main>
+
+              </>
+            )}
+          </main>
 
     </div>
   );
