@@ -90,6 +90,12 @@ export const redditEvents = {
     });
   },
 
+  viewTrialLandingPage: () => {
+    trackRedditEvent("ViewContent", {
+      customEventName: "ViewTrialLandingPage",
+    });
+  },
+
   // User starts the submission process (has a track ready)
   startSubmission: () => {
     trackRedditEvent("Lead", {

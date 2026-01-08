@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
+import { redditEvents } from "@/components/providers";
 import {
   ArrowRight,
   Ear,
@@ -20,6 +22,10 @@ import {
 } from "lucide-react";
 
 export default function TrialLandingPage() {
+  useEffect(() => {
+    redditEvents.viewTrialLandingPage();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-neutral-950 to-black text-white">
       <header className="border-b border-neutral-800">
