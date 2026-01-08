@@ -9,6 +9,7 @@ import {
   Ear,
   Flame,
   ListMusic,
+  Lock,
   MessageCircle,
   Sparkles,
   Target,
@@ -37,7 +38,9 @@ export default function TrialLandingPage() {
             Get <span className="text-lime-500">real listener feedback</span> on your tracks.
           </h1>
           <p className="mt-5 text-neutral-300 text-base sm:text-lg max-w-2xl mx-auto">
-            5–20 genre-matched listeners leave structured reviews with timestamps. We highlight the patterns so you know what to change.
+            MixReflect is a private feedback marketplace.
+            <br />
+            5–20 genre-matched artists + listeners leave structured reviews with timestamps.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -398,23 +401,41 @@ export default function TrialLandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-neutral-800 py-8">
+      <footer className="py-8 bg-white text-black">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
             <div className="flex items-center gap-2">
               <Logo />
             </div>
             <p className="text-neutral-500">&copy; {new Date().getFullYear()} MixReflect</p>
-            <div className="flex items-center gap-4 text-neutral-400">
-              <Link href="/terms" className="hover:text-white font-medium">
+            <div className="flex items-center gap-4 text-neutral-600">
+              <Link href="/terms" className="hover:text-black font-medium">
                 Terms
               </Link>
-              <Link href="/privacy" className="hover:text-white font-medium">
+              <Link href="/privacy" className="hover:text-black font-medium">
                 Privacy
               </Link>
-              <Link href="/support" className="hover:text-white font-medium">
+              <Link href="/support" className="hover:text-black font-medium">
                 Support
               </Link>
+            </div>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-neutral-500">
+            <div className="flex items-center gap-2">
+              <Lock className="h-3.5 w-3.5" />
+              <span>Secure payments powered by</span>
+              <svg className="h-5 w-auto text-neutral-600" viewBox="0 0 60 25" fill="currentColor">
+                <path d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.2 2.55 1.64 0 2.96-.37 4.05-.95l.3 2.92c-1.25.63-2.84 1.03-4.72 1.03-4.12 0-6.6-2.55-6.6-6.64 0-3.98 2.44-6.86 6.08-6.86 3.76 0 5.86 2.88 5.86 6.64 0 .42-.04.88-.11 1.31zm-5.73-5.2c-1.26 0-2.26.94-2.49 2.67h4.87c-.08-1.53-.86-2.67-2.38-2.67zM36.95 19.52V8.13l-2.2.49V5.94l5.88-1.32v14.9h-3.68zm-7.14 0V8.13l-2.2.49V5.94l5.88-1.32v14.9h-3.68zM15.97 6.33c3.9 0 6.05 2.88 6.05 6.64s-2.15 6.86-6.05 6.86-6.08-2.88-6.08-6.86 2.18-6.64 6.08-6.64zm0 10.46c1.49 0 2.37-1.34 2.37-3.82s-.88-3.6-2.37-3.6-2.4 1.12-2.4 3.6.91 3.82 2.4 3.82zM5.97 19.52c-2.15 0-3.87-1.12-3.87-3.98V9.38H0V6.55h2.1V3.11L5.82 2v4.55h2.79v2.83H5.82v5.72c0 1.08.45 1.46 1.19 1.46.56 0 1.08-.15 1.6-.45l.41 2.76c-.75.37-1.71.65-3.05.65z"/>
+              </svg>
+            </div>
+            <span className="hidden sm:inline text-neutral-300">•</span>
+            <div className="flex items-center gap-1.5">
+              <svg className="h-4 w-4 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M9 12l2 2 4-4"/>
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+              <span>SSL encrypted</span>
             </div>
           </div>
         </div>
