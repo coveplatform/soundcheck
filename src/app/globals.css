@@ -36,14 +36,14 @@ details summary {
   list-style: none;
 }
 
-details summary::before {
+details:not(.details-no-marker) summary::before {
   content: '+';
   font-weight: bold;
   margin-right: 0.75rem;
   font-family: var(--font-mono), monospace;
 }
 
-details[open] summary::before {
+details:not(.details-no-marker)[open] summary::before {
   content: '−';
 }
 

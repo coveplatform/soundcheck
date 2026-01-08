@@ -882,7 +882,7 @@ export default function GetFeedbackPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        <details className="group border-2 border-neutral-700 bg-neutral-900">
+        <details className="details-no-marker group border-2 border-neutral-700 bg-neutral-900">
           <summary className="cursor-pointer select-none p-4 flex items-center justify-between text-left">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center">
@@ -959,7 +959,7 @@ export default function GetFeedbackPage() {
           </div>
         </details>
 
-        <details className="group border-2 border-neutral-700 bg-neutral-900">
+        <details className="details-no-marker group border-2 border-neutral-700 bg-neutral-900">
           <summary className="cursor-pointer select-none p-4 flex items-center justify-between text-left">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center">
