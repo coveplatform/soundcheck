@@ -365,51 +365,45 @@ export default function TrialLandingPage() {
               How it works
             </h2>
 
-            <div className="mt-8 grid md:grid-cols-4 gap-4">
-              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-black">1</div>
-                  <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
-                    <Target className="h-5 w-5" />
-                  </div>
+            <div className="mt-8 grid md:grid-cols-4 gap-6">
+              <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
+                <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
+                  <Target className="h-6 w-6" />
                 </div>
-                <div className="mt-3 font-black">Submit your track</div>
-                <div className="mt-2 text-sm text-neutral-200">Upload or paste a link from your dashboard.</div>
-              </div>
-              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-black">2</div>
-                  <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
-                    <Users className="h-5 w-5" />
-                  </div>
-                </div>
-                <div className="mt-3 font-black">We match listeners</div>
-                <div className="mt-2 text-sm text-neutral-200">
-                  Your reviewers come from the MixReflect community marketplace (artists + listeners).
-                  They pick the genres they actually listen to, then we match your track to them.
+                <div className="mt-4 text-xl sm:text-2xl font-black">1. Submit your track</div>
+                <div className="mt-2 text-base font-medium">
+                  Paste a link or upload. Takes ~30 seconds.
                 </div>
               </div>
-              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-black">3</div>
-                  <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
-                    <MessageCircle className="h-5 w-5" />
-                  </div>
+
+              <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
+                <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
+                  <Users className="h-6 w-6" />
                 </div>
-                <div className="mt-3 font-black">They review (with timestamps)</div>
-                <div className="mt-2 text-sm text-neutral-200">
-                  Clear sections: what worked / what to fix — and you rate the review so quality stays high.
+                <div className="mt-4 text-xl sm:text-2xl font-black">2. We match reviewers</div>
+                <div className="mt-2 text-base font-medium">
+                  Reviewers come from the MixReflect marketplace (artists + listeners) who picked your genres.
                 </div>
               </div>
-              <div className="border-2 border-black bg-black/80 backdrop-blur text-white p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-black">4</div>
-                  <div className="h-10 w-10 border-2 border-black bg-lime-500 flex items-center justify-center">
-                    <Flame className="h-5 w-5" />
-                  </div>
+
+              <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
+                <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
+                  <MessageCircle className="h-6 w-6" />
                 </div>
-                <div className="mt-3 font-black">You get clarity</div>
-                <div className="mt-2 text-sm text-neutral-200">Charts + patterns to guide your next session.</div>
+                <div className="mt-4 text-xl sm:text-2xl font-black">3. They review</div>
+                <div className="mt-2 text-base font-medium">
+                  Structured notes + timestamps. Artists rate every review to keep quality high.
+                </div>
+              </div>
+
+              <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
+                <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
+                  <Flame className="h-6 w-6" />
+                </div>
+                <div className="mt-4 text-xl sm:text-2xl font-black">4. You get clarity</div>
+                <div className="mt-2 text-base font-medium">
+                  Patterns show what to change next.
+                </div>
               </div>
             </div>
           </div>
