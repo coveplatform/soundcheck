@@ -739,7 +739,31 @@ export default function GetFeedbackPage() {
         }
 
         // Successfully logged in
-        setShouldAutoSubmit(true);
+        try {
+          const profileRes = await fetch("/api/artist/profile");
+          if (profileRes.ok) {
+            const profileData = await profileRes.json().catch(() => ({}));
+            const hasCredit = Boolean((profileData?.freeReviewCredits ?? 0) > 0);
+            setHasFreeReviewCredit(hasCredit);
+            if (hasCredit) {
+              const submitted = await handleSubmit();
+              if (!submitted) setIsContinuingToPackage(false);
+              return;
+            }
+          } else if (profileRes.status === 404) {
+            setHasFreeReviewCredit(true);
+            const submitted = await handleSubmit();
+            if (!submitted) setIsContinuingToPackage(false);
+            return;
+          }
+        } catch {
+          setHasFreeReviewCredit(true);
+          const submitted = await handleSubmit();
+          if (!submitted) setIsContinuingToPackage(false);
+          return;
+        }
+
+        // No free credit - go to package selection
         setStep("package");
         void router.refresh();
         setIsContinuingToPackage(false);
@@ -787,10 +811,8 @@ export default function GetFeedbackPage() {
 
         // New account = has free review credit
         setHasFreeReviewCredit(true);
-        setShouldAutoSubmit(true);
-        setStep("package");
-        void router.refresh();
-        setIsContinuingToPackage(false);
+        const submitted = await handleSubmit();
+        if (!submitted) setIsContinuingToPackage(false);
         return;
       }
     }
@@ -809,7 +831,7 @@ export default function GetFeedbackPage() {
   };
 
   // Handle final submission
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<boolean> => {
     setError("");
     setIsSubmitting(true);
 
@@ -844,7 +866,7 @@ export default function GetFeedbackPage() {
 
       if (!response.ok) {
         setError(data.error || "Something went wrong");
-        return;
+        return false;
       }
 
       // Clear saved progress
@@ -876,8 +898,10 @@ export default function GetFeedbackPage() {
 
       // Redirect to success page (for free review) or checkout (for paid)
       router.push(data.successUrl || data.checkoutUrl);
+      return true;
     } catch {
       setError("Something went wrong. Please try again.");
+      return false;
     } finally {
       setIsSubmitting(false);
     }
