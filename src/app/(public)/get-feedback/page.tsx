@@ -116,6 +116,9 @@ export default function GetFeedbackPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [artistName, setArtistName] = useState("");
+  const [emailExists, setEmailExists] = useState<boolean | null>(null);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const emailCheckRequestIdRef = useRef(0);
 
   // Track details state
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -165,6 +168,42 @@ export default function GetFeedbackPage() {
     }
     fetchGenres();
   }, []);
+
+  useEffect(() => {
+    if (isLoggedIn) return;
+
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      setEmailExists(null);
+      setIsCheckingEmail(false);
+      return;
+    }
+
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
+    if (!isValidEmail) {
+      setEmailExists(null);
+      setIsCheckingEmail(false);
+      return;
+    }
+
+    const requestId = ++emailCheckRequestIdRef.current;
+    setIsCheckingEmail(true);
+    const timer = setTimeout(() => {
+      void (async () => {
+        try {
+          const exists = await checkEmailExists(normalizedEmail);
+          if (emailCheckRequestIdRef.current !== requestId) return;
+          setEmailExists(exists);
+        } finally {
+          if (emailCheckRequestIdRef.current === requestId) {
+            setIsCheckingEmail(false);
+          }
+        }
+      })();
+    }, 450);
+
+    return () => clearTimeout(timer);
+  }, [email, isLoggedIn]);
 
   useEffect(() => {
     if (hasTrackedViewContentRef.current) return;
@@ -1774,7 +1813,7 @@ export default function GetFeedbackPage() {
                     <span className="w-full border-t border-neutral-700" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-black px-2 text-neutral-500">or create account</span>
+                    <span className="bg-black px-2 text-neutral-500">or {emailExists ? "sign in" : "create account"}</span>
                   </div>
                 </div>
 
@@ -1795,13 +1834,34 @@ export default function GetFeedbackPage() {
                       )}
                     />
                     {fieldErrors.email && <p className="text-xs text-red-500 mt-1">{fieldErrors.email}</p>}
+                    {!fieldErrors.email && isCheckingEmail && (
+                      <p className="text-xs text-neutral-500 mt-1">Checking account…</p>
+                    )}
+                    {!fieldErrors.email && emailExists === true && (
+                      <div className="mt-2 border border-neutral-700 bg-neutral-950/40 p-3">
+                        <p className="text-xs font-bold text-neutral-200">Account found</p>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          Enter your password to continue, or use Google.
+                        </p>
+                        <p className="text-xs text-neutral-500 mt-2">
+                          Prefer the full sign-in page?{" "}
+                          <Link
+                            href={`/login?callbackUrl=${encodeURIComponent("/get-feedback")}`}
+                            className="text-lime-500 hover:text-lime-400 font-bold"
+                          >
+                            Sign in here
+                          </Link>
+                          .
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="text-sm font-bold text-neutral-400 mb-2 block">Password</label>
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Create password"
+                        placeholder={emailExists ? "Enter password" : "Create password"}
                         value={password}
                         onChange={(e) => {
                           setPassword(e.target.value);
@@ -1821,7 +1881,7 @@ export default function GetFeedbackPage() {
                       </button>
                     </div>
                     {fieldErrors.password && <p className="text-xs text-red-500 mt-1">{fieldErrors.password}</p>}
-                    {password && (
+                    {password && !emailExists && (
                       <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
                         {passwordChecklist.map((item) => (
                           <div key={item.label} className="flex items-center gap-2 text-xs">
