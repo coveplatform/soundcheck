@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Target, Clock, ListMusic, Share2, UserPlus, Quote, CheckCircle2, Lock, Users, MessageCircle, Flame } from "lucide-react";
+import { Music, Headphones, Star, DollarSign, Shield, ArrowRight, Target, Clock, ListMusic, Share2, Quote, CheckCircle2, Lock, Users, MessageCircle, Flame } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
@@ -364,50 +364,6 @@ export default function Home() {
               </div>
               <div className="mt-3 font-black">You get clarity</div>
               <div className="mt-2 text-sm text-neutral-200">Patterns show what to change next.</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Real Product Screenshots - Pattern Analytics */}
-      <section className="border-b border-neutral-800 py-16 bg-lime-500 text-black">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-black text-center mb-2 text-black">The accountability loop</h2>
-          <p className="text-black/80 text-center mb-10 max-w-lg mx-auto text-sm sm:text-base">
-            Reviewers earn based on artists&apos; ratings—so they give real feedback, not empty praise.
-          </p>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-            <div className="flex flex-col items-center p-4 bg-black/80 backdrop-blur text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-3">
-                <DollarSign className="h-6 w-6" />
-              </div>
-              <span className="font-black text-lg">Artist pays</span>
-              <span className="text-xs text-neutral-200">One-time fee</span>
-            </div>
-
-            <div className="flex flex-col items-center p-4 bg-black/80 backdrop-blur text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center mb-3">
-                <Headphones className="h-6 w-6" />
-              </div>
-              <span className="font-black text-lg">They review</span>
-              <span className="text-xs text-neutral-200">Structured feedback</span>
-            </div>
-
-            <div className="flex flex-col items-center p-4 bg-black/80 backdrop-blur text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-              <div className="h-12 w-12 bg-sky-400 border-2 border-black flex items-center justify-center mb-3">
-                <Star className="h-6 w-6" />
-              </div>
-              <span className="font-black text-lg">Artist rates</span>
-              <span className="text-xs text-neutral-200">1-5 stars</span>
-            </div>
-
-            <div className="flex flex-col items-center p-4 bg-black border-2 border-black shadow-[3px_3px_0px_0px_rgba(132,204,22,1)]">
-              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center mb-3">
-                <Shield className="h-6 w-6" />
-              </div>
-              <span className="font-black text-lg text-white">Quality</span>
-              <span className="text-xs text-lime-400">Enforced</span>
             </div>
           </div>
         </div>
