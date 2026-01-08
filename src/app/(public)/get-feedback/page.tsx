@@ -900,7 +900,7 @@ export default function GetFeedbackPage() {
               <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 p-3 flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-lime-500" />
                 <span className="font-bold text-sm text-white">Aggregated Results</span>
-                <span className="text-xs text-neutral-500">from 12 listeners</span>
+                <span className="text-xs text-neutral-500">from 5–20 listeners (depends on package)</span>
               </div>
 
               <div className="p-4 space-y-4">
