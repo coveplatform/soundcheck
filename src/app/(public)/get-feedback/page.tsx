@@ -124,6 +124,7 @@ export default function GetFeedbackPage() {
 
   // Package state
   const [selectedPackage, setSelectedPackage] = useState<PackageType>("STANDARD");
+  const [shouldAutoSubmit, setShouldAutoSubmit] = useState(false);
 
   const estimatedListenerPool = 25;
 
@@ -571,6 +572,7 @@ export default function GetFeedbackPage() {
     if (step === "matching") setStep("track");
     if (step === "details") setStep("track");
     if (step === "package") setStep("details");
+    setShouldAutoSubmit(false);
     setFieldErrors({});
   };
 
@@ -678,6 +680,7 @@ export default function GetFeedbackPage() {
         }
 
         // Successfully logged in
+        setShouldAutoSubmit(true);
         setStep("package");
         void router.refresh();
         setIsContinuingToPackage(false);
@@ -720,6 +723,7 @@ export default function GetFeedbackPage() {
           content_name: "artist",
         });
 
+        setShouldAutoSubmit(true);
         setStep("package");
         void router.refresh();
         setIsContinuingToPackage(false);
@@ -735,6 +739,7 @@ export default function GetFeedbackPage() {
       currency: "AUD",
     });
 
+    setShouldAutoSubmit(true);
     setStep("package");
     setIsContinuingToPackage(false);
   };
@@ -807,6 +812,16 @@ export default function GetFeedbackPage() {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (!shouldAutoSubmit) return;
+    if (step !== "package") return;
+    if (!isLoggedIn) return;
+    if (isSubmitting) return;
+
+    setShouldAutoSubmit(false);
+    void handleSubmit();
+  }, [handleSubmit, isLoggedIn, isSubmitting, shouldAutoSubmit, step]);
 
   // Check if we can proceed from track step
   // For URL mode: require verified link (no warning) and title
@@ -1943,7 +1958,7 @@ export default function GetFeedbackPage() {
               className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
               <Gift className="h-5 w-5 mr-2" />
-              Get My Free Review
+              {isSubmitting ? "Submitting…" : "Get My Free Review"}
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
 
