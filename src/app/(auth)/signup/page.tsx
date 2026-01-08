@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -25,10 +25,18 @@ type Role = "artist" | "reviewer" | "both";
 
 export default function SignupPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"role" | "details">("role");
-  const [role, setRole] = useState<Role | null>(null);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const searchParams = useSearchParams();
+
+  const roleParam = searchParams.get("role");
+  const initialRole: Role | null =
+    roleParam === "artist" || roleParam === "reviewer" || roleParam === "both" ? roleParam : null;
+
+  const callbackUrl = searchParams.get("callbackUrl") || "";
+
+  const [step, setStep] = useState<"role" | "details">(initialRole ? "details" : "role");
+  const [role, setRole] = useState<Role | null>(initialRole);
+  const [name, setName] = useState(searchParams.get("name") || "");
+  const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [referralSource, setReferralSource] = useState("");
@@ -128,7 +136,10 @@ export default function SignupPage() {
         content_name: role,
       });
 
-      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+      const verifyUrl = callbackUrl
+        ? `/verify-email?email=${encodeURIComponent(email)}&callbackUrl=${encodeURIComponent(callbackUrl)}`
+        : `/verify-email?email=${encodeURIComponent(email)}`;
+      router.push(verifyUrl);
       router.refresh();
     } catch {
       setError("Something went wrong");

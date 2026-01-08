@@ -21,6 +21,7 @@ export default function VerifyEmailPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const initialEmail = searchParams.get("email") || "";
+  const callbackUrl = searchParams.get("callbackUrl") || "";
 
   const [email, setEmail] = useState(initialEmail);
   const [status, setStatus] = useState<
@@ -105,6 +106,7 @@ export default function VerifyEmailPage() {
   }
 
   if (status === "verified") {
+    const loginHref = callbackUrl ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/login";
     return (
       <Card>
         <CardHeader className="text-center">
@@ -112,7 +114,7 @@ export default function VerifyEmailPage() {
           <CardDescription>You can now sign in and start using MixReflect.</CardDescription>
         </CardHeader>
         <CardFooter>
-          <Link href="/login" className="w-full">
+          <Link href={loginHref} className="w-full">
             <Button variant="primary" className="w-full">Continue to login</Button>
           </Link>
         </CardFooter>
@@ -176,7 +178,10 @@ export default function VerifyEmailPage() {
         <Button onClick={resend} className="w-full" isLoading={isResending}>
           Resend verification email
         </Button>
-        <Link href="/login" className="text-sm text-neutral-600 hover:text-black font-medium">
+        <Link
+          href={callbackUrl ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/login"}
+          className="text-sm text-neutral-600 hover:text-black font-medium"
+        >
           &larr; Back to login
         </Link>
       </CardFooter>

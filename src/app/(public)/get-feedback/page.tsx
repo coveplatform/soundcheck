@@ -1245,13 +1245,13 @@ export default function GetFeedbackPage() {
               </div>
 
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
-                Submit a track.<span className="text-lime-500"> Get genre-matched reviews fast.</span>
+                Feedback that&apos;s actually usable.<span className="text-lime-500"> From real listeners.</span>
               </h1>
               <p className="text-neutral-400 text-base sm:text-lg max-w-lg mx-auto">
-                Upload or paste a link. We match your track to listeners in your genre and send back aggregated feedback + analytics.
+                Get structured feedback from genre-matched listeners, plus aggregated insights so you can spot patterns quickly.
               </p>
               <p className="text-neutral-500 text-sm max-w-lg mx-auto">
-                What happens next: enter your email → add your track → choose a package.
+                What happens next: enter your email → create your account → open your dashboard.
               </p>
 
               {/* What you get - visual summary */}
@@ -1276,12 +1276,12 @@ export default function GetFeedbackPage() {
                 <div id="get-feedback-start" className="border-2 border-neutral-700 bg-neutral-900 p-4">
                   <div className="space-y-3">
                     <div className="text-center">
-                      <p className="text-xs font-black uppercase tracking-wide text-neutral-400">Step 1 of 3</p>
+                      <p className="text-xs font-black uppercase tracking-wide text-neutral-400">Get started</p>
                       <h2 className="text-xl font-black text-white">
                         Create your project
                       </h2>
                       <p className="text-sm text-neutral-400 mt-1">
-                        Next you&apos;ll add your track (upload or link). We&apos;ll use this to send your feedback and save your progress.
+                        Next you&apos;ll create your account and we&apos;ll take you to your dashboard.
                       </p>
                     </div>
 
@@ -1344,19 +1344,30 @@ export default function GetFeedbackPage() {
                       setEmail(nextEmail);
                       await captureLead();
 
-                      // TikTok
-                      trackTikTokEvent("SubmitForm", {
-                        content_type: "lead",
-                        content_id: "get_feedback_lead",
-                      });
-                      // Reddit
-                      redditEvents.startSubmission();
+                      const callbackUrl = "/artist/dashboard";
+                      let exists = false;
+                      try {
+                        exists = await checkEmailExists(nextEmail);
+                      } catch {
+                        exists = false;
+                      }
 
-                      setTrackStartStage("track");
+                      if (exists) {
+                        router.push(
+                          `/login?email=${encodeURIComponent(nextEmail)}&callbackUrl=${encodeURIComponent(callbackUrl)}`
+                        );
+                        return;
+                      }
+
+                      router.push(
+                        `/signup?role=artist&name=${encodeURIComponent(nextArtistName)}&email=${encodeURIComponent(
+                          nextEmail
+                        )}&callbackUrl=${encodeURIComponent(callbackUrl)}`
+                      );
                     }}
                     className="w-full h-11 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
                   >
-                    Next: add your track
+                    Continue to dashboard
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
 
@@ -1420,10 +1431,9 @@ export default function GetFeedbackPage() {
               <div className="order-[20] space-y-10">
                 <div className="w-full sm:max-w-lg sm:mx-auto space-y-8">
                   <div className="text-center space-y-1">
-                    <p className="text-xs font-black uppercase tracking-wide text-neutral-400">Step 2 of 3</p>
                     <h2 className="text-xl font-black text-white">Add your track</h2>
                     <p className="text-sm text-neutral-400">
-                      Upload an MP3 or paste a link. Next you&apos;ll confirm details and choose a package.
+                      Upload an MP3 or paste a link.
                     </p>
                   </div>
 
