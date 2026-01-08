@@ -1054,247 +1054,249 @@ export default function GetFeedbackPage() {
             )}
 
             {trackStartStage === "track" && (
-              <div className="order-[20] space-y-8">
-                {/* Input mode toggle */}
-                <div className="flex gap-2 bg-neutral-900 p-1 rounded-none border-2 border-neutral-700">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInputMode("upload");
-                      setTrackUrl("");
-                      setUrlError("");
-                    }}
-                    className={cn(
-                      "flex-1 px-4 py-3 text-sm font-black transition-all flex items-center justify-center gap-2",
-                      inputMode === "upload"
-                        ? "bg-lime-500 text-black"
-                        : "text-neutral-400 hover:text-white"
-                    )}
-                  >
-                    <Upload className="h-4 w-4" />
-                    Upload File
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInputMode("url");
-                      setUploadedUrl("");
-                      setUploadedFileName("");
-                    }}
-                    className={cn(
-                      "flex-1 px-4 py-3 text-sm font-black transition-all flex items-center justify-center gap-2",
-                      inputMode === "url"
-                        ? "bg-lime-500 text-black"
-                        : "text-neutral-400 hover:text-white"
-                    )}
-                  >
-                    <Link2 className="h-4 w-4" />
-                    Paste Link
-                  </button>
-                </div>
+              <div className="order-[20] space-y-10">
+                <div className="w-full sm:max-w-lg sm:mx-auto space-y-8">
+                  {/* Input mode toggle */}
+                  <div className="flex gap-2 bg-neutral-900 p-1 rounded-none border-2 border-neutral-700">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setInputMode("upload");
+                        setTrackUrl("");
+                        setUrlError("");
+                      }}
+                      className={cn(
+                        "flex-1 px-4 py-3 text-sm font-black transition-all flex items-center justify-center gap-2",
+                        inputMode === "upload"
+                          ? "bg-lime-500 text-black"
+                          : "text-neutral-400 hover:text-white"
+                      )}
+                    >
+                      <Upload className="h-4 w-4" />
+                      Upload File
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setInputMode("url");
+                        setUploadedUrl("");
+                        setUploadedFileName("");
+                      }}
+                      className={cn(
+                        "flex-1 px-4 py-3 text-sm font-black transition-all flex items-center justify-center gap-2",
+                        inputMode === "url"
+                          ? "bg-lime-500 text-black"
+                          : "text-neutral-400 hover:text-white"
+                      )}
+                    >
+                      <Link2 className="h-4 w-4" />
+                      Paste Link
+                    </button>
+                  </div>
 
-                {/* Upload area */}
-                <div>
-                  {inputMode === "upload" ? (
-                    <div>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="audio/mpeg,audio/mp3,.mp3"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) void handleUpload(file);
-                        }}
-                        className="hidden"
-                      />
-                      <div
-                        onClick={() => fileInputRef.current?.click()}
-                        onDragOver={(e) => {
-                          e.preventDefault();
-                          setIsDragging(true);
-                        }}
-                        onDragLeave={() => setIsDragging(false)}
-                        onDrop={(e) => {
-                          e.preventDefault();
-                          setIsDragging(false);
-                          const file = e.dataTransfer.files?.[0];
-                          if (file && (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))) {
-                            void handleUpload(file);
-                          } else {
-                            setError("Please upload an MP3 file");
-                          }
-                        }}
-                        className={cn(
-                          "border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-all",
-                          isDragging && "border-lime-500 bg-lime-500/10",
-                          !isDragging && !uploadedFileName && "border-neutral-700 hover:border-lime-500 hover:bg-neutral-900",
-                          uploadedFileName && !isUploading && "border-lime-500 bg-lime-500/10"
-                        )}
-                      >
-                        {isUploading ? (
-                          <div className="flex flex-col items-center gap-3">
-                            <Loader2 className="h-10 w-10 animate-spin text-lime-500" />
-                            <p className="font-bold">Uploading...</p>
-                          </div>
-                        ) : uploadedFileName ? (
-                          <div className="flex flex-col items-center gap-3">
-                            <div className="h-10 w-10 bg-lime-500 flex items-center justify-center">
-                              <Check className="h-5 w-5 text-black" />
+                  {/* Upload area */}
+                  <div>
+                    {inputMode === "upload" ? (
+                      <div>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="audio/mpeg,audio/mp3,.mp3"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) void handleUpload(file);
+                          }}
+                          className="hidden"
+                        />
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setIsDragging(true);
+                          }}
+                          onDragLeave={() => setIsDragging(false)}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setIsDragging(false);
+                            const file = e.dataTransfer.files?.[0];
+                            if (file && (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))) {
+                              void handleUpload(file);
+                            } else {
+                              setError("Please upload an MP3 file");
+                            }
+                          }}
+                          className={cn(
+                            "border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-all",
+                            isDragging && "border-lime-500 bg-lime-500/10",
+                            !isDragging && !uploadedFileName && "border-neutral-700 hover:border-lime-500 hover:bg-neutral-900",
+                            uploadedFileName && !isUploading && "border-lime-500 bg-lime-500/10"
+                          )}
+                        >
+                          {isUploading ? (
+                            <div className="flex flex-col items-center gap-3">
+                              <Loader2 className="h-10 w-10 animate-spin text-lime-500" />
+                              <p className="font-bold">Uploading...</p>
                             </div>
-                            <div>
-                              <p className="font-black text-lg text-lime-500">{uploadedFileName}</p>
-                              <p className="text-xs text-neutral-500 mt-1">Click to change</p>
+                          ) : uploadedFileName ? (
+                            <div className="flex flex-col items-center gap-3">
+                              <div className="h-10 w-10 bg-lime-500 flex items-center justify-center">
+                                <Check className="h-5 w-5 text-black" />
+                              </div>
+                              <div>
+                                <p className="font-black text-lg text-lime-500">{uploadedFileName}</p>
+                                <p className="text-xs text-neutral-500 mt-1">Click to change</p>
+                              </div>
                             </div>
-                          </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-3">
+                              <div className="h-10 w-10 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center">
+                                <Upload className="h-5 w-5 text-neutral-400" />
+                              </div>
+                              <div>
+                                <p className="font-black text-lg">Drop your MP3 here</p>
+                                <p className="text-xs text-neutral-500 mt-1">or click to browse</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {!isUrlTrackReady ? (
+                          <>
+                            <Input
+                              placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
+                              value={trackUrl}
+                              onChange={(e) => handleUrlChange(e.target.value)}
+                              className={cn(
+                                "text-lg h-14 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                                urlError && "border-red-500"
+                              )}
+                              autoFocus
+                            />
+                            {isLoadingMetadata && (
+                              <div className="flex items-center gap-2 text-sm text-neutral-500">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Getting track info...
+                              </div>
+                            )}
+                            {urlError && (
+                              <p className="text-sm text-red-500 font-medium">{urlError}</p>
+                            )}
+                            {!urlError && urlWarning && (
+                              <div className="flex items-start gap-2 text-sm text-amber-400 bg-amber-400/10 border border-amber-400/30 p-3 rounded">
+                                <svg className="h-4 w-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <span>{urlWarning}</span>
+                              </div>
+                            )}
+                          </>
                         ) : (
-                          <div className="flex flex-col items-center gap-3">
-                            <div className="h-10 w-10 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center">
-                              <Upload className="h-5 w-5 text-neutral-400" />
+                          <div
+                            ref={trackPreviewRef}
+                            className="border-2 border-neutral-700 bg-neutral-900 p-4 space-y-3"
+                          >
+                            <div className="flex items-center gap-4">
+                              {artworkUrl ? (
+                                <img
+                                  src={artworkUrl}
+                                  alt="Track artwork"
+                                  className="w-16 h-16 object-cover border-2 border-neutral-600 flex-shrink-0"
+                                />
+                              ) : (
+                                <div className="w-16 h-16 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center flex-shrink-0">
+                                  <Music className="h-7 w-7 text-neutral-500" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <Input
+                                  value={title}
+                                  onChange={(e) => setTitle(e.target.value)}
+                                  placeholder="Track title"
+                                  className="text-lg font-bold bg-transparent border-0 border-b-2 border-neutral-700 rounded-none px-0 focus:border-lime-500 text-white"
+                                />
+                                <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wide">
+                                  {sourceType ? sourceType.replace("_", " ") : "Ready"}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-black text-lg">Drop your MP3 here</p>
-                              <p className="text-xs text-neutral-500 mt-1">or click to browse</p>
+
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                              <p className="text-xs text-neutral-500 break-all">
+                                {trackUrl}
+                              </p>
+                              <button
+                                type="button"
+                                className="text-sm font-bold text-lime-500 hover:text-lime-400"
+                                onClick={() => {
+                                  setTrackUrl("");
+                                  setTitle("");
+                                  setArtworkUrl(null);
+                                  setSourceType("");
+                                }}
+                              >
+                                Change link
+                              </button>
                             </div>
                           </div>
                         )}
                       </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {!isUrlTrackReady ? (
-                        <>
-                          <Input
-                            placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
-                            value={trackUrl}
-                            onChange={(e) => handleUrlChange(e.target.value)}
-                            className={cn(
-                              "text-lg h-14 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
-                              urlError && "border-red-500"
-                            )}
-                            autoFocus
-                          />
-                          {isLoadingMetadata && (
-                            <div className="flex items-center gap-2 text-sm text-neutral-500">
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                              Getting track info...
-                            </div>
-                          )}
-                          {urlError && (
-                            <p className="text-sm text-red-500 font-medium">{urlError}</p>
-                          )}
-                          {!urlError && urlWarning && (
-                            <div className="flex items-start gap-2 text-sm text-amber-400 bg-amber-400/10 border border-amber-400/30 p-3 rounded">
-                              <svg className="h-4 w-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                              </svg>
-                              <span>{urlWarning}</span>
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <div
-                          ref={trackPreviewRef}
-                          className="border-2 border-neutral-700 bg-neutral-900 p-4 space-y-3"
-                        >
-                          <div className="flex items-center gap-4">
-                            {artworkUrl ? (
-                              <img
-                                src={artworkUrl}
-                                alt="Track artwork"
-                                className="w-16 h-16 object-cover border-2 border-neutral-600 flex-shrink-0"
-                              />
-                            ) : (
-                              <div className="w-16 h-16 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center flex-shrink-0">
-                                <Music className="h-7 w-7 text-neutral-500" />
-                              </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <Input
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                placeholder="Track title"
-                                className="text-lg font-bold bg-transparent border-0 border-b-2 border-neutral-700 rounded-none px-0 focus:border-lime-500 text-white"
-                              />
-                              <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wide">
-                                {sourceType ? sourceType.replace("_", " ") : "Ready"}
-                              </p>
-                            </div>
-                          </div>
+                    )}
+                  </div>
 
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <p className="text-xs text-neutral-500 break-all">
-                              {trackUrl}
-                            </p>
-                            <button
-                              type="button"
-                              className="text-sm font-bold text-lime-500 hover:text-lime-400"
-                              onClick={() => {
-                                setTrackUrl("");
-                                setTitle("");
-                                setArtworkUrl(null);
-                                setSourceType("");
-                              }}
-                            >
-                              Change link
-                            </button>
-                          </div>
+                  {/* Track title edit */}
+                  {inputMode === "upload" && uploadedUrl && (
+                    <div ref={trackPreviewRef} className="border-2 border-neutral-700 bg-neutral-900 p-4 flex items-center gap-4">
+                      {artworkUrl ? (
+                        <img
+                          src={artworkUrl}
+                          alt="Track artwork"
+                          className="w-16 h-16 object-cover border-2 border-neutral-600 flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center flex-shrink-0">
+                          <Music className="h-7 w-7 text-neutral-500" />
                         </div>
                       )}
+                      <div className="flex-1 min-w-0">
+                        <Input
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                          placeholder="Track title"
+                          className="text-lg font-bold bg-transparent border-0 border-b-2 border-neutral-700 rounded-none px-0 focus:border-lime-500 text-white"
+                        />
+                        <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wide">
+                          {sourceType ? sourceType.replace("_", " ") : "Ready to submit"}
+                        </p>
+                      </div>
                     </div>
+                  )}
+
+                  {/* Continue button */}
+                  {canContinueFromTrackStep && (
+                    <Button
+                      onClick={goToDetails}
+                      className={cn(
+                        "w-full h-14 text-lg font-black border-2 transition-all",
+                        "bg-lime-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                      )}
+                    >
+                      Continue
+                      <ArrowRight className="h-5 w-5 ml-2" />
+                    </Button>
+                  )}
+
+                  {!canContinueFromTrackStep && (
+                    <p className="text-center text-sm text-neutral-500">
+                      Add your track to unlock the next step.
+                    </p>
                   )}
                 </div>
 
-                {/* Track title edit */}
-                {inputMode === "upload" && uploadedUrl && (
-                  <div ref={trackPreviewRef} className="border-2 border-neutral-700 bg-neutral-900 p-4 flex items-center gap-4">
-                    {artworkUrl ? (
-                      <img
-                        src={artworkUrl}
-                        alt="Track artwork"
-                        className="w-16 h-16 object-cover border-2 border-neutral-600 flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 bg-neutral-800 border-2 border-neutral-600 flex items-center justify-center flex-shrink-0">
-                        <Music className="h-7 w-7 text-neutral-500" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <Input
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Track title"
-                        className="text-lg font-bold bg-transparent border-0 border-b-2 border-neutral-700 rounded-none px-0 focus:border-lime-500 text-white"
-                      />
-                      <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wide">
-                        {sourceType ? sourceType.replace("_", " ") : "Ready to submit"}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Continue button */}
-                {canContinueFromTrackStep && (
-                  <Button
-                    onClick={goToDetails}
-                    className={cn(
-                      "w-full h-14 text-lg font-black border-2 transition-all",
-                      "bg-lime-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
-                    )}
-                  >
-                    Continue
-                    <ArrowRight className="h-5 w-5 ml-2" />
-                  </Button>
-                )}
-
-                {!canContinueFromTrackStep && (
-                  <p className="text-center text-sm text-neutral-500">
-                    Add your track to unlock the next step.
-                  </p>
-                )}
-
                 <div
                   id="get-feedback-proof"
-                  className="space-y-6 pt-6 mt-2 border-t border-neutral-800"
+                  className="space-y-6 pt-8 border-t border-neutral-800"
                 >
                   <div className="border-2 border-neutral-700 bg-neutral-950/30 p-5">
                     <div className="flex items-start gap-3">
@@ -1324,7 +1326,7 @@ export default function GetFeedbackPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     <details className="group border-2 border-neutral-700 bg-neutral-900">
                       <summary className="cursor-pointer select-none p-4 flex items-center justify-between">
                         <div className="flex items-center gap-3">
