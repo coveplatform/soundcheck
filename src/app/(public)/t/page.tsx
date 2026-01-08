@@ -37,9 +37,13 @@ export default function TrialLandingPage() {
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05]">
             Get feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
           </h1>
-          <p className="mt-6 text-neutral-200 text-lg sm:text-xl font-bold leading-snug max-w-3xl mx-auto">
-            MixReflect is a private feedback marketplace — reviewers earn more for higher-quality reviews, and you rate every review to keep quality high.
-          </p>
+          <div className="mt-6 max-w-3xl mx-auto">
+            <div className="inline-block border-2 border-black bg-neutral-900 px-4 py-3 shadow-[6px_6px_0px_0px_rgba(251,146,60,1)]">
+              <p className="text-neutral-100 text-lg sm:text-xl font-bold leading-snug">
+                MixReflect is a <span className="text-orange-400">private feedback marketplace</span> — reviewers earn more for higher-quality reviews, and artists rate every review to keep quality high.
+              </p>
+            </div>
+          </div>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
