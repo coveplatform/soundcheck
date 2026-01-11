@@ -47,6 +47,67 @@ export default function Home() {
                 View examples
               </Link>
             </div>
+
+            {/* Track Scorecard Preview */}
+            <div className="mt-12 w-full max-w-2xl mx-auto">
+              <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
+                <div className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[10px] sm:text-xs font-black text-lime-500 tracking-wider">TRACK ANALYSIS</span>
+                    <span className="text-[10px] sm:text-xs font-black text-neutral-500">20 reviews</span>
+                  </div>
+
+                  {/* Main Score */}
+                  <div className="flex items-center gap-4 sm:gap-6 mb-5">
+                    <div className="text-center flex-shrink-0">
+                      <div className="text-4xl sm:text-5xl font-black text-lime-500">82%</div>
+                      <div className="text-[10px] sm:text-xs font-black text-neutral-400 mt-1">RELEASE READY</div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="h-3 sm:h-4 border-2 border-black bg-neutral-800">
+                        <div className="h-full bg-lime-500" style={{ width: "82%" }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Metrics Row */}
+                  <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-5">
+                    <div className="text-center p-2 sm:p-3 border-2 border-neutral-700 bg-black">
+                      <div className="text-lg sm:text-xl font-black text-white">83%</div>
+                      <div className="text-[10px] sm:text-xs text-neutral-500">Replay</div>
+                    </div>
+                    <div className="text-center p-2 sm:p-3 border-2 border-neutral-700 bg-black">
+                      <div className="text-lg sm:text-xl font-black text-white">67%</div>
+                      <div className="text-[10px] sm:text-xs text-neutral-500">Playlist</div>
+                    </div>
+                    <div className="text-center p-2 sm:p-3 border-2 border-neutral-700 bg-black">
+                      <div className="text-lg sm:text-xl font-black text-white">52%</div>
+                      <div className="text-[10px] sm:text-xs text-neutral-500">Share</div>
+                    </div>
+                    <div className="text-center p-2 sm:p-3 border-2 border-neutral-700 bg-black">
+                      <div className="text-lg sm:text-xl font-black text-white">4.2</div>
+                      <div className="text-[10px] sm:text-xs text-neutral-500">Avg Score</div>
+                    </div>
+                  </div>
+
+                  {/* Top Insights */}
+                  <div className="border-t-2 border-neutral-700 pt-4 space-y-2">
+                    <div className="flex items-start gap-2">
+                      <span className="text-lime-500 text-sm">✓</span>
+                      <span className="text-xs sm:text-sm text-neutral-300">
+                        <span className="font-black text-white">15/20</span> mentioned &quot;Hook hits hard at 0:45&quot;
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-orange-400 text-sm">!</span>
+                      <span className="text-xs sm:text-sm text-neutral-300">
+                        <span className="font-black text-white">14/20</span> said &quot;Intro could be shorter&quot;
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
