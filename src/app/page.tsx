@@ -25,11 +25,11 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="border-b border-neutral-800 relative overflow-hidden">
+      <section className="border-b border-neutral-800 relative overflow-hidden min-h-[calc(100vh-3.5rem)] flex flex-col">
         <div className="absolute top-20 right-10 w-32 h-32 bg-lime-500 rounded-full blur-3xl opacity-20" />
         <div className="absolute bottom-10 left-10 w-24 h-24 bg-orange-400 rounded-full blur-2xl opacity-20" />
-        <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-28 relative">
-          <div className="text-center min-h-[52vh] flex flex-col justify-center">
+        <div className="max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-28 relative flex-1 flex flex-col">
+          <div className="text-center flex-1 flex flex-col justify-center">
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight text-white max-w-5xl mx-auto leading-[1.08]">
               Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
             </h1>
@@ -134,7 +134,7 @@ export default function Home() {
                       <div className="text-xs font-black text-neutral-400">WOULD SHARE</div>
                       <div className="mt-1 text-2xl font-black text-white">52%</div>
                       <div className="mt-3 h-3 border-2 border-black bg-neutral-800">
-                        <div className="h-full bg-sky-400" style={{ width: "52%" }} />
+                        <div className="h-full bg-neutral-500" style={{ width: "52%" }} />
                       </div>
                     </div>
                   </div>
@@ -149,7 +149,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(56,189,248,1)]">
+            <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(251,146,60,1)]">
               <div className="p-5 sm:p-7">
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                   <div>
@@ -319,10 +319,10 @@ export default function Home() {
       </section>
 
       {/* The Solution */}
-      <section className="border-b border-neutral-800 py-16 bg-sky-400 text-black">
+      <section className="border-b border-neutral-800 py-16 bg-white text-black">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-black mb-2">How feedback works</h2>
-          <p className="text-black/80 mb-8">Fast, structured feedback—so you know what to change next.</p>
+          <p className="text-neutral-600 mb-8">Fast, structured feedback—so you know what to change next.</p>
 
           <div className="mt-8 grid md:grid-cols-4 gap-6">
             <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
@@ -382,7 +382,7 @@ export default function Home() {
             </div>
 
             <div className="border-2 border-black p-6 bg-black/80 backdrop-blur text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-              <Quote className="h-8 w-8 text-sky-400 mb-4" />
+              <Quote className="h-8 w-8 text-lime-500 mb-4" />
               <p className="text-neutral-200 mb-4">
                 &ldquo;The consensus thing is real. When 8 people independently say the same thing, you stop arguing with yourself and just fix it.&rdquo;
               </p>
@@ -391,7 +391,7 @@ export default function Home() {
             </div>
 
             <div className="border-2 border-black p-6 bg-black/80 backdrop-blur text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-              <Quote className="h-8 w-8 text-purple-400 mb-4" />
+              <Quote className="h-8 w-8 text-orange-400 mb-4" />
               <p className="text-neutral-200 mb-4">
                 &ldquo;I&apos;ve used this for my last 3 releases. The confidence of knowing it&apos;s actually ready before I put it out is priceless.&rdquo;
               </p>
@@ -417,7 +417,7 @@ export default function Home() {
             </div>
 
             <div className="text-center">
-              <div className="h-14 w-14 bg-sky-400 border-2 border-black flex items-center justify-center mb-4 mx-auto">
+              <div className="h-14 w-14 bg-lime-500 border-2 border-black flex items-center justify-center mb-4 mx-auto">
                 <Clock className="h-7 w-7 text-black" />
               </div>
               <h3 className="font-bold text-lg mb-2">Fast turnaround</h3>
@@ -427,7 +427,7 @@ export default function Home() {
             </div>
 
             <div className="text-center">
-              <div className="h-14 w-14 bg-purple-400 border-2 border-black flex items-center justify-center mb-4 mx-auto">
+              <div className="h-14 w-14 bg-orange-400 border-2 border-black flex items-center justify-center mb-4 mx-auto">
                 <Shield className="h-7 w-7 text-black" />
               </div>
               <h3 className="font-bold text-lg mb-2">Private & secure</h3>
@@ -440,14 +440,14 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section className="border-b border-neutral-800 py-16 bg-sky-400 text-black">
+      <section className="border-b border-neutral-800 py-16 bg-white text-black">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-black mb-2">Simple pricing. Real results.</h2>
-            <p className="text-black/80 mb-2">
+            <p className="text-neutral-600 mb-2">
               More reviews = clearer patterns = more confidence.
             </p>
-            <p className="text-sm text-black/70">
+            <p className="text-sm text-neutral-500">
               First review free, no card required
             </p>
           </div>
@@ -516,7 +516,7 @@ export default function Home() {
             })}
           </div>
 
-          <p className="text-center text-sm text-black/70 mt-8 flex items-center justify-center gap-2">
+          <p className="text-center text-sm text-neutral-500 mt-8 flex items-center justify-center gap-2">
             <DollarSign className="h-4 w-4" />
             <span>Your payment goes directly to reviewers. Quality enforced by your ratings.</span>
           </p>

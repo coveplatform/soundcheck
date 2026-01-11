@@ -38,8 +38,8 @@ export default function TrialLandingPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-16 sm:py-24">
-        <section className="text-center min-h-[62vh] flex flex-col justify-center">
+      <main className="max-w-5xl mx-auto px-4 py-16 sm:py-24 min-h-[calc(100vh-3.5rem)] flex flex-col">
+        <section className="text-center flex-1 flex flex-col justify-center">
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05]">
             Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
           </h1>
@@ -138,7 +138,7 @@ export default function TrialLandingPage() {
                     <div className="text-xs font-black text-neutral-400">WOULD SHARE</div>
                     <div className="mt-1 text-2xl font-black text-white">52%</div>
                     <div className="mt-3 h-3 border-2 border-black bg-neutral-800">
-                      <div className="h-full bg-sky-400" style={{ width: "52%" }} />
+                      <div className="h-full bg-neutral-500" style={{ width: "52%" }} />
                     </div>
                   </div>
                 </div>
@@ -153,7 +153,7 @@ export default function TrialLandingPage() {
             </div>
           </div>
 
-          <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(56,189,248,1)]">
+          <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(251,146,60,1)]">
             <div className="p-5 sm:p-7">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                 <div>
@@ -272,13 +272,13 @@ export default function TrialLandingPage() {
                       </div>
                     </div>
                     <div>
-                      <div className="text-xs font-black text-purple-300 uppercase tracking-wide mb-1">Timestamps</div>
+                      <div className="text-xs font-black text-neutral-300 uppercase tracking-wide mb-1">Timestamps</div>
                       <div className="space-y-2">
-                        <div className="pl-3 border-l-4 border-purple-400">
+                        <div className="pl-3 border-l-4 border-neutral-600">
                           <div className="text-xs font-mono text-neutral-400">0:45</div>
                           <div className="text-neutral-200">Best moment — hook melody lands here</div>
                         </div>
-                        <div className="pl-3 border-l-4 border-purple-400">
+                        <div className="pl-3 border-l-4 border-neutral-600">
                           <div className="text-xs font-mono text-neutral-400">1:30</div>
                           <div className="text-neutral-200">Vocal a touch loud vs lead synth</div>
                         </div>
@@ -388,7 +388,7 @@ export default function TrialLandingPage() {
           </div>
         </section>
 
-        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-sky-400 text-black border-y-2 border-black py-12">
+        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-white text-black border-y-2 border-black py-12">
           <div className="max-w-5xl mx-auto px-4">
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center">
               How it works
