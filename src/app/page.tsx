@@ -147,71 +147,95 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Quality Guarantee Flow */}
-      <section className="mt-0 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-orange-400 text-black border-y-2 border-black py-12">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-5xl font-black tracking-tight">
-            See exactly what you&apos;ll get.
+      {/* Your Track Report Section */}
+      <section className="mt-0 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-orange-400 text-black border-y-2 border-black py-10">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
+            Your Track Report
           </h2>
-          <p className="mt-3 text-base sm:text-lg font-bold max-w-2xl mx-auto">
-            Clear visuals + real reviews — so you know what to change.
+          <p className="mt-2 text-base font-medium max-w-xl mx-auto">
+            Analytics, consensus insights, and detailed reviews — all in one place
           </p>
         </div>
       </section>
 
       <section id="examples" className="py-16 border-b border-neutral-800">
         <div className="max-w-5xl mx-auto px-4">
-          {/* Consensus Moments - Visual Timeline Style */}
-          <div className="mb-16">
-            <div className="flex items-center gap-3 mb-8">
-              <h3 className="text-2xl font-black">Consensus moments</h3>
-              <span className="text-xs font-black text-neutral-500 bg-neutral-800 px-2 py-1">from 20 reviews</span>
-            </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
+          {/* Analytics Overview */}
+          <div className="mb-12">
+            <h3 className="text-xl font-black mb-2">Analytics overview</h3>
+            <p className="text-sm text-neutral-400 mb-6">See how listeners responded to your track at a glance</p>
+
+            <div className="grid sm:grid-cols-4 gap-4">
+              <div className="bg-neutral-900 border-2 border-neutral-800 p-5 text-center">
+                <div className="text-3xl font-black text-lime-500">83%</div>
+                <div className="text-xs text-neutral-400 mt-1">Would replay</div>
+              </div>
+              <div className="bg-neutral-900 border-2 border-neutral-800 p-5 text-center">
+                <div className="text-3xl font-black text-lime-500">67%</div>
+                <div className="text-xs text-neutral-400 mt-1">Would playlist</div>
+              </div>
+              <div className="bg-neutral-900 border-2 border-neutral-800 p-5 text-center">
+                <div className="text-3xl font-black text-white">52%</div>
+                <div className="text-xs text-neutral-400 mt-1">Would share</div>
+              </div>
+              <div className="bg-neutral-900 border-2 border-neutral-800 p-5 text-center">
+                <div className="text-3xl font-black text-white">4.2</div>
+                <div className="text-xs text-neutral-400 mt-1">Avg rating</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Consensus Insights */}
+          <div className="mb-12">
+            <h3 className="text-xl font-black mb-2">Consensus insights</h3>
+            <p className="text-sm text-neutral-400 mb-6">When multiple reviewers mention the same thing, you know it matters</p>
+
+            <div className="grid md:grid-cols-2 gap-6">
               {/* What hit */}
-              <div>
+              <div className="bg-neutral-900 border-2 border-neutral-800 p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="h-3 w-3 bg-lime-500" />
-                  <span className="text-sm font-black text-lime-500">WHAT HIT</span>
+                  <div className="h-2 w-2 bg-lime-500" />
+                  <span className="text-xs font-black text-lime-500">WHAT&apos;S WORKING</span>
                 </div>
                 <div className="space-y-4">
-                  <div className="flex items-start gap-4 p-4 bg-neutral-900 border-l-4 border-lime-500">
-                    <span className="text-2xl font-black text-lime-500">15</span>
+                  <div className="flex items-start gap-3">
+                    <span className="text-xs font-black bg-lime-500 text-black px-2 py-1 whitespace-nowrap">15 of 20</span>
                     <div>
-                      <div className="font-black">0:45 — Hook hits hard</div>
-                      <div className="text-sm text-neutral-400">Melody lands, drums feel confident</div>
+                      <div className="font-bold text-sm">Hook hits hard at 0:45</div>
+                      <div className="text-xs text-neutral-500">Melody lands, drums feel confident</div>
                     </div>
                   </div>
-                  <div className="flex items-start gap-4 p-4 bg-neutral-900 border-l-4 border-lime-500/50">
-                    <span className="text-2xl font-black text-lime-500/70">12</span>
+                  <div className="flex items-start gap-3">
+                    <span className="text-xs font-black bg-lime-500/70 text-black px-2 py-1 whitespace-nowrap">12 of 20</span>
                     <div>
-                      <div className="font-black">2:15 — Breakdown feels fresh</div>
-                      <div className="text-sm text-neutral-400">Nice contrast, keeps attention</div>
+                      <div className="font-bold text-sm">Breakdown feels fresh at 2:15</div>
+                      <div className="text-xs text-neutral-500">Nice contrast, keeps attention</div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* What to fix */}
-              <div>
+              <div className="bg-neutral-900 border-2 border-neutral-800 p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="h-3 w-3 bg-orange-400" />
-                  <span className="text-sm font-black text-orange-400">WHAT TO FIX</span>
+                  <div className="h-2 w-2 bg-orange-400" />
+                  <span className="text-xs font-black text-orange-400">WHAT TO IMPROVE</span>
                 </div>
                 <div className="space-y-4">
-                  <div className="flex items-start gap-4 p-4 bg-neutral-900 border-l-4 border-orange-400">
-                    <span className="text-2xl font-black text-orange-400">14</span>
+                  <div className="flex items-start gap-3">
+                    <span className="text-xs font-black bg-orange-400 text-black px-2 py-1 whitespace-nowrap">14 of 20</span>
                     <div>
-                      <div className="font-black">0:00 — Intro too long</div>
-                      <div className="text-sm text-neutral-400">Hook should arrive sooner</div>
+                      <div className="font-bold text-sm">Intro too long</div>
+                      <div className="text-xs text-neutral-500">Hook should arrive sooner</div>
                     </div>
                   </div>
-                  <div className="flex items-start gap-4 p-4 bg-neutral-900 border-l-4 border-orange-400/50">
-                    <span className="text-2xl font-black text-orange-400/70">10</span>
+                  <div className="flex items-start gap-3">
+                    <span className="text-xs font-black bg-orange-400/70 text-black px-2 py-1 whitespace-nowrap">10 of 20</span>
                     <div>
-                      <div className="font-black">1:30 — Vocal too loud</div>
-                      <div className="text-sm text-neutral-400">Clashes with the lead synth</div>
+                      <div className="font-bold text-sm">Vocal too loud at 1:30</div>
+                      <div className="text-xs text-neutral-500">Clashes with the lead synth</div>
                     </div>
                   </div>
                 </div>
@@ -219,96 +243,91 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Sample Review - Cleaner */}
+          {/* Individual Reviews */}
           <div>
-            <div className="flex items-center gap-3 mb-8">
-              <h3 className="text-2xl font-black">Sample review</h3>
-              <span className="text-xs font-black text-neutral-500 bg-neutral-800 px-2 py-1">1 of 20</span>
-            </div>
+            <h3 className="text-xl font-black mb-2">Individual reviews</h3>
+            <p className="text-sm text-neutral-400 mb-6">Each reviewer provides structured feedback you can actually use</p>
 
-            <div className="bg-neutral-900 border-2 border-neutral-800 p-6 sm:p-8">
-              <div className="flex items-center justify-between mb-6">
+            <div className="bg-neutral-900 border-2 border-neutral-800 p-5 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-5 border-b border-neutral-800">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-lime-500 flex items-center justify-center font-black text-black">S</div>
                   <div>
                     <div className="font-black">Sarah</div>
-                    <div className="text-xs text-neutral-500">Electronic • Verified reviewer</div>
+                    <div className="text-xs text-neutral-500">Electronic • 4.2/5 rating</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-black bg-lime-500/20 text-lime-400 px-2 py-1">Would replay</span>
-                  <span className="text-xs font-black bg-lime-500/20 text-lime-400 px-2 py-1">Would playlist</span>
+                  <span className="text-xs font-black bg-lime-500/20 text-lime-400 px-2 py-1">Would add to playlist</span>
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-6">
+              <div className="grid sm:grid-cols-2 gap-5">
                 <div>
                   <div className="text-xs font-black text-lime-500 mb-2">WHAT WORKED</div>
                   <p className="text-neutral-300 text-sm leading-relaxed">
-                    The hook at 0:45 is instantly memorable. Drums and bass feel tight — the drop hits hard. The 2:15 breakdown keeps it from feeling repetitive.
+                    The hook at 0:45 is instantly memorable. Drums and bass feel tight — the drop hits hard.
                   </p>
                 </div>
                 <div>
                   <div className="text-xs font-black text-orange-400 mb-2">TO IMPROVE</div>
                   <p className="text-neutral-300 text-sm leading-relaxed">
-                    Intro is too long — cut 8-12 seconds. Around 1:30 the vocal masks the lead synth. Verse 2 hats feel static.
+                    Intro is too long — cut 8-12 seconds. Around 1:30 the vocal masks the lead synth.
                   </p>
                 </div>
               </div>
+
+              <div className="mt-4 pt-4 border-t border-neutral-800 text-center">
+                <span className="text-xs text-neutral-500">Review 1 of 20</span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* The Problem */}
-      <section className="border-b border-neutral-800 py-12 bg-orange-400 text-black">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-lg font-bold">
-            <span>Can&apos;t hear it objectively anymore?</span>
-            <span className="text-black/50">•</span>
-            <span>Friends just say &quot;it&apos;s good&quot;?</span>
-            <span className="text-black/50">•</span>
-            <span>Online feedback is noise?</span>
-            <span className="text-black/50">•</span>
-            <span className="font-black">Get signal instead.</span>
+          {/* CTA */}
+          <div className="mt-12 text-center">
+            <Link href="/signup">
+              <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
+                Get your Track Report <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* The Solution */}
       <section className="border-b-2 border-black py-16 bg-lime-500 text-black">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-2">How feedback works</h2>
-          <p className="text-black/70 mb-8">Fast, structured feedback—so you know what to change next.</p>
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-black mb-8 text-center">How it works</h2>
 
-          <div className="mt-8 grid md:grid-cols-4 gap-6">
-            <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
-              <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
-                <Target className="h-6 w-6" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="border-2 border-black p-5 bg-lime-400/30 flex flex-col h-full">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 border-2 border-black bg-black text-lime-500 flex items-center justify-center font-black">1</div>
+                <div className="text-lg font-black">Submit</div>
               </div>
-              <div className="mt-4 text-xl sm:text-2xl font-black">1. Submit your track</div>
-              <div className="mt-2 text-base font-medium">Paste a link or upload.</div>
+              <div className="text-sm">Paste a link or upload your track</div>
             </div>
-            <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
-              <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
-                <Users className="h-6 w-6" />
+            <div className="border-2 border-black p-5 bg-lime-400/30 flex flex-col h-full">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 border-2 border-black bg-black text-lime-500 flex items-center justify-center font-black">2</div>
+                <div className="text-lg font-black">Match</div>
               </div>
-              <div className="mt-4 text-xl sm:text-2xl font-black">2. We match reviewers</div>
-              <div className="mt-2 text-base font-medium">Genre-picked artists + listeners review your track.</div>
+              <div className="text-sm">We assign genre-matched reviewers</div>
             </div>
-            <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
-              <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
-                <MessageCircle className="h-6 w-6" />
+            <div className="border-2 border-black p-5 bg-lime-400/30 flex flex-col h-full">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 border-2 border-black bg-black text-lime-500 flex items-center justify-center font-black">3</div>
+                <div className="text-lg font-black">Review</div>
               </div>
-              <div className="mt-4 text-xl sm:text-2xl font-black">3. They review</div>
-              <div className="mt-2 text-base font-medium">Structured notes + timestamps. Artists rate every review.</div>
+              <div className="text-sm">Structured feedback with timestamps</div>
             </div>
-            <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
-              <div className="h-12 w-12 border-2 border-black flex items-center justify-center">
-                <Flame className="h-6 w-6" />
+            <div className="border-2 border-black p-5 bg-lime-400/30 flex flex-col h-full">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 border-2 border-black bg-black text-lime-500 flex items-center justify-center font-black">4</div>
+                <div className="text-lg font-black">Clarity</div>
               </div>
-              <div className="mt-4 text-xl sm:text-2xl font-black">4. You get clarity</div>
-              <div className="mt-2 text-base font-medium">Patterns show what to change next.</div>
+              <div className="text-sm">Patterns show what to change</div>
             </div>
           </div>
         </div>
