@@ -319,10 +319,10 @@ export default function Home() {
       </section>
 
       {/* The Solution */}
-      <section className="border-b border-neutral-800 py-16 bg-white text-black">
+      <section className="border-b-2 border-black py-16 bg-lime-500 text-black">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-black mb-2">How feedback works</h2>
-          <p className="text-neutral-600 mb-8">Fast, structured feedback—so you know what to change next.</p>
+          <p className="text-black/70 mb-8">Fast, structured feedback—so you know what to change next.</p>
 
           <div className="mt-8 grid md:grid-cols-4 gap-6">
             <div className="border-2 border-black p-6 md:aspect-square flex flex-col">
@@ -440,14 +440,14 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section className="border-b border-neutral-800 py-16 bg-white text-black">
+      <section className="border-b border-neutral-800 py-16 bg-black text-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-black mb-2">Simple pricing. Real results.</h2>
-            <p className="text-neutral-600 mb-2">
+            <p className="text-neutral-300 mb-2">
               More reviews = clearer patterns = more confidence.
             </p>
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-neutral-400">
               First review free, no card required
             </p>
           </div>
@@ -516,7 +516,7 @@ export default function Home() {
             })}
           </div>
 
-          <p className="text-center text-sm text-neutral-500 mt-8 flex items-center justify-center gap-2">
+          <p className="text-center text-sm text-neutral-400 mt-8 flex items-center justify-center gap-2">
             <DollarSign className="h-4 w-4" />
             <span>Your payment goes directly to reviewers. Quality enforced by your ratings.</span>
           </p>
@@ -536,12 +536,12 @@ export default function Home() {
             <Link href="/signup">
               <Button
                 size="lg"
-                className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-lime-500"
+                className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
               >
                 Get Feedback <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <span className="text-sm font-bold text-black bg-lime-400 px-3 py-1">First one&apos;s free</span>
+            <span className="text-sm font-bold text-black bg-lime-500 px-3 py-1 border-2 border-black">First one&apos;s free</span>
           </div>
           <p className="mt-6 text-sm text-neutral-500">
             No card required • Results in under 12 hours
