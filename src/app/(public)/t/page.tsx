@@ -38,29 +38,6 @@ export default function TrialLandingPage() {
         </div>
       </header>
 
-      <section className="border-b-2 border-black bg-black text-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-neutral-800">
-            <div className="p-4 md:p-5 text-center">
-              <p className="text-2xl md:text-3xl font-black text-lime-400">&lt;24h</p>
-              <p className="text-xs md:text-sm text-neutral-400 mt-1">Turnaround</p>
-            </div>
-            <div className="p-4 md:p-5 text-center">
-              <p className="text-2xl md:text-3xl font-black text-lime-400">Up to 20</p>
-              <p className="text-xs md:text-sm text-neutral-400 mt-1">Reviews</p>
-            </div>
-            <div className="p-4 md:p-5 text-center">
-              <p className="text-2xl md:text-3xl font-black text-lime-400">Genre</p>
-              <p className="text-xs md:text-sm text-neutral-400 mt-1">Matched</p>
-            </div>
-            <div className="p-4 md:p-5 text-center">
-              <p className="text-2xl md:text-3xl font-black text-lime-400">Private</p>
-              <p className="text-xs md:text-sm text-neutral-400 mt-1">&amp; secure</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <main className="max-w-5xl mx-auto px-4 py-16 sm:py-24">
         <section className="text-center min-h-[62vh] flex flex-col justify-center">
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05]">
@@ -73,7 +50,7 @@ export default function TrialLandingPage() {
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
               <Button
-                className="w-full sm:w-auto h-11 text-base font-black bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
+                className="w-full sm:w-auto h-14 px-10 text-lg font-black bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[6px] active:translate-y-[6px] transition-all active:transition-none"
               >
                 Start trial
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -81,9 +58,28 @@ export default function TrialLandingPage() {
             </Link>
           </div>
 
-          <p className="mt-3 text-sm text-neutral-400 font-medium">
-            Next: create account - submit your track (30s) - choose 5-20 reviews.
-          </p>
+          <section className="mt-10 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-black text-white border-y border-neutral-800">
+            <div className="max-w-5xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-neutral-800">
+                <div className="p-4 md:p-5 text-center">
+                  <p className="text-2xl md:text-3xl font-black text-lime-400">&lt;24h</p>
+                  <p className="text-xs md:text-sm text-neutral-400 mt-1">Turnaround</p>
+                </div>
+                <div className="p-4 md:p-5 text-center">
+                  <p className="text-2xl md:text-3xl font-black text-lime-400">Up to 20</p>
+                  <p className="text-xs md:text-sm text-neutral-400 mt-1">Reviews</p>
+                </div>
+                <div className="p-4 md:p-5 text-center">
+                  <p className="text-2xl md:text-3xl font-black text-lime-400">Genre</p>
+                  <p className="text-xs md:text-sm text-neutral-400 mt-1">Matched</p>
+                </div>
+                <div className="p-4 md:p-5 text-center">
+                  <p className="text-2xl md:text-3xl font-black text-lime-400">Private</p>
+                  <p className="text-xs md:text-sm text-neutral-400 mt-1">&amp; secure</p>
+                </div>
+              </div>
+            </div>
+          </section>
         </section>
 
         <section className="mt-14 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-orange-400 text-black border-y-2 border-black py-12">
@@ -296,16 +292,11 @@ export default function TrialLandingPage() {
 
           <div className="pt-2 flex items-center justify-center">
             <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
-              <Button className="h-11 text-base font-black bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
+              <Button className="h-14 px-10 text-lg font-black bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[6px] active:translate-y-[6px] transition-all active:transition-none">
                 Start trial
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>
-          </div>
-          <div className="mt-3 flex items-center justify-center">
-            <p className="text-sm text-neutral-400 font-medium text-center">
-              Next: create account - submit your track - pick your review count.
-            </p>
           </div>
         </section>
 
