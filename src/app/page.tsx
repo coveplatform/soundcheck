@@ -47,29 +47,29 @@ export default function Home() {
                 View examples
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Social Proof Bar */}
-      <section className="border-b-2 border-black bg-black text-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-neutral-700">
-            <div className="p-4 md:p-6 text-center">
-              <p className="text-2xl md:text-3xl font-black text-lime-400">500+</p>
-              <p className="text-xs md:text-sm text-neutral-400 mt-1">Reviews Delivered</p>
-            </div>
-            <div className="p-4 md:p-6 text-center">
-              <p className="text-2xl md:text-3xl font-black text-lime-400">&lt;12h</p>
-              <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Turnaround</p>
-            </div>
-            <div className="p-4 md:p-6 text-center">
-              <p className="text-2xl md:text-3xl font-black text-lime-400">180+</p>
-              <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Words/Review</p>
-            </div>
-            <div className="p-4 md:p-6 text-center">
-              <p className="text-2xl md:text-3xl font-black text-lime-400">100%</p>
-              <p className="text-xs md:text-sm text-neutral-400 mt-1">Human Reviewers</p>
+            {/* Social Proof Bar */}
+            <div className="mt-10 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-black text-white border-y border-neutral-800">
+              <div className="max-w-6xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-neutral-700">
+                  <div className="p-4 md:p-6 text-center">
+                    <p className="text-2xl md:text-3xl font-black text-lime-400">500+</p>
+                    <p className="text-xs md:text-sm text-neutral-400 mt-1">Reviews Delivered</p>
+                  </div>
+                  <div className="p-4 md:p-6 text-center">
+                    <p className="text-2xl md:text-3xl font-black text-lime-400">&lt;12h</p>
+                    <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Turnaround</p>
+                  </div>
+                  <div className="p-4 md:p-6 text-center">
+                    <p className="text-2xl md:text-3xl font-black text-lime-400">180+</p>
+                    <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Words/Review</p>
+                  </div>
+                  <div className="p-4 md:p-6 text-center">
+                    <p className="text-2xl md:text-3xl font-black text-lime-400">100%</p>
+                    <p className="text-xs md:text-sm text-neutral-400 mt-1">Human Reviewers</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
