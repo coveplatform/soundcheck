@@ -295,13 +295,13 @@ export default function Home() {
                 <div>
                   <div className="text-xs font-black text-lime-500 mb-2">WHAT WORKED</div>
                   <p className="text-neutral-300 text-sm leading-relaxed">
-                    The hook at 0:45 is instantly memorable. Drums and bass feel tight — the drop hits hard.
+                    The hook at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">0:45</span> is instantly memorable — I caught myself humming it after. Drums and bass feel really tight throughout, especially that kick pattern in the verses. The drop at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:12</span> hits hard and the stereo width on the synths gives it a lot of energy. Vocal processing in the chorus sounds professional.
                   </p>
                 </div>
                 <div>
                   <div className="text-xs font-black text-orange-400 mb-2">TO IMPROVE</div>
                   <p className="text-neutral-300 text-sm leading-relaxed">
-                    Intro is too long — cut 8-12 seconds. Around 1:30 the vocal masks the lead synth.
+                    Intro feels too long — I&apos;d cut 8-12 seconds to get to the action faster. Around <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:30</span> the vocal sits on top of the lead synth and they&apos;re fighting for the same frequency space. Maybe automate the synth down a few dB there or add a sidechain. The outro also drags a bit after <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">2:45</span>.
                   </p>
                 </div>
               </div>
