@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Headphones, DollarSign, Shield, ArrowRight, Target, Clock, Quote, CheckCircle2, Lock, Users, MessageCircle, Flame } from "lucide-react";
+import { Headphones, DollarSign, Shield, ArrowRight, Target, Clock, Quote, CheckCircle2, Lock, Users, MessageCircle, Flame, Music } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
@@ -59,77 +59,85 @@ export default function Home() {
 
               {/* Main card */}
               <div className="relative border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
-                <div className="p-4 sm:p-6">
-                  {/* Header with reviewer count */}
-                  <div className="flex items-center justify-between mb-5 pb-4 border-b-2 border-neutral-800">
-                    <div className="flex items-center gap-3">
-                      {/* Reviewer avatars */}
+                {/* Track header */}
+                <div className="flex items-center gap-3 p-3 sm:p-4 border-b-2 border-neutral-800 bg-black/30">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-black flex items-center justify-center flex-shrink-0">
+                    <Music className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-black text-white text-sm sm:text-base truncate">Midnight Drive</div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] sm:text-xs font-bold text-black bg-orange-400 px-1.5 py-0.5">Electronic</span>
+                      <span className="text-[10px] sm:text-xs text-neutral-500">by You</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 sm:p-5">
+                  {/* Reviewers row */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
                       <div className="flex -space-x-2">
-                        {['bg-lime-500', 'bg-orange-400', 'bg-blue-500', 'bg-purple-500', 'bg-pink-500'].map((bg, i) => (
-                          <div key={i} className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${bg} border-2 border-neutral-900 flex items-center justify-center text-[10px] sm:text-xs font-black text-black`}>
-                            {['S', 'M', 'J', 'A', 'K'][i]}
+                        {['bg-lime-500', 'bg-blue-500', 'bg-purple-500', 'bg-pink-500'].map((bg, i) => (
+                          <div key={i} className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full ${bg} border-2 border-neutral-900 flex items-center justify-center text-[9px] sm:text-[10px] font-black text-black`}>
+                            {['S', 'M', 'J', 'A'][i]}
                           </div>
                         ))}
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-neutral-700 border-2 border-neutral-900 flex items-center justify-center text-[10px] sm:text-xs font-bold text-white">
-                          +15
+                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-neutral-700 border-2 border-neutral-900 flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-white">
+                          +16
                         </div>
                       </div>
+                      <span className="text-[10px] sm:text-xs font-bold text-neutral-400 hidden sm:inline">Genre-matched</span>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl sm:text-3xl font-black text-white">20</div>
-                      <div className="text-[10px] sm:text-xs font-bold text-neutral-400">REVIEWS</div>
+                    <div className="flex items-center gap-1.5 bg-lime-500/20 border border-lime-500/30 px-2 py-1 rounded">
+                      <span className="text-base sm:text-lg font-black text-lime-400">20</span>
+                      <span className="text-[10px] sm:text-xs font-bold text-lime-400/80">reviews</span>
                     </div>
                   </div>
 
-                  {/* Listener Intent - the real data */}
-                  <div className="space-y-3 mb-5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs sm:text-sm text-neutral-400">Would listen again</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-24 sm:w-32 h-2 bg-neutral-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-lime-500 rounded-full" style={{ width: '85%' }} />
-                        </div>
-                        <span className="text-sm sm:text-base font-black text-lime-500 w-12 text-right">17/20</span>
-                      </div>
+                  {/* Quick stats row */}
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <div className="text-center p-2 bg-black/40 border border-neutral-800 rounded">
+                      <div className="text-lg sm:text-xl font-black text-lime-400">85%</div>
+                      <div className="text-[9px] sm:text-[10px] text-neutral-500">would replay</div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs sm:text-sm text-neutral-400">Would add to playlist</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-24 sm:w-32 h-2 bg-neutral-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-lime-500 rounded-full" style={{ width: '60%' }} />
-                        </div>
-                        <span className="text-sm sm:text-base font-black text-white w-12 text-right">12/20</span>
-                      </div>
+                    <div className="text-center p-2 bg-black/40 border border-neutral-800 rounded">
+                      <div className="text-lg sm:text-xl font-black text-white">60%</div>
+                      <div className="text-[9px] sm:text-[10px] text-neutral-500">would playlist</div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs sm:text-sm text-neutral-400">Would share with others</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-24 sm:w-32 h-2 bg-neutral-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-orange-400 rounded-full" style={{ width: '35%' }} />
-                        </div>
-                        <span className="text-sm sm:text-base font-black text-white w-12 text-right">7/20</span>
-                      </div>
+                    <div className="text-center p-2 bg-black/40 border border-neutral-800 rounded">
+                      <div className="text-lg sm:text-xl font-black text-white">35%</div>
+                      <div className="text-[9px] sm:text-[10px] text-neutral-500">would share</div>
                     </div>
                   </div>
 
                   {/* Consensus Insights - the killer feature */}
-                  <div className="border-t-2 border-neutral-800 pt-4">
-                    <div className="text-[10px] sm:text-xs font-black text-neutral-500 mb-3 tracking-wider">CONSENSUS INSIGHTS</div>
-                    <div className="space-y-2">
-                      <div className="flex items-start gap-2 bg-lime-500/10 border border-lime-500/30 p-2 rounded">
-                        <span className="text-lime-500 text-sm mt-0.5">↑</span>
-                        <div>
-                          <span className="text-xs sm:text-sm font-black text-lime-400">15 of 20</span>
-                          <span className="text-xs sm:text-sm text-neutral-300"> loved the hook at </span>
-                          <span className="text-xs sm:text-sm font-mono text-white bg-neutral-800 px-1 rounded">0:45</span>
-                        </div>
+                  <div className="space-y-2 mb-4">
+                    <div className="text-[10px] font-black text-neutral-500 tracking-wider">WHAT YOUR REVIEWERS AGREED ON</div>
+                    <div className="bg-lime-500/10 border border-lime-500/40 p-2.5 sm:p-3 rounded">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs sm:text-sm font-black text-lime-400">15 of 20 agreed:</span>
                       </div>
-                      <div className="flex items-start gap-2 bg-orange-400/10 border border-orange-400/30 p-2 rounded">
-                        <span className="text-orange-400 text-sm mt-0.5">→</span>
-                        <div>
-                          <span className="text-xs sm:text-sm font-black text-orange-400">14 of 20</span>
-                          <span className="text-xs sm:text-sm text-neutral-300"> said intro is too long</span>
+                      <p className="text-xs sm:text-sm text-white">&quot;The hook at <span className="font-mono bg-neutral-800 px-1 rounded">0:45</span> is instantly memorable&quot;</p>
+                    </div>
+                    <div className="bg-orange-400/10 border border-orange-400/40 p-2.5 sm:p-3 rounded">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs sm:text-sm font-black text-orange-400">14 of 20 suggested:</span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-white">&quot;Cut the intro by 8-10 seconds&quot;</p>
+                    </div>
+                  </div>
+
+                  {/* Sample review snippet */}
+                  <div className="border-t border-neutral-800 pt-3">
+                    <div className="flex items-start gap-2">
+                      <div className="w-6 h-6 rounded-full bg-lime-500 flex items-center justify-center text-[10px] font-black text-black flex-shrink-0">S</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white">Sarah</span>
+                          <span className="text-[9px] text-neutral-500">Electronic fan</span>
                         </div>
+                        <p className="text-[11px] sm:text-xs text-neutral-400 mt-0.5 line-clamp-2">&quot;The drop at 1:12 hits hard — drums and bass are tight. I&apos;d listen to this again.&quot;</p>
                       </div>
                     </div>
                   </div>
