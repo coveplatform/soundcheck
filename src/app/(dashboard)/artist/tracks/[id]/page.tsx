@@ -13,6 +13,7 @@ import { AudioPlayer } from "@/components/audio/audio-player";
 import { GenreTagList } from "@/components/ui/genre-tag";
 import { ReviewDisplay } from "@/components/reviews/review-display";
 import { ReviewCarousel } from "@/components/reviews/review-carousel";
+import { ReviewUpsell } from "@/components/artist/review-upsell";
 import {
   ArrowLeft,
   Music,
@@ -415,6 +416,17 @@ export default async function TrackDetailPage({
           <ReviewCarousel reviews={track.reviews} showControls={true} />
         </CardContent>
       </Card>
+
+      {/* Upsell - show when track has few reviews and is complete */}
+      {completedReviews > 0 &&
+        completedReviews >= track.reviewsRequested &&
+        track.reviewsRequested <= 3 && (
+          <ReviewUpsell
+            completedReviews={completedReviews}
+            trackTitle={track.title}
+            wouldListenAgain={track.reviews[0]?.wouldListenAgain ?? undefined}
+          />
+        )}
     </div>
   );
 }
