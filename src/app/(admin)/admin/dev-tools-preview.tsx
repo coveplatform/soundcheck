@@ -6,8 +6,10 @@ import Link from "next/link";
 export function DevToolsPreview() {
   const [isLoadingReviewer, setIsLoadingReviewer] = useState(false);
   const [isLoadingArtist, setIsLoadingArtist] = useState(false);
+  const [isLoadingSingleReview, setIsLoadingSingleReview] = useState(false);
   const [reviewUrl, setReviewUrl] = useState<string | null>(null);
   const [trackUrl, setTrackUrl] = useState<string | null>(null);
+  const [singleReviewTrackUrl, setSingleReviewTrackUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleCreateReviewerPreview = async () => {
@@ -49,6 +51,27 @@ export function DevToolsPreview() {
       setError("Failed to create preview");
     } finally {
       setIsLoadingArtist(false);
+    }
+  };
+
+  const handleCreateSingleReviewPreview = async () => {
+    setIsLoadingSingleReview(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/admin/dev/preview-artist-track-single", { method: "POST" });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to create preview");
+        return;
+      }
+
+      setSingleReviewTrackUrl(`/artist/tracks/${data.trackId}`);
+    } catch {
+      setError("Failed to create preview");
+    } finally {
+      setIsLoadingSingleReview(false);
     }
   };
 
@@ -107,6 +130,32 @@ export function DevToolsPreview() {
           </div>
           <p className="text-xs text-amber-600">
             Track results page with 5 completed reviews (what artists see after reviews complete)
+          </p>
+        </div>
+
+        {/* Single Review Preview (Free Trial Upsell) */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleCreateSingleReviewPreview}
+              disabled={isLoadingSingleReview}
+              className="px-4 py-2 text-sm font-medium bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
+            >
+              {isLoadingSingleReview ? "Creating..." : "Preview Free Trial (1 Review)"}
+            </button>
+
+            {singleReviewTrackUrl && (
+              <Link
+                href={singleReviewTrackUrl}
+                target="_blank"
+                className="text-sm text-amber-800 underline hover:text-amber-900"
+              >
+                Open →
+              </Link>
+            )}
+          </div>
+          <p className="text-xs text-amber-600">
+            Track with 1 completed review — shows the upsell CTA for free trial users
           </p>
         </div>
 
