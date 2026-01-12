@@ -60,83 +60,77 @@ export default function Home() {
               {/* Main card */}
               <div className="relative border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
                 <div className="p-4 sm:p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] sm:text-xs font-black text-lime-500 tracking-wider">TRACK ANALYSIS</span>
-                    <span className="text-[10px] sm:text-xs font-black text-neutral-500">20 reviews</span>
-                  </div>
-
-                  {/* Main Score with Circular Gauge */}
-                  <div className="flex items-center gap-4 sm:gap-6 mb-5">
-                    <div className="relative flex-shrink-0">
-                      {/* Circular gauge */}
-                      <svg className="w-24 h-24 sm:w-28 sm:h-28 -rotate-90" viewBox="0 0 100 100">
-                        {/* Background circle */}
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="42"
-                          fill="none"
-                          stroke="#262626"
-                          strokeWidth="8"
-                        />
-                        {/* Progress circle */}
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="42"
-                          fill="none"
-                          stroke="#84cc16"
-                          strokeWidth="8"
-                          strokeLinecap="round"
-                          strokeDasharray={`${82 * 2.64} ${100 * 2.64}`}
-                          className="drop-shadow-[0_0_8px_rgba(132,204,22,0.5)]"
-                        />
-                      </svg>
-                      {/* Score text in center */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <div className="text-2xl sm:text-3xl font-black text-lime-500">82%</div>
-                        <div className="text-[8px] sm:text-[10px] font-black text-neutral-400">READY</div>
+                  {/* Header with reviewer count */}
+                  <div className="flex items-center justify-between mb-5 pb-4 border-b-2 border-neutral-800">
+                    <div className="flex items-center gap-3">
+                      {/* Reviewer avatars */}
+                      <div className="flex -space-x-2">
+                        {['bg-lime-500', 'bg-orange-400', 'bg-blue-500', 'bg-purple-500', 'bg-pink-500'].map((bg, i) => (
+                          <div key={i} className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${bg} border-2 border-neutral-900 flex items-center justify-center text-[10px] sm:text-xs font-black text-black`}>
+                            {['S', 'M', 'J', 'A', 'K'][i]}
+                          </div>
+                        ))}
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-neutral-700 border-2 border-neutral-900 flex items-center justify-center text-[10px] sm:text-xs font-bold text-white">
+                          +15
+                        </div>
                       </div>
                     </div>
-                    <div className="flex-1">
-                      <div className="text-xs sm:text-sm font-black text-white mb-1">Release Ready Score</div>
-                      <div className="text-[10px] sm:text-xs text-neutral-400">Based on 20 listener reviews</div>
+                    <div className="text-right">
+                      <div className="text-2xl sm:text-3xl font-black text-white">20</div>
+                      <div className="text-[10px] sm:text-xs font-bold text-neutral-400">REVIEWS</div>
                     </div>
                   </div>
 
-                  {/* Metrics Row */}
-                  <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-5">
-                    <div className="text-center p-2 sm:p-3 border-2 border-neutral-700 bg-black">
-                      <div className="text-lg sm:text-xl font-black text-white">83%</div>
-                      <div className="text-[10px] sm:text-xs text-neutral-500">Replay</div>
+                  {/* Listener Intent - the real data */}
+                  <div className="space-y-3 mb-5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs sm:text-sm text-neutral-400">Would listen again</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 sm:w-32 h-2 bg-neutral-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-lime-500 rounded-full" style={{ width: '85%' }} />
+                        </div>
+                        <span className="text-sm sm:text-base font-black text-lime-500 w-12 text-right">17/20</span>
+                      </div>
                     </div>
-                    <div className="text-center p-2 sm:p-3 border-2 border-neutral-700 bg-black">
-                      <div className="text-lg sm:text-xl font-black text-white">67%</div>
-                      <div className="text-[10px] sm:text-xs text-neutral-500">Playlist</div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs sm:text-sm text-neutral-400">Would add to playlist</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 sm:w-32 h-2 bg-neutral-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-lime-500 rounded-full" style={{ width: '60%' }} />
+                        </div>
+                        <span className="text-sm sm:text-base font-black text-white w-12 text-right">12/20</span>
+                      </div>
                     </div>
-                    <div className="text-center p-2 sm:p-3 border-2 border-neutral-700 bg-black">
-                      <div className="text-lg sm:text-xl font-black text-white">52%</div>
-                      <div className="text-[10px] sm:text-xs text-neutral-500">Share</div>
-                    </div>
-                    <div className="text-center p-2 sm:p-3 border-2 border-neutral-700 bg-black">
-                      <div className="text-lg sm:text-xl font-black text-white">4.2</div>
-                      <div className="text-[10px] sm:text-xs text-neutral-500">Avg Score</div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs sm:text-sm text-neutral-400">Would share with others</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 sm:w-32 h-2 bg-neutral-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-orange-400 rounded-full" style={{ width: '35%' }} />
+                        </div>
+                        <span className="text-sm sm:text-base font-black text-white w-12 text-right">7/20</span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Top Insights */}
-                  <div className="border-t-2 border-neutral-700 pt-4 space-y-2">
-                    <div className="flex items-start gap-2">
-                      <span className="text-lime-500 text-sm">✓</span>
-                      <span className="text-xs sm:text-sm text-neutral-300">
-                        <span className="font-black text-white">15/20</span> mentioned &quot;Hook hits hard at 0:45&quot;
-                      </span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-orange-400 text-sm">!</span>
-                      <span className="text-xs sm:text-sm text-neutral-300">
-                        <span className="font-black text-white">14/20</span> said &quot;Intro could be shorter&quot;
-                      </span>
+                  {/* Consensus Insights - the killer feature */}
+                  <div className="border-t-2 border-neutral-800 pt-4">
+                    <div className="text-[10px] sm:text-xs font-black text-neutral-500 mb-3 tracking-wider">CONSENSUS INSIGHTS</div>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2 bg-lime-500/10 border border-lime-500/30 p-2 rounded">
+                        <span className="text-lime-500 text-sm mt-0.5">↑</span>
+                        <div>
+                          <span className="text-xs sm:text-sm font-black text-lime-400">15 of 20</span>
+                          <span className="text-xs sm:text-sm text-neutral-300"> loved the hook at </span>
+                          <span className="text-xs sm:text-sm font-mono text-white bg-neutral-800 px-1 rounded">0:45</span>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 bg-orange-400/10 border border-orange-400/30 p-2 rounded">
+                        <span className="text-orange-400 text-sm mt-0.5">→</span>
+                        <div>
+                          <span className="text-xs sm:text-sm font-black text-orange-400">14 of 20</span>
+                          <span className="text-xs sm:text-sm text-neutral-300"> said intro is too long</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
