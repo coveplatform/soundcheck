@@ -43,7 +43,10 @@
       "Bash(tree:*)",
       "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" npx tsx:*)",
       "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" npx tsx -e:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(npx next lint:*)",
+      "Bash(timeout 15 npx next dev:*)",
+      "Bash(timeout 20 npx next dev:*)"
     ]
   }
 }

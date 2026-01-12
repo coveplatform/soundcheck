@@ -52,24 +52,55 @@ export default function Home() {
             </div>
 
             {/* Right column - Track Scorecard Preview */}
-            <div className="w-full max-w-lg mx-auto lg:max-w-none">
-              <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
+            <div className="w-full max-w-lg mx-auto lg:max-w-none relative">
+              {/* Stacked cards behind */}
+              <div className="absolute inset-0 border-2 border-black bg-neutral-800 transform rotate-3 translate-x-3 translate-y-3 opacity-60" />
+              <div className="absolute inset-0 border-2 border-black bg-neutral-850 transform rotate-1 translate-x-1.5 translate-y-1.5 opacity-80" style={{ backgroundColor: '#1a1a1a' }} />
+
+              {/* Main card */}
+              <div className="relative border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
                 <div className="p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[10px] sm:text-xs font-black text-lime-500 tracking-wider">TRACK ANALYSIS</span>
                     <span className="text-[10px] sm:text-xs font-black text-neutral-500">20 reviews</span>
                   </div>
 
-                  {/* Main Score */}
+                  {/* Main Score with Circular Gauge */}
                   <div className="flex items-center gap-4 sm:gap-6 mb-5">
-                    <div className="text-center flex-shrink-0">
-                      <div className="text-4xl sm:text-5xl font-black text-lime-500">82%</div>
-                      <div className="text-[10px] sm:text-xs font-black text-neutral-400 mt-1">RELEASE READY</div>
+                    <div className="relative flex-shrink-0">
+                      {/* Circular gauge */}
+                      <svg className="w-24 h-24 sm:w-28 sm:h-28 -rotate-90" viewBox="0 0 100 100">
+                        {/* Background circle */}
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="42"
+                          fill="none"
+                          stroke="#262626"
+                          strokeWidth="8"
+                        />
+                        {/* Progress circle */}
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="42"
+                          fill="none"
+                          stroke="#84cc16"
+                          strokeWidth="8"
+                          strokeLinecap="round"
+                          strokeDasharray={`${82 * 2.64} ${100 * 2.64}`}
+                          className="drop-shadow-[0_0_8px_rgba(132,204,22,0.5)]"
+                        />
+                      </svg>
+                      {/* Score text in center */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <div className="text-2xl sm:text-3xl font-black text-lime-500">82%</div>
+                        <div className="text-[8px] sm:text-[10px] font-black text-neutral-400">READY</div>
+                      </div>
                     </div>
                     <div className="flex-1">
-                      <div className="h-3 sm:h-4 border-2 border-black bg-neutral-800">
-                        <div className="h-full bg-lime-500" style={{ width: "82%" }} />
-                      </div>
+                      <div className="text-xs sm:text-sm font-black text-white mb-1">Release Ready Score</div>
+                      <div className="text-[10px] sm:text-xs text-neutral-400">Based on 20 listener reviews</div>
                     </div>
                   </div>
 
