@@ -167,13 +167,22 @@ export default function ReengagementPage() {
                 Users who signed up but never submitted a track
               </p>
             </div>
-            <button
-              onClick={sendTrialEmails}
-              disabled={sending !== null || (trialData?.stats.eligibleCount ?? 0) === 0}
-              className="px-4 py-2 bg-neutral-900 text-white rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-800"
-            >
-              {sending === "trial" ? "Sending..." : `Send to ${trialData?.stats.eligibleCount ?? 0}`}
-            </button>
+            <div className="flex items-center gap-2">
+              <a
+                href="/api/admin/reengagement/preview?type=trial"
+                target="_blank"
+                className="px-4 py-2 border border-neutral-300 text-neutral-700 rounded-lg text-sm font-medium hover:bg-neutral-50"
+              >
+                Preview Email
+              </a>
+              <button
+                onClick={sendTrialEmails}
+                disabled={sending !== null || (trialData?.stats.eligibleCount ?? 0) === 0}
+                className="px-4 py-2 bg-neutral-900 text-white rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-800"
+              >
+                {sending === "trial" ? "Sending..." : `Send to ${trialData?.stats.eligibleCount ?? 0}`}
+              </button>
+            </div>
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-4">
@@ -229,13 +238,22 @@ export default function ReengagementPage() {
                 People who started signup but never finished
               </p>
             </div>
-            <button
-              onClick={sendLeadEmails}
-              disabled={sending !== null || (leadsData?.stats.eligibleCount ?? 0) === 0}
-              className="px-4 py-2 bg-neutral-900 text-white rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-800"
-            >
-              {sending === "leads" ? "Sending..." : `Send to ${leadsData?.stats.eligibleCount ?? 0}`}
-            </button>
+            <div className="flex items-center gap-2">
+              <a
+                href="/api/admin/reengagement/preview?type=lead"
+                target="_blank"
+                className="px-4 py-2 border border-neutral-300 text-neutral-700 rounded-lg text-sm font-medium hover:bg-neutral-50"
+              >
+                Preview Email
+              </a>
+              <button
+                onClick={sendLeadEmails}
+                disabled={sending !== null || (leadsData?.stats.eligibleCount ?? 0) === 0}
+                className="px-4 py-2 bg-neutral-900 text-white rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-800"
+              >
+                {sending === "leads" ? "Sending..." : `Send to ${leadsData?.stats.eligibleCount ?? 0}`}
+              </button>
+            </div>
           </div>
 
           <div className="mt-4 grid grid-cols-3 gap-4">
