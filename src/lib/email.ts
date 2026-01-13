@@ -113,7 +113,7 @@ export function emailButton(text: string, url: string, variant: "primary" | "sec
   `;
 }
 
-async function sendEmail({ to, subject, html, required }: SendEmailParams) {
+async function sendEmail({ to, subject, html, required }: SendEmailParams): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM;
 
@@ -128,7 +128,7 @@ async function sendEmail({ to, subject, html, required }: SendEmailParams) {
     if (required) {
       throw new Error("Email service is not configured");
     }
-    return;
+    return false;
   }
 
   const res = await fetch("https://api.resend.com/emails", {
@@ -157,8 +157,10 @@ async function sendEmail({ to, subject, html, required }: SendEmailParams) {
     if (required) {
       throw new Error(`Email send failed (${res.status})`);
     }
-    return;
+    return false;
   }
+
+  return true;
 }
 
 export async function sendTierChangeEmail(params: {
@@ -508,8 +510,8 @@ export async function sendInvalidTrackLinkEmail(params: {
 export async function sendTrialReminderEmail(params: {
   to: string;
   artistName: string;
-}) {
-  if (!params.to) return;
+}): Promise<boolean> {
+  if (!params.to) return false;
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
@@ -544,7 +546,7 @@ export async function sendTrialReminderEmail(params: {
     </div>
   `;
 
-  await sendEmail({
+  return sendEmail({
     to: params.to,
     subject: "Your free review is waiting",
     html: emailWrapper(content),
@@ -554,8 +556,8 @@ export async function sendTrialReminderEmail(params: {
 export async function sendLeadReminderEmail(params: {
   to: string;
   artistName?: string;
-}) {
-  if (!params.to) return;
+}): Promise<boolean> {
+  if (!params.to) return false;
 
   const greeting = params.artistName ? `Hey ${params.artistName}` : "Hey there";
 
@@ -592,7 +594,7 @@ export async function sendLeadReminderEmail(params: {
     </div>
   `;
 
-  await sendEmail({
+  return sendEmail({
     to: params.to,
     subject: "Still want feedback on your music?",
     html: emailWrapper(content),

@@ -48,7 +48,8 @@
       "Bash(timeout 15 npx next dev:*)",
       "Bash(timeout 20 npx next dev:*)",
       "Bash(timeout 12 npx next:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(node reset-reminders.js:*)"
     ]
   }
 }

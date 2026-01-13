@@ -125,12 +125,16 @@ export async function POST(request: Request) {
     // Send emails and track results
     const results = await Promise.allSettled(
       users.map(async (user) => {
-        await sendTrialReminderEmail({
+        const emailSent = await sendTrialReminderEmail({
           to: user.email,
           artistName: user.artistProfile?.artistName ?? "there",
         });
 
-        // Mark as reminded
+        if (!emailSent) {
+          throw new Error(`Email failed for ${user.email}`);
+        }
+
+        // Only mark as reminded if email actually sent
         await prisma.user.update({
           where: { id: user.id },
           data: { trialReminderSentAt: new Date() },

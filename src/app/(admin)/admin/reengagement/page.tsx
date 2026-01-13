@@ -40,6 +40,7 @@ export default function ReengagementPage() {
   const [leadsData, setLeadsData] = useState<LeadsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState<"trial" | "leads" | null>(null);
+  const [resetting, setResetting] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const fetchData = async () => {
@@ -127,6 +128,34 @@ export default function ReengagementPage() {
     }
   };
 
+  const resetReminders = async () => {
+    if (!confirm("Reset all reminder flags? This will make previously reminded users eligible again.")) {
+      return;
+    }
+
+    setResetting(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch("/api/admin/reengagement/reset", { method: "POST" });
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage({
+          type: "success",
+          text: `Reset ${data.trialUsersReset} trial users and ${data.leadsReset} leads`,
+        });
+        fetchData();
+      } else {
+        setMessage({ type: "error", text: data.error || "Failed to reset" });
+      }
+    } catch (e) {
+      setMessage({ type: "error", text: "Network error" });
+    } finally {
+      setResetting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -140,9 +169,18 @@ export default function ReengagementPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Re-engagement</h1>
-        <p className="text-neutral-500">Send reminder emails to inactive users</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Re-engagement</h1>
+          <p className="text-neutral-500">Send reminder emails to inactive users</p>
+        </div>
+        <button
+          onClick={resetReminders}
+          disabled={resetting}
+          className="px-4 py-2 border border-red-300 text-red-700 rounded-lg text-sm font-medium hover:bg-red-50 disabled:opacity-50"
+        >
+          {resetting ? "Resetting..." : "Reset All Flags"}
+        </button>
       </div>
 
       {message && (

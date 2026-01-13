@@ -110,12 +110,16 @@ export async function POST(request: Request) {
     // Send emails and track results
     const results = await Promise.allSettled(
       leads.map(async (lead) => {
-        await sendLeadReminderEmail({
+        const emailSent = await sendLeadReminderEmail({
           to: lead.email,
           artistName: lead.artistName ?? undefined,
         });
 
-        // Mark as reminded
+        if (!emailSent) {
+          throw new Error(`Email failed for ${lead.email}`);
+        }
+
+        // Only mark as reminded if email actually sent
         await prisma.leadCapture.update({
           where: { id: lead.id },
           data: { reminded: true },
