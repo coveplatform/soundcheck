@@ -68,6 +68,9 @@ export default async function AdminPage() {
           <Link className="text-neutral-600 hover:text-neutral-900" href="/admin/support">
             Support tickets
           </Link>
+          <Link className="text-neutral-600 hover:text-neutral-900" href="/admin/reengagement">
+            Re-engagement emails
+          </Link>
         </div>
       </div>
 

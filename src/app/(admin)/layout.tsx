@@ -51,6 +51,9 @@ export default async function AdminLayout({
               <Link href="/admin/leads" className="text-neutral-600 hover:text-neutral-900">
                 Leads
               </Link>
+              <Link href="/admin/reengagement" className="text-neutral-600 hover:text-neutral-900">
+                Emails
+              </Link>
               <Link href="/admin/support" className="text-neutral-600 hover:text-neutral-900">
                 Support
               </Link>
