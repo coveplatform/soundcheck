@@ -432,35 +432,35 @@ export default function Home() {
       </section>
 
       {/* Features - Compact 3-column */}
-      <section className="border-b border-neutral-800 py-16 bg-black text-white">
+      <section className="border-y-2 border-black py-16 bg-orange-400 text-black">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid sm:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="h-14 w-14 bg-orange-400 border-2 border-black flex items-center justify-center mb-4 mx-auto">
-                <Target className="h-7 w-7 text-black" />
+              <div className="h-14 w-14 bg-black border-2 border-black flex items-center justify-center mb-4 mx-auto">
+                <Target className="h-7 w-7 text-orange-400" />
               </div>
               <h3 className="font-bold text-lg mb-2">Genre-matched</h3>
-              <p className="text-sm text-neutral-300">
+              <p className="text-sm text-black/70">
                 Your trap beat won&apos;t be reviewed by someone who only listens to country.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="h-14 w-14 bg-lime-500 border-2 border-black flex items-center justify-center mb-4 mx-auto">
-                <Clock className="h-7 w-7 text-black" />
+              <div className="h-14 w-14 bg-black border-2 border-black flex items-center justify-center mb-4 mx-auto">
+                <Clock className="h-7 w-7 text-orange-400" />
               </div>
               <h3 className="font-bold text-lg mb-2">Fast turnaround</h3>
-              <p className="text-sm text-neutral-300">
+              <p className="text-sm text-black/70">
                 All reviews delivered within 24 hours. Usually much faster.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="h-14 w-14 bg-orange-400 border-2 border-black flex items-center justify-center mb-4 mx-auto">
-                <Shield className="h-7 w-7 text-black" />
+              <div className="h-14 w-14 bg-black border-2 border-black flex items-center justify-center mb-4 mx-auto">
+                <Shield className="h-7 w-7 text-orange-400" />
               </div>
               <h3 className="font-bold text-lg mb-2">Private & secure</h3>
-              <p className="text-sm text-neutral-300">
+              <p className="text-sm text-black/70">
                 Only assigned reviewers hear your track. We never share or leak your work.
               </p>
             </div>
@@ -489,10 +489,10 @@ export default function Home() {
               return (
                 <div
                   key={p.key}
-                  className={`relative border-2 border-black bg-white p-8 text-black ${
+                  className={`relative border-2 border-black p-8 text-black ${
                     isPopular
-                      ? "shadow-[8px_8px_0px_0px_rgba(132,204,22,1)] md:-translate-y-2"
-                      : "shadow-[6px_6px_0px_0px_rgba(64,64,64,1)]"
+                      ? "bg-lime-400 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] md:-translate-y-2"
+                      : "bg-white shadow-[6px_6px_0px_0px_rgba(64,64,64,1)]"
                   }`}
                 >
                   {isPopular && (
@@ -549,26 +549,26 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="bg-black text-white py-20 border-b border-neutral-800">
+      <section className="bg-lime-500 text-black py-20 border-y-2 border-black">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-black mb-6">
             Stop wondering.<br />Start knowing.
           </h2>
-          <p className="text-neutral-400 mb-10 text-lg">
+          <p className="text-black/70 mb-10 text-lg">
             Your track deserves more than a guess. Get real feedback from real listeners.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/signup">
               <Button
                 size="lg"
-                className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
+                className="bg-black text-lime-500 hover:bg-neutral-900 active:bg-neutral-800 font-bold text-base px-10 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
               >
                 Get Feedback <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <span className="text-sm font-bold text-black bg-lime-500 px-3 py-1 border-2 border-black">First one&apos;s free</span>
+            <span className="text-sm font-bold text-lime-500 bg-black px-3 py-1 border-2 border-black">First one&apos;s free</span>
           </div>
-          <p className="mt-6 text-sm text-neutral-500">
+          <p className="mt-6 text-sm text-black/60">
             No card required • Results in under 12 hours
           </p>
         </div>
