@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Headphones, DollarSign, Shield, ArrowRight, Target, Clock, Quote, CheckCircle2, Lock, Users, MessageCircle, Flame, Music } from "lucide-react";
+import { Headphones, Shield, ArrowRight, Target, Clock, Quote, CheckCircle2, Lock, Users, MessageCircle, Flame, Music } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
@@ -177,8 +177,6 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-sm sm:text-base text-neutral-300">
             <span className="text-orange-400 font-black">Reviewers earn $0.50–$1.50 per review</span>
-            <span className="text-neutral-500 mx-2">•</span>
-            <span>You rate every review — quality pays, lazy doesn&apos;t</span>
           </p>
         </div>
       </section>
@@ -303,19 +301,22 @@ export default function Home() {
                 <div>
                   <div className="text-xs font-black text-lime-500 mb-2">WHAT WORKED</div>
                   <p className="text-neutral-300 text-sm leading-relaxed">
-                    The hook at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">0:45</span> is instantly memorable — I caught myself humming it after. Drums and bass feel really tight throughout, especially that kick pattern in the verses. The drop at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:12</span> hits hard and the stereo width on the synths gives it a lot of energy. Vocal processing in the chorus sounds professional.
+                    The hook at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">0:45</span> is instantly memorable — I caught myself humming it after. The drop at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:12</span> hits hard...
                   </p>
                 </div>
                 <div>
                   <div className="text-xs font-black text-orange-400 mb-2">TO IMPROVE</div>
                   <p className="text-neutral-300 text-sm leading-relaxed">
-                    Intro feels too long — I&apos;d cut 8-12 seconds to get to the action faster. Around <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:30</span> the vocal sits on top of the lead synth and they&apos;re fighting for the same frequency space. Maybe automate the synth down a few dB there or add a sidechain. The outro also drags a bit after <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">2:45</span>.
+                    Intro feels too long — I&apos;d cut 8-12 seconds to get to the action faster. Around <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:30</span> the vocal sits on top of...
                   </p>
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-neutral-800 text-center">
+              <div className="mt-4 pt-4 border-t border-neutral-800 flex items-center justify-between">
                 <span className="text-xs text-neutral-500">Review 1 of 20</span>
+                <span className="text-xs font-bold text-lime-500 flex items-center gap-1 cursor-pointer hover:text-lime-400">
+                  Read full review <ArrowRight className="h-3 w-3" />
+                </span>
               </div>
             </div>
           </div>
@@ -332,39 +333,64 @@ export default function Home() {
       </section>
 
       {/* The Solution */}
-      <section className="border-b-2 border-black py-16 bg-lime-500 text-black">
+      <section className="border-b-2 border-black py-16 bg-lime-500 text-black overflow-hidden">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black mb-8 text-center">How it works</h2>
+          <h2 className="text-3xl font-black mb-12 text-center">How it works</h2>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="border-2 border-black p-5 bg-lime-400/30 flex flex-col h-full">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-10 w-10 border-2 border-black bg-black text-lime-500 flex items-center justify-center font-black">1</div>
-                <div className="text-lg font-black">Submit</div>
+          {/* Desktop: Horizontal flow with arrows */}
+          <div className="hidden lg:flex items-center justify-center gap-0">
+            {[
+              { num: "1", title: "Submit", icon: Music },
+              { num: "2", title: "Match", icon: Users },
+              { num: "3", title: "Review", icon: MessageCircle },
+              { num: "4", title: "Clarity", icon: Flame },
+            ].map((step, i, arr) => (
+              <div key={step.num} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div className="h-20 w-20 border-3 border-black bg-black text-lime-500 flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
+                    <step.icon className="h-9 w-9" />
+                  </div>
+                  <div className="mt-4 text-center">
+                    <div className="text-xs font-black text-black/60">STEP {step.num}</div>
+                    <div className="text-xl font-black">{step.title}</div>
+                  </div>
+                </div>
+                {i < arr.length - 1 && (
+                  <div className="mx-6 flex items-center">
+                    <div className="w-12 h-1 bg-black/30" />
+                    <div className="w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-l-[12px] border-l-black/30" />
+                  </div>
+                )}
               </div>
-              <div className="text-sm">Paste a link or upload your track</div>
-            </div>
-            <div className="border-2 border-black p-5 bg-lime-400/30 flex flex-col h-full">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-10 w-10 border-2 border-black bg-black text-lime-500 flex items-center justify-center font-black">2</div>
-                <div className="text-lg font-black">Match</div>
+            ))}
+          </div>
+
+          {/* Mobile: Vertical flow with arrows */}
+          <div className="lg:hidden flex flex-col items-center gap-0">
+            {[
+              { num: "1", title: "Submit", icon: Music },
+              { num: "2", title: "Match", icon: Users },
+              { num: "3", title: "Review", icon: MessageCircle },
+              { num: "4", title: "Clarity", icon: Flame },
+            ].map((step, i, arr) => (
+              <div key={step.num} className="flex flex-col items-center">
+                <div className="flex items-center gap-4">
+                  <div className="h-16 w-16 border-2 border-black bg-black text-lime-500 flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,0.3)]">
+                    <step.icon className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-black text-black/60">STEP {step.num}</div>
+                    <div className="text-xl font-black">{step.title}</div>
+                  </div>
+                </div>
+                {i < arr.length - 1 && (
+                  <div className="my-4 flex flex-col items-center">
+                    <div className="w-1 h-6 bg-black/30" />
+                    <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[12px] border-t-black/30" />
+                  </div>
+                )}
               </div>
-              <div className="text-sm">We assign genre-matched reviewers</div>
-            </div>
-            <div className="border-2 border-black p-5 bg-lime-400/30 flex flex-col h-full">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-10 w-10 border-2 border-black bg-black text-lime-500 flex items-center justify-center font-black">3</div>
-                <div className="text-lg font-black">Review</div>
-              </div>
-              <div className="text-sm">Structured feedback with timestamps</div>
-            </div>
-            <div className="border-2 border-black p-5 bg-lime-400/30 flex flex-col h-full">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-10 w-10 border-2 border-black bg-black text-lime-500 flex items-center justify-center font-black">4</div>
-                <div className="text-lg font-black">Clarity</div>
-              </div>
-              <div className="text-sm">Patterns show what to change</div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -528,10 +554,6 @@ export default function Home() {
             })}
           </div>
 
-          <p className="text-center text-sm text-neutral-400 mt-8 flex items-center justify-center gap-2">
-            <DollarSign className="h-4 w-4" />
-            <span>Your payment goes directly to reviewers. Quality enforced by your ratings.</span>
-          </p>
         </div>
       </section>
 
