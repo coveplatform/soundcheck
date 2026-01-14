@@ -36,7 +36,7 @@ export default function Home() {
                 Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
               </h1>
               <p className="mt-6 text-neutral-200 text-lg sm:text-xl font-bold leading-snug">
-                MixReflect is a <span className="text-orange-400">private feedback marketplace</span> — reviewers earn more for higher-quality reviews, and artists rate every review to keep quality high.
+                <span className="text-orange-400">Reviewers earn $0.50–$1.50 per review.</span> You rate every review to keep quality high.
               </p>
 
               <div className="mt-8 flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4">
@@ -169,15 +169,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Reviewer Value Prop */}
-      <section className="bg-neutral-900 border-b border-neutral-800 py-4">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-sm sm:text-base text-neutral-300">
-            <span className="text-orange-400 font-black">Reviewers earn $0.50–$1.50 per review</span>
-          </p>
         </div>
       </section>
 
