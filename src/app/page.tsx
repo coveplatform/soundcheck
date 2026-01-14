@@ -489,10 +489,10 @@ export default function Home() {
               return (
                 <div
                   key={p.key}
-                  className={`relative border-2 border-black p-8 text-black ${
+                  className={`relative border-2 border-black bg-white p-8 text-black ${
                     isPopular
-                      ? "bg-lime-400 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] md:-translate-y-2"
-                      : "bg-white shadow-[6px_6px_0px_0px_rgba(64,64,64,1)]"
+                      ? "shadow-[8px_8px_0px_0px_rgba(132,204,22,1)] md:-translate-y-2"
+                      : "shadow-[6px_6px_0px_0px_rgba(64,64,64,1)]"
                   }`}
                 >
                   {isPopular && (
@@ -561,12 +561,12 @@ export default function Home() {
             <Link href="/signup">
               <Button
                 size="lg"
-                className="bg-black text-lime-500 hover:bg-neutral-900 active:bg-neutral-800 font-bold text-base px-10 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
+                className="bg-orange-400 text-black hover:bg-orange-300 active:bg-orange-500 font-bold text-base px-10 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
               >
                 Get Feedback <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <span className="text-sm font-bold text-lime-500 bg-black px-3 py-1 border-2 border-black">First one&apos;s free</span>
+            <span className="text-sm font-bold text-black bg-orange-400 px-3 py-1 border-2 border-black">First one&apos;s free</span>
           </div>
           <p className="mt-6 text-sm text-black/60">
             No card required • Results in under 12 hours
