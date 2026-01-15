@@ -1,12 +1,55 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight, Music, Play, TrendingUp, MessageSquare } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Music, Play, TrendingUp, MessageSquare, BarChart3 } from "lucide-react";
 
-type Tab = "consensus" | "reviews";
+type Tab = "analytics" | "consensus" | "reviews";
+
+// Circular progress component
+function CircleProgress({ value, label, color }: { value: number; label: string; color: string }) {
+  const radius = 36;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (value / 100) * circumference;
+
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative w-24 h-24">
+        <svg className="w-24 h-24 transform -rotate-90">
+          <circle
+            cx="48"
+            cy="48"
+            r={radius}
+            stroke="currentColor"
+            strokeWidth="6"
+            fill="none"
+            className="text-neutral-800"
+          />
+          <circle
+            cx="48"
+            cy="48"
+            r={radius}
+            stroke={color}
+            strokeWidth="6"
+            fill="none"
+            strokeLinecap="round"
+            style={{
+              strokeDasharray: circumference,
+              strokeDashoffset: strokeDashoffset,
+              transition: 'stroke-dashoffset 0.5s ease'
+            }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-xl font-black text-white">{value}%</span>
+        </div>
+      </div>
+      <span className="text-xs text-neutral-400 mt-2 text-center">{label}</span>
+    </div>
+  );
+}
 
 export function TrackReportDemo() {
-  const [activeTab, setActiveTab] = useState<Tab>("consensus");
+  const [activeTab, setActiveTab] = useState<Tab>("analytics");
 
   return (
     <div className="bg-neutral-900 border-2 border-black shadow-[8px_8px_0px_0px_rgba(132,204,22,0.4)]">
@@ -70,48 +113,76 @@ export function TrackReportDemo() {
       {/* Tabs - Clear tab navigation */}
       <div className="bg-neutral-950 border-b-2 border-neutral-800 px-2 pt-2">
         <div className="flex gap-1">
+          {/* Analytics Tab */}
+          <button
+            onClick={() => setActiveTab("analytics")}
+            className={`flex-1 px-3 sm:px-4 py-3 text-left transition-all rounded-t-lg relative ${
+              activeTab === "analytics"
+                ? "bg-neutral-900 text-white"
+                : "bg-neutral-800/50 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-300"
+            }`}
+          >
+            {activeTab === "analytics" && (
+              <div className="absolute top-0 left-3 right-3 h-1 bg-lime-500 rounded-b" />
+            )}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center flex-shrink-0 ${activeTab === "analytics" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
+                <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </div>
+              <div className="min-w-0">
+                <div className="font-black text-xs sm:text-sm truncate">Analytics</div>
+                <div className={`text-[10px] sm:text-xs mt-0.5 truncate ${activeTab === "analytics" ? "text-neutral-400" : "text-neutral-500"}`}>
+                  Visual breakdown
+                </div>
+              </div>
+            </div>
+          </button>
+
+          {/* Consensus Tab */}
           <button
             onClick={() => setActiveTab("consensus")}
-            className={`flex-1 px-4 py-3 sm:py-4 text-left transition-all rounded-t-lg relative ${
+            className={`flex-1 px-3 sm:px-4 py-3 text-left transition-all rounded-t-lg relative ${
               activeTab === "consensus"
                 ? "bg-neutral-900 text-white"
                 : "bg-neutral-800/50 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-300"
             }`}
           >
             {activeTab === "consensus" && (
-              <div className="absolute top-0 left-4 right-4 h-1 bg-lime-500 rounded-b" />
+              <div className="absolute top-0 left-3 right-3 h-1 bg-lime-500 rounded-b" />
             )}
-            <div className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded flex items-center justify-center ${activeTab === "consensus" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
-                <TrendingUp className="w-4 h-4" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center flex-shrink-0 ${activeTab === "consensus" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
+                <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-              <div>
-                <div className="font-black text-sm sm:text-base">Consensus Patterns</div>
-                <div className={`text-xs mt-0.5 ${activeTab === "consensus" ? "text-neutral-400" : "text-neutral-500"}`}>
-                  What 20 reviewers agreed on
+              <div className="min-w-0">
+                <div className="font-black text-xs sm:text-sm truncate">Consensus</div>
+                <div className={`text-[10px] sm:text-xs mt-0.5 truncate ${activeTab === "consensus" ? "text-neutral-400" : "text-neutral-500"}`}>
+                  What they agreed on
                 </div>
               </div>
             </div>
           </button>
+
+          {/* Reviews Tab */}
           <button
             onClick={() => setActiveTab("reviews")}
-            className={`flex-1 px-4 py-3 sm:py-4 text-left transition-all rounded-t-lg relative ${
+            className={`flex-1 px-3 sm:px-4 py-3 text-left transition-all rounded-t-lg relative ${
               activeTab === "reviews"
                 ? "bg-neutral-900 text-white"
                 : "bg-neutral-800/50 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-300"
             }`}
           >
             {activeTab === "reviews" && (
-              <div className="absolute top-0 left-4 right-4 h-1 bg-lime-500 rounded-b" />
+              <div className="absolute top-0 left-3 right-3 h-1 bg-lime-500 rounded-b" />
             )}
-            <div className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded flex items-center justify-center ${activeTab === "reviews" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
-                <MessageSquare className="w-4 h-4" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center flex-shrink-0 ${activeTab === "reviews" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
+                <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-              <div>
-                <div className="font-black text-sm sm:text-base">Individual Reviews</div>
-                <div className={`text-xs mt-0.5 ${activeTab === "reviews" ? "text-neutral-400" : "text-neutral-500"}`}>
-                  Detailed feedback from each reviewer
+              <div className="min-w-0">
+                <div className="font-black text-xs sm:text-sm truncate">Reviews</div>
+                <div className={`text-[10px] sm:text-xs mt-0.5 truncate ${activeTab === "reviews" ? "text-neutral-400" : "text-neutral-500"}`}>
+                  Individual feedback
                 </div>
               </div>
             </div>
@@ -128,6 +199,64 @@ export function TrackReportDemo() {
         </div>
 
         <div className="relative">
+          {/* Analytics Tab */}
+          {activeTab === "analytics" && (
+            <div className="space-y-6">
+              {/* Listener Response - Circle Charts */}
+              <div>
+                <h4 className="text-xs font-black text-neutral-400 mb-4 tracking-wider">LISTENER RESPONSE</h4>
+                <div className="grid grid-cols-3 gap-4 sm:gap-6">
+                  <CircleProgress value={85} label="Would Replay" color="#84cc16" />
+                  <CircleProgress value={67} label="Would Playlist" color="#84cc16" />
+                  <CircleProgress value={52} label="Would Share" color="#fb923c" />
+                </div>
+              </div>
+
+              {/* Rating Distribution - Bar Chart */}
+              <div>
+                <h4 className="text-xs font-black text-neutral-400 mb-4 tracking-wider">RATING DISTRIBUTION</h4>
+                <div className="bg-black/30 border border-neutral-800 p-4">
+                  <div className="space-y-2">
+                    {[
+                      { stars: 5, count: 8, percent: 40 },
+                      { stars: 4, count: 7, percent: 35 },
+                      { stars: 3, count: 4, percent: 20 },
+                      { stars: 2, count: 1, percent: 5 },
+                      { stars: 1, count: 0, percent: 0 },
+                    ].map((row) => (
+                      <div key={row.stars} className="flex items-center gap-3">
+                        <span className="text-xs font-bold text-neutral-500 w-12">{row.stars} star</span>
+                        <div className="flex-1 h-4 bg-neutral-800 rounded-sm overflow-hidden">
+                          <div
+                            className={`h-full ${row.stars >= 4 ? 'bg-lime-500' : row.stars === 3 ? 'bg-yellow-500' : 'bg-orange-500'}`}
+                            style={{ width: `${row.percent}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-neutral-400 w-8">{row.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-neutral-800 flex items-center justify-between">
+                    <span className="text-xs text-neutral-500">Average Rating</span>
+                    <span className="text-lg font-black text-white">4.2<span className="text-neutral-500 text-sm">/5</span></span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-lime-500/10 border border-lime-500/30 p-4 text-center">
+                  <div className="text-2xl font-black text-lime-500">75%</div>
+                  <div className="text-xs text-neutral-400 mt-1">Positive Sentiment</div>
+                </div>
+                <div className="bg-orange-400/10 border border-orange-400/30 p-4 text-center">
+                  <div className="text-2xl font-black text-orange-400">3</div>
+                  <div className="text-xs text-neutral-400 mt-1">Areas to Improve</div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Consensus Tab */}
           {activeTab === "consensus" && (
             <div className="space-y-4">
