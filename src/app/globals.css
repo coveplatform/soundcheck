@@ -32,10 +32,12 @@ body {
 .autofill-dark:-webkit-autofill:hover,
 .autofill-dark:-webkit-autofill:focus,
 .autofill-dark:-webkit-autofill:active {
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: white;
-  transition: background-color 5000s ease-in-out 0s;
-  box-shadow: inset 0 0 20px 20px transparent;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: white !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  box-shadow: inset 0 0 20px 20px black !important;
+  background-color: transparent !important;
+  caret-color: white;
 }
 
 /* FAQ details marker */

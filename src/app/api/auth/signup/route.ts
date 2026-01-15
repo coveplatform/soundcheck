@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { createHash, randomBytes } from "crypto";
-import { sendEmailVerificationEmail } from "@/lib/email";
 import { PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE } from "@/lib/password";
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 
@@ -44,17 +42,6 @@ export async function POST(request: Request) {
     const { email, password, role, acceptedTerms, referralSource } = signupSchema.parse(body);
     const normalizedEmail = email.trim().toLowerCase();
 
-    const emailConfigured = Boolean(
-      process.env.RESEND_API_KEY && (process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM)
-    );
-
-    if (process.env.NODE_ENV === "production" && !emailConfigured) {
-      return NextResponse.json(
-        { error: "Email service is not configured" },
-        { status: 500 }
-      );
-    }
-
     if (!acceptedTerms) {
       return NextResponse.json(
         { error: "You must agree to the Terms and Privacy Policy" },
@@ -82,40 +69,17 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user with role flags
+    // Create user with role flags (auto-verified)
     const user = await prisma.user.create({
       data: {
         email: normalizedEmail,
         password: hashedPassword,
+        emailVerified: new Date(),
         isArtist: role === "artist" || role === "both",
         isReviewer: role === "reviewer" || role === "both",
         referralSource,
       },
     });
-
-    const token = randomBytes(32).toString("hex");
-    const tokenHash = createHash("sha256").update(token).digest("hex");
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-    await prisma.emailVerificationToken.create({
-      data: {
-        userId: user.id,
-        tokenHash,
-        expiresAt,
-      },
-    });
-
-    const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
-    const verifyUrl = `${baseUrl}/verify-email?token=${token}&email=${encodeURIComponent(normalizedEmail)}`;
-
-    await sendEmailVerificationEmail({
-      to: normalizedEmail,
-      verifyUrl,
-    });
-
-    if (process.env.NODE_ENV !== "production" && !emailConfigured) {
-      console.log("Dev email verification link:", verifyUrl);
-    }
 
     return NextResponse.json(
       {
@@ -123,9 +87,6 @@ export async function POST(request: Request) {
         userId: user.id,
         isArtist: user.isArtist,
         isReviewer: user.isReviewer,
-        ...(process.env.NODE_ENV !== "production" && !emailConfigured
-          ? { verifyUrl }
-          : {}),
       },
       { status: 201 }
     );

@@ -45,6 +45,7 @@ export default function SubmitTrackPage() {
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<PackageType>("STANDARD");
+  const [useFreeTrial, setUseFreeTrial] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
 
   // UI state
@@ -352,7 +353,7 @@ export default function SubmitTrackPage() {
       }
 
       let checkoutUrl = `/artist/submit/checkout?trackId=${data.id}`;
-      if (freeCredits > 0) {
+      if (useFreeTrial) {
         checkoutUrl += "&useFreeCredit=true";
       }
       router.push(checkoutUrl);
@@ -733,16 +734,64 @@ export default function SubmitTrackPage() {
           </div>
 
           <div className="space-y-4">
+            {/* Free Trial Option */}
+            {freeCredits > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setUseFreeTrial(true);
+                }}
+                className={cn(
+                  "relative w-full text-left border-2 border-black transition-all",
+                  useFreeTrial
+                    ? "ring-2 ring-lime-500 ring-offset-2"
+                    : "hover:bg-neutral-50"
+                )}
+              >
+                <div className={cn(
+                  "p-4 flex items-center justify-between",
+                  useFreeTrial ? "bg-lime-400" : "bg-lime-100"
+                )}>
+                  <div className="flex items-center gap-3">
+                    <Gift className="h-5 w-5" />
+                    <div>
+                      <h3 className="font-bold text-lg">Free Trial</h3>
+                      <p className="text-sm text-neutral-600">Try it out with 1 review</p>
+                    </div>
+                  </div>
+                  <div className={cn(
+                    "h-12 w-12 border-2 border-black flex items-center justify-center font-black text-xl flex-shrink-0",
+                    useFreeTrial ? "bg-black text-white" : "bg-lime-400"
+                  )}>
+                    1
+                  </div>
+                </div>
+                <div className="px-4 py-3 border-t-2 border-black bg-white">
+                  <span className="text-3xl font-black">FREE</span>
+                </div>
+                {useFreeTrial && (
+                  <div className="px-4 py-2 bg-lime-400 border-t-2 border-black flex items-center justify-center gap-2">
+                    <Check className="h-4 w-4" />
+                    <span className="text-sm font-bold">Selected</span>
+                  </div>
+                )}
+              </button>
+            )}
+
+            {/* Paid Packages */}
             {ACTIVE_PACKAGE_TYPES.map((key) => {
               const pkg = PACKAGES[key];
-              const isSelected = selectedPackage === key;
+              const isSelected = selectedPackage === key && !useFreeTrial;
               const isPopular = key === "STANDARD";
-              
+
               return (
                 <button
                   key={key}
                   type="button"
-                  onClick={() => setSelectedPackage(key)}
+                  onClick={() => {
+                    setSelectedPackage(key);
+                    setUseFreeTrial(false);
+                  }}
                   className={cn(
                     "relative w-full text-left border-2 border-black transition-all",
                     isSelected
@@ -870,18 +919,18 @@ export default function SubmitTrackPage() {
           <div className="mt-4 border-2 border-black">
             <div className={cn(
               "p-4 flex items-center justify-between",
-              freeCredits > 0 ? "bg-lime-400" : "bg-lime-500"
+              useFreeTrial ? "bg-lime-400" : "bg-lime-500"
             )}>
-              <div>
-                <p className="font-black text-lg">{selectedPackageDetails.name}</p>
-                <p className="text-sm font-medium">{selectedPackageDetails.description}</p>
+              <div className="flex items-center gap-3">
+                {useFreeTrial && <Gift className="h-5 w-5" />}
+                <div>
+                  <p className="font-black text-lg">{useFreeTrial ? "Free Trial" : selectedPackageDetails.name}</p>
+                  <p className="text-sm font-medium">{useFreeTrial ? "1 review" : selectedPackageDetails.description}</p>
+                </div>
               </div>
               <div className="text-right">
-                {freeCredits > 0 ? (
-                  <div className="flex flex-col items-end">
-                    <span className="text-2xl font-black">FREE</span>
-                    <span className="text-sm line-through opacity-60">${(selectedPackageDetails.price / 100).toFixed(2)} AUD</span>
-                  </div>
+                {useFreeTrial ? (
+                  <span className="text-2xl font-black">FREE</span>
                 ) : (
                   <div className="flex flex-col items-end">
                     <span className="text-3xl font-black">${(selectedPackageDetails.price / 100).toFixed(2)}</span>
@@ -891,8 +940,8 @@ export default function SubmitTrackPage() {
               </div>
             </div>
 
-            {/* Price per review */}
-            {!freeCredits && (
+            {/* Price per review - only for paid packages */}
+            {!useFreeTrial && (
               <div className="px-4 py-2 bg-neutral-100 border-t-2 border-black flex items-center justify-between text-sm">
                 <span className="text-neutral-600">{selectedPackageDetails.reviews} reviews</span>
                 <span className="font-mono text-neutral-500">${(selectedPackageDetails.price / selectedPackageDetails.reviews / 100).toFixed(2)}/review</span>
@@ -900,34 +949,26 @@ export default function SubmitTrackPage() {
             )}
 
             {/* What you get - actual features from package */}
-            <div className="p-4 bg-white border-t-2 border-black space-y-2">
-              {selectedPackageDetails.features.map((feature, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm">
-                  <Check className={cn(
-                    "h-4 w-4 flex-shrink-0",
-                    feature.includes("Consensus") || feature.includes("Pattern")
-                      ? "text-orange-500"
-                      : "text-lime-600"
-                  )} />
-                  <span className={cn(
-                    feature.includes("Consensus") || feature.includes("Pattern")
-                      ? "font-semibold"
-                      : ""
-                  )}>{feature}</span>
-                </div>
-              ))}
-            </div>
+            {!useFreeTrial && (
+              <div className="p-4 bg-white border-t-2 border-black space-y-2">
+                {selectedPackageDetails.features.map((feature, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm">
+                    <Check className={cn(
+                      "h-4 w-4 flex-shrink-0",
+                      feature.includes("Consensus") || feature.includes("Pattern")
+                        ? "text-orange-500"
+                        : "text-lime-600"
+                    )} />
+                    <span className={cn(
+                      feature.includes("Consensus") || feature.includes("Pattern")
+                        ? "font-semibold"
+                        : ""
+                    )}>{feature}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-
-          {/* Free credit banner */}
-          {freeCredits > 0 && (
-            <div className="mt-4 bg-lime-100 border-2 border-lime-500 p-3 flex items-center gap-3">
-              <Gift className="h-5 w-5 text-lime-700 flex-shrink-0" />
-              <p className="text-sm font-medium text-lime-800">
-                Your free review credit will be applied at checkout
-              </p>
-            </div>
-          )}
 
           {/* Submit Button */}
           <div className="mt-6">
@@ -938,7 +979,7 @@ export default function SubmitTrackPage() {
               variant="primary"
               className="w-full h-14 text-lg font-bold"
             >
-              {freeCredits > 0 ? (
+              {useFreeTrial ? (
                 <>
                   <Gift className="h-5 w-5 mr-2" />
                   Get Your Free Review
@@ -950,7 +991,7 @@ export default function SubmitTrackPage() {
               )}
             </Button>
             <p className="text-center text-xs text-neutral-500 mt-3">
-              {freeCredits > 0 ? "No payment required" : "Secure payment via Stripe"}
+              {useFreeTrial ? "No payment required" : "Secure payment via Stripe"}
             </p>
           </div>
         </div>

@@ -120,7 +120,6 @@ export default function SignupPage() {
 
       const data = await response.json().catch(() => ({}));
       funnels.artistSignup.complete(data.userId || "unknown", role);
-      track("email_verification_sent");
 
       // Reddit conversion tracking
       redditEvents.signUp();
@@ -130,10 +129,21 @@ export default function SignupPage() {
         content_name: role,
       });
 
-      const verifyUrl = callbackUrl
-        ? `/verify-email?email=${encodeURIComponent(email)}&callbackUrl=${encodeURIComponent(callbackUrl)}`
-        : `/verify-email?email=${encodeURIComponent(email)}`;
-      router.push(verifyUrl);
+      // Sign in the user automatically
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        // Signup succeeded but auto-login failed - redirect to login
+        router.push("/login");
+        return;
+      }
+
+      // Redirect to submit page or callback URL
+      router.push(callbackUrl || "/artist/submit");
       router.refresh();
     } catch {
       setError("Something went wrong");
@@ -205,7 +215,8 @@ export default function SignupPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full bg-transparent rounded-none border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 outline-none focus-visible:outline-none transition-colors autofill-dark"
+            className="w-full rounded-none border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 autofill-dark"
+            style={{ backgroundColor: 'transparent' }}
           />
         </div>
 
@@ -220,7 +231,8 @@ export default function SignupPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full bg-transparent rounded-none border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 outline-none focus-visible:outline-none transition-colors autofill-dark"
+            className="w-full rounded-none border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 autofill-dark"
+            style={{ backgroundColor: 'transparent' }}
           />
           <div className="mt-3">
             <PasswordStrength password={password} />
