@@ -26,31 +26,33 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="border-b border-neutral-800 relative overflow-hidden">
+      <section className="min-h-[calc(100vh-3.5rem)] border-b border-neutral-800 relative overflow-hidden flex flex-col">
         <div className="absolute top-20 right-10 w-32 h-32 bg-lime-500 rounded-full blur-3xl opacity-20" />
         <div className="absolute bottom-10 left-10 w-24 h-24 bg-orange-400 rounded-full blur-2xl opacity-20" />
-        <div className="max-w-4xl mx-auto px-4 py-16 sm:py-20 md:py-28 relative text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
-            Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
-          </h1>
+        <div className="flex-1 flex items-center justify-center px-4 py-16 sm:py-20 md:py-28 relative">
+          <div className="max-w-4xl text-center">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
+              Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
+            </h1>
 
-          <p className="mt-6 text-neutral-300 text-base sm:text-lg max-w-2xl mx-auto">
-            A <span className="text-white font-bold">private feedback marketplace</span> where genre-matched reviewers give you honest, structured feedback on your unreleased tracks.
-          </p>
+            <p className="mt-6 text-neutral-300 text-base sm:text-lg max-w-2xl mx-auto">
+              A <span className="text-white font-bold">private feedback marketplace</span> where genre-matched reviewers give you honest, structured feedback on your unreleased tracks.
+            </p>
 
-          <p className="mt-4 text-neutral-200 text-lg sm:text-xl font-bold leading-snug">
-            <span className="text-orange-400">Reviewers earn $0.50–$1.50 per review.</span> You rate every review to keep quality high.
-          </p>
+            <p className="mt-4 text-neutral-200 text-lg sm:text-xl font-bold leading-snug">
+              <span className="text-orange-400">Reviewers earn $0.50–$1.50 per review.</span> You rate every review to keep quality high.
+            </p>
 
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/signup">
-              <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
-                Start trial <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="#examples" className="text-sm font-bold text-black bg-white px-4 py-2 border-2 border-black hover:bg-neutral-50 active:bg-neutral-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
-              See example report
-            </Link>
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/signup">
+                <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
+                  Start trial <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="#examples" className="text-sm font-bold text-black bg-white px-4 py-2 border-2 border-black hover:bg-neutral-50 active:bg-neutral-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
+                See example report
+              </Link>
+            </div>
           </div>
         </div>
 
