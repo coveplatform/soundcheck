@@ -110,28 +110,29 @@ export function TrackReportDemo() {
         </div>
       </div>
 
-      {/* Tabs - Clear tab navigation */}
-      <div className="bg-neutral-950 border-b-2 border-neutral-800 px-2 pt-2">
+      {/* Tabs - Responsive: compact on mobile, full on desktop */}
+      <div className="bg-neutral-950 border-b-2 border-neutral-800 px-1 sm:px-2 pt-1 sm:pt-2">
         <div className="flex gap-1">
           {/* Analytics Tab */}
           <button
             onClick={() => setActiveTab("analytics")}
-            className={`flex-1 px-3 sm:px-4 py-3 text-left transition-all rounded-t-lg relative ${
+            className={`flex-1 px-2 sm:px-4 py-2 sm:py-3 transition-all rounded-t-lg relative ${
               activeTab === "analytics"
                 ? "bg-neutral-900 text-white"
                 : "bg-neutral-800/50 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-300"
             }`}
           >
             {activeTab === "analytics" && (
-              <div className="absolute top-0 left-3 right-3 h-1 bg-lime-500 rounded-b" />
+              <div className="absolute top-0 left-2 right-2 sm:left-3 sm:right-3 h-1 bg-lime-500 rounded-b" />
             )}
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center flex-shrink-0 ${activeTab === "analytics" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
-                <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            {/* Mobile: Icon + short label */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
+              <div className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 ${activeTab === "analytics" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
+                <BarChart3 className="w-4 h-4" />
               </div>
-              <div className="min-w-0">
-                <div className="font-black text-xs sm:text-sm truncate">Analytics</div>
-                <div className={`text-[10px] sm:text-xs mt-0.5 truncate ${activeTab === "analytics" ? "text-neutral-400" : "text-neutral-500"}`}>
+              <div className="text-center sm:text-left">
+                <div className="font-black text-[10px] sm:text-sm">Analytics</div>
+                <div className={`hidden sm:block text-xs mt-0.5 ${activeTab === "analytics" ? "text-neutral-400" : "text-neutral-500"}`}>
                   Visual breakdown
                 </div>
               </div>
@@ -141,22 +142,22 @@ export function TrackReportDemo() {
           {/* Consensus Tab */}
           <button
             onClick={() => setActiveTab("consensus")}
-            className={`flex-1 px-3 sm:px-4 py-3 text-left transition-all rounded-t-lg relative ${
+            className={`flex-1 px-2 sm:px-4 py-2 sm:py-3 transition-all rounded-t-lg relative ${
               activeTab === "consensus"
                 ? "bg-neutral-900 text-white"
                 : "bg-neutral-800/50 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-300"
             }`}
           >
             {activeTab === "consensus" && (
-              <div className="absolute top-0 left-3 right-3 h-1 bg-lime-500 rounded-b" />
+              <div className="absolute top-0 left-2 right-2 sm:left-3 sm:right-3 h-1 bg-lime-500 rounded-b" />
             )}
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center flex-shrink-0 ${activeTab === "consensus" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
-                <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
+              <div className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 ${activeTab === "consensus" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
+                <TrendingUp className="w-4 h-4" />
               </div>
-              <div className="min-w-0">
-                <div className="font-black text-xs sm:text-sm truncate">Consensus</div>
-                <div className={`text-[10px] sm:text-xs mt-0.5 truncate ${activeTab === "consensus" ? "text-neutral-400" : "text-neutral-500"}`}>
+              <div className="text-center sm:text-left">
+                <div className="font-black text-[10px] sm:text-sm">Patterns</div>
+                <div className={`hidden sm:block text-xs mt-0.5 ${activeTab === "consensus" ? "text-neutral-400" : "text-neutral-500"}`}>
                   What they agreed on
                 </div>
               </div>
@@ -166,22 +167,22 @@ export function TrackReportDemo() {
           {/* Reviews Tab */}
           <button
             onClick={() => setActiveTab("reviews")}
-            className={`flex-1 px-3 sm:px-4 py-3 text-left transition-all rounded-t-lg relative ${
+            className={`flex-1 px-2 sm:px-4 py-2 sm:py-3 transition-all rounded-t-lg relative ${
               activeTab === "reviews"
                 ? "bg-neutral-900 text-white"
                 : "bg-neutral-800/50 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-300"
             }`}
           >
             {activeTab === "reviews" && (
-              <div className="absolute top-0 left-3 right-3 h-1 bg-lime-500 rounded-b" />
+              <div className="absolute top-0 left-2 right-2 sm:left-3 sm:right-3 h-1 bg-lime-500 rounded-b" />
             )}
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded flex items-center justify-center flex-shrink-0 ${activeTab === "reviews" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
-                <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
+              <div className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 ${activeTab === "reviews" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
+                <MessageSquare className="w-4 h-4" />
               </div>
-              <div className="min-w-0">
-                <div className="font-black text-xs sm:text-sm truncate">Reviews</div>
-                <div className={`text-[10px] sm:text-xs mt-0.5 truncate ${activeTab === "reviews" ? "text-neutral-400" : "text-neutral-500"}`}>
+              <div className="text-center sm:text-left">
+                <div className="font-black text-[10px] sm:text-sm">Reviews</div>
+                <div className={`hidden sm:block text-xs mt-0.5 ${activeTab === "reviews" ? "text-neutral-400" : "text-neutral-500"}`}>
                   Individual feedback
                 </div>
               </div>
