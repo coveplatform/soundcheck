@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Headphones, Shield, ArrowRight, Target, Clock, Quote, CheckCircle2, Lock, Users, MessageCircle, Flame, Music } from "lucide-react";
+import { Headphones, Shield, ArrowRight, ArrowLeft, Target, Clock, Quote, CheckCircle2, Lock, Users, MessageCircle, Flame, Music, Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
@@ -201,6 +201,49 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Track Header with Waveform */}
+            <div className="bg-black/80 border-b border-neutral-800 p-4 sm:p-5">
+              <div className="flex items-center gap-4">
+                {/* Album Art / Play Button */}
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-black flex-shrink-0 group cursor-pointer">
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Play className="h-6 w-6 text-white fill-white" />
+                  </div>
+                  <Music className="h-6 w-6 sm:h-7 sm:w-7 text-white/80 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover:opacity-0 transition-opacity" />
+                </div>
+
+                {/* Track Info + Waveform */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div>
+                      <h4 className="font-black text-white text-base sm:text-lg truncate">Midnight Drive</h4>
+                      <p className="text-xs sm:text-sm text-neutral-400">by <span className="text-white">You</span> • <span className="text-orange-400 font-bold">Electronic</span></p>
+                    </div>
+                    {/* 20 Reviews Badge - EMPHASIZED */}
+                    <div className="flex-shrink-0 bg-lime-500 border-2 border-black px-3 py-1.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                      <div className="text-xl sm:text-2xl font-black text-black leading-none">20</div>
+                      <div className="text-[9px] sm:text-[10px] font-bold text-black/70 uppercase tracking-wide">Reviews</div>
+                    </div>
+                  </div>
+
+                  {/* Waveform Visualization */}
+                  <div className="flex items-end gap-[2px] h-8 sm:h-10">
+                    {[40, 65, 45, 80, 55, 90, 70, 85, 50, 75, 95, 60, 85, 70, 55, 80, 45, 70, 90, 65, 50, 75, 85, 60, 45, 70, 55, 80, 65, 90, 75, 50, 85, 70, 55, 80, 60, 45, 75, 65].map((height, i) => (
+                      <div
+                        key={i}
+                        className="flex-1 bg-lime-500/60 rounded-sm min-w-[2px]"
+                        style={{ height: `${height}%` }}
+                      />
+                    ))}
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-[10px] text-neutral-500 font-mono">0:00</span>
+                    <span className="text-[10px] text-neutral-500 font-mono">3:24</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Dashboard Content */}
             <div className="p-5 sm:p-8 lg:p-10">
 
@@ -301,51 +344,87 @@ export default function Home() {
                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-700 to-transparent" />
               </div>
 
-              {/* Individual Reviews - RIGHT ALIGNED header */}
+              {/* Individual Reviews - with Navigation */}
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-6">
-                  <span className="text-xs font-black text-neutral-600 order-2 sm:order-1">REVIEW 1 OF 20</span>
                   <div className="order-1 sm:order-2 sm:text-right">
                     <h3 className="text-xl font-black mb-1">Individual reviews</h3>
                     <p className="text-sm text-neutral-400">Structured feedback you can actually use</p>
                   </div>
                 </div>
 
-                <div className="bg-black/50 border border-neutral-700 p-5 sm:p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-5 border-b border-neutral-700">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-lime-500 flex items-center justify-center font-black text-black">S</div>
-                      <div>
-                        <div className="font-black">Sarah</div>
-                        <div className="text-xs text-neutral-500">Electronic • 4.2/5 rating</div>
+                {/* Review Card with Navigation Arrows */}
+                <div className="flex items-stretch gap-3">
+                  {/* Left Arrow */}
+                  <button className="hidden sm:flex items-center justify-center w-10 bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 hover:border-neutral-600 transition-colors cursor-pointer group">
+                    <ChevronLeft className="h-5 w-5 text-neutral-500 group-hover:text-white transition-colors" />
+                  </button>
+
+                  {/* Review Card */}
+                  <div className="flex-1 bg-black/50 border border-neutral-700 p-5 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-5 border-b border-neutral-700">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-lime-500 flex items-center justify-center font-black text-black">S</div>
+                        <div>
+                          <div className="font-black">Sarah</div>
+                          <div className="text-xs text-neutral-500">Electronic • 4.2/5 rating</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black bg-lime-500/20 text-lime-400 px-2 py-1">Would replay</span>
+                        <span className="text-xs font-black bg-lime-500/20 text-lime-400 px-2 py-1">Would playlist</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-black bg-lime-500/20 text-lime-400 px-2 py-1">Would replay</span>
-                      <span className="text-xs font-black bg-lime-500/20 text-lime-400 px-2 py-1">Would playlist</span>
+
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div>
+                        <div className="text-xs font-black text-lime-500 mb-2">WHAT WORKED</div>
+                        <p className="text-neutral-300 text-sm leading-relaxed">
+                          The hook at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">0:45</span> is instantly memorable — I caught myself humming it after. The drop at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:12</span> hits hard...
+                        </p>
+                      </div>
+                      <div>
+                        <div className="text-xs font-black text-orange-400 mb-2">TO IMPROVE</div>
+                        <p className="text-neutral-300 text-sm leading-relaxed">
+                          Intro feels too long — I&apos;d cut 8-12 seconds to get to the action faster. Around <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:30</span> the vocal sits on top of...
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t border-neutral-700 flex items-center justify-between">
+                      {/* Pagination Dots */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 rounded-full bg-lime-500" />
+                          <div className="w-2 h-2 rounded-full bg-neutral-700" />
+                          <div className="w-2 h-2 rounded-full bg-neutral-700" />
+                          <div className="w-2 h-2 rounded-full bg-neutral-700" />
+                          <div className="w-2 h-2 rounded-full bg-neutral-700" />
+                          <span className="text-[10px] text-neutral-600 ml-1">+15</span>
+                        </div>
+                        <span className="text-xs font-bold text-neutral-500">1 of 20</span>
+                      </div>
+                      <span className="text-xs font-bold text-lime-500 flex items-center gap-1 cursor-pointer hover:text-lime-400">
+                        Read full review <ArrowRight className="h-3 w-3" />
+                      </span>
                     </div>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div>
-                      <div className="text-xs font-black text-lime-500 mb-2">WHAT WORKED</div>
-                      <p className="text-neutral-300 text-sm leading-relaxed">
-                        The hook at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">0:45</span> is instantly memorable — I caught myself humming it after. The drop at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:12</span> hits hard...
-                      </p>
-                    </div>
-                    <div>
-                      <div className="text-xs font-black text-orange-400 mb-2">TO IMPROVE</div>
-                      <p className="text-neutral-300 text-sm leading-relaxed">
-                        Intro feels too long — I&apos;d cut 8-12 seconds to get to the action faster. Around <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:30</span> the vocal sits on top of...
-                      </p>
-                    </div>
-                  </div>
+                  {/* Right Arrow */}
+                  <button className="hidden sm:flex items-center justify-center w-10 bg-lime-500 border-2 border-black hover:bg-lime-400 transition-colors cursor-pointer group">
+                    <ChevronRight className="h-5 w-5 text-black" />
+                  </button>
+                </div>
 
-                  <div className="mt-4 pt-4 border-t border-neutral-700 flex items-center justify-end">
-                    <span className="text-xs font-bold text-lime-500 flex items-center gap-1 cursor-pointer hover:text-lime-400">
-                      Read full review <ArrowRight className="h-3 w-3" />
-                    </span>
-                  </div>
+                {/* Mobile Navigation */}
+                <div className="flex sm:hidden items-center justify-center gap-4 mt-4">
+                  <button className="flex items-center justify-center w-10 h-10 bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 transition-colors">
+                    <ChevronLeft className="h-5 w-5 text-neutral-400" />
+                  </button>
+                  <span className="text-sm font-bold text-neutral-400">1 of 20</span>
+                  <button className="flex items-center justify-center w-10 h-10 bg-lime-500 border-2 border-black hover:bg-lime-400 transition-colors">
+                    <ChevronRight className="h-5 w-5 text-black" />
+                  </button>
                 </div>
               </div>
 
