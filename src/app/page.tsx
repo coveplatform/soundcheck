@@ -187,128 +187,168 @@ export default function Home() {
       <section id="examples" className="py-16 border-b border-neutral-800">
         <div className="max-w-5xl mx-auto px-4">
 
-          {/* Analytics Overview */}
-          <div className="mb-12">
-            <h3 className="text-xl font-black mb-2">Analytics overview</h3>
-            <p className="text-sm text-neutral-400 mb-6">See how listeners responded to your track at a glance</p>
-
-            <div className="grid sm:grid-cols-4 gap-4">
-              <div className="bg-neutral-900 border-2 border-neutral-800 p-5 text-center">
-                <div className="text-3xl font-black text-lime-500">83%</div>
-                <div className="text-xs text-neutral-400 mt-1">Would replay</div>
+          {/* Dashboard Frame */}
+          <div className="bg-neutral-900 border-2 border-black shadow-[8px_8px_0px_0px_rgba(132,204,22,0.4)]">
+            {/* Browser Chrome */}
+            <div className="bg-black px-4 py-3 border-b-2 border-neutral-800 flex items-center gap-3">
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-neutral-700" />
+                <div className="w-3 h-3 rounded-full bg-neutral-700" />
+                <div className="w-3 h-3 rounded-full bg-neutral-700" />
               </div>
-              <div className="bg-neutral-900 border-2 border-neutral-800 p-5 text-center">
-                <div className="text-3xl font-black text-lime-500">67%</div>
-                <div className="text-xs text-neutral-400 mt-1">Would playlist</div>
-              </div>
-              <div className="bg-neutral-900 border-2 border-neutral-800 p-5 text-center">
-                <div className="text-3xl font-black text-white">52%</div>
-                <div className="text-xs text-neutral-400 mt-1">Would share</div>
-              </div>
-              <div className="bg-neutral-900 border-2 border-neutral-800 p-5 text-center">
-                <div className="text-3xl font-black text-white">4.2</div>
-                <div className="text-xs text-neutral-400 mt-1">Avg rating</div>
+              <div className="flex-1 bg-neutral-800 rounded px-3 py-1 ml-2">
+                <span className="text-xs text-neutral-500 font-mono">mixreflect.com/tracks/midnight-drive/report</span>
               </div>
             </div>
-          </div>
 
-          {/* Consensus Insights */}
-          <div className="mb-12">
-            <h3 className="text-xl font-black mb-2">Consensus insights</h3>
-            <p className="text-sm text-neutral-400 mb-6">When multiple reviewers mention the same thing, you know it matters</p>
+            {/* Dashboard Content */}
+            <div className="p-5 sm:p-8 lg:p-10">
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* What hit */}
-              <div className="bg-neutral-900 border-2 border-neutral-800 p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="h-2 w-2 bg-lime-500" />
-                  <span className="text-xs font-black text-lime-500">WHAT&apos;S WORKING</span>
+              {/* Analytics Overview - CENTERED */}
+              <div className="text-center mb-10">
+                <h3 className="text-xl font-black mb-2">Analytics overview</h3>
+                <p className="text-sm text-neutral-400 mb-6">See how listeners responded to your track at a glance</p>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="bg-black/50 border border-neutral-700 p-4 sm:p-5">
+                    <div className="text-2xl sm:text-3xl font-black text-lime-500">83%</div>
+                    <div className="text-[10px] sm:text-xs text-neutral-500 mt-1">Would replay</div>
+                  </div>
+                  <div className="bg-black/50 border border-neutral-700 p-4 sm:p-5">
+                    <div className="text-2xl sm:text-3xl font-black text-lime-500">67%</div>
+                    <div className="text-[10px] sm:text-xs text-neutral-500 mt-1">Would playlist</div>
+                  </div>
+                  <div className="bg-black/50 border border-neutral-700 p-4 sm:p-5">
+                    <div className="text-2xl sm:text-3xl font-black text-white">52%</div>
+                    <div className="text-[10px] sm:text-xs text-neutral-500 mt-1">Would share</div>
+                  </div>
+                  <div className="bg-black/50 border border-neutral-700 p-4 sm:p-5">
+                    <div className="text-2xl sm:text-3xl font-black text-white">4.2</div>
+                    <div className="text-[10px] sm:text-xs text-neutral-500 mt-1">Avg rating</div>
+                  </div>
                 </div>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <span className="text-xs font-black bg-lime-500 text-black px-2 py-1 whitespace-nowrap">15 of 20</span>
-                    <div>
-                      <div className="font-bold text-sm">Hook hits hard at 0:45</div>
-                      <div className="text-xs text-neutral-500">Melody lands, drums feel confident</div>
+              </div>
+
+              {/* Divider */}
+              <div className="flex items-center gap-4 mb-10">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-700 to-transparent" />
+                <span className="text-[10px] font-black text-neutral-600 tracking-widest">CONSENSUS</span>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-700 to-transparent" />
+              </div>
+
+              {/* Consensus Insights - LEFT ALIGNED with colored backgrounds */}
+              <div className="mb-10">
+                <div className="mb-6">
+                  <h3 className="text-xl font-black mb-1">Consensus insights</h3>
+                  <p className="text-sm text-neutral-400">When multiple reviewers mention the same thing, you know it matters</p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* What&apos;s working - lime tinted */}
+                  <div className="bg-lime-500/10 border border-lime-500/30 p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="h-2 w-2 bg-lime-500" />
+                      <span className="text-xs font-black text-lime-500">WHAT&apos;S WORKING</span>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <span className="text-xs font-black bg-lime-500 text-black px-2 py-1 whitespace-nowrap">15 of 20</span>
+                        <div>
+                          <div className="font-bold text-sm">Hook hits hard at 0:45</div>
+                          <div className="text-xs text-neutral-500">Melody lands, drums feel confident</div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-xs font-black bg-lime-500/70 text-black px-2 py-1 whitespace-nowrap">12 of 20</span>
+                        <div>
+                          <div className="font-bold text-sm">Breakdown feels fresh at 2:15</div>
+                          <div className="text-xs text-neutral-500">Nice contrast, keeps attention</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-xs font-black bg-lime-500/70 text-black px-2 py-1 whitespace-nowrap">12 of 20</span>
-                    <div>
-                      <div className="font-bold text-sm">Breakdown feels fresh at 2:15</div>
-                      <div className="text-xs text-neutral-500">Nice contrast, keeps attention</div>
+
+                  {/* What to improve - orange tinted */}
+                  <div className="bg-orange-400/10 border border-orange-400/30 p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="h-2 w-2 bg-orange-400" />
+                      <span className="text-xs font-black text-orange-400">WHAT TO IMPROVE</span>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <span className="text-xs font-black bg-orange-400 text-black px-2 py-1 whitespace-nowrap">14 of 20</span>
+                        <div>
+                          <div className="font-bold text-sm">Intro too long</div>
+                          <div className="text-xs text-neutral-500">Hook should arrive sooner</div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-xs font-black bg-orange-400/70 text-black px-2 py-1 whitespace-nowrap">10 of 20</span>
+                        <div>
+                          <div className="font-bold text-sm">Vocal too loud at 1:30</div>
+                          <div className="text-xs text-neutral-500">Clashes with the lead synth</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* What to fix */}
-              <div className="bg-neutral-900 border-2 border-neutral-800 p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="h-2 w-2 bg-orange-400" />
-                  <span className="text-xs font-black text-orange-400">WHAT TO IMPROVE</span>
+              {/* Divider */}
+              <div className="flex items-center gap-4 mb-10">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-700 to-transparent" />
+                <span className="text-[10px] font-black text-neutral-600 tracking-widest">INDIVIDUAL FEEDBACK</span>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-700 to-transparent" />
+              </div>
+
+              {/* Individual Reviews - RIGHT ALIGNED header */}
+              <div>
+                <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-6">
+                  <span className="text-xs font-black text-neutral-600 order-2 sm:order-1">REVIEW 1 OF 20</span>
+                  <div className="order-1 sm:order-2 sm:text-right">
+                    <h3 className="text-xl font-black mb-1">Individual reviews</h3>
+                    <p className="text-sm text-neutral-400">Structured feedback you can actually use</p>
+                  </div>
                 </div>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <span className="text-xs font-black bg-orange-400 text-black px-2 py-1 whitespace-nowrap">14 of 20</span>
-                    <div>
-                      <div className="font-bold text-sm">Intro too long</div>
-                      <div className="text-xs text-neutral-500">Hook should arrive sooner</div>
+
+                <div className="bg-black/50 border border-neutral-700 p-5 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-5 border-b border-neutral-700">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-lime-500 flex items-center justify-center font-black text-black">S</div>
+                      <div>
+                        <div className="font-black">Sarah</div>
+                        <div className="text-xs text-neutral-500">Electronic • 4.2/5 rating</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black bg-lime-500/20 text-lime-400 px-2 py-1">Would replay</span>
+                      <span className="text-xs font-black bg-lime-500/20 text-lime-400 px-2 py-1">Would playlist</span>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-xs font-black bg-orange-400/70 text-black px-2 py-1 whitespace-nowrap">10 of 20</span>
+
+                  <div className="grid sm:grid-cols-2 gap-5">
                     <div>
-                      <div className="font-bold text-sm">Vocal too loud at 1:30</div>
-                      <div className="text-xs text-neutral-500">Clashes with the lead synth</div>
+                      <div className="text-xs font-black text-lime-500 mb-2">WHAT WORKED</div>
+                      <p className="text-neutral-300 text-sm leading-relaxed">
+                        The hook at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">0:45</span> is instantly memorable — I caught myself humming it after. The drop at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:12</span> hits hard...
+                      </p>
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-orange-400 mb-2">TO IMPROVE</div>
+                      <p className="text-neutral-300 text-sm leading-relaxed">
+                        Intro feels too long — I&apos;d cut 8-12 seconds to get to the action faster. Around <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:30</span> the vocal sits on top of...
+                      </p>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Individual Reviews */}
-          <div>
-            <h3 className="text-xl font-black mb-2">Individual reviews</h3>
-            <p className="text-sm text-neutral-400 mb-6">Each reviewer provides structured feedback you can actually use</p>
-
-            <div className="bg-neutral-900 border-2 border-neutral-800 p-5 sm:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-5 border-b border-neutral-800">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-lime-500 flex items-center justify-center font-black text-black">S</div>
-                  <div>
-                    <div className="font-black">Sarah</div>
-                    <div className="text-xs text-neutral-500">Electronic • 4.2/5 rating</div>
+                  <div className="mt-4 pt-4 border-t border-neutral-700 flex items-center justify-end">
+                    <span className="text-xs font-bold text-lime-500 flex items-center gap-1 cursor-pointer hover:text-lime-400">
+                      Read full review <ArrowRight className="h-3 w-3" />
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-black bg-lime-500/20 text-lime-400 px-2 py-1">Would replay</span>
-                  <span className="text-xs font-black bg-lime-500/20 text-lime-400 px-2 py-1">Would add to playlist</span>
-                </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-5">
-                <div>
-                  <div className="text-xs font-black text-lime-500 mb-2">WHAT WORKED</div>
-                  <p className="text-neutral-300 text-sm leading-relaxed">
-                    The hook at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">0:45</span> is instantly memorable — I caught myself humming it after. The drop at <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:12</span> hits hard...
-                  </p>
-                </div>
-                <div>
-                  <div className="text-xs font-black text-orange-400 mb-2">TO IMPROVE</div>
-                  <p className="text-neutral-300 text-sm leading-relaxed">
-                    Intro feels too long — I&apos;d cut 8-12 seconds to get to the action faster. Around <span className="font-mono text-white bg-neutral-800 px-1 rounded text-xs">1:30</span> the vocal sits on top of...
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-neutral-800 flex items-center justify-between">
-                <span className="text-xs text-neutral-500">Review 1 of 20</span>
-                <span className="text-xs font-bold text-lime-500 flex items-center gap-1 cursor-pointer hover:text-lime-400">
-                  Read full review <ArrowRight className="h-3 w-3" />
-                </span>
-              </div>
             </div>
           </div>
 
