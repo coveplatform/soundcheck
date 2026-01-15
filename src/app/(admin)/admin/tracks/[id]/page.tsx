@@ -8,6 +8,7 @@ import { GrantFreeButton } from "@/components/admin/grant-free-button";
 import { DeleteTrackButton } from "@/components/admin/delete-track-button";
 import { DebugAssignButton } from "@/components/admin/debug-assign-button";
 import { NotifyInvalidLinkButton } from "@/components/admin/notify-invalid-link-button";
+import { ReassignReviewerButton } from "@/components/admin/reassign-reviewer-button";
 import { AudioPlayer } from "@/components/audio/audio-player";
 
 export const dynamic = 'force-dynamic';
@@ -220,6 +221,7 @@ export default async function AdminTrackDetailPage({
                   <th className="text-left font-medium px-4 py-3">Reviewer</th>
                   <th className="text-left font-medium px-4 py-3">Assigned</th>
                   <th className="text-left font-medium px-4 py-3">Expires</th>
+                  <th className="text-left font-medium px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
@@ -228,11 +230,18 @@ export default async function AdminTrackDetailPage({
                     <td className="px-4 py-3">{q.reviewer.user.email}</td>
                     <td className="px-4 py-3">{new Date(q.assignedAt).toLocaleString()}</td>
                     <td className="px-4 py-3">{new Date(q.expiresAt).toLocaleString()}</td>
+                    <td className="px-4 py-3">
+                      <ReassignReviewerButton
+                        trackId={track.id}
+                        currentReviewerId={q.reviewerId}
+                        currentReviewerEmail={q.reviewer.user.email}
+                      />
+                    </td>
                   </tr>
                 ))}
                 {track.queueEntries.length === 0 ? (
                   <tr>
-                    <td className="px-4 py-6 text-center text-neutral-500" colSpan={3}>
+                    <td className="px-4 py-6 text-center text-neutral-500" colSpan={4}>
                       Queue is empty
                     </td>
                   </tr>
