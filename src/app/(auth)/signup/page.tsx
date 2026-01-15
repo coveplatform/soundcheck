@@ -5,16 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { funnels, track } from "@/lib/analytics";
 import { redditEvents, trackTikTokEvent } from "@/components/providers";
@@ -156,133 +146,142 @@ export default function SignupPage() {
 
   if (isCheckingSession) {
     return (
-      <Card className="w-full rounded-2xl border border-neutral-800 bg-neutral-950/60 text-white backdrop-blur shadow-[0_18px_60px_-20px_rgba(132,204,22,0.35)]">
-        <CardContent className="py-12">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-neutral-300" />
-            <p className="text-sm text-neutral-400">Loading...</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-neutral-500" />
+      </div>
     );
   }
 
   return (
-    <Card className="w-full rounded-2xl border border-neutral-800 bg-neutral-950/60 text-white backdrop-blur shadow-[0_18px_60px_-20px_rgba(132,204,22,0.35)]">
-      <CardHeader className="text-center">
+    <div className="w-full">
+      {/* Header */}
+      <div className="mb-10">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm font-bold text-neutral-300 hover:text-white transition-colors mb-4 self-start"
+          className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-white transition-colors mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
-          Home
+          Back
         </Link>
-        <CardTitle className="text-2xl font-black">Start your trial</CardTitle>
-        <CardDescription className="text-neutral-300">Artist name, email, and password. That&apos;s it.</CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full h-11 rounded-xl border border-neutral-800 bg-neutral-950/70 text-white hover:bg-neutral-900 hover:text-white"
-            onClick={() => signIn("google", { callbackUrl: callbackUrl || "/artist/onboarding" })}
-          >
-            <GoogleIcon className="h-5 w-5 mr-2" />
-            Continue with Google
-          </Button>
+        <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Start your trial</h1>
+        <p className="mt-2 text-neutral-500">Artist name, email, password. That&apos;s it.</p>
+      </div>
 
-          <div className="relative w-full">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-neutral-800" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-transparent px-2 text-neutral-400">or</span>
-            </div>
-          </div>
+      {/* Google */}
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full h-12 bg-transparent border-2 border-neutral-800 text-white hover:bg-white hover:text-black hover:border-white font-bold transition-all"
+        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/artist/onboarding" })}
+      >
+        <GoogleIcon className="h-5 w-5 mr-2" />
+        Continue with Google
+      </Button>
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/40 text-red-200 text-sm p-3 rounded-lg">
-              {error}
-            </div>
-          )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name" className="font-bold text-white">Artist / Project name</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Your artist name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="h-11 rounded-xl border border-neutral-800 bg-neutral-950/70 text-white placeholder:text-neutral-500 focus-visible:ring-2 focus-visible:ring-lime-500/30 focus-visible:ring-offset-0"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email" className="font-bold text-white">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-11 rounded-xl border border-neutral-800 bg-neutral-950/70 text-white placeholder:text-neutral-500 focus-visible:ring-2 focus-visible:ring-lime-500/30 focus-visible:ring-offset-0"
-              />
-            </div>
+      <div className="relative my-8">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-neutral-800" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-black px-4 text-neutral-600">or</span>
+        </div>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <div className="text-red-400 text-sm py-3 px-4 bg-red-500/10 border-l-2 border-red-500">
+            {error}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="font-bold text-white">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Create a strong password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="name" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
+              Artist / Project name
+            </label>
+            <input
+              id="name"
+              type="text"
+              placeholder="Your artist name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               required
-              className="h-11 rounded-xl border border-neutral-800 bg-neutral-950/70 text-white placeholder:text-neutral-500 focus-visible:ring-2 focus-visible:ring-lime-500/30 focus-visible:ring-offset-0"
+              className="w-full bg-transparent border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 focus:outline-none transition-colors"
             />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full bg-transparent border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 focus:outline-none transition-colors"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="password" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            placeholder="Create a strong password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full bg-transparent border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 focus:outline-none transition-colors"
+          />
+          <div className="mt-3">
             <PasswordStrength password={password} />
           </div>
-          <div className="flex items-start gap-3">
-            <input
-              id="terms"
-              type="checkbox"
-              checked={acceptedTerms}
-              onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className="mt-1 h-4 w-4 border border-neutral-700 bg-neutral-950 accent-lime-400"
-            />
-            <label htmlFor="terms" className="text-sm text-neutral-300">
-              I agree to the{" "}
-              <Link href="/terms" className="text-white font-bold hover:underline">
-                Terms of Service
-              </Link>
-              {" "}and{" "}
-              <Link href="/privacy" className="text-white font-bold hover:underline">
-                Privacy Policy
-              </Link>
-              .
-            </label>
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
+        </div>
+
+        <div className="flex items-start gap-3 pt-2">
+          <input
+            id="terms"
+            type="checkbox"
+            checked={acceptedTerms}
+            onChange={(e) => setAcceptedTerms(e.target.checked)}
+            className="mt-1 h-4 w-4 bg-transparent border-2 border-neutral-700 accent-lime-500 cursor-pointer"
+          />
+          <label htmlFor="terms" className="text-sm text-neutral-400 cursor-pointer">
+            I agree to the{" "}
+            <Link href="/terms" className="text-white hover:text-lime-500 transition-colors">
+              Terms
+            </Link>
+            {" "}and{" "}
+            <Link href="/privacy" className="text-white hover:text-lime-500 transition-colors">
+              Privacy Policy
+            </Link>
+          </label>
+        </div>
+
+        <div className="pt-4">
           <Button
             type="submit"
-            className="w-full h-11 rounded-xl bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black border border-black/60 shadow-[0_10px_30px_-14px_rgba(132,204,22,0.55)] hover:shadow-[0_10px_26px_-14px_rgba(132,204,22,0.45)] active:shadow-none hover:translate-y-[1px] active:translate-y-[2px] transition-all active:transition-none"
+            className="w-full h-12 bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
             isLoading={isLoading}
             disabled={!acceptedTerms || !validatePassword(password).valid}
           >
             Create account
           </Button>
-          <p className="text-sm text-neutral-300 text-center">
-            Already have an account?{" "}
-            <Link href="/login" className="text-white font-bold hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </CardFooter>
+        </div>
+
+        <p className="text-sm text-neutral-600 text-center pt-2">
+          Already have an account?{" "}
+          <Link href="/login" className="text-white font-bold hover:text-lime-500 transition-colors">
+            Sign in
+          </Link>
+        </p>
       </form>
-    </Card>
+    </div>
   );
 }

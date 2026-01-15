@@ -20,8 +20,8 @@ export default function AuthLayout({
       </header>
 
       {/* Content */}
-      <div className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-md sm:max-w-lg">{children}</div>
+      <div className="flex-1 flex items-center justify-center px-6 py-12 sm:py-16">
+        <div className="w-full max-w-md sm:max-w-xl">{children}</div>
       </div>
     </div>
   );
