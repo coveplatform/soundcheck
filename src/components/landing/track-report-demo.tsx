@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight, Music, Play } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Music, Play, TrendingUp, MessageSquare } from "lucide-react";
 
 type Tab = "consensus" | "reviews";
 
@@ -67,34 +67,56 @@ export function TrackReportDemo() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b-2 border-neutral-800">
-        <button
-          onClick={() => setActiveTab("consensus")}
-          className={`flex-1 px-4 py-3 sm:py-4 text-left transition-colors ${
-            activeTab === "consensus"
-              ? "bg-lime-500 text-black border-r-2 border-black"
-              : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700 border-r border-neutral-700"
-          }`}
-        >
-          <div className="font-black text-sm sm:text-base">What Patterns Emerged</div>
-          <div className={`text-xs mt-0.5 ${activeTab === "consensus" ? "text-black/70" : "text-neutral-500"}`}>
-            See what 20 reviewers agreed on
-          </div>
-        </button>
-        <button
-          onClick={() => setActiveTab("reviews")}
-          className={`flex-1 px-4 py-3 sm:py-4 text-left transition-colors ${
-            activeTab === "reviews"
-              ? "bg-lime-500 text-black"
-              : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
-          }`}
-        >
-          <div className="font-black text-sm sm:text-base">Individual Reviews</div>
-          <div className={`text-xs mt-0.5 ${activeTab === "reviews" ? "text-black/70" : "text-neutral-500"}`}>
-            Read detailed feedback from each
-          </div>
-        </button>
+      {/* Tabs - Clear tab navigation */}
+      <div className="bg-neutral-950 border-b-2 border-neutral-800 px-2 pt-2">
+        <div className="flex gap-1">
+          <button
+            onClick={() => setActiveTab("consensus")}
+            className={`flex-1 px-4 py-3 sm:py-4 text-left transition-all rounded-t-lg relative ${
+              activeTab === "consensus"
+                ? "bg-neutral-900 text-white"
+                : "bg-neutral-800/50 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-300"
+            }`}
+          >
+            {activeTab === "consensus" && (
+              <div className="absolute top-0 left-4 right-4 h-1 bg-lime-500 rounded-b" />
+            )}
+            <div className="flex items-center gap-3">
+              <div className={`w-8 h-8 rounded flex items-center justify-center ${activeTab === "consensus" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
+                <TrendingUp className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="font-black text-sm sm:text-base">Consensus Patterns</div>
+                <div className={`text-xs mt-0.5 ${activeTab === "consensus" ? "text-neutral-400" : "text-neutral-500"}`}>
+                  What 20 reviewers agreed on
+                </div>
+              </div>
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab("reviews")}
+            className={`flex-1 px-4 py-3 sm:py-4 text-left transition-all rounded-t-lg relative ${
+              activeTab === "reviews"
+                ? "bg-neutral-900 text-white"
+                : "bg-neutral-800/50 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-300"
+            }`}
+          >
+            {activeTab === "reviews" && (
+              <div className="absolute top-0 left-4 right-4 h-1 bg-lime-500 rounded-b" />
+            )}
+            <div className="flex items-center gap-3">
+              <div className={`w-8 h-8 rounded flex items-center justify-center ${activeTab === "reviews" ? "bg-lime-500 text-black" : "bg-neutral-700 text-neutral-400"}`}>
+                <MessageSquare className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="font-black text-sm sm:text-base">Individual Reviews</div>
+                <div className={`text-xs mt-0.5 ${activeTab === "reviews" ? "text-neutral-400" : "text-neutral-500"}`}>
+                  Detailed feedback from each reviewer
+                </div>
+              </div>
+            </div>
+          </button>
+        </div>
       </div>
 
       {/* Tab Content */}

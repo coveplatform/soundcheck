@@ -26,147 +26,53 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="border-b border-neutral-800 relative overflow-hidden min-h-[calc(100vh-3.5rem)] flex flex-col">
+      <section className="border-b border-neutral-800 relative overflow-hidden">
         <div className="absolute top-20 right-10 w-32 h-32 bg-lime-500 rounded-full blur-3xl opacity-20" />
         <div className="absolute bottom-10 left-10 w-24 h-24 bg-orange-400 rounded-full blur-2xl opacity-20" />
-        <div className="max-w-6xl mx-auto px-4 py-12 sm:py-16 md:py-20 relative flex-1 flex flex-col justify-center">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Left column - Text & CTA */}
-            <div className="text-center lg:text-left">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
-                Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
-              </h1>
-              <p className="mt-6 text-neutral-200 text-lg sm:text-xl font-bold leading-snug">
-                <span className="text-orange-400">Reviewers earn $0.50–$1.50 per review.</span> You rate every review to keep quality high.
-              </p>
+        <div className="max-w-4xl mx-auto px-4 py-16 sm:py-20 md:py-28 relative text-center">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
+            Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
+          </h1>
 
-              <div className="mt-8 flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4">
-                <Link href="/signup">
-                  <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
-                    Start trial <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link href="#examples" className="text-sm font-bold text-black bg-white px-3 py-1 border-2 border-black hover:bg-neutral-50 active:bg-neutral-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
-                  View examples
-                </Link>
-              </div>
-            </div>
+          <p className="mt-6 text-neutral-300 text-base sm:text-lg max-w-2xl mx-auto">
+            A <span className="text-white font-bold">private feedback marketplace</span> where genre-matched reviewers give you honest, structured feedback on your unreleased tracks.
+          </p>
 
-            {/* Right column - Track Scorecard Preview */}
-            <div className="w-full max-w-lg mx-auto lg:max-w-none relative">
-              {/* Stacked cards behind */}
-              <div className="absolute inset-0 border-2 border-black bg-neutral-800 transform rotate-3 translate-x-3 translate-y-3 opacity-60" />
-              <div className="absolute inset-0 border-2 border-black bg-neutral-850 transform rotate-1 translate-x-1.5 translate-y-1.5 opacity-80" style={{ backgroundColor: '#1a1a1a' }} />
+          <p className="mt-4 text-neutral-200 text-lg sm:text-xl font-bold leading-snug">
+            <span className="text-orange-400">Reviewers earn $0.50–$1.50 per review.</span> You rate every review to keep quality high.
+          </p>
 
-              {/* Main card */}
-              <div className="relative border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
-                {/* Track header */}
-                <div className="flex items-center gap-3 p-3 sm:p-4 border-b-2 border-neutral-800 bg-black/30">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-black flex items-center justify-center flex-shrink-0">
-                    <Music className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-black text-white text-sm sm:text-base truncate">Midnight Drive</div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] sm:text-xs font-bold text-black bg-orange-400 px-1.5 py-0.5">Electronic</span>
-                      <span className="text-[10px] sm:text-xs text-neutral-500">by You</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 sm:p-5">
-                  {/* Reviewers row */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="flex -space-x-2">
-                        {['bg-lime-500', 'bg-blue-500', 'bg-purple-500', 'bg-pink-500'].map((bg, i) => (
-                          <div key={i} className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full ${bg} border-2 border-neutral-900 flex items-center justify-center text-[9px] sm:text-[10px] font-black text-black`}>
-                            {['S', 'M', 'J', 'A'][i]}
-                          </div>
-                        ))}
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-neutral-700 border-2 border-neutral-900 flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-white">
-                          +16
-                        </div>
-                      </div>
-                      <span className="text-[10px] sm:text-xs font-bold text-neutral-400 hidden sm:inline">Genre-matched</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-lime-500/20 border border-lime-500/30 px-2 py-1 rounded">
-                      <span className="text-base sm:text-lg font-black text-lime-400">20</span>
-                      <span className="text-[10px] sm:text-xs font-bold text-lime-400/80">reviews</span>
-                    </div>
-                  </div>
-
-                  {/* Quick stats row */}
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="text-center p-2 bg-black/40 border border-neutral-800 rounded">
-                      <div className="text-lg sm:text-xl font-black text-lime-400">85%</div>
-                      <div className="text-[9px] sm:text-[10px] text-neutral-500">would replay</div>
-                    </div>
-                    <div className="text-center p-2 bg-black/40 border border-neutral-800 rounded">
-                      <div className="text-lg sm:text-xl font-black text-white">60%</div>
-                      <div className="text-[9px] sm:text-[10px] text-neutral-500">would playlist</div>
-                    </div>
-                    <div className="text-center p-2 bg-black/40 border border-neutral-800 rounded">
-                      <div className="text-lg sm:text-xl font-black text-white">35%</div>
-                      <div className="text-[9px] sm:text-[10px] text-neutral-500">would share</div>
-                    </div>
-                  </div>
-
-                  {/* Consensus Insights - the killer feature */}
-                  <div className="space-y-2 mb-4">
-                    <div className="text-[10px] font-black text-neutral-500 tracking-wider">WHAT YOUR REVIEWERS AGREED ON</div>
-                    <div className="bg-lime-500/10 border border-lime-500/40 p-2.5 sm:p-3 rounded">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs sm:text-sm font-black text-lime-400">15 of 20 agreed:</span>
-                      </div>
-                      <p className="text-xs sm:text-sm text-white">&quot;The hook at <span className="font-mono bg-neutral-800 px-1 rounded">0:45</span> is instantly memorable&quot;</p>
-                    </div>
-                    <div className="bg-orange-400/10 border border-orange-400/40 p-2.5 sm:p-3 rounded">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs sm:text-sm font-black text-orange-400">14 of 20 suggested:</span>
-                      </div>
-                      <p className="text-xs sm:text-sm text-white">&quot;Cut the intro by 8-10 seconds&quot;</p>
-                    </div>
-                  </div>
-
-                  {/* Sample review snippet */}
-                  <div className="border-t border-neutral-800 pt-3">
-                    <div className="flex items-start gap-2">
-                      <div className="w-6 h-6 rounded-full bg-lime-500 flex items-center justify-center text-[10px] font-black text-black flex-shrink-0">S</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-white">Sarah</span>
-                          <span className="text-[9px] text-neutral-500">Electronic fan</span>
-                        </div>
-                        <p className="text-[11px] sm:text-xs text-neutral-400 mt-0.5 line-clamp-2">&quot;The drop at 1:12 hits hard — drums and bass are tight. I&apos;d listen to this again.&quot;</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/signup">
+              <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
+                Start trial <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="#examples" className="text-sm font-bold text-black bg-white px-4 py-2 border-2 border-black hover:bg-neutral-50 active:bg-neutral-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
+              See example report
+            </Link>
           </div>
         </div>
 
-        {/* Social Proof Bar - pinned to bottom of hero */}
-        <div className="w-full bg-black text-white border-t border-neutral-800">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-neutral-700">
-              <div className="p-4 md:p-6 text-center">
-                <p className="text-2xl md:text-3xl font-black text-lime-400">500+</p>
-                <p className="text-xs md:text-sm text-neutral-400 mt-1">Reviews Delivered</p>
+        {/* Social Proof Stats - Cards style */}
+        <div className="w-full bg-black/50 backdrop-blur border-t border-neutral-800">
+          <div className="max-w-4xl mx-auto px-4 py-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+              <div className="bg-neutral-900 border border-neutral-800 p-4 text-center">
+                <p className="text-2xl sm:text-3xl font-black text-lime-500">500+</p>
+                <p className="text-xs text-neutral-400 mt-1 font-medium">Reviews Delivered</p>
               </div>
-              <div className="p-4 md:p-6 text-center">
-                <p className="text-2xl md:text-3xl font-black text-lime-400">&lt;12h</p>
-                <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Turnaround</p>
+              <div className="bg-neutral-900 border border-neutral-800 p-4 text-center">
+                <p className="text-2xl sm:text-3xl font-black text-lime-500">&lt;12h</p>
+                <p className="text-xs text-neutral-400 mt-1 font-medium">Avg Turnaround</p>
               </div>
-              <div className="p-4 md:p-6 text-center">
-                <p className="text-2xl md:text-3xl font-black text-lime-400">180+</p>
-                <p className="text-xs md:text-sm text-neutral-400 mt-1">Avg Words/Review</p>
+              <div className="bg-neutral-900 border border-neutral-800 p-4 text-center">
+                <p className="text-2xl sm:text-3xl font-black text-white">180+</p>
+                <p className="text-xs text-neutral-400 mt-1 font-medium">Words per Review</p>
               </div>
-              <div className="p-4 md:p-6 text-center">
-                <p className="text-2xl md:text-3xl font-black text-lime-400">100%</p>
-                <p className="text-xs md:text-sm text-neutral-400 mt-1">Human Reviewers</p>
+              <div className="bg-neutral-900 border border-neutral-800 p-4 text-center">
+                <p className="text-2xl sm:text-3xl font-black text-white">100%</p>
+                <p className="text-xs text-neutral-400 mt-1 font-medium">Human Reviewers</p>
               </div>
             </div>
           </div>
