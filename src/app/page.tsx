@@ -203,32 +203,36 @@ export default function Home() {
 
             {/* Track Header with Waveform */}
             <div className="bg-black/80 border-b border-neutral-800 p-4 sm:p-5">
-              <div className="flex items-center gap-4">
-                {/* Album Art / Play Button */}
-                <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-black flex-shrink-0 group cursor-pointer">
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Play className="h-6 w-6 text-white fill-white" />
+              {/* Mobile: Stack vertically, Desktop: Side by side */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+
+                {/* Top row on mobile: Album art + Track info + Badge */}
+                <div className="flex items-center gap-3 sm:gap-4 sm:flex-shrink-0">
+                  {/* Album Art / Play Button */}
+                  <div className="relative w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-black flex-shrink-0 group cursor-pointer">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Play className="h-5 w-5 sm:h-6 sm:w-6 text-white fill-white" />
+                    </div>
+                    <Music className="h-5 w-5 sm:h-7 sm:w-7 text-white/80 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover:opacity-0 transition-opacity" />
                   </div>
-                  <Music className="h-6 w-6 sm:h-7 sm:w-7 text-white/80 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover:opacity-0 transition-opacity" />
+
+                  {/* Track Info */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-black text-white text-sm sm:text-lg truncate">Midnight Drive</h4>
+                    <p className="text-xs sm:text-sm text-neutral-400">by <span className="text-white">You</span> • <span className="text-orange-400 font-bold">Electronic</span></p>
+                  </div>
+
+                  {/* 20 Reviews Badge */}
+                  <div className="flex-shrink-0 bg-lime-500 border-2 border-black px-2 sm:px-3 py-1 sm:py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] sm:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="text-lg sm:text-2xl font-black text-black leading-none">20</div>
+                    <div className="text-[8px] sm:text-[10px] font-bold text-black/70 uppercase tracking-wide">Reviews</div>
+                  </div>
                 </div>
 
-                {/* Track Info + Waveform */}
+                {/* Waveform - Full width on mobile, flex-1 on desktop */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div>
-                      <h4 className="font-black text-white text-base sm:text-lg truncate">Midnight Drive</h4>
-                      <p className="text-xs sm:text-sm text-neutral-400">by <span className="text-white">You</span> • <span className="text-orange-400 font-bold">Electronic</span></p>
-                    </div>
-                    {/* 20 Reviews Badge - EMPHASIZED */}
-                    <div className="flex-shrink-0 bg-lime-500 border-2 border-black px-3 py-1.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-                      <div className="text-xl sm:text-2xl font-black text-black leading-none">20</div>
-                      <div className="text-[9px] sm:text-[10px] font-bold text-black/70 uppercase tracking-wide">Reviews</div>
-                    </div>
-                  </div>
-
-                  {/* Realistic Waveform - Mirrored with musical structure */}
-                  {/* Structure: Intro (quiet) → Build → Drop (loud) → Breakdown → Build → Drop → Outro */}
-                  <div className="flex items-center gap-[2px] h-10 sm:h-12">
+                  {/* Realistic Waveform - Musical structure */}
+                  <div className="flex items-center gap-[1px] sm:gap-[2px] h-8 sm:h-12 overflow-hidden">
                     {[
                       // Intro - quiet, gentle
                       15, 22, 18, 25, 20, 28, 24, 30, 26, 32,
@@ -247,14 +251,14 @@ export default function Home() {
                     ].map((height, i) => (
                       <div
                         key={i}
-                        className="flex-1 bg-lime-500 rounded-sm min-w-[2px]"
+                        className="flex-1 bg-lime-500 rounded-sm"
                         style={{ height: `${height}%` }}
                       />
                     ))}
                   </div>
-                  <div className="flex justify-between mt-1.5">
-                    <span className="text-[10px] text-neutral-500 font-mono">0:00</span>
-                    <span className="text-[10px] text-neutral-500 font-mono">3:24</span>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-[9px] sm:text-[10px] text-neutral-500 font-mono">0:00</span>
+                    <span className="text-[9px] sm:text-[10px] text-neutral-500 font-mono">3:24</span>
                   </div>
                 </div>
               </div>
