@@ -226,17 +226,40 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Waveform Visualization */}
-                  <div className="flex items-end gap-[2px] h-8 sm:h-10">
-                    {[40, 65, 45, 80, 55, 90, 70, 85, 50, 75, 95, 60, 85, 70, 55, 80, 45, 70, 90, 65, 50, 75, 85, 60, 45, 70, 55, 80, 65, 90, 75, 50, 85, 70, 55, 80, 60, 45, 75, 65].map((height, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 bg-lime-500/60 rounded-sm min-w-[2px]"
-                        style={{ height: `${height}%` }}
-                      />
+                  {/* Realistic Waveform - Mirrored with musical structure */}
+                  {/* Structure: Intro (quiet) → Build → Drop (loud) → Breakdown → Build → Drop → Outro */}
+                  <div className="flex items-center gap-[1px] sm:gap-[2px] h-10 sm:h-12">
+                    {[
+                      // Intro - quiet, gentle
+                      15, 22, 18, 25, 20, 28, 24, 30, 26, 32,
+                      // Build up - gradually louder
+                      30, 35, 38, 42, 48, 52, 58, 65, 72, 78,
+                      // Drop - loud and punchy with variation
+                      95, 88, 92, 85, 98, 82, 95, 78, 92, 85, 98, 90, 85, 92, 88,
+                      // Breakdown - quieter, melodic
+                      45, 52, 48, 55, 42, 50, 45, 52, 48, 40,
+                      // Build 2
+                      45, 55, 62, 70, 78, 85,
+                      // Drop 2 - big energy
+                      100, 92, 95, 88, 98, 85, 95, 90, 98, 92, 88, 95, 90, 85,
+                      // Outro - fading
+                      75, 65, 55, 48, 40, 32, 25, 18, 12, 8
+                    ].map((height, i) => (
+                      <div key={i} className="flex-1 flex flex-col justify-center gap-[1px] min-w-[1px] sm:min-w-[2px]">
+                        {/* Top half */}
+                        <div
+                          className="w-full bg-lime-500 rounded-t-sm origin-bottom"
+                          style={{ height: `${height / 2}%` }}
+                        />
+                        {/* Bottom half (mirrored) */}
+                        <div
+                          className="w-full bg-lime-500/70 rounded-b-sm origin-top"
+                          style={{ height: `${height / 2}%` }}
+                        />
+                      </div>
                     ))}
                   </div>
-                  <div className="flex justify-between mt-1">
+                  <div className="flex justify-between mt-1.5">
                     <span className="text-[10px] text-neutral-500 font-mono">0:00</span>
                     <span className="text-[10px] text-neutral-500 font-mono">3:24</span>
                   </div>
@@ -244,8 +267,29 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Dashboard Content */}
-            <div className="p-5 sm:p-8 lg:p-10">
+            {/* Dashboard Content - with subtle background */}
+            <div className="p-5 sm:p-8 lg:p-10 relative overflow-hidden">
+              {/* Subtle background effects */}
+              <div className="absolute inset-0 pointer-events-none">
+                {/* Corner glows */}
+                <div className="absolute -top-20 -right-20 w-64 h-64 bg-lime-500/[0.07] rounded-full blur-3xl" />
+                <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-orange-400/[0.05] rounded-full blur-3xl" />
+
+                {/* Subtle grid pattern */}
+                <div
+                  className="absolute inset-0 opacity-[0.03]"
+                  style={{
+                    backgroundImage: `
+                      linear-gradient(to right, rgb(255 255 255) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgb(255 255 255) 1px, transparent 1px)
+                    `,
+                    backgroundSize: '24px 24px'
+                  }}
+                />
+              </div>
+
+              {/* Content wrapper for z-index */}
+              <div className="relative">
 
               {/* Analytics Overview - CENTERED */}
               <div className="text-center mb-10">
@@ -428,6 +472,7 @@ export default function Home() {
                 </div>
               </div>
 
+              </div>{/* Close content wrapper */}
             </div>
           </div>
 
