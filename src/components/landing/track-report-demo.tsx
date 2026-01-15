@@ -53,18 +53,6 @@ export function TrackReportDemo() {
 
   return (
     <div className="bg-neutral-900 border-2 border-black shadow-[8px_8px_0px_0px_rgba(132,204,22,0.4)]">
-      {/* Browser Chrome */}
-      <div className="bg-black px-4 py-3 border-b-2 border-neutral-800 flex items-center gap-3">
-        <div className="flex gap-2">
-          <div className="w-3 h-3 rounded-full bg-neutral-700" />
-          <div className="w-3 h-3 rounded-full bg-neutral-700" />
-          <div className="w-3 h-3 rounded-full bg-neutral-700" />
-        </div>
-        <div className="flex-1 bg-neutral-800 rounded px-3 py-1 ml-2">
-          <span className="text-xs text-neutral-500 font-mono">mixreflect.com/tracks/midnight-drive/report</span>
-        </div>
-      </div>
-
       {/* Track Header with Waveform */}
       <div className="bg-black/80 border-b border-neutral-800 p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">

@@ -26,10 +26,10 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="min-h-[calc(100vh-3.5rem)] border-b border-neutral-800 relative overflow-hidden flex flex-col">
+      <section className="border-b border-neutral-800 relative overflow-hidden">
         <div className="absolute top-20 right-10 w-32 h-32 bg-lime-500 rounded-full blur-3xl opacity-20" />
         <div className="absolute bottom-10 left-10 w-24 h-24 bg-orange-400 rounded-full blur-2xl opacity-20" />
-        <div className="flex-1 flex items-center justify-center px-4 py-16 sm:py-20 md:py-28 relative">
+        <div className="flex items-center justify-center px-4 py-20 sm:py-28 md:py-36 relative">
           <div className="max-w-4xl text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
               Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
@@ -53,47 +53,32 @@ export default function Home() {
                 See example report
               </Link>
             </div>
-          </div>
-        </div>
 
-        {/* Social Proof Stats - Cards style */}
-        <div className="w-full bg-black/50 backdrop-blur border-t border-neutral-800">
-          <div className="max-w-4xl mx-auto px-4 py-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-              <div className="bg-neutral-900 border border-neutral-800 p-4 text-center">
-                <p className="text-2xl sm:text-3xl font-black text-lime-500">500+</p>
-                <p className="text-xs text-neutral-400 mt-1 font-medium">Reviews Delivered</p>
-              </div>
-              <div className="bg-neutral-900 border border-neutral-800 p-4 text-center">
-                <p className="text-2xl sm:text-3xl font-black text-lime-500">&lt;12h</p>
-                <p className="text-xs text-neutral-400 mt-1 font-medium">Avg Turnaround</p>
-              </div>
-              <div className="bg-neutral-900 border border-neutral-800 p-4 text-center">
-                <p className="text-2xl sm:text-3xl font-black text-white">180+</p>
-                <p className="text-xs text-neutral-400 mt-1 font-medium">Words per Review</p>
-              </div>
-              <div className="bg-neutral-900 border border-neutral-800 p-4 text-center">
-                <p className="text-2xl sm:text-3xl font-black text-white">100%</p>
-                <p className="text-xs text-neutral-400 mt-1 font-medium">Human Reviewers</p>
-              </div>
-            </div>
+            {/* Social Proof - Inline */}
+            <p className="mt-8 text-sm text-neutral-400">
+              <span className="text-lime-500 font-bold">500+ reviews</span> delivered
+              <span className="mx-2 text-neutral-600">•</span>
+              <span className="text-white font-bold">&lt;12h</span> turnaround
+              <span className="mx-2 text-neutral-600">•</span>
+              <span className="text-white font-bold">100%</span> human reviewers
+            </p>
           </div>
         </div>
       </section>
 
       {/* Your Track Report Section */}
-      <section className="mt-0 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-orange-400 text-black border-y-2 border-black py-10">
+      <section className="mt-0 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-orange-400 text-black border-y-2 border-black py-12 sm:py-14">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
+          <h2 className="text-3xl sm:text-5xl font-black tracking-tight">
             Your Track Report
           </h2>
-          <p className="mt-2 text-base font-medium max-w-xl mx-auto">
+          <p className="mt-3 text-base sm:text-lg font-medium max-w-xl mx-auto text-black/80">
             Analytics, consensus insights, and detailed reviews — all in one place
           </p>
         </div>
       </section>
 
-      <section id="examples" className="py-16 border-b border-neutral-800">
+      <section id="examples" className="py-20 sm:py-24 border-b border-neutral-800">
         <div className="max-w-5xl mx-auto px-4">
           <TrackReportDemo />
 
