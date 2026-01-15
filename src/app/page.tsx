@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-neutral-950 to-black text-white">
       {/* Header */}
-      <header className="border-b border-neutral-800">
+      <header className="sticky top-0 z-50 border-b border-neutral-800 bg-black/95 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
             <Link href="/" className="flex items-center gap-2">
