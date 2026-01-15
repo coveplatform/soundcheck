@@ -205,7 +205,7 @@ export default function SignupPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full bg-transparent rounded-none border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 outline-none focus-visible:outline-none transition-colors"
+            className="w-full bg-transparent rounded-none border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 outline-none focus-visible:outline-none transition-colors autofill-dark"
           />
         </div>
 
@@ -220,7 +220,7 @@ export default function SignupPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full bg-transparent rounded-none border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 outline-none focus-visible:outline-none transition-colors"
+            className="w-full bg-transparent rounded-none border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 outline-none focus-visible:outline-none transition-colors autofill-dark"
           />
           <div className="mt-3">
             <PasswordStrength password={password} />

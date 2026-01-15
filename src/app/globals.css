@@ -27,6 +27,17 @@ body {
   outline-offset: 2px;
 }
 
+/* Override browser autofill styles for dark-themed inputs */
+.autofill-dark:-webkit-autofill,
+.autofill-dark:-webkit-autofill:hover,
+.autofill-dark:-webkit-autofill:focus,
+.autofill-dark:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: white;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 20px 20px transparent;
+}
+
 /* FAQ details marker */
 details summary::-webkit-details-marker {
   display: none;
