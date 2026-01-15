@@ -228,7 +228,7 @@ export default function Home() {
 
                   {/* Realistic Waveform - Mirrored with musical structure */}
                   {/* Structure: Intro (quiet) → Build → Drop (loud) → Breakdown → Build → Drop → Outro */}
-                  <div className="flex items-center gap-[1px] sm:gap-[2px] h-10 sm:h-12">
+                  <div className="flex items-center gap-[2px] h-10 sm:h-12">
                     {[
                       // Intro - quiet, gentle
                       15, 22, 18, 25, 20, 28, 24, 30, 26, 32,
@@ -245,18 +245,11 @@ export default function Home() {
                       // Outro - fading
                       75, 65, 55, 48, 40, 32, 25, 18, 12, 8
                     ].map((height, i) => (
-                      <div key={i} className="flex-1 flex flex-col justify-center gap-[1px] min-w-[1px] sm:min-w-[2px]">
-                        {/* Top half */}
-                        <div
-                          className="w-full bg-lime-500 rounded-t-sm origin-bottom"
-                          style={{ height: `${height / 2}%` }}
-                        />
-                        {/* Bottom half (mirrored) */}
-                        <div
-                          className="w-full bg-lime-500/70 rounded-b-sm origin-top"
-                          style={{ height: `${height / 2}%` }}
-                        />
-                      </div>
+                      <div
+                        key={i}
+                        className="flex-1 bg-lime-500 rounded-sm min-w-[2px]"
+                        style={{ height: `${height}%` }}
+                      />
                     ))}
                   </div>
                   <div className="flex justify-between mt-1.5">
@@ -318,9 +311,9 @@ export default function Home() {
 
               {/* Divider */}
               <div className="flex items-center gap-4 mb-10">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-700 to-transparent" />
-                <span className="text-[10px] font-black text-neutral-600 tracking-widest">CONSENSUS</span>
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-700 to-transparent" />
+                <div className="h-px flex-1 bg-neutral-700" />
+                <span className="text-[10px] font-black text-neutral-400 tracking-widest">CONSENSUS</span>
+                <div className="h-px flex-1 bg-neutral-700" />
               </div>
 
               {/* Consensus Insights - LEFT ALIGNED with colored backgrounds */}
@@ -383,29 +376,44 @@ export default function Home() {
 
               {/* Divider */}
               <div className="flex items-center gap-4 mb-10">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-700 to-transparent" />
-                <span className="text-[10px] font-black text-neutral-600 tracking-widest">INDIVIDUAL FEEDBACK</span>
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-700 to-transparent" />
+                <div className="h-px flex-1 bg-neutral-700" />
+                <span className="text-[10px] font-black text-neutral-400 tracking-widest">INDIVIDUAL FEEDBACK</span>
+                <div className="h-px flex-1 bg-neutral-700" />
               </div>
 
               {/* Individual Reviews - with Navigation */}
               <div>
-                <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-6">
-                  <div className="order-1 sm:order-2 sm:text-right">
-                    <h3 className="text-xl font-black mb-1">Individual reviews</h3>
-                    <p className="text-sm text-neutral-400">Structured feedback you can actually use</p>
-                  </div>
+                <div className="mb-4">
+                  <h3 className="text-xl font-black mb-1 text-left">Individual reviews</h3>
+                  <p className="text-sm text-neutral-400 text-left">Structured feedback you can actually use</p>
                 </div>
 
-                {/* Review Card with Navigation Arrows */}
-                <div className="flex items-stretch gap-3">
-                  {/* Left Arrow */}
-                  <button className="hidden sm:flex items-center justify-center w-10 bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 hover:border-neutral-600 transition-colors cursor-pointer group">
-                    <ChevronLeft className="h-5 w-5 text-neutral-500 group-hover:text-white transition-colors" />
-                  </button>
+                {/* Review Card with Header Navigation (matching real carousel) */}
+                <div className="bg-black/50 border border-neutral-700 overflow-hidden">
+                  {/* Navigation Header - matches review-carousel.tsx style */}
+                  <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-neutral-700 bg-neutral-800/50">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-bold text-neutral-400">Review</span>
+                      <div className="flex items-center gap-1 bg-lime-500 text-black px-2.5 py-1 font-mono text-xs font-bold">
+                        <span>1</span>
+                        <span className="text-black/50">/</span>
+                        <span>20</span>
+                      </div>
+                    </div>
 
-                  {/* Review Card */}
-                  <div className="flex-1 bg-black/50 border border-neutral-700 p-5 sm:p-6">
+                    {/* Navigation arrows - matching carousel style */}
+                    <div className="flex items-center gap-1.5">
+                      <button className="h-8 w-8 flex items-center justify-center border border-neutral-600 bg-neutral-700 text-neutral-500 cursor-not-allowed">
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      <button className="h-8 w-8 flex items-center justify-center border border-neutral-600 bg-neutral-700 hover:bg-lime-500 hover:border-lime-500 hover:text-black text-white transition-colors">
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Review Content */}
+                  <div className="p-5 sm:p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-5 border-b border-neutral-700">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-lime-500 flex items-center justify-center font-black text-black">S</div>
@@ -437,38 +445,19 @@ export default function Home() {
 
                     <div className="mt-4 pt-4 border-t border-neutral-700 flex items-center justify-between">
                       {/* Pagination Dots */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 rounded-full bg-lime-500" />
-                          <div className="w-2 h-2 rounded-full bg-neutral-700" />
-                          <div className="w-2 h-2 rounded-full bg-neutral-700" />
-                          <div className="w-2 h-2 rounded-full bg-neutral-700" />
-                          <div className="w-2 h-2 rounded-full bg-neutral-700" />
-                          <span className="text-[10px] text-neutral-600 ml-1">+15</span>
-                        </div>
-                        <span className="text-xs font-bold text-neutral-500">1 of 20</span>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-5 h-1.5 rounded-full bg-lime-500" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
+                        <span className="text-[10px] text-neutral-600 ml-1">+15 more</span>
                       </div>
                       <span className="text-xs font-bold text-lime-500 flex items-center gap-1 cursor-pointer hover:text-lime-400">
                         Read full review <ArrowRight className="h-3 w-3" />
                       </span>
                     </div>
                   </div>
-
-                  {/* Right Arrow */}
-                  <button className="hidden sm:flex items-center justify-center w-10 bg-lime-500 border-2 border-black hover:bg-lime-400 transition-colors cursor-pointer group">
-                    <ChevronRight className="h-5 w-5 text-black" />
-                  </button>
-                </div>
-
-                {/* Mobile Navigation */}
-                <div className="flex sm:hidden items-center justify-center gap-4 mt-4">
-                  <button className="flex items-center justify-center w-10 h-10 bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 transition-colors">
-                    <ChevronLeft className="h-5 w-5 text-neutral-400" />
-                  </button>
-                  <span className="text-sm font-bold text-neutral-400">1 of 20</span>
-                  <button className="flex items-center justify-center w-10 h-10 bg-lime-500 border-2 border-black hover:bg-lime-400 transition-colors">
-                    <ChevronRight className="h-5 w-5 text-black" />
-                  </button>
                 </div>
               </div>
 
