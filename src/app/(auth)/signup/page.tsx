@@ -43,7 +43,6 @@ export default function SignupPage() {
   const callbackUrl = searchParams.get("callbackUrl") || "";
   const role: Role = "artist";
 
-  const [name, setName] = useState(searchParams.get("name") || "");
   const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -108,7 +107,7 @@ export default function SignupPage() {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name, role, acceptedTerms }),
+        body: JSON.stringify({ email, password, role, acceptedTerms }),
       });
 
       if (!response.ok) {
@@ -164,7 +163,7 @@ export default function SignupPage() {
           Back
         </Link>
         <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Start your trial</h1>
-        <p className="mt-2 text-neutral-500">Artist name, email, password. That&apos;s it.</p>
+        <p className="mt-2 text-neutral-500">Email and password. That&apos;s it.</p>
       </div>
 
       {/* Google */}
@@ -172,7 +171,7 @@ export default function SignupPage() {
         type="button"
         variant="outline"
         className="w-full h-12 bg-transparent border-2 border-neutral-800 text-white hover:bg-white hover:text-black hover:border-white font-bold transition-all"
-        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/artist/onboarding" })}
+        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/artist/submit" })}
       >
         <GoogleIcon className="h-5 w-5 mr-2" />
         Continue with Google
@@ -195,35 +194,19 @@ export default function SignupPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="name" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
-              Artist / Project name
-            </label>
-            <input
-              id="name"
-              type="text"
-              placeholder="Your artist name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full bg-transparent border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 focus:outline-none transition-colors"
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full bg-transparent border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 focus:outline-none transition-colors"
-            />
-          </div>
+        <div>
+          <label htmlFor="email" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full bg-transparent border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 focus:outline-none transition-colors"
+          />
         </div>
 
         <div>

@@ -15,7 +15,6 @@ const signupSchema = z.object({
     .string()
     .min(8, "Password must be at least 8 characters")
     .regex(PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE),
-  name: z.string().min(1, "Name is required"),
   role: z.enum(["artist", "reviewer", "both"]),
   acceptedTerms: z.boolean(),
   referralSource: z.string().optional(),
@@ -42,7 +41,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { email, password, name, role, acceptedTerms, referralSource } = signupSchema.parse(body);
+    const { email, password, role, acceptedTerms, referralSource } = signupSchema.parse(body);
     const normalizedEmail = email.trim().toLowerCase();
 
     const emailConfigured = Boolean(
@@ -88,7 +87,6 @@ export async function POST(request: Request) {
       data: {
         email: normalizedEmail,
         password: hashedPassword,
-        name,
         isArtist: role === "artist" || role === "both",
         isReviewer: role === "reviewer" || role === "both",
         referralSource,

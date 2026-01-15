@@ -19,12 +19,17 @@ interface Genre {
   slug: string;
 }
 
-type Step = "track" | "details" | "package" | "confirm";
+type Step = "artist" | "track" | "details" | "package" | "confirm";
 
 export default function SubmitTrackPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const [step, setStep] = useState<Step>("track");
+
+  // Artist profile state
+  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
+  const [artistName, setArtistName] = useState("");
+  const [isCreatingProfile, setIsCreatingProfile] = useState(false);
 
   // Form state
   const [inputMode, setInputMode] = useState<"url" | "upload">("url");
@@ -72,20 +77,28 @@ export default function SubmitTrackPage() {
   }, []);
 
   useEffect(() => {
-    async function fetchCredits() {
+    async function fetchProfile() {
       try {
         const response = await fetch("/api/artist/profile");
         if (response.ok) {
           const data = await response.json();
           setFreeCredits(data.freeReviewCredits ?? 0);
+          setHasProfile(true);
+        } else if (response.status === 404) {
+          // No profile yet - need to ask for artist name
+          setHasProfile(false);
+          setStep("artist");
         }
       } catch (error) {
-        console.error("Failed to fetch credits:", error);
+        console.error("Failed to fetch profile:", error);
+        // On error, assume no profile and ask for artist name
+        setHasProfile(false);
+        setStep("artist");
       } finally {
         setIsLoadingCredits(false);
       }
     }
-    fetchCredits();
+    fetchProfile();
   }, []);
 
   const handleUrlChange = async (value: string) => {
@@ -356,10 +369,53 @@ export default function SubmitTrackPage() {
   const selectedPackageDetails = PACKAGES[selectedPackage];
 
   const goBack = () => {
-    if (step === "details") setStep("track");
+    if (step === "track" && !hasProfile) setStep("artist");
+    else if (step === "details") setStep("track");
     else if (step === "package") setStep("details");
     else if (step === "confirm") setStep("package");
   };
+
+  const handleCreateProfile = async () => {
+    if (!artistName.trim()) {
+      setError("Please enter your artist name");
+      return;
+    }
+
+    setError("");
+    setIsCreatingProfile(true);
+
+    try {
+      const response = await fetch("/api/artist/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artistName: artistName.trim() }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setError(data?.error || "Something went wrong");
+        return;
+      }
+
+      const data = await response.json();
+      setFreeCredits(data.freeReviewCredits ?? 0);
+      setHasProfile(true);
+      setStep("track");
+    } catch {
+      setError("Something went wrong");
+    } finally {
+      setIsCreatingProfile(false);
+    }
+  };
+
+  // Show loading while checking profile
+  if (hasProfile === null) {
+    return (
+      <div className="max-w-xl mx-auto min-h-[60vh] flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-xl mx-auto min-h-[60vh] flex flex-col">
@@ -368,7 +424,7 @@ export default function SubmitTrackPage() {
       )}
 
       {/* Free Credit Banner - always visible */}
-      {!isLoadingCredits && freeCredits > 0 && (
+      {!isLoadingCredits && freeCredits > 0 && hasProfile && (
         <div className="mb-6 bg-lime-400 border-2 border-black p-3 flex items-center gap-3">
           <Gift className="h-5 w-5 text-black flex-shrink-0" />
           <p className="text-sm font-bold text-black">You have a free review credit!</p>
@@ -378,6 +434,41 @@ export default function SubmitTrackPage() {
       {error && (
         <div className="mb-6 bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
           {error}
+        </div>
+      )}
+
+      {/* Step: Artist Name */}
+      {step === "artist" && (
+        <div className="flex-1 flex flex-col">
+          <div className="mb-8">
+            <h1 className="text-2xl font-black">First, what&apos;s your artist name?</h1>
+            <p className="text-neutral-500 mt-1">This is how you&apos;ll appear to reviewers</p>
+          </div>
+
+          <div className="flex-1">
+            <label htmlFor="artistName" className="block text-sm font-bold mb-2">Artist / Project name</label>
+            <Input
+              id="artistName"
+              value={artistName}
+              onChange={(e) => setArtistName(e.target.value)}
+              placeholder="Your artist or project name"
+              className="text-base h-12"
+              autoFocus
+            />
+          </div>
+
+          <div className="mt-6">
+            <Button
+              onClick={handleCreateProfile}
+              disabled={!artistName.trim() || isCreatingProfile}
+              isLoading={isCreatingProfile}
+              variant="primary"
+              className="w-full h-12 text-base"
+            >
+              Continue
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
         </div>
       )}
 
