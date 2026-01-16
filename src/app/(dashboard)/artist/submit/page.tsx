@@ -47,6 +47,7 @@ export default function SubmitTrackPage() {
   const [selectedPackage, setSelectedPackage] = useState<PackageType>("STANDARD");
   const [useFreeTrial, setUseFreeTrial] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
+  const [allowPurchase, setAllowPurchase] = useState(false);
 
   // UI state
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -328,6 +329,7 @@ export default function SubmitTrackPage() {
           ...(inputMode === "upload" && uploadedDuration
             ? { duration: uploadedDuration }
             : {}),
+          ...(inputMode === "upload" ? { allowPurchase } : {}),
           title: title.trim(),
           ...(artworkUrl ? { artworkUrl } : {}),
           genreIds: selectedGenres,
@@ -624,6 +626,22 @@ export default function SubmitTrackPage() {
                 <div className="mt-4">
                   <AudioPlayer sourceUrl={uploadedUrl} sourceType="UPLOAD" showListenTracker={false} showWaveform={true} />
                 </div>
+              )}
+              {uploadedUrl && !isUploading && (
+                <label className="mt-4 flex items-start gap-3 p-4 border-2 border-neutral-200 hover:border-black cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={allowPurchase}
+                    onChange={(e) => setAllowPurchase(e.target.checked)}
+                    className="mt-0.5 h-5 w-5 rounded border-2 border-neutral-300 text-lime-500 focus:ring-lime-500"
+                  />
+                  <div>
+                    <span className="font-bold text-black">Allow reviewers to purchase this track</span>
+                    <p className="text-sm text-neutral-500 mt-0.5">
+                      Reviewers can buy the track for $0.50 and download the MP3
+                    </p>
+                  </div>
+                </label>
               )}
             </div>
           )}

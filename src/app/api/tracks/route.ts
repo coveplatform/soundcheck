@@ -15,6 +15,7 @@ const createTrackSchema = z.object({
   genreIds: z.array(z.string()).min(1, "Select at least one genre").max(3),
   feedbackFocus: z.string().max(1000).optional(),
   packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE"]),
+  allowPurchase: z.boolean().optional(),
 });
 
 export async function POST(request: Request) {
@@ -97,6 +98,8 @@ export async function POST(request: Request) {
         feedbackFocus: data.feedbackFocus,
         packageType: data.packageType,
         reviewsRequested: packageDetails.reviews,
+        // Only allow purchases for uploaded tracks
+        allowPurchase: sourceType === "UPLOAD" ? (data.allowPurchase ?? false) : false,
         genres: {
           connect: data.genreIds.map((id) => ({ id })),
         },

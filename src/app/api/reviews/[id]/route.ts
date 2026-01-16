@@ -54,6 +54,11 @@ export async function GET(
         track: {
           include: {
             genres: true,
+            artist: {
+              select: {
+                artistName: true,
+              },
+            },
           },
         },
         reviewer: {

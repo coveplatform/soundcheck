@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Star, Check, Music, DollarSign, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Star, Check, Music, DollarSign, AlertTriangle, Download, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
 import { funnels, track } from "@/lib/analytics";
@@ -40,6 +40,10 @@ interface Review {
     sourceType: string;
     feedbackFocus: string | null;
     genres: { id: string; name: string }[];
+    allowPurchase: boolean;
+    artist?: {
+      artistName: string;
+    };
   };
   reviewer: {
     tier: string;
@@ -115,6 +119,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [isMarkingUnplayable, setIsMarkingUnplayable] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  // Purchase state
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const [purchaseError, setPurchaseError] = useState("");
+  const [reviewerBalance, setReviewerBalance] = useState<number | null>(null);
 
   const [draftReady, setDraftReady] = useState(false);
   const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
@@ -691,6 +701,62 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     }
   };
 
+  const handlePurchase = async () => {
+    if (!review) return;
+
+    setPurchaseError("");
+    setIsPurchasing(true);
+
+    try {
+      const response = await fetch("/api/purchases", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trackId: review.track.id }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setPurchaseError(data?.error || "Failed to purchase track");
+        return;
+      }
+
+      setHasPurchased(true);
+      // Update balance after purchase
+      if (reviewerBalance !== null) {
+        setReviewerBalance(reviewerBalance - 50);
+      }
+    } catch {
+      setPurchaseError("Failed to purchase track");
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!review) return;
+
+    try {
+      const response = await fetch(`/api/tracks/${review.track.id}/download`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setPurchaseError(data?.error || "Failed to get download link");
+        return;
+      }
+
+      // Trigger download
+      const link = document.createElement("a");
+      link.href = data.downloadUrl;
+      link.download = data.filename || "track.mp3";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch {
+      setPurchaseError("Failed to download track");
+    }
+  };
+
   const maybeSendHeartbeat = async () => {
     if (!review) return;
     if (heartbeatInFlight.current) return;
@@ -922,6 +988,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     weakestPartWords >= MIN_WORDS_PER_SECTION;
 
   if (success) {
+    const canPurchase = review.track.sourceType === "UPLOAD" && review.track.allowPurchase;
+
     return (
       <div className="max-w-md mx-auto text-center py-20">
         <div className="w-16 h-16 bg-lime-500 border-2 border-black flex items-center justify-center mx-auto mb-6">
@@ -937,6 +1005,51 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         <p className="text-neutral-600 mb-6">
           Your feedback helps artists improve their music.
         </p>
+
+        {/* Purchase option for uploaded tracks */}
+        {canPurchase && (
+          <div className="mb-6 p-4 border-2 border-neutral-200 bg-neutral-50 text-left">
+            <div className="flex items-center gap-3 mb-3">
+              <Music className="h-5 w-5 text-neutral-600" />
+              <div>
+                <p className="font-bold text-black">{review.track.title}</p>
+                {review.track.artist?.artistName && (
+                  <p className="text-sm text-neutral-500">{review.track.artist.artistName}</p>
+                )}
+              </div>
+            </div>
+
+            {purchaseError && (
+              <p className="text-sm text-red-600 mb-3">{purchaseError}</p>
+            )}
+
+            {hasPurchased ? (
+              <Button
+                variant="primary"
+                className="w-full"
+                onClick={handleDownload}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download MP3
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handlePurchase}
+                isLoading={isPurchasing}
+                disabled={isPurchasing}
+              >
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Buy Track - $0.50
+              </Button>
+            )}
+            <p className="text-xs text-neutral-500 mt-2 text-center">
+              {hasPurchased ? "Thanks for supporting the artist!" : "Support the artist by purchasing their track"}
+            </p>
+          </div>
+        )}
+
         <Link href="/reviewer/queue">
           <Button variant="primary">Continue Reviewing</Button>
         </Link>

@@ -121,6 +121,14 @@ model ArtistProfile {
   totalTracks Int @default(0)
   totalSpent  Int @default(0) // in cents
 
+  // Earnings from track purchases
+  pendingBalance Int @default(0) // in cents, available to withdraw
+  totalEarnings  Int @default(0) // in cents, lifetime earnings
+
+  // Stripe Connect for payouts
+  stripeAccountId   String?   @unique
+  stripeConnectedAt DateTime?
+
   // Free review credits (new users get 1)
   freeReviewCredits Int @default(1)
 
@@ -177,6 +185,7 @@ model ReviewerProfile {
   reviews      Review[]
   queueEntries ReviewQueue[]
   payouts      Payout[]
+  purchases    Purchase[]
 
   @@index([lastReviewDate])
 }
@@ -223,6 +232,9 @@ model Track {
   // Optional guidance
   feedbackFocus String? // "Looking for feedback on the mix" etc.
 
+  // Purchase settings (only for UPLOAD tracks)
+  allowPurchase Boolean @default(false) // Artist opt-in to allow reviewers to buy
+
   // Submission status
   status TrackStatus @default(PENDING_PAYMENT)
 
@@ -244,6 +256,7 @@ model Track {
   payment      Payment?
   reviews      Review[]
   queueEntries ReviewQueue[]
+  purchases    Purchase[]
 
   @@index([status, createdAt])
   @@index([artistId])
@@ -474,6 +487,22 @@ enum PayoutStatus {
   PROCESSING
   COMPLETED
   FAILED
+}
+
+// Track purchases by reviewers
+model Purchase {
+  id         String          @id @default(cuid())
+  trackId    String
+  track      Track           @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   ReviewerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  amount    Int      // cents (50 = $0.50)
+  createdAt DateTime @default(now())
+
+  @@unique([trackId, reviewerId]) // One purchase per reviewer per track
+  @@index([reviewerId])
+  @@index([trackId])
 }
 
 // ─────────────────────────────────────────────────────────────

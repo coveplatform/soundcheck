@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Music, Plus, Clock, CheckCircle, AlertCircle, Gift, CreditCard } from "lucide-react";
+import { Music, Plus, Clock, CheckCircle, AlertCircle, Gift, CreditCard, DollarSign } from "lucide-react";
 import { GenreTagList } from "@/components/ui/genre-tag";
 import { VerifyEmailBanner } from "@/components/ui/verify-email-banner";
 
@@ -101,7 +101,7 @@ export default async function ArtistDashboardPage() {
       )}
 
       {/* Stats */}
-      <div className="grid sm:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
@@ -141,7 +141,41 @@ export default async function ArtistDashboardPage() {
             </div>
           </CardContent>
         </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 bg-emerald-400 border-2 border-black flex items-center justify-center">
+                <DollarSign className="h-6 w-6 text-black" />
+              </div>
+              <div>
+                <p className="text-3xl font-black">${(artistProfile.totalEarnings / 100).toFixed(2)}</p>
+                <p className="text-sm text-neutral-600 font-medium">Track Sales</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Earnings Card - Show when there are earnings */}
+      {artistProfile.pendingBalance > 0 && (
+        <Card className="bg-emerald-50 border-emerald-500">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 bg-emerald-400 border-2 border-black flex items-center justify-center">
+                  <DollarSign className="h-6 w-6 text-black" />
+                </div>
+                <div>
+                  <p className="font-bold text-black">You have ${(artistProfile.pendingBalance / 100).toFixed(2)} from track sales</p>
+                  <p className="text-sm text-neutral-700">
+                    Reviewers purchased your tracks! Payout coming soon.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Track List */}
       <Card>
