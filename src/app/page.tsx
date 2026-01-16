@@ -69,7 +69,7 @@ export default function Home() {
             </p>
 
             {/* Live Activity Feed */}
-            <div className="mt-10">
+            <div className="mt-12 -mx-4 sm:mx-0">
               <ActivityFeed />
             </div>
           </div>
