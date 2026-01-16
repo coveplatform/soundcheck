@@ -5,6 +5,7 @@ import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
 import { TrackReportDemo } from "@/components/landing/track-report-demo";
+import { ActivityFeed } from "@/components/landing/activity-feed";
 
 export default function Home() {
   const pricing = ACTIVE_PACKAGE_TYPES.map((key) => ({ key, ...PACKAGES[key] }));
@@ -66,6 +67,11 @@ export default function Home() {
               <span className="mx-2 text-neutral-600">•</span>
               <span className="text-lime-500 font-bold">$12,600+</span> in artist sales
             </p>
+
+            {/* Live Activity Feed */}
+            <div className="mt-10">
+              <ActivityFeed />
+            </div>
           </div>
         </div>
       </section>
