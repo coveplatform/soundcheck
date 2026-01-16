@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 interface Activity {
   id: number;
@@ -26,41 +26,53 @@ const ACTIVITIES: Activity[] = [
 ];
 
 export function ActivityFeed() {
-  const [queue, setQueue] = useState<Activity[]>(() => ACTIVITIES.slice(0, 9));
-  const [nextIndex, setNextIndex] = useState(9);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [newItem, setNewItem] = useState<Activity | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const VISIBLE_COUNT = 9;
+  const CARD_SIZE_PX = 72;
+  const GAP_PX = 12;
+  const STEP_PX = CARD_SIZE_PX + GAP_PX;
+
+  const [queue, setQueue] = useState<Activity[]>(() => ACTIVITIES.slice(0, VISIBLE_COUNT));
+  const [nextIndex, setNextIndex] = useState(VISIBLE_COUNT);
+  const [renderQueue, setRenderQueue] = useState<Activity[]>(() => ACTIVITIES.slice(0, VISIBLE_COUNT));
+  const [phase, setPhase] = useState<"idle" | "pre" | "sliding">("idle");
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Prepare the new item that will slide in
       const incoming = { ...ACTIVITIES[nextIndex % ACTIVITIES.length], id: Date.now() };
-      setNewItem(incoming);
-      setIsAnimating(true);
 
+      // Add incoming item at the far-left (extra item), position row offset left by 1 step.
+      setRenderQueue([incoming, ...queue]);
+      setPhase("pre");
+
+      // Next paint: animate the row to the right by 1 step (Bandcamp push effect)
+      requestAnimationFrame(() => {
+        setPhase("sliding");
+      });
+
+      // After the slide, commit state: keep the new item, drop the far-right item.
       setTimeout(() => {
-        setQueue((prev) => {
-          // Add new item to start, remove last item
-          return [incoming, ...prev.slice(0, -1)];
-        });
+        const committed = [incoming, ...queue].slice(0, VISIBLE_COUNT);
+        setQueue(committed);
+        setRenderQueue(committed);
         setNextIndex((prev) => (prev + 1) % ACTIVITIES.length);
-        setNewItem(null);
-        setIsAnimating(false);
-      }, 500);
+        setPhase("idle");
+      }, 520);
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [nextIndex]);
+  }, [nextIndex, queue]);
 
   const ActivityCard = ({ activity }: { activity: Activity }) => (
-    <div>
+    <button
+      type="button"
+      className="group cursor-pointer select-none bg-transparent p-0 border-0 focus-visible:outline-none"
+    >
       {/* Artwork Square */}
       <div
-        className={`w-[72px] h-[72px] ${activity.color} border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center relative overflow-hidden`}
+        className={`w-[72px] h-[72px] ${activity.color} border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center relative overflow-hidden transition-all duration-150 ease-out group-hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:brightness-110 group-active:shadow-none group-active:translate-x-[3px] group-active:translate-y-[3px] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-400 group-focus-visible:outline-offset-2`}
       >
         {/* Abstract pattern overlay */}
-        <div className="absolute inset-0 opacity-30">
+        <div className="absolute inset-0 opacity-30 group-hover:opacity-40 transition-opacity">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 border-2 border-white/40 rounded-full" />
           <div className="absolute top-0 right-0 w-6 h-6 bg-white/20" />
         </div>
@@ -72,13 +84,13 @@ export function ActivityFeed() {
       </div>
 
       {/* Text underneath */}
-      <div className="mt-1.5 text-center w-[72px]">
-        <p className="text-[11px] font-bold text-white truncate">{activity.genre}</p>
+      <div className="mt-1.5 text-center w-[72px] transition-transform duration-150 group-hover:translate-x-[2px] group-hover:translate-y-[2px]">
+        <p className="text-[11px] font-bold text-white truncate group-hover:text-lime-400 transition-colors">{activity.genre}</p>
         <p className="text-[9px] text-neutral-500">
           {activity.type === "sale" ? "$0.50" : "reviewed"} · {activity.timeAgo}
         </p>
       </div>
-    </div>
+    </button>
   );
 
   return (
@@ -92,36 +104,30 @@ export function ActivityFeed() {
       </div>
 
       <div
-        ref={containerRef}
         className="relative overflow-hidden py-1"
       >
-        <div className="flex justify-center gap-3">
-          {/* New item sliding in from left */}
-          {newItem && (
-            <div
-              className={`flex-shrink-0 transition-all duration-500 ease-out ${
-                isAnimating
-                  ? "opacity-100 translate-x-0 scale-100"
-                  : "opacity-0 -translate-x-8 scale-90"
-              }`}
-            >
-              <ActivityCard activity={newItem} />
-            </div>
-          )}
-
-          {/* Existing items */}
-          {queue.map((activity, index) => (
-            <div
-              key={activity.id}
-              className={`flex-shrink-0 transition-all duration-500 ease-out ${
-                isAnimating && index === queue.length - 1
-                  ? "opacity-0 translate-x-8 scale-90"
-                  : "opacity-100 translate-x-0 scale-100"
-              }`}
-            >
-              <ActivityCard activity={activity} />
-            </div>
-          ))}
+        <div className="flex justify-center">
+          <div
+            className={`flex gap-3 will-change-transform ${
+              phase === "sliding"
+                ? "transition-transform duration-500 ease-out"
+                : "transition-none"
+            }`}
+            style={{ transform: `translateX(${phase === "pre" ? -STEP_PX : 0}px)` }}
+          >
+            {renderQueue.map((activity, index) => (
+              <div
+                key={activity.id}
+                className={`flex-shrink-0 transition-all duration-500 ease-out ${
+                  phase === "sliding" && index === renderQueue.length - 1
+                    ? "opacity-0 scale-95 translate-x-6"
+                    : "opacity-100 scale-100"
+                }`}
+              >
+                <ActivityCard activity={activity} />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Fade edges */}
