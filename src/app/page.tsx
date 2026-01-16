@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Headphones, Shield, ArrowRight, Target, Clock, Quote, CheckCircle2, Lock, Users, MessageCircle, Flame, Music } from "lucide-react";
+import { Headphones, Shield, ArrowRight, Target, Clock, Quote, CheckCircle2, Lock, Users, MessageCircle, Flame, Music, DollarSign } from "lucide-react";
 import { ACTIVE_PACKAGE_TYPES, PACKAGES } from "@/lib/metadata";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
@@ -43,6 +43,10 @@ export default function Home() {
               <span className="text-orange-400">Reviewers earn $0.50–$1.50 per review.</span> You rate every review to keep quality high.
             </p>
 
+            <p className="mt-3 text-neutral-400 text-sm">
+              Upload your track and <span className="text-lime-400 font-bold">earn $0.50</span> every time a reviewer buys it.
+            </p>
+
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/signup">
                 <Button size="lg" className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold text-base px-10 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none">
@@ -60,7 +64,7 @@ export default function Home() {
               <span className="mx-2 text-neutral-600">•</span>
               <span className="text-white font-bold">&lt;12h</span> turnaround
               <span className="mx-2 text-neutral-600">•</span>
-              <span className="text-white font-bold">100%</span> human reviewers
+              <span className="text-lime-500 font-bold">$12,600+</span> in artist sales
             </p>
           </div>
         </div>
@@ -201,38 +205,66 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features - Compact 3-column */}
+      {/* Features */}
       <section className="border-y-2 border-black py-16 bg-orange-400 text-black">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="grid sm:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="h-14 w-14 bg-black border-2 border-black flex items-center justify-center mb-4 mx-auto">
-                <Target className="h-7 w-7 text-orange-400" />
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl font-black mb-10 text-center">Why artists choose MixReflect</h2>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <div className="flex items-start gap-4">
+                <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center flex-shrink-0">
+                  <Target className="h-6 w-6 text-black" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg mb-1">Genre-matched reviewers</h3>
+                  <p className="text-sm text-neutral-600">
+                    Your trap beat won&apos;t be reviewed by someone who only listens to country. We match by genre.
+                  </p>
+                </div>
               </div>
-              <h3 className="font-bold text-lg mb-2">Genre-matched</h3>
-              <p className="text-sm text-black/70">
-                Your trap beat won&apos;t be reviewed by someone who only listens to country.
-              </p>
             </div>
 
-            <div className="text-center">
-              <div className="h-14 w-14 bg-black border-2 border-black flex items-center justify-center mb-4 mx-auto">
-                <Clock className="h-7 w-7 text-orange-400" />
+            <div className="bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <div className="flex items-start gap-4">
+                <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center flex-shrink-0">
+                  <Clock className="h-6 w-6 text-black" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg mb-1">Results in under 24 hours</h3>
+                  <p className="text-sm text-neutral-600">
+                    No waiting weeks for feedback. Most reviews complete within hours, not days.
+                  </p>
+                </div>
               </div>
-              <h3 className="font-bold text-lg mb-2">Fast turnaround</h3>
-              <p className="text-sm text-black/70">
-                All reviews delivered within 24 hours. Usually much faster.
-              </p>
             </div>
 
-            <div className="text-center">
-              <div className="h-14 w-14 bg-black border-2 border-black flex items-center justify-center mb-4 mx-auto">
-                <Shield className="h-7 w-7 text-orange-400" />
+            <div className="bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <div className="flex items-start gap-4">
+                <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center flex-shrink-0">
+                  <Shield className="h-6 w-6 text-black" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg mb-1">Private & secure</h3>
+                  <p className="text-sm text-neutral-600">
+                    Only assigned reviewers hear your track. We never share, publish, or leak your unreleased work.
+                  </p>
+                </div>
               </div>
-              <h3 className="font-bold text-lg mb-2">Private & secure</h3>
-              <p className="text-sm text-black/70">
-                Only assigned reviewers hear your track. We never share or leak your work.
-              </p>
+            </div>
+
+            <div className="bg-lime-400 border-2 border-black p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <div className="flex items-start gap-4">
+                <div className="h-12 w-12 bg-black border-2 border-black flex items-center justify-center flex-shrink-0">
+                  <DollarSign className="h-6 w-6 text-lime-400" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg mb-1">Earn from your uploads</h3>
+                  <p className="text-sm text-black/70">
+                    Reviewers who love your track can buy it for $0.50. You keep the money. Turn feedback into revenue.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
