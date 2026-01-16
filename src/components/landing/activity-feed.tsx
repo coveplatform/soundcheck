@@ -29,7 +29,7 @@ const ACTIVITIES: Activity[] = [
 
 export function ActivityFeed() {
   const VISIBLE_COUNT = 9;
-  const CARD_SIZE_PX = 72;
+  const CARD_SIZE_PX = 84;
   const GAP_PX = 12;
   const STEP_PX = CARD_SIZE_PX + GAP_PX;
 
@@ -100,7 +100,7 @@ export function ActivityFeed() {
     >
       {/* Artwork Square */}
       <div
-        className={`w-[72px] h-[72px] ${activity.color} border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center relative overflow-hidden transition-all duration-150 ease-out group-hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:brightness-110 group-active:shadow-none group-active:translate-x-[3px] group-active:translate-y-[3px] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-400 group-focus-visible:outline-offset-2`}
+        className={`w-[84px] h-[84px] ${activity.color} border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center relative overflow-hidden transition-all duration-150 ease-out group-hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:brightness-110 group-active:shadow-none group-active:translate-x-[3px] group-active:translate-y-[3px] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-400 group-focus-visible:outline-offset-2`}
       >
         {missingArtwork[activity.artwork] !== "both" ? (
           <img
@@ -125,8 +125,8 @@ export function ActivityFeed() {
         ) : null}
         {/* Abstract pattern overlay */}
         <div className="absolute inset-0 opacity-30 group-hover:opacity-40 transition-opacity">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 border-2 border-white/40 rounded-full" />
-          <div className="absolute top-0 right-0 w-6 h-6 bg-white/20" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 border-2 border-white/40 rounded-full" />
+          <div className="absolute top-0 right-0 w-7 h-7 bg-white/20" />
         </div>
         <span className="absolute top-1 right-1 text-[8px] font-black bg-white text-black px-1 border border-black">
           {activity.type === "sale" ? "$0.50" : activity.metric.split(" ")[0]}
@@ -134,10 +134,10 @@ export function ActivityFeed() {
       </div>
 
       {/* Text underneath */}
-      <div className="mt-1.5 text-center w-[72px] transition-transform duration-150 group-hover:translate-x-[2px] group-hover:translate-y-[2px]">
-        <p className="text-[11px] font-bold text-white truncate group-hover:text-lime-400 transition-colors">{activity.genre}</p>
-        <p className="text-[10px] font-black text-lime-400 leading-tight">{activity.metric}</p>
-        <p className="text-[9px] text-neutral-400">{activity.timeAgo}</p>
+      <div className="mt-2 text-center w-[84px] transition-transform duration-150 group-hover:translate-x-[2px] group-hover:translate-y-[2px]">
+        <p className="text-[12px] font-bold text-white truncate group-hover:text-lime-400 transition-colors">{activity.genre}</p>
+        <p className="text-[11px] font-black text-lime-400 leading-tight">{activity.metric}</p>
+        <p className="text-[10px] text-neutral-400">{activity.timeAgo}</p>
       </div>
     </button>
   );
