@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Activity {
   id: number;
@@ -36,31 +36,55 @@ export function ActivityFeed() {
   const [renderQueue, setRenderQueue] = useState<Activity[]>(() => ACTIVITIES.slice(0, VISIBLE_COUNT));
   const [phase, setPhase] = useState<"idle" | "pre" | "sliding">("idle");
 
+  const queueRef = useRef<Activity[]>(queue);
+  const nextIndexRef = useRef(nextIndex);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    queueRef.current = queue;
+  }, [queue]);
+
+  useEffect(() => {
+    nextIndexRef.current = nextIndex;
+  }, [nextIndex]);
+
   useEffect(() => {
     const interval = setInterval(() => {
-      const incoming = { ...ACTIVITIES[nextIndex % ACTIVITIES.length], id: Date.now() };
+      const currentQueue = queueRef.current;
+      const currentNextIndex = nextIndexRef.current;
+      const incoming = { ...ACTIVITIES[currentNextIndex % ACTIVITIES.length], id: Date.now() };
 
-      // Add incoming item at the far-left (extra item), position row offset left by 1 step.
-      setRenderQueue([incoming, ...queue]);
+      setRenderQueue([incoming, ...currentQueue]);
       setPhase("pre");
 
-      // Next paint: animate the row to the right by 1 step (Bandcamp push effect)
       requestAnimationFrame(() => {
-        setPhase("sliding");
+        requestAnimationFrame(() => {
+          setPhase("sliding");
+        });
       });
 
       // After the slide, commit state: keep the new item, drop the far-right item.
-      setTimeout(() => {
-        const committed = [incoming, ...queue].slice(0, VISIBLE_COUNT);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        const committed = [incoming, ...currentQueue].slice(0, VISIBLE_COUNT);
         setQueue(committed);
         setRenderQueue(committed);
-        setNextIndex((prev) => (prev + 1) % ACTIVITIES.length);
+        const updatedNextIndex = (currentNextIndex + 1) % ACTIVITIES.length;
+        nextIndexRef.current = updatedNextIndex;
+        setNextIndex(updatedNextIndex);
         setPhase("idle");
       }, 520);
     }, 3000);
 
-    return () => clearInterval(interval);
-  }, [nextIndex, queue]);
+    return () => {
+      clearInterval(interval);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const ActivityCard = ({ activity }: { activity: Activity }) => (
     <button
@@ -119,8 +143,10 @@ export function ActivityFeed() {
               <div
                 key={activity.id}
                 className={`flex-shrink-0 transition-all duration-500 ease-out ${
-                  phase === "sliding" && index === renderQueue.length - 1
-                    ? "opacity-0 scale-95 translate-x-6"
+                  phase === "pre" && renderQueue.length > VISIBLE_COUNT && index === 0
+                    ? "opacity-0 scale-95"
+                    : phase === "sliding" && index === renderQueue.length - 1
+                    ? "opacity-0 scale-95 translate-x-8"
                     : "opacity-100 scale-100"
                 }`}
               >
