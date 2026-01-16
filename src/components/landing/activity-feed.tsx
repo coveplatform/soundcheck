@@ -26,28 +26,60 @@ const ACTIVITIES: Activity[] = [
 ];
 
 export function ActivityFeed() {
-  const [queue, setQueue] = useState<Activity[]>(() => ACTIVITIES.slice(0, 6));
-  const [nextIndex, setNextIndex] = useState(6);
+  const [queue, setQueue] = useState<Activity[]>(() => ACTIVITIES.slice(0, 9));
+  const [nextIndex, setNextIndex] = useState(9);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [newItem, setNewItem] = useState<Activity | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
+      // Prepare the new item that will slide in
+      const incoming = { ...ACTIVITIES[nextIndex % ACTIVITIES.length], id: Date.now() };
+      setNewItem(incoming);
       setIsAnimating(true);
 
       setTimeout(() => {
         setQueue((prev) => {
-          const newItem = ACTIVITIES[nextIndex % ACTIVITIES.length];
           // Add new item to start, remove last item
-          return [{ ...newItem, id: Date.now() }, ...prev.slice(0, -1)];
+          return [incoming, ...prev.slice(0, -1)];
         });
         setNextIndex((prev) => (prev + 1) % ACTIVITIES.length);
+        setNewItem(null);
         setIsAnimating(false);
-      }, 400);
-    }, 3500);
+      }, 500);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [nextIndex]);
+
+  const ActivityCard = ({ activity }: { activity: Activity }) => (
+    <div>
+      {/* Artwork Square */}
+      <div
+        className={`w-[72px] h-[72px] ${activity.color} border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center relative overflow-hidden`}
+      >
+        {/* Abstract pattern overlay */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 border-2 border-white/40 rounded-full" />
+          <div className="absolute top-0 right-0 w-6 h-6 bg-white/20" />
+        </div>
+        {activity.type === "sale" && (
+          <span className="absolute top-1 right-1 text-[8px] font-black bg-lime-400 text-black px-1 border border-black">
+            SOLD
+          </span>
+        )}
+      </div>
+
+      {/* Text underneath */}
+      <div className="mt-1.5 text-center w-[72px]">
+        <p className="text-[11px] font-bold text-white truncate">{activity.genre}</p>
+        <p className="text-[9px] text-neutral-500">
+          {activity.type === "sale" ? "$0.50" : "reviewed"} · {activity.timeAgo}
+        </p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="w-full">
@@ -61,57 +93,40 @@ export function ActivityFeed() {
 
       <div
         ref={containerRef}
-        className="relative overflow-hidden"
+        className="relative overflow-hidden py-1"
       >
-        <div
-          className={`flex justify-center gap-3 transition-transform duration-400 ease-out ${
-            isAnimating ? "translate-x-[calc(80px+0.75rem)]" : "translate-x-0"
-          }`}
-        >
+        <div className="flex justify-center gap-3">
+          {/* New item sliding in from left */}
+          {newItem && (
+            <div
+              className={`flex-shrink-0 transition-all duration-500 ease-out ${
+                isAnimating
+                  ? "opacity-100 translate-x-0 scale-100"
+                  : "opacity-0 -translate-x-8 scale-90"
+              }`}
+            >
+              <ActivityCard activity={newItem} />
+            </div>
+          )}
+
+          {/* Existing items */}
           {queue.map((activity, index) => (
             <div
               key={activity.id}
-              className={`flex-shrink-0 transition-all duration-400 ${
-                isAnimating && index === 0
-                  ? "opacity-0 scale-90 -translate-x-4"
-                  : isAnimating && index === queue.length - 1
-                  ? "opacity-0 scale-90"
-                  : "opacity-100 scale-100"
+              className={`flex-shrink-0 transition-all duration-500 ease-out ${
+                isAnimating && index === queue.length - 1
+                  ? "opacity-0 translate-x-8 scale-90"
+                  : "opacity-100 translate-x-0 scale-100"
               }`}
-              style={{
-                transitionDelay: isAnimating ? `${index * 30}ms` : "0ms",
-              }}
             >
-              {/* Artwork Square */}
-              <div
-                className={`w-20 h-20 ${activity.color} border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center relative overflow-hidden`}
-              >
-                {/* Abstract pattern overlay */}
-                <div className="absolute inset-0 opacity-30">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 border-2 border-white/40 rounded-full" />
-                  <div className="absolute top-0 right-0 w-8 h-8 bg-white/20" />
-                </div>
-                {activity.type === "sale" && (
-                  <span className="absolute top-1 right-1 text-[10px] font-black bg-lime-400 text-black px-1 border border-black">
-                    SOLD
-                  </span>
-                )}
-              </div>
-
-              {/* Text underneath */}
-              <div className="mt-2 text-center w-20">
-                <p className="text-xs font-bold text-white truncate">{activity.genre}</p>
-                <p className="text-[10px] text-neutral-500">
-                  {activity.type === "sale" ? "$0.50" : "reviewed"} · {activity.timeAgo}
-                </p>
-              </div>
+              <ActivityCard activity={activity} />
             </div>
           ))}
         </div>
 
         {/* Fade edges */}
-        <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-black to-transparent pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-black to-transparent pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black to-transparent pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black to-transparent pointer-events-none" />
       </div>
     </div>
   );
