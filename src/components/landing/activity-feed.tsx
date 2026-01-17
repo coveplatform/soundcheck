@@ -28,7 +28,7 @@ const ACTIVITIES: Activity[] = [
 ];
 
 export function ActivityFeed() {
-  const VISIBLE_COUNT = 7;
+  const VISIBLE_COUNT = 8;
   const CARD_SIZE_PX = 104;
   const GAP_PX = 14;
   const STEP_PX = CARD_SIZE_PX + GAP_PX;
