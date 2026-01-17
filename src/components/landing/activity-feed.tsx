@@ -176,7 +176,7 @@ export function ActivityFeed() {
         <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Selling now</span>
       </div>
 
-      <div className="relative overflow-hidden py-1 mx-auto" style={{ width: `${VIEWPORT_WIDTH_PX}px` }}>
+      <div className="relative overflow-hidden py-1 mx-auto w-full" style={{ maxWidth: `${VIEWPORT_WIDTH_PX}px` }}>
         <div
           className={`flex gap-3 will-change-transform ${
             phase === "sliding"
@@ -209,8 +209,8 @@ export function ActivityFeed() {
         </div>
 
         {/* Fade edges */}
-        <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black to-transparent pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-black via-black to-transparent pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-10 sm:w-12 bg-gradient-to-r from-black/90 via-black/40 to-transparent pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-16 sm:w-20 bg-gradient-to-l from-black/90 via-black/40 to-transparent pointer-events-none" />
       </div>
     </div>
   );

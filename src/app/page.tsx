@@ -31,7 +31,7 @@ export default function Home() {
         <div className="absolute top-20 right-10 w-32 h-32 bg-lime-500 rounded-full blur-3xl opacity-20" />
         <div className="absolute bottom-10 left-10 w-24 h-24 bg-orange-400 rounded-full blur-2xl opacity-20" />
         <div className="flex items-center justify-center px-4 py-16 sm:py-20 relative">
-          <div className="max-w-4xl text-center">
+          <div className="max-w-6xl text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
               Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
             </h1>
