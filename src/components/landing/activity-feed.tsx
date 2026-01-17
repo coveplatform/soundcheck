@@ -39,7 +39,7 @@ export function ActivityFeed() {
   const [renderQueue, setRenderQueue] = useState<Activity[]>(() => ACTIVITIES.slice(0, VISIBLE_COUNT));
   const [phase, setPhase] = useState<"idle" | "pre" | "sliding">("idle");
 
-  const [missingArtwork, setMissingArtwork] = useState<Record<number, "png" | "both">>({});
+  const [missingArtwork, setMissingArtwork] = useState<Record<number, boolean>>({});
 
   const queueRef = useRef<Activity[]>(queue);
   const nextIndexRef = useRef(nextIndex);
@@ -79,8 +79,7 @@ export function ActivityFeed() {
     }
   };
 
-  const artworkSrcForIndex = (index: number) => `/activity-artwork/${index}.png`;
-  const artworkJpgSrcForIndex = (index: number) => `/activity-artwork/${index}.jpg`;
+  const artworkSrcForIndex = (index: number) => `/activity-artwork/${index}.jpg`;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -124,58 +123,46 @@ export function ActivityFeed() {
     >
       {/* Artwork Square */}
       <div
-        className={`w-[104px] h-[104px] ${activity.color} border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center relative overflow-hidden transition-all duration-150 ease-out group-hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:brightness-110 group-active:shadow-none group-active:translate-x-[3px] group-active:translate-y-[3px] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-400 group-focus-visible:outline-offset-2`}
+        className={`w-[104px] h-[104px] ${activity.color} border border-neutral-200 shadow-sm flex items-center justify-center relative overflow-hidden rounded-sm transition-shadow duration-150 ease-out group-hover:shadow group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-300 group-focus-visible:outline-offset-2`}
       >
-        {missingArtwork[activity.artwork] !== "both" ? (
+        {!missingArtwork[activity.artwork] ? (
           <img
-            src={
-              missingArtwork[activity.artwork] === "png"
-                ? artworkJpgSrcForIndex(activity.artwork)
-                : artworkSrcForIndex(activity.artwork)
-            }
+            src={artworkSrcForIndex(activity.artwork)}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             draggable={false}
             onError={() => {
-              setMissingArtwork((prev) => {
-                const current = prev[activity.artwork];
-                if (current === "png") {
-                  return { ...prev, [activity.artwork]: "both" };
-                }
-                return { ...prev, [activity.artwork]: "png" };
-              });
+              setMissingArtwork((prev) => ({ ...prev, [activity.artwork]: true }));
             }}
           />
         ) : null}
         {/* Abstract pattern overlay */}
-        <div className="absolute inset-0 opacity-30 group-hover:opacity-40 transition-opacity">
+        <div className="absolute inset-0 opacity-0 transition-opacity">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-2 border-white/40 rounded-full" />
           <div className="absolute top-0 right-0 w-9 h-9 bg-white/20" />
         </div>
-        <span className="absolute top-1.5 right-1.5 text-[9px] font-black bg-white text-black px-1.5 border border-black">
+        <span className="absolute top-1.5 right-1.5 text-[10px] font-semibold bg-white/90 text-neutral-950 px-1.5 border border-neutral-200">
           {activity.type === "sale" ? "$0.50" : activity.metric.split(" ")[0]}
         </span>
       </div>
 
       {/* Text underneath */}
-      <div className="mt-2.5 text-center w-[104px] transition-transform duration-150 group-hover:translate-x-[2px] group-hover:translate-y-[2px]">
-        <p className="text-[13px] font-bold text-white truncate group-hover:text-lime-400 transition-colors">{activity.genre}</p>
-        <p className="text-[12px] font-black text-lime-400 leading-tight">{activity.metric}</p>
-        <p className="text-[11px] text-neutral-400">{activity.timeAgo}</p>
+      <div className="mt-2.5 w-[104px]">
+        <p className="text-[13px] font-semibold text-neutral-950 truncate">{activity.genre}</p>
+        <p
+          className={`text-[12px] font-semibold leading-tight ${
+            activity.type === "sale" ? "text-lime-700" : "text-neutral-700"
+          }`}
+        >
+          {activity.metric}
+        </p>
+        <p className="text-[11px] text-neutral-500">{activity.timeAgo}</p>
       </div>
     </button>
   );
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-center gap-2 mb-4">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-lime-500"></span>
-        </span>
-        <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Selling now</span>
-      </div>
-
       <div className="relative overflow-hidden py-1 mx-auto w-full" style={{ maxWidth: `${VIEWPORT_WIDTH_PX}px` }}>
         <div
           className={`flex gap-3 will-change-transform ${
@@ -209,8 +196,8 @@ export function ActivityFeed() {
         </div>
 
         {/* Fade edges */}
-        <div className="absolute inset-y-0 left-0 w-10 sm:w-12 bg-gradient-to-r from-black/90 via-black/40 to-transparent pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-16 sm:w-20 bg-gradient-to-l from-black/90 via-black/40 to-transparent pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-10 sm:w-12 bg-gradient-to-r from-white via-white/70 to-transparent pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-16 sm:w-20 bg-gradient-to-l from-white via-white/70 to-transparent pointer-events-none" />
       </div>
     </div>
   );
