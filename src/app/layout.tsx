@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Syne, Space_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Space_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const syne = Syne({
-  variable: "--font-syne",
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
   subsets: ["latin"],
 });
 
@@ -119,7 +119,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${syne.variable} ${spaceMono.variable} antialiased`}
+        className={`${plusJakarta.variable} ${spaceMono.variable} antialiased`}
       >
         <Providers>{children}</Providers>
         <Analytics />

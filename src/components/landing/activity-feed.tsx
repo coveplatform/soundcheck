@@ -28,9 +28,9 @@ const ACTIVITIES: Activity[] = [
 ];
 
 export function ActivityFeed() {
-  const VISIBLE_COUNT = 8;
-  const CARD_SIZE_PX = 104;
-  const GAP_PX = 14;
+  const VISIBLE_COUNT = 7;
+  const CARD_SIZE_PX = 130;
+  const GAP_PX = 20;
   const STEP_PX = CARD_SIZE_PX + GAP_PX;
   const VIEWPORT_WIDTH_PX = VISIBLE_COUNT * CARD_SIZE_PX + (VISIBLE_COUNT - 1) * GAP_PX;
 
@@ -123,7 +123,7 @@ export function ActivityFeed() {
     >
       {/* Artwork Square */}
       <div
-        className={`w-[104px] h-[104px] ${activity.color} border border-neutral-200 shadow-sm flex items-center justify-center relative overflow-hidden rounded-sm transition-shadow duration-150 ease-out group-hover:shadow group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-300 group-focus-visible:outline-offset-2`}
+        className={`w-[130px] h-[130px] ${activity.color} shadow-md flex items-center justify-center relative overflow-hidden rounded-2xl transition-all duration-200 ease-out group-hover:shadow-lg group-hover:scale-[1.02] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-300 group-focus-visible:outline-offset-2`}
       >
         {!missingArtwork[activity.artwork] ? (
           <img
@@ -136,38 +136,33 @@ export function ActivityFeed() {
             }}
           />
         ) : null}
-        {/* Abstract pattern overlay */}
-        <div className="absolute inset-0 opacity-0 transition-opacity">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-2 border-white/40 rounded-full" />
-          <div className="absolute top-0 right-0 w-9 h-9 bg-white/20" />
-        </div>
-        <span className="absolute top-1.5 right-1.5 text-[10px] font-semibold bg-white/90 text-neutral-950 px-1.5 border border-neutral-200">
+        <span className="absolute top-2 right-2 text-[11px] font-semibold bg-white/95 text-neutral-950 px-2.5 py-0.5 rounded-full shadow-sm backdrop-blur-sm">
           {activity.type === "sale" ? "$0.50" : activity.metric.split(" ")[0]}
         </span>
       </div>
 
       {/* Text underneath */}
-      <div className="mt-2.5 w-[104px]">
-        <p className="text-[13px] font-semibold text-neutral-950 truncate">{activity.genre}</p>
+      <div className="mt-3 w-[130px]">
+        <p className="text-sm font-semibold text-neutral-950 truncate">{activity.genre}</p>
         <p
-          className={`text-[12px] font-semibold leading-tight ${
+          className={`text-[13px] font-semibold leading-tight ${
             activity.type === "sale" ? "text-lime-700" : "text-neutral-700"
           }`}
         >
           {activity.metric}
         </p>
-        <p className="text-[11px] text-neutral-500">{activity.timeAgo}</p>
+        <p className="text-xs text-neutral-500">{activity.timeAgo}</p>
       </div>
     </button>
   );
 
   return (
-    <div className="w-full">
-      <div className="relative overflow-hidden py-1 mx-auto w-full" style={{ maxWidth: `${VIEWPORT_WIDTH_PX}px` }}>
+    <div className="w-full flex justify-center">
+      <div className="relative overflow-hidden" style={{ width: `${VIEWPORT_WIDTH_PX}px` }}>
         <div
-          className={`flex gap-3 will-change-transform ${
+          className={`flex gap-5 will-change-transform ${
             phase === "sliding"
-              ? "transition-transform duration-650 ease-in-out"
+              ? "transition-transform duration-500 ease-out"
               : "transition-none"
           }`}
           style={{ transform: `translateX(${phase === "pre" ? -STEP_PX : 0}px)` }}
@@ -177,27 +172,12 @@ export function ActivityFeed() {
             commitPending();
           }}
         >
-          {renderQueue.map((activity, index) => (
-            <div
-              key={activity.id}
-              className={`flex-shrink-0 transition-all duration-650 ease-in-out ${
-                renderQueue.length > VISIBLE_COUNT && index === 0
-                  ? phase === "pre"
-                    ? "opacity-0 scale-95 -translate-x-3 -translate-y-6"
-                    : phase === "sliding"
-                    ? "opacity-100 scale-100 translate-x-0 translate-y-0"
-                    : "opacity-100 scale-100"
-                  : "opacity-100 scale-100"
-              }`}
-            >
+          {renderQueue.map((activity) => (
+            <div key={activity.id} className="flex-shrink-0">
               <ActivityCard activity={activity} />
             </div>
           ))}
         </div>
-
-        {/* Fade edges */}
-        <div className="absolute inset-y-0 left-0 w-10 sm:w-12 bg-gradient-to-r from-white via-white/70 to-transparent pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-16 sm:w-20 bg-gradient-to-l from-white via-white/70 to-transparent pointer-events-none" />
       </div>
     </div>
   );
