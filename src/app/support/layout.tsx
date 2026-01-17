@@ -24,8 +24,8 @@ export default async function SupportLayout({
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="bg-white border-b-2 border-black sticky top-0 z-50">
+    <div className="min-h-screen bg-white pt-14">
+      <header className="bg-white border-b-2 border-black fixed top-0 left-0 right-0 z-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
             <Link href="/" className="flex items-center">

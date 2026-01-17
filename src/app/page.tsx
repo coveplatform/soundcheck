@@ -19,9 +19,9 @@ const spaceGrotesk = Space_Grotesk({
 
 export default function Home() {
   return (
-    <div className={`${spaceGrotesk.className} min-h-screen bg-[#f7f7f5] text-neutral-950`}>
+    <div className={`${spaceGrotesk.className} min-h-screen bg-[#f7f7f5] text-neutral-950 pt-14`}>
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-neutral-200 bg-[#f7f7f5]/90 backdrop-blur-sm">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-200 bg-[#f7f7f5]/90 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-8">

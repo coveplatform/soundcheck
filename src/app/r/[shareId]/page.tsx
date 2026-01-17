@@ -110,9 +110,9 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
   ].filter(Boolean) as { icon: string; label: string }[];
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-neutral-50 pt-14">
       {/* Header */}
-      <header className="border-b-2 border-black bg-white sticky top-0 z-50">
+      <header className="border-b-2 border-black bg-white fixed top-0 left-0 right-0 z-50">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/">
             <Logo />

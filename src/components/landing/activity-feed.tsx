@@ -29,20 +29,11 @@ const ACTIVITIES: Activity[] = [
 ];
 
 export function ActivityFeed() {
-  const ARTWORK_COUNT = 36;
-  const DEFAULT_ARTWORK_COUNT = 15;
+  const ARTWORK_COUNT = 34;
+  const DEFAULT_ARTWORK_COUNT = 34;
 
-  const getInitialLayout = () => {
-    if (typeof window === "undefined") {
-      return { visibleCount: 7, cardSizePx: 130, gapPx: 20 };
-    }
-    const isMobile = window.innerWidth < 640;
-    return isMobile
-      ? { visibleCount: 3, cardSizePx: 108, gapPx: 14 }
-      : { visibleCount: 7, cardSizePx: 130, gapPx: 20 };
-  };
-
-  const [layout, setLayout] = useState(getInitialLayout);
+  const initialLayout = { visibleCount: 3, cardSizePx: 108, gapPx: 14 };
+  const [layout, setLayout] = useState(initialLayout);
   const STEP_PX = layout.cardSizePx + layout.gapPx;
   const VIEWPORT_WIDTH_PX = layout.visibleCount * layout.cardSizePx + (layout.visibleCount - 1) * layout.gapPx;
 
@@ -55,7 +46,13 @@ export function ActivityFeed() {
   );
   const [phase, setPhase] = useState<"idle" | "pre" | "sliding">("idle");
 
-  const [artworkExt, setArtworkExt] = useState<Record<number, "jpg" | "png" | "none">>({});
+  const [artworkExt, setArtworkExt] = useState<Record<number, "jpg" | "png" | "none">>(() => {
+    const initial: Record<number, "jpg" | "png" | "none"> = {};
+    for (let i = 1; i <= ARTWORK_COUNT; i++) {
+      initial[i] = "jpg";
+    }
+    return initial;
+  });
 
   const pickArtwork = (exclude: number[] = []) => {
     const available = Object.entries(artworkExt)
@@ -117,41 +114,6 @@ export function ActivityFeed() {
       timeoutRef.current = null;
     }
   }, [layout.visibleCount]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const preload = (src: string) =>
-      new Promise<boolean>((resolve) => {
-        const img = new Image();
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
-        img.src = src;
-      });
-
-    void (async () => {
-      for (let i = 1; i <= ARTWORK_COUNT; i++) {
-        const jpgOk = await preload(`/activity-artwork/${i}.jpg`);
-        if (cancelled) return;
-        if (jpgOk) {
-          setArtworkExt((prev) => (prev[i] ? prev : { ...prev, [i]: "jpg" }));
-          continue;
-        }
-
-        const pngOk = await preload(`/activity-artwork/${i}.png`);
-        if (cancelled) return;
-        if (pngOk) {
-          setArtworkExt((prev) => (prev[i] ? prev : { ...prev, [i]: "png" }));
-        } else {
-          setArtworkExt((prev) => (prev[i] ? prev : { ...prev, [i]: "none" }));
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [ARTWORK_COUNT]);
 
   useEffect(() => {
     queueRef.current = queue;
