@@ -6,12 +6,18 @@ import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
 import { TrackReportDemo } from "@/components/landing/track-report-demo";
 import { ActivityFeed } from "@/components/landing/activity-feed";
+import { Space_Grotesk } from "next/font/google";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 export default function Home() {
   const pricing = ACTIVE_PACKAGE_TYPES.map((key) => ({ key, ...PACKAGES[key] }));
 
   return (
-    <div className="min-h-screen bg-[#f7f7f5] text-neutral-950">
+    <div className={`${spaceGrotesk.className} min-h-screen bg-[#f7f7f5] text-neutral-950`}>
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-neutral-200 bg-[#f7f7f5]/90 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4">
@@ -365,7 +371,7 @@ export default function Home() {
                       isPopular
                         ? "bg-lime-400 text-black hover:bg-lime-300 active:bg-lime-500 border-0"
                         : "bg-transparent text-neutral-50 hover:bg-neutral-800 active:bg-neutral-800 border border-neutral-500"
-                    }`}>
+                    } focus-visible:ring-neutral-200 focus-visible:ring-offset-neutral-900`}>
                       Get {p.reviews} Reviews
                     </Button>
                   </Link>
@@ -391,6 +397,7 @@ export default function Home() {
               <Button
                 size="lg"
                 variant="primary"
+                className="focus-visible:ring-neutral-200 focus-visible:ring-offset-neutral-900"
               >
                 Get Feedback <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
