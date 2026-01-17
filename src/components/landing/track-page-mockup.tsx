@@ -1,15 +1,28 @@
 "use client";
 
 import { Play, Share2, Heart } from "lucide-react";
+import { useState } from "react";
 
 export function TrackPageMockup() {
+  const [missingArtwork, setMissingArtwork] = useState(false);
+
   return (
     <div className="p-6 sm:p-8">
       <div className="max-w-2xl mx-auto">
         {/* Track Header */}
         <div className="flex gap-6">
           {/* Album Art */}
-          <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 flex-shrink-0 shadow-lg" />
+          <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 flex-shrink-0 shadow-lg relative overflow-hidden">
+            {!missingArtwork ? (
+              <img
+                src="/track-artwork/midnight-drive.jpg"
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                draggable={false}
+                onError={() => setMissingArtwork(true)}
+              />
+            ) : null}
+          </div>
 
           {/* Track Info */}
           <div className="flex-1 min-w-0">

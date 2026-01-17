@@ -19,7 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export default function Home() {
   return (
-    <div className={`${spaceGrotesk.className} min-h-screen bg-[#f7f7f5] text-neutral-950 overflow-x-clip`}>
+    <div className={`${spaceGrotesk.className} min-h-screen bg-[#f7f7f5] text-neutral-950`}>
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-neutral-200 bg-[#f7f7f5]/90 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4">
@@ -58,7 +58,7 @@ export default function Home() {
             Upload your tracks. Get real feedback from people who love your genre. Earn when others discover and share your music.
           </p>
 
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mt-10 flex flex-col items-center justify-center gap-3">
             <Link href="/signup">
               <Button size="lg" variant="primary">
                 Start free trial <ArrowRight className="ml-2 h-4 w-4" />
@@ -95,7 +95,7 @@ export default function Home() {
             {/* Decorative doodles */}
             <Sparkle className="pointer-events-none absolute -top-10 -left-10 sm:-left-24 lg:-left-40 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-90 rotate-12" />
             <Star className="pointer-events-none absolute top-6 -left-6 sm:-left-16 lg:-left-24 w-12 h-12 sm:w-14 sm:h-14 text-lime-500 opacity-90 -rotate-12" />
-            <Circle className="pointer-events-none absolute -bottom-10 -right-10 sm:-right-28 lg:-right-44 w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 text-orange-300 opacity-60 rotate-6" />
+            <Squiggle className="pointer-events-none absolute -bottom-10 -right-10 sm:-right-28 lg:-right-44 w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 text-orange-300 opacity-60 rotate-6" />
 
             <BrowserMockup url="mixreflect.com/track/midnight-drive">
               <TrackPageMockup />
@@ -133,7 +133,7 @@ export default function Home() {
           <div className="max-w-2xl mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold">Your music earns</h2>
             <p className="mt-3 text-neutral-600">
-              You earn $0.50 every time someone buys your track. When reviewers share your music with their fans, they earn a commission—and you still get paid.
+              You earn $0.50 every time someone buys your track. When reviewers share your music with their fans, they earn a commission—and you still get paid. Even if you&apos;re starting from zero, your first listeners are built in.
             </p>
           </div>
 
@@ -164,7 +164,7 @@ export default function Home() {
           <div className="relative">
             {/* Decorative doodles */}
             <Sparkle className="pointer-events-none absolute top-6 -left-10 sm:-left-28 lg:-left-44 w-14 h-14 sm:w-20 sm:h-20 text-neutral-950 opacity-90 -rotate-12" />
-            <Circle className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-40 w-16 h-16 sm:w-28 sm:h-28 text-orange-300 opacity-70 rotate-12" />
+            <Squiggle className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-40 w-16 h-16 sm:w-28 sm:h-28 text-orange-300 opacity-70 rotate-12" />
             <Dots className="pointer-events-none absolute -bottom-10 right-2 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 text-lime-500 opacity-80 rotate-6" />
 
             <TrackReportDemo />

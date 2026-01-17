@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from "react";
 interface Activity {
   id: number;
   type: "review" | "sale";
-  genre: string;
+  title: string;
+  artist: string;
   timeAgo: string;
   metric: string;
   artwork: number;
@@ -13,18 +14,18 @@ interface Activity {
 }
 
 const ACTIVITIES: Activity[] = [
-  { id: 1, type: "review", genre: "Electronic", timeAgo: "just now", metric: "5 reviews", artwork: 1, color: "bg-gradient-to-br from-purple-500 to-blue-600" },
-  { id: 2, type: "sale", genre: "Hip-Hop", timeAgo: "1m ago", metric: "$0.50 sale", artwork: 2, color: "bg-gradient-to-br from-orange-500 to-red-600" },
-  { id: 3, type: "review", genre: "Indie Rock", timeAgo: "2m ago", metric: "8 reviews", artwork: 3, color: "bg-gradient-to-br from-green-500 to-teal-600" },
-  { id: 4, type: "review", genre: "Pop", timeAgo: "3m ago", metric: "4 reviews", artwork: 4, color: "bg-gradient-to-br from-pink-500 to-rose-600" },
-  { id: 5, type: "sale", genre: "Lo-Fi", timeAgo: "5m ago", metric: "$0.50 sale", artwork: 5, color: "bg-gradient-to-br from-amber-500 to-orange-600" },
-  { id: 6, type: "review", genre: "R&B", timeAgo: "6m ago", metric: "6 reviews", artwork: 6, color: "bg-gradient-to-br from-violet-500 to-purple-600" },
-  { id: 7, type: "review", genre: "Techno", timeAgo: "8m ago", metric: "7 reviews", artwork: 7, color: "bg-gradient-to-br from-cyan-500 to-blue-600" },
-  { id: 8, type: "sale", genre: "House", timeAgo: "10m ago", metric: "$0.50 sale", artwork: 8, color: "bg-gradient-to-br from-lime-500 to-green-600" },
-  { id: 9, type: "review", genre: "Drum & Bass", timeAgo: "12m ago", metric: "9 reviews", artwork: 9, color: "bg-gradient-to-br from-red-500 to-pink-600" },
-  { id: 10, type: "review", genre: "Alternative", timeAgo: "14m ago", metric: "3 reviews", artwork: 10, color: "bg-gradient-to-br from-indigo-500 to-violet-600" },
-  { id: 11, type: "sale", genre: "Trap", timeAgo: "16m ago", metric: "$0.50 sale", artwork: 11, color: "bg-gradient-to-br from-yellow-500 to-amber-600" },
-  { id: 12, type: "review", genre: "Ambient", timeAgo: "18m ago", metric: "6 reviews", artwork: 12, color: "bg-gradient-to-br from-teal-500 to-cyan-600" },
+  { id: 1, type: "review", title: "Neon Pulse", artist: "Maya Kim", timeAgo: "just now", metric: "5 reviews", artwork: 1, color: "bg-gradient-to-br from-purple-500 to-blue-600" },
+  { id: 2, type: "sale", title: "Late Night Taxi", artist: "Marcus T.", timeAgo: "1m ago", metric: "$0.50 sale", artwork: 2, color: "bg-gradient-to-br from-orange-500 to-red-600" },
+  { id: 3, type: "review", title: "Golden Hour", artist: "James Cole", timeAgo: "2m ago", metric: "8 reviews", artwork: 3, color: "bg-gradient-to-br from-green-500 to-teal-600" },
+  { id: 4, type: "review", title: "Street Lights", artist: "DJ Nova", timeAgo: "3m ago", metric: "4 reviews", artwork: 4, color: "bg-gradient-to-br from-pink-500 to-rose-600" },
+  { id: 5, type: "sale", title: "City Rain", artist: "Tom West", timeAgo: "5m ago", metric: "$0.50 sale", artwork: 5, color: "bg-gradient-to-br from-amber-500 to-orange-600" },
+  { id: 6, type: "review", title: "Echoes", artist: "Sarah Moon", timeAgo: "6m ago", metric: "6 reviews", artwork: 6, color: "bg-gradient-to-br from-violet-500 to-purple-600" },
+  { id: 7, type: "review", title: "Drift Away", artist: "Luna Park", timeAgo: "8m ago", metric: "7 reviews", artwork: 7, color: "bg-gradient-to-br from-cyan-500 to-blue-600" },
+  { id: 8, type: "sale", title: "After Hours", artist: "Kira Lane", timeAgo: "10m ago", metric: "$0.50 sale", artwork: 8, color: "bg-gradient-to-br from-lime-500 to-green-600" },
+  { id: 9, type: "review", title: "Soft Focus", artist: "Aiden Grey", timeAgo: "12m ago", metric: "9 reviews", artwork: 9, color: "bg-gradient-to-br from-red-500 to-pink-600" },
+  { id: 10, type: "review", title: "Static Bloom", artist: "Rae Winter", timeAgo: "14m ago", metric: "3 reviews", artwork: 10, color: "bg-gradient-to-br from-indigo-500 to-violet-600" },
+  { id: 11, type: "sale", title: "Low Tide", artist: "Niko Vale", timeAgo: "16m ago", metric: "$0.50 sale", artwork: 11, color: "bg-gradient-to-br from-yellow-500 to-amber-600" },
+  { id: 12, type: "review", title: "Night Garden", artist: "Ivy Stone", timeAgo: "18m ago", metric: "6 reviews", artwork: 12, color: "bg-gradient-to-br from-teal-500 to-cyan-600" },
 ];
 
 export function ActivityFeed() {
@@ -56,17 +57,24 @@ export function ActivityFeed() {
 
   const [artworkExt, setArtworkExt] = useState<Record<number, "jpg" | "png" | "none">>({});
 
-  const pickArtwork = () => {
+  const pickArtwork = (exclude: number[] = []) => {
     const available = Object.entries(artworkExt)
       .filter(([, ext]) => ext !== "none")
       .map(([key]) => Number(key))
       .filter((n) => Number.isFinite(n) && n >= 1);
 
+    const excludeSet = new Set(exclude);
+
     if (available.length > 0) {
-      return available[Math.floor(Math.random() * available.length)];
+      const filtered = available.filter((n) => !excludeSet.has(n));
+      const pool = filtered.length > 0 ? filtered : available;
+      return pool[Math.floor(Math.random() * pool.length)];
     }
 
-    return 1 + Math.floor(Math.random() * DEFAULT_ARTWORK_COUNT);
+    const fallbackAvailable = Array.from({ length: DEFAULT_ARTWORK_COUNT }, (_, i) => i + 1);
+    const fallbackFiltered = fallbackAvailable.filter((n) => !excludeSet.has(n));
+    const pool = fallbackFiltered.length > 0 ? fallbackFiltered : fallbackAvailable;
+    return pool[Math.floor(Math.random() * pool.length)];
   };
 
   const queueRef = useRef<Activity[]>(queue);
@@ -90,7 +98,12 @@ export function ActivityFeed() {
   }, []);
 
   useEffect(() => {
-    const reset = ACTIVITIES.slice(0, layout.visibleCount).map((activity) => ({ ...activity, artwork: pickArtwork() }));
+    const used = new Set<number>();
+    const reset = ACTIVITIES.slice(0, layout.visibleCount).map((activity) => {
+      const artwork = pickArtwork(Array.from(used));
+      used.add(artwork);
+      return { ...activity, artwork };
+    });
     setQueue(reset);
     setRenderQueue(reset);
     setNextIndex(layout.visibleCount);
@@ -181,10 +194,12 @@ export function ActivityFeed() {
     const interval = setInterval(() => {
       const currentQueue = queueRef.current;
       const currentNextIndex = nextIndexRef.current;
+
+      const excludeArtwork = currentQueue.map((a) => a.artwork);
       const incoming = {
         ...ACTIVITIES[currentNextIndex % ACTIVITIES.length],
         id: Date.now(),
-        artwork: pickArtwork(),
+        artwork: pickArtwork(excludeArtwork),
       };
 
       pendingIncomingRef.current = incoming;
@@ -254,7 +269,8 @@ export function ActivityFeed() {
 
       {/* Text underneath */}
       <div className="mt-3" style={{ width: `${layout.cardSizePx}px` }}>
-        <p className={`${isCompact ? "text-[13px]" : "text-sm"} font-semibold text-neutral-950 truncate`}>{activity.genre}</p>
+        <p className={`${isCompact ? "text-[13px]" : "text-sm"} font-semibold text-neutral-950 truncate`}>{activity.title}</p>
+        <p className={`${isCompact ? "text-[12px]" : "text-[13px]"} font-semibold text-neutral-700 truncate`}>{activity.artist}</p>
         <p
           className={`${isCompact ? "text-[12px]" : "text-[13px]"} font-semibold leading-tight ${
             activity.type === "sale" ? "text-lime-700" : "text-neutral-700"

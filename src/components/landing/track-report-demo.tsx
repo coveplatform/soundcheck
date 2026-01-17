@@ -50,6 +50,7 @@ function CircleProgress({ value, label, color }: { value: number; label: string;
 
 export function TrackReportDemo() {
   const [activeTab, setActiveTab] = useState<Tab>("analytics");
+  const [missingArtwork, setMissingArtwork] = useState(false);
 
   return (
     <div className="bg-white border border-neutral-200 shadow-sm">
@@ -58,16 +59,19 @@ export function TrackReportDemo() {
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-3 sm:gap-4 sm:flex-shrink-0">
             <div className="relative w-12 h-12 sm:w-16 sm:h-16 bg-neutral-200 border border-neutral-200 flex-shrink-0 group cursor-pointer overflow-hidden">
-              <img
-                src="/activity-artwork/13.jpg"
-                alt=""
-                className="absolute inset-0 h-full w-full object-cover"
-                draggable={false}
-              />
+              {!missingArtwork ? (
+                <img
+                  src="/track-artwork/midnight-drive.jpg"
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-cover"
+                  draggable={false}
+                  onError={() => setMissingArtwork(true)}
+                />
+              ) : null}
               <div className="absolute inset-0 flex items-center justify-center bg-neutral-950/30 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Play className="h-5 w-5 sm:h-6 sm:w-6 text-neutral-50 fill-neutral-50" />
               </div>
-              <Music className="h-5 w-5 sm:h-7 sm:w-7 text-neutral-950/60 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover:opacity-0 transition-opacity" />
+              <Music className={`h-5 w-5 sm:h-7 sm:w-7 text-neutral-950/60 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity ${missingArtwork ? "opacity-100" : "opacity-0 group-hover:opacity-0"}`} />
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="font-extrabold text-neutral-950 text-sm sm:text-lg truncate">Midnight Drive</h4>
