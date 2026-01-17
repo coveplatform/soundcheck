@@ -300,14 +300,14 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="border-b border-neutral-200 py-16 bg-[#f7f7f5] text-neutral-950">
+      <section id="pricing" className="border-b border-neutral-800 py-16 bg-neutral-900 text-neutral-50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-extrabold mb-2">Simple pricing. Real results.</h2>
-            <p className="text-neutral-700 mb-2">
+            <p className="text-neutral-300 mb-2">
               More reviews = clearer patterns = more confidence.
             </p>
-            <p className="text-sm text-neutral-600">
+            <p className="text-sm text-neutral-400">
               First review free, no card required
             </p>
           </div>
@@ -320,27 +320,27 @@ export default function Home() {
               return (
                 <div
                   key={p.key}
-                  className={`relative border border-neutral-200 bg-white p-8 text-neutral-950 shadow-sm ${
-                    isPopular ? "ring-1 ring-lime-200" : ""
+                  className={`relative border border-neutral-700/70 bg-neutral-950/30 p-8 text-neutral-50 shadow-sm ${
+                    isPopular ? "ring-1 ring-lime-400/30" : ""
                   }`}
                 >
                   {isPopular && (
-                    <span className="absolute -top-3 left-6 text-xs font-semibold bg-lime-100 text-lime-900 px-3 py-1 border border-lime-200">
+                    <span className="absolute -top-3 left-6 text-xs font-semibold bg-lime-400/15 text-lime-200 px-3 py-1 border border-lime-400/30">
                       RECOMMENDED
                     </span>
                   )}
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="font-bold text-xl">{p.name}</h3>
-                      <p className="text-sm text-neutral-500 mt-1">{p.description}</p>
+                      <p className="text-sm text-neutral-300 mt-1">{p.description}</p>
                     </div>
-                    <div className={`h-12 w-12 ${isPopular ? 'bg-lime-100' : 'bg-neutral-100'} border border-neutral-200 flex items-center justify-center font-extrabold text-lg`}>
+                    <div className={`h-12 w-12 ${isPopular ? 'bg-lime-400/15' : 'bg-neutral-800/60'} border border-neutral-700/70 flex items-center justify-center font-extrabold text-lg`}>
                       {p.reviews}
                     </div>
                   </div>
 
                   <div className="mb-6">
-                    <div className="text-5xl font-extrabold">${price}<span className="text-lg font-semibold text-neutral-500 ml-1">AUD</span></div>
+                    <div className="text-5xl font-extrabold">${price}<span className="text-lg font-semibold text-neutral-300 ml-1">AUD</span></div>
                   </div>
 
                   <div className="space-y-3 mb-8">
@@ -348,8 +348,8 @@ export default function Home() {
                       <div key={i} className="flex items-center gap-3">
                         <CheckCircle2 className={`h-5 w-5 flex-shrink-0 ${
                           feature.includes("Consensus") || feature.includes("Pattern")
-                            ? "text-orange-500"
-                            : "text-lime-600"
+                            ? "text-orange-300"
+                            : "text-lime-300"
                         }`} />
                         <span className={`text-sm ${
                           feature.includes("Consensus") || feature.includes("Pattern")
@@ -364,7 +364,7 @@ export default function Home() {
                     <Button className={`w-full font-bold py-6 text-base ${
                       isPopular
                         ? "bg-lime-400 text-black hover:bg-lime-300 active:bg-lime-500 border-0"
-                        : "bg-white text-black hover:bg-neutral-100 active:bg-neutral-200 border border-neutral-200"
+                        : "bg-transparent text-neutral-50 hover:bg-neutral-800 active:bg-neutral-800 border border-neutral-500"
                     }`}>
                       Get {p.reviews} Reviews
                     </Button>
@@ -378,12 +378,12 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="bg-white text-neutral-950 py-20 border-b border-neutral-200">
+      <section className="bg-neutral-900 text-neutral-50 py-20 border-b border-neutral-800">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
             Stop wondering.<br />Start knowing.
           </h2>
-          <p className="text-neutral-700 mb-10 text-lg">
+          <p className="text-neutral-300 mb-10 text-lg">
             Your track deserves more than a guess. Get real feedback from real listeners.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -395,9 +395,9 @@ export default function Home() {
                 Get Feedback <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <span className="text-sm font-semibold text-lime-900 bg-lime-100 px-3 py-1 border border-lime-200">First one&apos;s free</span>
+            <span className="text-sm font-semibold text-lime-200 bg-lime-400/15 px-3 py-1 border border-lime-400/30">First one&apos;s free</span>
           </div>
-          <p className="mt-6 text-sm text-neutral-600">
+          <p className="mt-6 text-sm text-neutral-400">
             No card required • Results in under 12 hours
           </p>
         </div>
