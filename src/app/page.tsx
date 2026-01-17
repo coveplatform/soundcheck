@@ -78,7 +78,7 @@ export default function Home() {
 
       {/* Your Track Report Section */}
       <section className="mt-0 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-orange-400 text-black border-y-2 border-black py-12 sm:py-14">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+        <div className="max-w-6xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-5xl font-black tracking-tight">
             Your Track Report
           </h2>
@@ -89,7 +89,7 @@ export default function Home() {
       </section>
 
       <section id="examples" className="py-20 sm:py-24 border-b border-neutral-800">
-        <div className="max-w-5xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <TrackReportDemo />
 
           {/* CTA */}
