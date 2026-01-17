@@ -28,24 +28,117 @@ const ACTIVITIES: Activity[] = [
 ];
 
 export function ActivityFeed() {
-  const VISIBLE_COUNT = 7;
-  const CARD_SIZE_PX = 130;
-  const GAP_PX = 20;
-  const STEP_PX = CARD_SIZE_PX + GAP_PX;
-  const VIEWPORT_WIDTH_PX = VISIBLE_COUNT * CARD_SIZE_PX + (VISIBLE_COUNT - 1) * GAP_PX;
+  const ARTWORK_COUNT = 36;
+  const DEFAULT_ARTWORK_COUNT = 15;
 
-  const [queue, setQueue] = useState<Activity[]>(() => ACTIVITIES.slice(0, VISIBLE_COUNT));
-  const [nextIndex, setNextIndex] = useState(VISIBLE_COUNT);
-  const [renderQueue, setRenderQueue] = useState<Activity[]>(() => ACTIVITIES.slice(0, VISIBLE_COUNT));
+  const getInitialLayout = () => {
+    if (typeof window === "undefined") {
+      return { visibleCount: 7, cardSizePx: 130, gapPx: 20 };
+    }
+    const isMobile = window.innerWidth < 640;
+    return isMobile
+      ? { visibleCount: 3, cardSizePx: 108, gapPx: 14 }
+      : { visibleCount: 7, cardSizePx: 130, gapPx: 20 };
+  };
+
+  const [layout, setLayout] = useState(getInitialLayout);
+  const STEP_PX = layout.cardSizePx + layout.gapPx;
+  const VIEWPORT_WIDTH_PX = layout.visibleCount * layout.cardSizePx + (layout.visibleCount - 1) * layout.gapPx;
+
+  const [queue, setQueue] = useState<Activity[]>(() =>
+    ACTIVITIES.slice(0, layout.visibleCount).map((activity) => ({ ...activity, artwork: 1 + Math.floor(Math.random() * DEFAULT_ARTWORK_COUNT) }))
+  );
+  const [nextIndex, setNextIndex] = useState(layout.visibleCount);
+  const [renderQueue, setRenderQueue] = useState<Activity[]>(() =>
+    ACTIVITIES.slice(0, layout.visibleCount).map((activity) => ({ ...activity, artwork: 1 + Math.floor(Math.random() * DEFAULT_ARTWORK_COUNT) }))
+  );
   const [phase, setPhase] = useState<"idle" | "pre" | "sliding">("idle");
 
-  const [missingArtwork, setMissingArtwork] = useState<Record<number, boolean>>({});
+  const [artworkExt, setArtworkExt] = useState<Record<number, "jpg" | "png" | "none">>({});
+
+  const pickArtwork = () => {
+    const available = Object.entries(artworkExt)
+      .filter(([, ext]) => ext !== "none")
+      .map(([key]) => Number(key))
+      .filter((n) => Number.isFinite(n) && n >= 1);
+
+    if (available.length > 0) {
+      return available[Math.floor(Math.random() * available.length)];
+    }
+
+    return 1 + Math.floor(Math.random() * DEFAULT_ARTWORK_COUNT);
+  };
 
   const queueRef = useRef<Activity[]>(queue);
   const nextIndexRef = useRef(nextIndex);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingIncomingRef = useRef<Activity | null>(null);
   const pendingQueueRef = useRef<Activity[]>(queue);
+
+  useEffect(() => {
+    const update = () => {
+      const isMobile = window.innerWidth < 640;
+      setLayout(isMobile
+        ? { visibleCount: 3, cardSizePx: 108, gapPx: 14 }
+        : { visibleCount: 7, cardSizePx: 130, gapPx: 20 }
+      );
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  useEffect(() => {
+    const reset = ACTIVITIES.slice(0, layout.visibleCount).map((activity) => ({ ...activity, artwork: pickArtwork() }));
+    setQueue(reset);
+    setRenderQueue(reset);
+    setNextIndex(layout.visibleCount);
+    nextIndexRef.current = layout.visibleCount;
+    queueRef.current = reset;
+    pendingQueueRef.current = reset;
+    setPhase("idle");
+    pendingIncomingRef.current = null;
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, [layout.visibleCount]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const preload = (src: string) =>
+      new Promise<boolean>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = src;
+      });
+
+    void (async () => {
+      for (let i = 1; i <= ARTWORK_COUNT; i++) {
+        const jpgOk = await preload(`/activity-artwork/${i}.jpg`);
+        if (cancelled) return;
+        if (jpgOk) {
+          setArtworkExt((prev) => (prev[i] ? prev : { ...prev, [i]: "jpg" }));
+          continue;
+        }
+
+        const pngOk = await preload(`/activity-artwork/${i}.png`);
+        if (cancelled) return;
+        if (pngOk) {
+          setArtworkExt((prev) => (prev[i] ? prev : { ...prev, [i]: "png" }));
+        } else {
+          setArtworkExt((prev) => (prev[i] ? prev : { ...prev, [i]: "none" }));
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ARTWORK_COUNT]);
 
   useEffect(() => {
     queueRef.current = queue;
@@ -62,7 +155,7 @@ export function ActivityFeed() {
   const commitPending = () => {
     if (!pendingIncomingRef.current) return;
 
-    const committed = [pendingIncomingRef.current, ...pendingQueueRef.current].slice(0, VISIBLE_COUNT);
+    const committed = [pendingIncomingRef.current, ...pendingQueueRef.current].slice(0, layout.visibleCount);
     setQueue(committed);
     setRenderQueue(committed);
 
@@ -79,13 +172,20 @@ export function ActivityFeed() {
     }
   };
 
-  const artworkSrcForIndex = (index: number) => `/activity-artwork/${index}.jpg`;
+  const artworkSrcForIndex = (index: number) => {
+    const ext = artworkExt[index] ?? "jpg";
+    return `/activity-artwork/${index}.${ext}`;
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
       const currentQueue = queueRef.current;
       const currentNextIndex = nextIndexRef.current;
-      const incoming = { ...ACTIVITIES[currentNextIndex % ACTIVITIES.length], id: Date.now() };
+      const incoming = {
+        ...ACTIVITIES[currentNextIndex % ACTIVITIES.length],
+        id: Date.now(),
+        artwork: pickArtwork(),
+      };
 
       pendingIncomingRef.current = incoming;
       pendingQueueRef.current = currentQueue;
@@ -117,22 +217,33 @@ export function ActivityFeed() {
   }, []);
 
   const ActivityCard = ({ activity }: { activity: Activity }) => (
+    (() => {
+      const isCompact = layout.visibleCount < 7;
+      const resolvedExt = artworkExt[activity.artwork];
+      const shouldRenderArtwork = resolvedExt && resolvedExt !== "none";
+
+      return (
     <button
       type="button"
       className="group cursor-pointer select-none bg-transparent p-0 border-0 focus-visible:outline-none"
     >
       {/* Artwork Square */}
       <div
-        className={`w-[130px] h-[130px] ${activity.color} shadow-md flex items-center justify-center relative overflow-hidden rounded-2xl transition-all duration-200 ease-out group-hover:shadow-lg group-hover:scale-[1.02] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-300 group-focus-visible:outline-offset-2`}
+        className={`${activity.color} shadow-md flex items-center justify-center relative overflow-hidden rounded-2xl transition-all duration-200 ease-out group-hover:shadow-lg group-hover:scale-[1.02] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-300 group-focus-visible:outline-offset-2`}
+        style={{ width: `${layout.cardSizePx}px`, height: `${layout.cardSizePx}px` }}
       >
-        {!missingArtwork[activity.artwork] ? (
+        {shouldRenderArtwork ? (
           <img
             src={artworkSrcForIndex(activity.artwork)}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             draggable={false}
             onError={() => {
-              setMissingArtwork((prev) => ({ ...prev, [activity.artwork]: true }));
+              setArtworkExt((prev) => {
+                const current = prev[activity.artwork] ?? "jpg";
+                if (current === "jpg") return { ...prev, [activity.artwork]: "png" };
+                return { ...prev, [activity.artwork]: "none" };
+              });
             }}
           />
         ) : null}
@@ -142,30 +253,35 @@ export function ActivityFeed() {
       </div>
 
       {/* Text underneath */}
-      <div className="mt-3 w-[130px]">
-        <p className="text-sm font-semibold text-neutral-950 truncate">{activity.genre}</p>
+      <div className="mt-3" style={{ width: `${layout.cardSizePx}px` }}>
+        <p className={`${isCompact ? "text-[13px]" : "text-sm"} font-semibold text-neutral-950 truncate`}>{activity.genre}</p>
         <p
-          className={`text-[13px] font-semibold leading-tight ${
+          className={`${isCompact ? "text-[12px]" : "text-[13px]"} font-semibold leading-tight ${
             activity.type === "sale" ? "text-lime-700" : "text-neutral-700"
           }`}
         >
           {activity.metric}
         </p>
-        <p className="text-xs text-neutral-500">{activity.timeAgo}</p>
+        <p className={`${isCompact ? "text-[11px]" : "text-xs"} text-neutral-500`}>{activity.timeAgo}</p>
       </div>
     </button>
+      );
+    })()
   );
 
   return (
-    <div className="w-full flex justify-center">
-      <div className="relative overflow-hidden" style={{ width: `${VIEWPORT_WIDTH_PX}px` }}>
+    <div className="w-full flex justify-center px-4">
+      <div className="relative overflow-hidden" style={{ width: `min(100%, ${VIEWPORT_WIDTH_PX}px)` }}>
         <div
-          className={`flex gap-5 will-change-transform ${
+          className={`flex will-change-transform ${
             phase === "sliding"
               ? "transition-transform duration-500 ease-out"
               : "transition-none"
           }`}
-          style={{ transform: `translateX(${phase === "pre" ? -STEP_PX : 0}px)` }}
+          style={{
+            gap: `${layout.gapPx}px`,
+            transform: `translateX(${phase === "pre" ? -STEP_PX : 0}px)`,
+          }}
           onTransitionEnd={(e) => {
             if (e.propertyName !== "transform") return;
             if (phase !== "sliding") return;

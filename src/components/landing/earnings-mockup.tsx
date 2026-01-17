@@ -20,34 +20,34 @@ export function EarningsMockup() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="bg-white rounded-xl p-4 border border-neutral-200">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-neutral-200 min-w-0">
           <div className="flex items-center gap-2 text-neutral-500 mb-1">
             <DollarSign className="w-4 h-4" />
             <span className="text-xs font-medium">This Month</span>
           </div>
-          <p className="text-2xl font-bold text-neutral-950">$127.50</p>
+          <p className="text-xl sm:text-2xl font-bold text-neutral-950 leading-none truncate">$127.50</p>
           <p className="text-xs text-lime-600 flex items-center gap-1 mt-1">
             <TrendingUp className="w-3 h-3" />
             +23% from last month
           </p>
         </div>
 
-        <div className="bg-white rounded-xl p-4 border border-neutral-200">
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-neutral-200 min-w-0">
           <div className="flex items-center gap-2 text-neutral-500 mb-1">
             <Music className="w-4 h-4" />
             <span className="text-xs font-medium">Track Sales</span>
           </div>
-          <p className="text-2xl font-bold text-neutral-950">$89.00</p>
+          <p className="text-xl sm:text-2xl font-bold text-neutral-950 leading-none truncate">$89.00</p>
           <p className="text-xs text-neutral-500 mt-1">178 sales</p>
         </div>
 
-        <div className="bg-white rounded-xl p-4 border border-neutral-200">
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-neutral-200 min-w-0">
           <div className="flex items-center gap-2 text-neutral-500 mb-1">
             <Share2 className="w-4 h-4" />
             <span className="text-xs font-medium">Share Commission</span>
           </div>
-          <p className="text-2xl font-bold text-neutral-950">$38.50</p>
+          <p className="text-xl sm:text-2xl font-bold text-neutral-950 leading-none truncate">$38.50</p>
           <p className="text-xs text-neutral-500 mt-1">From tracks you shared</p>
         </div>
       </div>
@@ -59,8 +59,8 @@ export function EarningsMockup() {
         </div>
         <div className="divide-y divide-neutral-100">
           {RECENT_EARNINGS.map((item, i) => (
-            <div key={i} className="px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
+            <div key={i} className="px-4 py-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                   item.type === "sale" ? "bg-lime-100 text-lime-700" :
                   item.type === "commission" ? "bg-blue-100 text-blue-700" :
@@ -70,12 +70,12 @@ export function EarningsMockup() {
                    item.type === "commission" ? <Share2 className="w-4 h-4" /> :
                    <DollarSign className="w-4 h-4" />}
                 </div>
-                <div>
-                  <p className="text-sm text-neutral-950">{item.description}</p>
+                <div className="min-w-0">
+                  <p className="text-sm text-neutral-950 truncate">{item.description}</p>
                   <p className="text-xs text-neutral-400">{item.time}</p>
                 </div>
               </div>
-              <p className="font-semibold text-lime-700">+${item.amount.toFixed(2)}</p>
+              <p className="font-semibold text-lime-700 text-sm sm:text-base flex-shrink-0">+${item.amount.toFixed(2)}</p>
             </div>
           ))}
         </div>

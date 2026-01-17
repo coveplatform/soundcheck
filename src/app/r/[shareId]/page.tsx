@@ -112,7 +112,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
   return (
     <div className="min-h-screen bg-neutral-50">
       {/* Header */}
-      <header className="border-b-2 border-black bg-white">
+      <header className="border-b-2 border-black bg-white sticky top-0 z-50">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/">
             <Logo />

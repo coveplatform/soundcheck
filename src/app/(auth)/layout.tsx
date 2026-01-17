@@ -16,7 +16,7 @@ export default function AuthLayout({
       />
       <div className="min-h-screen flex flex-col bg-black text-white" style={{ background: 'linear-gradient(to bottom, black, #0a0a0a, black)' }}>
         {/* Header */}
-      <header className="border-b border-neutral-800 bg-black/40 backdrop-blur">
+      <header className="border-b border-neutral-800 bg-black/40 backdrop-blur sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center h-14">
             <Link href="/" className="flex items-center gap-2 w-fit">

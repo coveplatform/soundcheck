@@ -7,7 +7,7 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b-2 border-black">
+      <header className="border-b-2 border-black sticky top-0 z-50 bg-white">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <Link href="/" className="flex items-center gap-2 w-fit">
             <Logo />

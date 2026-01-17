@@ -1198,7 +1198,7 @@ export default function GetFeedbackPage() {
       </div>
 
       {/* Header */}
-      <header className="border-b border-neutral-800">
+      <header className="border-b border-neutral-800 sticky top-0 z-50 bg-black/80 backdrop-blur">
         <div className="max-w-2xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
             <Link href="/" className="flex items-center gap-2">

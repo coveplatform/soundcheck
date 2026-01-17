@@ -28,7 +28,7 @@ export default function TrialLandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-neutral-950 to-black text-white">
-      <header className="border-b border-neutral-800">
+      <header className="border-b border-neutral-800 sticky top-0 z-50 bg-black/80 backdrop-blur">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
             <Link href="/" className="flex items-center gap-2">

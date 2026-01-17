@@ -93,9 +93,9 @@ export default function Home() {
 
           <div className="relative">
             {/* Decorative doodles */}
-            <Sparkle className="pointer-events-none absolute -top-12 -left-40 w-24 h-24 text-neutral-950 hidden lg:block opacity-90 rotate-12" />
-            <Star className="pointer-events-none absolute top-6 -left-24 w-14 h-14 text-lime-500 hidden lg:block opacity-90 -rotate-12" />
-            <Circle className="pointer-events-none absolute -bottom-20 -right-44 w-36 h-36 text-orange-300 hidden lg:block opacity-60 rotate-6" />
+            <Sparkle className="pointer-events-none absolute -top-10 -left-10 sm:-left-24 lg:-left-40 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-90 rotate-12" />
+            <Star className="pointer-events-none absolute top-6 -left-6 sm:-left-16 lg:-left-24 w-12 h-12 sm:w-14 sm:h-14 text-lime-500 opacity-90 -rotate-12" />
+            <Circle className="pointer-events-none absolute -bottom-10 -right-10 sm:-right-28 lg:-right-44 w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 text-orange-300 opacity-60 rotate-6" />
 
             <BrowserMockup url="mixreflect.com/track/midnight-drive">
               <TrackPageMockup />
@@ -116,9 +116,9 @@ export default function Home() {
 
           <div className="relative">
             {/* Decorative doodles */}
-            <Dots className="pointer-events-none absolute -top-14 -right-44 w-24 h-24 text-neutral-950 hidden lg:block opacity-80 rotate-12" />
-            <Sparkle className="pointer-events-none absolute -top-2 -right-20 w-14 h-14 text-orange-300 hidden lg:block opacity-85 -rotate-6" />
-            <Squiggle className="pointer-events-none absolute -bottom-10 -left-36 w-44 h-12 text-lime-400 hidden lg:block opacity-90 rotate-6" />
+            <Dots className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-44 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-80 rotate-12" />
+            <Sparkle className="pointer-events-none absolute -top-2 right-2 sm:-right-12 lg:-right-20 w-12 h-12 sm:w-14 sm:h-14 text-orange-300 opacity-85 -rotate-6" />
+            <Squiggle className="pointer-events-none absolute -bottom-8 -left-12 sm:-left-24 lg:-left-36 w-32 h-10 sm:w-44 sm:h-12 text-lime-400 opacity-90 rotate-6" />
 
             <BrowserMockup url="mixreflect.com/discover">
               <DiscoverMockup />
@@ -139,10 +139,10 @@ export default function Home() {
 
           <div className="relative">
             {/* Decorative doodles */}
-            <Star className="pointer-events-none absolute top-16 -left-40 w-14 h-14 text-lime-500 hidden lg:block opacity-90 rotate-12" />
-            <MusicNote className="pointer-events-none absolute -top-10 -right-44 w-28 h-28 text-neutral-950 hidden lg:block opacity-85 -rotate-12" />
-            <Sparkle className="pointer-events-none absolute top-10 -right-20 w-16 h-16 text-orange-300 hidden lg:block opacity-90 rotate-6" />
-            <Dots className="pointer-events-none absolute -bottom-16 left-1/3 w-20 h-20 text-neutral-950 hidden lg:block opacity-80 -rotate-6" />
+            <Star className="pointer-events-none absolute top-10 -left-8 sm:-left-24 lg:-left-40 w-12 h-12 sm:w-14 sm:h-14 text-lime-500 opacity-90 rotate-12" />
+            <MusicNote className="pointer-events-none absolute -top-8 -right-10 sm:-right-28 lg:-right-44 w-20 h-20 sm:w-28 sm:h-28 text-neutral-950 opacity-85 -rotate-12" />
+            <Sparkle className="pointer-events-none absolute top-8 right-2 sm:-right-12 lg:-right-20 w-12 h-12 sm:w-16 sm:h-16 text-orange-300 opacity-90 rotate-6" />
+            <Dots className="pointer-events-none absolute -bottom-10 left-1/3 w-14 h-14 sm:w-20 sm:h-20 text-neutral-950 opacity-80 -rotate-6" />
 
             <BrowserMockup url="mixreflect.com/earnings">
               <EarningsMockup />
@@ -163,9 +163,9 @@ export default function Home() {
 
           <div className="relative">
             {/* Decorative doodles */}
-            <Sparkle className="pointer-events-none absolute top-10 -left-44 w-20 h-20 text-neutral-950 hidden lg:block opacity-90 -rotate-12" />
-            <Circle className="pointer-events-none absolute -top-20 -right-40 w-28 h-28 text-orange-300 hidden lg:block opacity-70 rotate-12" />
-            <Dots className="pointer-events-none absolute -bottom-12 right-6 w-16 h-16 text-lime-500 hidden lg:block opacity-80 rotate-6" />
+            <Sparkle className="pointer-events-none absolute top-6 -left-10 sm:-left-28 lg:-left-44 w-14 h-14 sm:w-20 sm:h-20 text-neutral-950 opacity-90 -rotate-12" />
+            <Circle className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-40 w-16 h-16 sm:w-28 sm:h-28 text-orange-300 opacity-70 rotate-12" />
+            <Dots className="pointer-events-none absolute -bottom-10 right-2 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 text-lime-500 opacity-80 rotate-6" />
 
             <TrackReportDemo />
           </div>
@@ -280,9 +280,9 @@ export default function Home() {
       {/* For Reviewers */}
       <section id="for-reviewers" className="border-b border-neutral-200 py-12 bg-white text-neutral-950">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="flex flex-col items-center text-center md:text-left md:flex-row md:items-center md:justify-between gap-6">
             <div>
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
                 <div className="h-10 w-10 bg-orange-100 rounded-xl flex items-center justify-center">
                   <Headphones className="h-5 w-5 text-orange-700" />
                 </div>
@@ -292,7 +292,7 @@ export default function Home() {
                 Get paid to listen and give feedback. Earn $0.50–$1.50 per review.
               </p>
             </div>
-            <Link href="/signup" className="shrink-0">
+            <Link href="/signup" className="shrink-0 self-stretch md:self-auto">
               <Button>
                 Become a Reviewer
               </Button>
