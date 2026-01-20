@@ -14,7 +14,24 @@ export const config = {
 // Maximum project size: 500MB
 const MAX_PROJECT_SIZE = 500 * 1024 * 1024;
 
-async function parseAbletonProjectFromZip(zipData: ArrayBuffer) {
+type AbletonTrackInfo = {
+  name: string;
+  type: "audio" | "midi";
+};
+
+type AbletonProjectMetadata = {
+  tempo: number;
+  timeSignature: string;
+  trackCount: number;
+  audioTrackCount: number;
+  midiTrackCount: number;
+  tracks: AbletonTrackInfo[];
+  plugins: string[];
+};
+
+async function parseAbletonProjectFromZip(
+  zipData: ArrayBuffer
+): Promise<AbletonProjectMetadata> {
   const zip = await JSZip.loadAsync(zipData);
 
   // Find the .als file
@@ -70,7 +87,7 @@ async function parseAbletonProjectFromZip(zipData: ArrayBuffer) {
   const midiTracks = doc.querySelectorAll("Tracks > MidiTrack");
 
   // Extract track info
-  const tracks = [];
+  const tracks: AbletonTrackInfo[] = [];
   const getTrackName = (track: Element) => {
     const nameEl = track.querySelector("Name > EffectiveName");
     return nameEl?.getAttribute("Value") || "Untitled Track";
@@ -159,7 +176,7 @@ export async function POST(
     const arrayBuffer = await file.arrayBuffer();
 
     // Parse project metadata
-    let projectData;
+    let projectData: Awaited<ReturnType<typeof parseAbletonProjectFromZip>>;
     try {
       projectData = await parseAbletonProjectFromZip(arrayBuffer);
     } catch (error) {
