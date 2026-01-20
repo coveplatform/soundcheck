@@ -20,6 +20,7 @@ export default function SubmitTrackPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const [step, setStep] = useState<Step>("track");
+  const [showHowFeedbackWorks, setShowHowFeedbackWorks] = useState(false);
 
   // Artist profile state
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
@@ -480,9 +481,89 @@ export default function SubmitTrackPage() {
       {step === "track" && (
         <div className="flex-1 flex flex-col">
           <div className="mb-8">
-            <h1 className="text-3xl sm:text-4xl font-light tracking-tight">Upload your track</h1>
-            <p className="mt-2 text-sm text-black/40">Share a link or upload an MP3</p>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-light tracking-tight">Upload your track</h1>
+                <p className="mt-2 text-sm text-black/40">Share a link or upload an MP3</p>
+              </div>
+              <Button
+                type="button"
+                variant="airyOutline"
+                className="h-10 px-4 rounded-full"
+                onClick={() => setShowHowFeedbackWorks(true)}
+              >
+                <Info className="h-4 w-4 mr-2" />
+                How feedback works
+              </Button>
+            </div>
           </div>
+
+          {showHowFeedbackWorks && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center px-4"
+              role="dialog"
+              aria-modal="true"
+            >
+              <button
+                type="button"
+                className="absolute inset-0 bg-black/40"
+                onClick={() => setShowHowFeedbackWorks(false)}
+                aria-label="Close"
+              />
+              <Card
+                variant="soft"
+                elevated
+                className="relative w-full max-w-lg border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,0.12)]"
+              >
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-2xl bg-black text-white flex items-center justify-center flex-shrink-0">
+                      <Globe className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-mono tracking-widest text-black/40 uppercase">how it works</p>
+                      <h2 className="mt-2 text-2xl font-light tracking-tight text-black">Genre-matched listeners. Paid reviews. Real signal.</h2>
+                      <p className="mt-2 text-sm text-black/60">
+                        When you request reviews, we place your track into a pool of listeners who match your genres.
+                        They’re paid to review — so feedback is consistent, structured, and accountable.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 space-y-3 text-sm text-black/70">
+                    <div className="rounded-2xl border border-black/10 bg-white/60 p-4">
+                      <p className="text-xs font-mono tracking-widest text-black/40 uppercase">what you get</p>
+                      <div className="mt-2 space-y-2">
+                        <p>Structured scores + written feedback</p>
+                        <p>Notes on what worked, what didn’t, and what to try next</p>
+                        <p>Pattern analytics once multiple reviews come in</p>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-black/10 bg-white/60 p-4">
+                      <p className="text-xs font-mono tracking-widest text-black/40 uppercase">quality control</p>
+                      <div className="mt-2 space-y-2">
+                        <p>Listeners must pass onboarding + maintain rating to stay active</p>
+                        <p>We track listening time to ensure they actually listen</p>
+                        <p>Low-quality reviewers can be restricted</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex items-center justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-10 px-4"
+                      onClick={() => setShowHowFeedbackWorks(false)}
+                    >
+                      Got it
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {/* Upload mode toggle */}
           <Card variant="soft" className="mb-6">
