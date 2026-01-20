@@ -128,14 +128,14 @@ export function AccountSettingsClient({
   const hasFreeTrial = !isSubscribed && (subscription?.totalTracks || 0) < 1;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Subscription Card */}
       {isArtist && subscription && (
-        <Card>
-          <CardHeader>
+        <Card variant="soft" elevated>
+          <CardHeader className="border-b border-black/10">
             <CardTitle className="text-lg">Subscription</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="pt-6 space-y-3">
             {isSubscribed ? (
               <>
                 <div className="flex items-center justify-between">
@@ -203,11 +203,11 @@ export function AccountSettingsClient({
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
+      <Card variant="soft" elevated>
+        <CardHeader className="border-b border-black/10">
           <CardTitle className="text-lg">Profile</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="pt-6 space-y-3">
           {profileError ? (
             <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
               {profileError}
@@ -238,11 +238,11 @@ export function AccountSettingsClient({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
+      <Card variant="soft" elevated>
+        <CardHeader className="border-b border-black/10">
           <CardTitle className="text-lg">Roles</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm">
+        <CardContent className="pt-6 space-y-2 text-sm">
           <div className="flex items-center justify-between gap-4">
             <span className="text-neutral-600 font-medium">Artist</span>
             <span className="font-bold text-black">{isArtist ? "Enabled" : "Not enabled"}</span>
@@ -254,11 +254,11 @@ export function AccountSettingsClient({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
+      <Card variant="soft" elevated>
+        <CardHeader className="border-b border-black/10">
           <CardTitle className="text-lg">Security</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="pt-6 space-y-3">
           {resetError ? (
             <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
               {resetError}
@@ -289,11 +289,11 @@ export function AccountSettingsClient({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
+      <Card variant="soft" elevated>
+        <CardHeader className="border-b border-black/10">
           <CardTitle className="text-lg">Danger zone</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="pt-6 space-y-3">
           {deleteError ? (
             <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
               {deleteError}
