@@ -28,6 +28,7 @@ export function AccountSettingsClient({
     currentPeriodEnd: Date | null;
     canceledAt: Date | null;
     totalTracks: number;
+    reviewTokens?: number;
   } | null;
 }) {
   const router = useRouter();
@@ -126,6 +127,8 @@ export function AccountSettingsClient({
 
   const isSubscribed = subscription?.status === "active";
   const hasFreeTrial = !isSubscribed && (subscription?.totalTracks || 0) < 1;
+  const planLabel = isSubscribed ? "MixReflect Pro" : "Trial";
+  const reviewTokens = subscription?.reviewTokens ?? 0;
 
   return (
     <div className="space-y-6">
@@ -136,6 +139,16 @@ export function AccountSettingsClient({
             <CardTitle className="text-lg">Subscription</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-bold text-black">Plan</p>
+                <p className="text-xs text-black/50">{planLabel}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold text-black">Review tokens</p>
+                <p className="text-xs text-black/50">{reviewTokens}</p>
+              </div>
+            </div>
             {isSubscribed ? (
               <>
                 <div className="flex items-center justify-between">

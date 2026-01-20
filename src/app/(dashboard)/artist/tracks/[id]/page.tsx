@@ -15,7 +15,6 @@ import { AggregateAnalytics } from "@/components/feedback/aggregate-analytics";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { StemPlayer } from "@/components/audio/stem-player";
 import { ReviewCarousel } from "@/components/reviews/review-carousel";
-import { ReviewUpsell } from "@/components/artist/review-upsell";
 import { ProjectStructure } from "@/components/ableton/project-structure";
 import { AnimatedSection } from "@/components/landing/animated-section";
 import {
@@ -29,6 +28,7 @@ import {
   AlertCircle,
   Loader2,
   CheckCircle2,
+  Sparkles,
   XCircle,
   Clock,
   FileCode,
@@ -111,9 +111,9 @@ export default async function TrackDetailPage({
       : 0;
 
   // Calculate averages
-  const analyticsReviews = track.reviews.filter(
-    (r) => r.countsTowardAnalytics !== false
-  );
+  const analyticsReviews = isSubscribed
+    ? track.reviews.filter((r) => r.countsTowardAnalytics !== false)
+    : [];
 
   // For trial users, limit displayed reviews to 1
   const displayedReviews = isTrial ? track.reviews.slice(0, 1) : track.reviews;
@@ -169,6 +169,17 @@ export default async function TrackDetailPage({
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           {/* Album Art */}
           <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-3xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex-shrink-0 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] overflow-hidden">
+            {track.status === "COMPLETED" ? (
+              <div className="absolute top-3 left-3 -rotate-6">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-lime-300 via-yellow-200 to-orange-200 border-2 border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="h-5 w-5 bg-black text-white flex items-center justify-center">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  </div>
+                  <span className="text-xs font-black tracking-wide">COMPLETED</span>
+                  <Sparkles className="h-4 w-4" />
+                </div>
+              </div>
+            ) : null}
             {track.artworkUrl ? (
               <img
                 src={track.artworkUrl}
@@ -238,12 +249,14 @@ export default async function TrackDetailPage({
               <span className="text-2xl font-bold text-black">{progress}%</span>
               <span className="text-black/50 ml-2 font-medium">complete</span>
             </div>
-            {analyticsReviews.length > 0 && (
-              <div>
-                <span className="text-2xl font-bold text-lime-600">{avgProduction.toFixed(1)}</span>
-                <span className="text-black/50 ml-2 font-medium">avg production</span>
+            <div className="w-full">
+              <div className="w-full h-2 bg-black/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-lime-500 transition-all duration-300 ease-out motion-reduce:transition-none"
+                  style={{ width: `${progress}%` }}
+                />
               </div>
-            )}
+            </div>
           </div>
         )}
       </div>
@@ -335,7 +348,7 @@ export default async function TrackDetailPage({
         )}
 
         {/* Section 3: Feedback (conditional - reviews) */}
-        {analyticsReviews.length > 0 && (
+        {completedReviews > 0 && (
           <AnimatedSection>
             <div className="space-y-6">
               {/* Analytics - Blurred for trial users */}
@@ -343,7 +356,7 @@ export default async function TrackDetailPage({
                 <div className="relative">
                   <div className="pointer-events-none blur-sm opacity-50">
                     <AggregateAnalytics
-                      reviews={analyticsReviews}
+                      reviews={[]}
                       platformAverages={{
                         production: platformStats._avg.productionScore ?? 0,
                         originality: platformStats._avg.originalityScore ?? 0,
@@ -415,14 +428,68 @@ export default async function TrackDetailPage({
         )}
 
         {/* Section 4: Engagement (conditional - listener signals) */}
-        {analyticsReviews.length > 0 && hasListenerSignals && (
+        {completedReviews > 0 && (
           <AnimatedSection>
-            <Card variant="airy" className="overflow-hidden rounded-3xl">
-              <CardContent className="pt-6 space-y-6">
-                <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Engagement</p>
+            {isTrial ? (
+              <div className="relative">
+                <div className="pointer-events-none blur-sm opacity-50">
+                  <Card variant="airy" className="overflow-hidden rounded-3xl">
+                    <CardContent className="pt-6 space-y-6">
+                      <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Engagement</p>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center">
+                          <div className="flex justify-center mb-2">
+                            <div className="h-12 w-12 rounded-full flex items-center justify-center bg-neutral-100 text-neutral-500">
+                              <ListMusic className="h-6 w-6" />
+                            </div>
+                          </div>
+                          <p className="text-2xl font-black">—</p>
+                          <p className="text-sm text-neutral-600">Playlist</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="flex justify-center mb-2">
+                            <div className="h-12 w-12 rounded-full flex items-center justify-center bg-neutral-100 text-neutral-500">
+                              <Share2 className="h-6 w-6" />
+                            </div>
+                          </div>
+                          <p className="text-2xl font-black">—</p>
+                          <p className="text-sm text-neutral-600">Share</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="flex justify-center mb-2">
+                            <div className="h-12 w-12 rounded-full flex items-center justify-center bg-neutral-100 text-neutral-500">
+                              <UserPlus className="h-6 w-6" />
+                            </div>
+                          </div>
+                          <p className="text-2xl font-black">—</p>
+                          <p className="text-sm text-neutral-600">Follow</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Card variant="soft" elevated className="max-w-md">
+                    <CardContent className="pt-6 text-center">
+                      <h3 className="text-xl font-bold text-black mb-2">Upgrade to see engagement</h3>
+                      <p className="text-sm text-black/60 mb-4">
+                        Unlock playlist/share/follow signals across all {completedReviews} reviews.
+                      </p>
+                      <Link href="/artist/submit">
+                        <Button className="bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold">
+                          Upgrade to Standard
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            ) : hasListenerSignals ? (
+              <Card variant="airy" className="overflow-hidden rounded-3xl">
+                <CardContent className="pt-6 space-y-6">
+                  <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Engagement</p>
 
-                {/* Listener Signals */}
-                {hasListenerSignals && (
                   <div className="grid grid-cols-3 gap-4">
                     {playlistTotal > 0 && (
                       <div className="text-center">
@@ -490,22 +557,9 @@ export default async function TrackDetailPage({
                       </div>
                     )}
                   </div>
-                )}
-
-                {/* Review Upsell */}
-                {completedReviews > 0 &&
-                  completedReviews >= track.reviewsRequested &&
-                  track.reviewsRequested <= 3 && (
-                    <div className="pt-4 border-t border-black/10">
-                      <ReviewUpsell
-                        completedReviews={completedReviews}
-                        trackTitle={track.title}
-                        wouldListenAgain={track.reviews[0]?.wouldListenAgain ?? undefined}
-                      />
-                    </div>
-                  )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            ) : null}
           </AnimatedSection>
         )}
 
@@ -618,39 +672,10 @@ export default async function TrackDetailPage({
                 )}
 
                 {/* Review Progress */}
-                {track.status !== "CANCELLED" && track.reviewsRequested > 0 && (
-                  <div className="pt-6">
-                    <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-4">review progress</p>
-                    <div className="flex items-center justify-between gap-4 mb-2">
-                      <span className="text-sm font-bold text-black/80">{countedCompletedReviews} / {track.reviewsRequested}</span>
-                      <span className="text-sm text-black/60 font-mono">{progress}%</span>
-                    </div>
-                    <div className="w-full h-2 bg-black/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-lime-500 transition-all duration-300 ease-out motion-reduce:transition-none" style={{ width: `${progress}%` }} />
-                    </div>
-                  </div>
-                )}
+                
 
                 {/* Snapshot Stats */}
-                {analyticsReviews.length > 0 && (
-                  <div className="pt-6">
-                    <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-4">snapshot</p>
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="rounded-2xl border border-black/10 bg-white/70 p-3">
-                        <p className="text-xs font-mono text-black/50">production</p>
-                        <p className="text-2xl sm:text-3xl font-black mt-1">{avgProduction.toFixed(1)}</p>
-                      </div>
-                      <div className="rounded-2xl border border-black/10 bg-white/70 p-3">
-                        <p className="text-xs font-mono text-black/50">originality</p>
-                        <p className="text-2xl sm:text-3xl font-black mt-1">{avgOriginality.toFixed(1)}</p>
-                      </div>
-                      <div className="rounded-2xl border border-black/10 bg-white/70 p-3">
-                        <p className="text-xs font-mono text-black/50">listen again</p>
-                        <p className="text-2xl sm:text-3xl font-black mt-1">{wouldListenAgainPercent}%</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                
               </CardContent>
             </Card>
           </AnimatedSection>

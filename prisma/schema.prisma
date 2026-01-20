@@ -121,6 +121,8 @@ model ArtistProfile {
   totalTracks Int @default(0)
   totalSpent  Int @default(0) // in cents
 
+  freeReviewCredits Int @default(1)
+
   // Earnings from track purchases
   pendingBalance Int @default(0) // in cents, available to withdraw
   totalEarnings  Int @default(0) // in cents, lifetime earnings

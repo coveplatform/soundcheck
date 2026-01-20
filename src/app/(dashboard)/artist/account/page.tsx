@@ -25,7 +25,7 @@ export default async function ArtistAccountPage() {
 
   // Get artist profile with subscription info
   const artistProfile = session.user.isArtist
-    ? await prisma.artistProfile.findUnique({
+    ? await (prisma.artistProfile as any).findUnique({
         where: { userId: session.user.id },
         select: {
           subscriptionStatus: true,
@@ -33,8 +33,9 @@ export default async function ArtistAccountPage() {
           subscriptionCurrentPeriodEnd: true,
           subscriptionCanceledAt: true,
           totalTracks: true,
+          freeReviewCredits: true,
         },
-      })
+      } as any)
     : null;
 
   return (
@@ -53,13 +54,14 @@ export default async function ArtistAccountPage() {
           hasPassword={Boolean(dbUser.password)}
           subscription={
             artistProfile
-              ? {
+              ? ({
                   status: artistProfile.subscriptionStatus || null,
                   tier: artistProfile.subscriptionTier || null,
                   currentPeriodEnd: artistProfile.subscriptionCurrentPeriodEnd || null,
                   canceledAt: artistProfile.subscriptionCanceledAt || null,
                   totalTracks: artistProfile.totalTracks,
-                }
+                  reviewTokens: (artistProfile as any).freeReviewCredits ?? 0,
+                } as any)
               : null
           }
         />

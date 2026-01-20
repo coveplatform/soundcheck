@@ -80,10 +80,11 @@ export async function POST(request: Request) {
         // Create profile with genres from the track
         // Use provided artistName, fall back to user name, then "Artist"
         const profileName = data.artistName?.trim() || session.user.name || "Artist";
-        artistProfile = await prisma.artistProfile.create({
+        artistProfile = await (prisma.artistProfile as any).create({
           data: {
             userId: session.user.id,
             artistName: profileName,
+            freeReviewCredits: 5,
             genres: {
               connect: data.genreIds.map((id) => ({ id })),
             },
@@ -95,6 +96,11 @@ export async function POST(request: Request) {
           where: { id: session.user.id },
           data: { isArtist: true },
         });
+      }
+
+      const artistProfileId = (artistProfile as any)?.id as string | undefined;
+      if (!artistProfileId) {
+        return NextResponse.json({ error: "Artist profile not found" }, { status: 404 });
       }
 
       // Determine source type
@@ -124,7 +130,7 @@ export async function POST(request: Request) {
       const packageDetails = PACKAGES[data.packageType];
       const track = await prisma.track.create({
         data: {
-          artistId: artistProfile.id,
+          artistId: artistProfileId,
           sourceUrl: data.sourceUrl,
           sourceType,
           title: data.title,
@@ -199,10 +205,11 @@ export async function POST(request: Request) {
 
         if (!artistProfile) {
           const profileName = data.artistName.trim() || existingUser.name || "Artist";
-          artistProfile = await prisma.artistProfile.create({
+          artistProfile = await (prisma.artistProfile as any).create({
             data: {
               userId: existingUser.id,
               artistName: profileName,
+              freeReviewCredits: 5,
               genres: {
                 connect: data.genreIds.map((id) => ({ id })),
               },
@@ -213,6 +220,11 @@ export async function POST(request: Request) {
             where: { id: existingUser.id },
             data: { isArtist: true },
           });
+        }
+
+        const artistProfileId = (artistProfile as any)?.id as string | undefined;
+        if (!artistProfileId) {
+          return NextResponse.json({ error: "Artist profile not found" }, { status: 404 });
         }
 
         // Determine source type
@@ -243,7 +255,7 @@ export async function POST(request: Request) {
 
         const track = await prisma.track.create({
           data: {
-            artistId: artistProfile.id,
+            artistId: artistProfileId,
             sourceUrl: data.sourceUrl,
             sourceType,
             title: data.title,
@@ -313,10 +325,11 @@ export async function POST(request: Request) {
         });
 
         // 2. Create artist profile
-        const artistProfile = await tx.artistProfile.create({
+        const artistProfile = await (tx.artistProfile as any).create({
           data: {
             userId: user.id,
             artistName: data.artistName,
+            freeReviewCredits: 5,
             genres: {
               connect: data.genreIds.map((id) => ({ id })),
             },

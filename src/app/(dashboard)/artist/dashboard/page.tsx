@@ -22,7 +22,7 @@ export default async function ArtistDashboardPage() {
     redirect("/login");
   }
 
-  const artistProfile = await prisma.artistProfile.findUnique({
+  const artistProfile = await (prisma.artistProfile as any).findUnique({
     where: { userId: session.user.id },
     include: {
       tracks: {
@@ -52,14 +52,18 @@ export default async function ArtistDashboardPage() {
   const pendingBalance = artistProfile.pendingBalance / 100;
 
   const uploadedOnly = tracks.filter(
-    (t) => (t.status as any) === "UPLOADED" || t.reviewsRequested === 0
+    (t: any) => (t.status as any) === "UPLOADED" || t.reviewsRequested === 0
   );
   const reviewing = tracks.filter(
-    (t) => t.status === "QUEUED" || t.status === "IN_PROGRESS"
+    (t: any) => t.status === "QUEUED" || t.status === "IN_PROGRESS"
   );
 
   const newestUploadedOnly = uploadedOnly[0] ?? null;
   const newestReviewing = reviewing[0] ?? null;
+
+  const isSubscribed = artistProfile.subscriptionStatus === "active";
+  const planLabel = isSubscribed ? "MixReflect Pro" : "Trial";
+  const reviewTokens = (artistProfile.freeReviewCredits ?? 0) as number;
 
   const nextAction = (() => {
     if (tracks.length === 0) {
@@ -108,6 +112,23 @@ export default async function ArtistDashboardPage() {
       <div className="max-w-4xl mx-auto relative z-10">
         <div className="mb-10">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Dashboard</h1>
+        </div>
+
+        <div className="mb-8 rounded-3xl border border-neutral-200 bg-white/70 p-6 shadow-md">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-medium text-black/50 uppercase tracking-wider">Plan</p>
+              <p className="mt-2 text-2xl font-bold text-black">{planLabel}</p>
+              <p className="mt-1 text-sm text-black/50">
+                {isSubscribed ? "Choose how many reviews you want per track." : "You have 5 review tokens to start."}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-medium text-black/50 uppercase tracking-wider">Review tokens</p>
+              <p className="mt-2 text-2xl font-bold text-black">{reviewTokens}</p>
+              <p className="mt-1 text-sm text-black/50">1 token = 1 review</p>
+            </div>
+          </div>
         </div>
 
         {/* Main Action Card - flowy and soft */}
@@ -166,7 +187,7 @@ export default async function ArtistDashboardPage() {
             </div>
 
             <div className="space-y-3">
-              {tracks.slice(0, 3).map((t) => {
+              {tracks.slice(0, 3).map((t: any) => {
                 const cta = (t.status as any) === "UPLOADED" || t.reviewsRequested === 0
                   ? {
                       href: `/artist/tracks/${t.id}/request-reviews`,

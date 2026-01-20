@@ -7,6 +7,14 @@ import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email
 import { finalizePaidCheckoutSession } from "@/lib/payments";
 import type Stripe from "stripe";
 
+const getUnixTimestamp = (value: unknown): number | null =>
+  typeof value === "number" && Number.isFinite(value) ? value : null;
+
+type StripeSubscriptionUnixFields = {
+  current_period_end?: number | null;
+  canceled_at?: number | null;
+};
+
 export async function POST(request: Request) {
   const body = await request.text();
   const headersList = await headers();
@@ -191,16 +199,41 @@ async function handleSubscriptionCheckoutComplete(session: Stripe.Checkout.Sessi
     }
 
     const stripe = getStripe();
-    const subscriptionData = await stripe.subscriptions.retrieve(subscription);
+    const subscriptionResponse = await stripe.subscriptions.retrieve(subscription);
+    const subscriptionData: Stripe.Subscription =
+      (subscriptionResponse as any).data ?? (subscriptionResponse as any);
 
-    await prisma.artistProfile.update({
-      where: { id: artistProfileId },
-      data: {
-        subscriptionId: subscriptionData.id,
-        subscriptionStatus: subscriptionData.status,
-        subscriptionTier: "pro",
-        subscriptionCurrentPeriodEnd: new Date(subscriptionData.current_period_end * 1000),
-      },
+    const subscriptionUnixFields =
+      subscriptionData as unknown as StripeSubscriptionUnixFields;
+    const currentPeriodEndUnix = getUnixTimestamp(
+      subscriptionUnixFields.current_period_end
+    );
+
+    await prisma.$transaction(async (tx) => {
+      await tx.artistProfile.update({
+        where: { id: artistProfileId },
+        data: {
+          subscriptionId: subscriptionData.id,
+          subscriptionStatus: subscriptionData.status,
+          subscriptionTier: "pro",
+          subscriptionCurrentPeriodEnd: currentPeriodEndUnix
+            ? new Date(currentPeriodEndUnix * 1000)
+            : null,
+        },
+      });
+
+      await (tx.artistProfile as any).updateMany({
+        where: {
+          id: artistProfileId,
+          OR: [
+            { freeReviewCredits: { lt: 20 } },
+            { freeReviewCredits: { equals: null } },
+          ],
+        },
+        data: {
+          freeReviewCredits: 20,
+        },
+      });
     });
 
     console.log(`Subscription activated for artist profile: ${artistProfileId}`);
@@ -224,10 +257,14 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
       where: { id: artistProfile.id },
       data: {
         subscriptionStatus: subscription.status,
-        subscriptionCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-        subscriptionCanceledAt: subscription.canceled_at
-          ? new Date(subscription.canceled_at * 1000)
-          : null,
+        subscriptionCurrentPeriodEnd: (() => {
+          const unix = getUnixTimestamp((subscription as any).current_period_end);
+          return unix ? new Date(unix * 1000) : null;
+        })(),
+        subscriptionCanceledAt: (() => {
+          const unix = getUnixTimestamp((subscription as any).canceled_at);
+          return unix ? new Date(unix * 1000) : null;
+        })(),
       },
     });
 

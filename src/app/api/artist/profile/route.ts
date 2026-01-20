@@ -58,10 +58,11 @@ export async function POST(request: Request) {
     }
 
     // Create new profile
-    const profile = await prisma.artistProfile.create({
+    const profile = await (prisma.artistProfile as any).create({
       data: {
         userId: session.user.id,
         artistName,
+        freeReviewCredits: 5,
         ...(genreIds && genreIds.length > 0
           ? {
               genres: {
@@ -104,7 +105,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const profile = await prisma.artistProfile.findUnique({
+    const profile = await (prisma.artistProfile as any).findUnique({
       where: { userId: session.user.id },
       include: {
         genres: true,
@@ -123,6 +124,7 @@ export async function GET() {
       ...profile,
       totalTracks: profile.tracks.length,
       subscriptionStatus: profile.subscriptionStatus,
+      freeReviewCredits: profile.freeReviewCredits,
     };
 
     return NextResponse.json(response);

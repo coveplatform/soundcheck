@@ -77,6 +77,15 @@ export async function POST(request: Request) {
         select: { id: true },
       });
 
+      await (tx.artistProfile as any).create({
+        data: {
+          userId: user.id,
+          artistName: normalizedArtistName,
+          freeReviewCredits: 5,
+        },
+        select: { id: true },
+      });
+
       const rawToken = randomBytes(32).toString("hex");
       const tokenHash = createHash("sha256").update(rawToken).digest("hex");
       const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
