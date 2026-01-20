@@ -5,12 +5,6 @@ import { prisma } from "@/lib/prisma";
 import JSZip from "jszip";
 import pako from "pako";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 // Maximum project size: 500MB
 const MAX_PROJECT_SIZE = 500 * 1024 * 1024;
 

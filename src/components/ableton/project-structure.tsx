@@ -182,7 +182,8 @@ function TrackRow({
   isExpanded: boolean;
   onToggle: () => void;
 }) {
-  const hasPlugins = track.plugins && track.plugins.length > 0;
+  const plugins = track.plugins ?? [];
+  const hasPlugins = plugins.length > 0;
 
   return (
     <div className="rounded-lg border border-black/5 overflow-hidden mb-1">
@@ -213,7 +214,7 @@ function TrackRow({
         {/* Badges */}
         {hasPlugins && (
           <span className="text-xs px-2 py-0.5 rounded-full bg-black/10 text-black/50">
-            {track.plugins.length} plugin{track.plugins.length !== 1 ? "s" : ""}
+            {plugins.length} plugin{plugins.length !== 1 ? "s" : ""}
           </span>
         )}
 
@@ -231,13 +232,13 @@ function TrackRow({
         <div className="px-3 py-2 bg-black/[0.02] border-t border-black/5">
           <p className="text-xs text-black/40 mb-1.5">Plugin Chain:</p>
           <div className="flex items-center gap-1.5 flex-wrap">
-            {track.plugins!.map((plugin, i) => (
+            {plugins.map((plugin, i) => (
               <div key={i} className="flex items-center gap-1.5">
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white border border-black/5 text-xs text-black/70">
                   <Zap className="h-3 w-3 text-black/40" />
                   {plugin}
                 </span>
-                {i < track.plugins!.length - 1 && (
+                {i < plugins.length - 1 && (
                   <span className="text-black/20">→</span>
                 )}
               </div>

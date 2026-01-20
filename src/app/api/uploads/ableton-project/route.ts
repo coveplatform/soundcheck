@@ -5,12 +5,6 @@ import JSZip from "jszip";
 import pako from "pako";
 import { XMLParser } from "fast-xml-parser";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 // Maximum project size: 500MB
 const MAX_PROJECT_SIZE = 500 * 1024 * 1024;
 
