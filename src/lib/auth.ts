@@ -3,6 +3,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 import { checkRateLimit, RATE_LIMITS } from "./rate-limit";
 
@@ -108,31 +109,57 @@ export const authOptions: NextAuthOptions = {
       if (token.email) {
         const normalizedEmail =
           typeof token.email === "string" ? token.email.trim().toLowerCase() : "";
-        const dbUser = await prisma.user.findFirst({
-          where: {
-            email: {
-              equals: normalizedEmail,
-              mode: "insensitive",
-            },
+        const where = {
+          email: {
+            equals: normalizedEmail,
+            mode: "insensitive" as const,
           },
-          select: {
-            id: true,
-            isArtist: true,
-            isReviewer: true,
-            emailVerified: true,
-            artistProfile: { select: { id: true } },
-            reviewerProfile: { select: { id: true } },
-          },
-        });
-        if (dbUser) {
-          token.id = dbUser.id;
-          token.isArtist = dbUser.isArtist;
-          token.isReviewer = dbUser.isReviewer;
-          token.artistProfileId = dbUser.artistProfile?.id;
-          token.reviewerProfileId = dbUser.reviewerProfile?.id;
-          token.emailVerified = dbUser.emailVerified
-            ? dbUser.emailVerified.toISOString()
-            : null;
+        };
+
+        let dbUser: unknown;
+        try {
+          dbUser = await prisma.user.findFirst({
+            where,
+            select: {
+              id: true,
+              isArtist: true,
+              isReviewer: true,
+              emailVerified: true,
+              artistProfile: { select: { id: true } },
+              listenerProfile: { select: { id: true } },
+            } as unknown as Prisma.UserSelect,
+          });
+        } catch {
+          dbUser = await prisma.user.findFirst({
+            where,
+            select: {
+              id: true,
+              isArtist: true,
+              isReviewer: true,
+              emailVerified: true,
+              artistProfile: { select: { id: true } },
+              reviewerProfile: { select: { id: true } },
+            } as unknown as Prisma.UserSelect,
+          });
+        }
+        const db = dbUser as null | {
+          id: string;
+          isArtist: boolean;
+          isReviewer: boolean;
+          emailVerified: Date | null;
+          artistProfile?: { id: string } | null;
+          listenerProfile?: { id: string } | null;
+          reviewerProfile?: { id: string } | null;
+        };
+        if (db) {
+          token.id = db.id;
+          token.isArtist = db.isArtist;
+          token.isReviewer = db.isReviewer;
+          token.artistProfileId = db.artistProfile?.id;
+          const listenerProfileId = db.listenerProfile?.id ?? db.reviewerProfile?.id;
+          token.listenerProfileId = listenerProfileId;
+          token.reviewerProfileId = listenerProfileId;
+          token.emailVerified = db.emailVerified ? db.emailVerified.toISOString() : null;
         }
       }
       return token;
@@ -143,6 +170,7 @@ export const authOptions: NextAuthOptions = {
         session.user.isArtist = token.isArtist as boolean;
         session.user.isReviewer = token.isReviewer as boolean;
         session.user.artistProfileId = token.artistProfileId as string | undefined;
+        session.user.listenerProfileId = token.listenerProfileId as string | undefined;
         session.user.reviewerProfileId = token.reviewerProfileId as string | undefined;
         session.user.emailVerified = (token.emailVerified as string | null) ?? null;
       }

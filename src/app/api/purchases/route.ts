@@ -4,12 +4,43 @@ import { z } from "zod";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { COMMISSION_AMOUNT_CENTS } from "@/lib/referral";
 
 const PURCHASE_AMOUNT_CENTS = 50; // $0.50
 
 const purchaseSchema = z.object({
   trackId: z.string().min(1),
+  referral: z
+    .object({
+      reviewerId: z.string().min(1),
+      shareId: z.string().min(1),
+    })
+    .optional(),
 });
+
+async function validateReferral(
+  referral: { reviewerId: string; shareId: string },
+  buyerId: string,
+  trackId: string
+): Promise<boolean> {
+  // Self-referral check: buyer cannot be the referrer
+  if (referral.reviewerId === buyerId) {
+    return false;
+  }
+
+  // Verify the review exists, is completed, and matches the track
+  const review = await prisma.review.findUnique({
+    where: { shareId: referral.shareId },
+    select: { reviewerId: true, trackId: true, status: true },
+  });
+
+  if (!review) return false;
+  if (review.status !== "COMPLETED") return false;
+  if (review.reviewerId !== referral.reviewerId) return false;
+  if (review.trackId !== trackId) return false;
+
+  return true;
+}
 
 export async function POST(request: Request) {
   try {
@@ -32,10 +63,10 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { trackId } = purchaseSchema.parse(body);
+    const { trackId, referral } = purchaseSchema.parse(body);
 
     // Get reviewer profile
-    const reviewer = await prisma.reviewerProfile.findUnique({
+    const reviewer = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
       select: {
         id: true,
@@ -117,10 +148,19 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate referral if provided
+    let validatedReferral: { reviewerId: string; shareId: string } | null = null;
+    if (referral) {
+      const isValid = await validateReferral(referral, reviewer.id, trackId);
+      if (isValid) {
+        validatedReferral = referral;
+      }
+    }
+
     // Process purchase in transaction
     const purchase = await prisma.$transaction(async (tx) => {
       // Deduct from reviewer balance
-      const updated = await tx.reviewerProfile.updateMany({
+      const updated = await tx.listenerProfile.updateMany({
         where: {
           id: reviewer.id,
           pendingBalance: { gte: PURCHASE_AMOUNT_CENTS },
@@ -141,12 +181,27 @@ export async function POST(request: Request) {
         },
       });
 
-      // Create purchase record
+      // Credit affiliate commission if valid referral
+      if (validatedReferral) {
+        await tx.listenerProfile.update({
+          where: { id: validatedReferral.reviewerId },
+          data: {
+            pendingBalance: { increment: COMMISSION_AMOUNT_CENTS },
+            totalEarnings: { increment: COMMISSION_AMOUNT_CENTS },
+            affiliateEarnings: { increment: COMMISSION_AMOUNT_CENTS },
+          },
+        });
+      }
+
+      // Create purchase record with referral tracking
       return tx.purchase.create({
         data: {
           trackId: track.id,
           reviewerId: reviewer.id,
           amount: PURCHASE_AMOUNT_CENTS,
+          referredByReviewerId: validatedReferral?.reviewerId ?? null,
+          referralShareId: validatedReferral?.shareId ?? null,
+          commissionPaid: validatedReferral ? COMMISSION_AMOUNT_CENTS : 0,
         },
         select: {
           id: true,
@@ -193,7 +248,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const reviewer = await prisma.reviewerProfile.findUnique({
+    const reviewer = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
       select: { id: true },
     });

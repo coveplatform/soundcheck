@@ -48,6 +48,9 @@ export default async function AdminLayout({
               <Link href="/admin/reviewers" className="text-neutral-600 hover:text-neutral-900">
                 Reviewers
               </Link>
+              <Link href="/admin/ableton-renders" className="text-neutral-600 hover:text-neutral-900">
+                Renders
+              </Link>
               <Link href="/admin/leads" className="text-neutral-600 hover:text-neutral-900">
                 Leads
               </Link>

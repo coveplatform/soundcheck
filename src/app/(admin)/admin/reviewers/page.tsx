@@ -12,7 +12,7 @@ export default async function AdminReviewersPage({
   const restrictedOnly = restricted === "1";
   const q = typeof query === "string" ? query.trim() : "";
 
-  const reviewers = await prisma.reviewerProfile.findMany({
+  const reviewers = await prisma.listenerProfile.findMany({
     where: {
       ...(restrictedOnly ? { isRestricted: true } : {}),
       ...(q

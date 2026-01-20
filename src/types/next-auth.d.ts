@@ -11,6 +11,7 @@ declare module "next-auth" {
       isArtist: boolean;
       isReviewer: boolean;
       artistProfileId?: string;
+      listenerProfileId?: string;
       reviewerProfileId?: string;
     };
   }
@@ -29,6 +30,7 @@ declare module "next-auth/jwt" {
     isArtist?: boolean;
     isReviewer?: boolean;
     artistProfileId?: string;
+    listenerProfileId?: string;
     reviewerProfileId?: string;
     emailVerified?: string | null;
   }

@@ -91,7 +91,7 @@ export default function ReengagementPage() {
       } else {
         setMessage({ type: "error", text: data.error || "Failed to send emails" });
       }
-    } catch (e) {
+    } catch (_e) {
       setMessage({ type: "error", text: "Network error" });
     } finally {
       setSending(null);
@@ -121,7 +121,7 @@ export default function ReengagementPage() {
       } else {
         setMessage({ type: "error", text: data.error || "Failed to send emails" });
       }
-    } catch (e) {
+    } catch (_e) {
       setMessage({ type: "error", text: "Network error" });
     } finally {
       setSending(null);
@@ -149,7 +149,7 @@ export default function ReengagementPage() {
       } else {
         setMessage({ type: "error", text: data.error || "Failed to reset" });
       }
-    } catch (e) {
+    } catch (_e) {
       setMessage({ type: "error", text: "Network error" });
     } finally {
       setResetting(false);

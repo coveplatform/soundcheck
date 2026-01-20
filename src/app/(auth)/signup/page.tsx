@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { funnels, track } from "@/lib/analytics";
 import { redditEvents, trackTikTokEvent } from "@/components/providers";
 import { PasswordStrength } from "@/components/ui/password-strength";
@@ -167,7 +167,7 @@ export default function SignupPage() {
       <div className="mb-10">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-white transition-colors mb-8"
+          className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-950 transition-colors mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
@@ -180,7 +180,7 @@ export default function SignupPage() {
       <Button
         type="button"
         variant="outline"
-        className="w-full h-12 bg-transparent border-2 border-neutral-800 text-white hover:bg-white hover:text-black hover:border-white font-bold transition-all"
+        className="w-full h-12 bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-400 font-bold transition-colors duration-150 ease-out motion-reduce:transition-none"
         onClick={() => signIn("google", { callbackUrl: callbackUrl || "/artist/submit" })}
       >
         <GoogleIcon className="h-5 w-5 mr-2" />
@@ -189,10 +189,10 @@ export default function SignupPage() {
 
       <div className="relative my-8">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-neutral-800" />
+          <span className="w-full border-t border-neutral-300" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-black px-4 text-neutral-600">or</span>
+          <span className="bg-[#f7f7f5] px-4 text-neutral-500">or</span>
         </div>
       </div>
 
@@ -215,8 +215,7 @@ export default function SignupPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 autofill-dark"
-            style={{ backgroundColor: 'transparent' }}
+            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent"
           />
         </div>
 
@@ -231,8 +230,7 @@ export default function SignupPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-800 px-0 py-3 text-white text-lg placeholder:text-neutral-700 focus:border-lime-500 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 autofill-dark"
-            style={{ backgroundColor: 'transparent' }}
+            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent"
           />
           <div className="mt-3">
             <PasswordStrength password={password} />
@@ -245,15 +243,15 @@ export default function SignupPage() {
             type="checkbox"
             checked={acceptedTerms}
             onChange={(e) => setAcceptedTerms(e.target.checked)}
-            className="mt-1 h-4 w-4 bg-transparent border-2 border-neutral-700 accent-lime-500 cursor-pointer"
+            className="mt-1 h-4 w-4 bg-transparent border-2 border-neutral-400 accent-lime-600 cursor-pointer"
           />
-          <label htmlFor="terms" className="text-sm text-neutral-400 cursor-pointer">
+          <label htmlFor="terms" className="text-sm text-neutral-600 cursor-pointer">
             I agree to the{" "}
-            <Link href="/terms" className="text-white hover:text-lime-500 transition-colors">
+            <Link href="/terms" className="text-neutral-950 hover:text-lime-700 transition-colors">
               Terms
             </Link>
             {" "}and{" "}
-            <Link href="/privacy" className="text-white hover:text-lime-500 transition-colors">
+            <Link href="/privacy" className="text-neutral-950 hover:text-lime-700 transition-colors">
               Privacy Policy
             </Link>
           </label>
@@ -262,17 +260,18 @@ export default function SignupPage() {
         <div className="pt-4">
           <Button
             type="submit"
-            className="w-full h-12 bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all active:transition-none"
+            className="w-full h-12 bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
             isLoading={isLoading}
             disabled={!acceptedTerms || !validatePassword(password).valid}
           >
-            Create account
+            Start free trial
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
 
         <p className="text-sm text-neutral-600 text-center pt-2">
           Already have an account?{" "}
-          <Link href="/login" className="text-white font-bold hover:text-lime-500 transition-colors">
+          <Link href="/login" className="text-neutral-950 font-bold hover:text-lime-700 transition-colors">
             Sign in
           </Link>
         </p>

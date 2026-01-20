@@ -13,7 +13,7 @@ export function PasswordStrength({
   password,
   showRequirements = true,
 }: PasswordStrengthProps) {
-  const { strength, score } = validatePassword(password);
+  const { strength } = validatePassword(password);
 
   if (!password) {
     return null;
@@ -47,7 +47,7 @@ export function PasswordStrength({
         <div className="h-1.5 bg-neutral-200 rounded-full overflow-hidden">
           <div
             className={cn(
-              "h-full transition-all duration-300 rounded-full",
+              "h-full transition-[width] duration-300 ease-out rounded-full motion-reduce:transition-none",
               config.color,
               config.width
             )}

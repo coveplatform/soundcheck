@@ -67,7 +67,7 @@ export function ShareButtons({ shareId, trackTitle, score }: ShareButtonsProps) 
       {/* Copy Link */}
       <button
         onClick={handleCopyLink}
-        className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 transition-all ${
+        className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
           copied
             ? "bg-lime-500 border-black text-black"
             : "bg-white border-black text-black hover:bg-neutral-100"
@@ -89,7 +89,7 @@ export function ShareButtons({ shareId, trackTitle, score }: ShareButtonsProps) 
       {/* Twitter/X Share */}
       <button
         onClick={handleTwitterShare}
-        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold bg-black border-2 border-black text-white hover:bg-neutral-800 transition-all"
+        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold bg-black border-2 border-black text-white hover:bg-neutral-800 transition-colors duration-150 ease-out motion-reduce:transition-none"
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -101,7 +101,7 @@ export function ShareButtons({ shareId, trackTitle, score }: ShareButtonsProps) 
       <button
         onClick={handleDownloadStory}
         disabled={downloading}
-        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold bg-purple-500 border-2 border-black text-white hover:bg-purple-400 transition-all disabled:opacity-50"
+        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold bg-purple-500 border-2 border-black text-white hover:bg-purple-400 transition-colors duration-150 ease-out motion-reduce:transition-none disabled:opacity-50"
       >
         {downloading ? (
           <>

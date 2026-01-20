@@ -4,6 +4,9 @@ import Link from "next/link";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export const dynamic = 'force-dynamic';
 
@@ -34,7 +37,7 @@ export default async function ArtistReviewersPage({
   const now = new Date();
   const cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  const reviewers = await prisma.reviewerProfile.findMany({
+  const reviewers = await prisma.listenerProfile.findMany({
     where: {
       isRestricted: false,
       ...(active === "1"
@@ -75,86 +78,88 @@ export default async function ArtistReviewersPage({
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Reviewers</h1>
-        <p className="text-neutral-500">Browse reviewers (top 50). This is informational only.</p>
+    <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12">
+      <div className="mb-10">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Reviewers</h1>
+        <p className="mt-2 text-sm text-black/40">Browse reviewers (top 50). This is informational only.</p>
       </div>
 
-      <form className="flex flex-col md:flex-row gap-3" method="get">
-        <input
-          name="q"
-          defaultValue={q}
-          placeholder="Search by name or genre"
-          className="px-3 py-2 border border-neutral-200 rounded-md text-sm"
-        />
-        <label className="flex items-center gap-2 text-sm text-neutral-600">
-          <input
-            type="checkbox"
-            name="active"
-            value="1"
-            defaultChecked={active === "1"}
-          />
-          Active in last 30 days
-        </label>
-        <button className="px-3 py-2 rounded-md bg-neutral-900 text-white text-sm">Filter</button>
-      </form>
+      <Card variant="soft" className="mb-6">
+        <CardContent className="pt-6">
+          <form className="flex flex-col md:flex-row gap-3" method="get">
+            <Input
+              name="q"
+              defaultValue={q}
+              placeholder="Search by name or genre"
+              className="h-10 text-sm rounded-xl border-black/10 bg-white/60 focus:bg-white"
+            />
+            <label className="flex items-center gap-2 text-sm text-black/50">
+              <input
+                type="checkbox"
+                name="active"
+                value="1"
+                defaultChecked={active === "1"}
+                className="rounded"
+              />
+              Active in last 30 days
+            </label>
+            <Button type="submit" variant="airyOutline" className="w-full md:w-auto h-10">
+              Filter
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-neutral-50 text-neutral-600">
-              <tr>
-                <th className="text-left font-medium px-4 py-3">Reviewer</th>
-                <th className="text-left font-medium px-4 py-3">Tier</th>
-                <th className="text-left font-medium px-4 py-3">Avg rating</th>
-                <th className="text-left font-medium px-4 py-3">Reviews</th>
-                <th className="text-left font-medium px-4 py-3">Genres</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100">
+      <Card variant="soft" elevated>
+        <CardContent className="pt-6">
+          <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-4">reviewers</p>
+          
+          {reviewers.length === 0 ? (
+            <p className="text-sm text-black/40 py-8 text-center">No reviewers found.</p>
+          ) : (
+            <div className="space-y-2">
               {reviewers.map((r) => (
-                <tr key={r.id} className="text-neutral-700">
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/artist/reviewers/${r.id}`}
-                      className="inline-flex items-center gap-2 font-medium hover:text-black"
-                    >
-                      <span className="h-7 w-7 rounded-full bg-neutral-100 border border-black overflow-hidden flex items-center justify-center text-[11px] font-black text-black">
-                        {getInitial(r.user.name ?? "Reviewer")}
-                      </span>
-                      <span>{getFirstName(r.user.name ?? "Reviewer")}</span>
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">{r.tier}</td>
-                  <td className="px-4 py-3">{r.averageRating.toFixed(2)}</td>
-                  <td className="px-4 py-3">{r._count.reviews}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1">
-                      {r.genres.slice(0, 3).map((g) => (
-                        <span
-                          key={g.id}
-                          className="px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 text-xs"
-                        >
-                          {g.name}
-                        </span>
-                      ))}
+                <Link
+                  key={r.id}
+                  href={`/artist/reviewers/${r.id}`}
+                  className="flex items-center justify-between gap-3 rounded-2xl bg-white/60 border border-black/10 px-4 py-3 hover:bg-white transition-colors duration-150 ease-out"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="h-10 w-10 rounded-xl bg-lime-100 flex items-center justify-center text-sm font-bold text-lime-700 flex-shrink-0">
+                      {getInitial(r.user.name ?? "Reviewer")}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-black truncate">
+                        {getFirstName(r.user.name ?? "Reviewer")}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-black/40">
+                        <span>{r.tier}</span>
+                        <span>·</span>
+                        <span>{r.averageRating.toFixed(1)} avg</span>
+                        <span>·</span>
+                        <span>{r._count.reviews} reviews</span>
+                      </div>
                     </div>
-                  </td>
-                </tr>
+                  </div>
+                  <div className="flex flex-wrap gap-1 flex-shrink-0 max-w-[200px] justify-end">
+                    {r.genres.slice(0, 2).map((g) => (
+                      <span
+                        key={g.id}
+                        className="px-2 py-0.5 rounded-full bg-black/5 text-black/50 text-xs"
+                      >
+                        {g.name}
+                      </span>
+                    ))}
+                    {r.genres.length > 2 && (
+                      <span className="text-xs text-black/30">+{r.genres.length - 2}</span>
+                    )}
+                  </div>
+                </Link>
               ))}
-
-              {reviewers.length === 0 ? (
-                <tr>
-                  <td className="px-4 py-6 text-neutral-500" colSpan={5}>
-                    No reviewers found.
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

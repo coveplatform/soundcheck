@@ -25,7 +25,7 @@ export function AuthButtons({
     const dashboardHref = user?.isArtist
       ? "/artist/dashboard"
       : user?.isReviewer
-        ? "/reviewer/dashboard"
+        ? "/listener/dashboard"
         : "/artist/onboarding";
 
     return (

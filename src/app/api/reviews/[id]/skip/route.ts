@@ -31,7 +31,7 @@ export async function POST(
       );
     }
 
-    const reviewerProfile = await prisma.reviewerProfile.findUnique({
+    const reviewerProfile = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
       select: { isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
     });

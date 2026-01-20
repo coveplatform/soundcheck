@@ -31,7 +31,7 @@ export default async function ArtistReviewerProfilePage({
     redirect("/artist/onboarding");
   }
 
-  const reviewer = await prisma.reviewerProfile.findUnique({
+  const reviewer = await prisma.listenerProfile.findUnique({
     where: { id },
     include: {
       user: { select: { name: true } },

@@ -17,6 +17,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const existingUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { id: true },
+    });
+
+    if (!existingUser) {
+      return NextResponse.json(
+        { error: "Your session is out of date. Please sign in again." },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { artistName, genreIds } = createProfileSchema.parse(body);
 
@@ -50,7 +62,6 @@ export async function POST(request: Request) {
       data: {
         userId: session.user.id,
         artistName,
-        freeReviewCredits: 1,
         ...(genreIds && genreIds.length > 0
           ? {
               genres: {
@@ -95,14 +106,26 @@ export async function GET() {
 
     const profile = await prisma.artistProfile.findUnique({
       where: { userId: session.user.id },
-      include: { genres: true },
+      include: {
+        genres: true,
+        tracks: {
+          select: { id: true },
+        },
+      },
     });
 
     if (!profile) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    return NextResponse.json(profile);
+    // Add track count and subscription status to response
+    const response = {
+      ...profile,
+      totalTracks: profile.tracks.length,
+      subscriptionStatus: profile.subscriptionStatus,
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Error fetching artist profile:", error);
     return NextResponse.json(

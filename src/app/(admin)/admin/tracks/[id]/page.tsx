@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { RefundButton } from "@/components/admin/refund-button";
 import { CancelTrackButton } from "@/components/admin/cancel-track-button";
-import { GrantFreeButton } from "@/components/admin/grant-free-button";
 import { DeleteTrackButton } from "@/components/admin/delete-track-button";
 import { DebugAssignButton } from "@/components/admin/debug-assign-button";
 import { NotifyInvalidLinkButton } from "@/components/admin/notify-invalid-link-button";
@@ -61,9 +60,6 @@ export default async function AdminTrackDetailPage({
     track.status !== "CANCELLED" &&
     (track.status === "PENDING_PAYMENT" || track.status === "QUEUED");
 
-  const canGrantFree =
-    track.status === "PENDING_PAYMENT" &&
-    (!track.payment || track.payment.status === "PENDING");
 
   return (
     <div className="space-y-6">
@@ -73,7 +69,6 @@ export default async function AdminTrackDetailPage({
           <p className="text-neutral-500">{track.title}</p>
         </div>
         <div className="flex items-center gap-2">
-          {canGrantFree ? <GrantFreeButton trackId={track.id} /> : null}
           {canRefund ? <RefundButton trackId={track.id} /> : null}
           {canCancel ? <CancelTrackButton trackId={track.id} /> : null}
           <DeleteTrackButton trackId={track.id} />

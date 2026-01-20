@@ -50,7 +50,7 @@ export function ReviewGem({
         disabled={isSaving}
         title={isGem ? "Remove gem" : "Mark as gem"}
         className={cn(
-          "p-1.5 transition-all",
+          "p-1.5 transition-colors duration-150 ease-out motion-reduce:transition-none",
           isGem
             ? "text-amber-500"
             : "text-neutral-300 hover:text-amber-400",

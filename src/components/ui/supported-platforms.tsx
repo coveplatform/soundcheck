@@ -59,11 +59,11 @@ export function SupportedPlatforms({
             <div
               key={platform.id}
               className={cn(
-                "transition-all duration-200",
-                isActive ? "scale-125" : "opacity-50 hover:opacity-75"
+                "transition-transform transition-opacity duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                isActive ? "scale-125" : "opacity-75 hover:opacity-100"
               )}
               title={platform.name}
-              style={{ color: isActive ? platform.color : "#9ca3af" }}
+              style={{ color: platform.color }}
             >
               <platform.Icon className="h-6 w-6" />
             </div>
@@ -81,15 +81,15 @@ export function SupportedPlatforms({
           <div
             key={platform.id}
             className={cn(
-              "p-2.5 rounded-xl border-2 transition-all duration-200",
+              "p-2.5 rounded-xl border-2 transition-transform transition-colors transition-shadow duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
               isActive
                 ? cn(platform.bgActive, platform.borderActive, "scale-110")
                 : "border-neutral-200 bg-neutral-50 hover:border-neutral-300"
             )}
             title={platform.name}
-            style={{ color: isActive ? platform.color : "#9ca3af" }}
+            style={{ color: platform.color }}
           >
-            <platform.Icon className="h-6 w-6 transition-transform" />
+            <platform.Icon className="h-6 w-6" />
           </div>
         );
       })}

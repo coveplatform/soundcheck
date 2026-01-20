@@ -154,7 +154,7 @@ export function GenreSelector({
   selectedIds,
   onToggle,
   maxSelections = 3,
-  minSelections = 1,
+  minSelections: _minSelections = 1,
   variant = "artist",
   theme = "light",
 }: GenreSelectorProps) {

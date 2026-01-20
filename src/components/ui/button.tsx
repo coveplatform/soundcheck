@@ -5,14 +5,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] active:transition-none",
+  "inline-flex items-center justify-center whitespace-nowrap text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none",
   {
     variants: {
       variant: {
         default:
           "bg-black text-white border-2 border-black hover:bg-neutral-800 active:bg-neutral-900",
         primary:
-          "bg-lime-400 text-black border-2 border-black hover:bg-lime-300 active:bg-lime-500",
+          "bg-lime-400 text-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-lime-300 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:bg-lime-500 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
         destructive:
           "bg-red-500 text-white border-2 border-red-500 hover:bg-red-600 active:bg-red-700",
         outline:
@@ -21,6 +21,13 @@ const buttonVariants = cva(
           "bg-neutral-100 text-black border-2 border-neutral-200 hover:bg-neutral-200 active:bg-neutral-300",
         ghost: "text-black hover:bg-neutral-100 active:bg-neutral-200",
         link: "text-black underline-offset-4 hover:underline active:opacity-70",
+
+        airy:
+          "bg-white/60 text-black border border-black/10 hover:bg-white/80",
+        airyPrimary:
+          "bg-black text-white border border-black/10 hover:bg-black/90",
+        airyOutline:
+          "bg-transparent text-black border border-black/20 hover:bg-black/5",
       },
       size: {
         default: "h-10 px-4 py-2",

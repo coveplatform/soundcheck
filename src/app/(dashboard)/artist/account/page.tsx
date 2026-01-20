@@ -23,20 +23,45 @@ export default async function ArtistAccountPage() {
     redirect("/login");
   }
 
-  return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-black">Account settings</h1>
-      <p className="text-neutral-600 mt-1">Profile, security, and support</p>
+  // Get artist profile with subscription info
+  const artistProfile = session.user.isArtist
+    ? await prisma.artistProfile.findUnique({
+        where: { userId: session.user.id },
+        select: {
+          subscriptionStatus: true,
+          subscriptionTier: true,
+          subscriptionCurrentPeriodEnd: true,
+          subscriptionCanceledAt: true,
+          totalTracks: true,
+        },
+      })
+    : null;
 
-      <div className="mt-6">
-        <AccountSettingsClient
-          initialName={dbUser.name ?? ""}
-          email={dbUser.email}
-          isArtist={session.user.isArtist}
-          isReviewer={session.user.isReviewer}
-          hasPassword={Boolean(dbUser.password)}
-        />
+  return (
+    <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12 max-w-2xl">
+      <div className="mb-10">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Account</h1>
+        <p className="mt-2 text-sm text-black/40">Profile, security, and support</p>
       </div>
+
+      <AccountSettingsClient
+        initialName={dbUser.name ?? ""}
+        email={dbUser.email}
+        isArtist={session.user.isArtist}
+        isReviewer={session.user.isReviewer}
+        hasPassword={Boolean(dbUser.password)}
+        subscription={
+          artistProfile
+            ? {
+                status: artistProfile.subscriptionStatus || null,
+                tier: artistProfile.subscriptionTier || null,
+                currentPeriodEnd: artistProfile.subscriptionCurrentPeriodEnd || null,
+                canceledAt: artistProfile.subscriptionCanceledAt || null,
+                totalTracks: artistProfile.totalTracks,
+              }
+            : null
+        }
+      />
     </div>
   );
 }

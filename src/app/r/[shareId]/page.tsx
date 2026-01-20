@@ -6,6 +6,7 @@ import { Music, ArrowRight, Check, ListMusic, Share2, UserPlus } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { ShareButtons } from "./share-buttons";
 import { ExpandableDetails } from "./expandable-details";
+import { ReferralTracker } from "./referral-tracker";
 
 export const dynamic = "force-dynamic";
 
@@ -79,12 +80,14 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
     include: {
       track: {
         select: {
+          id: true,
           title: true,
           artworkUrl: true,
         },
       },
       reviewer: {
-        include: {
+        select: {
+          id: true,
           user: { select: { name: true } },
         },
       },
@@ -111,6 +114,13 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
 
   return (
     <div className="min-h-screen bg-neutral-50 pt-14">
+      {/* Referral tracking for affiliate commission */}
+      <ReferralTracker
+        reviewerId={review.reviewer.id}
+        shareId={shareId}
+        trackId={review.track.id}
+      />
+
       {/* Header */}
       <header className="border-b-2 border-black bg-white fixed top-0 left-0 right-0 z-50">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -229,11 +239,11 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
         {/* CTA */}
         <div className="mt-6 border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <p className="font-bold text-lg mb-1">Want feedback like this?</p>
-          <p className="text-neutral-600 text-sm mb-4">
+          <p className="text-neutral-700 max-w-xl mx-auto">
             Get 5-20 honest reviews from genre-matched listeners before you release.
           </p>
           <Link href="/signup">
-            <Button className="bg-lime-500 text-black hover:bg-lime-400 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+            <Button className="bg-lime-500 text-black hover:bg-lime-400 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none">
               Get Feedback <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>

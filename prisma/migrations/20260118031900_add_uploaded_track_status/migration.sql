@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "TrackStatus" ADD VALUE IF NOT EXISTS 'UPLOADED';

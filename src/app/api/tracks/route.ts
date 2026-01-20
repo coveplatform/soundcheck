@@ -14,8 +14,13 @@ const createTrackSchema = z.object({
   bpm: z.number().int().min(1).max(999).optional(),
   genreIds: z.array(z.string()).min(1, "Select at least one genre").max(3),
   feedbackFocus: z.string().max(1000).optional(),
-  packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE"]),
+  packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE"]).optional(),
   allowPurchase: z.boolean().optional(),
+  isPublic: z.boolean().optional(),
+  hasStems: z.boolean().optional(),
+  abletonProjectUrl: z.string().optional(),
+  abletonProjectData: z.any().optional(),
+  abletonRenderStatus: z.enum(["PENDING", "RENDERING", "COMPLETED", "FAILED"]).optional(),
 });
 
 export async function POST(request: Request) {
@@ -50,13 +55,30 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check subscription & upload limit
+    const isSubscribed = artistProfile.subscriptionStatus === "active";
+    const hasFreeTrial = artistProfile.totalTracks < 1;
+
+    if (!isSubscribed && !hasFreeTrial) {
+      return NextResponse.json(
+        { error: "Subscribe to upload more tracks" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const data = createTrackSchema.parse(body);
+
+    console.log("Track creation - sourceUrl:", data.sourceUrl);
+    console.log("Track creation - sourceType:", data.sourceType);
+    console.log("Track creation - abletonProjectUrl:", data.abletonProjectUrl);
 
     let sourceType = data.sourceType ?? detectSource(data.sourceUrl);
 
     if (data.sourceType === "UPLOAD") {
-      const isLocalUpload = data.sourceUrl.startsWith("/uploads/");
+      const isLocalUpload =
+        data.sourceUrl.startsWith("/uploads/") ||
+        (data.sourceUrl.startsWith("/ableton-projects/") && data.sourceUrl.toLowerCase().endsWith(".zip"));
       let isRemoteUpload = false;
 
       if (!isLocalUpload) {
@@ -67,6 +89,8 @@ export async function POST(request: Request) {
           isRemoteUpload = false;
         }
       }
+
+      console.log("Upload validation - isLocalUpload:", isLocalUpload, "isRemoteUpload:", isRemoteUpload);
 
       if (!isLocalUpload && !isRemoteUpload) {
         return NextResponse.json({ error: "Invalid upload URL" }, { status: 400 });
@@ -82,32 +106,59 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get package details
-    const packageDetails = PACKAGES[data.packageType as PackageType];
+    const shouldRequestReviews = !!data.packageType;
 
-    // Create track
-    const track = await prisma.track.create({
-      data: {
-        artistId: artistProfile.id,
-        sourceUrl: data.sourceUrl,
-        sourceType,
-        title: data.title,
-        artworkUrl: data.artworkUrl,
-        duration: data.duration,
-        bpm: data.bpm,
-        feedbackFocus: data.feedbackFocus,
-        packageType: data.packageType,
-        reviewsRequested: packageDetails.reviews,
-        // Only allow purchases for uploaded tracks
-        allowPurchase: sourceType === "UPLOAD" ? (data.allowPurchase ?? false) : false,
-        genres: {
-          connect: data.genreIds.map((id) => ({ id })),
+    const packageType: PackageType = (data.packageType ?? "STANDARD") as PackageType;
+    const packageDetails = PACKAGES[packageType];
+
+    const createData = {
+      artistId: artistProfile.id,
+      sourceUrl: data.sourceUrl,
+      sourceType,
+      title: data.title,
+      artworkUrl: data.artworkUrl,
+      duration: data.duration,
+      bpm: data.bpm,
+      feedbackFocus: data.feedbackFocus,
+      isPublic: data.isPublic ?? false,
+      hasStems: data.hasStems ?? false,
+      packageType,
+      reviewsRequested: shouldRequestReviews ? packageDetails.reviews : 0,
+      status: shouldRequestReviews ? undefined : ("UPLOADED" as any),
+      // Only allow purchases for uploaded tracks
+      allowPurchase: sourceType === "UPLOAD" ? (data.allowPurchase ?? false) : false,
+      // Ableton project data
+      abletonProjectUrl: data.abletonProjectUrl,
+      abletonProjectData: data.abletonProjectData,
+      // Auto-trigger render if Ableton project is uploaded
+      abletonRenderStatus: data.abletonProjectUrl ? "PENDING" : data.abletonRenderStatus,
+      genres: {
+        connect: data.genreIds.map((id) => ({ id })),
+      },
+    } as any;
+
+    let track;
+    try {
+      track = await prisma.track.create({
+        data: createData,
+        include: {
+          genres: true,
         },
-      },
-      include: {
-        genres: true,
-      },
-    });
+      });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      if (message.includes("Unknown argument `isPublic`")) {
+        const { isPublic: _ignored, ...fallbackData } = createData as Record<string, unknown>;
+        track = await prisma.track.create({
+          data: fallbackData as any,
+          include: {
+            genres: true,
+          },
+        });
+      } else {
+        throw e;
+      }
+    }
 
     return NextResponse.json(track, { status: 201 });
   } catch (error) {

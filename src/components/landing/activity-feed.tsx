@@ -37,12 +37,14 @@ export function ActivityFeed() {
   const STEP_PX = layout.cardSizePx + layout.gapPx;
   const VIEWPORT_WIDTH_PX = layout.visibleCount * layout.cardSizePx + (layout.visibleCount - 1) * layout.gapPx;
 
+  // Use deterministic artwork based on activity ID for SSR to avoid hydration mismatch
+  const getInitialArtwork = (id: number) => ((id * 7) % DEFAULT_ARTWORK_COUNT) + 1;
   const [queue, setQueue] = useState<Activity[]>(() =>
-    ACTIVITIES.slice(0, layout.visibleCount).map((activity) => ({ ...activity, artwork: 1 + Math.floor(Math.random() * DEFAULT_ARTWORK_COUNT) }))
+    ACTIVITIES.slice(0, layout.visibleCount).map((activity) => ({ ...activity, artwork: getInitialArtwork(activity.id) }))
   );
   const [nextIndex, setNextIndex] = useState(layout.visibleCount);
   const [renderQueue, setRenderQueue] = useState<Activity[]>(() =>
-    ACTIVITIES.slice(0, layout.visibleCount).map((activity) => ({ ...activity, artwork: 1 + Math.floor(Math.random() * DEFAULT_ARTWORK_COUNT) }))
+    ACTIVITIES.slice(0, layout.visibleCount).map((activity) => ({ ...activity, artwork: getInitialArtwork(activity.id) }))
   );
   const [phase, setPhase] = useState<"idle" | "pre" | "sliding">("idle");
 
@@ -206,7 +208,7 @@ export function ActivityFeed() {
     >
       {/* Artwork Square */}
       <div
-        className={`${activity.color} shadow-md flex items-center justify-center relative overflow-hidden rounded-2xl transition-all duration-200 ease-out group-hover:shadow-lg group-hover:scale-[1.02] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-300 group-focus-visible:outline-offset-2`}
+        className={`${activity.color} shadow-md flex items-center justify-center relative overflow-hidden rounded-2xl transition-transform transition-shadow duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none group-hover:shadow-lg group-hover:scale-[1.02] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-300 group-focus-visible:outline-offset-2`}
         style={{ width: `${layout.cardSizePx}px`, height: `${layout.cardSizePx}px` }}
       >
         {shouldRenderArtwork ? (

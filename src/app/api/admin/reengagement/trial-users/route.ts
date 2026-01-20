@@ -17,7 +17,7 @@ export async function GET() {
     }
 
     // Find users with:
-    // - An artist profile with freeReviewCredits >= 1 (haven't used free trial)
+    // - An artist profile
     // - No tracks submitted
     // - Haven't been reminded yet (trialReminderSentAt is null)
     const eligibleUsers = await prisma.user.findMany({
@@ -25,7 +25,6 @@ export async function GET() {
         isArtist: true,
         trialReminderSentAt: null,
         artistProfile: {
-          freeReviewCredits: { gte: 1 },
           tracks: { none: {} },
         },
       },
@@ -36,7 +35,6 @@ export async function GET() {
         artistProfile: {
           select: {
             artistName: true,
-            freeReviewCredits: true,
           },
         },
       },
@@ -59,7 +57,6 @@ export async function GET() {
         id: u.id,
         email: u.email,
         artistName: u.artistProfile?.artistName ?? "Artist",
-        freeCredits: u.artistProfile?.freeReviewCredits ?? 0,
         signedUpAt: u.createdAt,
       })),
       stats: {

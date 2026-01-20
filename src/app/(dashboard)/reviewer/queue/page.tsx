@@ -5,9 +5,10 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { expireAndReassignExpiredQueueEntries, assignReviewersToRecentTracks, assignTracksToTestReviewer } from "@/lib/queue";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Music, ArrowRight, Clock, Headphones } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Music, ArrowRight, Headphones } from "lucide-react";
 import { GenreTagList } from "@/components/ui/genre-tag";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const dynamic = 'force-dynamic';
 
@@ -44,35 +45,33 @@ export default async function ReviewQueuePage({
     await assignReviewersToRecentTracks();
   }
 
-  const reviewerProfile = await prisma.reviewerProfile.findUnique({
+  const listenerProfile = await prisma.listenerProfile.findUnique({
     where: { userId: session.user.id },
   });
 
   // For test reviewers, assign all available tracks to them
-  if (reviewerProfile && user?.email) {
-    await assignTracksToTestReviewer(reviewerProfile.id, user.email);
+  if (listenerProfile && user?.email) {
+    await assignTracksToTestReviewer(listenerProfile.id, user.email);
   }
 
-  if (!reviewerProfile) {
-    redirect("/reviewer/onboarding");
+  if (!listenerProfile) {
+    redirect("/listener/onboarding");
   }
 
-  if (reviewerProfile.isRestricted) {
+  if (listenerProfile.isRestricted) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-black">Review Queue</h1>
-          <p className="text-neutral-600">Your reviewer account is restricted.</p>
+      <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12">
+        <div className="mb-10">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Queue</h1>
+          <p className="mt-2 text-sm text-black/40">Your listener account is restricted.</p>
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Access restricted</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-neutral-600">
+        <Card variant="soft" elevated>
+          <CardContent className="pt-6">
+            <p className="text-xs font-mono tracking-widest text-black/40 uppercase">access restricted</p>
+            <p className="mt-3 text-sm text-black/50">
               You can&apos;t accept or work on new reviews right now. If you believe this is a mistake,
               {" "}
-              <Link href="/support" className="font-bold hover:underline underline-offset-4">
+              <Link href="/support" className="font-medium text-black hover:underline underline-offset-4">
                 contact support
               </Link>
               .
@@ -83,25 +82,23 @@ export default async function ReviewQueuePage({
     );
   }
 
-  if (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed) {
+  if (!listenerProfile.completedOnboarding || !listenerProfile.onboardingQuizPassed) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-black">Review Queue</h1>
-          <p className="text-neutral-600">Finish onboarding to start reviewing.</p>
+      <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12">
+        <div className="mb-10">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Queue</h1>
+          <p className="mt-2 text-sm text-black/40">Finish onboarding to start listening.</p>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Finish onboarding</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-neutral-600">
-              You still need to complete the quiz and select your genres before you can access the review queue.
+        <Card variant="soft" elevated>
+          <CardContent className="pt-6">
+            <p className="text-xs font-mono tracking-widest text-black/40 uppercase">next</p>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-light tracking-tight">Finish onboarding</h2>
+            <p className="mt-2 text-sm text-black/50 max-w-prose">
+              Complete the quiz and select your genres before you can access the review queue.
             </p>
-            <div className="mt-4">
-              <Link href="/reviewer/onboarding">
-                <Button className="w-full" variant="primary">
+            <div className="mt-6">
+              <Link href="/listener/onboarding">
+                <Button variant="airyPrimary" className="h-12 px-6">
                   Continue onboarding
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -116,7 +113,7 @@ export default async function ReviewQueuePage({
   // Get pending reviews (exclude reviews for completed tracks)
   const pendingReviews = await prisma.review.findMany({
     where: {
-      reviewerId: reviewerProfile.id,
+      reviewerId: listenerProfile.id,
       status: { in: ["ASSIGNED", "IN_PROGRESS"] },
       track: {
         status: { not: "COMPLETED" },
@@ -136,135 +133,98 @@ export default async function ReviewQueuePage({
   });
 
   return (
-    <div className="space-y-6">
-      {notice === "skipped" ? (
-        <div className="border-2 border-black bg-orange-50 p-4">
-          <p className="text-sm font-bold text-black">
-            Track skipped.
-          </p>
-          <p className="text-sm text-neutral-700 mt-1">
-            We removed it from your queue and reassigned it.
-          </p>
-          <div className="mt-3">
-            <Link href="/reviewer/queue" className="text-sm font-bold hover:underline underline-offset-4">
-              Dismiss
-            </Link>
-          </div>
+    <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12">
+      {/* Notices */}
+      {notice === "skipped" && (
+        <div className="mb-6 rounded-2xl border border-orange-200 bg-orange-50 p-4">
+          <p className="text-sm font-medium text-black">Track skipped.</p>
+          <p className="text-sm text-black/50 mt-1">We removed it from your queue and reassigned it.</p>
+          <Link href="/listener/queue" className="text-sm font-medium text-orange-600 hover:text-orange-800 mt-2 inline-block">
+            Dismiss
+          </Link>
         </div>
-      ) : null}
+      )}
 
-      {notice === "expired" ? (
-        <div className="border-2 border-black bg-red-50 p-4">
-          <p className="text-sm font-bold text-black">
-            Review expired.
-          </p>
-          <p className="text-sm text-neutral-700 mt-1">
-            This review timed out and was reassigned.
-          </p>
-          <div className="mt-3">
-            <Link href="/reviewer/queue" className="text-sm font-bold hover:underline underline-offset-4">
-              Dismiss
-            </Link>
-          </div>
+      {notice === "expired" && (
+        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4">
+          <p className="text-sm font-medium text-black">Review expired.</p>
+          <p className="text-sm text-black/50 mt-1">This review timed out and was reassigned.</p>
+          <Link href="/listener/queue" className="text-sm font-medium text-red-600 hover:text-red-800 mt-2 inline-block">
+            Dismiss
+          </Link>
         </div>
-      ) : null}
+      )}
 
-      {notice === "unplayable" ? (
-        <div className="border-2 border-black bg-red-50 p-4">
-          <p className="text-sm font-bold text-black">
-            Audio issue reported.
-          </p>
-          <p className="text-sm text-neutral-700 mt-1">
-            We removed it from your queue and reassigned it.
-          </p>
-          <div className="mt-3">
-            <Link href="/reviewer/queue" className="text-sm font-bold hover:underline underline-offset-4">
-              Dismiss
-            </Link>
-          </div>
+      {notice === "unplayable" && (
+        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4">
+          <p className="text-sm font-medium text-black">Audio issue reported.</p>
+          <p className="text-sm text-black/50 mt-1">We removed it from your queue and reassigned it.</p>
+          <Link href="/listener/queue" className="text-sm font-medium text-red-600 hover:text-red-800 mt-2 inline-block">
+            Dismiss
+          </Link>
         </div>
-      ) : null}
+      )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-black">Review Queue</h1>
-          <p className="text-neutral-600">
-            {pendingReviews.length} track{pendingReviews.length !== 1 ? "s" : ""} waiting for review
-          </p>
-        </div>
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <div className="h-10 w-10 bg-orange-400 border-2 border-black flex items-center justify-center">
-            <Headphones className="h-5 w-5 text-black" />
-          </div>
-          <span className="text-2xl font-black">{pendingReviews.length}</span>
-        </div>
+      <div className="mb-10">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Queue</h1>
+        <p className="mt-2 text-sm text-black/40">
+          {pendingReviews.length} track{pendingReviews.length !== 1 ? "s" : ""} waiting for feedback
+        </p>
       </div>
 
       {/* Queue */}
-      <Card>
-        <CardHeader className="border-b-2 border-black">
-          <CardTitle>Tracks to Review</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
+      <Card variant="soft" elevated>
+        <CardContent className="pt-6">
+          <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-4">tracks to listen</p>
+          
           {pendingReviews.length === 0 ? (
-            <div className="text-center py-12 px-6">
-              <div className="mx-auto w-12 h-12 bg-neutral-100 border-2 border-black flex items-center justify-center mb-4">
-                <Music className="h-6 w-6 text-black" />
-              </div>
-              <h3 className="font-bold text-black">Queue is empty</h3>
-              <p className="text-sm text-neutral-600 mt-1">
-                New tracks matching your genres will appear here
-              </p>
-            </div>
+            <EmptyState
+              doodle="headphones"
+              title="Queue is empty"
+              description="New tracks matching your genres will appear here"
+              className="py-12"
+            />
           ) : (
-            <div className="divide-y-2 divide-black">
+            <div className="space-y-3">
               {pendingReviews.map((review) => (
-                <Link
+                <div
                   key={review.id}
-                  href={`/reviewer/review/${review.id}`}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 hover:bg-neutral-50 transition-colors"
+                  className="flex items-center justify-between gap-3 rounded-2xl bg-white/60 border border-black/10 px-4 py-3"
                 >
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div className="h-12 w-12 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
-                      <Music className="h-6 w-6 text-black" />
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-10 w-10 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
+                      <Music className="h-5 w-5 text-orange-600" />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-bold truncate">{review.track.title}</p>
-                      <GenreTagList
-                        genres={review.track.genres}
-                        variant="reviewer"
-                        size="sm"
-                        maxDisplay={2}
-                      />
+                      <p className="text-sm font-medium text-black truncate">{review.track.title}</p>
+                      <div className="flex items-center gap-2">
+                        <GenreTagList
+                          genres={review.track.genres}
+                          variant="reviewer"
+                          size="sm"
+                          maxDisplay={2}
+                        />
+                        {review.status === "IN_PROGRESS" && (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                            In progress
+                          </span>
+                        )}
+                      </div>
                       {review.track.feedbackFocus && (
-                        <p className="text-xs text-amber-600 font-medium mt-1">
-                          Artist note: {review.track.feedbackFocus}
+                        <p className="text-xs text-amber-600 mt-1">
+                          Note: {review.track.feedbackFocus}
                         </p>
                       )}
                     </div>
                   </div>
-
-                  <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto flex-shrink-0">
-                    <div className="text-right hidden sm:block">
-                      <div className="flex items-center gap-1 text-xs text-neutral-600 font-mono">
-                        <Clock className="h-3 w-3" />
-                        <span>
-                          {new Date(review.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      {review.status === "IN_PROGRESS" && (
-                        <span className="inline-flex items-center px-2 py-0.5 border-2 border-black bg-purple-400 text-black text-xs font-bold mt-1">
-                          In Progress
-                        </span>
-                      )}
-                    </div>
-                    <Button variant="primary" size="sm">
-                      Review
+                  <Link href={`/listener/review/${review.id}`} className="flex-shrink-0">
+                    <Button variant="airyOutline" className="h-9 px-4">
+                      Listen
                       <ArrowRight className="h-4 w-4 ml-1" />
                     </Button>
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               ))}
             </div>
           )}

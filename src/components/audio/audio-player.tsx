@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, type MouseEvent as ReactMouseEvent } from "react";
+import { useState, useRef, useEffect, useId, type MouseEvent as ReactMouseEvent } from "react";
 import { Play, Pause, Volume2, VolumeX, Plus, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -96,7 +96,7 @@ export function AudioPlayer({
   const scIframeRef = useRef<HTMLIFrameElement | null>(null);
   const scWidgetRef = useRef<SoundCloudWidget | null>(null);
   const ytPlayerRef = useRef<YouTubePlayer | null>(null);
-  const ytContainerId = useRef(`yt-player-${Math.random().toString(36).slice(2, 9)}`);
+  const ytContainerId = useId();
   const bcIframeRef = useRef<HTMLIFrameElement | null>(null);
   const ytPlayerReady = useRef(false);
 
@@ -210,8 +210,7 @@ export function AudioPlayer({
         const pathPart = url.pathname.split("/").pop() || "";
         videoId = pathPart;
       }
-      const origin = typeof window !== "undefined" ? window.location.origin : "";
-      return `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${encodeURIComponent(origin)}`;
+      return `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
     }
     if (sourceType === "BANDCAMP") {
       return bandcampEmbedUrl || "";
@@ -438,7 +437,7 @@ export function AudioPlayer({
       if (!window.YT?.Player || !mounted) return;
 
       try {
-        const player = new window.YT.Player(ytContainerId.current, {
+        const player = new window.YT.Player(ytContainerId, {
           events: {
             onReady: () => {
               if (!mounted) return;
@@ -576,7 +575,7 @@ export function AudioPlayer({
             />
           ) : sourceType === "YOUTUBE" ? (
             <iframe
-              id={ytContainerId.current}
+              id={ytContainerId}
               src={getEmbedUrl()}
               width="100%"
               height={315}
@@ -627,7 +626,7 @@ export function AudioPlayer({
                 type="button"
                 onClick={() => setIsPlaying(!isPlaying)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 transition-all",
+                  "flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                   isPlaying
                     ? "bg-black text-white border-black"
                     : "bg-lime-500 text-black border-black hover:bg-lime-400"
@@ -674,7 +673,7 @@ export function AudioPlayer({
                 }}
                 disabled={!isPlaying && currentTime === 0}
                 className={cn(
-                  "flex items-center gap-1 px-3 py-1.5 text-xs font-bold border-2 transition-all",
+                  "flex items-center gap-1 px-3 py-1.5 text-xs font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                   timestampAdded
                     ? "bg-lime-500 text-black border-lime-600 scale-105"
                     : !isPlaying && currentTime === 0
@@ -714,7 +713,7 @@ export function AudioPlayer({
             <div className="h-3 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200">
               <div
                 className={cn(
-                  "h-full transition-all duration-300 rounded-full",
+                  "h-full transition-[width] duration-300 ease-out rounded-full motion-reduce:transition-none",
                   hasReachedMinimum
                     ? "bg-gradient-to-r from-green-400 to-green-500"
                     : "bg-gradient-to-r from-neutral-700 to-neutral-800"
@@ -838,7 +837,7 @@ export function AudioPlayer({
                       setTimeout(() => setTimestampAdded(false), 1500);
                     }}
                     className={cn(
-                      "flex items-center gap-1 px-2 py-1 text-xs font-bold border-2 transition-all",
+                      "flex items-center gap-1 px-2 py-1 text-xs font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                       timestampAdded
                         ? "bg-lime-500 text-black border-lime-600 scale-105"
                         : "bg-white text-black border-black hover:bg-neutral-100"
@@ -881,7 +880,7 @@ export function AudioPlayer({
                 }
               }
             }}
-            className="h-14 w-14 bg-black rounded-full flex items-center justify-center text-white hover:bg-neutral-800 transition-all hover:scale-105 active:scale-95 shadow-lg"
+            className="h-14 w-14 bg-black rounded-full flex items-center justify-center text-white hover:bg-neutral-800 transition-colors transition-transform duration-150 ease-out hover:scale-105 active:scale-95 motion-reduce:transition-none motion-reduce:transform-none shadow-lg"
           >
             {isPlaying ? (
               <Pause className="h-6 w-6" />
@@ -908,7 +907,7 @@ export function AudioPlayer({
               aria-valuemax={duration}
             >
               <div
-                className="h-full bg-gradient-to-r from-neutral-800 to-neutral-900 transition-all duration-100 rounded-full"
+                className="h-full bg-gradient-to-r from-neutral-800 to-neutral-900 transition-[width] duration-100 ease-out rounded-full motion-reduce:transition-none"
                 style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
               />
             </div>
@@ -927,7 +926,7 @@ export function AudioPlayer({
               }
             }}
             className={cn(
-              "h-10 w-10 rounded-full flex items-center justify-center transition-all",
+              "h-10 w-10 rounded-full flex items-center justify-center transition-colors duration-150 ease-out motion-reduce:transition-none",
               isMuted
                 ? "bg-neutral-200 text-neutral-500"
                 : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
@@ -952,7 +951,7 @@ export function AudioPlayer({
             <div className="h-3 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200">
               <div
                 className={cn(
-                  "h-full transition-all duration-300 rounded-full",
+                  "h-full transition-[width] duration-300 ease-out rounded-full motion-reduce:transition-none",
                   hasReachedMinimum
                     ? "bg-gradient-to-r from-green-400 to-green-500"
                     : "bg-gradient-to-r from-neutral-700 to-neutral-800"

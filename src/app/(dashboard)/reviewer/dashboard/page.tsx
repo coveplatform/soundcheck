@@ -4,14 +4,11 @@ import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Headphones,
-  DollarSign,
-  Star,
-  TrendingUp,
   ArrowRight,
-  Music,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { GenreTagList } from "@/components/ui/genre-tag";
@@ -44,7 +41,7 @@ export default async function ReviewerDashboardPage() {
     process.env.NODE_ENV !== "production" &&
     process.env.BYPASS_PAYMENTS === "true";
 
-  const baseReviewer = await prisma.reviewerProfile.findUnique({
+  const baseReviewer = await prisma.listenerProfile.findUnique({
     where: { userId: session.user.id },
     select: {
       id: true,
@@ -55,25 +52,23 @@ export default async function ReviewerDashboardPage() {
   });
 
   if (!baseReviewer) {
-    redirect("/reviewer/onboarding");
+    redirect("/listener/onboarding");
   }
 
   if (baseReviewer.isRestricted) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-black">Reviewer Dashboard</h1>
-          <p className="text-neutral-600">Your reviewer account is restricted.</p>
+      <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12">
+        <div className="mb-10">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Home</h1>
+          <p className="mt-2 text-sm text-black/40">Your listener account is restricted.</p>
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Access restricted</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-neutral-600">
+        <Card variant="soft" elevated>
+          <CardContent className="pt-6">
+            <p className="text-xs font-mono tracking-widest text-black/40 uppercase">access restricted</p>
+            <p className="mt-3 text-sm text-black/50">
               You can&apos;t accept or work on new reviews right now. If you believe this is a mistake,
               {" "}
-              <Link href="/support" className="font-bold hover:underline underline-offset-4">
+              <Link href="/support" className="font-medium text-black hover:underline underline-offset-4">
                 contact support
               </Link>
               .
@@ -86,23 +81,22 @@ export default async function ReviewerDashboardPage() {
 
   if (!baseReviewer.completedOnboarding || !baseReviewer.onboardingQuizPassed) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-black">Reviewer Dashboard</h1>
-          <p className="text-neutral-600">Finish onboarding to start reviewing.</p>
+      <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12">
+        <div className="mb-10">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Home</h1>
+          <p className="mt-2 text-sm text-black/40">Finish onboarding to start listening.</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Finish onboarding</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-neutral-600">
-              You still need to complete the quiz and select your genres before you can access the review queue.
+        <Card variant="soft" elevated>
+          <CardContent className="pt-6">
+            <p className="text-xs font-mono tracking-widest text-black/40 uppercase">next</p>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-light tracking-tight">Finish onboarding</h2>
+            <p className="mt-2 text-sm text-black/50 max-w-prose">
+              Complete the quiz and select your genres before you can access the review queue.
             </p>
-            <div className="mt-4">
-              <Link href="/reviewer/onboarding">
-                <Button className="w-full" variant="primary">
+            <div className="mt-6">
+              <Link href="/listener/onboarding">
+                <Button variant="airyPrimary" className="h-12 px-6">
                   Continue onboarding
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -119,7 +113,7 @@ export default async function ReviewerDashboardPage() {
     await assignReviewersToRecentTracks();
   }
 
-  const reviewerProfile = await prisma.reviewerProfile.findUnique({
+  const reviewerProfile = await prisma.listenerProfile.findUnique({
     where: { userId: session.user.id },
     include: {
       genres: true,
@@ -139,7 +133,7 @@ export default async function ReviewerDashboardPage() {
   });
 
   if (!reviewerProfile) {
-    redirect("/reviewer/onboarding");
+    redirect("/listener/onboarding");
   }
 
   // Calculate tier progress
@@ -170,184 +164,191 @@ export default async function ReviewerDashboardPage() {
   const currentTierProgress = tierProgress[tierKey];
   const pendingReviews = reviewerProfile.reviews;
 
+  // Determine next action
+  const nextAction = (() => {
+    if (pendingReviews.length > 0) {
+      return {
+        title: "Listen to tracks",
+        description: `You have ${pendingReviews.length} track${pendingReviews.length !== 1 ? "s" : ""} waiting for your feedback.`,
+        href: "/listener/queue",
+        cta: "Open queue",
+      };
+    }
+    return {
+      title: "Queue is empty",
+      description: "New tracks matching your genres will appear here soon.",
+      href: "/listener/queue",
+      cta: "Check queue",
+    };
+  })();
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-black">Reviewer Dashboard</h1>
-        <p className="text-neutral-600">
-          Discover new music and earn while you listen
+    <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12">
+      <div className="mb-10">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Home</h1>
+        <p className="mt-2 text-sm text-black/40">
+          Discover new music and earn while you listen.
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-purple-400 border-2 border-black flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-black" />
-              </div>
-              <div>
-                <p className="text-sm text-neutral-600 font-medium">Current Tier</p>
-                <p className="text-2xl font-black">{reviewerProfile.tier}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Link href="/reviewer/history" className="block">
-          <Card interactive>
+      <div className="grid gap-6 lg:grid-cols-12">
+        <div className="lg:col-span-7 space-y-6">
+          {/* Next Action Card */}
+          <Card variant="soft" elevated>
             <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 bg-blue-400 border-2 border-black flex items-center justify-center">
-                  <Headphones className="h-6 w-6 text-black" />
-                </div>
-                <div>
-                  <p className="text-sm text-neutral-600 font-medium">Total Reviews</p>
-                  <p className="text-2xl font-black">{reviewerProfile.totalReviews}</p>
-                </div>
+              <p className="text-xs font-mono tracking-widest text-black/40 uppercase">next</p>
+              <h2 className="mt-2 text-2xl sm:text-3xl font-light tracking-tight">{nextAction.title}</h2>
+              <p className="mt-2 text-sm text-black/50 max-w-prose">{nextAction.description}</p>
+              <div className="mt-6">
+                <Link href={nextAction.href}>
+                  <Button variant="airyPrimary" className="h-12 px-6">
+                    {nextAction.cta}
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
-        </Link>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center">
-                <Star className="h-6 w-6 text-black" />
-              </div>
-              <div>
-                <p className="text-sm text-neutral-600 font-medium">Avg Rating</p>
-                <p className="text-2xl font-black">
-                  {reviewerProfile.averageRating.toFixed(1)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-black" />
-              </div>
-              <div>
-                <p className="text-sm text-neutral-600 font-medium">Balance</p>
-                <p className="text-2xl font-black">
-                  {formatCurrency(reviewerProfile.pendingBalance)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
-      {/* Tier Progress */}
-      {currentTierProgress.next && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-bold">
-                Progress to {currentTierProgress.next}
-              </span>
-              <span className="text-sm text-neutral-600 font-mono">
-                {currentTierProgress.reviewsNeeded > 0
-                  ? `${currentTierProgress.reviewsNeeded} more reviews`
-                  : "Reviews complete!"}
-                {reviewerProfile.averageRating < currentTierProgress.ratingNeeded
-                  ? ` (need ${currentTierProgress.ratingNeeded}+ rating)`
-                  : ""}
-                {currentTierProgress.gemsNeeded > 0
-                  ? ` • or ${currentTierProgress.gemsNeeded} gems`
-                  : ""}
-              </span>
-            </div>
-            <div className="w-full h-3 bg-neutral-200 border border-black">
-              <div
-                className="h-full bg-purple-400 transition-all"
-                style={{ width: `${currentTierProgress.progress}%` }}
-              />
-            </div>
-            <div className="flex justify-between mt-2 text-xs text-neutral-600 font-mono">
-              <span>{reviewerProfile.tier}</span>
-              <span>
-                {formatCurrency(getTierRateCents(reviewerProfile.tier))}/review
-              </span>
-              <span>{currentTierProgress.next}</span>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          {/* Stats */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Card variant="soft">
+              <CardContent className="pt-6">
+                <p className="text-xs font-mono tracking-widest text-black/40 uppercase">reviews</p>
+                <p className="mt-2 text-3xl font-light tracking-tight">{reviewerProfile.totalReviews}</p>
+                <p className="mt-1 text-sm text-black/40">completed</p>
+              </CardContent>
+            </Card>
 
-      {/* Pending Reviews */}
-      <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <CardTitle>Tracks to Review</CardTitle>
+            <Card variant="soft">
+              <CardContent className="pt-6">
+                <p className="text-xs font-mono tracking-widest text-black/40 uppercase">rating</p>
+                <p className="mt-2 text-3xl font-light tracking-tight">{reviewerProfile.averageRating.toFixed(1)}</p>
+                <p className="mt-1 text-sm text-black/40">average</p>
+              </CardContent>
+            </Card>
+
+            <Card variant="soft">
+              <CardContent className="pt-6">
+                <p className="text-xs font-mono tracking-widest text-black/40 uppercase">queue</p>
+                <p className="mt-2 text-3xl font-light tracking-tight">{pendingReviews.length}</p>
+                <p className="mt-1 text-sm text-black/40">waiting</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Pending Reviews */}
           {pendingReviews.length > 0 && (
-            <Link href="/reviewer/queue">
-              <Button variant="ghost" size="sm" className="w-full sm:w-auto">
-                View All
-                <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
+            <Card variant="soft" elevated>
+              <CardContent className="pt-6">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="text-xs font-mono tracking-widest text-black/40 uppercase">tracks to listen</p>
+                  <Link href="/listener/queue" className="text-xs text-black/40 hover:text-black transition-colors">
+                    View all
+                  </Link>
+                </div>
+
+                <div className="mt-4 grid gap-3">
+                  {pendingReviews.slice(0, 3).map((review: any) => (
+                    <div
+                      key={review.id}
+                      className="flex items-center justify-between gap-3 rounded-2xl bg-white/60 border border-black/10 px-4 py-3"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-10 w-10 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
+                          <Headphones className="h-5 w-5 text-orange-600" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-black truncate">{review.track.title}</p>
+                          <GenreTagList
+                            genres={review.track.genres}
+                            variant="reviewer"
+                            size="sm"
+                            maxDisplay={2}
+                          />
+                        </div>
+                      </div>
+                      <Link href={`/listener/review/${review.id}`} className="flex-shrink-0">
+                        <Button variant="airyOutline" className="h-9 px-4">
+                          Listen
+                        </Button>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           )}
-        </CardHeader>
-        <CardContent>
-          {pendingReviews.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed border-black">
-              <div className="mx-auto w-12 h-12 bg-neutral-100 border-2 border-black flex items-center justify-center mb-4">
-                <Music className="h-6 w-6 text-black" />
-              </div>
-              <h3 className="font-bold text-black">No tracks to review</h3>
-              <p className="text-sm text-neutral-600 mt-1">
-                New tracks matching your genres will appear here
+
+          {pendingReviews.length === 0 && (
+            <Card variant="soft">
+              <CardContent className="pt-6">
+                <EmptyState
+                  doodle="headphones"
+                  title="No tracks to listen"
+                  description="New tracks matching your genres will appear here"
+                  className="py-8"
+                />
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        <div className="lg:col-span-5 space-y-4">
+          {/* Earnings Card */}
+          <Card variant="soft" elevated>
+            <CardContent className="pt-6">
+              <p className="text-xs font-mono tracking-widest text-black/40 uppercase">balance</p>
+              <p className="mt-2 text-3xl font-light tracking-tight">{formatCurrency(reviewerProfile.pendingBalance)}</p>
+              <p className="mt-1 text-sm text-black/40">
+                {formatCurrency(getTierRateCents(reviewerProfile.tier))}/review · {reviewerProfile.tier} tier
               </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {pendingReviews.map((review) => (
-                <Link
-                  key={review.id}
-                  href={`/reviewer/review/${review.id}`}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border-2 border-black hover:bg-neutral-50 transition-colors"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-10 w-10 bg-neutral-100 border-2 border-black flex items-center justify-center">
-                      <Music className="h-5 w-5 text-black" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-bold truncate">{review.track.title}</p>
-                      <GenreTagList
-                        genres={review.track.genres}
-                        variant="reviewer"
-                        size="sm"
-                        maxDisplay={2}
-                      />
-                    </div>
-                  </div>
-                  <Button size="sm" variant="primary" className="w-full sm:w-auto">
-                    Review
-                    <ArrowRight className="h-4 w-4 ml-1" />
+              <div className="mt-4">
+                <Link href="/listener/earnings">
+                  <Button variant="airyOutline" className="h-10 px-4">
+                    View earnings
                   </Button>
                 </Link>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Your Genres */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Genres</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <GenreTagList
-            genres={reviewerProfile.genres}
-            variant="reviewer"
-          />
-        </CardContent>
-      </Card>
+          {/* Tier Progress */}
+          {currentTierProgress.next && (
+            <Card variant="soft">
+              <CardContent className="pt-6">
+                <p className="text-xs font-mono tracking-widest text-black/40 uppercase">progress to {currentTierProgress.next}</p>
+                <div className="mt-3">
+                  <div className="w-full h-2 bg-black/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-orange-400 rounded-full transition-[width] duration-150 ease-out"
+                      style={{ width: `${currentTierProgress.progress}%` }}
+                    />
+                  </div>
+                  <p className="mt-2 text-sm text-black/50">
+                    {currentTierProgress.reviewsNeeded > 0
+                      ? `${currentTierProgress.reviewsNeeded} more reviews needed`
+                      : "Reviews complete!"}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Your Genres */}
+          <Card variant="soft">
+            <CardContent className="pt-6">
+              <p className="text-xs font-mono tracking-widest text-black/40 uppercase">your genres</p>
+              <div className="mt-3">
+                <GenreTagList
+                  genres={reviewerProfile.genres}
+                  variant="reviewer"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

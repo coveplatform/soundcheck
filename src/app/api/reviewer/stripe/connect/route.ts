@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const reviewer = await prisma.reviewerProfile.findUnique({
+    const reviewer = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
       select: {
         id: true,
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     let accountId = reviewer.stripeAccountId;
 
     if (reset && accountId) {
-      await prisma.reviewerProfile.update({
+      await prisma.listenerProfile.update({
         where: { id: reviewer.id },
         data: { stripeAccountId: null },
       });
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       if (!accountId) {
         const connectedAt = new Date();
         accountId = `bypass_${reviewer.id}`;
-        await prisma.reviewerProfile.update({
+        await prisma.listenerProfile.update({
           where: { id: reviewer.id },
           data: { stripeAccountId: accountId },
         });
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json({
-        url: `${baseUrl}/reviewer/earnings?stripe=bypass`,
+        url: `${baseUrl}/listener/earnings?stripe=bypass`,
         bypassed: true,
       });
     }
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
       accountId = account.id;
       const connectedAt = new Date();
 
-      await prisma.reviewerProfile.update({
+      await prisma.listenerProfile.update({
         where: { id: reviewer.id },
         data: { stripeAccountId: accountId },
       });
@@ -148,8 +148,8 @@ export async function POST(request: Request) {
     const stripe = getStripe();
     const link = await stripe.accountLinks.create({
       account: accountId,
-      refresh_url: `${baseUrl}/reviewer/earnings?stripe=refresh`,
-      return_url: `${baseUrl}/reviewer/earnings?stripe=return`,
+      refresh_url: `${baseUrl}/listener/earnings?stripe=refresh`,
+      return_url: `${baseUrl}/listener/earnings?stripe=return`,
       type: "account_onboarding",
     });
 

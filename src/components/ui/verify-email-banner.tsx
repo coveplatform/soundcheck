@@ -25,7 +25,7 @@ export function VerifyEmailBanner({
   if (!email || isVerified) return null;
 
   return (
-    <div className={className ?? "border-2 border-orange-400 bg-orange-50 p-4"}>
+    <div className={className ?? "rounded-3xl border border-orange-200 bg-orange-50/70 backdrop-blur-sm p-4"}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <p className="font-bold text-black">Verify your email to upload tracks</p>
@@ -38,8 +38,7 @@ export function VerifyEmailBanner({
         <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
           <Button
             type="button"
-            variant="outline"
-            className="border-2 border-black"
+            variant="airyOutline"
             isLoading={isSending}
             onClick={async () => {
               if (!email) return;

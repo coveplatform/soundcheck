@@ -152,7 +152,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const reviewerProfile = await prisma.reviewerProfile.findUnique({
+    const reviewerProfile = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
       select: { id: true, isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
     });
@@ -336,7 +336,7 @@ export async function POST(request: Request) {
         return { updated: false as const, reason: "UNKNOWN" as const };
       }
 
-      await tx.reviewerProfile.update({
+      await tx.listenerProfile.update({
         where: { id: review.reviewerId },
         data: {
           totalReviews: { increment: 1 },

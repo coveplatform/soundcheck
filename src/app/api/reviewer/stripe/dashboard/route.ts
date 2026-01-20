@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
     const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
 
-    const reviewer = await prisma.reviewerProfile.findUnique({
+    const reviewer = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
       select: {
         stripeAccountId: true,

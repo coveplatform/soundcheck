@@ -16,21 +16,34 @@ function redirectToLogin(request: NextRequest) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Add pathname header for layouts to detect current route
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", pathname);
+
   const isAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
   const isArtistPath = pathname === "/artist" || pathname.startsWith("/artist/");
   const isReviewerPath =
     pathname === "/reviewer" || pathname.startsWith("/reviewer/");
+  const isListenerPath =
+    pathname === "/listener" || pathname.startsWith("/listener/");
   const isAccountPath = pathname === "/account" || pathname.startsWith("/account/");
   const isApiAdminPath = pathname.startsWith("/api/admin/") || pathname === "/api/admin";
+
+  if (isReviewerPath) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.replace(/^\/reviewer/, "/listener");
+    return NextResponse.redirect(url);
+  }
 
   if (
     !isAdminPath &&
     !isArtistPath &&
     !isReviewerPath &&
+    !isListenerPath &&
     !isAccountPath &&
     !isApiAdminPath
   ) {
-    return NextResponse.next();
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   const token = await getToken({
@@ -55,7 +68,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
-    return NextResponse.next();
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   if (isArtistPath) {
@@ -72,40 +85,46 @@ export async function middleware(request: NextRequest) {
       if (hasArtistProfile) {
         return NextResponse.redirect(new URL("/artist/dashboard", request.url));
       }
-      return NextResponse.next();
+      return NextResponse.next({ request: { headers: requestHeaders } });
     }
 
     // Allow checkout flow through even without profile in JWT
     // (profile is created by API before redirect, but JWT not yet refreshed)
     if (isCheckoutFlow) {
-      return NextResponse.next();
+      return NextResponse.next({ request: { headers: requestHeaders } });
     }
 
     // No profile and not on onboarding? Redirect to onboarding to complete setup
     if (!hasArtistProfile) {
       return NextResponse.redirect(new URL("/artist/onboarding", request.url));
     }
-    return NextResponse.next();
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
-  if (isReviewerPath) {
-    const isReviewerOnboarding = pathname === "/reviewer/onboarding";
+  if (isListenerPath) {
+    const isListenerOnboarding = pathname === "/listener/onboarding";
     // Check for actual profile, not just the isReviewer flag
-    const hasReviewerProfile = Boolean(token.reviewerProfileId);
+    const tokenWithProfiles = token as unknown as {
+      listenerProfileId?: string;
+      reviewerProfileId?: string;
+    };
+    const hasListenerProfile = Boolean(
+      tokenWithProfiles.listenerProfileId ?? tokenWithProfiles.reviewerProfileId
+    );
 
-    if (isReviewerOnboarding) {
-      // Always allow access to onboarding so partially-onboarded reviewers
+    if (isListenerOnboarding) {
+      // Always allow access to onboarding so partially-onboarded listeners
       // (e.g. admin-enabled accounts) don't get stuck in a redirect loop.
-      return NextResponse.next();
+      return NextResponse.next({ request: { headers: requestHeaders } });
     }
     // No profile and not on onboarding? Redirect to onboarding to complete setup
-    if (!hasReviewerProfile) {
-      return NextResponse.redirect(new URL("/reviewer/onboarding", request.url));
+    if (!hasListenerProfile) {
+      return NextResponse.redirect(new URL("/listener/onboarding", request.url));
     }
-    return NextResponse.next();
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
-  return NextResponse.next();
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {
@@ -113,6 +132,7 @@ export const config = {
     "/admin/:path*",
     "/artist/:path*",
     "/reviewer/:path*",
+    "/listener/:path*",
     "/account/:path*",
     "/api/admin/:path*",
   ],

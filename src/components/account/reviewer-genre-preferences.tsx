@@ -69,7 +69,7 @@ export function ReviewerGenrePreferences({
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/reviewer/profile", {
+      const response = await fetch("/api/listener/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ genreIds: selectedGenres }),
@@ -99,7 +99,7 @@ export function ReviewerGenrePreferences({
       <CardHeader>
         <CardTitle className="text-lg">Genre Preferences</CardTitle>
         <CardDescription>
-          Select 3-5 genres you want to review. You&apos;ll be matched with tracks in these genres.
+          Select 3-5 genres you want to listen to. You&apos;ll be matched with tracks in these genres.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

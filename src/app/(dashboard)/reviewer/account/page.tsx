@@ -20,8 +20,8 @@ export default async function ReviewerAccountPage() {
     select: { name: true, email: true, password: true },
   });
 
-  // Get reviewer profile with genres
-  const reviewerProfile = await prisma.reviewerProfile.findUnique({
+  // Get listener profile with genres
+  const reviewerProfile = await prisma.listenerProfile.findUnique({
     where: { userId: session.user.id },
     select: { genres: { select: { id: true } } },
   });
@@ -30,17 +30,18 @@ export default async function ReviewerAccountPage() {
     redirect("/login");
   }
 
-  const initialGenreIds = reviewerProfile?.genres.map((g) => g.id) ?? [];
+  const initialGenreIds =
+    (reviewerProfile?.genres ?? []).map((g) => g.id);
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-black">Account settings</h1>
-      <p className="text-neutral-600 mt-1">Profile, security, and preferences</p>
+    <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12 max-w-2xl">
+      <div className="mb-10">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Account</h1>
+        <p className="mt-2 text-sm text-black/40">Profile, security, and preferences</p>
+      </div>
 
-      <div className="mt-6 space-y-4">
-        {/* Genre Preferences - Reviewer specific */}
+      <div className="space-y-6">
         <ReviewerGenrePreferences initialGenreIds={initialGenreIds} />
-
         <AccountSettingsClient
           initialName={dbUser.name ?? ""}
           email={dbUser.email}

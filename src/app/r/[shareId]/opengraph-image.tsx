@@ -6,7 +6,7 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 // Helper to generate star string
-function getStars(score: number): string {
+function _getStars(score: number): string {
   const full = Math.floor(score);
   const half = score % 1 >= 0.5 ? 1 : 0;
   const empty = 5 - full - half;

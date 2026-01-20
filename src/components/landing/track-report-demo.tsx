@@ -55,7 +55,7 @@ export function TrackReportDemo() {
   return (
     <div className="bg-white border border-neutral-200 shadow-sm">
       {/* Track Header with Waveform */}
-      <div className="bg-[#f7f7f5] border-b border-neutral-200 p-4 sm:p-5">
+      <div className="bg-[#faf8f5] border-b border-neutral-200 p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-3 sm:gap-4 sm:flex-shrink-0">
             <div className="relative w-12 h-12 sm:w-16 sm:h-16 bg-neutral-200 border border-neutral-200 flex-shrink-0 group cursor-pointer overflow-hidden">
@@ -77,25 +77,35 @@ export function TrackReportDemo() {
               <h4 className="font-extrabold text-neutral-950 text-sm sm:text-lg truncate">Midnight Drive</h4>
               <p className="text-xs sm:text-sm text-neutral-600">by <span className="text-neutral-950 font-semibold">You</span> • <span className="text-orange-700 font-semibold">Electronic</span></p>
             </div>
-            <div className="flex-shrink-0 bg-lime-100 border border-lime-200 px-2 sm:px-3 py-1 sm:py-1.5">
+            <div className="flex-shrink-0 bg-lime-100 border border-lime-200 px-2 sm:px-3 py-1 sm:py-1.5 text-center">
               <div className="text-lg sm:text-2xl font-extrabold text-lime-900 leading-none">20</div>
               <div className="text-[8px] sm:text-[10px] font-semibold text-lime-900/70 uppercase tracking-wide">Reviews</div>
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-[1px] sm:gap-[2px] h-8 sm:h-12 overflow-hidden">
+            <div className="flex items-end gap-[1px] h-8 sm:h-12 overflow-hidden">
               {[
-                15, 22, 18, 25, 20, 28, 24, 30, 26, 32,
-                30, 35, 38, 42, 48, 52, 58, 65, 72, 78,
-                95, 88, 92, 85, 98, 82, 95, 78, 92, 85, 98, 90, 85, 92, 88,
-                45, 52, 48, 55, 42, 50, 45, 52, 48, 40,
-                45, 55, 62, 70, 78, 85,
-                100, 92, 95, 88, 98, 85, 95, 90, 98, 92, 88, 95, 90, 85,
-                75, 65, 55, 48, 40, 32, 25, 18, 12, 8
+                // Intro - quiet, building
+                8, 12, 10, 15, 12, 18, 14, 20, 16, 22, 18, 25, 20, 28, 22, 30, 25, 32, 28, 35,
+                // Build up
+                30, 35, 32, 38, 35, 42, 38, 45, 42, 48, 45, 52, 48, 55, 52, 58, 55, 62, 58, 65,
+                62, 68, 65, 72, 68, 75, 72, 78, 75, 82,
+                // First drop - loud, punchy
+                95, 75, 92, 78, 98, 72, 95, 80, 100, 70, 95, 82, 98, 75, 92, 85, 95, 78, 100, 72,
+                92, 80, 95, 75, 98, 82, 92, 78, 95, 85, 98, 72, 95, 80, 92, 75, 98, 82, 95, 78,
+                // Breakdown - quieter
+                65, 55, 60, 50, 58, 48, 55, 45, 52, 42, 50, 40, 48, 38, 45, 35, 42, 38, 45, 42,
+                48, 45, 52, 48, 55, 52, 58, 55, 62, 58, 65, 62, 68, 65, 72, 68, 75, 72, 78, 75,
+                // Second drop - even louder
+                100, 78, 95, 82, 98, 75, 100, 85, 95, 72, 98, 80, 100, 75, 95, 85, 98, 78, 100, 72,
+                95, 82, 98, 78, 100, 85, 95, 75, 98, 82, 95, 80, 100, 75, 98, 82, 95, 78, 100, 85,
+                // Outro - fade out
+                88, 82, 85, 78, 82, 75, 78, 70, 75, 65, 70, 60, 65, 55, 60, 50, 55, 45, 50, 40,
+                45, 35, 40, 30, 35, 25, 30, 20, 25, 15, 20, 12, 15, 10, 12, 8, 10, 6, 8, 5
               ].map((height, i) => (
                 <div
                   key={i}
-                  className="flex-1 bg-neutral-300 rounded-sm"
+                  className="flex-1 min-w-[1px] bg-neutral-300 rounded-[1px]"
                   style={{ height: `${height}%` }}
                 />
               ))}
@@ -116,8 +126,8 @@ export function TrackReportDemo() {
             onClick={() => setActiveTab("analytics")}
             className={`flex-1 px-2 sm:px-4 py-2 sm:py-3 transition-colors rounded-t-lg relative border border-transparent ${
               activeTab === "analytics"
-                ? "bg-[#f7f7f5] text-neutral-950 border-neutral-200"
-                : "bg-white text-neutral-600 hover:bg-[#f7f7f5] hover:text-neutral-950"
+                ? "bg-[#faf8f5] text-neutral-950 border-neutral-200"
+                : "bg-white text-neutral-600 hover:bg-[#faf8f5] hover:text-neutral-950"
             }`}
           >
             {activeTab === "analytics" && (
@@ -148,8 +158,8 @@ export function TrackReportDemo() {
             onClick={() => setActiveTab("consensus")}
             className={`flex-1 px-2 sm:px-4 py-2 sm:py-3 transition-colors rounded-t-lg relative border border-transparent ${
               activeTab === "consensus"
-                ? "bg-[#f7f7f5] text-neutral-950 border-neutral-200"
-                : "bg-white text-neutral-600 hover:bg-[#f7f7f5] hover:text-neutral-950"
+                ? "bg-[#faf8f5] text-neutral-950 border-neutral-200"
+                : "bg-white text-neutral-600 hover:bg-[#faf8f5] hover:text-neutral-950"
             }`}
           >
             {activeTab === "consensus" && (
@@ -179,8 +189,8 @@ export function TrackReportDemo() {
             onClick={() => setActiveTab("reviews")}
             className={`flex-1 px-2 sm:px-4 py-2 sm:py-3 transition-colors rounded-t-lg relative border border-transparent ${
               activeTab === "reviews"
-                ? "bg-[#f7f7f5] text-neutral-950 border-neutral-200"
-                : "bg-white text-neutral-600 hover:bg-[#f7f7f5] hover:text-neutral-950"
+                ? "bg-[#faf8f5] text-neutral-950 border-neutral-200"
+                : "bg-white text-neutral-600 hover:bg-[#faf8f5] hover:text-neutral-950"
             }`}
           >
             {activeTab === "reviews" && (
@@ -232,7 +242,7 @@ export function TrackReportDemo() {
               {/* Rating Distribution - Bar Chart */}
               <div>
                 <h4 className="text-xs font-semibold text-neutral-500 mb-4 tracking-wider">RATING DISTRIBUTION</h4>
-                <div className="bg-[#f7f7f5] border border-neutral-200 p-4">
+                <div className="bg-[#faf8f5] border border-neutral-200 p-4">
                   <div className="space-y-2">
                     {[
                       { stars: 5, count: 8, percent: 40 },
@@ -368,13 +378,13 @@ export function TrackReportDemo() {
               </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
-                <div className="bg-[#f7f7f5] p-4 border border-neutral-200">
+                <div className="bg-[#faf8f5] p-4 border border-neutral-200">
                   <div className="text-xs font-semibold text-lime-700 mb-2">WHAT WORKED</div>
                   <p className="text-neutral-700 text-sm leading-relaxed">
                     The hook at <span className="font-mono text-neutral-950 bg-white border border-neutral-200 px-1 rounded text-xs">0:45</span> is instantly memorable — I caught myself humming it after.
                   </p>
                 </div>
-                <div className="bg-[#f7f7f5] p-4 border border-neutral-200">
+                <div className="bg-[#faf8f5] p-4 border border-neutral-200">
                   <div className="text-xs font-semibold text-orange-700 mb-2">TO IMPROVE</div>
                   <p className="text-neutral-700 text-sm leading-relaxed">
                     Intro feels too long — I&apos;d cut 8-12 seconds to get to the action faster.

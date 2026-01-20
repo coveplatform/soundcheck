@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Music, LayoutDashboard, Upload, Headphones, DollarSign, LogOut, User, Clock, ArrowRight, Menu, X, ChevronDown, Settings, LifeBuoy } from "lucide-react";
+import { Music, LayoutDashboard, Upload, Headphones, DollarSign, LogOut, User, Clock, ArrowRight, ChevronDown, Settings, LifeBuoy, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
@@ -20,7 +20,6 @@ interface DashboardNavProps {
 
 export function DashboardNav({ user }: DashboardNavProps) {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -39,35 +38,42 @@ export function DashboardNav({ user }: DashboardNavProps) {
   }, [userMenuOpen]);
 
   const artistLinks = [
-    { href: "/artist/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/artist/submit", label: "Submit Track", icon: Upload },
+    { href: "/artist/dashboard", label: "Home", icon: LayoutDashboard },
+    { href: "/artist/tracks", label: "Tracks", icon: Music },
+    { href: "/discover", label: "Discover", icon: Compass },
+    { href: "/artist/submit", label: "Upload", icon: Upload },
   ];
 
-  const reviewerLinks = [
-    { href: "/reviewer/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/reviewer/queue", label: "Review Queue", icon: Headphones },
-    { href: "/reviewer/history", label: "History", icon: Clock },
-    { href: "/reviewer/earnings", label: "Earnings", icon: DollarSign },
+  const listenerLinks = [
+    { href: "/listener/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/listener/queue", label: "Listening Queue", icon: Headphones },
+    { href: "/listener/history", label: "History", icon: Clock },
+    { href: "/listener/earnings", label: "Earnings", icon: DollarSign },
   ];
 
   const isArtistPath = pathname.startsWith("/artist");
-  const isReviewerPath = pathname.startsWith("/reviewer");
-  const isReviewerOnboarding = pathname === "/reviewer/onboarding";
+  const isListenerPath = pathname.startsWith("/listener");
+  const isLegacyReviewerPath = pathname.startsWith("/reviewer");
+  const isListenerOnboarding = pathname === "/listener/onboarding";
 
-  const currentSection = isArtistPath ? "artist" : isReviewerPath ? "reviewer" : null;
+  const currentSection = isArtistPath
+    ? "artist"
+    : isListenerPath || isLegacyReviewerPath
+      ? "listener"
+      : null;
 
-  // Don't show reviewer nav links if user isn't actually a reviewer (e.g., on onboarding)
+  // Don't show listener nav links if user isn't actually a reviewer (e.g., on onboarding)
   // Only show links if they have the corresponding role
   const links = isArtistPath
     ? artistLinks
-    : (isReviewerPath && user.isReviewer && !isReviewerOnboarding)
-      ? reviewerLinks
+    : ((isListenerPath || isLegacyReviewerPath) && user.isReviewer && !isListenerOnboarding)
+      ? listenerLinks
       : [];
 
   const accountHref = isArtistPath
     ? "/artist/account"
-    : isReviewerPath
-    ? "/reviewer/account"
+    : isListenerPath || isLegacyReviewerPath
+    ? "/listener/account"
     : "/account";
 
   const sectionConfig = {
@@ -78,12 +84,12 @@ export function DashboardNav({ user }: DashboardNavProps) {
       textColor: "text-black",
       icon: Music,
       switchTo: {
-        href: user.isReviewer ? "/reviewer/dashboard" : "/reviewer/onboarding",
-        label: user.isReviewer ? "Reviewer" : "Become Reviewer",
+        href: user.isReviewer ? "/listener/dashboard" : "/listener/onboarding",
+        label: user.isReviewer ? "Listener" : "Become Listener",
       },
     },
-    reviewer: {
-      label: "Reviewer",
+    listener: {
+      label: "Listener",
       color: "bg-orange-400",
       hoverColor: "hover:bg-orange-300",
       textColor: "text-black",
@@ -95,42 +101,96 @@ export function DashboardNav({ user }: DashboardNavProps) {
     },
   };
 
-  // Don't show section bar on reviewer onboarding if user isn't a reviewer
-  const showSectionBar = currentSection && !(isReviewerOnboarding && !user.isReviewer);
-  const config = showSectionBar ? sectionConfig[currentSection] : null;
+  // Don't show section bar on listener onboarding if user isn't a reviewer
+  const showShell = currentSection && !(isListenerOnboarding && !user.isReviewer);
+  const config = showShell ? sectionConfig[currentSection] : null;
+
+  const indexAccentClass =
+    isArtistPath ? "bg-lime-500" : isListenerPath || isLegacyReviewerPath ? "bg-orange-400" : "bg-black";
+
+  const primaryCtaHref = isArtistPath
+    ? "/artist/submit"
+    : isListenerPath || isLegacyReviewerPath
+    ? "/listener/queue"
+    : null;
+
+  const primaryCtaLabel =
+    isArtistPath
+      ? "Submit track"
+      : isListenerPath || isLegacyReviewerPath
+        ? "Listening queue"
+        : "Continue";
+
+  const mobileTabs = isArtistPath
+    ? [
+        { href: "/artist/dashboard", label: "Home", icon: LayoutDashboard },
+        { href: "/artist/tracks", label: "Tracks", icon: Music },
+        { href: "/discover", label: "Discover", icon: Compass },
+        { href: "/artist/submit", label: "Submit", icon: Upload },
+        { href: "/artist/reviewers", label: "Listeners", icon: Headphones },
+        { href: accountHref, label: "Account", icon: User },
+      ]
+    : isListenerPath || isLegacyReviewerPath
+    ? [
+        { href: "/listener/queue", label: "Queue", icon: Headphones },
+        { href: "/listener/dashboard", label: "Home", icon: LayoutDashboard },
+        { href: "/listener/history", label: "History", icon: Clock },
+        { href: "/listener/earnings", label: "Earnings", icon: DollarSign },
+        { href: accountHref, label: "Account", icon: User },
+      ]
+    : [];
 
   return (
-    <header className="sticky top-0 z-50">
-      {/* Top bar - Logo and user actions */}
-      <div className="bg-white border-b-2 border-black">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center justify-between h-14">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <Logo />
-            </Link>
+    <>
+      <header className="sticky top-0 z-50 bg-[#faf8f5]/92 backdrop-blur border-b border-black/10">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10">
+          <div className="h-20 flex items-center justify-between gap-6">
+            <div className="flex items-center gap-6 min-w-0">
+              <Link href="/" className="flex items-center gap-2">
+                <Logo />
+              </Link>
+              {config ? (
+                <span className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-black/50">
+                  <span className={cn("h-2 w-2 rounded-full", indexAccentClass)} />
+                  {config.label}
+                </span>
+              ) : null}
+            </div>
 
-            {/* User Menu */}
             <div className="flex items-center gap-3" ref={userMenuRef}>
+              {primaryCtaHref ? (
+                <Link href={primaryCtaHref} className="hidden sm:inline-flex">
+                  <Button size="sm" variant="primary">
+                    {primaryCtaLabel}
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </Link>
+              ) : null}
+
+              <div className="hidden md:flex flex-col items-end mr-3">
+                <p className="text-[10px] text-black/40 uppercase tracking-wider font-mono">Signed in as</p>
+                <p className="text-sm font-bold text-black truncate max-w-[200px]">{user.name || user.email}</p>
+              </div>
+
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setUserMenuOpen((v) => !v)}
-                  className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-2xl text-sm font-bold text-black/70 hover:bg-black/5 hover:text-black transition-colors duration-150 ease-out motion-reduce:transition-none"
                   aria-haspopup="menu"
                   aria-expanded={userMenuOpen}
                 >
-                  <User className="h-4 w-4 text-neutral-500" />
-                  <span className="hidden sm:inline">{user.name || user.email}</span>
-                  <ChevronDown className="h-4 w-4 text-neutral-500" />
+                  <User className="h-4 w-4 text-black/50" />
+                  <span className="md:hidden truncate max-w-[160px]">{user.name || user.email}</span>
+                  <ChevronDown className="h-4 w-4 text-black/50" />
                 </button>
 
                 {userMenuOpen ? (
                   <div
                     role="menu"
-                    className="absolute right-0 top-full mt-2 w-56 bg-white border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] z-50"
+                    className="absolute right-0 top-full mt-2 w-64 bg-white/95 backdrop-blur border border-black/10 shadow-[0_18px_60px_rgba(0,0,0,0.10)] z-50 rounded-2xl overflow-hidden"
                   >
-                    <div className="px-4 py-3 border-b-2 border-black">
+                    <div className="px-4 py-3 border-b border-black/10">
                       <p className="text-xs text-neutral-500 font-mono">Signed in as</p>
                       <p className="text-sm font-bold text-black truncate">{user.email}</p>
                     </div>
@@ -138,7 +198,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
                       <Link
                         href={accountHref}
                         onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-black border-2 border-transparent hover:border-black/20"
+                        className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-black rounded-xl hover:bg-black/5 transition-colors duration-150 ease-out motion-reduce:transition-none"
                         role="menuitem"
                       >
                         <Settings className="h-4 w-4" />
@@ -147,19 +207,31 @@ export function DashboardNav({ user }: DashboardNavProps) {
                       <Link
                         href="/support"
                         onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-black border-2 border-transparent hover:border-black/20"
+                        className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-black rounded-xl hover:bg-black/5 transition-colors duration-150 ease-out motion-reduce:transition-none"
                         role="menuitem"
                       >
                         <LifeBuoy className="h-4 w-4" />
                         Support
                       </Link>
+                      {config ? (
+                        <Link
+                          href={config.switchTo.href}
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center justify-between px-3 py-2 text-sm font-bold text-black rounded-xl hover:bg-black/5 transition-colors duration-150 ease-out motion-reduce:transition-none"
+                          role="menuitem"
+                        >
+                          <span>Switch to {config.switchTo.label}</span>
+                          <ArrowRight className="h-4 w-4" />
+                        </Link>
+                      ) : null}
+                      <div className="h-px bg-black/10 my-1" />
                       <button
                         type="button"
                         onClick={() => {
                           setUserMenuOpen(false);
                           signOut({ callbackUrl: "/" });
                         }}
-                        className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm font-bold text-black border-2 border-transparent hover:border-black/20"
+                        className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm font-bold text-black rounded-xl hover:bg-black/5 transition-colors duration-150 ease-out motion-reduce:transition-none"
                         role="menuitem"
                       >
                         <LogOut className="h-4 w-4" />
@@ -169,108 +241,85 @@ export function DashboardNav({ user }: DashboardNavProps) {
                   </div>
                 ) : null}
               </div>
-
-              {/* Mobile menu button */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 -mr-2"
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-5 w-5" />
-                ) : (
-                  <Menu className="h-5 w-5" />
-                )}
-              </button>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Section bar - Shows current section prominently */}
-      {config && (
-        <div className={cn("border-b-2 border-black", config.color)}>
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center justify-between h-12">
-              {/* Current section indicator */}
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <config.icon className="h-5 w-5" />
-                  <span className="font-black text-lg uppercase tracking-wide">
-                    {config.label}
-                  </span>
+      {links.length > 0 ? (
+        <aside className="hidden md:block fixed left-0 top-20 w-64 lg:w-72 px-6 lg:px-10 py-10">
+          <div className="space-y-6">
+            {config ? (
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-mono tracking-widest text-black/50 uppercase">
+                  index
                 </div>
-
-                {/* Page navigation - Desktop */}
-                <nav className="hidden md:flex items-center gap-1">
-                  {links.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={cn(
-                        "px-3 py-1.5 text-sm font-bold transition-all border-2",
-                        pathname === link.href
-                          ? "bg-black text-white border-black"
-                          : "border-transparent hover:border-black/20"
-                      )}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </nav>
-              </div>
-
-              {/* Switch section - Desktop */}
-              <Link
-                href={config.switchTo.href}
-                className="hidden md:flex items-center gap-1.5 text-sm font-medium opacity-70 hover:opacity-100 transition-opacity"
-              >
-                <span>{config.switchTo.label}</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b-2 border-black">
-          <div className="px-4 py-4 space-y-2">
-            {/* Page links */}
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 text-sm font-bold border-2 border-black",
-                  pathname === link.href
-                    ? "bg-black text-white"
-                    : "bg-white text-black"
-                )}
-              >
-                <link.icon className="h-4 w-4" />
-                {link.label}
-              </Link>
-            ))}
-
-            {/* Section switcher */}
-            {config && (
-              <>
-                <div className="border-t-2 border-black my-3" />
                 <Link
                   href={config.switchTo.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 text-sm font-medium text-neutral-600"
+                  className="text-xs font-bold text-black/50 hover:text-black transition-colors duration-150 ease-out motion-reduce:transition-none"
                 >
-                  <span>Switch to {config.switchTo.label}</span>
-                  <ArrowRight className="h-4 w-4" />
+                  Switch
                 </Link>
-              </>
-            )}
+              </div>
+            ) : null}
+
+            <nav className="space-y-3">
+              {links.map((link, idx) => {
+                const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "group flex items-baseline gap-3",
+                      "text-sm font-bold text-black/60 hover:text-black transition-colors duration-150 ease-out motion-reduce:transition-none"
+                    )}
+                  >
+                    <span className="w-10 text-xs font-mono text-black/35">{String(idx + 1).padStart(2, "0")}</span>
+                    <span className="relative">
+                      {link.label}
+                      {active ? (
+                        <span className={cn("absolute -left-4 top-1.5 h-2 w-2 rounded-full", indexAccentClass)} />
+                      ) : null}
+                    </span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        </aside>
+      ) : null}
+
+      {config && mobileTabs.length > 0 ? (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#faf8f5]/92 backdrop-blur border-t border-black/10">
+          <div className="max-w-6xl mx-auto px-2">
+            <nav
+              className={cn(
+                "grid gap-1 py-2",
+                mobileTabs.length === 4 ? "grid-cols-4" : mobileTabs.length === 5 ? "grid-cols-5" : "grid-cols-4"
+              )}
+            >
+              {mobileTabs.map((tab) => {
+                const active = pathname === tab.href;
+                const Icon = tab.icon;
+                return (
+                  <Link
+                    key={tab.href}
+                    href={tab.href}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-bold transition-colors duration-150 ease-out motion-reduce:transition-none",
+                      active ? "bg-black text-white" : "text-black/70 hover:bg-black/5"
+                    )}
+                  >
+                    <Icon className={cn("h-5 w-5", active ? "text-white" : "text-black/60")} />
+                    <span className="leading-none">{tab.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
           </div>
         </div>
-      )}
-    </header>
+      ) : null}
+    </>
   );
 }

@@ -153,7 +153,7 @@ function ScoreCircle({
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
-            className="transition-all duration-500"
+            className="transition-[stroke-dashoffset] duration-300 ease-out motion-reduce:transition-none"
           />
         </svg>
         {/* Center content */}
@@ -183,21 +183,21 @@ function ImpressionsBar({ impressions, total }: { impressions: { hook: number; d
       <div className="h-4 w-full rounded-full overflow-hidden flex bg-neutral-100">
         {hookPct > 0 && (
           <div
-            className="h-full bg-lime-500 transition-all"
+            className="h-full bg-lime-500 transition-[width] duration-300 ease-out motion-reduce:transition-none"
             style={{ width: `${hookPct}%` }}
             title={`Strong Hook: ${hookPct}%`}
           />
         )}
         {decentPct > 0 && (
           <div
-            className="h-full bg-amber-400 transition-all"
+            className="h-full bg-amber-400 transition-[width] duration-300 ease-out motion-reduce:transition-none"
             style={{ width: `${decentPct}%` }}
             title={`Decent: ${decentPct}%`}
           />
         )}
         {lostPct > 0 && (
           <div
-            className="h-full bg-neutral-300 transition-all"
+            className="h-full bg-neutral-300 transition-[width] duration-300 ease-out motion-reduce:transition-none"
             style={{ width: `${lostPct}%` }}
             title={`Lost Interest: ${lostPct}%`}
           />
@@ -238,7 +238,7 @@ function EngagementRow({
       <div className="flex items-center gap-2">
         <div className="w-24 h-2 bg-neutral-100 rounded-full overflow-hidden">
           <div
-            className="h-full bg-lime-500 rounded-full transition-all"
+            className="h-full bg-lime-500 rounded-full transition-[width] duration-300 ease-out motion-reduce:transition-none"
             style={{ width: `${percentage}%` }}
           />
         </div>
@@ -387,17 +387,17 @@ export function AggregateAnalytics({
   const topArtists = topFrequencies(artistsItems, 6);
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-neutral-900 to-neutral-800 text-white">
-        <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5" />
+    <Card variant="soft" elevated className="overflow-hidden rounded-3xl">
+      <CardHeader className="border-b border-black/10">
+        <div className="text-xs font-mono tracking-widest text-black/40 uppercase">
           Pattern Analytics
-        </CardTitle>
-        <p className="text-sm text-neutral-400 mt-1">
+        </div>
+        <CardTitle className="flex items-center gap-2 text-neutral-900 mt-2">
+          <Sparkles className="h-5 w-5 text-neutral-700" />
           Insights from {completed} review{completed === 1 ? "" : "s"}
-        </p>
+        </CardTitle>
       </CardHeader>
-      <CardContent className="p-6 space-y-8">
+      <CardContent className="p-6 sm:p-8 space-y-8">
         {/* Score Circles with Platform Comparison */}
         <div className="flex justify-center gap-8 sm:gap-12">
           <ScoreCircle

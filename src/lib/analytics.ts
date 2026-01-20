@@ -23,7 +23,7 @@ export function initAnalytics() {
         password: true,
       },
     },
-    loaded: (posthog) => {
+    loaded: (_posthog) => {
       if (process.env.NODE_ENV === "development") {
         // Uncomment to debug in dev:
         // posthog.debug();

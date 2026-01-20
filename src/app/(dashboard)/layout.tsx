@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import { DashboardNav } from "@/components/dashboard/nav";
 
 export default async function DashboardLayout({
   children,
@@ -14,10 +13,7 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  return (
-    <div className="min-h-screen bg-white">
-      <DashboardNav user={session.user} />
-      <main className="max-w-6xl mx-auto px-4 py-4 sm:py-8">{children}</main>
-    </div>
-  );
+  // Each section (artist, reviewer) has its own layout with nav and styling
+  // This parent layout just handles auth
+  return <>{children}</>;
 }

@@ -71,7 +71,7 @@ export async function POST(
     }
 
     // Verify new reviewer exists and isn't already assigned
-    const newReviewer = await prisma.reviewerProfile.findUnique({
+    const newReviewer = await prisma.listenerProfile.findUnique({
       where: { id: newReviewerId },
       include: { user: { select: { email: true } } },
     });

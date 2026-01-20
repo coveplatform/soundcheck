@@ -4,12 +4,16 @@ import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Music, Plus, Clock, CheckCircle, AlertCircle, Gift, CreditCard, DollarSign } from "lucide-react";
-import { GenreTagList } from "@/components/ui/genre-tag";
-import { VerifyEmailBanner } from "@/components/ui/verify-email-banner";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
+import {
+  SparklesDoodle,
+  StarDoodle,
+  SquiggleDoodle,
+  MusicDoodle,
+} from "@/components/dashboard/doodles";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function ArtistDashboardPage() {
   const session = await getServerSession(authOptions);
@@ -18,22 +22,23 @@ export default async function ArtistDashboardPage() {
     redirect("/login");
   }
 
-  // Check if artist has a profile
   const artistProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
     include: {
       tracks: {
         include: {
-          genres: true,
           reviews: {
             select: {
-              id: true,
               status: true,
+            },
+          },
+          purchases: {
+            select: {
+              amount: true,
             },
           },
         },
         orderBy: { createdAt: "desc" },
-        take: 10,
       },
     },
   });
@@ -42,269 +47,159 @@ export default async function ArtistDashboardPage() {
     redirect("/artist/onboarding");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { emailVerified: true },
-  });
+  const tracks = artistProfile.tracks;
+  const totalEarnings = artistProfile.totalEarnings / 100;
+  const pendingBalance = artistProfile.pendingBalance / 100;
 
-  // Calculate stats
-  const totalTracks = artistProfile.tracks.length;
-  const activeSubmissions = artistProfile.tracks.filter(
+  const uploadedOnly = tracks.filter(
+    (t) => (t.status as any) === "UPLOADED" || t.reviewsRequested === 0
+  );
+  const reviewing = tracks.filter(
     (t) => t.status === "QUEUED" || t.status === "IN_PROGRESS"
-  ).length;
-  const completedTracks = artistProfile.tracks.filter(
-    (t) => t.status === "COMPLETED"
-  ).length;
+  );
+
+  const newestUploadedOnly = uploadedOnly[0] ?? null;
+  const newestReviewing = reviewing[0] ?? null;
+
+  const nextAction = (() => {
+    if (tracks.length === 0) {
+      return {
+        title: "Upload your first track",
+        description: "Start building your library and request reviews from listeners.",
+        href: "/artist/submit",
+        cta: "Upload track",
+      };
+    }
+
+    if (newestUploadedOnly) {
+      return {
+        title: "Request reviews",
+        description: `Ready to get feedback on "${newestUploadedOnly.title}"?`,
+        href: `/artist/tracks/${newestUploadedOnly.id}/request-reviews`,
+        cta: "Request reviews",
+      };
+    }
+
+    if (newestReviewing) {
+      return {
+        title: "Reviews in progress",
+        description: `Check feedback for "${newestReviewing.title}".`,
+        href: `/artist/tracks/${newestReviewing.id}`,
+        cta: "View track",
+      };
+    }
+
+    return {
+      title: "Your tracks",
+      description: "Upload more tracks or explore what's already in your library.",
+      href: "/artist/tracks",
+      cta: "View tracks",
+    };
+  })();
 
   return (
-    <div className="space-y-6">
-      {!user?.emailVerified && (
-        <VerifyEmailBanner />
-      )}
+    <div className="pt-14 sm:pt-16 px-4 sm:px-6 lg:px-12 relative overflow-hidden">
+      {/* Doodles for personality */}
+      <SparklesDoodle className="pointer-events-none absolute top-20 right-10 w-16 h-16 text-yellow-400 opacity-40 rotate-12 hidden lg:block" />
+      <StarDoodle className="pointer-events-none absolute top-40 left-10 w-12 h-12 text-lime-500 opacity-60 -rotate-12 hidden lg:block" />
+      <MusicDoodle className="pointer-events-none absolute bottom-40 right-20 w-20 h-20 text-purple-400 opacity-30 rotate-6 hidden lg:block" />
+      <SquiggleDoodle className="pointer-events-none absolute top-1/2 left-1/4 w-24 h-24 text-orange-300 opacity-20 -rotate-12 hidden xl:block" />
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-black">Welcome back, {artistProfile.artistName}</h1>
-          <p className="text-neutral-600">Manage your tracks and view feedback</p>
+      <div className="max-w-4xl mx-auto relative z-10">
+        <div className="mb-10">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Dashboard</h1>
         </div>
-        <Link href="/artist/submit">
-          <Button variant="primary" className="w-full sm:w-auto">
-            <Plus className="h-4 w-4 mr-2" />
-            Submit Track
-          </Button>
-        </Link>
-      </div>
 
-      {/* Free Credit Banner */}
-      {artistProfile.freeReviewCredits > 0 && (
-        <Card className="bg-lime-100 border-lime-500">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
-                <Gift className="h-6 w-6 text-black" />
+        {/* Main Action Card - flowy and soft */}
+        <div className="mb-8 rounded-3xl border border-neutral-200 bg-gradient-to-br from-lime-50 via-yellow-50 to-orange-50 p-5 sm:p-8 shadow-lg relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-lime-400 rounded-full mb-4">
+                <span className="text-xs font-bold uppercase tracking-wider">Next Step</span>
               </div>
-              <div className="flex-1">
-                <p className="font-bold text-black">You have {artistProfile.freeReviewCredits} free review{artistProfile.freeReviewCredits > 1 ? "s" : ""}!</p>
-                <p className="text-sm text-neutral-700">
-                  Submit a track to use your free review credit.
-                </p>
+              <h2 className="text-2xl font-bold text-black">{nextAction.title}</h2>
+              <p className="mt-2 text-black/70">{nextAction.description}</p>
+              <div className="mt-6">
+                <Link href={nextAction.href}>
+                  <Button className="bg-lime-400 hover:bg-lime-300 text-black font-bold rounded-full shadow-md hover:shadow-lg transition-all h-12 px-6">
+                    {nextAction.cta}
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </Link>
               </div>
-              <Link href="/artist/submit">
-                <Button variant="primary" size="sm">
-                  Use Now
-                </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Grid - soft and flowy */}
+        <div className="grid gap-5 sm:grid-cols-3 mb-8">
+          <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-purple-50 to-pink-50 p-6 shadow-md">
+            <p className="text-xs font-medium text-black/50 uppercase tracking-wider">Tracks</p>
+            <p className="mt-3 text-4xl font-bold text-black">{tracks.length}</p>
+            <p className="text-sm text-black/50 mt-1">in your library</p>
+          </div>
+
+          <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-6 shadow-md">
+            <p className="text-xs font-medium text-black/50 uppercase tracking-wider">In Review</p>
+            <p className="mt-3 text-4xl font-bold text-black">{reviewing.length}</p>
+            <p className="text-sm text-black/50 mt-1">getting feedback</p>
+          </div>
+
+          <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-lime-50 to-yellow-50 p-6 shadow-md">
+            <p className="text-xs font-medium text-black/50 uppercase tracking-wider">Earnings</p>
+            <p className="mt-3 text-4xl font-bold text-lime-700">${totalEarnings.toFixed(2)}</p>
+            <p className="text-sm text-black/50 mt-1">lifetime total</p>
+          </div>
+        </div>
+
+        {/* Recent Tracks - soft and flowy */}
+        {tracks.length > 0 && (
+          <div className="rounded-3xl border border-neutral-200 bg-white p-8 shadow-lg">
+            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 mb-6">
+              <div>
+                <p className="text-xs font-medium text-black/50 uppercase tracking-wider">Recent Tracks</p>
+                <p className="text-lg font-bold text-black mt-1">Your latest uploads</p>
+              </div>
+              <Link href="/artist/tracks" className="text-sm text-black/60 hover:text-black font-medium transition-colors">
+                View all →
               </Link>
             </div>
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Stats */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-neutral-100 border-2 border-black flex items-center justify-center">
-                <Music className="h-6 w-6 text-black" />
-              </div>
-              <div>
-                <p className="text-3xl font-black">{totalTracks}</p>
-                <p className="text-sm text-neutral-600 font-medium">Total Tracks</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-orange-400 border-2 border-black flex items-center justify-center">
-                <Clock className="h-6 w-6 text-black" />
-              </div>
-              <div>
-                <p className="text-3xl font-black">{activeSubmissions}</p>
-                <p className="text-sm text-neutral-600 font-medium">In Progress</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-lime-500 border-2 border-black flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-black" />
-              </div>
-              <div>
-                <p className="text-3xl font-black">{completedTracks}</p>
-                <p className="text-sm text-neutral-600 font-medium">Completed</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-emerald-400 border-2 border-black flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-black" />
-              </div>
-              <div>
-                <p className="text-3xl font-black">${(artistProfile.totalEarnings / 100).toFixed(2)}</p>
-                <p className="text-sm text-neutral-600 font-medium">Track Sales</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Earnings Card - Show when there are earnings */}
-      {artistProfile.pendingBalance > 0 && (
-        <Card className="bg-emerald-50 border-emerald-500">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 bg-emerald-400 border-2 border-black flex items-center justify-center">
-                  <DollarSign className="h-6 w-6 text-black" />
-                </div>
-                <div>
-                  <p className="font-bold text-black">You have ${(artistProfile.pendingBalance / 100).toFixed(2)} from track sales</p>
-                  <p className="text-sm text-neutral-700">
-                    Reviewers purchased your tracks! Payout coming soon.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Track List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Tracks</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {artistProfile.tracks.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed border-black">
-              <div className="mx-auto w-12 h-12 bg-neutral-100 border-2 border-black flex items-center justify-center mb-4">
-                <Music className="h-6 w-6 text-black" />
-              </div>
-              <h3 className="font-bold text-black">No tracks yet</h3>
-              <p className="text-sm text-neutral-600 mt-1 mb-4">
-                Submit your first track to get feedback
-              </p>
-              <Link href="/artist/submit">
-                <Button variant="primary">Submit Your First Track</Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="divide-y-2 divide-black border-t-2 border-black">
-              {artistProfile.tracks.map((track) => {
-                const completedReviews = track.reviews.filter(
-                  (r) => r.status === "COMPLETED"
-                ).length;
-                const progress = Math.round(
-                  (completedReviews / track.reviewsRequested) * 100
-                );
+            <div className="space-y-3">
+              {tracks.slice(0, 3).map((t) => {
+                const cta = (t.status as any) === "UPLOADED" || t.reviewsRequested === 0
+                  ? {
+                      href: `/artist/tracks/${t.id}/request-reviews`,
+                      label: "Request reviews",
+                    }
+                  : {
+                      href: `/artist/tracks/${t.id}`,
+                      label: "View",
+                    };
 
                 return (
-                  <Link
-                    key={track.id}
-                    href={`/artist/tracks/${track.id}`}
-                    className="block py-4 hover:bg-neutral-50 -mx-4 px-4 sm:-mx-6 sm:px-6 transition-colors"
+                  <div
+                    key={t.id}
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl bg-gradient-to-r from-neutral-50 to-white border border-neutral-200 px-5 py-4 hover:shadow-md transition-all"
                   >
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="h-10 w-10 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
-                          <Music className="h-5 w-5 text-black" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-bold truncate">{track.title}</p>
-                          <GenreTagList
-                            genres={track.genres}
-                            variant="artist"
-                            size="sm"
-                            maxDisplay={2}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4 flex-shrink-0">
-                        {/* Action for pending payment */}
-                        {track.status === "PENDING_PAYMENT" && (
-                          <Link href={`/artist/submit/checkout?trackId=${track.id}`}>
-                            <Button size="sm" variant="outline" className="hidden sm:flex border-orange-400 text-orange-600 hover:bg-orange-50 hover:text-orange-700">
-                              <CreditCard className="h-3.5 w-3.5 mr-1.5" />
-                              Pay Now
-                            </Button>
-                          </Link>
-                        )}
-
-                        {/* Progress */}
-                        <div className="text-right hidden sm:block">
-                          <p className="text-sm font-bold">
-                            {completedReviews}/{track.reviewsRequested} reviews
-                          </p>
-                          <div className="w-24 h-2 bg-neutral-200 border border-black mt-1">
-                            <div
-                              className="h-full bg-lime-500"
-                              style={{ width: `${progress}%` }}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Status Badge */}
-                        <StatusBadge status={track.status} />
-                      </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-black truncate">{t.title}</p>
+                      <p className="text-xs text-black/50 font-medium">
+                        {(t.status as any) === "UPLOADED" ? "Ready to request reviews" : t.status.replaceAll("_", " ").toLowerCase()}
+                      </p>
                     </div>
-                  </Link>
+                    <Link href={cta.href} className="w-full sm:w-auto flex-shrink-0">
+                      <Button className="h-9 px-4 bg-black hover:bg-black/90 text-white font-bold rounded-full w-full sm:w-auto">
+                        {cta.label}
+                      </Button>
+                    </Link>
+                  </div>
                 );
               })}
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        )}
+      </div>
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const configs = {
-    PENDING_PAYMENT: {
-      label: "Pending Payment",
-      className: "bg-orange-400 text-black border-black",
-      icon: AlertCircle,
-    },
-    QUEUED: {
-      label: "Queued",
-      className: "bg-blue-400 text-black border-black",
-      icon: Clock,
-    },
-    IN_PROGRESS: {
-      label: "In Progress",
-      className: "bg-purple-400 text-black border-black",
-      icon: Clock,
-    },
-    COMPLETED: {
-      label: "Completed",
-      className: "bg-lime-500 text-black border-black",
-      icon: CheckCircle,
-    },
-    CANCELLED: {
-      label: "Cancelled",
-      className: "bg-neutral-200 text-black border-black",
-      icon: AlertCircle,
-    },
-  };
-
-  const config = configs[status as keyof typeof configs] || configs.QUEUED;
-  const Icon = config.icon;
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1 px-2.5 py-1 border-2 text-xs font-bold ${config.className}`}
-    >
-      <Icon className="h-3 w-3" />
-      {config.label}
-    </span>
   );
 }

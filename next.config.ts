@@ -7,6 +7,23 @@ const nextConfig: NextConfig = {
     turbopackFileSystemCacheForDev: false,
     viewTransition: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+        pathname: "/vi/**",
+      },
+      {
+        protocol: "https",
+        hostname: "i1.sndcdn.com",
+      },
+      {
+        protocol: "https",
+        hostname: "f4.bcbits.com",
+      },
+    ],
+  },
   async rewrites() {
     return [
       {

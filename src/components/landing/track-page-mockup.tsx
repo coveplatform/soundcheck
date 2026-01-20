@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, Share2, Heart } from "lucide-react";
+import { Play, Share2 } from "lucide-react";
 import { useState } from "react";
 
 export function TrackPageMockup() {
@@ -65,7 +65,7 @@ export function TrackPageMockup() {
         </div>
 
         {/* Share Section */}
-        <div className="mt-6 p-4 bg-white rounded-xl border border-neutral-200">
+        <div className="mt-6 p-4 bg-[#faf8f5] rounded-xl border border-neutral-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-neutral-950">Share this track</p>

@@ -25,7 +25,7 @@ export async function POST(
     const body = await request.json();
     const { isRestricted } = schema.parse(body);
 
-    const reviewer = await prisma.reviewerProfile.update({
+    const reviewer = await prisma.listenerProfile.update({
       where: { id },
       data: { isRestricted },
       select: { id: true, isRestricted: true },

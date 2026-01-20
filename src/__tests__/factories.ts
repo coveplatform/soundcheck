@@ -7,13 +7,16 @@ import type { ReviewerTier } from '@prisma/client'
 import type {
   User,
   ArtistProfile,
-  ReviewerProfile,
+  ListenerProfile,
   Track,
   Review,
   Genre,
   Payment,
   ReviewQueue,
 } from '@prisma/client'
+
+// Alias for backwards compatibility in tests
+type ReviewerProfile = ListenerProfile;
 
 let idCounter = 0
 const generateId = () => `test-id-${++idCounter}`
@@ -49,7 +52,6 @@ export function createMockArtistProfile(
     totalEarnings: 0,
     stripeAccountId: null,
     stripeConnectedAt: null,
-    freeReviewCredits: 1,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
@@ -106,6 +108,7 @@ export function createMockTrack(overrides: Partial<Track> = {}): Track {
     duration: 180,
     bpm: null,
     feedbackFocus: null,
+    isPublic: false,
     allowPurchase: false,
     status: 'QUEUED',
     packageType: 'STANDARD',
@@ -117,7 +120,7 @@ export function createMockTrack(overrides: Partial<Track> = {}): Track {
     completedAt: null,
     linkIssueNotifiedAt: null,
     ...overrides,
-  }
+  } as any
 }
 
 export function createMockReview(overrides: Partial<Review> = {}): Review {

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Track" ADD COLUMN IF NOT EXISTS "isPublic" BOOLEAN NOT NULL DEFAULT false;

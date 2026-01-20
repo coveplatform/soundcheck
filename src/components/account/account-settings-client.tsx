@@ -15,12 +15,20 @@ export function AccountSettingsClient({
   isArtist,
   isReviewer,
   hasPassword,
+  subscription,
 }: {
   initialName: string;
   email: string;
   isArtist: boolean;
   isReviewer: boolean;
   hasPassword: boolean;
+  subscription: {
+    status: string | null;
+    tier: string | null;
+    currentPeriodEnd: Date | null;
+    canceledAt: Date | null;
+    totalTracks: number;
+  } | null;
 }) {
   const router = useRouter();
 
@@ -116,8 +124,85 @@ export function AccountSettingsClient({
     }
   }
 
+  const isSubscribed = subscription?.status === "active";
+  const hasFreeTrial = !isSubscribed && (subscription?.totalTracks || 0) < 1;
+
   return (
     <div className="space-y-4">
+      {/* Subscription Card */}
+      {isArtist && subscription && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Subscription</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {isSubscribed ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-black">MixReflect Pro</p>
+                    <p className="text-xs text-black/50">$9.95/month</p>
+                  </div>
+                  <div className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
+                    Active
+                  </div>
+                </div>
+                <div className="text-sm text-black/60">
+                  {subscription.canceledAt ? (
+                    <p>
+                      Your subscription will end on{" "}
+                      {new Date(subscription.currentPeriodEnd!).toLocaleDateString()}
+                    </p>
+                  ) : (
+                    <p>
+                      Next billing date:{" "}
+                      {new Date(subscription.currentPeriodEnd!).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch("/api/subscriptions/portal", {
+                        method: "POST",
+                      });
+                      const data = await res.json();
+                      if (data.url) {
+                        window.location.href = data.url;
+                      }
+                    } catch (error) {
+                      console.error("Portal error:", error);
+                    }
+                  }}
+                >
+                  Manage Subscription
+                </Button>
+              </>
+            ) : (
+              <>
+                <div className="text-sm text-black/60">
+                  {hasFreeTrial ? (
+                    <p>
+                      You're on the free trial. You can upload 1 track for free.
+                    </p>
+                  ) : (
+                    <p>
+                      Subscribe to upload unlimited tracks and request reviews.
+                    </p>
+                  )}
+                </div>
+                <Link href="/artist/submit">
+                  <Button variant="primary">
+                    {hasFreeTrial ? "Upload Your Free Track" : "Subscribe Now"}
+                  </Button>
+                </Link>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Profile</CardTitle>

@@ -50,7 +50,9 @@
       "Bash(timeout 12 npx next:*)",
       "Bash(npx eslint:*)",
       "Bash(node reset-reminders.js:*)",
-      "WebFetch(domain:fonts.google.com)"
+      "WebFetch(domain:fonts.google.com)",
+      "Bash(npm run dev:*)",
+      "Bash(psql:*)"
     ]
   }
 }

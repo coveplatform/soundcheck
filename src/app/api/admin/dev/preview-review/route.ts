@@ -57,7 +57,7 @@ export async function POST() {
       data: { isReviewer: true },
     });
 
-    const reviewerProfile = await prisma.reviewerProfile.upsert({
+    const reviewerProfile = await prisma.listenerProfile.upsert({
       where: { userId: adminUserId },
       update: {},
       create: {

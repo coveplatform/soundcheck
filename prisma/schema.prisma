@@ -32,7 +32,7 @@ model User {
 
   // Relations
   artistProfile   ArtistProfile?
-  reviewerProfile ReviewerProfile?
+  listenerProfile ListenerProfile?
   accounts        Account[]
   sessions        Session[]
 
@@ -125,12 +125,17 @@ model ArtistProfile {
   pendingBalance Int @default(0) // in cents, available to withdraw
   totalEarnings  Int @default(0) // in cents, lifetime earnings
 
+  // Subscription (for unlimited uploads)
+  stripeCustomerId        String?   // Stripe customer ID for subscriptions
+  subscriptionStatus      String?   // active, canceled, past_due, etc.
+  subscriptionId          String?   // Stripe subscription ID
+  subscriptionTier        String?   // pro (for now just one tier)
+  subscriptionCurrentPeriodEnd DateTime? // When current period ends
+  subscriptionCanceledAt  DateTime? // When they canceled (still active until period end)
+
   // Stripe Connect for payouts
   stripeAccountId   String?   @unique
   stripeConnectedAt DateTime?
-
-  // Free review credits (new users get 1)
-  freeReviewCredits Int @default(1)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -138,7 +143,7 @@ model ArtistProfile {
   tracks Track[]
 }
 
-model ReviewerProfile {
+model ListenerProfile {
   id     String @id @default(cuid())
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -185,9 +190,14 @@ model ReviewerProfile {
   reviews      Review[]
   queueEntries ReviewQueue[]
   payouts      Payout[]
-  purchases    Purchase[]
+  purchases    Purchase[] @relation("PurchasesByReviewer")
+
+  // Affiliate system
+  referralPurchases Purchase[] @relation("ReferralPurchases")
+  affiliateEarnings Int        @default(0) // cents earned from referrals
 
   @@index([lastReviewDate])
+  @@map("ReviewerProfile")
 }
 
 enum ReviewerTier {
@@ -205,7 +215,7 @@ model Genre {
   slug String @unique
 
   artistProfiles   ArtistProfile[]   @relation("ArtistGenres")
-  reviewerProfiles ReviewerProfile[] @relation("ReviewerGenres")
+  listenerProfiles ListenerProfile[] @relation("ReviewerGenres")
   tracks           Track[]           @relation("TrackGenres")
 }
 
@@ -232,6 +242,9 @@ model Track {
   // Optional guidance
   feedbackFocus String? // "Looking for feedback on the mix" etc.
 
+  // Visibility
+  isPublic Boolean @default(false)
+
   // Purchase settings (only for UPLOAD tracks)
   allowPurchase Boolean @default(false) // Artist opt-in to allow reviewers to buy
 
@@ -252,6 +265,19 @@ model Track {
   completedAt         DateTime?
   linkIssueNotifiedAt DateTime? // When admin notified artist about broken link
 
+  // View tracking
+  viewCount    Int       @default(0) // Total views for public tracks
+  lastViewedAt DateTime? // When track was last viewed
+
+  // Stem support
+  hasStems Boolean @default(false)
+  stems    TrackStem[]
+
+  // Ableton project support
+  abletonProjectUrl    String? // S3 URL to uploaded project ZIP
+  abletonProjectData   Json?   // Parsed project metadata (tempo, tracks, plugins, etc.)
+  abletonRenderStatus  AbletonRenderStatus? // Status of cloud rendering
+
   // Relations
   payment      Payment?
   reviews      Review[]
@@ -261,6 +287,14 @@ model Track {
   @@index([status, createdAt])
   @@index([artistId])
   @@index([paidAt])
+  @@index([abletonRenderStatus])
+}
+
+enum AbletonRenderStatus {
+  PENDING     // Project uploaded, waiting to render
+  RENDERING   // Cloud instance is rendering stems
+  COMPLETED   // Stems rendered and stored
+  FAILED      // Rendering failed
 }
 
 enum TrackSource {
@@ -271,6 +305,7 @@ enum TrackSource {
 }
 
 enum TrackStatus {
+  UPLOADED
   PENDING_PAYMENT
   QUEUED      // Paid, waiting for reviewers
   IN_PROGRESS // Some reviews complete
@@ -286,6 +321,45 @@ enum PackageType {
 }
 
 // ─────────────────────────────────────────────────────────────
+// TRACK STEMS
+// ─────────────────────────────────────────────────────────────
+
+model TrackStem {
+  id       String   @id @default(cuid())
+  trackId  String
+  track    Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  // Storage
+  stemUrl  String // S3 URL or local path
+
+  // Metadata
+  stemType StemType
+  label    String   // User-provided name (e.g., "Lead Vocals", "Kick Drum")
+  order    Int      // Display order in mixer (0 = first)
+  duration Int?     // Seconds (for validation)
+
+  // Processing metadata (optional, for future features)
+  waveformData Json? // Pre-computed waveform peaks
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([trackId, order])
+  @@index([trackId])
+}
+
+enum StemType {
+  MASTER  // Full mix (always present for stem uploads)
+  DRUMS   // All percussion
+  BASS    // Bass instruments
+  SYNTHS  // Synthesizers, keys
+  VOCALS  // All vocals (lead + backing)
+  MELODY  // Melodic instruments (guitar, piano, etc.)
+  FX      // Effects, atmospheres
+  OTHER   // Custom/other
+}
+
+// ─────────────────────────────────────────────────────────────
 // REVIEWS
 // ─────────────────────────────────────────────────────────────
 
@@ -294,7 +368,7 @@ model Review {
   trackId    String
   track      Track           @relation(fields: [trackId], references: [id], onDelete: Cascade)
   reviewerId String
-  reviewer   ReviewerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewer   ListenerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
 
   status ReviewStatus @default(ASSIGNED)
 
@@ -463,7 +537,7 @@ enum PaymentStatus {
 model Payout {
   id         String          @id @default(cuid())
   reviewerId String
-  reviewer   ReviewerProfile @relation(fields: [reviewerId], references: [id])
+  reviewer   ListenerProfile @relation(fields: [reviewerId], references: [id])
 
   amount Int          // cents
   method PayoutMethod
@@ -495,14 +569,21 @@ model Purchase {
   trackId    String
   track      Track           @relation(fields: [trackId], references: [id], onDelete: Cascade)
   reviewerId String
-  reviewer   ReviewerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewer   ListenerProfile @relation("PurchasesByReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
 
   amount    Int      // cents (50 = $0.50)
   createdAt DateTime @default(now())
 
+  // Referral tracking for affiliate commission
+  referredByReviewerId String?
+  referredBy           ListenerProfile? @relation("ReferralPurchases", fields: [referredByReviewerId], references: [id], onDelete: SetNull)
+  referralShareId      String?
+  commissionPaid       Int              @default(0) // cents paid as commission
+
   @@unique([trackId, reviewerId]) // One purchase per reviewer per track
   @@index([reviewerId])
   @@index([trackId])
+  @@index([referredByReviewerId])
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -510,11 +591,11 @@ model Purchase {
 // ─────────────────────────────────────────────────────────────
 
 model ReviewQueue {
-  id         String          @id @default(cuid())
-  trackId    String
-  track      Track           @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  id        String @id @default(cuid())
+  trackId   String
+  track     Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
   reviewerId String
-  reviewer   ReviewerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewer   ListenerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
 
   priority   Int      @default(0) // Higher = more urgent
   assignedAt DateTime @default(now())

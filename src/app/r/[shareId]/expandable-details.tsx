@@ -53,7 +53,7 @@ export function ExpandableDetails({
   productionScore,
   originalityScore,
   vocalScore,
-  bestPart,
+  bestPart: _bestPart,
   weakestPart,
   nextActions,
   perceivedGenre,

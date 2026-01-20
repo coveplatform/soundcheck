@@ -7,7 +7,7 @@ interface BrowserMockupProps {
 
 export function BrowserMockup({ url, children }: BrowserMockupProps) {
   return (
-    <div className="rounded-2xl overflow-hidden shadow-xl shadow-neutral-300/50 border border-neutral-200/80 bg-white">
+    <div className="rounded-2xl overflow-hidden shadow-xl shadow-neutral-300/50 border border-neutral-200/80 bg-white transition-transform transition-shadow duration-150 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-neutral-400/40 motion-reduce:transition-none motion-reduce:transform-none">
       {/* Browser Chrome */}
       <div className="bg-gradient-to-b from-neutral-100 to-neutral-50 border-b border-neutral-200 px-4 py-3 flex items-center gap-3">
         {/* Traffic lights */}
@@ -29,7 +29,7 @@ export function BrowserMockup({ url, children }: BrowserMockupProps) {
       </div>
 
       {/* Content */}
-      <div className="bg-[#f7f7f5]">
+      <div className="bg-[#faf8f5]">
         {children}
       </div>
     </div>

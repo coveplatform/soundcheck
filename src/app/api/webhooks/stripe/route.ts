@@ -64,13 +64,30 @@ export async function POST(request: Request) {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
-      await handleCheckoutComplete(session);
+      // Handle both subscription and one-time payments
+      if (session.mode === "subscription") {
+        await handleSubscriptionCheckoutComplete(session);
+      } else {
+        await handleCheckoutComplete(session);
+      }
       break;
     }
 
     case "checkout.session.expired": {
       const session = event.data.object as Stripe.Checkout.Session;
       await handleCheckoutExpired(session);
+      break;
+    }
+
+    case "customer.subscription.updated": {
+      const subscription = event.data.object as Stripe.Subscription;
+      await handleSubscriptionUpdated(subscription);
+      break;
+    }
+
+    case "customer.subscription.deleted": {
+      const subscription = event.data.object as Stripe.Subscription;
+      await handleSubscriptionDeleted(subscription);
       break;
     }
 
@@ -160,5 +177,87 @@ async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
     });
   } catch (error) {
     console.error("Error handling checkout expired:", error);
+  }
+}
+
+async function handleSubscriptionCheckoutComplete(session: Stripe.Checkout.Session) {
+  try {
+    const artistProfileId = session.metadata?.artistProfileId;
+    const subscription = session.subscription as string;
+
+    if (!artistProfileId || !subscription) {
+      console.error("Missing artistProfileId or subscription in session metadata");
+      return;
+    }
+
+    const stripe = getStripe();
+    const subscriptionData = await stripe.subscriptions.retrieve(subscription);
+
+    await prisma.artistProfile.update({
+      where: { id: artistProfileId },
+      data: {
+        subscriptionId: subscriptionData.id,
+        subscriptionStatus: subscriptionData.status,
+        subscriptionTier: "pro",
+        subscriptionCurrentPeriodEnd: new Date(subscriptionData.current_period_end * 1000),
+      },
+    });
+
+    console.log(`Subscription activated for artist profile: ${artistProfileId}`);
+  } catch (error) {
+    console.error("Error handling subscription checkout complete:", error);
+  }
+}
+
+async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+  try {
+    const artistProfile = await prisma.artistProfile.findFirst({
+      where: { subscriptionId: subscription.id },
+    });
+
+    if (!artistProfile) {
+      console.error(`Artist profile not found for subscription: ${subscription.id}`);
+      return;
+    }
+
+    await prisma.artistProfile.update({
+      where: { id: artistProfile.id },
+      data: {
+        subscriptionStatus: subscription.status,
+        subscriptionCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        subscriptionCanceledAt: subscription.canceled_at
+          ? new Date(subscription.canceled_at * 1000)
+          : null,
+      },
+    });
+
+    console.log(`Subscription updated for artist profile: ${artistProfile.id}`);
+  } catch (error) {
+    console.error("Error handling subscription updated:", error);
+  }
+}
+
+async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+  try {
+    const artistProfile = await prisma.artistProfile.findFirst({
+      where: { subscriptionId: subscription.id },
+    });
+
+    if (!artistProfile) {
+      console.error(`Artist profile not found for subscription: ${subscription.id}`);
+      return;
+    }
+
+    await prisma.artistProfile.update({
+      where: { id: artistProfile.id },
+      data: {
+        subscriptionStatus: "canceled",
+        subscriptionCanceledAt: new Date(),
+      },
+    });
+
+    console.log(`Subscription deleted for artist profile: ${artistProfile.id}`);
+  } catch (error) {
+    console.error("Error handling subscription deleted:", error);
   }
 }

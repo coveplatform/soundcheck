@@ -95,7 +95,7 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
             onClick={goToPrev}
             disabled={currentIndex === 0}
             className={cn(
-              "h-10 w-10 flex items-center justify-center border-2 border-black transition-all",
+              "h-10 w-10 flex items-center justify-center border-2 border-black transition-colors duration-150 ease-out motion-reduce:transition-none",
               currentIndex === 0
                 ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
                 : "bg-white hover:bg-black hover:text-white"
@@ -108,7 +108,7 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
             onClick={goToNext}
             disabled={currentIndex === totalReviews - 1}
             className={cn(
-              "h-10 w-10 flex items-center justify-center border-2 border-black transition-all",
+              "h-10 w-10 flex items-center justify-center border-2 border-black transition-colors duration-150 ease-out motion-reduce:transition-none",
               currentIndex === totalReviews - 1
                 ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
                 : "bg-white hover:bg-black hover:text-white"
@@ -124,7 +124,7 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
       <div className="relative overflow-hidden">
         <div
           className={cn(
-            "transition-all duration-300 ease-out",
+            "transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
             isAnimating && direction === "right" && "animate-slide-in-right",
             isAnimating && direction === "left" && "animate-slide-in-left"
           )}
@@ -145,7 +145,7 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
             key={index}
             onClick={() => goToIndex(index)}
             className={cn(
-              "h-2 rounded-full transition-all duration-200",
+              "h-2 rounded-full transition-[width,background-color] duration-150 ease-out motion-reduce:transition-none",
               index === currentIndex
                 ? "w-6 bg-black"
                 : "w-2 bg-neutral-300 hover:bg-neutral-400"

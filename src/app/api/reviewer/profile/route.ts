@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     const { genreIds, country } = createProfileSchema.parse(body);
 
     // Check if profile already exists
-    const existingProfile = await prisma.reviewerProfile.findUnique({
+    const existingProfile = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
     });
 
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
 
     if (existingProfile) {
       // Update existing profile
-      const profile = await prisma.reviewerProfile.update({
+      const profile = await prisma.listenerProfile.update({
         where: { userId: session.user.id },
         data: {
           genres: {
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     }
 
     // Create new profile
-    const profile = await prisma.reviewerProfile.create({
+    const profile = await prisma.listenerProfile.create({
       data: {
         userId: session.user.id,
         genres: {
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Error creating reviewer profile:", error);
+    console.error("Error creating listener profile:", error);
     return NextResponse.json(
       { error: "Failed to create profile" },
       { status: 500 }
@@ -125,7 +125,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const profile = await prisma.reviewerProfile.findUnique({
+    const profile = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
       include: { genres: true },
     });
@@ -136,7 +136,7 @@ export async function GET() {
 
     return NextResponse.json(profile);
   } catch (error) {
-    console.error("Error fetching reviewer profile:", error);
+    console.error("Error fetching listener profile:", error);
     return NextResponse.json(
       { error: "Failed to fetch profile" },
       { status: 500 }
@@ -155,7 +155,7 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { completedOnboarding, quizAnswers, country } = patchProfileSchema.parse(body);
 
-    let profile = await prisma.reviewerProfile.findUnique({
+    let profile = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
       include: { genres: true },
     });
@@ -169,7 +169,7 @@ export async function PATCH(request: Request) {
         );
       }
 
-      profile = await prisma.reviewerProfile.create({
+      profile = await prisma.listenerProfile.create({
         data: {
           userId: session.user.id,
         },
@@ -186,7 +186,7 @@ export async function PATCH(request: Request) {
       const score = scoreQuiz(quizAnswers);
       const passed = score >= 3;
 
-      const updated = await prisma.reviewerProfile.update({
+      const updated = await prisma.listenerProfile.update({
         where: { id: profile.id },
         data: {
           onboardingQuizScore: score,
@@ -226,7 +226,7 @@ export async function PATCH(request: Request) {
       }
     }
 
-    const updated = await prisma.reviewerProfile.update({
+    const updated = await prisma.listenerProfile.update({
       where: { id: profile.id },
       data: {
         completedOnboarding: completedOnboarding ?? undefined,
@@ -242,7 +242,7 @@ export async function PATCH(request: Request) {
         { status: 400 }
       );
     }
-    console.error("Error updating reviewer profile:", error);
+    console.error("Error updating listener profile:", error);
     return NextResponse.json(
       { error: "Failed to update profile" },
       { status: 500 }

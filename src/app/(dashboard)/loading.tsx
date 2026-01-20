@@ -2,7 +2,7 @@ import { Skeleton, SkeletonStatCard, SkeletonTrackRow } from "@/components/ui/sk
 
 export default function DashboardLoading() {
   return (
-    <div className="space-y-6 animate-in fade-in duration-150">
+    <div className="space-y-8">
       {/* Header skeleton */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-2">
@@ -20,11 +20,11 @@ export default function DashboardLoading() {
       </div>
 
       {/* Content skeleton */}
-      <div className="border-2 border-black bg-white">
-        <div className="p-4 border-b-2 border-black">
+      <div className="rounded-3xl border border-black/10 bg-white/70 overflow-hidden">
+        <div className="p-6 border-b border-black/10">
           <Skeleton className="h-6 w-32" />
         </div>
-        <div className="divide-y-2 divide-black">
+        <div className="p-2 sm:p-3 space-y-2">
           <SkeletonTrackRow />
           <SkeletonTrackRow />
           <SkeletonTrackRow />

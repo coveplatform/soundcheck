@@ -516,21 +516,21 @@ export async function sendTrialReminderEmail(params: {
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
       <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
-        Free Review Waiting
+        Ready to get feedback?
       </div>
     </div>
     <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
-      Your free review is still available
+      Submit your first track
     </h1>
     <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
-      Hey ${params.artistName}, you signed up for MixReflect but haven't submitted your track yet. Your free review credit is waiting for you.
+      Hey ${params.artistName}, you signed up for MixReflect but haven't submitted your track yet. We'd love to help you get real feedback on your music.
     </p>
     <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
       <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
         <strong style="color: ${COLORS.black};">Here's what you'll get:</strong>
       </p>
       <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: ${COLORS.gray};">
-        <li>Detailed feedback from a genre-matched listener</li>
+        <li>Detailed feedback from genre-matched listeners</li>
         <li>Honest first impressions and production notes</li>
         <li>Actionable suggestions to improve your track</li>
       </ul>
@@ -538,17 +538,17 @@ export async function sendTrialReminderEmail(params: {
     <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Submit any track — SoundCloud, Bandcamp, or YouTube link — and get real feedback within 24 hours.
     </p>
-    ${emailButton("Use Your Free Review", "https://mixreflect.com/artist/submit")}
+    ${emailButton("Submit Your Track", "https://mixreflect.com/artist/submit")}
     <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
       <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-        No strings attached. Just honest feedback on your music.
+        Honest feedback on your music from real listeners.
       </p>
     </div>
   `;
 
   return sendEmail({
     to: params.to,
-    subject: "Your free review is waiting",
+    subject: "Ready to get feedback on your music?",
     html: emailWrapper(content),
   });
 }
@@ -584,12 +584,12 @@ export async function sendLeadReminderEmail(params: {
       </ul>
     </div>
     <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
-      Sign up takes 30 seconds, and your first review is free.
+      Sign up takes 30 seconds. Get real feedback from genre-matched listeners.
     </p>
     ${emailButton("Finish Signing Up", "https://mixreflect.com/signup")}
     <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
       <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-        No credit card required. Just create an account and submit a track.
+        Create an account and submit a track to get started.
       </p>
     </div>
   `;
@@ -606,21 +606,21 @@ export function previewTrialReminderEmail(artistName: string): string {
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
       <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
-        Free Review Waiting
+        Ready to get feedback?
       </div>
     </div>
     <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
-      Your free review is still available
+      Submit your first track
     </h1>
     <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
-      Hey ${artistName}, you signed up for MixReflect but haven't submitted your track yet. Your free review credit is waiting for you.
+      Hey ${artistName}, you signed up for MixReflect but haven't submitted your track yet. We'd love to help you get real feedback on your music.
     </p>
     <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
       <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
         <strong style="color: ${COLORS.black};">Here's what you'll get:</strong>
       </p>
       <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: ${COLORS.gray};">
-        <li>Detailed feedback from a genre-matched listener</li>
+        <li>Detailed feedback from genre-matched listeners</li>
         <li>Honest first impressions and production notes</li>
         <li>Actionable suggestions to improve your track</li>
       </ul>
@@ -628,10 +628,10 @@ export function previewTrialReminderEmail(artistName: string): string {
     <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Submit any track — SoundCloud, Bandcamp, or YouTube link — and get real feedback within 24 hours.
     </p>
-    ${emailButton("Use Your Free Review", "https://mixreflect.com/artist/submit")}
+    ${emailButton("Submit Your Track", "https://mixreflect.com/artist/submit")}
     <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
       <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-        No strings attached. Just honest feedback on your music.
+        Honest feedback on your music from real listeners.
       </p>
     </div>
   `;
@@ -665,12 +665,12 @@ export function previewLeadReminderEmail(artistName?: string): string {
       </ul>
     </div>
     <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
-      Sign up takes 30 seconds, and your first review is free.
+      Sign up takes 30 seconds. Get real feedback from genre-matched listeners.
     </p>
     ${emailButton("Finish Signing Up", "https://mixreflect.com/signup")}
     <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
       <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-        No credit card required. Just create an account and submit a track.
+        Create an account and submit a track to get started.
       </p>
     </div>
   `;

@@ -2,10 +2,11 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, TrendingUp, Clock, CheckCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Music } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { PayoutActions } from "@/components/reviewer/payout-actions";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +27,7 @@ export default async function EarningsPage() {
     redirect(`/verify-email${email}`);
   }
 
-  const reviewerProfile = await prisma.reviewerProfile.findUnique({
+  const reviewerProfile = await prisma.listenerProfile.findUnique({
     where: { userId: session.user.id },
     include: {
       reviews: {
@@ -47,15 +48,15 @@ export default async function EarningsPage() {
   });
 
   if (!reviewerProfile) {
-    redirect("/reviewer/onboarding");
+    redirect("/listener/onboarding");
   }
 
   if (reviewerProfile.isRestricted) {
-    redirect("/reviewer/dashboard");
+    redirect("/listener/dashboard");
   }
 
   if (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed) {
-    redirect("/reviewer/onboarding");
+    redirect("/listener/onboarding");
   }
 
   // Calculate stats
@@ -66,167 +67,161 @@ export default async function EarningsPage() {
   const monthlyReviews = reviewerProfile.reviews.filter(
     (r) => new Date(r.createdAt) >= thisMonth
   );
-  const monthlyEarnings = monthlyReviews.reduce((sum, r) => sum + r.paidAmount, 0);
+  const monthlyEarnings = monthlyReviews.reduce(
+    (sum, r) => sum + r.paidAmount,
+    0
+  );
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Earnings</h1>
-        <p className="text-neutral-500">Track your earnings and payouts</p>
+    <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12">
+      {/* Header */}
+      <div className="mb-10">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Earnings</h1>
+        <p className="mt-2 text-sm text-black/40">Track your earnings and payouts</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-neutral-500">Available Balance</p>
-                <p className="text-2xl font-bold">
-                  {formatCurrency(reviewerProfile.pendingBalance)}
+      <div className="grid gap-6 lg:grid-cols-12">
+        <div className="lg:col-span-7 space-y-6">
+          {/* Stats */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Card variant="soft" elevated>
+              <CardContent className="pt-6">
+                <p className="text-xs font-mono tracking-widest text-black/40 uppercase">available</p>
+                <p className="mt-2 text-3xl font-light tracking-tight text-emerald-600">{formatCurrency(reviewerProfile.pendingBalance)}</p>
+                <p className="mt-1 text-sm text-black/40">ready to withdraw</p>
+              </CardContent>
+            </Card>
+
+            <Card variant="soft">
+              <CardContent className="pt-6">
+                <p className="text-xs font-mono tracking-widest text-black/40 uppercase">total earned</p>
+                <p className="mt-2 text-3xl font-light tracking-tight">{formatCurrency(reviewerProfile.totalEarnings)}</p>
+                <p className="mt-1 text-sm text-black/40">all time</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Card variant="soft">
+              <CardContent className="pt-6">
+                <p className="text-xs font-mono tracking-widest text-black/40 uppercase">this month</p>
+                <p className="mt-2 text-3xl font-light tracking-tight">{formatCurrency(monthlyEarnings)}</p>
+                <p className="mt-1 text-sm text-black/40">{monthlyReviews.length} reviews</p>
+              </CardContent>
+            </Card>
+
+            <Card variant="soft">
+              <CardContent className="pt-6">
+                <p className="text-xs font-mono tracking-widest text-black/40 uppercase">reviews</p>
+                <p className="mt-2 text-3xl font-light tracking-tight">{monthlyReviews.length}</p>
+                <p className="mt-1 text-sm text-black/40">this month</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Earnings */}
+          <Card variant="soft" elevated>
+            <CardContent className="pt-6">
+              <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-4">recent earnings</p>
+              
+              {reviewerProfile.reviews.length === 0 ? (
+                <EmptyState
+                  title="No reviews completed yet"
+                  description="Your review earnings will show up here."
+                  className="py-8"
+                />
+              ) : (
+                <div className="space-y-2">
+                  {reviewerProfile.reviews.map((review: any) => (
+                    <div
+                      key={review.id}
+                      className="flex items-center justify-between gap-3 rounded-2xl bg-white/60 border border-black/10 px-4 py-3"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                          <Music className="h-5 w-5 text-emerald-600" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-black truncate">{review.track.title}</p>
+                          <p className="text-xs text-black/40">
+                            {new Date(review.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-emerald-600 font-medium text-sm">
+                        +{formatCurrency(review.paidAmount)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="lg:col-span-5 space-y-4">
+          {/* Payout Card */}
+          <Card variant="soft" elevated>
+            <CardContent className="pt-6">
+              <p className="text-xs font-mono tracking-widest text-black/40 uppercase">payouts</p>
+              <div className="mt-4 p-4 rounded-xl bg-black/5">
+                <p className="text-sm text-black/60">
+                  Minimum payout: <span className="font-medium text-black">$10.00</span>
+                </p>
+                <p className="text-sm text-black/40 mt-1">
+                  Connect Stripe to receive automated payouts.
                 </p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
+
+              <div className="mt-4">
+                <PayoutActions
+                  pendingBalance={reviewerProfile.pendingBalance}
+                  stripeAccountId={reviewerProfile.stripeAccountId ?? null}
+                  country={reviewerProfile.country ?? null}
+                />
               </div>
-              <div>
-                <p className="text-sm text-neutral-500">This Month</p>
-                <p className="text-2xl font-bold">
-                  {formatCurrency(monthlyEarnings)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-neutral-500">Total Earned</p>
-                <p className="text-2xl font-bold">
-                  {formatCurrency(reviewerProfile.totalEarnings)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                <Clock className="h-5 w-5 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-sm text-neutral-500">Reviews This Month</p>
-                <p className="text-2xl font-bold">{monthlyReviews.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          {/* Payout History */}
+          <Card variant="soft">
+            <CardContent className="pt-6">
+              <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-4">payout history</p>
+              
+              {reviewerProfile.payouts.length === 0 ? (
+                <p className="text-sm text-black/40">No payouts yet</p>
+              ) : (
+                <div className="space-y-2">
+                  {reviewerProfile.payouts.map((payout: any) => (
+                    <div
+                      key={payout.id}
+                      className="flex items-center justify-between gap-3 py-2"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">{formatCurrency(payout.amount)}</p>
+                        <p className="text-xs text-black/40">
+                          {new Date(payout.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full ${
+                          payout.status === "COMPLETED"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : payout.status === "PROCESSING"
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-black/5 text-black/50"
+                        }`}
+                      >
+                        {payout.status.toLowerCase()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
-
-      {/* Payout Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Payouts</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-neutral-50 rounded-lg p-4 mb-4">
-            <p className="text-sm text-neutral-600">
-              Minimum payout: <strong>$10.00</strong>
-            </p>
-            <p className="text-sm text-neutral-500 mt-1">
-              Connect Stripe to receive automated payouts.
-            </p>
-          </div>
-
-          <div className="mb-6">
-            <PayoutActions
-              pendingBalance={reviewerProfile.pendingBalance}
-              stripeAccountId={reviewerProfile.stripeAccountId ?? null}
-              country={reviewerProfile.country ?? null}
-            />
-          </div>
-
-          {reviewerProfile.payouts.length === 0 ? (
-            <p className="text-sm text-neutral-500 text-center py-8">
-              No payouts yet
-            </p>
-          ) : (
-            <div className="divide-y divide-neutral-100">
-              {reviewerProfile.payouts.map((payout) => (
-                <div
-                  key={payout.id}
-                  className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
-                >
-                  <div className="min-w-0">
-                    <p className="font-medium">{formatCurrency(payout.amount)}</p>
-                    <p className="text-sm text-neutral-500">
-                      {new Date(payout.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <span
-                    className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                      payout.status === "COMPLETED"
-                        ? "bg-green-100 text-green-700"
-                        : payout.status === "PROCESSING"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-neutral-100 text-neutral-700"
-                    }`}
-                  >
-                    {payout.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Recent Reviews */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Earnings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {reviewerProfile.reviews.length === 0 ? (
-            <p className="text-sm text-neutral-500 text-center py-8">
-              No reviews completed yet
-            </p>
-          ) : (
-            <div className="divide-y divide-neutral-100">
-              {reviewerProfile.reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
-                >
-                  <div className="min-w-0">
-                    <p className="font-medium truncate">{review.track.title}</p>
-                    <p className="text-sm text-neutral-500">
-                      {new Date(review.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <span className="text-green-600 font-medium">
-                    +{formatCurrency(review.paidAmount)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }

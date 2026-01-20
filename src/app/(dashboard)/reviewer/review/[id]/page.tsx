@@ -8,100 +8,30 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AudioPlayer } from "@/components/audio/audio-player";
+import { StemPlayer } from "@/components/audio/stem-player";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Star, Check, Music, DollarSign, AlertTriangle, Download, ShoppingCart } from "lucide-react";
+import { ScoreInput } from "@/components/ui/score-input";
+import { YesNoToggle } from "@/components/ui/yes-no-toggle";
+import { WordCounter, countWords } from "@/components/ui/word-counter";
+import { ErrorAlert } from "@/components/ui/error-alert";
+import { ProjectStructure } from "@/components/ableton/project-structure";
+import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, Download, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
 import { funnels, track } from "@/lib/analytics";
+import { getReferralCookie, clearReferralCookie } from "@/lib/referral";
+import { Review, FirstImpression, MIN_LISTEN_SECONDS, MIN_WORDS_PER_SECTION } from "./types";
+import {
+  formatTimestamp,
+  getTierEarningsCents,
+  formatFirstImpression,
+  makeClientId,
+  firstImpressionLabel,
+  firstImpressionColor,
+  firstImpressionEnumFromScore,
+} from "./utils";
 
-interface Review {
-  id: string;
-  status: string;
-  createdAt?: string;
-  paidAmount?: number;
-  listenDuration?: number;
-  firstImpression?: FirstImpression | null;
-  productionScore?: number | null;
-  vocalScore?: number | null;
-  originalityScore?: number | null;
-  wouldListenAgain?: boolean | null;
-  perceivedGenre?: string | null;
-  similarArtists?: string | null;
-  bestPart?: string | null;
-  weakestPart?: string | null;
-  additionalNotes?: string | null;
-  addressedArtistNote?: "YES" | "PARTIALLY" | "NO" | null;
-  nextActions?: string | null;
-  timestamps?: Array<{ seconds: number; note: string }> | null;
-  track: {
-    id: string;
-    title: string;
-    sourceUrl: string;
-    sourceType: string;
-    feedbackFocus: string | null;
-    genres: { id: string; name: string }[];
-    allowPurchase: boolean;
-    artist?: {
-      artistName: string;
-    };
-  };
-  reviewer: {
-    tier: string;
-  };
-}
-
-type FirstImpression = "STRONG_HOOK" | "DECENT" | "LOST_INTEREST";
-
-const MIN_LISTEN_SECONDS = 180;
-const MIN_WORDS_PER_SECTION = 30;
-
-function formatTimestamp(seconds: number) {
-  const s = Math.max(0, Math.floor(seconds));
-  const mins = Math.floor(s / 60);
-  const secs = s % 60;
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-}
-
-function countWords(text: string): number {
-  return (text.toLowerCase().match(/[a-z0-9']+/g) ?? []).length;
-}
-
-function getTierEarningsCents(tier: string | null | undefined): number {
-  return tier === "PRO" ? 150 : 50;
-}
-
-function formatFirstImpression(value: FirstImpression | null | undefined) {
-  if (!value) return "—";
-  if (value === "STRONG_HOOK") return "Strong Hook";
-  if (value === "DECENT") return "Decent";
-  return "Lost Interest";
-}
-
-function makeClientId(): string {
-  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
-function firstImpressionLabel(score: number) {
-  if (score <= 1) return "Skipped ahead / Lost interest";
-  if (score === 2) return "Kept listening, but not grabbed";
-  if (score === 3) return "Solid intro, curious to hear more";
-  if (score === 4) return "This is catching my attention";
-  return "Hooked - I need to hear the rest";
-}
-
-function firstImpressionColor(score: number) {
-  if (score <= 1) return "bg-red-100 border-red-400 text-red-800";
-  if (score === 2) return "bg-orange-100 border-orange-400 text-orange-800";
-  if (score === 3) return "bg-yellow-100 border-yellow-400 text-yellow-800";
-  if (score === 4) return "bg-lime-100 border-lime-400 text-lime-800";
-  return "bg-green-100 border-green-400 text-green-800";
-}
-
-function firstImpressionEnumFromScore(score: number): FirstImpression {
-  if (score <= 2) return "LOST_INTEREST";
-  if (score === 3) return "DECENT";
-  return "STRONG_HOOK";
-}
+// Types and utilities imported from ./types and ./utils
 
 export default function ReviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -213,7 +143,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             }
 
             const notice = data.status === "SKIPPED" ? "skipped" : "expired";
-            router.push(`/reviewer/queue?notice=${notice}`);
+            router.push(`/listener/queue?notice=${notice}`);
             router.refresh();
             return;
           }
@@ -237,12 +167,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               return;
             }
             if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
-              router.push("/reviewer/onboarding");
+              router.push("/listener/onboarding");
               router.refresh();
               return;
             }
             if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
-              router.push("/reviewer/dashboard");
+              router.push("/listener/dashboard");
               router.refresh();
               return;
             }
@@ -535,12 +465,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
-            router.push("/reviewer/onboarding");
+            router.push("/listener/onboarding");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
-            router.push("/reviewer/dashboard");
+            router.push("/listener/dashboard");
             router.refresh();
             return;
           }
@@ -608,12 +538,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
-            router.push("/reviewer/onboarding");
+            router.push("/listener/onboarding");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
-            router.push("/reviewer/dashboard");
+            router.push("/listener/dashboard");
             router.refresh();
             return;
           }
@@ -628,7 +558,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       } catch {
       }
 
-      router.push("/reviewer/queue?notice=skipped");
+      router.push("/listener/queue?notice=skipped");
       router.refresh();
     } catch {
       setError("Failed to skip review");
@@ -672,12 +602,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
-            router.push("/reviewer/onboarding");
+            router.push("/listener/onboarding");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
-            router.push("/reviewer/dashboard");
+            router.push("/listener/dashboard");
             router.refresh();
             return;
           }
@@ -692,7 +622,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       } catch {
       }
 
-      router.push("/reviewer/queue?notice=unplayable");
+      router.push("/listener/queue?notice=unplayable");
       router.refresh();
     } catch {
       setError("Failed to mark review unplayable");
@@ -708,10 +638,17 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     setIsPurchasing(true);
 
     try {
+      // Get referral data from cookie if it matches this track
+      const referralCookie = getReferralCookie();
+      const referral =
+        referralCookie && referralCookie.trackId === review.track.id
+          ? { reviewerId: referralCookie.reviewerId, shareId: referralCookie.shareId }
+          : undefined;
+
       const response = await fetch("/api/purchases", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ trackId: review.track.id }),
+        body: JSON.stringify({ trackId: review.track.id, referral }),
       });
 
       const data = await response.json();
@@ -720,6 +657,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         setPurchaseError(data?.error || "Failed to purchase track");
         return;
       }
+
+      // Clear referral cookie after successful purchase
+      clearReferralCookie();
 
       setHasPurchased(true);
       // Update balance after purchase
@@ -792,12 +732,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             return;
           }
           if (msg.includes("onboarding")) {
-            router.push("/reviewer/onboarding");
+            router.push("/listener/onboarding");
             router.refresh();
             return;
           }
           if (msg.includes("restricted")) {
-            router.push("/reviewer/dashboard");
+            router.push("/listener/dashboard");
             router.refresh();
             return;
           }
@@ -824,12 +764,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     return (
       <div className="max-w-3xl mx-auto space-y-6">
         <Skeleton className="h-8 w-32" />
-        <div className="border-2 border-black bg-white p-6 space-y-4">
+        <div className="rounded-3xl border border-black/10 bg-white/70 p-6 space-y-4">
           <Skeleton className="h-6 w-1/2" />
           <Skeleton className="h-4 w-1/3" />
           <Skeleton className="h-24 w-full" />
         </div>
-        <div className="border-2 border-black bg-white p-6 space-y-4">
+        <div className="rounded-3xl border border-black/10 bg-white/70 p-6 space-y-4">
           <Skeleton className="h-6 w-1/4" />
           <div className="grid sm:grid-cols-3 gap-4">
             <Skeleton className="h-20" />
@@ -852,7 +792,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </div>
         <h2 className="text-2xl font-black mb-2">Something went wrong</h2>
         <p className="text-neutral-600 mb-6">{error}</p>
-        <Link href="/reviewer/queue">
+        <Link href="/listener/queue">
           <Button variant="outline">Back to Queue</Button>
         </Link>
       </div>
@@ -861,12 +801,26 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   if (!review) return null;
 
+  const stems = Array.isArray(review.track.stems) ? review.track.stems : [];
+
+  const isZipUpload =
+    review.track.sourceType === "UPLOAD" &&
+    typeof review.track.sourceUrl === "string" &&
+    review.track.sourceUrl.toLowerCase().endsWith(".zip");
+
+  const hasPlayableStems =
+    Boolean(review.track.hasStems) &&
+    stems.length > 0 &&
+    stems.every(
+      (s) => typeof s.stemUrl === "string" && !s.stemUrl.toLowerCase().endsWith(".zip")
+    );
+
   if (review.status === "COMPLETED") {
     return (
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="max-w-3xl mx-auto space-y-10">
         <div className="flex items-center justify-between gap-4">
           <Link
-            href="/reviewer/history"
+            href="/listener/history"
             className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -878,8 +832,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
         </div>
 
-        <Card>
-          <CardHeader className="border-b-2 border-black">
+        <Card variant="soft" elevated>
+          <CardHeader className="border-b border-black/10">
             <div className="flex items-start gap-4">
               <div className="h-12 w-12 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
                 <Music className="h-6 w-6 text-black" />
@@ -893,45 +847,60 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           </CardHeader>
           <CardContent className="pt-6">
-            <AudioPlayer
-              sourceUrl={review.track.sourceUrl}
-              sourceType={review.track.sourceType}
-              showListenTracker={false}
-              showWaveform={review.track.sourceType === "UPLOAD"}
-            />
+            {hasPlayableStems ? (
+              <StemPlayer
+                trackId={review.track.id}
+                stems={stems}
+                showListenTracker={false}
+              />
+            ) : isZipUpload ? (
+              <div className="rounded-xl border-2 border-black bg-white p-4">
+                <p className="text-sm font-bold">Audio will be available after rendering</p>
+                <p className="mt-1 text-sm text-neutral-600">
+                  This track was uploaded as an Ableton project ZIP. Once rendering finishes, you&apos;ll be able to listen here.
+                </p>
+              </div>
+            ) : (
+              <AudioPlayer
+                sourceUrl={review.track.sourceUrl}
+                sourceType={review.track.sourceType}
+                showListenTracker={false}
+                showWaveform={review.track.sourceType === "UPLOAD"}
+              />
+            )}
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="border-b-2 border-black">
+        <Card variant="soft" elevated>
+          <CardHeader className="border-b border-black/10">
             <CardTitle>Your Submitted Review</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-4">
             <div className="flex flex-wrap gap-3 text-sm">
-              <div className="px-3 py-1.5 bg-neutral-100 border-2 border-black">
+              <div className="px-3 py-1.5 bg-white/70 border border-black/10 rounded-2xl">
                 <span className="text-neutral-600">First impression:</span>{" "}
                 <span className="font-bold">{formatFirstImpression(review.firstImpression)}</span>
               </div>
               {typeof review.productionScore === "number" && (
-                <div className="px-3 py-1.5 bg-neutral-100 border-2 border-black">
+                <div className="px-3 py-1.5 bg-white/70 border border-black/10 rounded-2xl">
                   <span className="text-neutral-600">Production:</span>{" "}
                   <span className="font-bold">{review.productionScore}/5</span>
                 </div>
               )}
               {typeof review.vocalScore === "number" && (
-                <div className="px-3 py-1.5 bg-neutral-100 border-2 border-black">
+                <div className="px-3 py-1.5 bg-white/70 border border-black/10 rounded-2xl">
                   <span className="text-neutral-600">Vocals:</span>{" "}
                   <span className="font-bold">{review.vocalScore}/5</span>
                 </div>
               )}
               {typeof review.originalityScore === "number" && (
-                <div className="px-3 py-1.5 bg-neutral-100 border-2 border-black">
+                <div className="px-3 py-1.5 bg-white/70 border border-black/10 rounded-2xl">
                   <span className="text-neutral-600">Originality:</span>{" "}
                   <span className="font-bold">{review.originalityScore}/5</span>
                 </div>
               )}
               {review.wouldListenAgain !== null && review.wouldListenAgain !== undefined && (
-                <div className="px-3 py-1.5 bg-neutral-100 border-2 border-black">
+                <div className="px-3 py-1.5 bg-white/70 border border-black/10 rounded-2xl">
                   <span className="text-neutral-600">Would listen again:</span>{" "}
                   <span className="font-bold">{review.wouldListenAgain ? "Yes" : "No"}</span>
                 </div>
@@ -939,7 +908,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
 
             {(review.perceivedGenre || review.similarArtists) && (
-              <div className="text-sm p-3 bg-neutral-50 border-2 border-black">
+              <div className="text-sm p-3 bg-white/70 border border-black/10 rounded-2xl">
                 {review.perceivedGenre ? (
                   <p>
                     <span className="text-neutral-600 font-medium">Perceived genre:</span>{" "}
@@ -956,21 +925,21 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             )}
 
             {review.bestPart ? (
-              <div className="bg-lime-50 border-2 border-lime-500 p-4">
+              <div className="bg-lime-50 border border-lime-200 rounded-2xl p-4">
                 <p className="text-xs font-bold text-lime-700 mb-2">Best Part</p>
                 <p className="text-sm text-lime-900">{review.bestPart}</p>
               </div>
             ) : null}
 
             {review.weakestPart ? (
-              <div className="bg-red-50 border-2 border-red-400 p-4">
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
                 <p className="text-xs font-bold text-red-700 mb-2">Areas for Improvement</p>
                 <p className="text-sm text-red-900">{review.weakestPart}</p>
               </div>
             ) : null}
 
             {review.additionalNotes ? (
-              <div className="bg-neutral-100 border-2 border-black p-4">
+              <div className="bg-neutral-50 border border-black/10 rounded-2xl p-4">
                 <p className="text-xs font-bold text-neutral-700 mb-2">Additional Notes</p>
                 <p className="text-sm text-neutral-800">{review.additionalNotes}</p>
               </div>
@@ -996,7 +965,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <Check className="h-8 w-8 text-black" />
         </div>
         <h2 className="text-2xl font-black mb-2">Review Submitted!</h2>
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-lime-500 border-2 border-black mb-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-lime-500 border-2 border-black mb-4 rounded-full">
           <DollarSign className="h-5 w-5 text-black" />
           <span className="font-black text-lg">
             +{formatCurrency(getTierEarningsCents(review.reviewer.tier))}
@@ -1008,7 +977,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
         {/* Purchase option for uploaded tracks */}
         {canPurchase && (
-          <div className="mb-6 p-4 border-2 border-neutral-200 bg-neutral-50 text-left">
+          <div className="mb-6 p-4 border border-black/10 bg-white/70 rounded-3xl text-left">
             <div className="flex items-center gap-3 mb-3">
               <Music className="h-5 w-5 text-neutral-600" />
               <div>
@@ -1050,8 +1019,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
         )}
 
-        <Link href="/reviewer/queue">
-          <Button variant="primary">Continue Reviewing</Button>
+        <Link href="/listener/queue">
+          <Button variant="primary">Continue Listening</Button>
         </Link>
       </div>
     );
@@ -1065,7 +1034,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           type="button"
           onClick={() => {
             if (!confirmLeave()) return;
-            router.push("/reviewer/queue");
+            router.push("/listener/queue");
             router.refresh();
           }}
           className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
@@ -1096,8 +1065,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       </div>
 
       {/* Track Info */}
-      <Card>
-        <CardHeader className="border-b-2 border-black">
+      <Card variant="soft" elevated>
+        <CardHeader className="border-b border-black/10">
           <div className="flex items-start gap-4">
             <div className="h-12 w-12 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
               <Music className="h-6 w-6 text-black" />
@@ -1110,7 +1079,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           </div>
           {review.track.feedbackFocus && (
-            <div className="mt-4 p-3 bg-amber-50 border-2 border-amber-400">
+            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-2xl">
               <p className="text-sm font-bold text-amber-800">
                 Artist note: <span className="font-medium">{review.track.feedbackFocus}</span>
               </p>
@@ -1118,33 +1087,72 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           )}
         </CardHeader>
         <CardContent className="pt-6 space-y-4">
-          <AudioPlayer
-            sourceUrl={review.track.sourceUrl}
-            sourceType={review.track.sourceType}
-            showWaveform={review.track.sourceType === "UPLOAD"}
-            minListenTime={MIN_LISTEN_SECONDS}
-            initialListenTime={listenTime}
-            onTimeUpdate={(seconds) => setPlayerSeconds(seconds)}
-            onListenProgress={(seconds) => {
-              setListenTime((prev) => Math.max(prev, seconds));
-              void maybeSendHeartbeat();
-            }}
-            onMinimumReached={() => {
-              setCanSubmit(true);
-              funnels.review.minimumReached(review.track.id, MIN_LISTEN_SECONDS);
-            }}
-            onAddTimestamp={(seconds) => {
+          {hasPlayableStems ? (
+            <StemPlayer
+              trackId={review.track.id}
+              stems={stems}
+              minListenTime={MIN_LISTEN_SECONDS}
+              initialListenTime={listenTime}
+              onTimeUpdate={(seconds) => setPlayerSeconds(seconds)}
+              onListenProgress={(seconds) => {
+                setListenTime((prev) => Math.max(prev, seconds));
+                void maybeSendHeartbeat();
+              }}
+              onMinimumReached={() => {
+                setCanSubmit(true);
+                funnels.review.minimumReached(review.track.id, MIN_LISTEN_SECONDS);
+              }}
+              showListenTracker
+              onAddTimestamp={(seconds) => {
               addTimestampNote(seconds);
             }}
           />
+          ) : isZipUpload ? (
+            <div className="rounded-xl border-2 border-black bg-white p-4">
+              <p className="text-sm font-bold">Audio will be available after rendering</p>
+              <p className="mt-1 text-sm text-neutral-600">
+                This track was uploaded as an Ableton project ZIP. Once rendering finishes, you&apos;ll be able to listen and submit.
+              </p>
+            </div>
+          ) : (
+            <AudioPlayer
+              sourceUrl={review.track.sourceUrl}
+              sourceType={review.track.sourceType}
+              showWaveform={review.track.sourceType === "UPLOAD"}
+              minListenTime={MIN_LISTEN_SECONDS}
+              initialListenTime={listenTime}
+              onTimeUpdate={(seconds) => setPlayerSeconds(seconds)}
+              onListenProgress={(seconds) => {
+                setListenTime((prev) => Math.max(prev, seconds));
+                void maybeSendHeartbeat();
+              }}
+              onMinimumReached={() => {
+                setCanSubmit(true);
+                funnels.review.minimumReached(review.track.id, MIN_LISTEN_SECONDS);
+              }}
+              onAddTimestamp={(seconds) => {
+                addTimestampNote(seconds);
+              }}
+              showListenTracker
+            />
+          )}
+        </CardContent>
+      </Card>
 
+      {/* Project Structure (for Ableton projects) */}
+      {Boolean(review.track.abletonProjectData) && (
+        <ProjectStructure projectData={review.track.abletonProjectData as any} />
+      )}
+
+      <Card variant="soft" elevated>
+        <CardContent className="pt-6">
           {/* Inline timestamp controls */}
-          <div className="border-t-2 border-neutral-200 pt-4">
+          <div className="border-t border-black/10 pt-4">
             <div className="flex items-center justify-between gap-3 mb-2">
               <span className="text-sm font-bold text-neutral-700">
                 Timestamp Notes
                 {timestampNotes.length > 0 && (
-                  <span className="ml-2 px-1.5 py-0.5 text-xs bg-black text-white">
+                  <span className="ml-2 px-2 py-0.5 text-xs bg-black text-white rounded-full">
                     {timestampNotes.length}
                   </span>
                 )}
@@ -1193,8 +1201,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       </Card>
 
       {/* Review Form */}
-      <Card>
-        <CardHeader className="border-b-2 border-black">
+      <Card variant="soft" elevated>
+        <CardHeader className="border-b border-black/10">
           <CardTitle>Your Review</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
@@ -1243,7 +1251,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                       setFirstImpression(firstImpressionEnumFromScore(score));
                     }}
                     className={cn(
-                      "flex-1 py-3 text-xs font-bold transition-all border-2",
+                      "flex-1 py-3 text-xs font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                       firstImpressionTouched && firstImpressionScore === score
                         ? firstImpressionColor(score)
                         : "border-neutral-200 bg-neutral-50 hover:border-neutral-400 hover:bg-white text-neutral-600"
@@ -1586,7 +1594,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       </Card>
 
       {/* Submit Card */}
-      <Card className="bg-black text-white border-black">
+      <Card variant="soft" elevated className="bg-black text-white border-black">
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div className="min-w-0">
@@ -1666,42 +1674,3 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   );
 }
 
-function ScoreInput({
-  label,
-  value,
-  onChange,
-  hasError = false,
-}: {
-  label: string;
-  value: number;
-  onChange: (value: number) => void;
-  hasError?: boolean;
-}) {
-  return (
-    <div className="space-y-3">
-      <Label className={cn("font-bold", hasError && "text-red-600")}>{label}</Label>
-      <div className={cn("flex gap-1 p-2 border-2 bg-white", hasError ? "border-red-400" : "border-black")}>
-        {[1, 2, 3, 4, 5].map((score) => (
-          <button
-            key={score}
-            type="button"
-            onClick={() => onChange(score)}
-            className="flex-1 p-1 hover:bg-neutral-100 transition-colors"
-          >
-            <Star
-              className={cn(
-                "h-6 w-6 mx-auto transition-colors",
-                score <= value
-                  ? "text-amber-500 fill-amber-500"
-                  : "text-neutral-300 hover:text-neutral-400"
-              )}
-            />
-          </button>
-        ))}
-      </div>
-      {value > 0 && (
-        <p className="text-xs font-mono text-neutral-600 text-center">{value}/5</p>
-      )}
-    </div>
-  );
-}

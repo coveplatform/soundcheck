@@ -69,7 +69,7 @@ type ReviewDisplayProps = {
 
 export function ReviewDisplay({
   review,
-  index,
+  index: _index,
   showControls = true,
 }: ReviewDisplayProps) {
   const [copied, setCopied] = useState(false);
