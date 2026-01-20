@@ -1,10 +1,35 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { StemType } from "@prisma/client";
 
 const WORKER_API_KEY = process.env.WORKER_API_KEY || "dev-worker-key";
 
 export const runtime = "nodejs";
+
+const normalizeStemType = (stemType: string): StemType => {
+  switch (stemType) {
+    case "MASTER":
+      return StemType.MASTER;
+    case "DRUMS":
+      return StemType.DRUMS;
+    case "BASS":
+      return StemType.BASS;
+    case "VOCALS":
+      return StemType.VOCALS;
+    case "MELODY":
+      return StemType.MELODY;
+    case "SYNTHS":
+      return StemType.SYNTHS;
+    case "FX":
+    case "EFFECTS":
+      return StemType.FX;
+    case "HARMONY":
+    case "OTHER":
+    default:
+      return StemType.OTHER;
+  }
+};
 
 const completeStemSchema = z.object({
   stemUrl: z.string().min(1),
@@ -14,7 +39,9 @@ const completeStemSchema = z.object({
     "VOCALS",
     "MELODY",
     "HARMONY",
+    "SYNTHS",
     "EFFECTS",
+    "FX",
     "OTHER",
     "MASTER",
   ]),
@@ -76,7 +103,7 @@ export async function POST(
       data: data.stems.map((stem) => ({
         trackId: track.id,
         stemUrl: stem.stemUrl,
-        stemType: stem.stemType,
+        stemType: normalizeStemType(stem.stemType),
         label: stem.label || stem.stemType,
         order: stem.order,
         duration: stem.duration,
