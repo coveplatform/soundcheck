@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { StemUploadItem } from "./stem-upload-item";
-import { Plus } from "lucide-react";
+import { Plus, Check } from "lucide-react";
 
 export type StemType = "MASTER" | "DRUMS" | "BASS" | "SYNTHS" | "VOCALS" | "MELODY" | "FX" | "OTHER";
 
@@ -30,13 +30,90 @@ export function StemUploader({ trackId, onComplete, onStemsChange }: StemUploade
     {
       id: "master",
       type: "MASTER",
-      label: "Full Mix (Master)",
+      label: "Full Mix",
       file: null,
       url: null,
       uploadProgress: 0,
       duration: null,
       error: null,
       order: 0,
+    },
+    {
+      id: "stem-1",
+      type: "DRUMS",
+      label: "",
+      file: null,
+      url: null,
+      uploadProgress: 0,
+      duration: null,
+      error: null,
+      order: 1,
+    },
+    {
+      id: "stem-2",
+      type: "BASS",
+      label: "",
+      file: null,
+      url: null,
+      uploadProgress: 0,
+      duration: null,
+      error: null,
+      order: 2,
+    },
+    {
+      id: "stem-3",
+      type: "SYNTHS",
+      label: "",
+      file: null,
+      url: null,
+      uploadProgress: 0,
+      duration: null,
+      error: null,
+      order: 3,
+    },
+    {
+      id: "stem-4",
+      type: "VOCALS",
+      label: "",
+      file: null,
+      url: null,
+      uploadProgress: 0,
+      duration: null,
+      error: null,
+      order: 4,
+    },
+    {
+      id: "stem-5",
+      type: "MELODY",
+      label: "",
+      file: null,
+      url: null,
+      uploadProgress: 0,
+      duration: null,
+      error: null,
+      order: 5,
+    },
+    {
+      id: "stem-6",
+      type: "FX",
+      label: "",
+      file: null,
+      url: null,
+      uploadProgress: 0,
+      duration: null,
+      error: null,
+      order: 6,
+    },
+    {
+      id: "stem-7",
+      type: "OTHER",
+      label: "",
+      file: null,
+      url: null,
+      uploadProgress: 0,
+      duration: null,
+      error: null,
+      order: 7,
     },
   ]);
 
@@ -123,13 +200,13 @@ export function StemUploader({ trackId, onComplete, onStemsChange }: StemUploade
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-bold mb-2">Upload Stems</h3>
-        <p className="text-sm text-neutral-600 mb-4">
-          Upload your master track and individual stems for detailed feedback. Reviewers can mute/solo each stem.
+        <h3 className="text-base font-semibold tracking-tight mb-1">Upload Stems for Detailed Feedback</h3>
+        <p className="text-sm text-neutral-600">
+          Upload your master track and individual stems. Reviewers can mute/solo each element.
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-1.5">
         {stems.map((stem) => (
           <StemUploadItem
             key={stem.id}
@@ -144,25 +221,31 @@ export function StemUploader({ trackId, onComplete, onStemsChange }: StemUploade
       </div>
 
       {stems.length < 10 && (
-        <Button onClick={addStem} variant="outline" className="w-full">
+        <Button
+          onClick={addStem}
+          variant="outline"
+          className="w-full border-neutral-300 hover:border-neutral-900 hover:bg-neutral-50 transition-all"
+        >
           <Plus className="w-4 h-4 mr-2" />
-          Add Stem {stems.length > 1 && `(${stems.length}/10)`}
+          <span className="text-sm font-medium">Add Stem</span>
+          {stems.length > 1 && <span className="ml-2 text-xs text-neutral-500 font-mono">({stems.length}/10)</span>}
         </Button>
       )}
 
       {durationError && (
-        <div className="p-3 bg-rose-50 border-2 border-rose-500 rounded-lg">
+        <div className="p-3.5 bg-rose-50 ring-1 ring-rose-500/30 rounded-md">
           <p className="text-sm text-rose-700 font-medium">{durationError}</p>
-          <p className="text-xs text-rose-600 mt-1">
+          <p className="text-xs text-rose-600 mt-1.5">
             Ensure all stems are exported from the same project with matching lengths.
           </p>
         </div>
       )}
 
       {allStemsUploaded && !durationError && (
-        <div className="p-3 bg-lime-50 border-2 border-lime-500 rounded-lg">
-          <p className="text-sm text-lime-700 font-medium">
-            ✓ All stems uploaded successfully! ({stems.length} {stems.length === 1 ? "stem" : "stems"})
+        <div className="p-3.5 bg-emerald-50 ring-1 ring-emerald-500/30 rounded-md">
+          <p className="text-sm text-emerald-700 font-medium flex items-center gap-2">
+            <Check className="w-4 h-4" strokeWidth={2.5} />
+            All stems uploaded successfully! ({stems.length} {stems.length === 1 ? "stem" : "stems"})
           </p>
         </div>
       )}

@@ -155,7 +155,13 @@ export function ActivityFeed() {
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+    let isPageVisible = !document.hidden;
+
+    const tick = () => {
+      // Only tick if page is visible
+      if (!isPageVisible) return;
+
       const currentQueue = queueRef.current;
       const currentNextIndex = nextIndexRef.current;
 
@@ -185,10 +191,27 @@ export function ActivityFeed() {
       timeoutRef.current = setTimeout(() => {
         commitPending();
       }, 900);
-    }, 3000);
+    };
+
+    const handleVisibilityChange = () => {
+      isPageVisible = !document.hidden;
+
+      // When page becomes visible again, reset the interval to avoid desyncs
+      if (isPageVisible && interval) {
+        clearInterval(interval);
+        interval = setInterval(tick, 3000);
+      }
+    };
+
+    // Set up visibility listener
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Start the interval
+    interval = setInterval(tick, 3000);
 
     return () => {
-      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      if (interval) clearInterval(interval);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }

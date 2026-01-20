@@ -62,17 +62,18 @@ export default function ResetPasswordPage() {
 
       if (!res.ok) {
         setError(data?.error || "Failed to reset password");
+        setIsLoading(false);
         return;
       }
 
       setSuccess(true);
+      // Keep loading state active during navigation delay and navigation
       setTimeout(() => {
         router.push("/login");
         router.refresh();
       }, 500);
     } catch {
       setError("Something went wrong");
-    } finally {
       setIsLoading(false);
     }
   };

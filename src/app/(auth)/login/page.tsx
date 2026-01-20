@@ -105,6 +105,7 @@ export default function LoginPage() {
 
       if (!result) {
         setError("Sign in failed");
+        setIsLoading(false);
         return;
       }
 
@@ -118,6 +119,7 @@ export default function LoginPage() {
         } else {
           setError("Invalid email or password");
         }
+        setIsLoading(false);
       } else {
         const session = await getSession();
         const defaultUrl = session?.user?.isArtist
@@ -126,12 +128,12 @@ export default function LoginPage() {
           ? "/reviewer/dashboard"
           : "/";
         const target = callbackUrl && callbackUrl !== "/" ? callbackUrl : defaultUrl;
+        // Keep loading state active during navigation
         router.push(target);
         router.refresh();
       }
     } catch {
       setError("Something went wrong");
-    } finally {
       setIsLoading(false);
     }
   };

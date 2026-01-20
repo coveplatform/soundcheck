@@ -115,6 +115,7 @@ export default function SignupPage() {
         const errorMsg = data?.error || "Something went wrong";
         setError(errorMsg);
         track("signup_failed", { error: errorMsg });
+        setIsLoading(false);
         return;
       }
 
@@ -139,16 +140,17 @@ export default function SignupPage() {
       if (signInResult?.error) {
         // Signup succeeded but auto-login failed - redirect to login
         router.push("/login");
+        // Keep loading state active during navigation
         return;
       }
 
       // Redirect to submit page or callback URL
+      // Keep loading state active during navigation
       router.push(callbackUrl || "/artist/submit");
       router.refresh();
     } catch {
       setError("Something went wrong");
       track("signup_failed", { error: "network_error" });
-    } finally {
       setIsLoading(false);
     }
   };

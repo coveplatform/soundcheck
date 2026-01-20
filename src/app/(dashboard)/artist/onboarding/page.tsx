@@ -4,8 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
 
 export default function ArtistOnboardingPage() {
   const router = useRouter();
@@ -39,9 +38,11 @@ export default function ArtistOnboardingPage() {
         if (response.status === 401) {
           router.push(`/login?callbackUrl=${encodeURIComponent("/artist/onboarding")}`);
           router.refresh();
+          // Keep loading state active during navigation
           return;
         }
         setError((data as any)?.error || "Something went wrong");
+        setIsLoading(false);
         return;
       }
 
@@ -50,55 +51,59 @@ export default function ArtistOnboardingPage() {
       await updateSession();
       router.push("/artist/dashboard");
       router.refresh();
+      // Keep loading state active during navigation
     } catch {
       setError("Something went wrong");
-    } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12 max-w-xl mx-auto">
-      <div className="mb-10 text-center">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Welcome</h1>
-        <p className="mt-2 text-sm text-black/40">Let&apos;s set up your artist profile</p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center px-6 bg-[#f7f7f5]">
+      <div className="w-full max-w-md">
+        <div className="mb-10">
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Welcome</h1>
+          <p className="mt-2 text-neutral-500">Let&apos;s set up your artist profile</p>
+        </div>
 
-      <Card variant="soft" elevated>
-        <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm p-4">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <p className="text-xs font-mono tracking-widest text-black/40 uppercase">artist name</p>
-              <Input
-                id="artistName"
-                placeholder="Your artist or project name"
-                value={artistName}
-                onChange={(e) => setArtistName(e.target.value)}
-                className="h-12 rounded-xl border-black/10 bg-white/60 focus:bg-white"
-              />
-              <p className="text-sm text-black/40">
-                This is how you&apos;ll appear to reviewers. You can pick genres when you submit a track.
-              </p>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && (
+            <div className="text-red-400 text-sm py-3 px-4 bg-red-500/10 border-l-2 border-red-500">
+              {error}
             </div>
+          )}
 
+          <div>
+            <label htmlFor="artistName" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
+              Artist Name
+            </label>
+            <input
+              id="artistName"
+              type="text"
+              placeholder="Your artist or project name"
+              value={artistName}
+              onChange={(e) => setArtistName(e.target.value)}
+              required
+              className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent"
+            />
+            <p className="text-sm text-neutral-500 mt-3">
+              This is how you&apos;ll appear to reviewers. You can pick genres when you submit a track.
+            </p>
+          </div>
+
+          <div className="pt-4">
             <Button
               type="submit"
-              variant="airyPrimary"
-              className="w-full h-12"
+              className="w-full h-12 bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
               isLoading={isLoading}
               disabled={!artistName.trim()}
             >
               Complete Setup
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

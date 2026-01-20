@@ -357,17 +357,19 @@ export default function SubmitTrackPage() {
         ) {
           setRequiresEmailVerification(true);
           setError("Please verify your email to submit tracks");
+          setIsSubmitting(false);
           return;
         }
         setError(data.error || "Something went wrong");
+        setIsSubmitting(false);
         return;
       }
 
       // Redirect to track page after successful submission
+      // Keep loading state active during navigation
       router.push(`/artist/tracks/${data.id}`);
     } catch {
       setError("Something went wrong");
-    } finally {
       setIsSubmitting(false);
     }
   };

@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Plus, Music, DollarSign, MessageSquare } from "lucide-react";
+import { Plus, Music, DollarSign, MessageSquare, CheckCircle2, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -184,7 +184,17 @@ function TrackCard({
             </div>
           )}
 
-          {statusLabel && (
+          {isComplete ? (
+            <div className="absolute top-2 left-2 -rotate-3">
+              <div className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-lime-300 via-yellow-200 to-orange-200 border-2 border-black text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                <div className="h-4 w-4 bg-black text-white flex items-center justify-center rounded-sm">
+                  <CheckCircle2 className="h-2.5 w-2.5" />
+                </div>
+                <span className="text-[9px] font-black tracking-wide uppercase">Done</span>
+                <Sparkles className="h-3 w-3" />
+              </div>
+            </div>
+          ) : statusLabel && (
             <div className="absolute top-3 left-3">
               <span
                 className={cn(
@@ -193,9 +203,7 @@ function TrackCard({
                     ? "bg-white/80 text-black border-black/15"
                     : isUploaded
                       ? "bg-lime-100 text-black border-black/10"
-                      : isComplete
-                        ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                        : "bg-white/70 text-black border-black/10"
+                      : "bg-white/70 text-black border-black/10"
                 )}
               >
                 {statusLabel}

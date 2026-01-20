@@ -16,7 +16,7 @@ const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
 
 const DAW_TRACKS = [
   {
-    name: "Drums 🥁",
+    name: "Kick & Snare",
     color: "#fb923c",
     clips: [
       { label: "Beat A", startBeat: 0, lengthBeats: 8 },
@@ -25,7 +25,7 @@ const DAW_TRACKS = [
     ],
   },
   {
-    name: "Bass 🎸",
+    name: "Sub Bass",
     color: "#a3e635",
     clips: [
       { label: "Sub", startBeat: 4, lengthBeats: 8 },
@@ -33,7 +33,7 @@ const DAW_TRACKS = [
     ],
   },
   {
-    name: "Synths 🎹",
+    name: "Main Synth",
     color: "#60a5fa",
     clips: [
       { label: "Pad", startBeat: 0, lengthBeats: 16 },
@@ -41,7 +41,7 @@ const DAW_TRACKS = [
     ],
   },
   {
-    name: "Vocals 🎤",
+    name: "Lead Vocal",
     color: "#f472b6",
     clips: [
       { label: "Verse", startBeat: 8, lengthBeats: 8 },
@@ -115,7 +115,12 @@ export default function Home() {
 
           <AnimatedSection className="relative">
             {/* Decorative doodles */}
-            <Sparkle className="pointer-events-none absolute top-6 -left-10 sm:-left-28 lg:-left-44 w-14 h-14 sm:w-20 sm:h-20 text-neutral-950 opacity-90 -rotate-12" />
+            <Sparkle className="pointer-events-none absolute top-6 -right-10 sm:-right-28 lg:-right-44 w-14 h-14 sm:w-20 sm:h-20 text-orange-300 opacity-90 -rotate-12" />
+            <img
+              src="/doodles/report-doodle.png"
+              alt=""
+              className="pointer-events-none absolute top-56 -left-24 sm:-left-40 lg:-left-56 w-48 h-48 sm:w-56 sm:h-56 rotate-[-8deg] hidden lg:block"
+            />
             <Squiggle className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-40 w-16 h-16 sm:w-28 sm:h-28 text-orange-300 opacity-70 rotate-12" />
             <Dots className="pointer-events-none absolute -bottom-10 right-2 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 text-lime-500 opacity-80 rotate-6" />
 
@@ -228,29 +233,27 @@ export default function Home() {
                                 ))}
                               </div>
                             </div>
-                            <div className="pointer-events-none absolute inset-y-0 left-[52%] w-px bg-lime-300/80" />
-                            <div className="pointer-events-none absolute -top-1 left-[52%] -translate-x-1/2 h-0 w-0 border-l-[6px] border-r-[6px] border-b-[10px] border-l-transparent border-r-transparent border-b-lime-300/80" />
                           </div>
                         </div>
 
                         <div className="divide-y divide-white/10">
                           {DAW_TRACKS.map((track) => (
                             <div key={track.name} className="grid grid-cols-[160px_1fr]">
-                              <div className="h-12 px-3 flex items-center" style={{ backgroundColor: track.color }}>
-                                <div className="w-full flex items-center justify-between gap-3">
-                                  <div className="text-[11px] font-extrabold text-black truncate">
+                              <div className="h-9 px-3 flex items-center" style={{ backgroundColor: track.color }}>
+                                <div className="w-full flex items-center justify-between gap-2">
+                                  <div className="text-[10px] font-extrabold text-black truncate">
                                     {track.name}
                                   </div>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-1.5">
                                     <button
                                       type="button"
-                                      className="h-6 w-7 text-[11px] font-extrabold border border-black/20 bg-black/10 rounded-md text-black hover:bg-black/15 active:bg-black/20 transition-colors duration-150 ease-out"
+                                      className="h-5 w-6 text-[9px] font-extrabold border border-black/20 bg-black/10 rounded text-black hover:bg-black/15 active:bg-black/20 transition-colors duration-150 ease-out"
                                     >
                                       M
                                     </button>
                                     <button
                                       type="button"
-                                      className="h-6 w-7 text-[11px] font-extrabold border border-black/20 bg-black/10 rounded-md text-black hover:bg-black/15 active:bg-black/20 transition-colors duration-150 ease-out"
+                                      className="h-5 w-6 text-[9px] font-extrabold border border-black/20 bg-black/10 rounded text-black hover:bg-black/15 active:bg-black/20 transition-colors duration-150 ease-out"
                                     >
                                       S
                                     </button>
@@ -274,26 +277,24 @@ export default function Home() {
                                   </div>
                                 </div>
 
-                                <div className="relative h-12 px-3 py-2">
+                                <div className="relative h-9 px-3 py-1.5">
                                   {track.clips.map((clip) => (
                                     <div
                                       key={`${track.name}-${clip.label}-${clip.startBeat}`}
-                                      className="absolute top-2 h-8 rounded-md border border-black/20 hover:opacity-90 transition-opacity duration-150 ease-out shadow-[2px_2px_0px_0px_rgba(0,0,0,0.35)]"
+                                      className="absolute top-1.5 h-6 rounded border border-black/20 hover:opacity-90 transition-opacity duration-150 ease-out shadow-[2px_2px_0px_0px_rgba(0,0,0,0.35)]"
                                       style={{
                                         backgroundColor: track.color,
                                         left: `${clip.startBeat * 16}px`,
                                         width: `${clip.lengthBeats * 16}px`,
                                       }}
                                     >
-                                      <div className="px-2 py-1.5">
-                                        <div className="text-[10px] font-bold text-black truncate">
+                                      <div className="px-2 py-1">
+                                        <div className="text-[9px] font-bold text-black truncate">
                                           {clip.label}
                                         </div>
                                       </div>
                                     </div>
                                   ))}
-
-                                  <div className="pointer-events-none absolute inset-y-0 left-[52%] w-px bg-lime-300/80" />
                                 </div>
                               </div>
                             </div>
@@ -348,7 +349,7 @@ export default function Home() {
           <AnimatedSection className="max-w-2xl mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold">A community of listeners</h2>
             <p className="mt-3 text-neutral-600">
-              Reviewers browse by genre and discover tracks to review. They buy your track, listen deeply, and give structured feedback. When they love it, they share it with their fans.
+              Your tracks are automatically shown to reviewers who selected your genre. They buy your track, listen deeply, and give structured feedback. When they love it, they share it with their fans—getting your music heard by the right audience.
             </p>
           </AnimatedSection>
 
@@ -387,6 +388,10 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
                 <span>20 reviews included every month</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                <span>Auto-matched to genre reviewers</span>
               </div>
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />

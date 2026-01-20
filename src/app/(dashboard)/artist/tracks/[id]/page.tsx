@@ -168,18 +168,7 @@ export default async function TrackDetailPage({
       <div className="max-w-5xl mx-auto mb-12">
         <div className="flex flex-col sm:flex-row gap-6 items-start">
           {/* Album Art */}
-          <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-3xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex-shrink-0 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] overflow-hidden">
-            {track.status === "COMPLETED" ? (
-              <div className="absolute top-3 left-3 -rotate-6">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-lime-300 via-yellow-200 to-orange-200 border-2 border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="h-5 w-5 bg-black text-white flex items-center justify-center">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                  </div>
-                  <span className="text-xs font-black tracking-wide">COMPLETED</span>
-                  <Sparkles className="h-4 w-4" />
-                </div>
-              </div>
-            ) : null}
+          <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-3xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex-shrink-0 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] overflow-hidden relative">
             {track.artworkUrl ? (
               <img
                 src={track.artworkUrl}
@@ -196,7 +185,20 @@ export default async function TrackDetailPage({
           {/* Track Info */}
           <div className="flex-1 min-w-0">
             <div className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Track</div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-black mt-2 break-words">{track.title}</h1>
+            <div className="flex flex-wrap items-center gap-3 mt-2">
+              <h1 className="text-3xl sm:text-4xl font-bold text-black break-words">{track.title}</h1>
+              {track.status === "COMPLETED" && (
+                <div className="-rotate-3">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-lime-300 via-yellow-200 to-orange-200 border-2 border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="h-5 w-5 bg-black text-white flex items-center justify-center">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                    </div>
+                    <span className="text-xs font-black tracking-wide">COMPLETED</span>
+                    <Sparkles className="h-4 w-4" />
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Genre Pills */}
             <div className="flex flex-wrap items-center gap-2 mt-4">
@@ -351,10 +353,10 @@ export default async function TrackDetailPage({
         {completedReviews > 0 && (
           <AnimatedSection>
             <div className="space-y-6">
-              {/* Analytics - Blurred for trial users */}
+              {/* Analytics & Engagement - Combined for trial users */}
               {isTrial ? (
                 <div className="relative">
-                  <div className="pointer-events-none blur-sm opacity-50">
+                  <div className="pointer-events-none blur-sm opacity-50 space-y-6">
                     <AggregateAnalytics
                       reviews={[]}
                       platformAverages={{
@@ -363,16 +365,50 @@ export default async function TrackDetailPage({
                         vocals: platformStats._avg.vocalScore ?? 0,
                       }}
                     />
+                    <Card variant="airy" className="overflow-hidden rounded-3xl">
+                      <CardContent className="pt-6 space-y-6">
+                        <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Engagement</p>
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="text-center">
+                            <div className="flex justify-center mb-2">
+                              <div className="h-12 w-12 rounded-full flex items-center justify-center bg-neutral-100 text-neutral-500">
+                                <ListMusic className="h-6 w-6" />
+                              </div>
+                            </div>
+                            <p className="text-2xl font-black">—</p>
+                            <p className="text-sm text-neutral-600">Playlist</p>
+                          </div>
+                          <div className="text-center">
+                            <div className="flex justify-center mb-2">
+                              <div className="h-12 w-12 rounded-full flex items-center justify-center bg-neutral-100 text-neutral-500">
+                                <Share2 className="h-6 w-6" />
+                              </div>
+                            </div>
+                            <p className="text-2xl font-black">—</p>
+                            <p className="text-sm text-neutral-600">Share</p>
+                          </div>
+                          <div className="text-center">
+                            <div className="flex justify-center mb-2">
+                              <div className="h-12 w-12 rounded-full flex items-center justify-center bg-neutral-100 text-neutral-500">
+                                <UserPlus className="h-6 w-6" />
+                              </div>
+                            </div>
+                            <p className="text-2xl font-black">—</p>
+                            <p className="text-sm text-neutral-600">Follow</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <Card variant="soft" elevated className="max-w-md">
                       <CardContent className="pt-6 text-center">
                         <h3 className="text-xl font-bold text-black mb-2">Upgrade to see full analytics</h3>
                         <p className="text-sm text-black/60 mb-4">
-                          Get pattern insights, aggregate scores, and detailed analytics from all {completedReviews} reviews.
+                          Get pattern insights, aggregate scores, engagement signals, and detailed analytics from all {completedReviews} reviews.
                         </p>
                         <Link href="/artist/submit">
-                          <Button className="bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold">
+                          <Button className="bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
                             Upgrade to Standard
                             <ArrowRight className="h-4 w-4 ml-2" />
                           </Button>
@@ -382,14 +418,93 @@ export default async function TrackDetailPage({
                   </div>
                 </div>
               ) : (
-                <AggregateAnalytics
-                  reviews={analyticsReviews}
-                  platformAverages={{
-                    production: platformStats._avg.productionScore ?? 0,
-                    originality: platformStats._avg.originalityScore ?? 0,
-                    vocals: platformStats._avg.vocalScore ?? 0,
-                  }}
-                />
+                <>
+                  <AggregateAnalytics
+                    reviews={analyticsReviews}
+                    platformAverages={{
+                      production: platformStats._avg.productionScore ?? 0,
+                      originality: platformStats._avg.originalityScore ?? 0,
+                      vocals: platformStats._avg.vocalScore ?? 0,
+                    }}
+                  />
+
+                  {/* Engagement */}
+                  {hasListenerSignals && (
+                    <Card variant="airy" className="overflow-hidden rounded-3xl">
+                      <CardContent className="pt-6 space-y-6">
+                        <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Engagement</p>
+
+                        <div className="grid grid-cols-3 gap-4">
+                          {playlistTotal > 0 && (
+                            <div className="text-center">
+                              <div className="flex justify-center mb-2">
+                                <div className={cn(
+                                  "h-12 w-12 rounded-full flex items-center justify-center",
+                                  playlistYes / playlistTotal >= 0.5
+                                    ? "bg-lime-100 text-lime-700"
+                                    : "bg-neutral-100 text-neutral-500"
+                                )}>
+                                  <ListMusic className="h-6 w-6" />
+                                </div>
+                              </div>
+                              <p className="text-2xl font-black">
+                                {Math.round((playlistYes / playlistTotal) * 100)}%
+                              </p>
+                              <p className="text-sm text-neutral-600">Playlist</p>
+                              <p className="text-xs text-neutral-400 font-mono mt-1">
+                                {playlistYes} / {playlistTotal}
+                              </p>
+                            </div>
+                          )}
+
+                          {shareTotal > 0 && (
+                            <div className="text-center">
+                              <div className="flex justify-center mb-2">
+                                <div className={cn(
+                                  "h-12 w-12 rounded-full flex items-center justify-center",
+                                  shareYes / shareTotal >= 0.5
+                                    ? "bg-lime-100 text-lime-700"
+                                    : "bg-neutral-100 text-neutral-500"
+                                )}>
+                                  <Share2 className="h-6 w-6" />
+                                </div>
+                              </div>
+                              <p className="text-2xl font-black">
+                                {Math.round((shareYes / shareTotal) * 100)}%
+                              </p>
+                              <p className="text-sm text-neutral-600">Share</p>
+                              <p className="text-xs text-neutral-400 font-mono mt-1">
+                                {shareYes} / {shareTotal}
+                              </p>
+                            </div>
+                          )}
+
+                          {followTotal > 0 && (
+                            <div className="text-center">
+                              <div className="flex justify-center mb-2">
+                                <div className={cn(
+                                  "h-12 w-12 rounded-full flex items-center justify-center",
+                                  followYes / followTotal >= 0.5
+                                    ? "bg-lime-100 text-lime-700"
+                                    : "bg-neutral-100 text-neutral-500"
+                                )}>
+                                  <UserPlus className="h-6 w-6" />
+                                </div>
+                              </div>
+                              <p className="text-2xl font-black">
+                                {Math.round((followYes / followTotal) * 100)}%
+                              </p>
+                              <p className="text-sm text-neutral-600">Follow</p>
+                              <p className="text-xs text-neutral-400 font-mono mt-1">
+                                {followYes} / {followTotal}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </>
               )}
 
               {/* Reviews Carousel - Limited to 1 for trial */}
@@ -427,143 +542,7 @@ export default async function TrackDetailPage({
           </AnimatedSection>
         )}
 
-        {/* Section 4: Engagement (conditional - listener signals) */}
-        {completedReviews > 0 && (
-          <AnimatedSection>
-            {isTrial ? (
-              <div className="relative">
-                <div className="pointer-events-none blur-sm opacity-50">
-                  <Card variant="airy" className="overflow-hidden rounded-3xl">
-                    <CardContent className="pt-6 space-y-6">
-                      <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Engagement</p>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-2">
-                            <div className="h-12 w-12 rounded-full flex items-center justify-center bg-neutral-100 text-neutral-500">
-                              <ListMusic className="h-6 w-6" />
-                            </div>
-                          </div>
-                          <p className="text-2xl font-black">—</p>
-                          <p className="text-sm text-neutral-600">Playlist</p>
-                        </div>
-                        <div className="text-center">
-                          <div className="flex justify-center mb-2">
-                            <div className="h-12 w-12 rounded-full flex items-center justify-center bg-neutral-100 text-neutral-500">
-                              <Share2 className="h-6 w-6" />
-                            </div>
-                          </div>
-                          <p className="text-2xl font-black">—</p>
-                          <p className="text-sm text-neutral-600">Share</p>
-                        </div>
-                        <div className="text-center">
-                          <div className="flex justify-center mb-2">
-                            <div className="h-12 w-12 rounded-full flex items-center justify-center bg-neutral-100 text-neutral-500">
-                              <UserPlus className="h-6 w-6" />
-                            </div>
-                          </div>
-                          <p className="text-2xl font-black">—</p>
-                          <p className="text-sm text-neutral-600">Follow</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Card variant="soft" elevated className="max-w-md">
-                    <CardContent className="pt-6 text-center">
-                      <h3 className="text-xl font-bold text-black mb-2">Upgrade to see engagement</h3>
-                      <p className="text-sm text-black/60 mb-4">
-                        Unlock playlist/share/follow signals across all {completedReviews} reviews.
-                      </p>
-                      <Link href="/artist/submit">
-                        <Button className="bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold">
-                          Upgrade to Standard
-                          <ArrowRight className="h-4 w-4 ml-2" />
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            ) : hasListenerSignals ? (
-              <Card variant="airy" className="overflow-hidden rounded-3xl">
-                <CardContent className="pt-6 space-y-6">
-                  <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Engagement</p>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    {playlistTotal > 0 && (
-                      <div className="text-center">
-                        <div className="flex justify-center mb-2">
-                          <div className={cn(
-                            "h-12 w-12 rounded-full flex items-center justify-center",
-                            playlistYes / playlistTotal >= 0.5
-                              ? "bg-lime-100 text-lime-700"
-                              : "bg-neutral-100 text-neutral-500"
-                          )}>
-                            <ListMusic className="h-6 w-6" />
-                          </div>
-                        </div>
-                        <p className="text-2xl font-black">
-                          {Math.round((playlistYes / playlistTotal) * 100)}%
-                        </p>
-                        <p className="text-sm text-neutral-600">Playlist</p>
-                        <p className="text-xs text-neutral-400 font-mono mt-1">
-                          {playlistYes} / {playlistTotal}
-                        </p>
-                      </div>
-                    )}
-
-                    {shareTotal > 0 && (
-                      <div className="text-center">
-                        <div className="flex justify-center mb-2">
-                          <div className={cn(
-                            "h-12 w-12 rounded-full flex items-center justify-center",
-                            shareYes / shareTotal >= 0.5
-                              ? "bg-lime-100 text-lime-700"
-                              : "bg-neutral-100 text-neutral-500"
-                          )}>
-                            <Share2 className="h-6 w-6" />
-                          </div>
-                        </div>
-                        <p className="text-2xl font-black">
-                          {Math.round((shareYes / shareTotal) * 100)}%
-                        </p>
-                        <p className="text-sm text-neutral-600">Share</p>
-                        <p className="text-xs text-neutral-400 font-mono mt-1">
-                          {shareYes} / {shareTotal}
-                        </p>
-                      </div>
-                    )}
-
-                    {followTotal > 0 && (
-                      <div className="text-center">
-                        <div className="flex justify-center mb-2">
-                          <div className={cn(
-                            "h-12 w-12 rounded-full flex items-center justify-center",
-                            followYes / followTotal >= 0.5
-                              ? "bg-lime-100 text-lime-700"
-                              : "bg-neutral-100 text-neutral-500"
-                          )}>
-                            <UserPlus className="h-6 w-6" />
-                          </div>
-                        </div>
-                        <p className="text-2xl font-black">
-                          {Math.round((followYes / followTotal) * 100)}%
-                        </p>
-                        <p className="text-sm text-neutral-600">Follow</p>
-                        <p className="text-xs text-neutral-400 font-mono mt-1">
-                          {followYes} / {followTotal}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ) : null}
-          </AnimatedSection>
-        )}
-
-        {/* Section 5: Status (conditional - ableton, upload status, progress, snapshot) */}
+        {/* Section 4: Status (conditional - ableton, upload status, progress, snapshot) */}
         {(track.abletonRenderStatus || (track.status as any) === "UPLOADED" || track.reviewsRequested > 0 || track.status === "CANCELLED") && (
           <AnimatedSection>
             <Card variant="soft" elevated className="overflow-hidden rounded-3xl">

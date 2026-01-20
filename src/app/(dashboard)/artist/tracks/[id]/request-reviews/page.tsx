@@ -75,18 +75,20 @@ export default function RequestReviewsPage() {
         ) {
           router.push("/verify-email");
           router.refresh();
+          // Keep loading state active during navigation
           return;
         }
 
         setError((data as any)?.error || "Failed to request reviews");
+        setIsSubmitting(false);
         return;
       }
 
       // Redirect to track page after successful submission
+      // Keep loading state active during navigation
       router.push(`/artist/tracks/${trackId}`);
     } catch {
       setError("Failed to request reviews");
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -130,49 +132,60 @@ export default function RequestReviewsPage() {
         </Card>
 
         <Card variant="soft" elevated className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-mono tracking-widest text-black/40 uppercase">plan</p>
-                <p className="mt-1 text-sm font-bold text-black">
-                  {isSubscribed ? "MixReflect Pro" : "Trial"}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs font-mono tracking-widest text-black/40 uppercase">review tokens</p>
-                <p className="mt-1 text-sm font-bold text-black">
-                  {isLoadingProfile ? "…" : reviewTokens}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-mono tracking-widest text-black/40 uppercase">reviews</p>
-                <p className="text-sm font-bold text-black">{isSubscribed ? desiredReviews : 5}</p>
-              </div>
-
-              {isSubscribed ? (
-                <div className="mt-3">
-                  <input
-                    type="range"
-                    min={5}
-                    max={20}
-                    step={1}
-                    value={desiredReviews}
-                    onChange={(e) => setDesiredReviews(Number(e.target.value))}
-                    className="w-full"
-                  />
-                  <p className="mt-2 text-sm text-black/50">
-                    Spend <span className="font-bold text-black">{desiredReviews}</span> tokens to request <span className="font-bold text-black">{desiredReviews}</span> reviews.
-                  </p>
+          <CardContent className="pt-6 space-y-6">
+            {isSubscribed ? (
+              <>
+                {/* Subscribed User View */}
+                <div>
+                  <label className="block text-sm font-bold text-black mb-3">
+                    How many reviews do you want?
+                  </label>
+                  <div className="flex items-center gap-4 mb-3">
+                    <input
+                      type="range"
+                      min={5}
+                      max={20}
+                      step={1}
+                      value={desiredReviews}
+                      onChange={(e) => setDesiredReviews(Number(e.target.value))}
+                      className="flex-1 h-2 bg-neutral-200 rounded-full appearance-none cursor-pointer accent-lime-500"
+                    />
+                    <span className="text-3xl font-black text-black min-w-[3rem] text-right">{desiredReviews}</span>
+                  </div>
                 </div>
-              ) : (
-                <p className="mt-2 text-sm text-black/50">
-                  Trial requests use <span className="font-bold text-black">5</span> tokens for <span className="font-bold text-black">5</span> reviews.
-                </p>
-              )}
-            </div>
+
+                <div className="pt-4 border-t border-black/10 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-black/60">Available review credits</p>
+                    <p className="text-2xl font-bold text-black">{isLoadingProfile ? "…" : reviewTokens}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-black/60">This request will use</p>
+                    <p className="text-2xl font-bold text-lime-600">{desiredReviews}</p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Trial User View */}
+                <div className="text-center py-4">
+                  <p className="text-sm text-black/60 mb-2">You're requesting</p>
+                  <p className="text-5xl font-black text-black mb-2">5</p>
+                  <p className="text-sm font-bold text-black">reviews</p>
+                </div>
+
+                <div className="pt-4 border-t border-black/10 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-black/60">Available trial credits</p>
+                    <p className="text-2xl font-bold text-black">{isLoadingProfile ? "…" : reviewTokens}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-black/60">This request will use</p>
+                    <p className="text-2xl font-bold text-lime-600">5</p>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 

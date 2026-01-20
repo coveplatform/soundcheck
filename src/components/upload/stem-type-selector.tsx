@@ -27,13 +27,17 @@ export function StemTypeSelector({ value, onChange, disabled = false }: StemType
       value={value}
       onChange={(e) => onChange(e.target.value as StemType)}
       disabled={disabled}
-      className="w-full px-3 py-2 border-2 border-black rounded-lg font-bold text-sm bg-white disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed appearance-none cursor-pointer hover:bg-neutral-50 transition-colors"
+      className="w-full px-2.5 py-1.5 text-xs font-medium bg-white rounded ring-1 ring-neutral-200
+                 disabled:bg-neutral-100/50 disabled:text-neutral-500 disabled:cursor-not-allowed
+                 appearance-none cursor-pointer hover:bg-neutral-50 hover:ring-neutral-300
+                 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all"
       style={{
         backgroundImage: disabled
           ? "none"
-          : `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+          : `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%23737373' d='M4 6L1 2h6z'/%3E%3C/svg%3E")`,
         backgroundRepeat: "no-repeat",
         backgroundPosition: "right 8px center",
+        paddingRight: "28px",
       }}
     >
       {STEM_TYPES.map((type) => (

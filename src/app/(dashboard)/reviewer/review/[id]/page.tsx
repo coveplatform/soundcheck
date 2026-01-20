@@ -143,6 +143,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             }
 
             const notice = data.status === "SKIPPED" ? "skipped" : "expired";
+            // Keep loading state active during navigation
             router.push(`/listener/queue?notice=${notice}`);
             router.refresh();
             return;
@@ -150,11 +151,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           if (data.status !== "COMPLETED") {
             funnels.review.start(data.track.id, data.id);
           }
+          setIsLoading(false);
         } else {
           const data = await response.json().catch(() => null);
           const message = data?.error || "Review not found";
 
           if (response.status === 401) {
+            // Keep loading state active during navigation
             router.push("/login");
             router.refresh();
             return;
@@ -162,16 +165,19 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
           if (response.status === 403) {
             if (typeof message === "string" && message.toLowerCase().includes("verify")) {
+              // Keep loading state active during navigation
               router.push("/verify-email");
               router.refresh();
               return;
             }
             if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
+              // Keep loading state active during navigation
               router.push("/listener/onboarding");
               router.refresh();
               return;
             }
             if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
+              // Keep loading state active during navigation
               router.push("/listener/dashboard");
               router.refresh();
               return;
@@ -179,10 +185,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           }
 
           setError(message);
+          setIsLoading(false);
         }
       } catch {
         setError("Failed to load review");
-      } finally {
         setIsLoading(false);
       }
     }
@@ -453,6 +459,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         const message = data?.error || "Failed to submit review";
 
         if (response.status === 401) {
+          // Keep loading state active during navigation
           router.push("/login");
           router.refresh();
           return;
@@ -460,16 +467,19 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
         if (response.status === 403) {
           if (typeof message === "string" && message.toLowerCase().includes("verify")) {
+            // Keep loading state active during navigation
             router.push("/verify-email");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
+            // Keep loading state active during navigation
             router.push("/listener/onboarding");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
+            // Keep loading state active during navigation
             router.push("/listener/dashboard");
             router.refresh();
             return;
@@ -478,6 +488,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
         setError(message);
         track("review_form_validation_failed", { field: "api", error: message });
+        setIsSubmitting(false);
         return;
       }
 
@@ -493,11 +504,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       } catch {
       }
 
+      // Keep loading state active - success screen will handle any navigation
       setSuccess(true);
     } catch {
       setError("Something went wrong");
       track("review_form_validation_failed", { field: "api", error: "network_error" });
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -526,6 +537,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         const message = data?.error || "Failed to skip review";
 
         if (response.status === 401) {
+          // Keep loading state active during navigation
           router.push("/login");
           router.refresh();
           return;
@@ -533,16 +545,19 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
         if (response.status === 403) {
           if (typeof message === "string" && message.toLowerCase().includes("verify")) {
+            // Keep loading state active during navigation
             router.push("/verify-email");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
+            // Keep loading state active during navigation
             router.push("/listener/onboarding");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
+            // Keep loading state active during navigation
             router.push("/listener/dashboard");
             router.refresh();
             return;
@@ -550,6 +565,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         }
 
         setError(message);
+        setIsSkipping(false);
         return;
       }
 
@@ -558,11 +574,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       } catch {
       }
 
+      // Keep loading state active during navigation
       router.push("/listener/queue?notice=skipped");
       router.refresh();
     } catch {
       setError("Failed to skip review");
-    } finally {
       setIsSkipping(false);
     }
   };
@@ -590,6 +606,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         const message = data?.error || "Failed to mark review unplayable";
 
         if (response.status === 401) {
+          // Keep loading state active during navigation
           router.push("/login");
           router.refresh();
           return;
@@ -597,16 +614,19 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
         if (response.status === 403) {
           if (typeof message === "string" && message.toLowerCase().includes("verify")) {
+            // Keep loading state active during navigation
             router.push("/verify-email");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
+            // Keep loading state active during navigation
             router.push("/listener/onboarding");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
+            // Keep loading state active during navigation
             router.push("/listener/dashboard");
             router.refresh();
             return;
@@ -614,6 +634,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         }
 
         setError(message);
+        setIsMarkingUnplayable(false);
         return;
       }
 
@@ -622,11 +643,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       } catch {
       }
 
+      // Keep loading state active during navigation
       router.push("/listener/queue?notice=unplayable");
       router.refresh();
     } catch {
       setError("Failed to mark review unplayable");
-    } finally {
       setIsMarkingUnplayable(false);
     }
   };
