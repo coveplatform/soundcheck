@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 interface Activity {
@@ -235,11 +236,15 @@ export function ActivityFeed() {
         style={{ width: `${layout.cardSizePx}px`, height: `${layout.cardSizePx}px` }}
       >
         {shouldRenderArtwork ? (
-          <img
+          <Image
             src={artworkSrcForIndex(activity.artwork)}
             alt=""
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            sizes={`${layout.cardSizePx}px`}
+            className="object-cover"
             draggable={false}
+            loading="lazy"
+            quality={85}
             onError={() => {
               setArtworkExt((prev) => {
                 const current = prev[activity.artwork] ?? "jpg";
