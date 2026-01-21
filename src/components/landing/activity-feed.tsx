@@ -48,6 +48,8 @@ export function ActivityFeed() {
     ACTIVITIES.slice(0, layout.visibleCount).map((activity) => ({ ...activity, artwork: getInitialArtwork(activity.id) }))
   );
   const [phase, setPhase] = useState<"idle" | "pre" | "sliding">("idle");
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const [artworkExt, setArtworkExt] = useState<Record<number, "jpg" | "png" | "none">>(() => {
     const initial: Record<number, "jpg" | "png" | "none"> = {};
@@ -85,8 +87,9 @@ export function ActivityFeed() {
 
   useEffect(() => {
     const update = () => {
-      const isMobile = window.innerWidth < 640;
-      setLayout(isMobile
+      const mobile = window.innerWidth < 640;
+      setIsMobile(mobile);
+      setLayout(mobile
         ? { visibleCount: 3, cardSizePx: 108, gapPx: 14 }
         : { visibleCount: 7, cardSizePx: 130, gapPx: 20 }
       );
@@ -158,11 +161,10 @@ export function ActivityFeed() {
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
     let isPageVisible = !document.hidden;
-    let isMobile = window.innerWidth < 640;
 
     const tick = () => {
-      // Only tick if page is visible
-      if (!isPageVisible) return;
+      // Only tick if page is visible and not already animating
+      if (!isPageVisible || isAnimating) return;
 
       const currentQueue = queueRef.current;
       const currentNextIndex = nextIndexRef.current;
@@ -174,24 +176,50 @@ export function ActivityFeed() {
         artwork: pickArtwork(excludeArtwork),
       };
 
-      pendingIncomingRef.current = incoming;
-      pendingQueueRef.current = currentQueue;
+      setIsAnimating(true);
 
-      setRenderQueue([incoming, ...currentQueue]);
-      setPhase("pre");
+      // On mobile, use a simple fade approach
+      if (isMobile) {
+        // Fade out
+        setPhase("pre");
+        
+        setTimeout(() => {
+          // Replace content
+          const newQueue = [incoming, ...currentQueue].slice(0, layout.visibleCount);
+          setQueue(newQueue);
+          setRenderQueue(newQueue);
+          setNextIndex((currentNextIndex + 1) % ACTIVITIES.length);
+          nextIndexRef.current = (currentNextIndex + 1) % ACTIVITIES.length;
+          queueRef.current = newQueue;
 
-      // Use a single timeout instead of double rAF for more consistent mobile performance
-      setTimeout(() => {
-        setPhase("sliding");
-      }, 50);
+          // Fade in
+          setTimeout(() => {
+            setPhase("sliding");
+            setIsAnimating(false);
+          }, 50);
+        }, 150);
+      } else {
+        // Desktop: use original sliding animation
+        pendingIncomingRef.current = incoming;
+        pendingQueueRef.current = currentQueue;
 
-      // Fallback commit only (primary commit is onTransitionEnd).
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+        setRenderQueue([incoming, ...currentQueue]);
+        setPhase("pre");
+
+        // Use a single timeout instead of double rAF for more consistent mobile performance
+        setTimeout(() => {
+          setPhase("sliding");
+        }, 50);
+
+        // Fallback commit only (primary commit is onTransitionEnd).
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+        timeoutRef.current = setTimeout(() => {
+          commitPending();
+          setIsAnimating(false);
+        }, 400);
       }
-      timeoutRef.current = setTimeout(() => {
-        commitPending();
-      }, 900);
     };
 
     const handleVisibilityChange = () => {
@@ -207,10 +235,10 @@ export function ActivityFeed() {
     const handleResize = () => {
       const newIsMobile = window.innerWidth < 640;
       if (newIsMobile !== isMobile) {
-        isMobile = newIsMobile;
+        setIsMobile(newIsMobile);
         if (interval) {
           clearInterval(interval);
-          interval = setInterval(tick, isMobile ? 4000 : 3000);
+          interval = setInterval(tick, newIsMobile ? 4000 : 3000);
         }
       }
     };
@@ -230,7 +258,7 @@ export function ActivityFeed() {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, []);
+  }, [isMobile, isAnimating]);
 
   const ActivityCard = ({ activity }: { activity: Activity }) => (
     (() => {
@@ -296,14 +324,20 @@ export function ActivityFeed() {
         <div
           className={`flex will-change-transform ${
             phase === "sliding"
-              ? "transition-transform duration-300 ease-out"
-              : "transition-none"
+              ? isMobile 
+                ? "transition-opacity duration-200 ease-out"
+                : "transition-transform duration-300 ease-out"
+              : isMobile
+                ? "transition-opacity duration-200 ease-out"
+                : "transition-none"
           }`}
           style={{
             gap: `${layout.gapPx}px`,
-            transform: `translateX(${phase === "pre" ? -STEP_PX : 0}px)`,
+            transform: isMobile ? "none" : `translateX(${phase === "pre" ? -STEP_PX : 0}px)`,
+            opacity: isMobile ? (phase === "pre" ? 0.3 : 1) : 1,
           }}
           onTransitionEnd={(e) => {
+            if (isMobile) return; // Skip transition end handling on mobile
             if (e.propertyName !== "transform") return;
             if (phase !== "sliding") return;
             commitPending();
