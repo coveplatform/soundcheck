@@ -16,7 +16,9 @@ import {
   Lock,
   Upload,
   Eye,
-  ShoppingCart
+  ShoppingCart,
+  ArrowLeft,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +41,92 @@ export default async function SalesHubPage() {
   }
 
   const isPro = artistProfile.subscriptionStatus === "active";
+
+  if (!isPro) {
+    return (
+      <div className="pt-14 sm:pt-16 px-4 sm:px-6 lg:px-12">
+        <Link
+          href="/artist/dashboard"
+          className="inline-flex items-center gap-2 text-sm text-black/50 hover:text-black transition-colors mb-8"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Dashboard
+        </Link>
+
+        <PageHeader
+          title="Sales & Sharing Hub"
+          description="Sell your tracks, share links, and track purchases"
+        />
+
+        <div className="max-w-4xl mx-auto mt-12">
+          <Card variant="soft" elevated className="border-2 border-lime-400 rounded-3xl overflow-hidden">
+            <CardContent className="pt-6 text-center py-16">
+              <div className="w-16 h-16 rounded-full bg-lime-100 flex items-center justify-center mx-auto mb-6">
+                <ShoppingCart className="h-8 w-8 text-lime-600" />
+              </div>
+              <h2 className="text-3xl font-black mb-4">Upgrade to Pro to start selling</h2>
+              <p className="text-lg text-black/70 mb-2 max-w-2xl mx-auto">
+                Turn your uploaded tracks into a shareable purchase link and track sales, plays, and referrals.
+              </p>
+              <p className="text-sm text-black/50 mb-8 max-w-xl mx-auto">
+                Pro unlocks sales mode, affiliate links, and a clean hub for managing your sharing.
+              </p>
+
+              <div className="bg-white/50 rounded-2xl p-8 max-w-2xl mx-auto mb-8">
+                <p className="text-xs font-mono text-black/40 uppercase tracking-widest mb-4">What you'll get</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-xs font-black">✓</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">Sell your tracks</p>
+                      <p className="text-xs text-black/60">Generate a purchase link for any uploaded track</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-xs font-black">✓</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">Affiliate links</p>
+                      <p className="text-xs text-black/60">Track referrals and reward your community</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-xs font-black">✓</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">Sales tracking</p>
+                      <p className="text-xs text-black/60">See purchases, plays, and performance per track</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-xs font-black">✓</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">Simple sharing hub</p>
+                      <p className="text-xs text-black/60">Manage links in one place, no confusion</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                href="/artist/submit"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold rounded-lg text-lg shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+              >
+                Upgrade to Pro
+                <Sparkles className="h-5 w-5" />
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   // Fetch all external purchases for this artist's tracks
   const externalPurchases = await prisma.externalPurchase.findMany({

@@ -57,9 +57,9 @@ export default async function AnalyticsPage() {
               <div className="w-16 h-16 rounded-full bg-lime-100 flex items-center justify-center mx-auto mb-6">
                 <BarChart3 className="h-8 w-8 text-lime-600" />
               </div>
-              <h2 className="text-3xl font-black mb-4">Analytics is a Pro Feature</h2>
+              <h2 className="text-3xl font-black mb-4">Upgrade to Pro to unlock Analytics</h2>
               <p className="text-lg text-black/70 mb-2 max-w-2xl mx-auto">
-                Unlock detailed insights, track your improvement over time, and see patterns across all your submissions.
+                Get detailed insights, track your improvement over time, and spot patterns across all your submissions.
               </p>
               <p className="text-sm text-black/50 mb-8 max-w-xl mx-auto">
                 Get aggregate analytics, trend graphs, category breakdowns, and actionable insights to level up your music.
