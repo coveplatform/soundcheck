@@ -333,7 +333,7 @@ export default function PublicTrackPage() {
                               disabled={purchasing}
                               className="flex-1 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold"
                             >
-                              {purchasing ? "Processing..." : `Pay $${(track.salePrice / 100).toFixed(2)}`}
+                              {purchasing ? "Processing..." : `Pay $${((track.salePrice ?? 0) / 100).toFixed(2)}`}
                             </Button>
                             <Button
                               onClick={() => setShowCheckoutForm(false)}
