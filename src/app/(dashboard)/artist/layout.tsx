@@ -2,8 +2,9 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ArtistNav } from "@/components/dashboard/artist-nav";
+import { ArtistSidebar } from "@/components/dashboard/artist-sidebar";
 import { VerifyEmailBanner } from "@/components/ui/verify-email-banner";
+import { ArtistLayoutClient } from "@/components/dashboard/artist-layout-client";
 
 export default async function ArtistLayout({
   children,
@@ -34,26 +35,31 @@ export default async function ArtistLayout({
   const hasEarnings = (artistProfile?.totalEarnings || 0) > 0;
 
   return (
-    <div className="min-h-screen bg-[#faf8f5]">
-      <ArtistNav
-        user={{
-          name: session.user.name,
-          email: session.user.email,
-          isReviewer: session.user.isReviewer,
-        }}
-        artistName={artistName}
-        hasEarnings={hasEarnings}
-      />
+    <ArtistLayoutClient>
+      <div className="min-h-screen bg-[#faf8f5]">
+        <ArtistSidebar
+          user={{
+            name: session.user.name,
+            email: session.user.email,
+            isReviewer: session.user.isReviewer,
+          }}
+          artistName={artistName}
+          hasEarnings={hasEarnings}
+        />
 
-      {!user?.emailVerified && (
-        <div className="pt-16 px-6 sm:px-8">
-          <VerifyEmailBanner />
+        {/* Main content with sidebar offset */}
+        <div className="md:pl-64">
+          {!user?.emailVerified && (
+            <div className="pt-6 px-6 sm:px-8">
+              <VerifyEmailBanner />
+            </div>
+          )}
+
+          <main className="pb-24 md:pb-8">
+            {children}
+          </main>
         </div>
-      )}
-
-      <main className="pb-24 md:pb-8">
-        {children}
-      </main>
-    </div>
+      </div>
+    </ArtistLayoutClient>
   );
 }

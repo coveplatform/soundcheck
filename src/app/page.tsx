@@ -48,6 +48,31 @@ const DAW_TRACKS = [
       { label: "Hook", startBeat: 16, lengthBeats: 8 },
     ],
   },
+  {
+    name: "FX & Risers",
+    color: "#a78bfa",
+    clips: [
+      { label: "Riser", startBeat: 6, lengthBeats: 2 },
+      { label: "Impact", startBeat: 8, lengthBeats: 1 },
+      { label: "Sweep", startBeat: 15, lengthBeats: 1 },
+    ],
+  },
+  {
+    name: "Hi-Hats",
+    color: "#fbbf24",
+    clips: [
+      { label: "Pattern A", startBeat: 4, lengthBeats: 12 },
+      { label: "Rolls", startBeat: 18, lengthBeats: 6 },
+    ],
+  },
+  {
+    name: "Backing Vox",
+    color: "#ec4899",
+    clips: [
+      { label: "Ahhs", startBeat: 12, lengthBeats: 4 },
+      { label: "Harmony", startBeat: 16, lengthBeats: 8 },
+    ],
+  },
 ];
 
 export default function Home() {
@@ -87,6 +112,26 @@ export default function Home() {
               </Button>
             </Link>
             <span className="text-sm text-neutral-500">$9.95/mo · Cancel anytime</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof Stats */}
+      <section className="py-8 bg-[#faf8f5]">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid grid-cols-3 gap-4 sm:gap-12">
+            <div className="text-center">
+              <p className="text-2xl sm:text-4xl font-bold text-neutral-950 mb-1">103</p>
+              <p className="text-[10px] sm:text-xs text-neutral-500">Reviewed</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl sm:text-4xl font-bold text-lime-700 mb-1">&lt;4hrs</p>
+              <p className="text-[10px] sm:text-xs text-neutral-500">Avg turnaround</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl sm:text-4xl font-bold text-neutral-950 mb-1">$1,073</p>
+              <p className="text-[10px] sm:text-xs text-neutral-500">Paid out</p>
+            </div>
           </div>
         </div>
       </section>
@@ -145,52 +190,21 @@ export default function Home() {
 
         <div className="max-w-5xl mx-auto px-4 pt-6 sm:pt-8">
           <AnimatedSection className="is-visible max-w-4xl mb-4 sm:mb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold">Upload stems for detailed feedback</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold">Drop in your DAW file. Get feedback on every layer.</h2>
             <p className="mt-3 text-neutral-300">
-              Export stems straight from your DAW (Ableton, Logic, FL Studio, etc.) and upload them here.
-              Reviewers can mute and solo each element (drums, bass, vocals, synths) to give you precise, actionable feedback on your production.
+              Upload your Ableton Live Set (.als), Logic project, or exported stems.
+              Reviewers can mute/solo each element to give you precise feedback on your mix.
             </p>
           </AnimatedSection>
 
           <AnimatedSection className="is-visible">
             <div className="bg-neutral-800 border-2 border-neutral-700 rounded-lg p-6 sm:p-8">
               <div className="space-y-6">
-                <div className="grid sm:grid-cols-3 gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-lime-500/20 border border-lime-500 flex items-center justify-center">
-                      <span className="text-lime-400 font-bold">🎛️</span>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white">Stem-by-stem control</h3>
-                      <p className="text-sm text-neutral-400 mt-1">
-                        Reviewers can mute your drums to hear if the bass is too loud, or solo your vocals to check if they sit right in the mix.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-orange-500/20 border border-orange-500 flex items-center justify-center">
-                      <span className="text-orange-400 font-bold">🎯</span>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white">More precise feedback</h3>
-                      <p className="text-sm text-neutral-400 mt-1">
-                        Get comments like &quot;Your kick at 1:42 is masking the bass&quot; instead of vague &quot;mix needs work&quot; feedback.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500 flex items-center justify-center">
-                      <span className="text-blue-400 font-bold">⚡</span>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white">Pro-level workflow</h3>
-                      <p className="text-sm text-neutral-400 mt-1">
-                        Upload master + stems just like sending to a mix engineer. Reviewers experience your track the way you built it.
-                      </p>
-                    </div>
-                  </div>
+                <div className="flex flex-wrap gap-3 text-xs font-mono">
+                  <span className="px-3 py-1.5 bg-neutral-700 text-neutral-300 rounded">Ableton .als</span>
+                  <span className="px-3 py-1.5 bg-neutral-700 text-neutral-300 rounded">Logic .logicx</span>
+                  <span className="px-3 py-1.5 bg-neutral-700 text-neutral-300 rounded">FL Studio .flp</span>
+                  <span className="px-3 py-1.5 bg-neutral-700 text-neutral-300 rounded">or export stems</span>
                 </div>
 
                 <div className="relative">
@@ -239,21 +253,21 @@ export default function Home() {
                         <div className="divide-y divide-white/10">
                           {DAW_TRACKS.map((track) => (
                             <div key={track.name} className="grid grid-cols-[160px_1fr]">
-                              <div className="h-9 px-3 flex items-center" style={{ backgroundColor: track.color }}>
+                              <div className="h-6 px-3 flex items-center" style={{ backgroundColor: track.color }}>
                                 <div className="w-full flex items-center justify-between gap-2">
-                                  <div className="text-[10px] font-extrabold text-black truncate">
+                                  <div className="text-[9px] font-bold text-black truncate">
                                     {track.name}
                                   </div>
-                                  <div className="flex items-center gap-1.5">
+                                  <div className="flex items-center gap-1">
                                     <button
                                       type="button"
-                                      className="h-5 w-6 text-[9px] font-extrabold border border-black/20 bg-black/10 rounded text-black hover:bg-black/15 active:bg-black/20 transition-colors duration-150 ease-out"
+                                      className="h-4 w-5 text-[8px] font-bold border border-black/20 bg-black/10 rounded text-black hover:bg-black/15 active:bg-black/20 transition-colors duration-150 ease-out"
                                     >
                                       M
                                     </button>
                                     <button
                                       type="button"
-                                      className="h-5 w-6 text-[9px] font-extrabold border border-black/20 bg-black/10 rounded text-black hover:bg-black/15 active:bg-black/20 transition-colors duration-150 ease-out"
+                                      className="h-4 w-5 text-[8px] font-bold border border-black/20 bg-black/10 rounded text-black hover:bg-black/15 active:bg-black/20 transition-colors duration-150 ease-out"
                                     >
                                       S
                                     </button>
@@ -277,19 +291,19 @@ export default function Home() {
                                   </div>
                                 </div>
 
-                                <div className="relative h-9 px-3 py-1.5">
+                                <div className="relative h-6 px-3">
                                   {track.clips.map((clip) => (
                                     <div
                                       key={`${track.name}-${clip.label}-${clip.startBeat}`}
-                                      className="absolute top-1.5 h-6 rounded border border-black/20 hover:opacity-90 transition-opacity duration-150 ease-out shadow-[2px_2px_0px_0px_rgba(0,0,0,0.35)]"
+                                      className="absolute top-0 h-full rounded-sm border border-black/20 hover:opacity-90 transition-opacity duration-150 ease-out shadow-[1px_1px_0px_0px_rgba(0,0,0,0.35)] flex items-center"
                                       style={{
                                         backgroundColor: track.color,
                                         left: `${clip.startBeat * 16}px`,
                                         width: `${clip.lengthBeats * 16}px`,
                                       }}
                                     >
-                                      <div className="px-2 py-1">
-                                        <div className="text-[9px] font-bold text-black truncate">
+                                      <div className="px-1.5 w-full">
+                                        <div className="text-[8px] font-bold text-black truncate">
                                           {clip.label}
                                         </div>
                                       </div>
@@ -303,8 +317,12 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="mt-4 p-3 bg-lime-500/10 border border-lime-500/30 rounded text-xs text-lime-300">
-                      💡 Tip: Jump to the hook clip to hear what reviewers are reacting to
+                    <div className="mt-4 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2 text-lime-400">
+                        <div className="w-1.5 h-1.5 rounded-full bg-lime-400 animate-pulse" />
+                        <span className="font-mono">Live stem preview</span>
+                      </div>
+                      <span className="text-neutral-500 font-mono">Click M/S to mute or solo</span>
                     </div>
                   </div>
                 </div>

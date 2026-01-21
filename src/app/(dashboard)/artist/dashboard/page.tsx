@@ -1,17 +1,13 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
-import {
-  SparklesDoodle,
-  StarDoodle,
-  SquiggleDoodle,
-  MusicDoodle,
-} from "@/components/dashboard/doodles";
+import { TrackPlayButton } from "@/components/dashboard/track-play-button";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +35,7 @@ export default async function ArtistDashboardPage() {
           },
         },
         orderBy: { createdAt: "desc" },
+        take: 3,
       },
     },
   });
@@ -102,86 +99,56 @@ export default async function ArtistDashboardPage() {
   })();
 
   return (
-    <div className="pt-14 sm:pt-16 px-4 sm:px-6 lg:px-12 relative overflow-hidden">
-      {/* Doodles for personality */}
-      <SparklesDoodle className="pointer-events-none absolute top-20 right-10 w-16 h-16 text-yellow-400 opacity-40 rotate-12 hidden lg:block" />
-      <StarDoodle className="pointer-events-none absolute top-40 left-10 w-12 h-12 text-lime-500 opacity-60 -rotate-12 hidden lg:block" />
-      <MusicDoodle className="pointer-events-none absolute bottom-40 right-20 w-20 h-20 text-purple-400 opacity-30 rotate-6 hidden lg:block" />
-      <SquiggleDoodle className="pointer-events-none absolute top-1/2 left-1/4 w-24 h-24 text-orange-300 opacity-20 -rotate-12 hidden xl:block" />
+    <div className="pt-14 px-6 sm:px-8 lg:px-12 pb-20">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-10 pb-6 border-b border-neutral-200">
+          <div>
+            <h1 className="text-4xl sm:text-5xl font-light tracking-tight mb-2">dashboard</h1>
+            <div className="flex items-center gap-4 text-sm">
+              <span className="text-neutral-500">{planLabel}</span>
+              <span className="text-neutral-300">•</span>
+              <span className="font-semibold">{reviewTokens} tokens</span>
+            </div>
+          </div>
 
-      <div className="max-w-4xl mx-auto relative z-10">
-        <div className="mb-10">
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Dashboard</h1>
-        </div>
-
-        <div className="mb-8 rounded-3xl border border-neutral-200 bg-white/70 p-6 shadow-md">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-6">
             <div>
-              <p className="text-xs font-medium text-black/50 uppercase tracking-wider">Plan</p>
-              <p className="mt-2 text-2xl font-bold text-black">{planLabel}</p>
-              <p className="mt-1 text-sm text-black/50">
-                {isSubscribed ? "Choose how many reviews you want per track." : "You have 5 review tokens to start."}
-              </p>
+              <p className="text-xs text-neutral-500 mb-1">Tracks</p>
+              <p className="text-2xl font-semibold tabular-nums">{tracks.length}</p>
             </div>
-            <div className="text-right">
-              <p className="text-xs font-medium text-black/50 uppercase tracking-wider">Review tokens</p>
-              <p className="mt-2 text-2xl font-bold text-black">{reviewTokens}</p>
-              <p className="mt-1 text-sm text-black/50">1 token = 1 review</p>
+            <div>
+              <p className="text-xs text-neutral-500 mb-1">In Review</p>
+              <p className="text-2xl font-semibold text-orange-500 tabular-nums">{reviewing.length}</p>
             </div>
-          </div>
-        </div>
-
-        {/* Main Action Card - flowy and soft */}
-        <div className="mb-8 rounded-3xl border border-neutral-200 bg-gradient-to-br from-lime-50 via-yellow-50 to-orange-50 p-5 sm:p-8 shadow-lg relative overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-lime-400 rounded-full mb-4">
-                <span className="text-xs font-bold uppercase tracking-wider">Next Step</span>
-              </div>
-              <h2 className="text-2xl font-bold text-black">{nextAction.title}</h2>
-              <p className="mt-2 text-black/70">{nextAction.description}</p>
-              <div className="mt-6">
-                <Link href={nextAction.href}>
-                  <Button className="bg-lime-400 hover:bg-lime-300 text-black font-bold rounded-full shadow-md hover:shadow-lg transition-all h-12 px-6">
-                    {nextAction.cta}
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
+            <div>
+              <p className="text-xs text-neutral-500 mb-1">Earnings</p>
+              <p className="text-2xl font-semibold text-lime-700 tabular-nums">${totalEarnings.toFixed(2)}</p>
             </div>
           </div>
         </div>
 
-        {/* Stats Grid - soft and flowy */}
-        <div className="grid gap-5 sm:grid-cols-3 mb-8">
-          <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-purple-50 to-pink-50 p-6 shadow-md">
-            <p className="text-xs font-medium text-black/50 uppercase tracking-wider">Tracks</p>
-            <p className="mt-3 text-4xl font-bold text-black">{tracks.length}</p>
-            <p className="text-sm text-black/50 mt-1">in your library</p>
+        <Card variant="soft" elevated className="mb-10 overflow-hidden">
+          <div className="p-5 sm:p-6">
+            <div className="inline-block bg-lime-400 px-3 py-1 text-xs font-semibold uppercase tracking-wider mb-4">
+              Next Step
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-semibold mb-2 max-w-2xl">{nextAction.title}</h2>
+            <p className="text-neutral-700 text-base mb-6 max-w-xl">{nextAction.description}</p>
+            <Link href={nextAction.href}>
+              <Button className="bg-black text-white hover:bg-neutral-800 font-semibold text-base px-8 h-12">
+                {nextAction.cta}
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </Button>
+            </Link>
           </div>
+        </Card>
 
-          <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-6 shadow-md">
-            <p className="text-xs font-medium text-black/50 uppercase tracking-wider">In Review</p>
-            <p className="mt-3 text-4xl font-bold text-black">{reviewing.length}</p>
-            <p className="text-sm text-black/50 mt-1">getting feedback</p>
-          </div>
-
-          <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-lime-50 to-yellow-50 p-6 shadow-md">
-            <p className="text-xs font-medium text-black/50 uppercase tracking-wider">Earnings</p>
-            <p className="mt-3 text-4xl font-bold text-lime-700">${totalEarnings.toFixed(2)}</p>
-            <p className="text-sm text-black/50 mt-1">lifetime total</p>
-          </div>
-        </div>
-
-        {/* Recent Tracks - soft and flowy */}
+        {/* Recent Tracks */}
         {tracks.length > 0 && (
-          <div className="rounded-3xl border border-neutral-200 bg-white p-8 shadow-lg">
-            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 mb-6">
-              <div>
-                <p className="text-xs font-medium text-black/50 uppercase tracking-wider">Recent Tracks</p>
-                <p className="text-lg font-bold text-black mt-1">Your latest uploads</p>
-              </div>
-              <Link href="/artist/tracks" className="text-sm text-black/60 hover:text-black font-medium transition-colors">
+          <div>
+            <div className="flex items-baseline justify-between mb-6">
+              <h2 className="text-xl font-semibold">Recent Tracks</h2>
+              <Link href="/artist/tracks" className="text-sm font-semibold text-neutral-600 hover:text-black">
                 View all →
               </Link>
             </div>
@@ -201,16 +168,39 @@ export default async function ArtistDashboardPage() {
                 return (
                   <div
                     key={t.id}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl bg-gradient-to-r from-neutral-50 to-white border border-neutral-200 px-5 py-4 hover:shadow-md transition-all"
+                    className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white rounded-xl px-5 py-4 border border-neutral-200 hover:border-neutral-300 hover:shadow-sm transition-all"
                   >
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-black truncate">{t.title}</p>
-                      <p className="text-xs text-black/50 font-medium">
-                        {(t.status as any) === "UPLOADED" ? "Ready to request reviews" : t.status.replaceAll("_", " ").toLowerCase()}
+                    {/* Artwork + Play Button */}
+                    <div className="relative flex-shrink-0 group">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-neutral-100">
+                        {t.artworkUrl ? (
+                          <Image
+                            src={t.artworkUrl}
+                            alt={t.title}
+                            width={64}
+                            height={64}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-neutral-200 to-neutral-300">
+                            <span className="text-2xl text-neutral-400">♪</span>
+                          </div>
+                        )}
+                      </div>
+                      {t.sourceUrl && <TrackPlayButton audioUrl={t.sourceUrl} />}
+                    </div>
+
+                    {/* Track Info */}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-base truncate mb-1">{t.title}</p>
+                      <p className="text-xs text-neutral-500 uppercase tracking-wide">
+                        {(t.status as any) === "UPLOADED" ? "Ready to request reviews" : t.status.replaceAll("_", " ")}
                       </p>
                     </div>
+
+                    {/* CTA Button */}
                     <Link href={cta.href} className="w-full sm:w-auto flex-shrink-0">
-                      <Button className="h-9 px-4 bg-black hover:bg-black/90 text-white font-bold rounded-full w-full sm:w-auto">
+                      <Button className="h-10 px-6 bg-black hover:bg-neutral-800 text-white text-sm font-semibold w-full sm:w-auto">
                         {cta.label}
                       </Button>
                     </Link>

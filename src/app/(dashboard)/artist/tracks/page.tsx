@@ -51,81 +51,82 @@ export default async function ArtistTracksPage() {
   const pendingBalance = artistProfile.pendingBalance / 100;
 
   return (
-    <div className="pt-14 sm:pt-16 px-4 sm:px-6 lg:px-12">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-        <div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">
-            Your tracks
-          </h1>
-          <p className="mt-2 text-sm text-black/40">
-            {tracks.length} {tracks.length === 1 ? "track" : "tracks"}
-            {totalEarnings > 0 && ` · $${totalEarnings.toFixed(2)} earned`}
-          </p>
+    <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 pb-8 border-b border-neutral-200">
+          <div>
+            <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">tracks</h1>
+            <div className="flex items-center gap-4 text-sm">
+              <span className="text-neutral-500">{tracks.length} {tracks.length === 1 ? "track" : "tracks"}</span>
+              {totalEarnings > 0 && (
+                <>
+                  <span className="text-neutral-300">•</span>
+                  <span className="font-semibold text-lime-700">${totalEarnings.toFixed(2)} earned</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          {pendingBalance > 0 && (
+            <div className="px-4 py-2 bg-lime-50 border border-lime-200 rounded-lg">
+              <span className="text-sm font-bold text-lime-700">${pendingBalance.toFixed(2)} pending</span>
+            </div>
+          )}
         </div>
 
-        {(totalEarnings > 0 || pendingBalance > 0) && (
-          <div className="flex gap-4 text-sm">
-            {pendingBalance > 0 && (
-              <div className="px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200">
-                <span className="text-emerald-700">${pendingBalance.toFixed(2)} pending</span>
-              </div>
-            )}
+        {tracks.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+            <Link
+              href="/artist/submit"
+              className="group aspect-square"
+            >
+              <Card
+                variant="soft"
+                interactive
+                className="h-full border-2 border-dashed border-black/10 bg-white/40 hover:bg-white/60 hover:border-black/20"
+              >
+                <div className="h-full flex flex-col items-center justify-center gap-3">
+                  <div className="h-12 w-12 rounded-full bg-black/5 group-hover:bg-black flex items-center justify-center transition-colors duration-150 ease-out motion-reduce:transition-none">
+                    <Plus className="h-5 w-5 text-black/40 group-hover:text-white transition-colors duration-150 ease-out motion-reduce:transition-none" />
+                  </div>
+                  <span className="text-sm text-black/50 group-hover:text-black transition-colors duration-150 ease-out motion-reduce:transition-none">
+                    Upload track
+                  </span>
+                </div>
+              </Card>
+            </Link>
+
+            {tracks.map((track) => {
+              const completedReviews = track.reviews.filter(
+                (r) => r.status === "COMPLETED"
+              ).length;
+              const totalPurchases =
+                track.purchases.reduce((sum, p) => sum + p.amount, 0) / 100;
+              const hasReviews = track.reviewsRequested > 0;
+              const reviewProgress = hasReviews
+                ? completedReviews / track.reviewsRequested
+                : 0;
+
+              return (
+                <TrackCard
+                  key={track.id}
+                  id={track.id}
+                  title={track.title}
+                  artworkUrl={track.artworkUrl}
+                  status={track.status}
+                  hasReviews={hasReviews}
+                  reviewProgress={reviewProgress}
+                  completedReviews={completedReviews}
+                  totalReviews={track.reviewsRequested}
+                  earnings={totalPurchases}
+                />
+              );
+            })}
           </div>
         )}
       </div>
-
-      {tracks.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-          <Link
-            href="/artist/submit"
-            className="group aspect-square"
-          >
-            <Card
-              variant="soft"
-              interactive
-              className="h-full border-2 border-dashed border-black/10 bg-white/40 hover:bg-white/60 hover:border-black/20"
-            >
-              <div className="h-full flex flex-col items-center justify-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-black/5 group-hover:bg-black flex items-center justify-center transition-colors duration-150 ease-out motion-reduce:transition-none">
-                  <Plus className="h-5 w-5 text-black/40 group-hover:text-white transition-colors duration-150 ease-out motion-reduce:transition-none" />
-                </div>
-                <span className="text-sm text-black/50 group-hover:text-black transition-colors duration-150 ease-out motion-reduce:transition-none">
-                  Upload track
-                </span>
-              </div>
-            </Card>
-          </Link>
-
-          {tracks.map((track) => {
-            const completedReviews = track.reviews.filter(
-              (r) => r.status === "COMPLETED"
-            ).length;
-            const totalPurchases =
-              track.purchases.reduce((sum, p) => sum + p.amount, 0) / 100;
-            const hasReviews = track.reviewsRequested > 0;
-            const reviewProgress = hasReviews
-              ? completedReviews / track.reviewsRequested
-              : 0;
-
-            return (
-              <TrackCard
-                key={track.id}
-                id={track.id}
-                title={track.title}
-                artworkUrl={track.artworkUrl}
-                status={track.status}
-                hasReviews={hasReviews}
-                reviewProgress={reviewProgress}
-                completedReviews={completedReviews}
-                totalReviews={track.reviewsRequested}
-                earnings={totalPurchases}
-              />
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }

@@ -178,26 +178,6 @@ export default function SignupPage() {
         <p className="mt-2 text-neutral-500">Email and password. That&apos;s it.</p>
       </div>
 
-      {/* Google */}
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full h-12 bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-400 font-bold transition-colors duration-150 ease-out motion-reduce:transition-none"
-        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/artist/submit" })}
-      >
-        <GoogleIcon className="h-5 w-5 mr-2" />
-        Continue with Google
-      </Button>
-
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-neutral-300" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-[#f7f7f5] px-4 text-neutral-500">or</span>
-        </div>
-      </div>
-
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
@@ -217,7 +197,7 @@ export default function SignupPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent"
+            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
           />
         </div>
 
@@ -232,7 +212,7 @@ export default function SignupPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent"
+            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
           />
           <div className="mt-3">
             <PasswordStrength password={password} />
@@ -278,6 +258,26 @@ export default function SignupPage() {
           </Link>
         </p>
       </form>
+
+      <div className="relative my-8">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-neutral-300" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-[#f7f7f5] px-4 text-neutral-500">or</span>
+        </div>
+      </div>
+
+      {/* Google */}
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full h-12 bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-400 font-bold transition-colors duration-150 ease-out motion-reduce:transition-none"
+        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/artist/submit" })}
+      >
+        <GoogleIcon className="h-5 w-5 mr-2" />
+        Continue with Google
+      </Button>
     </div>
   );
 }

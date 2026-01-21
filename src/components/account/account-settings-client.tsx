@@ -46,6 +46,9 @@ export function AccountSettingsClient({
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
+  const [isStartingCheckout, setIsStartingCheckout] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
+
   async function saveProfile() {
     setProfileError("");
     setProfileSaved(false);
@@ -126,9 +129,36 @@ export function AccountSettingsClient({
   }
 
   const isSubscribed = subscription?.status === "active";
-  const hasFreeTrial = !isSubscribed && (subscription?.totalTracks || 0) < 1;
-  const planLabel = isSubscribed ? "MixReflect Pro" : "Trial";
+  const planLabel = isSubscribed ? "MixReflect Pro" : "Free";
   const reviewTokens = subscription?.reviewTokens ?? 0;
+
+  async function startCheckout() {
+    setCheckoutError("");
+    setIsStartingCheckout(true);
+
+    try {
+      const res = await fetch("/api/subscriptions/checkout", {
+        method: "POST",
+      });
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        setCheckoutError(data?.error || "Failed to start checkout");
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      setCheckoutError("Failed to start checkout");
+    } catch {
+      setCheckoutError("Failed to start checkout");
+    } finally {
+      setIsStartingCheckout(false);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -139,6 +169,11 @@ export function AccountSettingsClient({
             <CardTitle className="text-lg">Subscription</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-3">
+            {checkoutError ? (
+              <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
+                {checkoutError}
+              </div>
+            ) : null}
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-bold text-black">Plan</p>
@@ -194,22 +229,25 @@ export function AccountSettingsClient({
               </>
             ) : (
               <>
-                <div className="text-sm text-black/60">
-                  {hasFreeTrial ? (
-                    <p>
-                      You're on the free trial. You can upload 1 track for free.
-                    </p>
-                  ) : (
-                    <p>
-                      Subscribe to upload unlimited tracks and request reviews.
-                    </p>
-                  )}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-black">Current plan</p>
+                    <p className="text-xs text-black/50">Free</p>
+                  </div>
+                  <div className="px-3 py-1 bg-neutral-100 text-neutral-700 text-xs font-bold rounded-full">
+                    Not subscribed
+                  </div>
                 </div>
-                <Link href="/artist/submit">
-                  <Button variant="primary">
-                    {hasFreeTrial ? "Upload Your Free Track" : "Subscribe Now"}
+
+                <div className="text-sm text-black/60">
+                  <p>Upgrade to MixReflect Pro to unlock unlimited uploads and review requests.</p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button variant="primary" onClick={startCheckout} isLoading={isStartingCheckout}>
+                    Upgrade to Pro
                   </Button>
-                </Link>
+                </div>
               </>
             )}
           </CardContent>

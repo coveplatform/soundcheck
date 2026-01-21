@@ -52,7 +52,8 @@
       "Bash(node reset-reminders.js:*)",
       "WebFetch(domain:fonts.google.com)",
       "Bash(npm run dev:*)",
-      "Bash(psql:*)"
+      "Bash(psql:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }
