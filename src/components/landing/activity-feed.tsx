@@ -158,6 +158,7 @@ export function ActivityFeed() {
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
     let isPageVisible = !document.hidden;
+    let isMobile = window.innerWidth < 640;
 
     const tick = () => {
       // Only tick if page is visible
@@ -179,11 +180,10 @@ export function ActivityFeed() {
       setRenderQueue([incoming, ...currentQueue]);
       setPhase("pre");
 
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setPhase("sliding");
-        });
-      });
+      // Use a single timeout instead of double rAF for more consistent mobile performance
+      setTimeout(() => {
+        setPhase("sliding");
+      }, 50);
 
       // Fallback commit only (primary commit is onTransitionEnd).
       if (timeoutRef.current) {
@@ -200,18 +200,31 @@ export function ActivityFeed() {
       // When page becomes visible again, reset the interval to avoid desyncs
       if (isPageVisible && interval) {
         clearInterval(interval);
-        interval = setInterval(tick, 3000);
+        interval = setInterval(tick, isMobile ? 4000 : 3000);
       }
     };
 
-    // Set up visibility listener
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    const handleResize = () => {
+      const newIsMobile = window.innerWidth < 640;
+      if (newIsMobile !== isMobile) {
+        isMobile = newIsMobile;
+        if (interval) {
+          clearInterval(interval);
+          interval = setInterval(tick, isMobile ? 4000 : 3000);
+        }
+      }
+    };
 
-    // Start the interval
-    interval = setInterval(tick, 3000);
+    // Set up visibility and resize listeners
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("resize", handleResize);
+
+    // Start the interval with mobile-optimized timing
+    interval = setInterval(tick, isMobile ? 4000 : 3000);
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("resize", handleResize);
       if (interval) clearInterval(interval);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -283,7 +296,7 @@ export function ActivityFeed() {
         <div
           className={`flex will-change-transform ${
             phase === "sliding"
-              ? "transition-transform duration-500 ease-out"
+              ? "transition-transform duration-300 ease-out"
               : "transition-none"
           }`}
           style={{
