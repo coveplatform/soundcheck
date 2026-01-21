@@ -53,7 +53,11 @@
       "WebFetch(domain:fonts.google.com)",
       "Bash(npm run dev:*)",
       "Bash(psql:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(set:*)",
+      "Bash(node drop-index.js:*)",
+      "Bash(cross-env DATABASE_URL=\"postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" node:*)",
+      "Bash(copy .env .env.backup)"
     ]
   }
 }

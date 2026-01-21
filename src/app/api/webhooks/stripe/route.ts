@@ -107,6 +107,16 @@ export async function POST(request: Request) {
 }
 
 async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
+  // Check if this is an external purchase (track sale) or track review payment
+  const purchaseId = session.metadata?.purchaseId;
+
+  if (purchaseId) {
+    // External purchase - handle track sale
+    await handleExternalPurchaseComplete(session, purchaseId);
+    return;
+  }
+
+  // Track review payment (existing flow)
   const trackId = session.metadata?.trackId;
 
   if (!trackId) {
@@ -296,5 +306,141 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     console.log(`Subscription deleted for artist profile: ${artistProfile.id}`);
   } catch (error) {
     console.error("Error handling subscription deleted:", error);
+  }
+}
+
+async function handleExternalPurchaseComplete(
+  session: Stripe.Checkout.Session,
+  purchaseId: string
+) {
+  try {
+    const purchase = await prisma.externalPurchase.findUnique({
+      where: { id: purchaseId },
+      include: {
+        track: {
+          select: {
+            id: true,
+            title: true,
+            sourceUrl: true,
+            artist: {
+              select: {
+                id: true,
+                artistName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!purchase) {
+      console.error(`External purchase not found: ${purchaseId}`);
+      return;
+    }
+
+    if (purchase.status === "COMPLETED") {
+      console.log(`Purchase ${purchaseId} already completed, skipping`);
+      return;
+    }
+
+    const completedAt = new Date();
+
+    // Generate download URL (7 day expiry)
+    const { generateDownloadUrl } = await import("@/lib/s3");
+    const downloadUrl = await generateDownloadUrl(purchase.track.sourceUrl, 7 * 24 * 60 * 60);
+
+    if (!downloadUrl) {
+      console.error(`Failed to generate download URL for purchase: ${purchaseId}`);
+      // Don't fail the purchase - can regenerate later
+    }
+
+    // Update purchase to completed
+    await prisma.$transaction(async (tx) => {
+      await tx.externalPurchase.update({
+        where: { id: purchaseId },
+        data: {
+          status: "COMPLETED",
+          stripePaymentIntentId: (session.payment_intent as string) || "unknown",
+          downloadUrl,
+          completedAt,
+        },
+      });
+
+      // Credit artist
+      await tx.artistProfile.update({
+        where: { id: purchase.track.artist.id },
+        data: {
+          pendingBalance: { increment: purchase.artistAmount },
+          totalEarnings: { increment: purchase.artistAmount },
+        },
+      });
+
+      // Credit affiliate commission if applicable
+      if (purchase.affiliateUserId && purchase.affiliateCommission > 0) {
+        // Check if user is an artist or reviewer
+        const user = await tx.user.findUnique({
+          where: { id: purchase.affiliateUserId },
+          select: {
+            isArtist: true,
+            isReviewer: true,
+            artistProfile: { select: { id: true } },
+            listenerProfile: { select: { id: true } },
+          },
+        });
+
+        if (user?.isArtist && user.artistProfile) {
+          // Credit to artist profile
+          await tx.artistProfile.update({
+            where: { id: user.artistProfile.id },
+            data: {
+              pendingBalance: { increment: purchase.affiliateCommission },
+              totalEarnings: { increment: purchase.affiliateCommission },
+            },
+          });
+        } else if (user?.isReviewer && user.listenerProfile) {
+          // Credit to listener profile
+          await tx.listenerProfile.update({
+            where: { id: user.listenerProfile.id },
+            data: {
+              pendingBalance: { increment: purchase.affiliateCommission },
+              totalEarnings: { increment: purchase.affiliateCommission },
+              affiliateEarnings: { increment: purchase.affiliateCommission },
+            },
+          });
+        }
+      }
+
+      // Update affiliate link stats
+      if (purchase.affiliateCode) {
+        await tx.trackAffiliateLink
+          .update({
+            where: { code: purchase.affiliateCode },
+            data: {
+              purchaseCount: { increment: 1 },
+              totalRevenue: { increment: purchase.affiliateCommission },
+            },
+          })
+          .catch((err) => {
+            console.error("Failed to update affiliate link stats:", err);
+          });
+      }
+    });
+
+    // Send purchase confirmation email
+    const { sendPurchaseConfirmationEmail } = await import("@/lib/email");
+    await sendPurchaseConfirmationEmail({
+      buyerEmail: purchase.buyerEmail,
+      buyerName: purchase.buyerName || undefined,
+      trackTitle: purchase.track.title,
+      artistName: purchase.track.artist.artistName,
+      downloadUrl: downloadUrl || undefined,
+      purchaseId: purchase.id,
+    }).catch((err) => {
+      console.error("Failed to send purchase confirmation email:", err);
+    });
+
+    console.log(`External purchase completed: ${purchaseId}`);
+  } catch (error) {
+    console.error("Error handling external purchase complete:", error);
   }
 }

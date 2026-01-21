@@ -39,6 +39,10 @@ model User {
   passwordResetTokens    PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
   supportTickets         SupportTicket[]
+
+  // Affiliate system
+  createdAffiliateLinks TrackAffiliateLink[] @relation("CreatedAffiliateLinks")
+  affiliateCommissions  ExternalPurchase[]   @relation("AffiliateCommissions")
 }
 
 // NextAuth required models
@@ -250,6 +254,14 @@ model Track {
   // Purchase settings (only for UPLOAD tracks)
   allowPurchase Boolean @default(false) // Artist opt-in to allow reviewers to buy
 
+  // Public sharing & sales (NEW - for affiliate/monetization system)
+  trackShareId    String?      @unique // Short ID for public links e.g., `/t/[trackShareId]`
+  sharingEnabled  Boolean      @default(false) // Whether public sharing is enabled
+  sharingMode     SharingMode? // EXPOSURE or SALES
+  salePrice       Int?         // cents (e.g., 500 = $5.00), null if not for sale
+  showReviewsOnPublicPage Boolean @default(true) // Show reviews on public share page
+  publicPlayCount Int @default(0) // Plays from public share page
+
   // Submission status
   status TrackStatus @default(PENDING_PAYMENT)
 
@@ -285,6 +297,8 @@ model Track {
   reviews      Review[]
   queueEntries ReviewQueue[]
   purchases    Purchase[]
+  externalPurchases ExternalPurchase[]
+  affiliateLinks    TrackAffiliateLink[]
 
   @@index([status, createdAt])
   @@index([artistId])
@@ -320,6 +334,11 @@ enum PackageType {
   STANDARD  // 10 reviews, verified+
   PRO       // 10 reviews, pro only
   DEEP_DIVE // 25 reviews, mixed + 3 Pro
+}
+
+enum SharingMode {
+  EXPOSURE // Free streaming/plays, track engagement
+  SALES    // Paid downloads with revenue split
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -586,6 +605,83 @@ model Purchase {
   @@index([reviewerId])
   @@index([trackId])
   @@index([referredByReviewerId])
+}
+
+// External track purchases by public users (not reviewers)
+model ExternalPurchase {
+  id      String @id @default(cuid())
+  trackId String
+  track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  // Buyer info (not a registered user, just email)
+  buyerEmail String
+  buyerName  String?
+
+  // Payment via Stripe
+  amount                 Int     // cents (full sale price, e.g., 500 for $5)
+  stripePaymentIntentId  String  @unique
+  stripeCheckoutSessionId String?
+  status                 ExternalPurchaseStatus @default(PENDING)
+
+  // Revenue split
+  platformFee         Int // cents kept by platform (e.g., 20% = 100¢)
+  affiliateCommission Int @default(0) // cents to affiliate (e.g., 10% = 50¢)
+  artistAmount        Int // cents to artist (e.g., 70% = 350¢)
+
+  // Affiliate tracking
+  affiliateCode   String? // which campaign link was used
+  affiliateUserId String? // who gets the commission (artist or other)
+  affiliateUser   User?   @relation("AffiliateCommissions", fields: [affiliateUserId], references: [id], onDelete: SetNull)
+
+  // Download delivery
+  downloadUrl   String? // S3 pre-signed URL (expires after 7 days)
+  downloadedAt  DateTime?
+  downloadCount Int       @default(0)
+
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@index([trackId])
+  @@index([affiliateCode])
+  @@index([buyerEmail])
+  @@index([affiliateUserId])
+  @@index([status])
+}
+
+enum ExternalPurchaseStatus {
+  PENDING   // Checkout created, not paid
+  COMPLETED // Payment successful
+  FAILED    // Payment failed
+  REFUNDED  // Purchase refunded
+}
+
+// Track affiliate link management for campaigns
+model TrackAffiliateLink {
+  id      String @id @default(cuid())
+  trackId String
+  track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  code String @unique // e.g., "twitter_jan" for `/t/[trackShareId]?ref=twitter_jan`
+  name String // Campaign name (e.g., "Twitter January Campaign")
+
+  // Who created this link (usually the artist)
+  createdByUserId String
+  createdByUser   User   @relation("CreatedAffiliateLinks", fields: [createdByUserId], references: [id], onDelete: Cascade)
+
+  // Performance stats
+  clickCount    Int @default(0)
+  playCount     Int @default(0)
+  purchaseCount Int @default(0)
+  totalRevenue  Int @default(0) // cents earned from this link
+
+  isActive Boolean @default(true) // Can be deactivated
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([trackId])
+  @@index([code])
+  @@index([createdByUserId])
 }
 
 // ─────────────────────────────────────────────────────────────

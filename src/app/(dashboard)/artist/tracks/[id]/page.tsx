@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { TrackCancelButton } from "@/components/artist/track-cancel-button";
 import { TrackUpdateSourceForm } from "@/components/artist/track-update-source-form";
 import { TrackFeedbackViewTracker } from "@/components/artist/track-feedback-view-tracker";
+import { TrackSharingButton } from "@/components/artist/track-sharing-button";
 import { AggregateAnalytics } from "@/components/feedback/aggregate-analytics";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { StemPlayer } from "@/components/audio/stem-player";
@@ -222,6 +223,15 @@ export default async function TrackDetailPage({
                   </Button>
                 </Link>
               ) : null}
+
+              {track.sourceType === "UPLOAD" && (
+                <TrackSharingButton
+                  trackId={track.id}
+                  trackTitle={track.title}
+                  sourceType={track.sourceType}
+                  sharingEnabled={track.sharingEnabled}
+                />
+              )}
 
               <a href={track.sourceUrl} target="_blank" rel="noopener noreferrer">
                 <Button className="bg-black hover:bg-black/90 text-white font-bold border-2 border-black">

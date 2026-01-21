@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import { Home, Music, Compass, DollarSign, Settings, LogOut, Headphones, BarChart3 } from "lucide-react";
+import { Home, Music, Compass, DollarSign, Settings, LogOut, Headphones, BarChart3, Share2 } from "lucide-react";
 
 interface ArtistSidebarProps {
   user: {
@@ -24,6 +24,7 @@ export function ArtistSidebar({ user, artistName, hasEarnings = false }: ArtistS
     { href: "/artist/dashboard", label: "Dashboard", icon: Home },
     { href: "/artist/tracks", label: "Tracks", icon: Music },
     { href: "/artist/analytics", label: "Analytics", icon: BarChart3 },
+    { href: "/artist/sales", label: "Sales", icon: Share2 },
     { href: "/discover", label: "Discover", icon: Compass },
     ...(hasEarnings ? [{ href: "/artist/earnings", label: "Earnings", icon: DollarSign }] : []),
   ];
