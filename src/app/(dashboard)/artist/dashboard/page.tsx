@@ -103,7 +103,7 @@ export default async function ArtistDashboardPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-10 pb-6 border-b border-neutral-200">
           <div>
-            <h1 className="text-4xl sm:text-5xl font-light tracking-tight mb-2">Dashboard</h1>
+            <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-2">Dashboard</h1>
             <div className="flex items-center gap-4 text-sm">
               <span className="text-neutral-500">{planLabel}</span>
               <span className="text-neutral-300">•</span>
@@ -118,24 +118,24 @@ export default async function ArtistDashboardPage() {
             </div>
             <div>
               <p className="text-xs text-neutral-500 mb-1">In Review</p>
-              <p className="text-2xl font-semibold text-orange-500 tabular-nums">{reviewing.length}</p>
+              <p className="text-2xl font-semibold text-purple-600 tabular-nums">{reviewing.length}</p>
             </div>
             <div>
               <p className="text-xs text-neutral-500 mb-1">Earnings</p>
-              <p className="text-2xl font-semibold text-lime-700 tabular-nums">${totalEarnings.toFixed(2)}</p>
+              <p className="text-2xl font-semibold text-teal-600 tabular-nums">${totalEarnings.toFixed(2)}</p>
             </div>
           </div>
         </div>
 
-        <Card variant="soft" elevated className="mb-10 overflow-hidden">
+        <Card variant="soft" elevated className="mb-10 overflow-hidden border-l-4 border-l-purple-600">
           <div className="p-5 sm:p-6">
-            <div className="inline-block bg-lime-400 px-3 py-1 text-xs font-semibold uppercase tracking-wider mb-4">
+            <div className="inline-block bg-purple-100 text-purple-700 px-3 py-1 text-xs font-semibold uppercase tracking-wider mb-4 rounded-md">
               Next Step
             </div>
             <h2 className="text-2xl sm:text-3xl font-semibold mb-2 max-w-2xl">{nextAction.title}</h2>
             <p className="text-neutral-700 text-base mb-6 max-w-xl">{nextAction.description}</p>
             <Link href={nextAction.href}>
-              <Button className="bg-black text-white hover:bg-neutral-800 font-semibold text-base px-8 h-12">
+              <Button variant="primary" size="lg">
                 {nextAction.cta}
                 <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
@@ -148,7 +148,7 @@ export default async function ArtistDashboardPage() {
           <div>
             <div className="flex items-baseline justify-between mb-6">
               <h2 className="text-xl font-semibold">Recent Tracks</h2>
-              <Link href="/artist/tracks" className="text-sm font-semibold text-neutral-600 hover:text-black">
+              <Link href="/artist/tracks" className="text-sm font-semibold text-purple-600 hover:text-purple-700 transition-colors">
                 View all →
               </Link>
             </div>
@@ -168,7 +168,7 @@ export default async function ArtistDashboardPage() {
                 return (
                   <div
                     key={t.id}
-                    className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white rounded-xl px-5 py-4 border border-neutral-200 hover:border-neutral-300 hover:shadow-sm transition-all"
+                    className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white rounded-xl px-5 py-4 border border-neutral-200 hover:border-purple-300 hover:shadow-md transition-all"
                   >
                     {/* Artwork + Play Button */}
                     <div className="relative flex-shrink-0 group">
@@ -200,7 +200,7 @@ export default async function ArtistDashboardPage() {
 
                     {/* CTA Button */}
                     <Link href={cta.href} className="w-full sm:w-auto flex-shrink-0">
-                      <Button className="h-10 px-6 bg-black hover:bg-neutral-800 text-white text-sm font-semibold w-full sm:w-auto">
+                      <Button variant="primary" className="w-full sm:w-auto">
                         {cta.label}
                       </Button>
                     </Link>

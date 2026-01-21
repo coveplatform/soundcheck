@@ -98,7 +98,7 @@ export default function Home() {
       <section className=" overflow-visible bg-[#faf8f5]">
         <div className="max-w-3xl mx-auto px-4 py-12 sm:py-16 text-center relative">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-neutral-950 leading-[1.05]">
-            A home for your music to <span className="text-lime-700">grow</span>
+            A home for your music to <span className="text-purple-600">grow</span>
           </h1>
 
           <p className="mt-6 text-neutral-700 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
@@ -107,7 +107,7 @@ export default function Home() {
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3">
             <Link href="/signup">
-              <Button size="lg" className="bg-lime-400 text-black border-2 border-black hover:bg-lime-300 active:bg-lime-500 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none">
+              <Button variant="primary" size="lg">
                 Start free trial <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -125,7 +125,7 @@ export default function Home() {
               <p className="text-[10px] sm:text-xs text-neutral-500">Reviewed</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl sm:text-4xl font-bold text-lime-700 mb-1">&lt;4hrs</p>
+              <p className="text-2xl sm:text-4xl font-bold text-purple-600 mb-1">&lt;4hrs</p>
               <p className="text-[10px] sm:text-xs text-neutral-500">Avg turnaround</p>
             </div>
             <div className="text-center">
@@ -140,8 +140,8 @@ export default function Home() {
       <section className="py-10  overflow-hidden bg-[#faf8f5]">
         <div className="flex items-center justify-center gap-2 mb-6">
           <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-500 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-lime-500"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-500 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-purple-500"></span>
           </span>
           <span className="text-sm font-medium text-neutral-600">Happening now</span>
         </div>
@@ -167,7 +167,7 @@ export default function Home() {
               className="pointer-events-none absolute top-56 -left-24 sm:-left-40 lg:-left-56 w-48 h-48 sm:w-56 sm:h-56 rotate-[-8deg] hidden lg:block"
             />
             <Squiggle className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-40 w-16 h-16 sm:w-28 sm:h-28 text-orange-300 opacity-70 rotate-12" />
-            <Dots className="pointer-events-none absolute -bottom-10 right-2 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 text-lime-500 opacity-80 rotate-6" />
+            <Dots className="pointer-events-none absolute -bottom-10 right-2 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 text-purple-400 opacity-80 rotate-6" />
 
             <TrackReportDemo />
           </AnimatedSection>
@@ -176,10 +176,10 @@ export default function Home() {
 
       {/* Artist Earnings - NEW */}
       <section className="pb-12 sm:pb-16 pt-0 bg-neutral-900 text-neutral-50 overflow-visible font-sans">
-        <div className="w-full overflow-hidden bg-lime-400/10">
+        <div className="w-full overflow-hidden bg-purple-400/10">
           <div className="h-12 flex items-center">
             <div
-              className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-lime-300 text-3xl font-bold leading-none`}
+              className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-purple-300 text-3xl font-bold leading-none`}
             >
               {Array.from({ length: 60 }).map((_, i) => (
                 <span key={i}>new</span>
@@ -199,18 +199,12 @@ export default function Home() {
 
               <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                 <Link href="/signup">
-                  <Button
-                    size="lg"
-                    className="bg-lime-400 text-black hover:bg-lime-300 active:bg-lime-500 border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
-                  >
+                  <Button variant="primary" size="lg">
                     Start free trial <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="#pricing">
-                  <Button
-                    size="lg"
-                    className="bg-white/10 text-neutral-50 border-2 border-white/20 hover:bg-white/15 active:bg-white/20"
-                  >
+                  <Button variant="outline" size="lg" className="bg-white/10 text-neutral-50 border-white/20 hover:bg-white/15">
                     See pricing
                   </Button>
                 </Link>
@@ -220,9 +214,9 @@ export default function Home() {
             <AnimatedSection className="is-visible w-full max-w-sm mx-auto md:mx-0 md:max-w-none">
               <div className="bg-neutral-800 border-2 border-neutral-700 rounded-2xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
                 {/* Header with balance */}
-                <div className="bg-gradient-to-br from-lime-400 to-lime-500 px-3 py-2 border-b-2 border-black/20">
-                  <div className="text-[9px] font-bold text-black/60 uppercase tracking-wider">Your Balance</div>
-                  <div className="text-lg font-extrabold text-black">$12.50</div>
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 px-3 py-2 border-b-2 border-black/20">
+                  <div className="text-[9px] font-bold text-white/80 uppercase tracking-wider">Your Balance</div>
+                  <div className="text-lg font-extrabold text-white">$12.50</div>
                 </div>
                 
                 {/* Recent sales list */}
@@ -235,7 +229,7 @@ export default function Home() {
                       <div className="text-[13px] font-semibold text-white truncate">Neon Pulse</div>
                       <div className="text-[11px] text-neutral-500">2 min ago</div>
                     </div>
-                    <div className="text-[13px] font-bold text-lime-400">+$0.50</div>
+                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
                   </div>
                   
                   <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
@@ -244,7 +238,7 @@ export default function Home() {
                       <div className="text-[13px] font-semibold text-white truncate">Late Night Taxi</div>
                       <div className="text-[11px] text-neutral-500">via @lofi_curator · 8 min ago</div>
                     </div>
-                    <div className="text-[13px] font-bold text-lime-400">+$0.50</div>
+                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
                   </div>
                   
                   <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
@@ -253,13 +247,13 @@ export default function Home() {
                       <div className="text-[13px] font-semibold text-white truncate">Golden Hour</div>
                       <div className="text-[11px] text-neutral-500">15 min ago</div>
                     </div>
-                    <div className="text-[13px] font-bold text-lime-400">+$0.50</div>
+                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
                   </div>
                 </div>
                 
                 {/* Footer */}
                 <div className="px-4 py-2.5 bg-black/20 border-t border-white/5 text-center">
-                  <span className="text-[11px] text-neutral-400">Earn <span className="text-lime-400 font-semibold">$0.50</span> every time someone buys your track</span>
+                  <span className="text-[11px] text-neutral-400">Earn <span className="text-blue-400 font-semibold">$0.50</span> every time someone buys your track</span>
                 </div>
               </div>
             </AnimatedSection>
@@ -280,7 +274,7 @@ export default function Home() {
           <AnimatedSection className="relative">
             {/* Decorative doodles */}
             <Sparkle className="pointer-events-none absolute -top-10 -left-10 sm:-left-24 lg:-left-40 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-90 rotate-12" />
-            <Star className="pointer-events-none absolute top-6 -left-6 sm:-left-16 lg:-left-24 w-12 h-12 sm:w-14 sm:h-14 text-lime-500 opacity-90 -rotate-12" />
+            <Star className="pointer-events-none absolute top-6 -left-6 sm:-left-16 lg:-left-24 w-12 h-12 sm:w-14 sm:h-14 text-purple-400 opacity-90 -rotate-12" />
             <Squiggle className="pointer-events-none absolute -bottom-10 -right-10 sm:-right-28 lg:-right-44 w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 text-orange-300 opacity-60 rotate-6" />
 
             <BrowserMockup url="mixreflect.com/track/midnight-drive">
@@ -292,10 +286,10 @@ export default function Home() {
 
       {/* Stem Upload Feature - NEW */}
       <section className="pb-12 sm:pb-16 pt-0 bg-neutral-900 text-neutral-50 overflow-visible">
-        <div className="w-full overflow-hidden bg-lime-400/10">
+        <div className="w-full overflow-hidden bg-purple-400/10">
           <div className="h-12 flex items-center">
             <div
-              className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-lime-300 text-3xl font-bold leading-none`}
+              className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-purple-300 text-3xl font-bold leading-none`}
             >
               {Array.from({ length: 60 }).map((_, i) => (
                 <span key={i}>new</span>
@@ -328,7 +322,7 @@ export default function Home() {
                     <div className="flex items-center justify-between gap-3 mb-3">
                       <div className="text-xs text-neutral-400 uppercase tracking-wider">Example Arrangement</div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-lime-300 bg-lime-400/10 border border-lime-400/20 rounded-full px-2 py-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-purple-300 bg-purple-400/10 border border-purple-400/20 rounded-full px-2 py-1">
                           Preview
                         </span>
                         <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-300 bg-white/5 border border-white/10 rounded-full px-2 py-1">
@@ -434,8 +428,8 @@ export default function Home() {
                     </div>
 
                     <div className="mt-4 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2 text-lime-400">
-                        <div className="w-1.5 h-1.5 rounded-full bg-lime-400 animate-pulse" />
+                      <div className="flex items-center gap-2 text-purple-400">
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
                         <span className="font-mono">Live stem preview</span>
                       </div>
                       <span className="text-neutral-500 font-mono">Click M/S to mute or solo</span>
@@ -468,7 +462,7 @@ export default function Home() {
             {/* Decorative doodles */}
             <Dots className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-44 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-80 rotate-12" />
             <Sparkle className="pointer-events-none absolute -top-2 right-2 sm:-right-12 lg:-right-20 w-12 h-12 sm:w-14 sm:h-14 text-orange-300 opacity-85 -rotate-6" />
-            <Squiggle className="pointer-events-none absolute -bottom-8 -left-12 sm:-left-24 lg:-left-36 w-32 h-10 sm:w-44 sm:h-12 text-lime-400 opacity-90 rotate-6" />
+            <Squiggle className="pointer-events-none absolute -bottom-8 -left-12 sm:-left-24 lg:-left-36 w-32 h-10 sm:w-44 sm:h-12 text-purple-400 opacity-90 rotate-6" />
 
             <BrowserMockup url="mixreflect.com/discover">
               <DiscoverMockup />
@@ -497,34 +491,34 @@ export default function Home() {
 
             <AnimatedSection stagger className="mt-8 space-y-3 text-left max-w-sm mx-auto">
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                 <span>20 reviews included every month</span>
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                 <span>Auto-matched to genre reviewers</span>
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                 <span>Unlimited track uploads</span>
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                 <span>Upload stems for detailed feedback</span>
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                 <span>Earn from every sale</span>
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                 <span>Your track links to share</span>
               </div>
             </AnimatedSection>
 
             <div className="mt-8">
               <Link href="/signup">
-                <Button size="lg" className="bg-lime-400 text-black hover:bg-lime-300 active:bg-lime-500 border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none">
+                <Button variant="primary" size="lg">
                   Start free trial <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -645,7 +639,7 @@ export default function Home() {
             </div>
             <span className="hidden sm:inline text-neutral-600">•</span>
             <div className="flex items-center gap-1.5">
-              <svg className="h-4 w-4 text-lime-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg className="h-4 w-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M9 12l2 2 4-4"/>
                 <circle cx="12" cy="12" r="10"/>
               </svg>

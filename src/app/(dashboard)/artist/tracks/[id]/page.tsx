@@ -190,7 +190,7 @@ export default async function TrackDetailPage({
               <h1 className="text-3xl sm:text-4xl font-bold text-black break-words">{track.title}</h1>
               {track.status === "COMPLETED" && (
                 <div className="-rotate-3">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-lime-300 via-yellow-200 to-orange-200 border-2 border-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-400 to-purple-500 border-2 border-black text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                     <div className="h-5 w-5 bg-black text-white flex items-center justify-center">
                       <CheckCircle2 className="h-3.5 w-3.5" />
                     </div>
@@ -217,7 +217,7 @@ export default async function TrackDetailPage({
             <div className="flex flex-wrap items-center gap-3 mt-6">
               {(track.status as any) === "UPLOADED" ? (
                 <Link href={`/artist/tracks/${track.id}/request-reviews`}>
-                  <Button className="bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all">
                     Request reviews
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
@@ -264,7 +264,7 @@ export default async function TrackDetailPage({
             <div className="w-full">
               <div className="w-full h-2 bg-black/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-lime-500 transition-all duration-300 ease-out motion-reduce:transition-none"
+                  className="h-full bg-purple-500 transition-all duration-300 ease-out motion-reduce:transition-none"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -418,7 +418,7 @@ export default async function TrackDetailPage({
                           Get pattern insights, aggregate scores, engagement signals, and detailed analytics from all {completedReviews} reviews.
                         </p>
                         <Link href="/artist/submit">
-                          <Button className="bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                          <Button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all">
                             Upgrade to Standard
                             <ArrowRight className="h-4 w-4 ml-2" />
                           </Button>
@@ -451,7 +451,7 @@ export default async function TrackDetailPage({
                                 <div className={cn(
                                   "h-12 w-12 rounded-full flex items-center justify-center",
                                   playlistYes / playlistTotal >= 0.5
-                                    ? "bg-lime-100 text-lime-700"
+                                    ? "bg-purple-100 text-purple-700"
                                     : "bg-neutral-100 text-neutral-500"
                                 )}>
                                   <ListMusic className="h-6 w-6" />
@@ -473,7 +473,7 @@ export default async function TrackDetailPage({
                                 <div className={cn(
                                   "h-12 w-12 rounded-full flex items-center justify-center",
                                   shareYes / shareTotal >= 0.5
-                                    ? "bg-lime-100 text-lime-700"
+                                    ? "bg-purple-100 text-purple-700"
                                     : "bg-neutral-100 text-neutral-500"
                                 )}>
                                   <Share2 className="h-6 w-6" />
@@ -495,7 +495,7 @@ export default async function TrackDetailPage({
                                 <div className={cn(
                                   "h-12 w-12 rounded-full flex items-center justify-center",
                                   followYes / followTotal >= 0.5
-                                    ? "bg-lime-100 text-lime-700"
+                                    ? "bg-purple-100 text-purple-700"
                                     : "bg-neutral-100 text-neutral-500"
                                 )}>
                                   <UserPlus className="h-6 w-6" />
@@ -529,7 +529,7 @@ export default async function TrackDetailPage({
 
               {/* Trial upgrade prompt after first review */}
               {isTrial && completedReviews > 1 && (
-                <Card variant="soft" elevated className="border-2 border-lime-400">
+                <Card variant="soft" elevated className="border-2 border-purple-400">
                   <CardContent className="pt-6">
                     <div className="text-center">
                       <h3 className="text-xl font-bold text-black mb-2">
@@ -539,7 +539,7 @@ export default async function TrackDetailPage({
                         You have {completedReviews} total reviews. Upgrade to see all feedback and unlock full analytics.
                       </p>
                       <Link href="/artist/submit">
-                        <Button className="bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                        <Button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all">
                           Upgrade Now
                           <ArrowRight className="h-4 w-4 ml-2" />
                         </Button>

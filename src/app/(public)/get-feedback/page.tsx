@@ -834,7 +834,7 @@ export default function GetFeedbackPage() {
   if (sessionStatus === "loading" || !isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
-        <Loader2 className="h-8 w-8 animate-spin text-lime-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
       </div>
     );
   }
@@ -850,7 +850,7 @@ export default function GetFeedbackPage() {
     >
       <div className="border-2 border-neutral-700 bg-neutral-950/30 p-5">
         <div className="flex items-start gap-3">
-          <div className="h-10 w-10 bg-lime-500 text-black flex items-center justify-center flex-shrink-0">
+          <div className="h-10 w-10 bg-purple-500 text-black flex items-center justify-center flex-shrink-0">
             <Sparkles className="h-5 w-5" />
           </div>
           <div className="space-y-1">
@@ -860,19 +860,19 @@ export default function GetFeedbackPage() {
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-2">
               <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
-                <Check className="h-3.5 w-3.5 text-lime-500" />
+                <Check className="h-3.5 w-3.5 text-purple-500" />
                 Specific timestamps
               </span>
               <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
-                <Check className="h-3.5 w-3.5 text-lime-500" />
+                <Check className="h-3.5 w-3.5 text-purple-500" />
                 Actionable next steps
               </span>
               <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
-                <Check className="h-3.5 w-3.5 text-lime-500" />
+                <Check className="h-3.5 w-3.5 text-purple-500" />
                 Aggregated scores
               </span>
               <span className="inline-flex items-center gap-2 border border-neutral-700 bg-neutral-900 px-3 py-1 text-xs font-bold text-neutral-200">
-                <Check className="h-3.5 w-3.5 text-lime-500" />
+                <Check className="h-3.5 w-3.5 text-purple-500" />
                 Consensus highlights
               </span>
             </div>
@@ -885,14 +885,14 @@ export default function GetFeedbackPage() {
           <summary className="cursor-pointer select-none p-4 flex items-center justify-between text-left">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center">
-                <Zap className="h-4 w-4 text-lime-500" />
+                <Zap className="h-4 w-4 text-purple-500" />
               </div>
               <div>
                 <p className="font-black text-white">Aggregated analytics</p>
                 <p className="text-xs text-neutral-500">Averages + distributions from multiple listeners</p>
               </div>
             </div>
-            <div className="text-xs font-mono text-neutral-500 group-open:text-lime-500">
+            <div className="text-xs font-mono text-neutral-500 group-open:text-purple-500">
               <span className="group-open:hidden">VIEW</span>
               <span className="hidden group-open:inline">HIDE</span>
             </div>
@@ -900,7 +900,7 @@ export default function GetFeedbackPage() {
           <div className="border-t border-neutral-800 p-4">
             <div className="border border-neutral-700 bg-black/30 overflow-hidden">
               <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 p-3 flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-lime-500" />
+                <Sparkles className="h-4 w-4 text-purple-500" />
                 <span className="font-bold text-sm text-white">Aggregated Results</span>
                 <span className="text-xs text-neutral-500">from 5–20 listeners (depends on package)</span>
               </div>
@@ -908,7 +908,7 @@ export default function GetFeedbackPage() {
               <div className="p-4 space-y-4">
                 <div className="grid grid-cols-3 gap-3">
                   <div className="border border-neutral-800 bg-neutral-950/40 p-3 text-center">
-                    <div className="text-2xl font-black text-lime-500">4.2</div>
+                    <div className="text-2xl font-black text-purple-500">4.2</div>
                     <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide">Production</div>
                   </div>
                   <div className="border border-neutral-800 bg-neutral-950/40 p-3 text-center">
@@ -916,7 +916,7 @@ export default function GetFeedbackPage() {
                     <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide">Originality</div>
                   </div>
                   <div className="border border-neutral-800 bg-neutral-950/40 p-3 text-center">
-                    <div className="text-2xl font-black text-lime-500">4.5</div>
+                    <div className="text-2xl font-black text-purple-500">4.5</div>
                     <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide">Vocals</div>
                   </div>
                 </div>
@@ -927,13 +927,13 @@ export default function GetFeedbackPage() {
                     <span className="text-xs font-mono text-neutral-500">Example</span>
                   </div>
                   <div className="h-3 w-full rounded-full overflow-hidden flex bg-neutral-800">
-                    <div className="h-full bg-lime-500" style={{ width: "67%" }} />
+                    <div className="h-full bg-purple-500" style={{ width: "67%" }} />
                     <div className="h-full bg-amber-400" style={{ width: "25%" }} />
                     <div className="h-full bg-neutral-500" style={{ width: "8%" }} />
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-[11px] text-neutral-400">
                     <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-lime-500" />
+                      <span className="h-2 w-2 rounded-full bg-purple-500" />
                       Strong hook
                     </div>
                     <div className="flex items-center gap-2">
@@ -950,10 +950,10 @@ export default function GetFeedbackPage() {
                 <div className="border border-neutral-800 bg-neutral-950/40 p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-bold text-neutral-400 uppercase tracking-wide">Would listen again</span>
-                    <span className="text-xs font-black px-2 py-0.5 rounded bg-lime-500 text-black">83%</span>
+                    <span className="text-xs font-black px-2 py-0.5 rounded bg-purple-500 text-black">83%</span>
                   </div>
                   <div className="h-2 bg-neutral-800 overflow-hidden">
-                    <div className="h-full bg-lime-500" style={{ width: "83%" }} />
+                    <div className="h-full bg-purple-500" style={{ width: "83%" }} />
                   </div>
                 </div>
               </div>
@@ -965,14 +965,14 @@ export default function GetFeedbackPage() {
           <summary className="cursor-pointer select-none p-4 flex items-center justify-between text-left">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center">
-                <Star className="h-4 w-4 text-lime-500" />
+                <Star className="h-4 w-4 text-purple-500" />
               </div>
               <div>
                 <p className="font-black text-white">Example feedback</p>
                 <p className="text-xs text-neutral-500">One review (your package includes more)</p>
               </div>
             </div>
-            <div className="text-xs font-mono text-neutral-500 group-open:text-lime-500">
+            <div className="text-xs font-mono text-neutral-500 group-open:text-purple-500">
               <span className="group-open:hidden">VIEW</span>
               <span className="hidden group-open:inline">HIDE</span>
             </div>
@@ -986,7 +986,7 @@ export default function GetFeedbackPage() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-bold text-white">Sarah</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-lime-500 text-black">Strong hook</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500 text-black">Strong hook</span>
                   </div>
                   <p className="text-xs text-neutral-500">Example review</p>
                 </div>
@@ -996,12 +996,12 @@ export default function GetFeedbackPage() {
                 <span>Production <strong className="text-white">4/5</strong></span>
                 <span>Vocals <strong className="text-white">5/5</strong></span>
                 <span>Originality <strong className="text-white">4/5</strong></span>
-                <span className="text-lime-400 font-bold">Would listen again</span>
+                <span className="text-purple-400 font-bold">Would listen again</span>
               </div>
 
               <div className="grid grid-cols-1 gap-3">
                 <div className="border-l-4 border-lime-500 pl-3">
-                  <p className="text-xs font-bold text-lime-400 uppercase tracking-wide">What worked</p>
+                  <p className="text-xs font-bold text-purple-400 uppercase tracking-wide">What worked</p>
                   <p className="text-sm text-neutral-200 leading-relaxed">
                     The synth hook around 0:45 is genuinely catchy. Low end is tight and punchy.
                     The breakdown at 2:15 adds a great dynamic shift.
@@ -1035,7 +1035,7 @@ export default function GetFeedbackPage() {
           <details className="group border border-neutral-800 bg-neutral-950/40 p-3">
             <summary className="cursor-pointer select-none font-bold text-sm text-neutral-200 flex items-center justify-between">
               What platforms do you support?
-              <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">OPEN</span>
+              <span className="text-xs font-mono text-neutral-500 group-open:text-purple-500">OPEN</span>
             </summary>
             <p className="text-sm text-neutral-400 mt-2">
               SoundCloud, Bandcamp, YouTube, or an MP3 upload.
@@ -1045,7 +1045,7 @@ export default function GetFeedbackPage() {
           <details className="group border border-neutral-800 bg-neutral-950/40 p-3">
             <summary className="cursor-pointer select-none font-bold text-sm text-neutral-200 flex items-center justify-between">
               Is my track private?
-              <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">OPEN</span>
+              <span className="text-xs font-mono text-neutral-500 group-open:text-purple-500">OPEN</span>
             </summary>
             <p className="text-sm text-neutral-400 mt-2">
               Yes. Only assigned reviewers can access your track. It isn’t publicly shared by default.
@@ -1055,7 +1055,7 @@ export default function GetFeedbackPage() {
           <details className="group border border-neutral-800 bg-neutral-950/40 p-3">
             <summary className="cursor-pointer select-none font-bold text-sm text-neutral-200 flex items-center justify-between">
               Do I need a credit card?
-              <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">OPEN</span>
+              <span className="text-xs font-mono text-neutral-500 group-open:text-purple-500">OPEN</span>
             </summary>
             <p className="text-sm text-neutral-400 mt-2">
               Your first review is free with no card required. You only pay if you choose a larger package.
@@ -1065,7 +1065,7 @@ export default function GetFeedbackPage() {
           <details className="group border border-neutral-800 bg-neutral-950/40 p-3">
             <summary className="cursor-pointer select-none font-bold text-sm text-neutral-200 flex items-center justify-between">
               How do you ensure quality?
-              <span className="text-xs font-mono text-neutral-500 group-open:text-lime-500">OPEN</span>
+              <span className="text-xs font-mono text-neutral-500 group-open:text-purple-500">OPEN</span>
             </summary>
             <p className="text-sm text-neutral-400 mt-2">
               Reviews require minimum listening and detailed feedback. Reviewers are also rated, which helps maintain standards.
@@ -1081,7 +1081,7 @@ export default function GetFeedbackPage() {
       {/* Progress bar */}
       <div className="fixed top-0 left-0 right-0 h-1 bg-neutral-800 z-[60]">
         <div
-          className="h-full bg-lime-500 transition-[width] duration-300 ease-out motion-reduce:transition-none"
+          className="h-full bg-purple-500 transition-[width] duration-300 ease-out motion-reduce:transition-none"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -1094,11 +1094,11 @@ export default function GetFeedbackPage() {
               <Logo className="text-white" />
             </Link>
             <div className="flex items-center gap-2 text-xs font-mono text-neutral-500">
-              <span className={cn(step === "track" && "text-lime-500")}>TRACK</span>
+              <span className={cn(step === "track" && "text-purple-500")}>TRACK</span>
               <span>→</span>
-              <span className={cn((step === "matching" || step === "details") && "text-lime-500")}>DETAILS</span>
+              <span className={cn((step === "matching" || step === "details") && "text-purple-500")}>DETAILS</span>
               <span>→</span>
-              <span className={cn(step === "package" && "text-lime-500")}>CONFIRM</span>
+              <span className={cn(step === "package" && "text-purple-500")}>CONFIRM</span>
             </div>
           </div>
         </div>
@@ -1136,22 +1136,22 @@ export default function GetFeedbackPage() {
               <div className="max-w-lg mx-auto">
                 <div className="grid gap-2 text-sm text-neutral-300">
                   <div className="flex items-start gap-2">
-                    <Check className="h-4 w-4 text-lime-500 mt-0.5 flex-shrink-0" />
+                    <Check className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
                     <span>Submit a track from your dashboard</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Check className="h-4 w-4 text-lime-500 mt-0.5 flex-shrink-0" />
+                    <Check className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
                     <span>Get feedback from multiple genre-fit listeners</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Check className="h-4 w-4 text-lime-500 mt-0.5 flex-shrink-0" />
+                    <Check className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
                     <span>See an aggregated summary + analytics (so you can spot patterns)</span>
                   </div>
                 </div>
 
                 <button
                   type="button"
-                  className="mt-3 text-sm font-bold text-lime-500 hover:text-lime-400"
+                  className="mt-3 text-sm font-bold text-purple-500 hover:text-purple-400"
                   onClick={() => {
                     const el = document.getElementById("get-feedback-proof");
                     el?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1164,15 +1164,15 @@ export default function GetFeedbackPage() {
               {/* What you get - visual summary */}
               <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto pt-1">
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-lg font-black text-lime-500">5-20</p>
+                  <p className="text-lg font-black text-purple-500">5-20</p>
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Reviews</p>
                 </div>
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-lg font-black text-lime-500">&lt;12h</p>
+                  <p className="text-lg font-black text-purple-500">&lt;12h</p>
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Turnaround</p>
                 </div>
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-lg font-black text-lime-500">TRIAL</p>
+                  <p className="text-lg font-black text-purple-500">TRIAL</p>
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Get started</p>
                 </div>
               </div>
@@ -1270,7 +1270,7 @@ export default function GetFeedbackPage() {
                         )}&callbackUrl=${encodeURIComponent(callbackUrl)}`
                       );
                     }}
-                    className="w-full h-11 text-base font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400"
+                    className="w-full h-11 text-base font-black bg-purple-500 text-black border-2 border-lime-500 hover:bg-lime-400"
                   >
                     Start trial
                     <ArrowRight className="h-4 w-4 ml-2" />
@@ -1308,7 +1308,7 @@ export default function GetFeedbackPage() {
                       className={cn(
                         "flex-1 px-4 py-3 text-sm font-black flex items-center justify-center gap-2 transition-colors duration-150 ease-out motion-reduce:transition-none",
                         inputMode === "upload"
-                          ? "bg-lime-500 text-black"
+                          ? "bg-purple-500 text-black"
                           : "text-neutral-400 hover:text-white"
                       )}
                     >
@@ -1325,7 +1325,7 @@ export default function GetFeedbackPage() {
                       className={cn(
                         "flex-1 px-4 py-3 text-sm font-black flex items-center justify-center gap-2 transition-colors duration-150 ease-out motion-reduce:transition-none",
                         inputMode === "url"
-                          ? "bg-lime-500 text-black"
+                          ? "bg-purple-500 text-black"
                           : "text-neutral-400 hover:text-white"
                       )}
                     >
@@ -1367,23 +1367,23 @@ export default function GetFeedbackPage() {
                           }}
                           className={cn(
                             "border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-                            isDragging && "border-lime-500 bg-lime-500/10",
+                            isDragging && "border-lime-500 bg-purple-500/10",
                             !isDragging && !uploadedFileName && "border-neutral-700 hover:border-lime-500 hover:bg-neutral-900",
-                            uploadedFileName && !isUploading && "border-lime-500 bg-lime-500/10"
+                            uploadedFileName && !isUploading && "border-lime-500 bg-purple-500/10"
                           )}
                         >
                           {isUploading ? (
                             <div className="flex flex-col items-center gap-3">
-                              <Loader2 className="h-10 w-10 animate-spin text-lime-500" />
+                              <Loader2 className="h-10 w-10 animate-spin text-purple-500" />
                               <p className="font-bold">Uploading...</p>
                             </div>
                           ) : uploadedFileName ? (
                             <div className="flex flex-col items-center gap-3">
-                              <div className="h-10 w-10 bg-lime-500 flex items-center justify-center">
+                              <div className="h-10 w-10 bg-purple-500 flex items-center justify-center">
                                 <Check className="h-5 w-5 text-black" />
                               </div>
                               <div>
-                                <p className="font-black text-lg text-lime-500">{uploadedFileName}</p>
+                                <p className="font-black text-lg text-purple-500">{uploadedFileName}</p>
                                 <p className="text-xs text-neutral-500 mt-1">Click to change</p>
                               </div>
                             </div>
@@ -1468,7 +1468,7 @@ export default function GetFeedbackPage() {
                               </p>
                               <button
                                 type="button"
-                                className="text-sm font-bold text-lime-500 hover:text-lime-400"
+                                className="text-sm font-bold text-purple-500 hover:text-purple-400"
                                 onClick={() => {
                                   setTrackUrl("");
                                   setTitle("");
@@ -1519,7 +1519,7 @@ export default function GetFeedbackPage() {
                       onClick={goToDetails}
                       className={cn(
                         "w-full h-14 text-lg font-black border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-                        "bg-lime-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                        "bg-purple-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
                       )}
                     >
                       Next: confirm details
@@ -1544,7 +1544,7 @@ export default function GetFeedbackPage() {
           <div className="space-y-8">
             <div className="text-center space-y-4">
               <div className="inline-flex items-center gap-2 bg-neutral-900 border-2 border-neutral-700 px-4 py-2 text-sm font-black uppercase tracking-wider">
-                <Sparkles className="h-4 w-4 text-lime-500" />
+                <Sparkles className="h-4 w-4 text-purple-500" />
                 Matching Reviewers
               </div>
               <h1 className="text-3xl sm:text-4xl font-black">Finding your best listeners</h1>
@@ -1553,19 +1553,19 @@ export default function GetFeedbackPage() {
 
             <div className="relative border-2 border-neutral-700 bg-neutral-900 overflow-hidden">
               <div className="absolute inset-0 opacity-30 pointer-events-none">
-                <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-lime-500/25 blur-3xl" />
-                <div className="absolute -bottom-24 left-1/3 h-72 w-72 -translate-x-1/2 rounded-full bg-lime-500/10 blur-3xl" />
+                <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-purple-500/25 blur-3xl" />
+                <div className="absolute -bottom-24 left-1/3 h-72 w-72 -translate-x-1/2 rounded-full bg-purple-500/10 blur-3xl" />
               </div>
 
               <div className="relative p-6 space-y-6">
                 <div className="flex items-start gap-4">
                   {matchingDone ? (
-                    <div className="h-12 w-12 bg-lime-500 flex items-center justify-center flex-shrink-0 shadow-[0_0_0_2px_rgba(132,204,22,1),0_0_40px_rgba(132,204,22,0.25)]">
+                    <div className="h-12 w-12 bg-purple-500 flex items-center justify-center flex-shrink-0 shadow-[0_0_0_2px_rgba(132,204,22,1),0_0_40px_rgba(132,204,22,0.25)]">
                       <Check className="h-6 w-6 text-black" />
                     </div>
                   ) : (
                     <div className="h-12 w-12 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center flex-shrink-0">
-                      <Loader2 className="h-6 w-6 animate-spin text-lime-500" />
+                      <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
                     </div>
                   )}
 
@@ -1589,7 +1589,7 @@ export default function GetFeedbackPage() {
                       </div>
                       <div className="h-2 bg-neutral-800 border border-neutral-700">
                         <div
-                          className="h-full bg-lime-500 transition-[width] duration-300 ease-out motion-reduce:transition-none"
+                          className="h-full bg-purple-500 transition-[width] duration-300 ease-out motion-reduce:transition-none"
                           style={{ width: `${matchingDone ? 100 : Math.round((matchingIndex / 3) * 100)}%` }}
                         />
                       </div>
@@ -1611,14 +1611,14 @@ export default function GetFeedbackPage() {
                         key={label}
                         className={cn(
                           "flex items-center gap-3 border-2 p-3",
-                          isActive ? "border-lime-500 bg-lime-500/10" : "border-neutral-700 bg-neutral-950/30"
+                          isActive ? "border-lime-500 bg-purple-500/10" : "border-neutral-700 bg-neutral-950/30"
                         )}
                       >
                         <div
                           className={cn(
                             "h-7 w-7 flex items-center justify-center flex-shrink-0 border-2",
                             isComplete
-                              ? "bg-lime-500 border-lime-500"
+                              ? "bg-purple-500 border-lime-500"
                               : isActive
                                 ? "border-lime-500 bg-neutral-900"
                                 : "border-neutral-700 bg-neutral-900"
@@ -1627,7 +1627,7 @@ export default function GetFeedbackPage() {
                           {isComplete ? (
                             <Check className="h-4 w-4 text-black" />
                           ) : (
-                            <span className={cn("text-xs font-mono", isActive ? "text-lime-500" : "text-neutral-500")}>
+                            <span className={cn("text-xs font-mono", isActive ? "text-purple-500" : "text-neutral-500")}>
                               {idx + 1}
                             </span>
                           )}
@@ -1661,7 +1661,7 @@ export default function GetFeedbackPage() {
 
             <div className="text-center space-y-2">
               <h1 className="text-3xl sm:text-4xl font-black">Almost there</h1>
-              <p className="text-sm font-bold text-lime-500">
+              <p className="text-sm font-bold text-purple-500">
                 We found {estimatedListenerPool}+ good-fit listeners for your track.
               </p>
               <p className="text-neutral-400">
@@ -1682,7 +1682,7 @@ export default function GetFeedbackPage() {
                 <p className="font-bold text-white truncate">{title}</p>
                 <p className="text-xs text-neutral-500 uppercase">{sourceType || "Ready"}</p>
               </div>
-              <div className="h-8 w-8 bg-lime-500 flex items-center justify-center">
+              <div className="h-8 w-8 bg-purple-500 flex items-center justify-center">
                 <Check className="h-4 w-4 text-black" />
               </div>
             </div>
@@ -1691,7 +1691,7 @@ export default function GetFeedbackPage() {
               <div className="border-2 border-neutral-700 bg-neutral-900 p-6">
                 <div className="flex items-start gap-4">
                   <div className="h-12 w-12 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center flex-shrink-0">
-                    <Loader2 className="h-6 w-6 animate-spin text-lime-500" />
+                    <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
                   </div>
                   <div className="min-w-0">
                     <p className="font-black text-white text-lg">Setting things up…</p>
@@ -1757,7 +1757,7 @@ export default function GetFeedbackPage() {
                           Prefer the full sign-in page?{" "}
                           <Link
                             href={`/login?callbackUrl=${encodeURIComponent("/t")}`}
-                            className="text-lime-500 hover:text-lime-400 font-bold"
+                            className="text-purple-500 hover:text-purple-400 font-bold"
                           >
                             Sign in here
                           </Link>
@@ -1799,7 +1799,7 @@ export default function GetFeedbackPage() {
                               className={cn(
                                 "h-4 w-4 flex items-center justify-center border",
                                 item.met
-                                  ? "bg-lime-500 border-lime-500 text-black"
+                                  ? "bg-purple-500 border-lime-500 text-black"
                                   : "bg-neutral-900 border-neutral-700 text-neutral-400"
                               )}
                             >
@@ -1831,7 +1831,7 @@ export default function GetFeedbackPage() {
 
                 <p className="text-sm text-neutral-500 text-center">
                   Already have an account?{" "}
-                  <Link href={`/login?callbackUrl=${encodeURIComponent("/t")}`} className="text-lime-500 hover:text-lime-400 font-medium">
+                  <Link href={`/login?callbackUrl=${encodeURIComponent("/t")}`} className="text-purple-500 hover:text-purple-400 font-medium">
                     Sign in
                   </Link>
                 </p>
@@ -1888,7 +1888,7 @@ export default function GetFeedbackPage() {
 
                     <button
                       type="button"
-                      className="text-sm font-bold text-lime-500 hover:text-lime-400 flex-shrink-0"
+                      className="text-sm font-bold text-purple-500 hover:text-purple-400 flex-shrink-0"
                       onClick={() => setIsEditingGenres(true)}
                     >
                       Change
@@ -1909,7 +1909,7 @@ export default function GetFeedbackPage() {
                   <div className="flex justify-end">
                     <button
                       type="button"
-                      className="text-sm font-bold text-lime-500 hover:text-lime-400"
+                      className="text-sm font-bold text-purple-500 hover:text-purple-400"
                       onClick={() => setIsEditingGenres(false)}
                     >
                       Done
@@ -1926,7 +1926,7 @@ export default function GetFeedbackPage() {
               onClick={goToPackage}
               isLoading={isContinuingToPackage}
               disabled={isContinuingToPackage}
-              className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none"
+              className="w-full h-14 text-lg font-black bg-purple-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none"
             >
               Continue
               <ArrowRight className="h-5 w-5 ml-2" />
@@ -1954,7 +1954,7 @@ export default function GetFeedbackPage() {
               <div className="border-2 border-neutral-700 bg-neutral-900 p-6">
                 <div className="flex items-start gap-4">
                   <div className="h-12 w-12 bg-neutral-800 border-2 border-neutral-700 flex items-center justify-center flex-shrink-0">
-                    <Loader2 className="h-6 w-6 animate-spin text-lime-500" />
+                    <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
                   </div>
                   <div className="min-w-0">
                     <p className="font-black text-white text-lg">Submitting your track…</p>
@@ -1985,7 +1985,7 @@ export default function GetFeedbackPage() {
                         <p className="font-bold text-white truncate">{title}</p>
                         <p className="text-xs text-neutral-500 uppercase">{sourceType || "Ready"}</p>
                       </div>
-                      <div className="h-8 w-8 bg-lime-500 flex items-center justify-center">
+                      <div className="h-8 w-8 bg-purple-500 flex items-center justify-center">
                         <Check className="h-4 w-4 text-black" />
                       </div>
                     </div>
@@ -2002,7 +2002,7 @@ export default function GetFeedbackPage() {
                             className={cn(
                               "w-full p-4 border-2 text-left transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                               isSelected
-                                ? "border-lime-500 bg-lime-500/10"
+                                ? "border-lime-500 bg-purple-500/10"
                                 : "border-neutral-700 bg-neutral-900 hover:border-neutral-500"
                             )}
                           >
@@ -2011,7 +2011,7 @@ export default function GetFeedbackPage() {
                                 <div className="flex items-center gap-2">
                                   <span className="font-black text-white">{details.name}</span>
                                   {pkg === "STANDARD" && (
-                                    <span className="text-[10px] font-bold px-2 py-0.5 bg-lime-500 text-black uppercase">
+                                    <span className="text-[10px] font-bold px-2 py-0.5 bg-purple-500 text-black uppercase">
                                       Popular
                                     </span>
                                   )}
@@ -2033,7 +2033,7 @@ export default function GetFeedbackPage() {
                     <Button
                       onClick={handleSubmit}
                       isLoading={isSubmitting}
-                      className="w-full h-14 text-lg font-black bg-lime-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none"
+                      className="w-full h-14 text-lg font-black bg-purple-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none"
                     >
                       {isSubmitting ? "Submitting…" : "Continue to Checkout"}
                       <ArrowRight className="h-5 w-5 ml-2" />

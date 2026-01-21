@@ -88,7 +88,7 @@ export default async function AnalyticsPage() {
               </p>
               <Link
                 href="/artist/submit"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
               >
                 Submit your first track
               </Link>
@@ -132,7 +132,7 @@ export default async function AnalyticsPage() {
 
   // Calculate category strengths
   const categories = [
-    { name: "Production", score: avgProduction, color: "bg-lime-500" },
+    { name: "Production", score: avgProduction, color: "bg-purple-500" },
     { name: "Originality", score: avgOriginality, color: "bg-purple-500" },
     { name: "Vocals", score: avgVocals, color: "bg-blue-500" },
   ].sort((a, b) => b.score - a.score);
@@ -234,6 +234,73 @@ export default async function AnalyticsPage() {
   const feedbackPatterns = analyzeFeedbackPatterns(allReviews);
 
   if (!isSubscribed) {
+    // Generate demo data for visual appeal when blurred
+    const demoData = hasAnalyticsData ? {
+      tracks: trackData,
+      totalReviews,
+      totalEarnings,
+      totalTracks,
+      overallAvg,
+      highestScore,
+      improvementRate,
+      wouldListenAgainPercent,
+      categories,
+      trendData,
+      earningsData,
+      reviewVelocity,
+      feedbackPatterns,
+    } : {
+      tracks: [
+        { id: '1', title: 'Summer Vibes', artworkUrl: null, createdAt: new Date(), completedAt: new Date(), reviewsCompleted: 10, avgScore: 4.2, categoryScores: { production: 4.3, vocals: 4.0, originality: 4.3 }, engagement: { listenAgain: 85, playlist: 72, share: 68 }, earnings: 12.50 },
+        { id: '2', title: 'Night Drive', artworkUrl: null, createdAt: new Date(), completedAt: new Date(), reviewsCompleted: 10, avgScore: 4.5, categoryScores: { production: 4.6, vocals: 4.3, originality: 4.6 }, engagement: { listenAgain: 90, playlist: 80, share: 75 }, earnings: 18.00 },
+        { id: '3', title: 'Lost in Thought', artworkUrl: null, createdAt: new Date(), completedAt: new Date(), reviewsCompleted: 10, avgScore: 3.8, categoryScores: { production: 3.9, vocals: 3.7, originality: 3.8 }, engagement: { listenAgain: 70, playlist: 60, share: 55 }, earnings: 8.50 },
+      ],
+      totalReviews: 30,
+      totalEarnings: 39.00,
+      totalTracks: 3,
+      overallAvg: 4.17,
+      highestScore: 4.5,
+      improvementRate: 15.8,
+      wouldListenAgainPercent: 82,
+      categories: [
+        { name: "Production", score: 4.27, color: "bg-purple-500" },
+        { name: "Originality", score: 4.23, color: "bg-purple-500" },
+        { name: "Vocals", score: 4.0, color: "bg-blue-500" },
+      ],
+      trendData: [
+        { month: "Jan 2024", production: 4.1, vocals: 3.8, originality: 4.0, overall: 3.97 },
+        { month: "Feb 2024", production: 4.3, vocals: 4.0, originality: 4.2, overall: 4.17 },
+        { month: "Mar 2024", production: 4.5, vocals: 4.2, originality: 4.4, overall: 4.37 },
+      ],
+      earningsData: [
+        { month: "Jan 2024", earnings: 8.50 },
+        { month: "Feb 2024", earnings: 12.50 },
+        { month: "Mar 2024", earnings: 18.00 },
+      ],
+      reviewVelocity: {
+        avgTimeToComplete: 2.3,
+        fastestTrack: { title: 'Night Drive', days: 1.2 },
+        slowestTrack: { title: 'Lost in Thought', days: 3.8 },
+        reviewsPerWeek: 10.5
+      },
+      feedbackPatterns: {
+        commonPraise: [
+          { word: "production", count: 18 },
+          { word: "mix", count: 15 },
+          { word: "energy", count: 12 },
+          { word: "catchy", count: 10 },
+          { word: "professional", count: 9 },
+        ],
+        commonCritiques: [
+          { word: "vocals", count: 8 },
+          { word: "repetitive", count: 6 },
+          { word: "clarity", count: 5 },
+        ],
+        improvingAreas: ["Production quality", "Originality"],
+        consistentStrengths: ["Production", "Originality"],
+      },
+    };
+
     return (
       <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
         <div className="max-w-6xl mx-auto">
@@ -257,56 +324,80 @@ export default async function AnalyticsPage() {
           </div>
 
           <div className="relative">
-            <div className="pointer-events-none select-none blur-sm opacity-60">
-              {hasAnalyticsData ? (
-                <AnalyticsDashboard
-                  tracks={trackData}
-                  totalReviews={totalReviews}
-                  totalEarnings={totalEarnings}
-                  totalTracks={totalTracks}
-                  overallAvg={overallAvg}
-                  highestScore={highestScore}
-                  improvementRate={improvementRate}
-                  wouldListenAgainPercent={wouldListenAgainPercent}
-                  categories={categories}
-                  trendData={trendData}
-                  earningsData={earningsData}
-                  reviewVelocity={reviewVelocity}
-                  feedbackPatterns={feedbackPatterns}
-                />
-              ) : (
-                <Card variant="soft" elevated className="max-w-2xl mx-auto mt-12">
-                  <CardContent className="pt-6 text-center py-12">
-                    <BarChart3 className="h-12 w-12 text-black/20 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-black mb-2">No analytics yet</h3>
-                    <p className="text-sm text-black/60 mb-6">
-                      Submit a track and get reviews to start seeing insights and trends.
-                    </p>
-                    <div className="inline-flex items-center gap-2 px-6 py-3 bg-lime-400 text-black border-2 border-black font-bold rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                      Submit your first track
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+            <div className="pointer-events-none select-none blur-md opacity-40">
+              <AnalyticsDashboard
+                tracks={demoData.tracks}
+                totalReviews={demoData.totalReviews}
+                totalEarnings={demoData.totalEarnings}
+                totalTracks={demoData.totalTracks}
+                overallAvg={demoData.overallAvg}
+                highestScore={demoData.highestScore}
+                improvementRate={demoData.improvementRate}
+                wouldListenAgainPercent={demoData.wouldListenAgainPercent}
+                categories={demoData.categories}
+                trendData={demoData.trendData}
+                earningsData={demoData.earningsData}
+                reviewVelocity={demoData.reviewVelocity}
+                feedbackPatterns={demoData.feedbackPatterns}
+              />
             </div>
 
             <div className="absolute inset-0 flex items-start justify-center pt-10">
               <Card variant="soft" elevated className="border-2 border-lime-400 rounded-3xl overflow-hidden w-full max-w-2xl">
                 <CardContent className="pt-6 text-center py-10">
-                  <div className="w-14 h-14 rounded-full bg-lime-100 flex items-center justify-center mx-auto mb-5">
-                    <BarChart3 className="h-7 w-7 text-lime-600" />
+                  <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-5">
+                    <BarChart3 className="h-7 w-7 text-purple-600" />
                   </div>
                   <h2 className="text-2xl font-black mb-2">Unlock Analytics</h2>
                   <p className="text-sm text-black/60 mb-6">
                     MixReflect Pro · <span className="font-bold text-black">$9.95/month</span>
                   </p>
 
+                  <p className="text-sm text-black/70 max-w-lg mx-auto mb-6">
+                    See what’s improving, what’s holding you back, and which tracks are actually landing — without digging through every review.
+                  </p>
+
+                  <div className="bg-white/50 rounded-2xl p-5 max-w-lg mx-auto mb-7">
+                    <p className="text-xs font-mono text-black/40 uppercase tracking-widest mb-3">Includes</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-lime-400 text-black text-xs font-black">✓</span>
+                        <div>
+                          <p className="text-sm font-bold">Trend graphs</p>
+                          <p className="text-xs text-black/60">Scores over time + recent momentum</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-lime-400 text-black text-xs font-black">✓</span>
+                        <div>
+                          <p className="text-sm font-bold">Category breakdowns</p>
+                          <p className="text-xs text-black/60">Production, vocals, originality</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-lime-400 text-black text-xs font-black">✓</span>
+                        <div>
+                          <p className="text-sm font-bold">Top tracks</p>
+                          <p className="text-xs text-black/60">Quickly spot what’s working</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-lime-400 text-black text-xs font-black">✓</span>
+                        <div>
+                          <p className="text-sm font-bold">Patterns & velocity</p>
+                          <p className="text-xs text-black/60">Common feedback + review pace</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <Link
                     href="/artist/submit"
-                    className="inline-flex items-center gap-2 px-7 py-3 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold rounded-lg shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
                   >
-                    Upgrade to Pro
-                    <Sparkles className="h-5 w-5" />
+                    <Button variant="primary" size="lg">
+                      Upgrade to Pro
+                      <Sparkles className="h-5 w-5 ml-2" />
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>

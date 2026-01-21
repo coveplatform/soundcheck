@@ -116,32 +116,17 @@ export const authOptions: NextAuthOptions = {
           },
         };
 
-        let dbUser: unknown;
-        try {
-          dbUser = await prisma.user.findFirst({
-            where,
-            select: {
-              id: true,
-              isArtist: true,
-              isReviewer: true,
-              emailVerified: true,
-              artistProfile: { select: { id: true } },
-              listenerProfile: { select: { id: true } },
-            } as unknown as Prisma.UserSelect,
-          });
-        } catch {
-          dbUser = await prisma.user.findFirst({
-            where,
-            select: {
-              id: true,
-              isArtist: true,
-              isReviewer: true,
-              emailVerified: true,
-              artistProfile: { select: { id: true } },
-              reviewerProfile: { select: { id: true } },
-            } as unknown as Prisma.UserSelect,
-          });
-        }
+        const dbUser = await prisma.user.findFirst({
+          where,
+          select: {
+            id: true,
+            isArtist: true,
+            isReviewer: true,
+            emailVerified: true,
+            artistProfile: { select: { id: true } },
+            listenerProfile: { select: { id: true } },
+          },
+        });
         const db = dbUser as null | {
           id: string;
           isArtist: boolean;
@@ -149,14 +134,13 @@ export const authOptions: NextAuthOptions = {
           emailVerified: Date | null;
           artistProfile?: { id: string } | null;
           listenerProfile?: { id: string } | null;
-          reviewerProfile?: { id: string } | null;
         };
         if (db) {
           token.id = db.id;
           token.isArtist = db.isArtist;
           token.isReviewer = db.isReviewer;
           token.artistProfileId = db.artistProfile?.id;
-          const listenerProfileId = db.listenerProfile?.id ?? db.reviewerProfile?.id;
+          const listenerProfileId = db.listenerProfile?.id;
           token.listenerProfileId = listenerProfileId;
           token.reviewerProfileId = listenerProfileId;
           token.emailVerified = db.emailVerified ? db.emailVerified.toISOString() : null;

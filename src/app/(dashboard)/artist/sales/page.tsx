@@ -192,8 +192,8 @@ export default async function SalesHubPage() {
                   ${(totalExternalEarnings / 100).toFixed(2)} from sales
                 </p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-lime-100 flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-lime-600" />
+              <div className="h-12 w-12 rounded-full bg-teal-100 flex items-center justify-center">
+                <DollarSign className="h-6 w-6 text-teal-600" />
               </div>
             </div>
           </CardContent>
@@ -292,7 +292,7 @@ export default async function SalesHubPage() {
                                   For Sale - ${((track.salePrice || 0) / 100).toFixed(2)}
                                 </span>
                               ) : (
-                                <span className="flex items-center gap-1 px-2 py-0.5 bg-lime-100 text-lime-700 font-bold rounded">
+                                <span className="flex items-center gap-1 px-2 py-0.5 bg-teal-100 text-teal-700 font-bold rounded">
                                   <Eye className="h-3 w-3" />
                                   Exposure Mode
                                 </span>
@@ -421,7 +421,7 @@ export default async function SalesHubPage() {
                         </div>
                         {link.totalRevenue > 0 && (
                           <div>
-                            <span className="font-bold text-lime-600">
+                            <span className="font-bold text-teal-600">
                               ${(link.totalRevenue / 100).toFixed(2)}
                             </span>{" "}
                             earned
@@ -469,7 +469,7 @@ export default async function SalesHubPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-lime-600">
+                    <p className="font-bold text-teal-600">
                       +${(purchase.artistAmount / 100).toFixed(2)}
                     </p>
                     <p className="text-xs text-black/50">
@@ -494,7 +494,7 @@ export default async function SalesHubPage() {
             </p>
             <div className="flex gap-3 justify-center">
               <Link href="/artist/submit">
-                <Button className="bg-lime-400 hover:bg-lime-300 text-black font-bold">
+                <Button variant="primary">
                   Upload Track
                 </Button>
               </Link>
@@ -532,20 +532,57 @@ export default async function SalesHubPage() {
                 className="border-2 border-lime-400 rounded-3xl overflow-hidden w-full max-w-2xl"
               >
                 <CardContent className="pt-6 text-center py-10">
-                  <div className="w-14 h-14 rounded-full bg-lime-100 flex items-center justify-center mx-auto mb-5">
-                    <ShoppingCart className="h-7 w-7 text-lime-600" />
+                  <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-5">
+                    <ShoppingCart className="h-7 w-7 text-teal-600" />
                   </div>
                   <h2 className="text-2xl font-black mb-2">Unlock Sales</h2>
                   <p className="text-sm text-black/60 mb-6">
                     MixReflect Pro · <span className="font-bold text-black">$9.95/month</span>
                   </p>
 
-                  <Link
-                    href="/artist/submit"
-                    className="inline-flex items-center gap-2 px-7 py-3 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold rounded-lg shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
-                  >
-                    Upgrade to Pro
-                    <Sparkles className="h-5 w-5" />
+                  <p className="text-sm text-black/70 max-w-lg mx-auto mb-6">
+                    Turn any uploaded track into a clean purchase link, then track what’s converting — plays, clicks, sales, and referrals.
+                  </p>
+
+                  <div className="bg-white/50 rounded-2xl p-5 max-w-lg mx-auto mb-7">
+                    <p className="text-xs font-mono text-black/40 uppercase tracking-widest mb-3">Includes</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-black text-xs font-black">✓</span>
+                        <div>
+                          <p className="text-sm font-bold">Sales links</p>
+                          <p className="text-xs text-black/60">Set a price and start selling</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-black text-xs font-black">✓</span>
+                        <div>
+                          <p className="text-sm font-bold">Affiliate tracking</p>
+                          <p className="text-xs text-black/60">Reward listeners who share</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-black text-xs font-black">✓</span>
+                        <div>
+                          <p className="text-sm font-bold">Performance metrics</p>
+                          <p className="text-xs text-black/60">Plays, clicks, conversions</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-black text-xs font-black">✓</span>
+                        <div>
+                          <p className="text-sm font-bold">Sales hub</p>
+                          <p className="text-xs text-black/60">All links + payouts in one place</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Link href="/artist/submit">
+                    <Button variant="primary" size="lg">
+                      Upgrade to Pro
+                      <Sparkles className="h-5 w-5 ml-2" />
+                    </Button>
                   </Link>
                 </CardContent>
               </Card>

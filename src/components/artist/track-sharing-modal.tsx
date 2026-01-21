@@ -175,14 +175,14 @@ export function TrackSharingModal({
 
         {/* Step 1: Choose Mode */}
         {step === 1 && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Eligibility Check */}
             {!canShare && (
-              <div className="p-4 bg-yellow-50 border-2 border-yellow-400 rounded-xl">
-                <p className="text-sm font-bold text-yellow-900">
+              <div className="p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+                <p className="text-sm font-semibold text-yellow-900 mb-1">
                   {eligibilityReason || "This track cannot be shared"}
                 </p>
-                <p className="text-sm text-yellow-700 mt-1">
+                <p className="text-sm text-yellow-800">
                   Only uploaded tracks (MP3/WAV) can be shared publicly. Linked tracks from SoundCloud,
                   YouTube, or Bandcamp are not eligible.
                 </p>
@@ -191,15 +191,15 @@ export function TrackSharingModal({
 
             {/* Platform Stats Banner */}
             {platformStats && canShare && (
-              <div className="p-4 bg-lime-100 border-2 border-lime-400 rounded-xl">
+              <div className="p-4 bg-lime-50 border border-lime-300 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <Users className="h-8 w-8 text-lime-700" />
+                  <Users className="h-6 w-6 text-lime-700" />
                   <div>
-                    <p className="text-lg font-bold text-lime-900">
+                    <p className="text-base font-semibold text-lime-900">
                       {platformStats.activeListeners.toLocaleString()}+ Active Listeners
                     </p>
-                    <p className="text-sm text-lime-700">
-                      {platformStats.totalReviews.toLocaleString()}+ reviews completed on the platform
+                    <p className="text-sm text-lime-800">
+                      {platformStats.totalReviews.toLocaleString()}+ reviews on the platform
                     </p>
                   </div>
                 </div>
@@ -210,127 +210,104 @@ export function TrackSharingModal({
             {canShare && (
               <>
                 <div>
-                  <Label className="text-base font-bold mb-3 block">Choose Sharing Mode</Label>
-                  <div className="space-y-3">
+                  <Label className="text-sm font-semibold mb-2 block">Choose Sharing Mode</Label>
+                  <div className="space-y-2">
                     {/* Exposure Mode */}
                     <button
                       onClick={() => setSharingMode("EXPOSURE")}
                       className={cn(
-                        "w-full p-4 border-2 rounded-xl text-left transition-all",
+                        "w-full p-4 border rounded-lg text-left transition-colors",
                         sharingMode === "EXPOSURE"
                           ? "border-lime-500 bg-lime-50"
-                          : "border-black/10 bg-white hover:border-black/30"
+                          : "border-neutral-200 bg-white hover:border-neutral-300"
                       )}
                     >
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <TrendingUp className="h-5 w-5 text-lime-600" />
-                            <h4 className="font-bold text-black">Exposure Only (Free)</h4>
+                          <div className="flex items-center gap-2 mb-2">
+                            <TrendingUp className="h-4 w-4 text-neutral-600" />
+                            <h4 className="font-semibold text-sm">Exposure Only</h4>
                           </div>
-                          <ul className="mt-2 space-y-1 text-sm text-black/70">
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-lime-600" />
-                              Public can stream your track
-                            </li>
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-lime-600" />
-                              Track clicks and plays
-                            </li>
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-lime-600" />
-                              Drive traffic to your platforms
-                            </li>
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-lime-600" />
-                              Show off your reviews
-                            </li>
+                          <ul className="space-y-1 text-xs text-neutral-600">
+                            <li>• Public streaming</li>
+                            <li>• Track clicks and plays</li>
+                            <li>• Drive traffic to your platforms</li>
                           </ul>
                         </div>
                         {sharingMode === "EXPOSURE" && (
-                          <div className="ml-4">
-                            <div className="h-6 w-6 rounded-full bg-lime-500 border-2 border-lime-600 flex items-center justify-center">
-                              <Check className="h-4 w-4 text-white" />
-                            </div>
+                          <div className="h-5 w-5 rounded-full bg-lime-500 flex items-center justify-center flex-shrink-0">
+                            <Check className="h-3 w-3 text-white" />
                           </div>
                         )}
                       </div>
                     </button>
 
                     {/* Sales Mode */}
-                    <button
-                      onClick={() => canSell && setSharingMode("SALES")}
-                      disabled={!canSell}
+                    <div
                       className={cn(
-                        "w-full p-4 border-2 rounded-xl text-left transition-all",
-                        sharingMode === "SALES"
-                          ? "border-purple-500 bg-purple-50"
-                          : !canSell
-                          ? "border-black/10 bg-neutral-50 opacity-50 cursor-not-allowed"
-                          : "border-black/10 bg-white hover:border-black/30"
+                        "w-full p-4 border rounded-lg transition-colors",
+                        !canSell && "bg-neutral-50",
+                        sharingMode === "SALES" && canSell && "border-lime-500 bg-lime-50",
+                        canSell && sharingMode !== "SALES" && "border-neutral-200 bg-white"
                       )}
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <Zap className="h-5 w-5 text-purple-600" />
-                            <h4 className="font-bold text-black">Paid Downloads (Pro)</h4>
-                            {!canSell && <Lock className="h-4 w-4 text-black/40" />}
-                          </div>
-                          <ul className="mt-2 space-y-1 text-sm text-black/70">
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-purple-600" />
-                              Everything in Exposure mode
-                            </li>
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-purple-600" />
-                              Sell downloads via Stripe
-                            </li>
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-purple-600" />
-                              You keep 70% of sales
-                            </li>
-                            <li className="flex items-center gap-2">
-                              <Check className="h-4 w-4 text-purple-600" />
-                              Affiliates earn 10% commission
-                            </li>
-                          </ul>
-                        </div>
-                        {sharingMode === "SALES" && canSell && (
-                          <div className="ml-4">
-                            <div className="h-6 w-6 rounded-full bg-purple-500 border-2 border-purple-600 flex items-center justify-center">
-                              <Check className="h-4 w-4 text-white" />
+                      <button
+                        onClick={() => canSell && setSharingMode("SALES")}
+                        disabled={!canSell}
+                        className="w-full text-left"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Zap className="h-4 w-4 text-neutral-600" />
+                              <h4 className="font-semibold text-sm">Paid Downloads</h4>
+                              {!canSell && (
+                                <span className="px-1.5 py-0.5 text-[10px] font-bold bg-black text-white rounded">
+                                  PRO
+                                </span>
+                              )}
                             </div>
+                            <ul className="space-y-1 text-xs text-neutral-600">
+                              <li>• Everything in Exposure mode</li>
+                              <li>• Sell downloads via Stripe</li>
+                              <li>• You keep 70% of sales</li>
+                            </ul>
                           </div>
-                        )}
-                      </div>
-                    </button>
+                          {sharingMode === "SALES" && canSell && (
+                            <div className="h-5 w-5 rounded-full bg-lime-500 flex items-center justify-center flex-shrink-0">
+                              <Check className="h-3 w-3 text-white" />
+                            </div>
+                          )}
+                        </div>
+                      </button>
 
-                    {!canSell && (
-                      <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
-                        <p className="text-sm text-black/70">
-                          {eligibilityReason || "Upgrade to Pro to enable sales mode"}
-                        </p>
-                        <Button
-                          onClick={handleUpgrade}
-                          size="sm"
-                          className="mt-2 bg-purple-500 hover:bg-purple-600 text-white font-bold"
-                        >
-                          Upgrade to Pro
-                        </Button>
-                      </div>
-                    )}
+                      {/* Upgrade CTA inside the box */}
+                      {!canSell && (
+                        <div className="mt-3 pt-3 border-t border-neutral-200">
+                          <p className="text-xs text-neutral-600 mb-2">
+                            {eligibilityReason || "Upgrade to Pro to sell downloads and earn from your tracks"}
+                          </p>
+                          <Button
+                            onClick={handleUpgrade}
+                            size="sm"
+                            className="w-full bg-black text-white hover:bg-neutral-800"
+                          >
+                            Upgrade to Pro - $9.95/mo
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
                 {/* Price Input (Sales Mode) */}
                 {sharingMode === "SALES" && canSell && (
                   <div>
-                    <Label htmlFor="salePrice" className="text-base font-bold">
+                    <Label htmlFor="salePrice" className="text-sm font-semibold mb-2 block">
                       Sale Price
                     </Label>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-2xl font-bold">$</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-semibold">$</span>
                       <Input
                         id="salePrice"
                         type="number"
@@ -339,30 +316,30 @@ export function TrackSharingModal({
                         step="0.50"
                         value={salePrice}
                         onChange={(e) => setSalePrice(e.target.value)}
-                        className="text-lg font-bold w-32"
+                        className="w-24"
                       />
-                      <span className="text-sm text-black/60">(min $1.00, max $100.00)</span>
+                      <span className="text-xs text-neutral-500">min $1, max $100</span>
                     </div>
-                    <p className="text-sm text-black/60 mt-2">
-                      You'll earn 70% (${(parseFloat(salePrice) * 0.7).toFixed(2)}) per sale
+                    <p className="text-xs text-neutral-500 mt-1">
+                      You'll earn ${(parseFloat(salePrice) * 0.7).toFixed(2)} per sale (70%)
                     </p>
                   </div>
                 )}
 
                 {error && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm text-red-900">{error}</p>
+                    <p className="text-xs text-red-900">{error}</p>
                   </div>
                 )}
 
-                <div className="flex gap-3">
-                  <Button variant="airy" onClick={onClose} disabled={loading}>
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" onClick={onClose} disabled={loading} size="default">
                     Cancel
                   </Button>
                   <Button
                     onClick={handleEnableSharing}
                     disabled={loading || !canShare}
-                    className="flex-1 bg-lime-400 hover:bg-lime-300 text-black font-bold"
+                    className="flex-1 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black"
                   >
                     {loading ? "Enabling..." : "Continue"}
                   </Button>
@@ -371,7 +348,7 @@ export function TrackSharingModal({
             )}
 
             {!canShare && (
-              <Button variant="airy" onClick={onClose} className="w-full">
+              <Button variant="outline" onClick={onClose} className="w-full">
                 Close
               </Button>
             )}
@@ -380,16 +357,16 @@ export function TrackSharingModal({
 
         {/* Step 2: Create First Link */}
         {step === 2 && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold mb-2">Create Your First Campaign Link</h3>
-              <p className="text-sm text-black/60">
+              <h3 className="text-base font-semibold mb-1">Create Your First Campaign Link</h3>
+              <p className="text-sm text-neutral-600">
                 Give this link a name to help you track where clicks come from
               </p>
             </div>
 
             <div>
-              <Label htmlFor="campaignName" className="text-base font-bold">
+              <Label htmlFor="campaignName" className="text-sm font-semibold mb-2 block">
                 Campaign Name (Optional)
               </Label>
               <Input
@@ -397,27 +374,26 @@ export function TrackSharingModal({
                 value={campaignName}
                 onChange={(e) => setCampaignName(e.target.value)}
                 placeholder="e.g., Twitter January, Instagram Bio"
-                className="mt-2"
               />
-              <p className="text-xs text-black/50 mt-1">
+              <p className="text-xs text-neutral-500 mt-1">
                 Leave blank to use "Main Link"
               </p>
             </div>
 
             {error && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-900">{error}</p>
+                <p className="text-xs text-red-900">{error}</p>
               </div>
             )}
 
-            <div className="flex gap-3">
-              <Button variant="airy" onClick={onClose} disabled={loading}>
+            <div className="flex gap-2 pt-2">
+              <Button variant="outline" onClick={onClose} disabled={loading}>
                 Cancel
               </Button>
               <Button
                 onClick={handleCreateAffiliateLink}
                 disabled={loading}
-                className="flex-1 bg-lime-400 hover:bg-lime-300 text-black font-bold"
+                className="flex-1 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black"
               >
                 {loading ? "Creating..." : "Create Link"}
               </Button>
@@ -427,23 +403,23 @@ export function TrackSharingModal({
 
         {/* Step 3: Success */}
         {step === 3 && generatedUrl && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-lime-100 mb-4">
-                <Check className="h-8 w-8 text-lime-600" />
+          <div className="space-y-4">
+            <div className="text-center py-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-lime-100 mb-3">
+                <Check className="h-6 w-6 text-lime-600" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Sharing Enabled!</h3>
-              <p className="text-sm text-black/60">
+              <h3 className="text-lg font-semibold mb-1">Sharing Enabled!</h3>
+              <p className="text-sm text-neutral-600">
                 Your track is now publicly shareable. Copy your link below:
               </p>
             </div>
 
-            <div className="p-4 bg-neutral-50 border-2 border-black/10 rounded-xl">
-              <Label className="text-xs font-bold uppercase tracking-wide text-black/60 mb-2 block">
+            <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
+              <Label className="text-xs font-semibold uppercase tracking-wide text-neutral-500 mb-2 block">
                 Your Campaign Link
               </Label>
               <div className="flex items-center gap-2">
-                <Input value={generatedUrl} readOnly className="font-mono text-sm" />
+                <Input value={generatedUrl} readOnly className="text-sm" />
                 <Button
                   size="sm"
                   onClick={() => {
@@ -456,26 +432,26 @@ export function TrackSharingModal({
               </div>
             </div>
 
-            <div className="p-4 bg-lime-50 border-2 border-lime-200 rounded-xl">
-              <p className="text-sm font-bold text-lime-900 mb-2">What's next?</p>
-              <ul className="text-sm text-lime-800 space-y-1">
+            <div className="p-3 bg-lime-50 border border-lime-200 rounded-lg">
+              <p className="text-sm font-semibold text-lime-900 mb-2">What's next?</p>
+              <ul className="text-xs text-lime-800 space-y-1">
                 <li>• Share your link on social media</li>
                 <li>• Track clicks, plays, and sales in your Sales Hub</li>
                 <li>• Create more campaign links for different channels</li>
               </ul>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2 pt-2">
               <Button
                 onClick={handleFinish}
-                className="flex-1 bg-lime-400 hover:bg-lime-300 text-black font-bold"
+                className="flex-1 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black"
               >
                 Done
               </Button>
               <a href={generatedUrl} target="_blank" rel="noopener noreferrer">
-                <Button variant="airy">
-                  Preview Page
-                  <ExternalLink className="ml-2 h-4 w-4" />
+                <Button variant="outline">
+                  Preview
+                  <ExternalLink className="ml-2 h-3 w-3" />
                 </Button>
               </a>
             </div>

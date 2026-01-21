@@ -191,7 +191,7 @@ export default function RequestReviewsPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-black/60">This request will use</p>
-                    <p className="text-2xl font-bold text-lime-600">{desiredReviews}</p>
+                    <p className="text-2xl font-bold text-purple-600">{desiredReviews}</p>
                   </div>
                 </div>
               </>
@@ -211,7 +211,7 @@ export default function RequestReviewsPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-black/60">This request will use</p>
-                    <p className="text-2xl font-bold text-lime-600">5</p>
+                    <p className="text-2xl font-bold text-purple-600">5</p>
                   </div>
                 </div>
               </>

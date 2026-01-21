@@ -77,9 +77,9 @@ export function TrackReportDemo() {
               <h4 className="font-extrabold text-neutral-950 text-sm sm:text-lg truncate">Midnight Drive</h4>
               <p className="text-xs sm:text-sm text-neutral-600">by <span className="text-neutral-950 font-semibold">You</span> • <span className="text-orange-700 font-semibold">Electronic</span></p>
             </div>
-            <div className="flex-shrink-0 bg-lime-100 border border-lime-200 px-2 sm:px-3 py-1 sm:py-1.5 text-center">
-              <div className="text-lg sm:text-2xl font-extrabold text-lime-900 leading-none">20</div>
-              <div className="text-[8px] sm:text-[10px] font-semibold text-lime-900/70 uppercase tracking-wide">Reviews</div>
+            <div className="flex-shrink-0 bg-purple-100 border border-purple-200 px-2 sm:px-3 py-1 sm:py-1.5 text-center">
+              <div className="text-lg sm:text-2xl font-extrabold text-purple-900 leading-none">20</div>
+              <div className="text-[8px] sm:text-[10px] font-semibold text-purple-900/70 uppercase tracking-wide">Reviews</div>
             </div>
           </div>
           <div className="flex-1 min-w-0">
@@ -131,14 +131,14 @@ export function TrackReportDemo() {
             }`}
           >
             {activeTab === "analytics" && (
-              <div className="absolute top-0 left-2 right-2 sm:left-3 sm:right-3 h-1 bg-lime-400 rounded-b" />
+              <div className="absolute top-0 left-2 right-2 sm:left-3 sm:right-3 h-1 bg-purple-500 rounded-b" />
             )}
             {/* Mobile: Icon + short label */}
             <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
               <div
                 className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 border ${
                   activeTab === "analytics"
-                    ? "bg-lime-100 text-lime-900 border-lime-200"
+                    ? "bg-purple-100 text-purple-900 border-purple-200"
                     : "bg-neutral-100 text-neutral-500 border-neutral-200"
                 }`}
               >
@@ -163,13 +163,13 @@ export function TrackReportDemo() {
             }`}
           >
             {activeTab === "consensus" && (
-              <div className="absolute top-0 left-2 right-2 sm:left-3 sm:right-3 h-1 bg-lime-400 rounded-b" />
+              <div className="absolute top-0 left-2 right-2 sm:left-3 sm:right-3 h-1 bg-purple-500 rounded-b" />
             )}
             <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
               <div
                 className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 border ${
                   activeTab === "consensus"
-                    ? "bg-lime-100 text-lime-900 border-lime-200"
+                    ? "bg-purple-100 text-purple-900 border-purple-200"
                     : "bg-neutral-100 text-neutral-500 border-neutral-200"
                 }`}
               >
@@ -194,13 +194,13 @@ export function TrackReportDemo() {
             }`}
           >
             {activeTab === "reviews" && (
-              <div className="absolute top-0 left-2 right-2 sm:left-3 sm:right-3 h-1 bg-lime-400 rounded-b" />
+              <div className="absolute top-0 left-2 right-2 sm:left-3 sm:right-3 h-1 bg-purple-500 rounded-b" />
             )}
             <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
               <div
                 className={`w-8 h-8 rounded flex items-center justify-center flex-shrink-0 border ${
                   activeTab === "reviews"
-                    ? "bg-lime-100 text-lime-900 border-lime-200"
+                    ? "bg-purple-100 text-purple-900 border-purple-200"
                     : "bg-neutral-100 text-neutral-500 border-neutral-200"
                 }`}
               >
@@ -221,8 +221,8 @@ export function TrackReportDemo() {
       <div className="p-5 sm:p-6 lg:p-8 relative overflow-hidden">
         {/* Subtle background effects */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-lime-500/[0.07] rounded-full blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-orange-400/[0.05] rounded-full blur-3xl" />
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-purple-500/[0.07] rounded-full blur-3xl" />
+          <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-blue-400/[0.05] rounded-full blur-3xl" />
         </div>
 
         <div className="relative">
@@ -255,7 +255,7 @@ export function TrackReportDemo() {
                         <span className="text-xs font-bold text-neutral-500 w-12">{row.stars} star</span>
                         <div className="flex-1 h-4 bg-neutral-200 rounded-sm overflow-hidden">
                           <div
-                            className={`h-full ${row.stars >= 4 ? 'bg-lime-500' : row.stars === 3 ? 'bg-yellow-500' : 'bg-orange-500'}`}
+                            className={`h-full ${row.stars >= 4 ? 'bg-purple-500' : row.stars === 3 ? 'bg-yellow-500' : 'bg-orange-500'}`}
                             style={{ width: `${row.percent}%` }}
                           />
                         </div>
@@ -272,8 +272,8 @@ export function TrackReportDemo() {
 
               {/* Quick Stats */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-lime-500/10 border border-lime-500/30 p-4 text-center">
-                  <div className="text-2xl font-extrabold text-lime-700">75%</div>
+                <div className="bg-purple-500/10 border border-purple-500/30 p-4 text-center">
+                  <div className="text-2xl font-extrabold text-purple-700">75%</div>
                   <div className="text-xs text-neutral-600 mt-1">Positive Sentiment</div>
                 </div>
                 <div className="bg-orange-400/10 border border-orange-400/30 p-4 text-center">
@@ -288,21 +288,21 @@ export function TrackReportDemo() {
           {activeTab === "consensus" && (
             <div className="space-y-4">
               {/* What's Working */}
-              <div className="bg-lime-500/10 border border-lime-500/30 p-4 sm:p-5">
+              <div className="bg-purple-500/10 border border-purple-500/30 p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="h-2 w-2 bg-lime-400" />
-                  <span className="text-xs font-semibold text-lime-800">WHAT&apos;S WORKING</span>
+                  <div className="h-2 w-2 bg-purple-500" />
+                  <span className="text-xs font-semibold text-purple-800">WHAT&apos;S WORKING</span>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <span className="text-xs font-semibold bg-lime-200 text-lime-900 px-2 py-1 whitespace-nowrap border border-lime-300">15 of 20</span>
+                    <span className="text-xs font-semibold bg-purple-200 text-purple-900 px-2 py-1 whitespace-nowrap border border-purple-300">15 of 20</span>
                     <div>
                       <div className="font-semibold text-sm text-neutral-950">Hook hits hard at 0:45</div>
                       <div className="text-xs text-neutral-600">Melody lands, drums feel confident</div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-xs font-semibold bg-lime-100 text-lime-900 px-2 py-1 whitespace-nowrap border border-lime-200">12 of 20</span>
+                    <span className="text-xs font-semibold bg-purple-100 text-purple-900 px-2 py-1 whitespace-nowrap border border-purple-200">12 of 20</span>
                     <div>
                       <div className="font-semibold text-sm text-neutral-950">Breakdown feels fresh at 2:15</div>
                       <div className="text-xs text-neutral-600">Nice contrast, keeps attention</div>
@@ -348,7 +348,7 @@ export function TrackReportDemo() {
               <div className="flex items-center justify-between mb-4 pb-4 border-b border-neutral-200">
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-semibold text-neutral-600">Review</span>
-                  <div className="flex items-center gap-1 bg-lime-100 text-lime-900 px-2.5 py-1 border border-lime-200 font-mono text-xs font-semibold">
+                  <div className="flex items-center gap-1 bg-purple-100 text-purple-900 px-2.5 py-1 border border-purple-200 font-mono text-xs font-semibold">
                     <span>1</span>
                     <span className="text-black/50">/</span>
                     <span>20</span>
@@ -358,7 +358,7 @@ export function TrackReportDemo() {
                   <button className="h-8 w-8 flex items-center justify-center border border-neutral-200 bg-neutral-100 text-neutral-400 cursor-not-allowed">
                     <ChevronLeft className="h-4 w-4" />
                   </button>
-                  <button className="h-8 w-8 flex items-center justify-center border border-neutral-200 bg-white hover:bg-lime-100 hover:border-lime-200 hover:text-lime-900 text-neutral-700 transition-colors">
+                  <button className="h-8 w-8 flex items-center justify-center border border-neutral-200 bg-white hover:bg-purple-100 hover:border-purple-200 hover:text-purple-900 text-neutral-700 transition-colors">
                     <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>
@@ -366,20 +366,20 @@ export function TrackReportDemo() {
 
               {/* Review Content */}
               <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-full bg-lime-100 border border-lime-200 flex items-center justify-center font-extrabold text-lime-900">S</div>
+                <div className="h-10 w-10 rounded-full bg-purple-100 border border-purple-200 flex items-center justify-center font-extrabold text-purple-900">S</div>
                 <div className="flex-1">
                   <div className="font-extrabold text-neutral-950">Sarah</div>
                   <div className="text-xs text-neutral-500">Electronic fan • 4.2/5 rating</div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] sm:text-xs font-semibold bg-lime-100 text-lime-900 border border-lime-200 px-2 py-1">Would replay</span>
-                  <span className="hidden sm:inline text-xs font-semibold bg-lime-100 text-lime-900 border border-lime-200 px-2 py-1">Would playlist</span>
+                  <span className="text-[10px] sm:text-xs font-semibold bg-purple-100 text-purple-900 border border-purple-200 px-2 py-1">Would replay</span>
+                  <span className="hidden sm:inline text-xs font-semibold bg-purple-100 text-purple-900 border border-purple-200 px-2 py-1">Would playlist</span>
                 </div>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="bg-[#faf8f5] p-4 border border-neutral-200">
-                  <div className="text-xs font-semibold text-lime-700 mb-2">WHAT WORKED</div>
+                  <div className="text-xs font-semibold text-purple-700 mb-2">WHAT WORKED</div>
                   <p className="text-neutral-700 text-sm leading-relaxed">
                     The hook at <span className="font-mono text-neutral-950 bg-white border border-neutral-200 px-1 rounded text-xs">0:45</span> is instantly memorable — I caught myself humming it after.
                   </p>
@@ -394,14 +394,14 @@ export function TrackReportDemo() {
 
               <div className="flex items-center justify-between mt-4 pt-4 border-t border-neutral-200">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-1.5 rounded-full bg-lime-400" />
+                  <div className="w-5 h-1.5 rounded-full bg-purple-500" />
                   <div className="w-1.5 h-1.5 rounded-full bg-neutral-300" />
                   <div className="w-1.5 h-1.5 rounded-full bg-neutral-300" />
                   <div className="w-1.5 h-1.5 rounded-full bg-neutral-300" />
                   <div className="w-1.5 h-1.5 rounded-full bg-neutral-300" />
                   <span className="text-[10px] text-neutral-500 ml-1">+15 more</span>
                 </div>
-                <span className="text-xs font-semibold text-lime-700 flex items-center gap-1 cursor-pointer hover:text-lime-800">
+                <span className="text-xs font-semibold text-purple-700 flex items-center gap-1 cursor-pointer hover:text-purple-800">
                   Read full review <ArrowRight className="h-3 w-3" />
                 </span>
               </div>

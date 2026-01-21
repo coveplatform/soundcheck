@@ -94,7 +94,7 @@ export default function ArtistOnboardingPage() {
           <div className="pt-4">
             <Button
               type="submit"
-              className="w-full h-12 bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+              className="w-full h-12 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-semibold text-base shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
               isLoading={isLoading}
               disabled={!artistName.trim()}
             >

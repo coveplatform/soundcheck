@@ -125,7 +125,7 @@ export default async function ArtistReviewersPage({
                   className="flex items-center justify-between gap-3 rounded-2xl bg-white/60 border border-black/10 px-4 py-3 hover:bg-white transition-colors duration-150 ease-out"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="h-10 w-10 rounded-xl bg-lime-100 flex items-center justify-center text-sm font-bold text-lime-700 flex-shrink-0">
+                    <span className="h-10 w-10 rounded-xl bg-purple-100 flex items-center justify-center text-sm font-bold text-purple-700 flex-shrink-0">
                       {getInitial(r.user.name ?? "Reviewer")}
                     </span>
                     <div className="min-w-0">

@@ -61,15 +61,15 @@ export default async function ArtistTracksPage() {
               {totalEarnings > 0 && (
                 <>
                   <span className="text-neutral-300">•</span>
-                  <span className="font-semibold text-lime-700">${totalEarnings.toFixed(2)} earned</span>
+                  <span className="font-semibold text-teal-600">${totalEarnings.toFixed(2)} earned</span>
                 </>
               )}
             </div>
           </div>
 
           {pendingBalance > 0 && (
-            <div className="px-4 py-2 bg-lime-50 border border-lime-200 rounded-lg">
-              <span className="text-sm font-bold text-lime-700">${pendingBalance.toFixed(2)} pending</span>
+            <div className="px-4 py-2 bg-purple-50 border border-purple-200 rounded-lg">
+              <span className="text-sm font-bold text-purple-700">${pendingBalance.toFixed(2)} pending</span>
             </div>
           )}
         </div>
@@ -187,8 +187,8 @@ function TrackCard({
 
           {isComplete ? (
             <div className="absolute top-2 left-2 -rotate-3">
-              <div className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-lime-300 via-yellow-200 to-orange-200 border-2 border-black text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-                <div className="h-4 w-4 bg-black text-white flex items-center justify-center rounded-sm">
+              <div className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-purple-400 to-purple-500 border-2 border-black text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                <div className="h-4 w-4 bg-white text-purple-600 flex items-center justify-center rounded-sm">
                   <CheckCircle2 className="h-2.5 w-2.5" />
                 </div>
                 <span className="text-[9px] font-black tracking-wide uppercase">Done</span>
@@ -203,7 +203,7 @@ function TrackCard({
                   isPending
                     ? "bg-white/80 text-black border-black/15"
                     : isUploaded
-                      ? "bg-lime-100 text-black border-black/10"
+                      ? "bg-purple-100 text-purple-800 border-purple-200"
                       : "bg-white/70 text-black border-black/10"
                 )}
               >

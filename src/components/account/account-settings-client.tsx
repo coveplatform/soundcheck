@@ -368,7 +368,7 @@ export function AccountSettingsClient({
             </div>
           ) : null}
           {profileSaved ? (
-            <div className="bg-lime-50 border-2 border-lime-500 text-lime-800 text-sm p-3 font-medium">
+            <div className="bg-purple-50 border-2 border-purple-500 text-purple-800 text-sm p-3 font-medium">
               Saved
             </div>
           ) : null}
@@ -419,7 +419,7 @@ export function AccountSettingsClient({
             </div>
           ) : null}
           {resetSent ? (
-            <div className="bg-lime-50 border-2 border-lime-500 text-lime-800 text-sm p-3 font-medium">
+            <div className="bg-purple-50 border-2 border-purple-500 text-purple-800 text-sm p-3 font-medium">
               If an account exists for this email, we sent a reset link.
             </div>
           ) : null}
