@@ -103,7 +103,7 @@ export default async function ArtistDashboardPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-10 pb-6 border-b border-neutral-200">
           <div>
-            <h1 className="text-4xl sm:text-5xl font-light tracking-tight mb-2">dashboard</h1>
+            <h1 className="text-4xl sm:text-5xl font-light tracking-tight mb-2">Dashboard</h1>
             <div className="flex items-center gap-4 text-sm">
               <span className="text-neutral-500">{planLabel}</span>
               <span className="text-neutral-300">•</span>

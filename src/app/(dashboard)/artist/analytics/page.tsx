@@ -33,166 +33,6 @@ export default async function AnalyticsPage() {
   // Check if user has active subscription (Pro only feature)
   const isSubscribed = artistProfile.subscriptionStatus === "active";
 
-  if (!isSubscribed) {
-    return (
-      <div className="pt-14 sm:pt-16 px-4 sm:px-6 lg:px-12">
-        <Link
-          href="/artist/dashboard"
-          className="inline-flex items-center gap-2 text-sm text-black/50 hover:text-black transition-colors mb-8"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Link>
-
-        <div className="mb-8">
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-[1.02]">Analytics</h1>
-          <p className="mt-2 text-base sm:text-lg text-black/70 leading-relaxed max-w-prose">
-            Track your progress and insights across all your submissions
-          </p>
-        </div>
-
-        <div className="max-w-5xl mx-auto mt-12 relative">
-          <div className="pointer-events-none select-none blur-sm opacity-60">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Card variant="soft" elevated>
-                <CardContent className="pt-6">
-                  <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Total feedback</p>
-                  <p className="text-3xl font-black mt-2">128</p>
-                  <p className="text-xs text-black/50 mt-1">Across 9 tracks</p>
-                </CardContent>
-              </Card>
-              <Card variant="soft" elevated>
-                <CardContent className="pt-6">
-                  <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Avg score</p>
-                  <p className="text-3xl font-black mt-2">4.1</p>
-                  <p className="text-xs text-black/50 mt-1">Trending up</p>
-                </CardContent>
-              </Card>
-              <Card variant="soft" elevated>
-                <CardContent className="pt-6">
-                  <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Earnings</p>
-                  <p className="text-3xl font-black mt-2">$82</p>
-                  <p className="text-xs text-black/50 mt-1">Last 30 days</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-              <Card variant="soft" elevated className="rounded-3xl overflow-hidden">
-                <CardContent className="pt-6">
-                  <p className="text-xs font-mono text-black/40 uppercase tracking-widest mb-5">Score trends</p>
-                  <div className="h-40 rounded-2xl border-2 border-black/10 bg-gradient-to-br from-lime-100 via-yellow-50 to-orange-50" />
-                  <div className="grid grid-cols-3 gap-3 mt-4">
-                    <div className="h-10 rounded-xl border-2 border-black/10 bg-white/60" />
-                    <div className="h-10 rounded-xl border-2 border-black/10 bg-white/60" />
-                    <div className="h-10 rounded-xl border-2 border-black/10 bg-white/60" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card variant="soft" elevated className="rounded-3xl overflow-hidden">
-                <CardContent className="pt-6">
-                  <p className="text-xs font-mono text-black/40 uppercase tracking-widest mb-5">Top tracks</p>
-                  <div className="space-y-3">
-                    <div className="h-12 rounded-2xl border-2 border-black/10 bg-white/60" />
-                    <div className="h-12 rounded-2xl border-2 border-black/10 bg-white/60" />
-                    <div className="h-12 rounded-2xl border-2 border-black/10 bg-white/60" />
-                    <div className="h-12 rounded-2xl border-2 border-black/10 bg-white/60" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          <div className="absolute inset-0 flex items-start justify-center">
-            <Card variant="soft" elevated className="border-2 border-lime-400 rounded-3xl overflow-hidden w-full max-w-4xl">
-              <CardContent className="pt-6 text-center py-16">
-                <div className="w-16 h-16 rounded-full bg-lime-100 flex items-center justify-center mx-auto mb-6">
-                  <BarChart3 className="h-8 w-8 text-lime-600" />
-                </div>
-                <h2 className="text-3xl font-black mb-4">Upgrade to Pro to unlock Analytics</h2>
-                <p className="text-lg text-black/70 mb-2 max-w-2xl mx-auto">
-                  Get detailed insights, track your improvement over time, and spot patterns across all your submissions.
-                </p>
-                <p className="text-sm text-black/50 mb-8 max-w-xl mx-auto">
-                  Get aggregate analytics, trend graphs, category breakdowns, and actionable insights to level up your music.
-                </p>
-
-                <div className="bg-white/50 rounded-2xl p-8 max-w-2xl mx-auto mb-8">
-                  <p className="text-xs font-mono text-black/40 uppercase tracking-widest mb-4">What you'll get</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-black">✓</span>
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm">Score Trends Over Time</p>
-                        <p className="text-xs text-black/60">See how you've improved month by month</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-black">✓</span>
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm">Category Breakdown</p>
-                        <p className="text-xs text-black/60">Production, vocals, originality strengths</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-black">✓</span>
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm">Track Comparisons</p>
-                        <p className="text-xs text-black/60">See which tracks performed best</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-black">✓</span>
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm">Actionable Insights</p>
-                        <p className="text-xs text-black/60">Data-driven recommendations</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-black">✓</span>
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm">Earnings Tracking</p>
-                        <p className="text-xs text-black/60">Monitor revenue from track purchases</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-black">✓</span>
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm">Expandable Track Details</p>
-                        <p className="text-xs text-black/60">Deep dive into each track's performance</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Link
-                  href="/artist/submit"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold rounded-lg text-lg shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
-                >
-                  Upgrade to Pro
-                  <Sparkles className="h-5 w-5" />
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Fetch all tracks with completed reviews and purchases
   const tracks = await prisma.track.findMany({
     where: {
@@ -216,42 +56,50 @@ export default async function AnalyticsPage() {
   });
 
   // If no tracks with reviews, show empty state
-  if (tracks.length === 0) {
+  if (tracks.length === 0 && isSubscribed) {
     return (
-      <div className="pt-14 sm:pt-16 px-4 sm:px-6 lg:px-12">
-        <Link
-          href="/artist/dashboard"
-          className="inline-flex items-center gap-2 text-sm text-black/50 hover:text-black transition-colors mb-8"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Link>
+      <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 pb-8 border-b border-neutral-200">
+            <div>
+              <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">Analytics</h1>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="text-neutral-500">All time</span>
+                <span className="text-neutral-300">•</span>
+                <span className="font-semibold">0 reviews</span>
+              </div>
+            </div>
 
-        <div className="mb-8">
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-[1.02]">Analytics</h1>
-          <p className="mt-2 text-base sm:text-lg text-black/70 leading-relaxed max-w-prose">
-            Track your progress and insights across all your submissions
-          </p>
-        </div>
-
-        <Card variant="soft" elevated className="max-w-2xl mx-auto mt-12">
-          <CardContent className="pt-6 text-center py-12">
-            <BarChart3 className="h-12 w-12 text-black/20 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-black mb-2">No analytics yet</h3>
-            <p className="text-sm text-black/60 mb-6">
-              Submit a track and get reviews to start seeing insights and trends.
-            </p>
             <Link
-              href="/artist/submit"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              href="/artist/dashboard"
+              className="inline-flex items-center gap-2 text-sm text-black/50 hover:text-black transition-colors"
             >
-              Submit your first track
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
             </Link>
-          </CardContent>
-        </Card>
+          </div>
+
+          <Card variant="soft" elevated className="max-w-2xl mx-auto">
+            <CardContent className="pt-6 text-center py-12">
+              <BarChart3 className="h-12 w-12 text-black/20 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-black mb-2">No analytics yet</h3>
+              <p className="text-sm text-black/60 mb-6">
+                Submit a track and get reviews to start seeing insights and trends.
+              </p>
+              <Link
+                href="/artist/submit"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              >
+                Submit your first track
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
+
+  const hasAnalyticsData = tracks.length > 0;
 
   // Calculate aggregate statistics
   const totalReviews = tracks.reduce((sum, t) => sum + t.reviews.length, 0);
@@ -385,24 +233,112 @@ export default async function AnalyticsPage() {
   // Analyze feedback patterns
   const feedbackPatterns = analyzeFeedbackPatterns(allReviews);
 
-  return (
-    <div className="pt-14 sm:pt-16 px-4 sm:px-6 lg:px-12 pb-24">
-      <Link
-        href="/artist/dashboard"
-        className="inline-flex items-center gap-2 text-sm text-black/50 hover:text-black transition-colors mb-8"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Dashboard
-      </Link>
+  if (!isSubscribed) {
+    return (
+      <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 pb-8 border-b border-neutral-200">
+            <div>
+              <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">Analytics</h1>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="text-neutral-500">MixReflect Pro</span>
+                <span className="text-neutral-300">•</span>
+                <span className="font-semibold">$9.95/month</span>
+              </div>
+            </div>
 
-      <div className="mb-8">
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-[1.02]">Analytics</h1>
-        <p className="mt-2 text-base sm:text-lg text-black/70 leading-relaxed max-w-prose">
-          Track your progress and insights across all your submissions
-        </p>
+            <Link
+              href="/artist/dashboard"
+              className="inline-flex items-center gap-2 text-sm text-black/50 hover:text-black transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Link>
+          </div>
+
+          <div className="relative">
+            <div className="pointer-events-none select-none blur-sm opacity-60">
+              {hasAnalyticsData ? (
+                <AnalyticsDashboard
+                  tracks={trackData}
+                  totalReviews={totalReviews}
+                  totalEarnings={totalEarnings}
+                  totalTracks={totalTracks}
+                  overallAvg={overallAvg}
+                  highestScore={highestScore}
+                  improvementRate={improvementRate}
+                  wouldListenAgainPercent={wouldListenAgainPercent}
+                  categories={categories}
+                  trendData={trendData}
+                  earningsData={earningsData}
+                  reviewVelocity={reviewVelocity}
+                  feedbackPatterns={feedbackPatterns}
+                />
+              ) : (
+                <Card variant="soft" elevated className="max-w-2xl mx-auto mt-12">
+                  <CardContent className="pt-6 text-center py-12">
+                    <BarChart3 className="h-12 w-12 text-black/20 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-black mb-2">No analytics yet</h3>
+                    <p className="text-sm text-black/60 mb-6">
+                      Submit a track and get reviews to start seeing insights and trends.
+                    </p>
+                    <div className="inline-flex items-center gap-2 px-6 py-3 bg-lime-400 text-black border-2 border-black font-bold rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      Submit your first track
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            <div className="absolute inset-0 flex items-start justify-center pt-10">
+              <Card variant="soft" elevated className="border-2 border-lime-400 rounded-3xl overflow-hidden w-full max-w-2xl">
+                <CardContent className="pt-6 text-center py-10">
+                  <div className="w-14 h-14 rounded-full bg-lime-100 flex items-center justify-center mx-auto mb-5">
+                    <BarChart3 className="h-7 w-7 text-lime-600" />
+                  </div>
+                  <h2 className="text-2xl font-black mb-2">Unlock Analytics</h2>
+                  <p className="text-sm text-black/60 mb-6">
+                    MixReflect Pro · <span className="font-bold text-black">$9.95/month</span>
+                  </p>
+
+                  <Link
+                    href="/artist/submit"
+                    className="inline-flex items-center gap-2 px-7 py-3 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold rounded-lg shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+                  >
+                    Upgrade to Pro
+                    <Sparkles className="h-5 w-5" />
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
       </div>
+    );
+  }
 
-      <div className="max-w-7xl mx-auto">
+  return (
+    <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 pb-8 border-b border-neutral-200">
+          <div>
+            <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">Analytics</h1>
+            <div className="flex items-center gap-4 text-sm">
+              <span className="text-neutral-500">All time</span>
+              <span className="text-neutral-300">•</span>
+              <span className="font-semibold">{totalReviews} reviews</span>
+            </div>
+          </div>
+
+          <Link
+            href="/artist/dashboard"
+            className="inline-flex items-center gap-2 text-sm text-black/50 hover:text-black transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Link>
+        </div>
+
         <AnalyticsDashboard
           tracks={trackData}
           totalReviews={totalReviews}
