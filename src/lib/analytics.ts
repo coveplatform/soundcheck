@@ -7,31 +7,34 @@ import posthog from "posthog-js";
 let isInitialized = false;
 
 export function initAnalytics() {
-  if (typeof window === "undefined") return;
-  if (isInitialized) return;
-  if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
+  // DISABLED: PostHog analytics disabled
+  return;
 
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
-    person_profiles: "identified_only",
-    capture_pageview: true,
-    capture_pageleave: true,
-    autocapture: true,
-    session_recording: {
-      maskAllInputs: false,
-      maskInputOptions: {
-        password: true,
-      },
-    },
-    loaded: (_posthog) => {
-      if (process.env.NODE_ENV === "development") {
-        // Uncomment to debug in dev:
-        // posthog.debug();
-      }
-    },
-  });
+  // if (typeof window === "undefined") return;
+  // if (isInitialized) return;
+  // if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
 
-  isInitialized = true;
+  // posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
+  //   api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
+  //   person_profiles: "identified_only",
+  //   capture_pageview: true,
+  //   capture_pageleave: true,
+  //   autocapture: true,
+  //   session_recording: {
+  //     maskAllInputs: false,
+  //     maskInputOptions: {
+  //       password: true,
+  //     },
+  //   },
+  //   loaded: (_posthog) => {
+  //     if (process.env.NODE_ENV === "development") {
+  //       // Uncomment to debug in dev:
+  //       // posthog.debug();
+  //     }
+  //   },
+  // });
+
+  // isInitialized = true;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -184,16 +187,19 @@ export function track<K extends keyof AnalyticsEvents>(
     ? []
     : [properties: AnalyticsEvents[K]]
 ) {
-  if (typeof window === "undefined") return;
+  // DISABLED: PostHog analytics disabled
+  return;
 
-  const properties = args[0];
+  // if (typeof window === "undefined") return;
 
-  // Log in development
-  if (process.env.NODE_ENV === "development") {
-    console.log(`[Analytics] ${event}`, properties || "");
-  }
+  // const properties = args[0];
 
-  posthog.capture(event, properties as Record<string, unknown>);
+  // // Log in development
+  // if (process.env.NODE_ENV === "development") {
+  //   console.log(`[Analytics] ${event}`, properties || "");
+  // }
+
+  // posthog.capture(event, properties as Record<string, unknown>);
 }
 
 // ─────────────────────────────────────────────────────────────

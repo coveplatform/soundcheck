@@ -55,9 +55,9 @@ export default async function ArtistTracksPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 pb-8 border-b border-neutral-200">
           <div>
-            <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">tracks</h1>
+            <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">Tracks</h1>
             <div className="flex items-center gap-4 text-sm">
-              <span className="text-neutral-500">{tracks.length} {tracks.length === 1 ? "track" : "tracks"}</span>
+              <span className="text-neutral-500">{tracks.length} {tracks.length === 1 ? "Track" : "Tracks"}</span>
               {totalEarnings > 0 && (
                 <>
                   <span className="text-neutral-300">•</span>

@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import { Home, Music, Compass, DollarSign, Settings, LogOut, Headphones } from "lucide-react";
+import { Home, Music, Compass, DollarSign, Settings, LogOut, Headphones, BarChart3 } from "lucide-react";
 
 interface ArtistSidebarProps {
   user: {
@@ -22,6 +23,7 @@ export function ArtistSidebar({ user, artistName, hasEarnings = false }: ArtistS
   const navLinks = [
     { href: "/artist/dashboard", label: "Dashboard", icon: Home },
     { href: "/artist/tracks", label: "Tracks", icon: Music },
+    { href: "/artist/analytics", label: "Analytics", icon: BarChart3 },
     { href: "/discover", label: "Discover", icon: Compass },
     ...(hasEarnings ? [{ href: "/artist/earnings", label: "Earnings", icon: DollarSign }] : []),
   ];
@@ -35,7 +37,8 @@ export function ArtistSidebar({ user, artistName, hasEarnings = false }: ArtistS
       <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 bg-[#faf8f5] border-r border-black/10 flex-col z-40">
         {/* Header */}
         <div className="p-6 border-b border-black/10">
-          <Link href="/artist/dashboard" className="block">
+          <Link href="/artist/dashboard" className="flex items-center gap-2.5">
+            <Image src="/icon.svg" alt="MixReflect" width={28} height={28} className="flex-shrink-0" />
             <span className="text-lg font-semibold tracking-tight">MixReflect</span>
           </Link>
         </div>
@@ -73,13 +76,13 @@ export function ArtistSidebar({ user, artistName, hasEarnings = false }: ArtistS
           {/* Actions */}
           <div className="space-y-1">
             {user.isReviewer && (
-              <Link
-                href="/listener/dashboard"
-                className="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium text-neutral-600 hover:text-black transition-colors border-l-2 border-transparent hover:border-black/20"
+              <div
+                title="We aren't accepting listeners at the moment - all spots are full"
+                className="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium text-neutral-400 border-l-2 border-transparent cursor-not-allowed opacity-50"
               >
-                <Headphones className="w-4 h-4 opacity-70" />
+                <Headphones className="w-4 h-4 opacity-40" />
                 Switch to Listener
-              </Link>
+              </div>
             )}
 
             <Link

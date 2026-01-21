@@ -36,8 +36,9 @@ export function ArtistNav({ user, artistName, hasEarnings = false }: ArtistNavPr
   }, [menuOpen]);
 
   const navLinks = [
-    { href: "/artist/dashboard", label: "Home" },
+    { href: "/artist/dashboard", label: "Dashboard" },
     { href: "/artist/tracks", label: "Your Tracks" },
+    { href: "/artist/analytics", label: "Analytics" },
     { href: "/discover", label: "Discover" },
     ...(hasEarnings ? [{ href: "/artist/earnings", label: "Earnings" }] : []),
   ];
@@ -144,16 +145,15 @@ export function ArtistNav({ user, artistName, hasEarnings = false }: ArtistNavPr
             </div>
 
             {user.isReviewer && (
-              <Link
-                href="/listener/dashboard"
-                onClick={() => setMenuOpen(false)}
-                className="group inline-flex items-center gap-3 px-5 py-3 rounded-full border border-black/10 hover:border-black/30 hover:bg-black/5 transition-all"
+              <div
+                title="We aren't accepting listeners at the moment - all spots are full"
+                className="group inline-flex items-center gap-3 px-5 py-3 rounded-full border border-black/5 bg-black/5 cursor-not-allowed opacity-50"
               >
-                <span className="text-sm text-black/70 group-hover:text-black">Switch to Listener</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-black/40 group-hover:text-black transition-colors">
+                <span className="text-sm text-black/40">Switch to Listener</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-black/20">
                   <path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-              </Link>
+              </div>
             )}
           </div>
         </div>
