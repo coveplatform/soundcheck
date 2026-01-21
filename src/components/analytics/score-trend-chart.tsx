@@ -115,7 +115,18 @@ export function ScoreTrendChart({ data }: ScoreTrendChartProps) {
                 borderRadius: "8px",
                 fontSize: "12px",
               }}
-              formatter={(value: number) => value.toFixed(2)}
+              formatter={(value) => {
+                const numericValue =
+                  typeof value === "number"
+                    ? value
+                    : typeof value === "string"
+                      ? Number(value)
+                      : 0
+
+                const safeValue = Number.isFinite(numericValue) ? numericValue : 0
+
+                return safeValue.toFixed(2)
+              }}
             />
             {activeMetrics.has("overall") && (
               <Line
