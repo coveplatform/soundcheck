@@ -92,7 +92,18 @@ export function EarningsChart({ data }: EarningsChartProps) {
                   borderRadius: "8px",
                   fontSize: "12px",
                 }}
-                formatter={(value: number) => [`$${value.toFixed(2)}`, "Earnings"]}
+                formatter={(value) => {
+                  const numericValue =
+                    typeof value === "number"
+                      ? value
+                      : typeof value === "string"
+                        ? Number(value)
+                        : 0
+
+                  const safeValue = Number.isFinite(numericValue) ? numericValue : 0
+
+                  return [`$${safeValue.toFixed(2)}`, "Earnings"]
+                }}
                 labelFormatter={(label) => `${label}`}
               />
               <Bar
@@ -121,7 +132,18 @@ export function EarningsChart({ data }: EarningsChartProps) {
                   borderRadius: "8px",
                   fontSize: "12px",
                 }}
-                formatter={(value: number) => [`$${value.toFixed(2)}`, "Earnings"]}
+                formatter={(value) => {
+                  const numericValue =
+                    typeof value === "number"
+                      ? value
+                      : typeof value === "string"
+                        ? Number(value)
+                        : 0
+
+                  const safeValue = Number.isFinite(numericValue) ? numericValue : 0
+
+                  return [`$${safeValue.toFixed(2)}`, "Earnings"]
+                }}
               />
               <Line
                 type="monotone"
