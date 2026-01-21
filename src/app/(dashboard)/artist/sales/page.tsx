@@ -58,71 +58,116 @@ export default async function SalesHubPage() {
           description="Sell your tracks, share links, and track purchases"
         />
 
-        <div className="max-w-4xl mx-auto mt-12">
-          <Card variant="soft" elevated className="border-2 border-lime-400 rounded-3xl overflow-hidden">
-            <CardContent className="pt-6 text-center py-16">
-              <div className="w-16 h-16 rounded-full bg-lime-100 flex items-center justify-center mx-auto mb-6">
-                <ShoppingCart className="h-8 w-8 text-lime-600" />
-              </div>
-              <h2 className="text-3xl font-black mb-4">Upgrade to Pro to start selling</h2>
-              <p className="text-lg text-black/70 mb-2 max-w-2xl mx-auto">
-                Turn your uploaded tracks into a shareable purchase link and track sales, plays, and referrals.
-              </p>
-              <p className="text-sm text-black/50 mb-8 max-w-xl mx-auto">
-                Pro unlocks sales mode, affiliate links, and a clean hub for managing your sharing.
-              </p>
+        <div className="max-w-5xl mx-auto mt-12 relative">
+          <div className="pointer-events-none select-none blur-sm opacity-60">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+              <Card variant="soft" elevated>
+                <CardContent className="pt-6">
+                  <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Total Earnings</p>
+                  <p className="text-3xl font-black mt-2">$56.50</p>
+                  <p className="text-xs text-black/50 mt-1">$22.00 from sales</p>
+                </CardContent>
+              </Card>
+              <Card variant="soft" elevated>
+                <CardContent className="pt-6">
+                  <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">This Month</p>
+                  <p className="text-3xl font-black mt-2">$12.00</p>
+                  <p className="text-xs text-black/50 mt-1">4 sales</p>
+                </CardContent>
+              </Card>
+              <Card variant="soft" elevated>
+                <CardContent className="pt-6">
+                  <p className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest">Active Links</p>
+                  <p className="text-3xl font-black mt-2">7</p>
+                  <p className="text-xs text-black/50 mt-1">2 tracks for sale</p>
+                </CardContent>
+              </Card>
+            </div>
 
-              <div className="bg-white/50 rounded-2xl p-8 max-w-2xl mx-auto mb-8">
-                <p className="text-xs font-mono text-black/40 uppercase tracking-widest mb-4">What you'll get</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-black">✓</span>
+            <Card variant="soft" elevated className="mb-8">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="h-5 w-5" />
+                  Uploaded Tracks (3)
+                </CardTitle>
+                <p className="text-sm text-black/60 mt-1">Can enable sharing and sales</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="h-16 rounded-xl border-2 border-black/10 bg-white/60" />
+                  <div className="h-16 rounded-xl border-2 border-black/10 bg-white/60" />
+                  <div className="h-16 rounded-xl border-2 border-black/10 bg-white/60" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="absolute inset-0 flex items-start justify-center">
+            <Card variant="soft" elevated className="border-2 border-lime-400 rounded-3xl overflow-hidden w-full max-w-4xl">
+              <CardContent className="pt-6 text-center py-16">
+                <div className="w-16 h-16 rounded-full bg-lime-100 flex items-center justify-center mx-auto mb-6">
+                  <ShoppingCart className="h-8 w-8 text-lime-600" />
+                </div>
+                <h2 className="text-3xl font-black mb-4">Upgrade to Pro to start selling</h2>
+                <p className="text-lg text-black/70 mb-2 max-w-2xl mx-auto">
+                  Turn your uploaded tracks into a shareable purchase link and track sales, plays, and referrals.
+                </p>
+                <p className="text-sm text-black/50 mb-8 max-w-xl mx-auto">
+                  Pro unlocks sales mode, affiliate links, and a clean hub for managing your sharing.
+                </p>
+
+                <div className="bg-white/50 rounded-2xl p-8 max-w-2xl mx-auto mb-8">
+                  <p className="text-xs font-mono text-black/40 uppercase tracking-widest mb-4">What you'll get</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-black">✓</span>
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm">Sell your tracks</p>
+                        <p className="text-xs text-black/60">Generate a purchase link for any uploaded track</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-bold text-sm">Sell your tracks</p>
-                      <p className="text-xs text-black/60">Generate a purchase link for any uploaded track</p>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-black">✓</span>
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm">Affiliate links</p>
+                        <p className="text-xs text-black/60">Track referrals and reward your community</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-black">✓</span>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-black">✓</span>
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm">Sales tracking</p>
+                        <p className="text-xs text-black/60">See purchases, plays, and performance per track</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-bold text-sm">Affiliate links</p>
-                      <p className="text-xs text-black/60">Track referrals and reward your community</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-black">✓</span>
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm">Sales tracking</p>
-                      <p className="text-xs text-black/60">See purchases, plays, and performance per track</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-xs font-black">✓</span>
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm">Simple sharing hub</p>
-                      <p className="text-xs text-black/60">Manage links in one place, no confusion</p>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-black">✓</span>
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm">Simple sharing hub</p>
+                        <p className="text-xs text-black/60">Manage links in one place, no confusion</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <Link
-                href="/artist/submit"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold rounded-lg text-lg shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
-              >
-                Upgrade to Pro
-                <Sparkles className="h-5 w-5" />
-              </Link>
-            </CardContent>
-          </Card>
+                <Link
+                  href="/artist/submit"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold rounded-lg text-lg shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+                >
+                  Upgrade to Pro
+                  <Sparkles className="h-5 w-5" />
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     );
