@@ -6,7 +6,6 @@ import { TimePeriodSelector, TimePeriod } from "./time-period-selector";
 import { ScoreTrendChart } from "./score-trend-chart";
 import { ExpandableTrackList } from "./expandable-track-list";
 import { EarningsChart } from "./earnings-chart";
-import { Milestones } from "./milestones";
 import { ReviewVelocity } from "./review-velocity";
 import { FeedbackPatterns } from "./feedback-patterns";
 import {
@@ -17,7 +16,6 @@ import {
   TrendingUp,
   MessageSquare,
   Zap,
-  Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -153,7 +151,7 @@ export function AnalyticsDashboard({
       {/* HERO SECTION - MASSIVE REVIEW COUNT */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-lime-100 via-yellow-50 to-orange-50 opacity-50" />
-        <div className="relative bg-gradient-to-br from-lime-400/10 to-green-400/10 rounded-3xl border-2 border-lime-300 p-8 sm:p-12">
+        <div className="relative bg-gradient-to-br from-lime-400/10 to-green-400/10 rounded-3xl border-2 border-lime-300 p-6 sm:p-8">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-2 border-black/10 mb-6">
               <MessageSquare className="w-4 h-4 text-lime-600" />
@@ -163,27 +161,27 @@ export function AnalyticsDashboard({
             </div>
 
             <div className="mb-6">
-              <div className="text-[120px] sm:text-[160px] lg:text-[200px] font-black leading-none tracking-tighter bg-gradient-to-br from-lime-600 via-green-600 to-emerald-600 bg-clip-text text-transparent">
+              <div className="text-[72px] sm:text-[96px] lg:text-[120px] font-black leading-none tracking-tighter bg-gradient-to-br from-lime-600 via-green-600 to-emerald-600 bg-clip-text text-transparent">
                 {displayStats.totalReviews}
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-black/80 mt-4">
+              <p className="text-lg sm:text-xl font-bold text-black/80 mt-3">
                 Professional Review{displayStats.totalReviews === 1 ? "" : "s"}
               </p>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-center">
               <div>
-                <p className="text-4xl sm:text-5xl font-black">{displayStats.avgScore.toFixed(1)}</p>
+                <p className="text-3xl sm:text-4xl font-black">{displayStats.avgScore.toFixed(1)}</p>
                 <p className="text-sm text-black/60 mt-1">Avg Score</p>
               </div>
               <div className="w-px h-12 bg-black/10" />
               <div>
-                <p className="text-4xl sm:text-5xl font-black">{filteredTracks.length}</p>
+                <p className="text-3xl sm:text-4xl font-black">{filteredTracks.length}</p>
                 <p className="text-sm text-black/60 mt-1">Track{filteredTracks.length === 1 ? "" : "s"}</p>
               </div>
               <div className="w-px h-12 bg-black/10" />
               <div>
-                <p className="text-4xl sm:text-5xl font-black">${displayStats.totalEarnings.toFixed(0)}</p>
+                <p className="text-3xl sm:text-4xl font-black">${displayStats.totalEarnings.toFixed(0)}</p>
                 <p className="text-sm text-black/60 mt-1">Earned</p>
               </div>
             </div>
@@ -210,20 +208,6 @@ export function AnalyticsDashboard({
         </div>
         <TimePeriodSelector selected={timePeriod} onChange={setTimePeriod} />
       </div>
-
-      {/* MILESTONES & ACHIEVEMENTS */}
-      <section>
-        <div className="flex items-center gap-3 mb-6">
-          <Trophy className="w-6 h-6 text-lime-600" />
-          <h3 className="text-xl font-black">Milestones & Achievements</h3>
-        </div>
-        <Milestones
-          totalReviews={totalReviews}
-          totalEarnings={totalEarnings}
-          totalTracks={totalTracks}
-          highestScore={highestScore}
-        />
-      </section>
 
       {/* EARNINGS ANALYSIS */}
       {(totalEarnings > 0 || earningsData.length > 0) && (

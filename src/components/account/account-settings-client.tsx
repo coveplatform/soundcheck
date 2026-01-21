@@ -49,6 +49,10 @@ export function AccountSettingsClient({
   const [isStartingCheckout, setIsStartingCheckout] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
 
+  const [isBuyingCredits, setIsBuyingCredits] = useState(false);
+  const [buyCreditsError, setBuyCreditsError] = useState("");
+  const [buyCreditsQuantity, setBuyCreditsQuantity] = useState(10);
+
   async function saveProfile() {
     setProfileError("");
     setProfileSaved(false);
@@ -74,6 +78,34 @@ export function AccountSettingsClient({
       setProfileError("Failed to update profile");
     } finally {
       setIsSavingProfile(false);
+    }
+  }
+
+  async function buyCredits(
+    payload: { kind: "quantity"; quantity: number } | { kind: "pack"; pack: 5 | 20 | 50 }
+  ) {
+    setBuyCreditsError("");
+    setIsBuyingCredits(true);
+
+    try {
+      const res = await fetch("/api/review-credits/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data?.url) {
+        setBuyCreditsError(data?.error || "Failed to start checkout");
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch {
+      setBuyCreditsError("Failed to start checkout");
+    } finally {
+      setIsBuyingCredits(false);
     }
   }
 
@@ -174,6 +206,11 @@ export function AccountSettingsClient({
                 {checkoutError}
               </div>
             ) : null}
+            {buyCreditsError ? (
+              <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
+                {buyCreditsError}
+              </div>
+            ) : null}
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-bold text-black">Plan</p>
@@ -182,6 +219,72 @@ export function AccountSettingsClient({
               <div className="text-right">
                 <p className="text-sm font-bold text-black">Review tokens</p>
                 <p className="text-xs text-black/50">{reviewTokens}</p>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-black/10">
+              <div className="bg-white/60 border-2 border-black/10 rounded-2xl p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.08)] space-y-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-bold text-black">Buy more review credits</p>
+                    <p className="text-xs text-black/60 mt-1">
+                      <span className="font-bold text-black">$1</span> per credit • packs available
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-mono text-black/40 uppercase tracking-widest">Balance</p>
+                    <p className="text-lg font-black text-black">{reviewTokens}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <Button
+                    variant="airy"
+                    onClick={() => buyCredits({ kind: "pack", pack: 5 })}
+                    isLoading={isBuyingCredits}
+                    className="justify-between"
+                  >
+                    <span className="font-bold">+5</span>
+                    <span className="text-black/50">$5</span>
+                  </Button>
+                  <Button
+                    variant="airy"
+                    onClick={() => buyCredits({ kind: "pack", pack: 20 })}
+                    isLoading={isBuyingCredits}
+                    className="justify-between"
+                  >
+                    <span className="font-bold">+20</span>
+                    <span className="text-black/50">$18</span>
+                  </Button>
+                  <Button
+                    variant="airy"
+                    onClick={() => buyCredits({ kind: "pack", pack: 50 })}
+                    isLoading={isBuyingCredits}
+                    className="justify-between"
+                  >
+                    <span className="font-bold">+50</span>
+                    <span className="text-black/50">$40</span>
+                  </Button>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Input
+                    type="number"
+                    min={1}
+                    max={200}
+                    value={buyCreditsQuantity}
+                    onChange={(e) => setBuyCreditsQuantity(Number(e.target.value))}
+                    className="h-10"
+                  />
+                  <Button
+                    variant="primary"
+                    onClick={() => buyCredits({ kind: "quantity", quantity: Math.max(1, Math.min(200, buyCreditsQuantity || 1)) })}
+                    isLoading={isBuyingCredits}
+                    className="h-10"
+                  >
+                    Buy custom
+                  </Button>
+                </div>
               </div>
             </div>
             {isSubscribed ? (

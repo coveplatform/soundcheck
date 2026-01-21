@@ -174,6 +174,122 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Artist Earnings - NEW */}
+      <section className="pb-12 sm:pb-16 pt-0 bg-neutral-900 text-neutral-50 overflow-visible font-sans">
+        <div className="w-full overflow-hidden bg-lime-400/10">
+          <div className="h-12 flex items-center">
+            <div
+              className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-lime-300 text-3xl font-bold leading-none`}
+            >
+              {Array.from({ length: 60 }).map((_, i) => (
+                <span key={i}>new</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-5xl mx-auto px-4 pt-6 sm:pt-8">
+          <div className="grid gap-8 md:gap-10 md:grid-cols-2 lg:grid-cols-[1fr_380px] items-center">
+            <AnimatedSection className="is-visible max-w-xl text-center md:text-left">
+              <h2 className="text-2xl sm:text-3xl font-bold">Get paid when people buy your track</h2>
+              <p className="mt-3 text-neutral-300">
+                Listeners can share your track link. If other listeners buy through it, you get the sale—and the sharer
+                earns a commission.
+              </p>
+
+              <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+                <Link href="/signup">
+                  <Button
+                    size="lg"
+                    className="bg-lime-400 text-black hover:bg-lime-300 active:bg-lime-500 border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+                  >
+                    Start free trial <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="#pricing">
+                  <Button
+                    size="lg"
+                    className="bg-white/10 text-neutral-50 border-2 border-white/20 hover:bg-white/15 active:bg-white/20"
+                  >
+                    See pricing
+                  </Button>
+                </Link>
+              </div>
+            </AnimatedSection>
+
+            <AnimatedSection className="is-visible w-full max-w-sm mx-auto md:mx-0 md:max-w-none">
+              <div className="bg-neutral-800 border-2 border-neutral-700 rounded-2xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
+                {/* Header with balance */}
+                <div className="bg-gradient-to-br from-lime-400 to-lime-500 px-3 py-2 border-b-2 border-black/20">
+                  <div className="text-[9px] font-bold text-black/60 uppercase tracking-wider">Your Balance</div>
+                  <div className="text-lg font-extrabold text-black">$12.50</div>
+                </div>
+                
+                {/* Recent sales list */}
+                <div className="p-3 space-y-1.5">
+                  <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider px-1 mb-2">Recent Sales</div>
+                  
+                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
+                    <img src="/activity-artwork/1.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] font-semibold text-white truncate">Neon Pulse</div>
+                      <div className="text-[11px] text-neutral-500">2 min ago</div>
+                    </div>
+                    <div className="text-[13px] font-bold text-lime-400">+$0.50</div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
+                    <img src="/activity-artwork/5.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] font-semibold text-white truncate">Late Night Taxi</div>
+                      <div className="text-[11px] text-neutral-500">via @lofi_curator · 8 min ago</div>
+                    </div>
+                    <div className="text-[13px] font-bold text-lime-400">+$0.50</div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
+                    <img src="/activity-artwork/9.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] font-semibold text-white truncate">Golden Hour</div>
+                      <div className="text-[11px] text-neutral-500">15 min ago</div>
+                    </div>
+                    <div className="text-[13px] font-bold text-lime-400">+$0.50</div>
+                  </div>
+                </div>
+                
+                {/* Footer */}
+                <div className="px-4 py-2.5 bg-black/20 border-t border-white/5 text-center">
+                  <span className="text-[11px] text-neutral-400">Earn <span className="text-lime-400 font-semibold">$0.50</span> every time someone buys your track</span>
+                </div>
+              </div>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
+      {/* Your Music Has a Home */}
+      <section className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
+        <div className="max-w-5xl mx-auto px-4">
+          <AnimatedSection className="max-w-2xl mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold">Your music has a home</h2>
+            <p className="mt-3 text-neutral-600">
+              Every track you upload gets its own page. Listeners can discover it, listen, and if they like it, buy it and share it with their audience.
+            </p>
+          </AnimatedSection>
+
+          <AnimatedSection className="relative">
+            {/* Decorative doodles */}
+            <Sparkle className="pointer-events-none absolute -top-10 -left-10 sm:-left-24 lg:-left-40 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-90 rotate-12" />
+            <Star className="pointer-events-none absolute top-6 -left-6 sm:-left-16 lg:-left-24 w-12 h-12 sm:w-14 sm:h-14 text-lime-500 opacity-90 -rotate-12" />
+            <Squiggle className="pointer-events-none absolute -bottom-10 -right-10 sm:-right-28 lg:-right-44 w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 text-orange-300 opacity-60 rotate-6" />
+
+            <BrowserMockup url="mixreflect.com/track/midnight-drive">
+              <TrackPageMockup />
+            </BrowserMockup>
+          </AnimatedSection>
+        </div>
+      </section>
+
       {/* Stem Upload Feature - NEW */}
       <section className="pb-12 sm:pb-16 pt-0 bg-neutral-900 text-neutral-50 overflow-visible">
         <div className="w-full overflow-hidden bg-lime-400/10">
@@ -334,29 +450,6 @@ export default function Home() {
                 </p>
               </div>
             </div>
-          </AnimatedSection>
-        </div>
-      </section>
-
-      {/* Your Music Has a Home */}
-      <section className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
-        <div className="max-w-5xl mx-auto px-4">
-          <AnimatedSection className="max-w-2xl mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">Your music has a home</h2>
-            <p className="mt-3 text-neutral-600">
-              Every track you upload gets its own page. Listeners can discover it, listen, and if they like it, buy it and share it with their audience.
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection className="relative">
-            {/* Decorative doodles */}
-            <Sparkle className="pointer-events-none absolute -top-10 -left-10 sm:-left-24 lg:-left-40 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-90 rotate-12" />
-            <Star className="pointer-events-none absolute top-6 -left-6 sm:-left-16 lg:-left-24 w-12 h-12 sm:w-14 sm:h-14 text-lime-500 opacity-90 -rotate-12" />
-            <Squiggle className="pointer-events-none absolute -bottom-10 -right-10 sm:-right-28 lg:-right-44 w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 text-orange-300 opacity-60 rotate-6" />
-
-            <BrowserMockup url="mixreflect.com/track/midnight-drive">
-              <TrackPageMockup />
-            </BrowserMockup>
           </AnimatedSection>
         </div>
       </section>

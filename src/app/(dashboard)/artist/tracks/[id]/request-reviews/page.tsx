@@ -16,11 +16,39 @@ export default function RequestReviewsPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [isBuyingCredits, setIsBuyingCredits] = useState(false);
 
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [reviewTokens, setReviewTokens] = useState<number>(0);
   const [desiredReviews, setDesiredReviews] = useState<number>(5);
+
+  const buyCredits = async (payload: { kind: "quantity"; quantity: number } | { kind: "pack"; pack: 5 | 20 | 50 }) => {
+    if (isBuyingCredits) return;
+    setIsBuyingCredits(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/review-credits/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...payload, trackId }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data?.url) {
+        setError(data?.error || "Failed to start checkout");
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch {
+      setError("Failed to start checkout");
+    } finally {
+      setIsBuyingCredits(false);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -92,6 +120,8 @@ export default function RequestReviewsPage() {
       setIsSubmitting(false);
     }
   };
+
+  const needsCredits = !isLoadingProfile && desiredReviews > reviewTokens;
 
   return (
     <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12">
@@ -186,6 +216,70 @@ export default function RequestReviewsPage() {
                 </div>
               </>
             )}
+
+            {(needsCredits || error.toLowerCase().includes("not enough") || error.toLowerCase().includes("token")) && (
+              <div className="pt-4 border-t border-black/10">
+                <div className="bg-white/60 border-2 border-black/10 rounded-2xl p-4 sm:p-5 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.08)]">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="text-sm font-bold text-black">Buy more credits</div>
+                      <div className="text-xs text-black/60 mt-1">
+                        <span className="font-bold text-black">$1</span> per review • packs available
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs font-mono text-black/40 uppercase tracking-widest">Needed</div>
+                      <div className="text-xl font-black text-black">
+                        {Math.max(1, desiredReviews - reviewTokens)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
+                    <Button
+                      type="button"
+                      variant="airy"
+                      onClick={() => buyCredits({ kind: "pack", pack: 5 })}
+                      isLoading={isBuyingCredits}
+                      className="justify-between"
+                    >
+                      <span className="font-bold">+5</span>
+                      <span className="text-black/50">$5</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="airy"
+                      onClick={() => buyCredits({ kind: "pack", pack: 20 })}
+                      isLoading={isBuyingCredits}
+                      className="justify-between"
+                    >
+                      <span className="font-bold">+20</span>
+                      <span className="text-black/50">$18</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="airy"
+                      onClick={() => buyCredits({ kind: "pack", pack: 50 })}
+                      isLoading={isBuyingCredits}
+                      className="justify-between"
+                    >
+                      <span className="font-bold">+50</span>
+                      <span className="text-black/50">$40</span>
+                    </Button>
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="airyPrimary"
+                    onClick={() => buyCredits({ kind: "quantity", quantity: Math.max(1, desiredReviews - reviewTokens) })}
+                    isLoading={isBuyingCredits}
+                    className="w-full mt-3"
+                  >
+                    Top up {Math.max(1, desiredReviews - reviewTokens)} credits
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -194,7 +288,7 @@ export default function RequestReviewsPage() {
           isLoading={isSubmitting}
           variant="airyPrimary"
           className="w-full h-12"
-          disabled={!trackId || isSubmitting}
+          disabled={!trackId || isSubmitting || needsCredits}
         >
           Request reviews
           <ArrowRight className="h-4 w-4 ml-2" />

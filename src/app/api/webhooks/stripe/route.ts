@@ -15,6 +15,70 @@ type StripeSubscriptionUnixFields = {
   canceled_at?: number | null;
 };
 
+async function handleReviewCreditsTopup(session: Stripe.Checkout.Session) {
+  try {
+    const artistProfileId = session.metadata?.artistProfileId;
+    const creditsToAddRaw = session.metadata?.creditsToAdd;
+
+    const creditsToAdd = Number.parseInt(String(creditsToAddRaw ?? ""), 10);
+
+    if (!artistProfileId || !Number.isFinite(creditsToAdd) || creditsToAdd <= 0) {
+      console.error("Invalid review credit topup metadata", {
+        artistProfileId,
+        creditsToAdd: creditsToAddRaw,
+      });
+      return;
+    }
+
+    await prisma.artistProfile.updateMany({
+      where: { id: artistProfileId },
+      data: {
+        freeReviewCredits: {
+          increment: creditsToAdd,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error handling review credits topup:", error);
+  }
+}
+
+async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
+  try {
+    const subscriptionId =
+      typeof (invoice as any).subscription === "string" ? ((invoice as any).subscription as string) : null;
+    const billingReason = typeof (invoice as any).billing_reason === "string" ? (invoice as any).billing_reason : null;
+
+    if (!subscriptionId || billingReason !== "subscription_cycle") {
+      return;
+    }
+
+    const artistProfile = await prisma.artistProfile.findFirst({
+      where: {
+        subscriptionId,
+        subscriptionStatus: "active",
+      },
+      select: { id: true },
+    });
+
+    if (!artistProfile) {
+      return;
+    }
+
+    await (prisma.artistProfile as any).updateMany({
+      where: {
+        id: artistProfile.id,
+        OR: [{ freeReviewCredits: { lt: 20 } }, { freeReviewCredits: { equals: null } }],
+      },
+      data: {
+        freeReviewCredits: 20,
+      },
+    });
+  } catch (error) {
+    console.error("Error handling invoice payment succeeded:", error);
+  }
+}
+
 export async function POST(request: Request) {
   const body = await request.text();
   const headersList = await headers();
@@ -81,6 +145,12 @@ export async function POST(request: Request) {
       break;
     }
 
+    case "invoice.payment_succeeded": {
+      const invoice = event.data.object as Stripe.Invoice;
+      await handleInvoicePaymentSucceeded(invoice);
+      break;
+    }
+
     case "checkout.session.expired": {
       const session = event.data.object as Stripe.Checkout.Session;
       await handleCheckoutExpired(session);
@@ -108,6 +178,11 @@ export async function POST(request: Request) {
 
 async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   // Check if this is an external purchase (track sale) or track review payment
+  if (session.metadata?.type === "review_credits_topup") {
+    await handleReviewCreditsTopup(session);
+    return;
+  }
+
   const purchaseId = session.metadata?.purchaseId;
 
   if (purchaseId) {

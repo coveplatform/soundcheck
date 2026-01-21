@@ -553,7 +553,7 @@ export default async function TrackDetailPage({
         )}
 
         {/* Section 4: Status (conditional - ableton, upload status, progress, snapshot) */}
-        {(track.abletonRenderStatus || (track.status as any) === "UPLOADED" || track.reviewsRequested > 0 || track.status === "CANCELLED") && (
+        {(track.abletonRenderStatus || (track.status as any) === "UPLOADED" || track.status === "CANCELLED") && (
           <AnimatedSection>
             <Card variant="soft" elevated className="overflow-hidden rounded-3xl">
               <CardContent className="pt-6 space-y-6 divide-y divide-black/10">
@@ -659,12 +659,6 @@ export default async function TrackDetailPage({
                     </div>
                   </div>
                 )}
-
-                {/* Review Progress */}
-                
-
-                {/* Snapshot Stats */}
-                
               </CardContent>
             </Card>
           </AnimatedSection>
