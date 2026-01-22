@@ -188,7 +188,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
+            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
           />
         </div>
 
@@ -203,7 +203,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
+            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
           />
         </div>
 
@@ -219,7 +219,7 @@ export default function LoginPage() {
         <div className="pt-2">
           <Button
             type="submit"
-            className="w-full h-12 bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+            className="w-full h-12 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
             isLoading={isLoading}
           >
             Sign in
@@ -251,7 +251,7 @@ export default function LoginPage() {
 
       <p className="text-sm text-neutral-600 text-center mt-8">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="text-neutral-950 font-bold hover:text-lime-700 transition-colors">
+        <Link href="/signup" className="text-neutral-950 font-bold hover:text-purple-700 transition-colors">
           Sign up
         </Link>
       </p>

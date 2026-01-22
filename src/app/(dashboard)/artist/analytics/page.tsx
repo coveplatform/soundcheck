@@ -4,6 +4,7 @@ import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { BarChart3, Sparkles, ArrowLeft } from "lucide-react";
 import { AnalyticsDashboard } from "@/components/analytics/analytics-dashboard";
 import {

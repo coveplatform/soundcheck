@@ -197,7 +197,7 @@ export default function SignupPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
+            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
           />
         </div>
 
@@ -212,7 +212,7 @@ export default function SignupPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
+            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
           />
           <div className="mt-3">
             <PasswordStrength password={password} />
@@ -225,15 +225,15 @@ export default function SignupPage() {
             type="checkbox"
             checked={acceptedTerms}
             onChange={(e) => setAcceptedTerms(e.target.checked)}
-            className="mt-1 h-4 w-4 bg-transparent border-2 border-neutral-400 accent-lime-600 cursor-pointer"
+            className="mt-1 h-4 w-4 bg-transparent border-2 border-neutral-400 accent-purple-600 cursor-pointer"
           />
           <label htmlFor="terms" className="text-sm text-neutral-600 cursor-pointer">
             I agree to the{" "}
-            <Link href="/terms" className="text-neutral-950 hover:text-lime-700 transition-colors">
+            <Link href="/terms" className="text-neutral-950 hover:text-purple-700 transition-colors">
               Terms
             </Link>
             {" "}and{" "}
-            <Link href="/privacy" className="text-neutral-950 hover:text-lime-700 transition-colors">
+            <Link href="/privacy" className="text-neutral-950 hover:text-purple-700 transition-colors">
               Privacy Policy
             </Link>
           </label>
@@ -242,7 +242,7 @@ export default function SignupPage() {
         <div className="pt-4">
           <Button
             type="submit"
-            className="w-full h-12 bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+            className="w-full h-12 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
             isLoading={isLoading}
             disabled={!acceptedTerms || !validatePassword(password).valid}
           >
@@ -253,7 +253,7 @@ export default function SignupPage() {
 
         <p className="text-sm text-neutral-600 text-center pt-2">
           Already have an account?{" "}
-          <Link href="/login" className="text-neutral-950 font-bold hover:text-lime-700 transition-colors">
+          <Link href="/login" className="text-neutral-950 font-bold hover:text-purple-700 transition-colors">
             Sign in
           </Link>
         </p>

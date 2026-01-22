@@ -84,7 +84,7 @@ export default function ArtistOnboardingPage() {
               value={artistName}
               onChange={(e) => setArtistName(e.target.value)}
               required
-              className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-lime-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent"
+              className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent"
             />
             <p className="text-sm text-neutral-500 mt-3">
               This is how you&apos;ll appear to reviewers. You can pick genres when you submit a track.

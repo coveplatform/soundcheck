@@ -1201,7 +1201,7 @@ export default function GetFeedbackPage() {
                           setFieldErrors((prev) => ({ ...prev, artistName: "" }));
                         }}
                         className={cn(
-                          "h-11 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                          "h-11 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-purple-500",
                           fieldErrors.artistName && "border-red-500"
                         )}
                       />
@@ -1220,7 +1220,7 @@ export default function GetFeedbackPage() {
                           setFieldErrors((prev) => ({ ...prev, email: "" }));
                         }}
                         className={cn(
-                          "h-11 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                          "h-11 bg-neutral-800 border-2 border-neutral-600 text-white placeholder:text-neutral-500 focus:border-purple-500",
                           fieldErrors.email && "border-red-500"
                         )}
                       />
@@ -1409,7 +1409,7 @@ export default function GetFeedbackPage() {
                               value={trackUrl}
                               onChange={(e) => handleUrlChange(e.target.value)}
                               className={cn(
-                                "text-lg h-14 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                                "text-lg h-14 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-purple-500",
                                 urlError && "border-red-500"
                               )}
                               autoFocus
@@ -1454,7 +1454,7 @@ export default function GetFeedbackPage() {
                                   value={title}
                                   onChange={(e) => setTitle(e.target.value)}
                                   placeholder="Track title"
-                                  className="text-lg font-bold bg-transparent border-0 border-b-2 border-neutral-700 rounded-none px-0 focus:border-lime-500 text-white"
+                                  className="text-lg font-bold bg-transparent border-0 border-b-2 border-neutral-700 rounded-none px-0 focus:border-purple-500 text-white"
                                 />
                                 <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wide">
                                   {sourceType ? sourceType.replace("_", " ") : "Ready"}
@@ -1504,7 +1504,7 @@ export default function GetFeedbackPage() {
                           value={title}
                           onChange={(e) => setTitle(e.target.value)}
                           placeholder="Track title"
-                          className="text-lg font-bold bg-transparent border-0 border-b-2 border-neutral-700 rounded-none px-0 focus:border-lime-500 text-white"
+                          className="text-lg font-bold bg-transparent border-0 border-b-2 border-neutral-700 rounded-none px-0 focus:border-purple-500 text-white"
                         />
                         <p className="text-xs text-neutral-500 mt-2 uppercase tracking-wide">
                           {sourceType ? sourceType.replace("_", " ") : "Ready to submit"}
@@ -1739,7 +1739,7 @@ export default function GetFeedbackPage() {
                         setFieldErrors((prev) => ({ ...prev, email: "" }));
                       }}
                       className={cn(
-                        "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                        "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-purple-500",
                         fieldErrors.email && "border-red-500"
                       )}
                     />
@@ -1778,7 +1778,7 @@ export default function GetFeedbackPage() {
                           setFieldErrors((prev) => ({ ...prev, password: "" }));
                         }}
                         className={cn(
-                          "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500 pr-10",
+                          "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-purple-500 pr-10",
                           fieldErrors.password && "border-red-500"
                         )}
                       />
@@ -1822,7 +1822,7 @@ export default function GetFeedbackPage() {
                       setFieldErrors((prev) => ({ ...prev, artistName: "" }));
                     }}
                     className={cn(
-                      "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                      "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-purple-500",
                       fieldErrors.artistName && "border-red-500"
                     )}
                   />
@@ -1851,7 +1851,7 @@ export default function GetFeedbackPage() {
                         setFieldErrors((prev) => ({ ...prev, artistName: "" }));
                       }}
                       className={cn(
-                        "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-500",
+                        "h-12 bg-neutral-900 border-2 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-purple-500",
                         fieldErrors.artistName && "border-red-500"
                       )}
                     />
