@@ -273,9 +273,9 @@ export default async function AnalyticsPage() {
         { month: "Mar 2024", production: 4.5, vocals: 4.2, originality: 4.4, overall: 4.37 },
       ],
       earningsData: [
-        { month: "Jan 2024", earnings: 8.50 },
-        { month: "Feb 2024", earnings: 12.50 },
-        { month: "Mar 2024", earnings: 18.00 },
+        { month: "Jan 2024", earnings: 8.50, trackCount: 1 },
+        { month: "Feb 2024", earnings: 12.50, trackCount: 1 },
+        { month: "Mar 2024", earnings: 18.00, trackCount: 1 },
       ],
       reviewVelocity: {
         avgTimeToComplete: 2.3,

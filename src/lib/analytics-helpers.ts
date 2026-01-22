@@ -167,7 +167,7 @@ export function generateEarningsData(
     createdAt: Date;
     earnings: number;
   }>
-) {
+): Array<{ month: string; earnings: number; trackCount: number }> {
   const monthMap = new Map<string, { earnings: number; trackCount: number }>();
 
   tracks.forEach((track) => {
