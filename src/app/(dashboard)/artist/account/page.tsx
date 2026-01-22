@@ -28,6 +28,7 @@ export default async function ArtistAccountPage() {
     ? await (prisma.artistProfile as any).findUnique({
         where: { userId: session.user.id },
         select: {
+          artistName: true,
           subscriptionStatus: true,
           subscriptionTier: true,
           subscriptionCurrentPeriodEnd: true,
@@ -48,6 +49,7 @@ export default async function ArtistAccountPage() {
 
         <AccountSettingsClient
           initialName={dbUser.name ?? ""}
+          artistName={artistProfile?.artistName ?? null}
           email={dbUser.email}
           isArtist={session.user.isArtist}
           isReviewer={session.user.isReviewer}

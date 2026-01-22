@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function AccountSettingsClient({
   initialName,
+  artistName: initialArtistName,
   email,
   isArtist,
   isReviewer,
@@ -18,6 +19,7 @@ export function AccountSettingsClient({
   subscription,
 }: {
   initialName: string;
+  artistName: string | null;
   email: string;
   isArtist: boolean;
   isReviewer: boolean;
@@ -34,6 +36,7 @@ export function AccountSettingsClient({
   const router = useRouter();
 
   const [name, setName] = useState(initialName);
+  const [artistName, setArtistName] = useState(initialArtistName ?? "");
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [profileError, setProfileError] = useState("");
   const [profileSaved, setProfileSaved] = useState(false);
@@ -62,7 +65,10 @@ export function AccountSettingsClient({
       const res = await fetch("/api/account/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim() ? name.trim() : null }),
+        body: JSON.stringify({
+          name: name.trim() ? name.trim() : null,
+          artistName: isArtist && artistName.trim() ? artistName.trim() : undefined,
+        }),
       });
 
       const data = await res.json().catch(() => null);
@@ -382,11 +388,39 @@ export function AccountSettingsClient({
             </div>
           ) : null}
 
-          <div className="space-y-2">
-            <div className="text-sm text-neutral-600 font-bold">Display name</div>
-            <Input value={name} onChange={(e) => setName(e.target.value)} />
-            <div className="text-xs text-neutral-600 font-mono">Visible in your dashboard</div>
-          </div>
+          {/* Pure Artist: Show Artist Name only */}
+          {isArtist && !isReviewer && (
+            <div className="space-y-2">
+              <div className="text-sm text-neutral-600 font-bold">Artist name</div>
+              <Input value={artistName} onChange={(e) => setArtistName(e.target.value)} />
+              <div className="text-xs text-neutral-600 font-mono">How you appear to reviewers and listeners</div>
+            </div>
+          )}
+
+          {/* Pure Reviewer: Show Display Name only */}
+          {!isArtist && isReviewer && (
+            <div className="space-y-2">
+              <div className="text-sm text-neutral-600 font-bold">Display name</div>
+              <Input value={name} onChange={(e) => setName(e.target.value)} />
+              <div className="text-xs text-neutral-600 font-mono">How you appear when reviewing tracks</div>
+            </div>
+          )}
+
+          {/* Dual Role: Show both fields */}
+          {isArtist && isReviewer && (
+            <>
+              <div className="space-y-2">
+                <div className="text-sm text-neutral-600 font-bold">Artist name</div>
+                <Input value={artistName} onChange={(e) => setArtistName(e.target.value)} />
+                <div className="text-xs text-neutral-600 font-mono">How you appear as an artist</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm text-neutral-600 font-bold">Reviewer name</div>
+                <Input value={name} onChange={(e) => setName(e.target.value)} />
+                <div className="text-xs text-neutral-600 font-mono">How you appear when reviewing tracks</div>
+              </div>
+            </>
+          )}
 
           <div className="space-y-1">
             <div className="text-sm text-neutral-600 font-bold">Email</div>

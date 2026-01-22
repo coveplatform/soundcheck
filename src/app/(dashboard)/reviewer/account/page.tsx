@@ -26,6 +26,14 @@ export default async function ReviewerAccountPage() {
     select: { genres: { select: { id: true } } },
   });
 
+  // Get artist profile if user is also an artist
+  const artistProfile = session.user.isArtist
+    ? await (prisma.artistProfile as any).findUnique({
+        where: { userId: session.user.id },
+        select: { artistName: true },
+      } as any)
+    : null;
+
   if (!dbUser?.email) {
     redirect("/login");
   }
@@ -45,6 +53,7 @@ export default async function ReviewerAccountPage() {
           <ReviewerGenrePreferences initialGenreIds={initialGenreIds} />
           <AccountSettingsClient
             initialName={dbUser.name ?? ""}
+            artistName={artistProfile?.artistName ?? null}
             email={dbUser.email}
             isArtist={session.user.isArtist}
             isReviewer={session.user.isReviewer}
