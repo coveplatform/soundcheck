@@ -529,7 +529,7 @@ export default async function SalesHubPage() {
               <Card
                 variant="soft"
                 elevated
-                className="border-2 border-lime-400 rounded-3xl overflow-hidden w-full max-w-2xl"
+                className="border-2 border-purple-400 rounded-3xl overflow-hidden w-full max-w-2xl"
               >
                 <CardContent className="pt-6 text-center py-10">
                   <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-5">

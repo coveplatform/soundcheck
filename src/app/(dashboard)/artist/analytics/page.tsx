@@ -344,7 +344,7 @@ export default async function AnalyticsPage() {
             </div>
 
             <div className="absolute inset-0 flex items-start justify-center pt-10">
-              <Card variant="soft" elevated className="border-2 border-lime-400 rounded-3xl overflow-hidden w-full max-w-2xl">
+              <Card variant="soft" elevated className="border-2 border-purple-400 rounded-3xl overflow-hidden w-full max-w-2xl">
                 <CardContent className="pt-6 text-center py-10">
                   <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-5">
                     <BarChart3 className="h-7 w-7 text-purple-600" />
@@ -362,28 +362,28 @@ export default async function AnalyticsPage() {
                     <p className="text-xs font-mono text-black/40 uppercase tracking-widest mb-3">Includes</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
                       <div className="flex items-start gap-3">
-                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-lime-400 text-black text-xs font-black">✓</span>
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black">✓</span>
                         <div>
                           <p className="text-sm font-bold">Trend graphs</p>
                           <p className="text-xs text-black/60">Scores over time + recent momentum</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-lime-400 text-black text-xs font-black">✓</span>
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black">✓</span>
                         <div>
                           <p className="text-sm font-bold">Category breakdowns</p>
                           <p className="text-xs text-black/60">Production, vocals, originality</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-lime-400 text-black text-xs font-black">✓</span>
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black">✓</span>
                         <div>
                           <p className="text-sm font-bold">Top tracks</p>
                           <p className="text-xs text-black/60">Quickly spot what’s working</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-lime-400 text-black text-xs font-black">✓</span>
+                        <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black">✓</span>
                         <div>
                           <p className="text-sm font-bold">Patterns & velocity</p>
                           <p className="text-xs text-black/60">Common feedback + review pace</p>
