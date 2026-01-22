@@ -770,22 +770,34 @@ export default function SubmitTrackPage() {
                 </div>
               </div>
 
-              <div className="space-y-2 text-sm text-black/60 mb-6">
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-600" />
-                  <span>Upload unlimited tracks</span>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start gap-3">
+                  <Check className="h-5 w-5 text-purple-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-bold text-black">Unlimited uploads</p>
+                    <p className="text-xs text-black/60">Submit as many tracks as you want</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-600" />
-                  <span>Request reviews anytime</span>
+                <div className="flex items-start gap-3">
+                  <Check className="h-5 w-5 text-purple-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-bold text-black">Analytics dashboard</p>
+                    <p className="text-xs text-black/60">Track trends, top tracks, and feedback patterns</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-600" />
-                  <span>Build your track library</span>
+                <div className="flex items-start gap-3">
+                  <Check className="h-5 w-5 text-purple-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-bold text-black">Sales hub</p>
+                    <p className="text-xs text-black/60">Sell tracks with custom links and affiliate tracking</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-600" />
-                  <span>Cancel anytime</span>
+                <div className="flex items-start gap-3">
+                  <Check className="h-5 w-5 text-purple-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-bold text-black">Priority support</p>
+                    <p className="text-xs text-black/60">Get help when you need it</p>
+                  </div>
                 </div>
               </div>
 

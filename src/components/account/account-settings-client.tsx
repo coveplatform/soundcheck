@@ -206,87 +206,7 @@ export function AccountSettingsClient({
                 {checkoutError}
               </div>
             ) : null}
-            {buyCreditsError ? (
-              <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
-                {buyCreditsError}
-              </div>
-            ) : null}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-bold text-black">Plan</p>
-                <p className="text-xs text-black/50">{planLabel}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-bold text-black">Review tokens</p>
-                <p className="text-xs text-black/50">{reviewTokens}</p>
-              </div>
-            </div>
 
-            <div className="pt-3 border-t border-black/10">
-              <div className="bg-white/60 border-2 border-black/10 rounded-2xl p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.08)] space-y-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-sm font-bold text-black">Buy more review credits</p>
-                    <p className="text-xs text-black/60 mt-1">
-                      <span className="font-bold text-black">$1</span> per credit • packs available
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-mono text-black/40 uppercase tracking-widest">Balance</p>
-                    <p className="text-lg font-black text-black">{reviewTokens}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <Button
-                    variant="airy"
-                    onClick={() => buyCredits({ kind: "pack", pack: 5 })}
-                    isLoading={isBuyingCredits}
-                    className="justify-between"
-                  >
-                    <span className="font-bold">+5</span>
-                    <span className="text-black/50">$5</span>
-                  </Button>
-                  <Button
-                    variant="airy"
-                    onClick={() => buyCredits({ kind: "pack", pack: 20 })}
-                    isLoading={isBuyingCredits}
-                    className="justify-between"
-                  >
-                    <span className="font-bold">+20</span>
-                    <span className="text-black/50">$18</span>
-                  </Button>
-                  <Button
-                    variant="airy"
-                    onClick={() => buyCredits({ kind: "pack", pack: 50 })}
-                    isLoading={isBuyingCredits}
-                    className="justify-between"
-                  >
-                    <span className="font-bold">+50</span>
-                    <span className="text-black/50">$40</span>
-                  </Button>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Input
-                    type="number"
-                    min={1}
-                    max={200}
-                    value={buyCreditsQuantity}
-                    onChange={(e) => setBuyCreditsQuantity(Number(e.target.value))}
-                    className="h-10"
-                  />
-                  <Button
-                    variant="primary"
-                    onClick={() => buyCredits({ kind: "quantity", quantity: Math.max(1, Math.min(200, buyCreditsQuantity || 1)) })}
-                    isLoading={isBuyingCredits}
-                    className="h-10"
-                  >
-                    Buy custom
-                  </Button>
-                </div>
-              </div>
-            </div>
             {isSubscribed ? (
               <>
                 <div className="flex items-center justify-between">
@@ -311,6 +231,61 @@ export function AccountSettingsClient({
                     </p>
                   )}
                 </div>
+
+                {/* Review Credits Section - Pro Only */}
+                {buyCreditsError ? (
+                  <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
+                    {buyCreditsError}
+                  </div>
+                ) : null}
+
+                <div className="pt-3 border-t border-black/10">
+                  <div className="bg-white/60 border-2 border-black/10 rounded-2xl p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.08)] space-y-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-bold text-black">Review credits</p>
+                        <p className="text-xs text-black/60 mt-1">
+                          <span className="font-bold text-black">$1</span> per credit
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-mono text-black/40 uppercase tracking-widest">Balance</p>
+                        <p className="text-lg font-black text-black">{reviewTokens}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      <Button
+                        variant="airy"
+                        onClick={() => buyCredits({ kind: "pack", pack: 5 })}
+                        isLoading={isBuyingCredits}
+                        className="justify-between flex-col h-auto py-3"
+                      >
+                        <span className="font-black text-lg">+5</span>
+                        <span className="text-xs text-black/50">$5</span>
+                      </Button>
+                      <Button
+                        variant="airy"
+                        onClick={() => buyCredits({ kind: "pack", pack: 20 })}
+                        isLoading={isBuyingCredits}
+                        className="justify-between flex-col h-auto py-3"
+                      >
+                        <span className="font-black text-lg">+20</span>
+                        <span className="text-xs text-black/50">$18</span>
+                      </Button>
+                      <Button
+                        variant="airy"
+                        onClick={() => buyCredits({ kind: "pack", pack: 50 })}
+                        isLoading={isBuyingCredits}
+                        className="justify-between flex-col h-auto py-3"
+                      >
+                        <span className="font-black text-lg">+50</span>
+                        <span className="text-xs text-black/50">$40</span>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
                 <Button
                   variant="outline"
                   onClick={async () => {
@@ -342,13 +317,47 @@ export function AccountSettingsClient({
                   </div>
                 </div>
 
-                <div className="text-sm text-black/60">
-                  <p>Upgrade to MixReflect Pro to unlock unlimited uploads and review requests.</p>
-                </div>
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 border-2 border-purple-200 rounded-2xl p-5 space-y-4">
+                  <div>
+                    <p className="text-base font-black text-black mb-2">Upgrade to MixReflect Pro</p>
+                    <p className="text-sm text-black/70">
+                      <span className="font-bold text-black">$9.95/month</span> · Cancel anytime
+                    </p>
+                  </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button variant="primary" onClick={startCheckout} isLoading={isStartingCheckout}>
-                    Upgrade to Pro
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">✓</span>
+                      <div>
+                        <p className="text-sm font-bold text-black">Analytics dashboard</p>
+                        <p className="text-xs text-black/60">Track trends, top tracks, and feedback patterns</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">✓</span>
+                      <div>
+                        <p className="text-sm font-bold text-black">Sales hub</p>
+                        <p className="text-xs text-black/60">Sell tracks with custom links and affiliate tracking</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">✓</span>
+                      <div>
+                        <p className="text-sm font-bold text-black">Unlimited uploads</p>
+                        <p className="text-xs text-black/60">Submit as many tracks as you want</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">✓</span>
+                      <div>
+                        <p className="text-sm font-bold text-black">Priority support</p>
+                        <p className="text-xs text-black/60">Get help when you need it</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button variant="primary" onClick={startCheckout} isLoading={isStartingCheckout} className="w-full">
+                    Upgrade to Pro — $9.95/month
                   </Button>
                 </div>
               </>
