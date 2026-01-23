@@ -500,15 +500,15 @@ export default function Home() {
               <div className="space-y-3 text-left">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm">5 review credits</span>
+                  <span className="text-sm text-neutral-50">5 review credits</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm">Up to 3 track uploads</span>
+                  <span className="text-sm text-neutral-50">Up to 3 track uploads</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm">Public track pages</span>
+                  <span className="text-sm text-neutral-50">Public track pages</span>
                 </div>
               </div>
               
@@ -550,6 +550,10 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <span className="text-sm font-semibold">Earn from sales</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
                   <span className="text-sm font-semibold">Upload stems for detailed feedback</span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -563,10 +567,6 @@ export default function Home() {
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
                   <span className="text-sm font-semibold">Full analytics & insights</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
-                  <span className="text-sm font-semibold">Earn from sales</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
