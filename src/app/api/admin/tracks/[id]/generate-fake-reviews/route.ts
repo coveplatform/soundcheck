@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -18,30 +19,25 @@ const FAKE_REVIEWERS = [
   "demo.reviewer5@soundcheck.com",
 ];
 
+// Password for all demo reviewer accounts
+const DEMO_PASSWORD = "demo123456";
+
 const FIRST_IMPRESSIONS = ["CAPTIVATING", "PROMISING", "INTERESTING", "SOLID", "UNIQUE"] as const;
-const GENRES = ["Electronic", "Hip Hop", "Rock", "Pop", "R&B", "Indie", "House", "Techno"];
-const SIMILAR_ARTISTS = [
-  "Flume, ODESZA",
-  "Tame Impala, Mac DeMarco",
-  "Travis Scott, Drake",
-  "The Weeknd, Frank Ocean",
-  "Disclosure, Kaytranada",
-];
 
 const BEST_PARTS = [
-  "The drop is incredibly well-produced",
-  "Love the vocal processing here",
-  "The melody is super catchy",
-  "Great energy and progression",
-  "The atmosphere you created is amazing",
+  "Really enjoyed the energy in this section",
+  "The production quality stands out here",
+  "This part has great momentum",
+  "Strong section overall",
+  "Nice creative touch here",
 ];
 
 const WEAKEST_PARTS = [
-  "The intro could be a bit shorter",
-  "Mix feels slightly muddy in the low end",
-  "Vocal sits a bit low in the mix",
-  "Could use more variation in the arrangement",
-  "The outro feels a bit abrupt",
+  "This section could use some refinement",
+  "The mix could be improved here",
+  "Could use a bit more polish in this area",
+  "This part feels like it could be stronger",
+  "Consider revisiting this section",
 ];
 
 const ADDITIONAL_NOTES = [
@@ -49,7 +45,7 @@ const ADDITIONAL_NOTES = [
   "Can't wait to hear more from you. This is solid.",
   "Really vibing with your style. Looking forward to your next release.",
   "This has serious potential. Keep refining your sound.",
-  "Great work! Would love to hear this on a bigger sound system.",
+  "Great work overall!",
 ];
 
 const NEXT_ACTIONS = [
@@ -57,7 +53,7 @@ const NEXT_ACTIONS = [
   "Keep developing this sound",
   "Focus on the arrangement flow",
   "Polish the production details",
-  "Get feedback from other producers",
+  "Get feedback from other listeners",
 ];
 
 function getRandomElement<T>(arr: T[]): T {
@@ -72,18 +68,17 @@ function generateFakeReview(trackDuration: number) {
   return {
     firstImpression: getRandomElement(FIRST_IMPRESSIONS),
     productionScore: getRandomInt(3, 5),
-    vocalScore: getRandomInt(3, 5),
+    // vocalScore is omitted - we don't know if there are vocals
     originalityScore: getRandomInt(3, 5),
     wouldListenAgain: Math.random() > 0.3,
     wouldAddToPlaylist: Math.random() > 0.4,
     wouldShare: Math.random() > 0.5,
     wouldFollow: Math.random() > 0.4,
-    perceivedGenre: getRandomElement(GENRES),
-    similarArtists: getRandomElement(SIMILAR_ARTISTS),
+    // perceivedGenre and similarArtists omitted - too specific
     bestPart: getRandomElement(BEST_PARTS),
-    bestPartTimestamp: getRandomInt(20, Math.max(30, trackDuration - 30)),
+    // bestPartTimestamp omitted - generic feedback doesn't need timestamps
     weakestPart: getRandomElement(WEAKEST_PARTS),
-    weakestTimestamp: getRandomInt(10, Math.max(20, trackDuration - 20)),
+    // weakestTimestamp omitted - generic feedback doesn't need timestamps
     additionalNotes: getRandomElement(ADDITIONAL_NOTES),
     nextActions: getRandomElement(NEXT_ACTIONS),
     listenDuration: Math.max(60, trackDuration - getRandomInt(0, 30)),
@@ -134,6 +129,9 @@ export async function POST(
 
     const trackDuration = track.duration || 180; // Default 3 minutes if no duration
 
+    // Hash the demo password once
+    const passwordHash = bcrypt.hashSync(DEMO_PASSWORD, 10);
+
     // Get or create demo reviewers
     const reviewerEmails = FAKE_REVIEWERS.slice(0, count);
     const reviewers = [];
@@ -149,6 +147,7 @@ export async function POST(
         user = await prisma.user.create({
           data: {
             email,
+            password: passwordHash,
             emailVerified: new Date(),
             isReviewer: true,
             listenerProfile: {
