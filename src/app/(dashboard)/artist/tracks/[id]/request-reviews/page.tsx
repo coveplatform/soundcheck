@@ -206,7 +206,7 @@ export default function RequestReviewsPage() {
 
                 <div className="pt-4 border-t border-black/10 flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-black/60">Available free credits</p>
+                    <p className="text-sm text-black/60">Available credits</p>
                     <p className="text-2xl font-bold text-black">{isLoadingProfile ? "…" : reviewTokens}</p>
                   </div>
                   <div className="text-right">

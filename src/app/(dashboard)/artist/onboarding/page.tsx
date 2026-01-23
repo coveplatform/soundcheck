@@ -64,6 +64,15 @@ export default function ArtistOnboardingPage() {
         <div className="mb-10">
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Welcome</h1>
           <p className="mt-2 text-neutral-500">Let&apos;s set up your artist profile</p>
+          
+          <div className="mt-6 p-4 bg-purple-50 border-2 border-purple-200 rounded-lg shadow-sm">
+            <p className="text-xs font-bold text-purple-900 uppercase tracking-wider mb-3">What&apos;s next:</p>
+            <ol className="text-sm text-purple-900 space-y-2 list-decimal list-inside font-medium">
+              <li>Upload your first track</li>
+              <li>Request your 5 free reviews</li>
+              <li>Get detailed feedback in 24-48 hours</li>
+            </ol>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

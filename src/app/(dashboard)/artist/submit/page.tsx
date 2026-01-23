@@ -80,8 +80,8 @@ export default function SubmitTrackPage() {
           setTrackCount(data.totalTracks || 0);
           setIsSubscribed(data.subscriptionStatus === "active");
 
-          // Can upload if: subscribed OR track count < 1 (free tier)
-          const canUploadNow = data.subscriptionStatus === "active" || (data.totalTracks || 0) < 1;
+          // Can upload if: subscribed OR track count < 3 (free tier)
+          const canUploadNow = data.subscriptionStatus === "active" || (data.totalTracks || 0) < 3;
           setCanUpload(canUploadNow);
 
           // If they can't upload, show upgrade step
@@ -754,7 +754,7 @@ export default function SubmitTrackPage() {
         <div className="flex-1 flex flex-col">
           <div className="mb-8">
             <h1 className="text-3xl sm:text-4xl font-light tracking-tight">Ready to unlock unlimited uploads?</h1>
-            <p className="mt-2 text-sm text-black/40">You've used your free track. Subscribe to upload as many tracks as you want.</p>
+            <p className="mt-2 text-sm text-black/40">You've used your 3 free tracks. Subscribe to upload as many tracks as you want.</p>
           </div>
 
           <Card variant="soft" elevated className="mb-6">

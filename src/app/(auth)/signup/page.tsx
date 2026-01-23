@@ -175,7 +175,8 @@ export default function SignupPage() {
           Back
         </Link>
         <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Get started free</h1>
-        <p className="mt-2 text-neutral-500">5 free reviews. No credit card required.</p>
+        <p className="mt-2 text-neutral-500">5 free review credits • Public track pages • Earn from sales</p>
+        <p className="mt-1 text-sm text-neutral-400">No credit card required • Upgrade anytime</p>
       </div>
 
       {/* Form */}

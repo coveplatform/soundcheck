@@ -115,7 +115,7 @@ export default function Home() {
                 Get started free <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <span className="text-sm text-neutral-500">$9.95/mo · Cancel anytime</span>
+            <span className="text-sm text-neutral-500">Start free • 5 reviews included</span>
           </div>
         </div>
       </section>
@@ -485,54 +485,107 @@ export default function Home() {
 
       {/* Pricing */}
       <section id="pricing" className="py-16 bg-neutral-900 text-neutral-50">
-        <div className="max-w-2xl mx-auto px-4">
-          <div className="text-center">
-            <div className="text-5xl sm:text-6xl font-extrabold">
-              $9.95<span className="text-xl sm:text-2xl font-semibold text-neutral-400 ml-1">/mo</span>
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-12">Simple Pricing</h2>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Free Tier */}
+            <div className="bg-neutral-800 border-2 border-neutral-700 rounded-2xl p-8">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-purple-400 mb-2">Free</h3>
+                <div className="text-4xl font-extrabold">$0</div>
+                <p className="text-sm text-neutral-400 mt-2">Perfect to get started</p>
+              </div>
+              
+              <div className="space-y-3 text-left">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm">5 review credits (one-time)</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm">Up to 3 track uploads</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm">Public track pages</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm">Earn from sales</span>
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <Link href="/signup">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full border-2 border-neutral-600 text-neutral-50 hover:bg-neutral-700"
+                  >
+                    Get started free
+                  </Button>
+                </Link>
+              </div>
             </div>
 
-            <AnimatedSection stagger className="mt-8 space-y-3 text-left max-w-sm mx-auto">
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                <span>20 reviews included every month</span>
+            {/* Pro Tier */}
+            <div className="bg-purple-600 border-2 border-purple-500 rounded-2xl p-8 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-lime-400 text-black text-xs font-bold px-3 py-1 rounded-full">
+                MOST POPULAR
               </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                <span>Auto-matched to genre reviewers</span>
+              
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
+                <div className="text-4xl font-extrabold text-white">
+                  $9.95<span className="text-xl font-semibold text-purple-200">/mo</span>
+                </div>
+                <p className="text-sm text-purple-100 mt-2">For serious artists</p>
               </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                <span>Unlimited track uploads</span>
+              
+              <div className="space-y-3 text-left text-white">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <span className="text-sm font-semibold">20 review credits every month</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <span className="text-sm">Unlimited track uploads</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <span className="text-sm">Upload stems for detailed feedback</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <span className="text-sm">Auto-matched to genre reviewers</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <span className="text-sm">Priority review queue</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <span className="text-sm">Full analytics & insights</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                <span>Upload stems for detailed feedback</span>
+              
+              <div className="mt-6">
+                <Link href="/signup">
+                  <Button
+                    size="lg"
+                    className="w-full bg-white text-purple-600 hover:bg-neutral-100 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    Start with Pro <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                <span>Earn from every sale</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                <span>Your track links to share</span>
-              </div>
-            </AnimatedSection>
-
-            <div className="mt-8">
-              <Link href="/signup">
-                <Button
-                  size="lg"
-                  className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
-                >
-                  Get started free <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
             </div>
-
-            <p className="mt-6 text-sm text-neutral-400">
-              Need more reviews? Add extra for $5 anytime.
-            </p>
           </div>
+
+          <p className="mt-8 text-center text-sm text-neutral-400">
+            Need more reviews? Buy extra credits for $4.95 per 5 reviews anytime.
+          </p>
         </div>
       </section>
 

@@ -6,8 +6,9 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Info } from "lucide-react";
 import { TrackPlayButton } from "@/components/dashboard/track-play-button";
+import { Tooltip } from "@/components/ui/tooltip";
 
 export const dynamic = "force-dynamic";
 
@@ -107,7 +108,12 @@ export default async function ArtistDashboardPage() {
             <div className="flex items-center gap-4 text-sm">
               <span className="text-neutral-500">{planLabel}</span>
               <span className="text-neutral-300">•</span>
-              <span className="font-semibold">{reviewTokens} tokens</span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-semibold">{reviewTokens} credits</span>
+                <Tooltip content="1 credit = 1 review. Use credits to request feedback on your tracks.">
+                  <Info className="h-3.5 w-3.5 text-neutral-400" />
+                </Tooltip>
+              </div>
             </div>
           </div>
 
