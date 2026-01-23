@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isAdminEmail } from "@/lib/admin";
 
 const generateReviewSchema = z.object({
   count: z.number().int().min(1).max(20),
@@ -93,17 +94,12 @@ export async function POST(
     const session = await getServerSession(authOptions);
 
     // Admin check
-    if (!session?.user?.email || !session.user.email.includes("@")) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { isAdmin: true },
-    });
-
-    if (!user?.isAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!isAdminEmail(session.user.email)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { id } = await params;
