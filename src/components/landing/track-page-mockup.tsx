@@ -37,7 +37,7 @@ export function TrackPageMockup() {
 
             {/* Action Buttons */}
             <div className="flex items-center gap-3 mt-4">
-              <button className="flex items-center gap-2 bg-lime-500 hover:bg-lime-400 text-black font-semibold px-4 py-2 rounded-full text-sm transition-colors">
+              <button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded-full text-sm transition-colors">
                 <Play className="w-4 h-4 fill-current" />
                 Play
               </button>

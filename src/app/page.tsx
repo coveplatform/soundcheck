@@ -11,6 +11,7 @@ import { TrackPageMockup } from "@/components/landing/track-page-mockup";
 import { DiscoverMockup } from "@/components/landing/discover-mockup";
 import { Sparkle, Star, Squiggle, Dots } from "@/components/landing/doodles";
 import { AnimatedSection } from "@/components/landing/animated-section";
+import { OnlineListeners } from "@/components/landing/online-listeners";
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
 
@@ -107,7 +108,10 @@ export default function Home() {
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3">
             <Link href="/signup">
-              <Button variant="primary" size="lg">
+              <Button
+                size="lg"
+                className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+              >
                 Start free trial <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -138,12 +142,8 @@ export default function Home() {
 
       {/* Live Activity */}
       <section className="py-10  overflow-hidden bg-[#faf8f5]">
-        <div className="flex items-center justify-center gap-2 mb-6">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-500 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-purple-500"></span>
-          </span>
-          <span className="text-sm font-medium text-neutral-600">Happening now</span>
+        <div className="mb-6">
+          <OnlineListeners />
         </div>
         <ActivityFeed />
       </section>
@@ -154,7 +154,7 @@ export default function Home() {
           <AnimatedSection className="max-w-2xl mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold">See what&apos;s working</h2>
             <p className="mt-3 text-neutral-600">
-              Your Track Report shows patterns across all your reviews. When multiple people say the same thing, that&apos;s not taste—that&apos;s signal.
+              Get multiple reviews on your track. We show you patterns. When 4 out of 5 people say the same thing, that&apos;s not taste—that&apos;s signal.
             </p>
           </AnimatedSection>
 
@@ -191,15 +191,17 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-4 pt-6 sm:pt-8">
           <div className="grid gap-8 md:gap-10 md:grid-cols-2 lg:grid-cols-[1fr_380px] items-center">
             <AnimatedSection className="is-visible max-w-xl text-center md:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold">Get paid when people buy your track</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold">Reviewers buy your track, then share it</h2>
               <p className="mt-3 text-neutral-300">
-                Listeners can share your track link. If other listeners buy through it, you get the sale—and the sharer
-                earns a commission.
+                Every reviewer pays $0.50 to review your track—you get that. If they love it, they can share it with their audience. When their fans buy through that link, you earn another $0.50 and the reviewer gets a commission.
               </p>
 
               <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                 <Link href="/signup">
-                  <Button variant="primary" size="lg">
+                  <Button
+                    size="lg"
+                    className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+                  >
                     Start free trial <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -518,7 +520,10 @@ export default function Home() {
 
             <div className="mt-8">
               <Link href="/signup">
-                <Button variant="primary" size="lg">
+                <Button
+                  size="lg"
+                  className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+                >
                   Start free trial <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -600,7 +605,9 @@ export default function Home() {
               </p>
             </div>
             <Link href="/signup" className="shrink-0 self-stretch md:self-auto">
-              <Button variant="primary">
+              <Button
+                className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+              >
                 Become a Reviewer
               </Button>
             </Link>
