@@ -490,100 +490,99 @@ export default function Home() {
           
           <div className="grid md:grid-cols-2 gap-8">
             {/* Free Tier */}
-            <div className="bg-neutral-800 border-2 border-neutral-700 rounded-2xl p-8">
+            <div className="bg-white text-black border-2 border-black p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-purple-400 mb-2">Free</h3>
-                <div className="text-4xl font-extrabold">$0</div>
-                <p className="text-sm text-neutral-400 mt-2">Perfect to get started</p>
+                <h3 className="text-2xl font-black mb-2">Free</h3>
+                <div className="text-5xl font-black">$0</div>
+                <p className="text-sm text-neutral-600 mt-2 font-semibold">Perfect to get started</p>
               </div>
               
-              <div className="space-y-3 text-left">
+              <div className="space-y-3 text-left mb-6">
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm">5 review credits (one-time)</span>
+                  <div className="h-2 w-2 bg-black flex-shrink-0" />
+                  <span className="text-sm font-semibold">5 review credits</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm">Up to 3 track uploads</span>
+                  <div className="h-2 w-2 bg-black flex-shrink-0" />
+                  <span className="text-sm font-semibold">Up to 3 track uploads</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm">Public track pages</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm">Earn from sales</span>
+                  <div className="h-2 w-2 bg-black flex-shrink-0" />
+                  <span className="text-sm font-semibold">Public track pages</span>
                 </div>
               </div>
               
-              <div className="mt-6">
-                <Link href="/signup">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full border-2 border-neutral-600 text-neutral-50 hover:bg-neutral-700"
-                  >
-                    Get started free
-                  </Button>
-                </Link>
-              </div>
+              <Link href="/signup">
+                <Button
+                  size="lg"
+                  className="w-full bg-neutral-900 text-white border-2 border-black hover:bg-black font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out"
+                >
+                  Get started free
+                </Button>
+              </Link>
             </div>
 
             {/* Pro Tier */}
-            <div className="bg-purple-600 border-2 border-purple-500 rounded-2xl p-8 relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-lime-400 text-black text-xs font-bold px-3 py-1 rounded-full">
+            <div className="bg-purple-600 text-white border-2 border-black p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-lime-500 text-black text-xs font-black px-3 py-1 border-2 border-black">
                 MOST POPULAR
               </div>
               
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
-                <div className="text-4xl font-extrabold text-white">
-                  $9.95<span className="text-xl font-semibold text-purple-200">/mo</span>
+                <h3 className="text-2xl font-black mb-2">Pro</h3>
+                <div className="text-5xl font-black">
+                  $9.95<span className="text-xl font-black">/mo</span>
                 </div>
-                <p className="text-sm text-purple-100 mt-2">For serious artists</p>
+                <p className="text-sm text-purple-100 mt-2 font-semibold">For serious artists</p>
               </div>
               
-              <div className="space-y-3 text-left text-white">
+              <div className="space-y-3 text-left mb-6">
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
-                  <span className="text-sm font-semibold">20 review credits every month</span>
+                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <span className="text-sm font-bold">20 review credits every month</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
-                  <span className="text-sm">Unlimited track uploads</span>
+                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <span className="text-sm font-semibold">Unlimited track uploads</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
-                  <span className="text-sm">Upload stems for detailed feedback</span>
+                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <span className="text-sm font-semibold">Upload stems for detailed feedback</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
-                  <span className="text-sm">Auto-matched to genre reviewers</span>
+                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <span className="text-sm font-semibold">Auto-matched to genre reviewers</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
-                  <span className="text-sm">Priority review queue</span>
+                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <span className="text-sm font-semibold">Priority review queue</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
-                  <span className="text-sm">Full analytics & insights</span>
+                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <span className="text-sm font-semibold">Full analytics & insights</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <span className="text-sm font-semibold">Earn from sales</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <span className="text-sm font-semibold">Affiliate link tracking</span>
                 </div>
               </div>
               
-              <div className="mt-6">
-                <Link href="/signup">
-                  <Button
-                    size="lg"
-                    className="w-full bg-white text-purple-600 hover:bg-neutral-100 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                  >
-                    Start with Pro <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
+              <Link href="/signup">
+                <Button
+                  size="lg"
+                  className="w-full bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out"
+                >
+                  Start with Pro <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
 
-          <p className="mt-8 text-center text-sm text-neutral-400">
+          <p className="mt-8 text-center text-sm text-neutral-400 font-semibold">
             Need more reviews? Buy extra credits for $4.95 per 5 reviews anytime.
           </p>
         </div>
