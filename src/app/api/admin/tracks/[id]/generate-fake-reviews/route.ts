@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isAdminEmail } from "@/lib/admin";
+import type { FirstImpression } from "@prisma/client";
 
 const generateReviewSchema = z.object({
   count: z.number().int().min(1).max(20),
@@ -23,7 +24,7 @@ const FAKE_REVIEWERS = [
 // Password for all demo reviewer accounts
 const DEMO_PASSWORD = "demo123456";
 
-const FIRST_IMPRESSIONS = ["CAPTIVATING", "PROMISING", "INTERESTING", "SOLID", "UNIQUE"] as const;
+const FIRST_IMPRESSIONS: FirstImpression[] = ["STRONG_HOOK", "DECENT", "LOST_INTEREST"];
 
 const BEST_PARTS = [
   "Really enjoyed the energy in this section",
