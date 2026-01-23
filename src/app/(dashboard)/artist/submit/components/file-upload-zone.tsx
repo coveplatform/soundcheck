@@ -11,6 +11,7 @@ interface FileUploadZoneProps {
   uploadedFileName: string;
   isUploading: boolean;
   allowPurchase: boolean;
+  isSubscribed: boolean;
   onAllowPurchaseChange: (allow: boolean) => void;
   onFileSelect: (file: File) => void;
 }
@@ -20,6 +21,7 @@ export function FileUploadZone({
   uploadedFileName,
   isUploading,
   allowPurchase,
+  isSubscribed,
   onAllowPurchaseChange,
   onFileSelect,
 }: FileUploadZoneProps) {
@@ -89,20 +91,43 @@ export function FileUploadZone({
         )}
 
         {uploadedUrl && !isUploading && (
-          <label className="mt-4 flex items-start gap-3 p-4 rounded-2xl border border-black/10 bg-white/60 hover:bg-white cursor-pointer transition-colors duration-150 ease-out">
+          <div
+            onClick={() => {
+              if (!isSubscribed && !allowPurchase) {
+                // Trigger upgrade prompt when free user tries to enable
+                window.alert("Upgrade to Pro to enable track sales and monetize your music!");
+                // TODO: Replace with proper modal/upgrade flow
+              } else if (isSubscribed) {
+                onAllowPurchaseChange(!allowPurchase);
+              }
+            }}
+            className={cn(
+              "mt-4 flex items-start gap-3 p-4 rounded-2xl border border-black/10 bg-white/60 hover:bg-white cursor-pointer transition-colors duration-150 ease-out"
+            )}
+          >
             <input
               type="checkbox"
-              checked={allowPurchase}
-              onChange={(e) => onAllowPurchaseChange(e.target.checked)}
-              className="mt-0.5 h-5 w-5 rounded border-black/20 text-emerald-500 focus:ring-emerald-500"
+              checked={allowPurchase && isSubscribed}
+              readOnly
+              className="mt-0.5 h-5 w-5 rounded border-black/20 text-emerald-500 focus:ring-emerald-500 pointer-events-none"
             />
             <div>
-              <span className="font-medium text-black">Allow reviewers to purchase this track</span>
+              <span className="font-medium text-black">
+                Allow listeners to purchase this track
+                {!isSubscribed && (
+                  <span className="ml-2 text-xs font-semibold text-lime-600 bg-lime-50 px-2 py-1 rounded">
+                    PRO
+                  </span>
+                )}
+              </span>
               <p className="text-sm text-black/50 mt-0.5">
-                Reviewers can buy the track for $0.50 and download the MP3
+                {isSubscribed
+                  ? "Listeners can buy and download this track after reviewing. You keep 85% of sales."
+                  : "Upgrade to Pro to enable track sales and monetize your music"
+                }
               </p>
             </div>
-          </label>
+          </div>
         )}
       </CardContent>
     </Card>

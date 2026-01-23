@@ -125,8 +125,8 @@ export async function POST(request: Request) {
       packageType,
       reviewsRequested: shouldRequestReviews ? packageDetails.reviews : 0,
       status: shouldRequestReviews ? undefined : ("UPLOADED" as any),
-      // Only allow purchases for uploaded tracks
-      allowPurchase: sourceType === "UPLOAD" ? (data.allowPurchase ?? false) : false,
+      // Only allow purchases for uploaded tracks AND Pro subscribers
+      allowPurchase: sourceType === "UPLOAD" && isSubscribed ? (data.allowPurchase ?? false) : false,
       // Ableton project data
       abletonProjectUrl: data.abletonProjectUrl,
       abletonProjectData: data.abletonProjectData,

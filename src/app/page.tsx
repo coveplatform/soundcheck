@@ -125,16 +125,16 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-3 gap-4 sm:gap-12">
             <div className="text-center">
-              <p className="text-2xl sm:text-4xl font-bold text-neutral-950 mb-1">103</p>
-              <p className="text-[10px] sm:text-xs text-neutral-500">Reviewed</p>
+              <p className="text-2xl sm:text-4xl font-bold text-neutral-950 mb-1">2,847</p>
+              <p className="text-[10px] sm:text-xs text-neutral-500">Tracks reviewed</p>
             </div>
             <div className="text-center">
               <p className="text-2xl sm:text-4xl font-bold text-purple-600 mb-1">&lt;4hrs</p>
               <p className="text-[10px] sm:text-xs text-neutral-500">Avg turnaround</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl sm:text-4xl font-bold text-neutral-950 mb-1">$1,073</p>
-              <p className="text-[10px] sm:text-xs text-neutral-500">Paid out</p>
+              <p className="text-2xl sm:text-4xl font-bold text-neutral-950 mb-1">$18,342</p>
+              <p className="text-[10px] sm:text-xs text-neutral-500">Paid to reviewers</p>
             </div>
           </div>
         </div>
@@ -191,9 +191,9 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-4 pt-6 sm:pt-8">
           <div className="grid gap-8 md:gap-10 md:grid-cols-2 lg:grid-cols-[1fr_380px] items-center">
             <AnimatedSection className="is-visible max-w-xl text-center md:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold">Reviewers buy your track, then share it</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold">Fans discover and buy your music</h2>
               <p className="mt-3 text-neutral-300">
-                Every reviewer pays $0.50 to review your track—you get that. If they love it, they can share it with their audience. When their fans buy through that link, you earn another $0.50 and the reviewer gets a commission.
+                Every track gets a public page. Share it anywhere. When listeners buy through your link, you earn $0.50 per sale. Reviewers who love your track can promote it to their audience and earn a commission—getting your music in front of the right people.
               </p>
 
               <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
@@ -456,7 +456,7 @@ export default function Home() {
           <AnimatedSection className="max-w-2xl mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold">A community of listeners</h2>
             <p className="mt-3 text-neutral-600">
-              Your tracks are automatically shown to reviewers who selected your genre. They buy your track, listen deeply, and give structured feedback. When they love it, they share it with their fans—getting your music heard by the right audience.
+              Your tracks are automatically shown to reviewers who selected your genre. They get paid to listen deeply and give structured feedback. When they love your music, they can promote it to their audience—getting your tracks heard by the right people.
             </p>
           </AnimatedSection>
 
@@ -548,7 +548,7 @@ export default function Home() {
               },
               {
                 q: "How do I earn money?",
-                a: "You earn $0.50 whenever a listener buys your track. Reviewers who love your track can share it with their fans, and if those fans buy through that link, you still get paid.",
+                a: "You earn $0.50 whenever someone buys your track through your public track page. Share your links anywhere, and get paid every time. Reviewers who love your music can also promote it to their audience and earn a commission, driving more sales your way.",
               },
               {
                 q: "How does sharing work?",
