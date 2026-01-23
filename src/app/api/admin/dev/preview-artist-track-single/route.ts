@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { isAdminEmail } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 
-// Single review data for free trial preview
+// Single review data for free tier preview
 const singleReview = {
   firstImpression: "STRONG_HOOK" as const,
   productionScore: 4,
@@ -65,7 +65,7 @@ export async function POST() {
     let track = await prisma.track.findFirst({
       where: {
         artistId: artistProfile.id,
-        title: { startsWith: "Free Trial Preview" },
+        title: { startsWith: "Free Tier Preview" },
         status: "COMPLETED",
         reviewsRequested: 1,
       },
@@ -99,18 +99,18 @@ export async function POST() {
         },
       });
 
-      // Create track with 1 review (simulating free trial)
+      // Create track with 1 review (simulating free tier)
       track = await prisma.track.create({
         data: {
           artistId: artistProfile.id,
           sourceUrl: "https://soundcloud.com/user-587506684/sick-track",
           sourceType: "SOUNDCLOUD",
-          title: `Free Trial Preview - ${new Date().toLocaleDateString()}`,
+          title: `Free Tier Preview - ${new Date().toLocaleDateString()}`,
           duration: 240,
           feedbackFocus: "First time trying this out - looking for honest feedback!",
           status: "COMPLETED",
           packageType: "STARTER",
-          reviewsRequested: 1, // Free trial = 1 review
+          reviewsRequested: 1, // Free tier = 1 review
           reviewsCompleted: 1,
           paidAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
           completedAt: new Date(),

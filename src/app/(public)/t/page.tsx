@@ -52,7 +52,7 @@ export default function TrialLandingPage() {
               <Button
                 className="w-full sm:w-auto h-14 px-10 text-lg font-black bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[6px] active:translate-y-[6px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
               >
-                Start trial
+                Get started free
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>
@@ -293,7 +293,7 @@ export default function TrialLandingPage() {
           <div className="pt-2 flex items-center justify-center">
             <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
               <Button className="h-14 px-10 text-lg font-black bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[6px] active:translate-y-[6px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none">
-                Start trial
+                Get started free
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>

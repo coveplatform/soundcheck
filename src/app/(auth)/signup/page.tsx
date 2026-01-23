@@ -174,8 +174,8 @@ export default function SignupPage() {
           <ArrowLeft className="h-4 w-4" />
           Back
         </Link>
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Start your trial</h1>
-        <p className="mt-2 text-neutral-500">Email and password. That&apos;s it.</p>
+        <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Get started free</h1>
+        <p className="mt-2 text-neutral-500">5 free reviews. No credit card required.</p>
       </div>
 
       {/* Form */}
@@ -246,7 +246,7 @@ export default function SignupPage() {
             isLoading={isLoading}
             disabled={!acceptedTerms || !validatePassword(password).valid}
           >
-            Start free trial
+            Create account
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>

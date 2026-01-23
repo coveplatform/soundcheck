@@ -16,7 +16,7 @@ export function ReviewUpsell({
   trackTitle: _trackTitle,
   wouldListenAgain,
 }: ReviewUpsellProps) {
-  // Only show for small review counts (1-3 reviews, typically free trial users)
+  // Only show for small review counts (1-3 reviews, typically free tier users)
   if (completedReviews > 3) {
     return null;
   }

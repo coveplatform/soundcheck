@@ -112,7 +112,7 @@ export default function Home() {
                 size="lg"
                 className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
               >
-                Start free trial <ArrowRight className="ml-2 h-4 w-4" />
+                Get started free <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <span className="text-sm text-neutral-500">$9.95/mo · Cancel anytime</span>
@@ -202,7 +202,7 @@ export default function Home() {
                     size="lg"
                     className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
                   >
-                    Start free trial <ArrowRight className="ml-2 h-4 w-4" />
+                    Get started free <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
                 <Link href="#pricing">
@@ -524,7 +524,7 @@ export default function Home() {
                   size="lg"
                   className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
                 >
-                  Start free trial <ArrowRight className="ml-2 h-4 w-4" />
+                  Get started free <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>

@@ -133,7 +133,7 @@ export function DevToolsPreview() {
           </p>
         </div>
 
-        {/* Single Review Preview (Free Trial Upsell) */}
+        {/* Single Review Preview (Free Tier Upsell) */}
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <button
@@ -141,7 +141,7 @@ export function DevToolsPreview() {
               disabled={isLoadingSingleReview}
               className="px-4 py-2 text-sm font-medium bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
             >
-              {isLoadingSingleReview ? "Creating..." : "Preview Free Trial (1 Review)"}
+              {isLoadingSingleReview ? "Creating..." : "Preview Free Tier (1 Review)"}
             </button>
 
             {singleReviewTrackUrl && (
@@ -155,7 +155,7 @@ export function DevToolsPreview() {
             )}
           </div>
           <p className="text-xs text-amber-600">
-            Track with 1 completed review — shows the upsell CTA for free trial users
+            Track with 1 completed review — shows the upsell CTA for free tier users
           </p>
         </div>
 

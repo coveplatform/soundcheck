@@ -98,9 +98,9 @@ export default async function TrackDetailPage({
     notFound();
   }
 
-  // Check subscription status for trial limitations
+  // Check subscription status for free tier limitations
   const isSubscribed = track.artist.subscriptionStatus === "active";
-  const isTrial = !isSubscribed;
+  const isFreeTier = !isSubscribed;
 
   const completedReviews = track.reviews.length;
   const countedCompletedReviews = track.reviews.filter(
@@ -116,8 +116,8 @@ export default async function TrackDetailPage({
     ? track.reviews.filter((r) => r.countsTowardAnalytics !== false)
     : [];
 
-  // For trial users, limit displayed reviews to 1
-  const displayedReviews = isTrial ? track.reviews.slice(0, 1) : track.reviews;
+  // For free tier users, limit displayed reviews to 1
+  const displayedReviews = isFreeTier ? track.reviews.slice(0, 1) : track.reviews;
 
   const avgProduction =
     analyticsReviews.reduce((sum, r) => sum + (r.productionScore || 0), 0) /
@@ -363,8 +363,8 @@ export default async function TrackDetailPage({
         {completedReviews > 0 && (
           <AnimatedSection>
             <div className="space-y-6">
-              {/* Analytics & Engagement - Combined for trial users */}
-              {isTrial ? (
+              {/* Analytics & Engagement - Combined for free tier users */}
+              {isFreeTier ? (
                 <div className="relative">
                   <div className="pointer-events-none blur-sm opacity-50 space-y-6">
                     <AggregateAnalytics
@@ -517,18 +517,18 @@ export default async function TrackDetailPage({
                 </>
               )}
 
-              {/* Reviews Carousel - Limited to 1 for trial */}
+              {/* Reviews Carousel - Limited to 1 for free tier */}
               <Card variant="soft" elevated className="overflow-hidden rounded-3xl">
                 <CardHeader className="sr-only">
                   <CardTitle>Reviews ({completedReviews})</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <ReviewCarousel reviews={displayedReviews} showControls={!isTrial} />
+                  <ReviewCarousel reviews={displayedReviews} showControls={!isFreeTier} />
                 </CardContent>
               </Card>
 
-              {/* Trial upgrade prompt after first review */}
-              {isTrial && completedReviews > 1 && (
+              {/* Free tier upgrade prompt after first review */}
+              {isFreeTier && completedReviews > 1 && (
                 <Card variant="soft" elevated className="border-2 border-purple-400">
                   <CardContent className="pt-6">
                     <div className="text-center">

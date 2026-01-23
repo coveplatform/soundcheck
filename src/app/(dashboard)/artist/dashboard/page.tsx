@@ -59,7 +59,7 @@ export default async function ArtistDashboardPage() {
   const newestReviewing = reviewing[0] ?? null;
 
   const isSubscribed = artistProfile.subscriptionStatus === "active";
-  const planLabel = isSubscribed ? "MixReflect Pro" : "Trial";
+  const planLabel = isSubscribed ? "MixReflect Pro" : "Free";
   const reviewTokens = (artistProfile.freeReviewCredits ?? 0) as number;
 
   const nextAction = (() => {

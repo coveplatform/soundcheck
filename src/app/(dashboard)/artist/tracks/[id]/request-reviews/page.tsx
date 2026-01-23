@@ -197,7 +197,7 @@ export default function RequestReviewsPage() {
               </>
             ) : (
               <>
-                {/* Trial User View */}
+                {/* Free Tier User View */}
                 <div className="text-center py-4">
                   <p className="text-sm text-black/60 mb-2">You're requesting</p>
                   <p className="text-5xl font-black text-black mb-2">5</p>
@@ -206,7 +206,7 @@ export default function RequestReviewsPage() {
 
                 <div className="pt-4 border-t border-black/10 flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-black/60">Available trial credits</p>
+                    <p className="text-sm text-black/60">Available free credits</p>
                     <p className="text-2xl font-bold text-black">{isLoadingProfile ? "…" : reviewTokens}</p>
                   </div>
                   <div className="text-right">

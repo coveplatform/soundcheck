@@ -69,7 +69,7 @@ export default function ReengagementPage() {
   }, []);
 
   const sendTrialEmails = async () => {
-    if (!confirm(`Send reminder emails to ${trialData?.stats.eligibleCount} trial users?`)) {
+    if (!confirm(`Send reminder emails to ${trialData?.stats.eligibleCount} free tier users?`)) {
       return;
     }
 
@@ -86,7 +86,7 @@ export default function ReengagementPage() {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage({ type: "success", text: `Sent ${data.sent} emails to trial users` });
+        setMessage({ type: "success", text: `Sent ${data.sent} emails to free tier users` });
         fetchData();
       } else {
         setMessage({ type: "error", text: data.error || "Failed to send emails" });
@@ -143,7 +143,7 @@ export default function ReengagementPage() {
       if (res.ok) {
         setMessage({
           type: "success",
-          text: `Reset ${data.trialUsersReset} trial users and ${data.leadsReset} leads`,
+          text: `Reset ${data.trialUsersReset} free tier users and ${data.leadsReset} leads`,
         });
         fetchData();
       } else {
@@ -195,12 +195,12 @@ export default function ReengagementPage() {
         </div>
       )}
 
-      {/* Trial Users Section */}
+      {/* Free Tier Users Section */}
       <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
         <div className="p-6 border-b border-neutral-100">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold">Free Trial Users</h2>
+              <h2 className="text-lg font-semibold">Free Tier Users</h2>
               <p className="text-sm text-neutral-500">
                 Users who signed up but never submitted a track
               </p>

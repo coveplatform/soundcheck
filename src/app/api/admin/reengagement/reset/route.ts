@@ -14,7 +14,7 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Reset trial users
+    // Reset free tier users
     const trialResult = await prisma.user.updateMany({
       where: { trialReminderSentAt: { not: null } },
       data: { trialReminderSentAt: null }

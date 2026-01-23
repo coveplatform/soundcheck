@@ -17,7 +17,7 @@ const schema = z.object({
 function generateTemporaryPassword(): string {
   const code = randomInt(100000, 1000000);
   // Uppercase + lowercase + number, >= 8 chars
-  return `MrTrial${code}`;
+  return `MrFree${code}`;
 }
 
 export async function POST(request: Request) {
@@ -123,7 +123,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
     }
 
-    console.error("Trial signup error:", error);
+    console.error("Signup error:", error);
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

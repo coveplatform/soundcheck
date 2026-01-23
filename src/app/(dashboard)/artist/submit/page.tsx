@@ -80,7 +80,7 @@ export default function SubmitTrackPage() {
           setTrackCount(data.totalTracks || 0);
           setIsSubscribed(data.subscriptionStatus === "active");
 
-          // Can upload if: subscribed OR track count < 1 (free trial)
+          // Can upload if: subscribed OR track count < 1 (free tier)
           const canUploadNow = data.subscriptionStatus === "active" || (data.totalTracks || 0) < 1;
           setCanUpload(canUploadNow);
 

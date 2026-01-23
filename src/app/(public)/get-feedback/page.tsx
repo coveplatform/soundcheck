@@ -1172,7 +1172,7 @@ export default function GetFeedbackPage() {
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Turnaround</p>
                 </div>
                 <div className="bg-neutral-900 border border-neutral-700 p-3 text-center">
-                  <p className="text-lg font-black text-purple-500">TRIAL</p>
+                  <p className="text-lg font-black text-purple-500">FREE</p>
                   <p className="text-[10px] text-neutral-500 uppercase tracking-wide">Get started</p>
                 </div>
               </div>
@@ -1188,7 +1188,7 @@ export default function GetFeedbackPage() {
                         Create your project
                       </h2>
                       <p className="text-sm text-neutral-400 mt-1">
-                        Next you&apos;ll create your account and start your trial in the dashboard.
+                        Next you&apos;ll create your account and get 5 free reviews to start.
                       </p>
                     </div>
 
@@ -1272,7 +1272,7 @@ export default function GetFeedbackPage() {
                     }}
                     className="w-full h-11 text-base font-black bg-purple-500 text-black border-2 border-lime-500 hover:bg-lime-400"
                   >
-                    Start trial
+                    Get started free
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </div>

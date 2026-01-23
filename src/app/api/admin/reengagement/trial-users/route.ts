@@ -7,7 +7,7 @@ import { isAdminEmail } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { sendTrialReminderEmail } from "@/lib/email";
 
-// GET: List eligible trial users who haven't submitted a track
+// GET: List eligible free tier users who haven't submitted a track
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -65,9 +65,9 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error("Get trial users error:", error);
+    console.error("Get free tier users error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch trial users" },
+      { error: "Failed to fetch free tier users" },
       { status: 500 }
     );
   }
@@ -77,7 +77,7 @@ const postSchema = z.object({
   userIds: z.array(z.string()).optional(), // If not provided, send to all eligible
 });
 
-// POST: Send reminder emails to trial users
+// POST: Send reminder emails to free tier users
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -158,7 +158,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Send trial reminder error:", error);
+    console.error("Send free tier reminder error:", error);
     return NextResponse.json(
       { error: "Failed to send reminders" },
       { status: 500 }
