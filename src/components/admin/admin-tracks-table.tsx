@@ -178,7 +178,15 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                     track.packageType
                   )}
                 </td>
-                <td className="px-4 py-3">{track.payment?.status ?? ""}</td>
+                <td className="px-4 py-3">
+                  {!track.payment && track.status !== "PENDING_PAYMENT" ? (
+                    <span className="px-1.5 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded">
+                      FREE CREDITS
+                    </span>
+                  ) : (
+                    track.payment?.status ?? ""
+                  )}
+                </td>
                 <td className="px-4 py-3">
                   <Link
                     className="underline"
