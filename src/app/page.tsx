@@ -490,36 +490,39 @@ export default function Home() {
           
           <div className="grid md:grid-cols-2 gap-8">
             {/* Free Tier */}
-            <div className="bg-white text-black border-2 border-black p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="bg-neutral-800 border-2 border-neutral-700 rounded-2xl p-8">
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-black mb-2">Free</h3>
-                <div className="text-5xl font-black">$0</div>
-                <p className="text-sm text-neutral-600 mt-2 font-semibold">Perfect to get started</p>
+                <h3 className="text-2xl font-bold text-purple-400 mb-2">Free</h3>
+                <div className="text-4xl font-extrabold">$0</div>
+                <p className="text-sm text-neutral-400 mt-2">Perfect to get started</p>
               </div>
               
-              <div className="space-y-3 text-left mb-6">
+              <div className="space-y-3 text-left">
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-black flex-shrink-0" />
-                  <span className="text-sm font-semibold">5 review credits</span>
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm">5 review credits</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-black flex-shrink-0" />
-                  <span className="text-sm font-semibold">Up to 3 track uploads</span>
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm">Up to 3 track uploads</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-black flex-shrink-0" />
-                  <span className="text-sm font-semibold">Public track pages</span>
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm">Public track pages</span>
                 </div>
               </div>
               
-              <Link href="/signup">
-                <Button
-                  size="lg"
-                  className="w-full bg-neutral-900 text-white border-2 border-black hover:bg-black font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out"
-                >
-                  Get started free
-                </Button>
-              </Link>
+              <div className="mt-6">
+                <Link href="/signup">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full border-2 border-neutral-600 text-neutral-50 hover:bg-neutral-700"
+                  >
+                    Get started free
+                  </Button>
+                </Link>
+              </div>
             </div>
 
             {/* Pro Tier */}
