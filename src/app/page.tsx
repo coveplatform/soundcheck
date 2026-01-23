@@ -517,7 +517,7 @@ export default function Home() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="w-full border-2 border-neutral-600 text-neutral-50 hover:bg-neutral-700"
+                    className="w-full bg-neutral-700 border-2 border-neutral-600 text-neutral-50 hover:bg-neutral-600"
                   >
                     Get started free
                   </Button>
