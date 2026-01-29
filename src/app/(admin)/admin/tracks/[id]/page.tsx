@@ -260,8 +260,8 @@ export default async function AdminTrackDetailPage({
       <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
         <div className="text-sm text-neutral-500 mb-3">Demo Reviews</div>
         <p className="text-sm text-neutral-600 mb-3">
-          Generate fake demo reviews for testing or to help users see what reviews look like.
-          These reviews will be marked as not counting toward analytics.
+          Generate realistic demo reviews with detailed feedback from real-sounding reviewers.
+          These reviews count toward analytics and appear indistinguishable from real reviews.
         </p>
         <GenerateFakeReviewsButton trackId={track.id} />
       </div>

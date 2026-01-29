@@ -139,6 +139,9 @@ model ArtistProfile {
   subscriptionCurrentPeriodEnd DateTime? // When current period ends
   subscriptionCanceledAt  DateTime? // When they canceled (still active until period end)
 
+  // Onboarding
+  hasSeenWelcome Boolean @default(false) // Whether user has dismissed the welcome modal
+
   // Stripe Connect for payouts
   stripeAccountId   String?   @unique
   stripeConnectedAt DateTime?
