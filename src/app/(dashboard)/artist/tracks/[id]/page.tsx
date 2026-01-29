@@ -71,7 +71,7 @@ export default async function TrackDetailPage({
               },
             },
           },
-          orderBy: { createdAt: "desc" },
+          orderBy: { createdAt: "asc" },
         },
       },
     }),
