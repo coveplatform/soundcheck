@@ -9,17 +9,15 @@ export function GenerateFakeReviewsButton({ trackId }: { trackId: string }) {
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [count, setCount] = useState(5);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleGenerate = async () => {
-    const confirmed = window.confirm(
-      `Generate ${count} fake demo reviews for this track? This will create completed reviews from demo accounts.`
-    );
-
-    if (!confirmed) return;
-
     setError(null);
+    setSuccess(null);
     setIsGenerating(true);
+    setShowConfirm(false);
 
     try {
       const res = await fetch(`/api/admin/tracks/${trackId}/generate-fake-reviews`, {
@@ -34,6 +32,7 @@ export function GenerateFakeReviewsButton({ trackId }: { trackId: string }) {
         throw new Error(data.error || "Failed to generate reviews");
       }
 
+      setSuccess(`Generated ${data.count || count} reviews successfully!`);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate reviews");
@@ -41,6 +40,34 @@ export function GenerateFakeReviewsButton({ trackId }: { trackId: string }) {
       setIsGenerating(false);
     }
   };
+
+  if (showConfirm) {
+    return (
+      <div className="space-y-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+        <p className="text-sm text-amber-800">
+          Generate {count} demo reviews for this track?
+        </p>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            isLoading={isGenerating}
+          >
+            {isGenerating ? "Generating..." : "Yes, generate"}
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setShowConfirm(false)}
+            disabled={isGenerating}
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">
@@ -56,14 +83,14 @@ export function GenerateFakeReviewsButton({ trackId }: { trackId: string }) {
         />
         <Button
           size="sm"
-          onClick={handleGenerate}
+          onClick={() => setShowConfirm(true)}
           disabled={isGenerating}
-          isLoading={isGenerating}
         >
-          Generate Fake Reviews
+          Generate Reviews
         </Button>
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
+      {success && <p className="text-sm text-green-600">{success}</p>}
     </div>
   );
 }
