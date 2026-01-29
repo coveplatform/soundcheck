@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowRight, Info } from "lucide-react";
 import { TrackPlayButton } from "@/components/dashboard/track-play-button";
 import { Tooltip } from "@/components/ui/tooltip";
+import { WelcomeModalWrapper } from "@/components/artist/welcome-modal-wrapper";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +63,9 @@ export default async function ArtistDashboardPage() {
   const isSubscribed = artistProfile.subscriptionStatus === "active";
   const planLabel = isSubscribed ? "MixReflect Pro" : "Free";
   const reviewTokens = (artistProfile.freeReviewCredits ?? 0) as number;
+  // Show welcome if hasSeenWelcome is explicitly false, or if field doesn't exist yet and user is new (no tracks)
+  const showWelcome = artistProfile.hasSeenWelcome === false ||
+    (artistProfile.hasSeenWelcome === undefined && tracks.length === 0);
 
   const nextAction = (() => {
     if (tracks.length === 0) {
@@ -100,8 +104,10 @@ export default async function ArtistDashboardPage() {
   })();
 
   return (
-    <div className="pt-14 px-6 sm:px-8 lg:px-12 pb-20">
-      <div className="max-w-6xl mx-auto">
+    <>
+      <WelcomeModalWrapper showWelcome={showWelcome} freeCredits={reviewTokens} />
+      <div className="pt-14 px-6 sm:px-8 lg:px-12 pb-20">
+        <div className="max-w-6xl mx-auto">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-10 pb-6 border-b border-neutral-200">
           <div>
             <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-2">Dashboard</h1>
@@ -216,7 +222,8 @@ export default async function ArtistDashboardPage() {
             </div>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
