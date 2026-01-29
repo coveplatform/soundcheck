@@ -63,9 +63,9 @@ export default async function ArtistDashboardPage() {
   const isSubscribed = artistProfile.subscriptionStatus === "active";
   const planLabel = isSubscribed ? "MixReflect Pro" : "Free";
   const reviewTokens = (artistProfile.freeReviewCredits ?? 0) as number;
-  // Show welcome if hasSeenWelcome is explicitly false, or if field doesn't exist yet and user is new (no tracks)
-  const showWelcome = artistProfile.hasSeenWelcome === false ||
-    (artistProfile.hasSeenWelcome === undefined && tracks.length === 0);
+  // Only show welcome modal for new users where hasSeenWelcome is explicitly false
+  // Existing users (where field is null/undefined) won't see it to avoid confusion
+  const showWelcome = artistProfile.hasSeenWelcome === false;
 
   const nextAction = (() => {
     if (tracks.length === 0) {

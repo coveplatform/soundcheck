@@ -22,15 +22,13 @@ export function WelcomeModal({ open, onDismiss, freeCredits }: WelcomeModalProps
 
   const handleGetStarted = async () => {
     setIsLoading(true);
-    try {
-      await fetch("/api/artist/welcome-seen", { method: "POST" });
-      onDismiss();
-    } catch (error) {
-      console.error("Failed to mark welcome as seen:", error);
-      onDismiss();
-    } finally {
-      setIsLoading(false);
-    }
+    // Fire and forget - don't block the user if the API fails
+    fetch("/api/artist/welcome-seen", { method: "POST" }).catch(() => {
+      // Silently ignore errors - user experience is more important
+    });
+    // Always dismiss immediately for smooth UX
+    onDismiss();
+    setIsLoading(false);
   };
 
   return (
