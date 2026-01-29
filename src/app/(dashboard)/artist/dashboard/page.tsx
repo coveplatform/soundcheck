@@ -22,7 +22,13 @@ export default async function ArtistDashboardPage() {
 
   const artistProfile = await (prisma.artistProfile as any).findUnique({
     where: { userId: session.user.id },
-    include: {
+    select: {
+      id: true,
+      artistName: true,
+      totalEarnings: true,
+      pendingBalance: true,
+      freeReviewCredits: true,
+      subscriptionStatus: true,
       tracks: {
         include: {
           reviews: {
@@ -46,6 +52,18 @@ export default async function ArtistDashboardPage() {
     redirect("/artist/onboarding");
   }
 
+  // Try to get hasSeenWelcome separately - this may fail if column doesn't exist yet
+  let hasSeenWelcome: boolean | null = null;
+  try {
+    const welcomeStatus = await prisma.$queryRaw<{ hasSeenWelcome: boolean }[]>`
+      SELECT "hasSeenWelcome" FROM "ArtistProfile" WHERE "userId" = ${session.user.id} LIMIT 1
+    `;
+    hasSeenWelcome = welcomeStatus[0]?.hasSeenWelcome ?? null;
+  } catch {
+    // Column doesn't exist yet - that's fine, just don't show the modal
+    hasSeenWelcome = null;
+  }
+
   const tracks = artistProfile.tracks;
   const totalEarnings = artistProfile.totalEarnings / 100;
   const pendingBalance = artistProfile.pendingBalance / 100;
@@ -65,7 +83,7 @@ export default async function ArtistDashboardPage() {
   const reviewTokens = (artistProfile.freeReviewCredits ?? 0) as number;
   // Only show welcome modal for new users where hasSeenWelcome is explicitly false
   // Existing users (where field is null/undefined) won't see it to avoid confusion
-  const showWelcome = artistProfile.hasSeenWelcome === false;
+  const showWelcome = hasSeenWelcome === false;
 
   const nextAction = (() => {
     if (tracks.length === 0) {
