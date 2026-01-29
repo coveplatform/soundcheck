@@ -30,7 +30,9 @@ export default async function AdminLayout({
               <Link href="/" className="flex items-center">
                 <Logo />
               </Link>
-              <span className="text-sm text-neutral-400">Admin</span>
+              <span className="px-2 py-0.5 text-xs font-semibold bg-red-100 text-red-700 rounded-full border border-red-200">
+                Admin Dashboard
+              </span>
             </div>
             <nav className="flex items-center gap-4 text-sm">
               <Link href="/admin" className="text-neutral-600 hover:text-neutral-900">

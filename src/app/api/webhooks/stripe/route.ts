@@ -49,22 +49,39 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       typeof (invoice as any).subscription === "string" ? ((invoice as any).subscription as string) : null;
     const billingReason = typeof (invoice as any).billing_reason === "string" ? (invoice as any).billing_reason : null;
 
-    if (!subscriptionId || billingReason !== "subscription_cycle") {
+    if (!subscriptionId) {
+      return;
+    }
+
+    // Handle both initial subscription payment and renewal payments
+    const isInitialPayment = billingReason === "subscription_create";
+    const isRenewalPayment = billingReason === "subscription_cycle";
+
+    if (!isInitialPayment && !isRenewalPayment) {
       return;
     }
 
     const artistProfile = await prisma.artistProfile.findFirst({
-      where: {
-        subscriptionId,
-        subscriptionStatus: "active",
-      },
-      select: { id: true },
+      where: { subscriptionId },
+      select: { id: true, subscriptionStatus: true },
     });
 
     if (!artistProfile) {
       return;
     }
 
+    if (isInitialPayment) {
+      // Initial payment succeeded - activate the subscription
+      await prisma.artistProfile.update({
+        where: { id: artistProfile.id },
+        data: {
+          subscriptionStatus: "active",
+        },
+      });
+      console.log(`Subscription activated for artist profile: ${artistProfile.id} (initial payment succeeded)`);
+    }
+
+    // Grant free review credits for both initial and renewal payments
     await (prisma.artistProfile as any).updateMany({
       where: {
         id: artistProfile.id,
