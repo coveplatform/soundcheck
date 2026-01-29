@@ -58,6 +58,7 @@ export async function POST(request: Request) {
     }
 
     // Create new profile
+    // Note: hasSeenWelcome will use database default (false) if the column exists
     const profile = await (prisma.artistProfile as any).create({
       data: {
         userId: session.user.id,
