@@ -14,6 +14,7 @@ import { validateTrackUrl, fetchTrackMetadata, detectSource } from "@/lib/metada
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { SupportedPlatforms, PlatformBadge } from "@/components/ui/supported-platforms";
 import { VerifyEmailBanner } from "@/components/ui/verify-email-banner";
+import { StepIndicator } from "@/components/ui/step-indicator";
 import type { Genre, Step, UploadMode } from "./types";
 
 export default function SubmitTrackPage() {
@@ -360,7 +361,22 @@ export default function SubmitTrackPage() {
           setIsSubmitting(false);
           return;
         }
-        setError(data.error || "Something went wrong");
+        // Provide more specific error messages based on response
+        let errorMsg = data.error;
+        if (!errorMsg) {
+          if (response.status === 400) {
+            errorMsg = "Invalid track data. Please check all fields and try again.";
+          } else if (response.status === 401) {
+            errorMsg = "Your session has expired. Please refresh the page and try again.";
+          } else if (response.status === 413) {
+            errorMsg = "Track file is too large. Maximum size is 25MB.";
+          } else if (response.status >= 500) {
+            errorMsg = "Our servers are having issues. Please try again in a moment.";
+          } else {
+            errorMsg = "Failed to submit track. Please try again.";
+          }
+        }
+        setError(errorMsg);
         setIsSubmitting(false);
         return;
       }
@@ -368,8 +384,13 @@ export default function SubmitTrackPage() {
       // Redirect to track page after successful submission
       // Keep loading state active during navigation
       router.push(`/artist/tracks/${data.id}`);
-    } catch {
-      setError("Something went wrong");
+    } catch (err) {
+      // Check for network errors
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("Failed to submit track. Please try again.");
+      }
       setIsSubmitting(false);
     }
   };
@@ -379,6 +400,26 @@ export default function SubmitTrackPage() {
     ? (url && !urlError && !urlWarning && !isLoadingMetadata && title)
     : (!!uploadedUrl && !isUploading);
   const hasDetails = title.trim() && selectedGenres.length > 0;
+
+  // Step indicator calculation
+  const getStepInfo = () => {
+    // Users without profile go through: artist → track → details (3 steps)
+    // Users with profile go through: track → details (2 steps)
+    if (!hasProfile) {
+      const totalSteps = 3;
+      const labels = ["Artist", "Track", "Details"];
+      if (step === "artist") return { currentStep: 1, totalSteps, labels };
+      if (step === "track") return { currentStep: 2, totalSteps, labels };
+      if (step === "details") return { currentStep: 3, totalSteps, labels };
+    } else {
+      const totalSteps = 2;
+      const labels = ["Track", "Details"];
+      if (step === "track") return { currentStep: 1, totalSteps, labels };
+      if (step === "details") return { currentStep: 2, totalSteps, labels };
+    }
+    return null; // upgrade step doesn't show progress
+  };
+  const stepInfo = getStepInfo();
 
   const goBack = () => {
     if (step === "track" && !hasProfile) setStep("artist");
@@ -403,14 +444,30 @@ export default function SubmitTrackPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => null);
-        setError(data?.error || "Something went wrong");
+        let errorMsg = data?.error;
+        if (!errorMsg) {
+          if (response.status === 400) {
+            errorMsg = "Invalid artist name. Please use letters, numbers, and spaces only.";
+          } else if (response.status === 409) {
+            errorMsg = "This artist name is already taken. Please choose another.";
+          } else if (response.status >= 500) {
+            errorMsg = "Our servers are having issues. Please try again in a moment.";
+          } else {
+            errorMsg = "Failed to create profile. Please try again.";
+          }
+        }
+        setError(errorMsg);
         return;
       }
 
       setHasProfile(true);
       setStep("track");
-    } catch {
-      setError("Something went wrong");
+    } catch (err) {
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("Failed to create profile. Please try again.");
+      }
     } finally {
       setIsCreatingProfile(false);
     }
@@ -440,6 +497,17 @@ export default function SubmitTrackPage() {
               <p className="text-sm text-red-700 font-medium">{error}</p>
             </CardContent>
           </Card>
+        )}
+
+        {/* Progress indicator */}
+        {stepInfo && (
+          <StepIndicator
+            currentStep={stepInfo.currentStep}
+            totalSteps={stepInfo.totalSteps}
+            labels={stepInfo.labels}
+            variant="progress"
+            className="mb-6"
+          />
         )}
 
         {/* Step: Artist Name */}
@@ -482,6 +550,38 @@ export default function SubmitTrackPage() {
       {/* Step: Track */}
       {step === "track" && (
         <div className="flex-1 flex flex-col">
+          {/* Free tier upload counter */}
+          {!isSubscribed && canUpload && (
+            <Card variant="soft" className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200">
+              <CardContent className="py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-1">
+                      {[0, 1, 2].map((i) => (
+                        <div
+                          key={i}
+                          className={cn(
+                            "w-3 h-3 rounded-full transition-colors",
+                            i < trackCount ? "bg-purple-500" : "bg-purple-200"
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-sm text-purple-900">
+                      <span className="font-semibold">{trackCount} of 3</span> free uploads used
+                    </p>
+                  </div>
+                  <Link
+                    href="/artist/account"
+                    className="text-xs font-medium text-purple-700 hover:text-purple-900 underline underline-offset-2"
+                  >
+                    Go Pro for unlimited
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="mb-8">
             <div className="flex items-start justify-between gap-4">
               <div>
