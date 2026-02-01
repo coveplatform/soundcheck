@@ -77,9 +77,10 @@ export async function POST(request: Request) {
         const subscription = subscriptions.data[0];
 
         // Active subscription found in Stripe but not in DB - sync it
-        const currentPeriodEnd = new Date(
-          subscription.current_period_end * 1000
-        );
+        const currentPeriodEndUnix = (subscription as unknown as { current_period_end?: number }).current_period_end;
+        const currentPeriodEnd = currentPeriodEndUnix
+          ? new Date(currentPeriodEndUnix * 1000)
+          : null;
 
         // Update local database to match Stripe
         const updatedProfile = await prisma.artistProfile.update({
