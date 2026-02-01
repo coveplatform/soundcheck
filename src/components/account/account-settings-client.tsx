@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ export function AccountSettingsClient({
   } | null;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [name, setName] = useState(initialName);
   const [artistName, setArtistName] = useState(initialArtistName ?? "");
@@ -55,6 +56,81 @@ export function AccountSettingsClient({
   const [isBuyingCredits, setIsBuyingCredits] = useState(false);
   const [buyCreditsError, setBuyCreditsError] = useState("");
   const [buyCreditsQuantity, setBuyCreditsQuantity] = useState(10);
+
+  // Subscription verification state (for handling redirect from Stripe checkout)
+  const [isVerifyingSubscription, setIsVerifyingSubscription] = useState(false);
+  const [subscriptionJustActivated, setSubscriptionJustActivated] = useState(false);
+  const [verifiedSubscription, setVerifiedSubscription] = useState<{
+    status: string;
+    tier: string | null;
+    currentPeriodEnd: Date | null;
+    credits: number;
+  } | null>(null);
+
+  // Verify subscription status when redirected from checkout
+  const verifySubscription = useCallback(async () => {
+    try {
+      const res = await fetch("/api/subscriptions/verify", { method: "POST" });
+      const data = await res.json();
+
+      if (res.ok && data.status === "active") {
+        setVerifiedSubscription({
+          status: data.status,
+          tier: data.tier,
+          currentPeriodEnd: data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null,
+          credits: data.credits ?? 0,
+        });
+        setSubscriptionJustActivated(true);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  // Poll for subscription activation when coming from checkout
+  useEffect(() => {
+    const checkoutSuccess = searchParams.get("subscription") === "success";
+    const creditsSuccess = searchParams.get("credits") === "success";
+
+    // Show credits success message
+    if (creditsSuccess) {
+      // Refresh the page data to show updated credits
+      router.refresh();
+    }
+
+    // Handle subscription checkout success - poll until activated
+    if (checkoutSuccess && isArtist && subscription?.status !== "active") {
+      setIsVerifyingSubscription(true);
+
+      let attempts = 0;
+      const maxAttempts = 10;
+      const pollInterval = 2000; // 2 seconds
+
+      const poll = async () => {
+        attempts++;
+        const activated = await verifySubscription();
+
+        if (activated) {
+          setIsVerifyingSubscription(false);
+          // Clean up URL
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.delete("subscription");
+          window.history.replaceState({}, "", newUrl.toString());
+          // Refresh to update server-side data
+          router.refresh();
+        } else if (attempts < maxAttempts) {
+          setTimeout(poll, pollInterval);
+        } else {
+          // Max attempts reached - subscription might still activate via webhook
+          setIsVerifyingSubscription(false);
+        }
+      };
+
+      poll();
+    }
+  }, [searchParams, isArtist, subscription?.status, verifySubscription, router]);
 
   async function saveProfile() {
     setProfileError("");
@@ -166,9 +242,11 @@ export function AccountSettingsClient({
     }
   }
 
-  const isSubscribed = subscription?.status === "active";
+  // Use verified subscription state if available (for immediate UI update after checkout)
+  const effectiveSubscription = verifiedSubscription || subscription;
+  const isSubscribed = effectiveSubscription?.status === "active";
   const planLabel = isSubscribed ? "MixReflect Pro" : "Free";
-  const reviewTokens = subscription?.reviewTokens ?? 0;
+  const reviewTokens = verifiedSubscription?.credits ?? subscription?.reviewTokens ?? 0;
 
   async function startCheckout() {
     setCheckoutError("");
@@ -207,6 +285,26 @@ export function AccountSettingsClient({
             <CardTitle className="text-lg">Subscription</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-3">
+            {/* Verifying subscription after checkout */}
+            {isVerifyingSubscription ? (
+              <div className="bg-purple-50 border-2 border-purple-300 text-purple-800 text-sm p-4 font-medium rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="animate-spin h-4 w-4 border-2 border-purple-600 border-t-transparent rounded-full" />
+                  <span>Activating your subscription...</span>
+                </div>
+              </div>
+            ) : null}
+
+            {/* Subscription just activated success message */}
+            {subscriptionJustActivated && !isVerifyingSubscription ? (
+              <div className="bg-emerald-50 border-2 border-emerald-300 text-emerald-800 text-sm p-4 font-medium rounded-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-emerald-600 font-bold">&#10003;</span>
+                  <span>Your Pro subscription is now active! You have {reviewTokens} review credits.</span>
+                </div>
+              </div>
+            ) : null}
+
             {checkoutError ? (
               <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
                 {checkoutError}
@@ -225,17 +323,17 @@ export function AccountSettingsClient({
                   </div>
                 </div>
                 <div className="text-sm text-black/60">
-                  {subscription.canceledAt ? (
+                  {subscription?.canceledAt ? (
                     <p>
                       Your subscription will end on{" "}
-                      {new Date(subscription.currentPeriodEnd!).toLocaleDateString()}
+                      {new Date(effectiveSubscription?.currentPeriodEnd ?? subscription?.currentPeriodEnd!).toLocaleDateString()}
                     </p>
-                  ) : (
+                  ) : effectiveSubscription?.currentPeriodEnd ? (
                     <p>
                       Next billing date:{" "}
-                      {new Date(subscription.currentPeriodEnd!).toLocaleDateString()}
+                      {new Date(effectiveSubscription.currentPeriodEnd).toLocaleDateString()}
                     </p>
-                  )}
+                  ) : null}
                 </div>
 
                 {/* Review Credits Section - Pro Only */}

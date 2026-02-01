@@ -384,6 +384,7 @@ Admins can manually activate Pro for users (e.g., for partners, promotions).
 | File | Purpose |
 |------|---------|
 | `src/app/api/subscriptions/checkout/route.ts` | Create subscription checkout |
+| `src/app/api/subscriptions/verify/route.ts` | Verify subscription status (handles race condition) |
 | `src/app/api/subscriptions/portal/route.ts` | Stripe billing portal access |
 | `src/app/api/webhooks/stripe/route.ts` | All Stripe webhook handling |
 | `src/app/api/review-credits/checkout/route.ts` | Review credits purchase |
@@ -458,3 +459,118 @@ ADMIN_EMAILS=admin@example.com,admin2@example.com
 2. `invoice.payment_succeeded` webhook fires with `billing_reason: "subscription_cycle"`
 3. Credits replenished to 20 if user has < 20
 4. No user action required
+
+---
+
+## Race Condition Handling
+
+### The Problem
+
+When a user completes Stripe checkout, they are redirected back to the app with `?subscription=success`. However, the Stripe webhook may not have processed yet (webhooks can be delayed by seconds to minutes), causing the user to see "Not subscribed" even though they just paid.
+
+### The Solution
+
+We handle this with a multi-layered approach:
+
+#### 1. Subscription Verification Endpoint
+
+**Endpoint**: `POST /api/subscriptions/verify`
+
+**File**: `src/app/api/subscriptions/verify/route.ts`
+
+This endpoint:
+1. Checks local database for `subscriptionStatus === "active"`
+2. If not active but `stripeCustomerId` exists, queries Stripe directly for active subscriptions
+3. If Stripe shows an active subscription, syncs it to the local database
+4. Returns the verified subscription status
+
+```typescript
+// Response format
+{
+  status: "active" | "canceled" | "none",
+  tier: "pro" | null,
+  currentPeriodEnd: Date | null,
+  credits: number,
+  source: "database" | "stripe_sync" | "stripe_verified" | "database_fallback"
+}
+```
+
+#### 2. Client-Side Polling
+
+**File**: `src/components/account/account-settings-client.tsx`
+
+When the account page loads with `?subscription=success`:
+
+1. Shows "Activating your subscription..." loading state
+2. Polls `/api/subscriptions/verify` every 2 seconds
+3. Maximum 10 attempts (20 seconds total)
+4. On success: Shows success message, refreshes page data
+5. On timeout: Stops polling (webhook will eventually activate)
+
+```typescript
+// Polling logic
+const poll = async () => {
+  const activated = await verifySubscription();
+  if (activated) {
+    setSubscriptionJustActivated(true);
+    router.refresh();
+  } else if (attempts < maxAttempts) {
+    setTimeout(poll, 2000);
+  }
+};
+```
+
+#### 3. Dual Webhook Handling
+
+Both `checkout.session.completed` and `invoice.payment_succeeded` can activate subscriptions, providing redundancy:
+
+- `checkout.session.completed` → Immediate activation
+- `invoice.payment_succeeded` → Backup activation (with `stripeCustomerId` fallback)
+
+#### 4. User Feedback
+
+- **Loading state**: Purple spinner with "Activating your subscription..."
+- **Success state**: Green checkmark with "Your Pro subscription is now active!"
+- **Credits display**: Shows the 20 review credits they received
+
+### Flow Diagram
+
+```
+User completes Stripe checkout
+         │
+         ▼
+Redirected to /artist/account?subscription=success
+         │
+         ├─────────────────────────────────────┐
+         ▼                                      ▼
+Client detects ?subscription=success      Stripe sends webhook
+         │                                      │
+         ▼                                      ▼
+Shows "Activating..." spinner           Webhook updates DB
+         │                                      │
+         ▼                                      │
+Polls /api/subscriptions/verify ◄───────────────┘
+         │
+         ▼
+Verify endpoint checks DB (or Stripe if needed)
+         │
+         ▼
+Returns status: "active"
+         │
+         ▼
+Client shows success message
+         │
+         ▼
+Page refreshes with Pro features enabled
+```
+
+### Edge Cases Handled
+
+| Scenario | Handling |
+|----------|----------|
+| Webhook arrives before redirect | DB already active, verify returns immediately |
+| Webhook delayed by seconds | Polling catches it within 20 seconds |
+| Webhook delayed by minutes | Verify endpoint queries Stripe directly |
+| Webhook completely fails | Verify endpoint syncs from Stripe |
+| Network error during verify | Falls back to database state |
+| User refreshes during activation | Polling restarts if still `?subscription=success` |
