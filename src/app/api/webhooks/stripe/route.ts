@@ -48,6 +48,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     const subscriptionId =
       typeof (invoice as any).subscription === "string" ? ((invoice as any).subscription as string) : null;
     const billingReason = typeof (invoice as any).billing_reason === "string" ? (invoice as any).billing_reason : null;
+    const customerId = typeof (invoice as any).customer === "string" ? ((invoice as any).customer as string) : null;
 
     if (!subscriptionId) {
       return;
@@ -61,12 +62,31 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       return;
     }
 
-    const artistProfile = await prisma.artistProfile.findFirst({
+    // Try to find artist profile by subscriptionId first, then by customerId as fallback
+    let artistProfile = await prisma.artistProfile.findFirst({
       where: { subscriptionId },
       select: { id: true, subscriptionStatus: true },
     });
 
+    // Fallback: if not found by subscriptionId, try by stripeCustomerId (for initial payment race condition)
+    if (!artistProfile && customerId && isInitialPayment) {
+      artistProfile = await prisma.artistProfile.findFirst({
+        where: { stripeCustomerId: customerId },
+        select: { id: true, subscriptionStatus: true },
+      });
+
+      // If found by customerId, also save the subscriptionId
+      if (artistProfile) {
+        await prisma.artistProfile.update({
+          where: { id: artistProfile.id },
+          data: { subscriptionId },
+        });
+        console.log(`Saved subscriptionId for artist profile: ${artistProfile.id} (found by customerId)`);
+      }
+    }
+
     if (!artistProfile) {
+      console.error(`Artist profile not found for subscription: ${subscriptionId}, customer: ${customerId}`);
       return;
     }
 
