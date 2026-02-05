@@ -21,7 +21,7 @@ export type AdminTrackRow = {
   packageType: string | null;
   promoCode: string | null;
   createdAt: Date;
-  desiredReviews: number | null;
+  reviewsRequested: number;
   artist: {
     subscriptionStatus: string | null;
     freeReviewCredits: number;
@@ -180,9 +180,9 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                     <Link className="underline" href={`/admin/tracks/${track.id}`}>
                       {track.title}
                     </Link>
-                    {track.desiredReviews && (
+                    {track.reviewsRequested > 0 && (
                       <span className="ml-2 text-xs text-neutral-400">
-                        ({track.desiredReviews} reviews)
+                        ({track.reviewsRequested} reviews)
                       </span>
                     )}
                   </td>
