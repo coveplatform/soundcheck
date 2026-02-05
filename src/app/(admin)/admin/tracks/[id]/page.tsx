@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
-import { PACKAGES } from "@/lib/metadata";
 import { RefundButton } from "@/components/admin/refund-button";
 import { CancelTrackButton } from "@/components/admin/cancel-track-button";
 import { DeleteTrackButton } from "@/components/admin/delete-track-button";
@@ -123,13 +122,26 @@ export default async function AdminTrackDetailPage({
           <div className="font-medium">{track.status}</div>
         </div>
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Payment</div>
+          <div className="text-sm text-neutral-500">Reviews</div>
           <div className="font-medium">
-            {track.payment?.status ? (
+            {countedCompletedReviews} / {track.reviewsRequested}
+            {track.reviewsRequested > 5 && (
+              <span className="ml-2 px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
+                PRO
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+          <div className="text-sm text-neutral-500">Paid with</div>
+          <div className="font-medium">
+            {track.promoCode ? (
+              <span className="text-purple-600">Promo: {track.promoCode}</span>
+            ) : track.payment?.status ? (
               track.payment.status
             ) : track.status !== "PENDING_PAYMENT" ? (
               <span className="px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-700 rounded">
-                REVIEW CREDITS
+                CREDITS
               </span>
             ) : (
               "Pending"
@@ -143,22 +155,8 @@ export default async function AdminTrackDetailPage({
               {track.artist.user.email}
             </Link>
           </div>
-        </div>
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Subscription</div>
-          <div className="font-medium">
-            {track.artist.subscriptionStatus === "active" ? (
-              <span className="px-2 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
-                PRO
-              </span>
-            ) : (
-              <span className="px-2 py-0.5 text-xs font-bold bg-neutral-100 text-neutral-500 rounded">
-                FREE TIER
-              </span>
-            )}
-            <span className="ml-2 text-sm text-neutral-400">
-              {track.artist.freeReviewCredits} credits remaining
-            </span>
+          <div className="text-xs text-neutral-400 mt-1">
+            {track.artist.subscriptionStatus === "active" ? "Currently Pro" : "Free tier"} · {track.artist.freeReviewCredits} credits
           </div>
         </div>
       </div>
@@ -167,26 +165,18 @@ export default async function AdminTrackDetailPage({
         <div className="text-sm text-neutral-500">Details</div>
         <div className="mt-2 grid md:grid-cols-3 gap-3 text-sm">
           <div>
-            <div className="text-neutral-500">Package</div>
+            <div className="text-neutral-500">Reviews requested</div>
             <div className="font-medium">
-              {track.promoCode ? (
-                <span className="inline-flex items-center gap-2">
-                  <span className="px-2 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
-                    PROMO: {track.promoCode}
-                  </span>
-                </span>
-              ) : track.packageType ? (
-                <span>
-                  {(PACKAGES as Record<string, { name: string }>)[track.packageType]?.name || track.packageType}
-                  <span className="ml-1 text-xs text-neutral-400">({track.packageType})</span>
-                </span>
-              ) : (
-                <span className="text-neutral-400">—</span>
-              )}
+              {track.reviewsRequested} reviews
+              {track.reviewsRequested > 5 ? (
+                <span className="ml-1 text-xs text-neutral-400">(was Pro at submission)</span>
+              ) : track.reviewsRequested > 0 ? (
+                <span className="ml-1 text-xs text-neutral-400">(standard)</span>
+              ) : null}
             </div>
           </div>
           <div>
-            <div className="text-neutral-500">Reviews</div>
+            <div className="text-neutral-500">Completed</div>
             <div className="font-medium">
               {countedCompletedReviews} / {track.reviewsRequested}
             </div>

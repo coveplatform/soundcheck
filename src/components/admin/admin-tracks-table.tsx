@@ -7,13 +7,6 @@ import { Button } from "@/components/ui/button";
 import { RefundButton } from "@/components/admin/refund-button";
 import { DeleteTrackButton } from "@/components/admin/delete-track-button";
 
-const PACKAGE_NAMES: Record<string, string> = {
-  STARTER: "Listener Pulse",
-  STANDARD: "Release Ready",
-  PRO: "Maximum Signal",
-  DEEP_DIVE: "Deep Dive",
-};
-
 export type AdminTrackRow = {
   id: string;
   title: string;
@@ -22,6 +15,7 @@ export type AdminTrackRow = {
   promoCode: string | null;
   createdAt: Date;
   reviewsRequested: number;
+  reviewsCompleted: number;
   artist: {
     subscriptionStatus: string | null;
     freeReviewCredits: number;
@@ -151,8 +145,8 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
               </th>
               <th className="text-left font-medium px-4 py-3">Title</th>
               <th className="text-left font-medium px-4 py-3">Status</th>
-              <th className="text-left font-medium px-4 py-3">Package</th>
-              <th className="text-left font-medium px-4 py-3">Payment</th>
+              <th className="text-left font-medium px-4 py-3">Reviews</th>
+              <th className="text-left font-medium px-4 py-3">Paid with</th>
               <th className="text-left font-medium px-4 py-3">Artist</th>
               <th className="text-left font-medium px-4 py-3">Created</th>
               <th className="text-left font-medium px-4 py-3">Actions</th>
@@ -160,10 +154,10 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
           </thead>
           <tbody className="divide-y divide-neutral-100">
             {tracks.map((track) => {
+              // Infer tier at time of submission from the data we have:
+              // >5 reviews = must have been Pro, =5 could be either
+              const wasProAtSubmission = track.reviewsRequested > 5;
               const isPro = track.artist.subscriptionStatus === "active";
-              const packageName = track.packageType
-                ? PACKAGE_NAMES[track.packageType] || track.packageType
-                : null;
 
               return (
                 <tr key={track.id} className="text-neutral-700">
@@ -180,39 +174,49 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                     <Link className="underline" href={`/admin/tracks/${track.id}`}>
                       {track.title}
                     </Link>
-                    {track.reviewsRequested > 0 && (
-                      <span className="ml-2 text-xs text-neutral-400">
-                        ({track.reviewsRequested} reviews)
-                      </span>
-                    )}
                   </td>
                   <td className="px-4 py-3">{track.status}</td>
                   <td className="px-4 py-3">
-                    {track.promoCode ? (
-                      <span className="inline-flex items-center gap-1">
-                        <span className="px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
-                          PROMO
+                    {track.reviewsRequested > 0 ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="font-medium">
+                          {track.reviewsCompleted} / {track.reviewsRequested}
                         </span>
-                        <span className="text-neutral-400 text-xs">
-                          {track.promoCode}
-                        </span>
-                      </span>
-                    ) : packageName ? (
-                      <span className="inline-flex flex-col">
-                        <span>{packageName}</span>
-                        <span className="text-xs text-neutral-400">{track.packageType}</span>
+                        {track.promoCode ? (
+                          <span className="px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
+                            PROMO
+                          </span>
+                        ) : wasProAtSubmission ? (
+                          <span className="px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
+                            PRO
+                          </span>
+                        ) : null}
                       </span>
                     ) : (
                       <span className="text-neutral-400">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    {!track.payment && track.status !== "PENDING_PAYMENT" ? (
+                    {track.promoCode ? (
+                      <span className="text-xs text-purple-600 font-medium">
+                        {track.promoCode}
+                      </span>
+                    ) : !track.payment && track.status !== "PENDING_PAYMENT" ? (
                       <span className="px-1.5 py-0.5 text-xs font-bold bg-blue-100 text-blue-700 rounded">
-                        REVIEW CREDITS
+                        CREDITS
+                      </span>
+                    ) : track.payment?.status ? (
+                      <span className={
+                        track.payment.status === "COMPLETED"
+                          ? "px-1.5 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded"
+                          : track.payment.status === "REFUNDED"
+                          ? "px-1.5 py-0.5 text-xs font-bold bg-orange-100 text-orange-700 rounded"
+                          : "text-xs text-neutral-500"
+                      }>
+                        {track.payment.status}
                       </span>
                     ) : (
-                      track.payment?.status ?? ""
+                      ""
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -223,19 +227,8 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                       >
                         {track.artist.user.email}
                       </Link>
-                      <span className="inline-flex items-center gap-1 mt-0.5">
-                        {isPro ? (
-                          <span className="px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
-                            PRO
-                          </span>
-                        ) : (
-                          <span className="px-1.5 py-0.5 text-xs font-bold bg-neutral-100 text-neutral-500 rounded">
-                            FREE
-                          </span>
-                        )}
-                        <span className="text-xs text-neutral-400">
-                          {track.artist.freeReviewCredits} credits
-                        </span>
+                      <span className="text-xs text-neutral-400 mt-0.5">
+                        {isPro ? "Currently Pro" : "Free tier"} · {track.artist.freeReviewCredits} credits
                       </span>
                     </div>
                   </td>

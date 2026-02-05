@@ -38,6 +38,7 @@ export default async function AdminTracksPage({
       promoCode: true,
       createdAt: true,
       reviewsRequested: true,
+      reviewsCompleted: true,
       artist: {
         select: {
           subscriptionStatus: true,
