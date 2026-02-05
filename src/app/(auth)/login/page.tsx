@@ -132,8 +132,12 @@ export default function LoginPage() {
         router.push(target);
         router.refresh();
       }
-    } catch {
-      setError("Something went wrong");
+    } catch (err) {
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("Sign in failed. Please try again.");
+      }
       setIsLoading(false);
     }
   };

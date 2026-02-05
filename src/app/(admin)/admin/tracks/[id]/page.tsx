@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
+import { PACKAGES } from "@/lib/metadata";
 import { RefundButton } from "@/components/admin/refund-button";
 import { CancelTrackButton } from "@/components/admin/cancel-track-button";
 import { DeleteTrackButton } from "@/components/admin/delete-track-button";
@@ -23,7 +24,9 @@ export default async function AdminTrackDetailPage({
   const track = await prisma.track.findUnique({
     where: { id },
     include: {
-      artist: { include: { user: { select: { id: true, email: true } } } },
+      artist: {
+        include: { user: { select: { id: true, email: true } } },
+      },
       genres: true,
       payment: true,
       queueEntries: {
@@ -114,14 +117,24 @@ export default async function AdminTrackDetailPage({
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-4 gap-4">
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="text-sm text-neutral-500">Status</div>
           <div className="font-medium">{track.status}</div>
         </div>
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="text-sm text-neutral-500">Payment</div>
-          <div className="font-medium">{track.payment?.status ?? "None"}</div>
+          <div className="font-medium">
+            {track.payment?.status ? (
+              track.payment.status
+            ) : track.status !== "PENDING_PAYMENT" ? (
+              <span className="px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-700 rounded">
+                REVIEW CREDITS
+              </span>
+            ) : (
+              "Pending"
+            )}
+          </div>
         </div>
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="text-sm text-neutral-500">Artist</div>
@@ -129,6 +142,23 @@ export default async function AdminTrackDetailPage({
             <Link className="underline" href={`/admin/users/${track.artist.user.id}`}>
               {track.artist.user.email}
             </Link>
+          </div>
+        </div>
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
+          <div className="text-sm text-neutral-500">Subscription</div>
+          <div className="font-medium">
+            {track.artist.subscriptionStatus === "active" ? (
+              <span className="px-2 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
+                PRO
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 text-xs font-bold bg-neutral-100 text-neutral-500 rounded">
+                FREE TIER
+              </span>
+            )}
+            <span className="ml-2 text-sm text-neutral-400">
+              {track.artist.freeReviewCredits} credits remaining
+            </span>
           </div>
         </div>
       </div>
@@ -145,8 +175,13 @@ export default async function AdminTrackDetailPage({
                     PROMO: {track.promoCode}
                   </span>
                 </span>
+              ) : track.packageType ? (
+                <span>
+                  {(PACKAGES as Record<string, { name: string }>)[track.packageType]?.name || track.packageType}
+                  <span className="ml-1 text-xs text-neutral-400">({track.packageType})</span>
+                </span>
               ) : (
-                track.packageType
+                <span className="text-neutral-400">—</span>
               )}
             </div>
           </div>

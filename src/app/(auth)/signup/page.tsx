@@ -112,7 +112,18 @@ export default function SignupPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => null);
-        const errorMsg = data?.error || "Something went wrong";
+        let errorMsg = data?.error;
+        if (!errorMsg) {
+          if (response.status === 400) {
+            errorMsg = "Invalid signup details. Please check your email and password.";
+          } else if (response.status === 409) {
+            errorMsg = "An account with this email already exists. Try signing in instead.";
+          } else if (response.status >= 500) {
+            errorMsg = "Our servers are having issues. Please try again in a moment.";
+          } else {
+            errorMsg = "Failed to create account. Please try again.";
+          }
+        }
         setError(errorMsg);
         track("signup_failed", { error: errorMsg });
         setIsLoading(false);
@@ -148,8 +159,12 @@ export default function SignupPage() {
       // Keep loading state active during navigation
       router.push(callbackUrl || "/artist/submit");
       router.refresh();
-    } catch {
-      setError("Something went wrong");
+    } catch (err) {
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("Failed to create account. Please try again.");
+      }
       track("signup_failed", { error: "network_error" });
       setIsLoading(false);
     }

@@ -37,7 +37,14 @@ export default async function AdminTracksPage({
       packageType: true,
       promoCode: true,
       createdAt: true,
-      artist: { include: { user: { select: { id: true, email: true } } } },
+      reviewsRequested: true,
+      artist: {
+        select: {
+          subscriptionStatus: true,
+          freeReviewCredits: true,
+          user: { select: { id: true, email: true } },
+        },
+      },
       payment: { select: { status: true, stripePaymentId: true } },
     },
   });
