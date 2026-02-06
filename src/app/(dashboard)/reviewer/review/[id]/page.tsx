@@ -172,13 +172,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             }
             if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
               // Keep loading state active during navigation
-              router.push("/listener/onboarding");
+              router.push("/onboarding");
               router.refresh();
               return;
             }
             if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
               // Keep loading state active during navigation
-              router.push("/listener/dashboard");
+              router.push("/dashboard");
               router.refresh();
               return;
             }
@@ -474,13 +474,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
             // Keep loading state active during navigation
-            router.push("/listener/onboarding");
+            router.push("/onboarding");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
             // Keep loading state active during navigation
-            router.push("/listener/dashboard");
+            router.push("/dashboard");
             router.refresh();
             return;
           }
@@ -552,13 +552,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
             // Keep loading state active during navigation
-            router.push("/listener/onboarding");
+            router.push("/onboarding");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
             // Keep loading state active during navigation
-            router.push("/listener/dashboard");
+            router.push("/dashboard");
             router.refresh();
             return;
           }
@@ -621,13 +621,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
             // Keep loading state active during navigation
-            router.push("/listener/onboarding");
+            router.push("/onboarding");
             router.refresh();
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
             // Keep loading state active during navigation
-            router.push("/listener/dashboard");
+            router.push("/dashboard");
             router.refresh();
             return;
           }
@@ -753,12 +753,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             return;
           }
           if (msg.includes("onboarding")) {
-            router.push("/listener/onboarding");
+            router.push("/onboarding");
             router.refresh();
             return;
           }
           if (msg.includes("restricted")) {
-            router.push("/listener/dashboard");
+            router.push("/dashboard");
             router.refresh();
             return;
           }

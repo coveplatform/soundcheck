@@ -168,7 +168,7 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
           </span>
         )}
         {currentReview.wouldListenAgain !== null && (
-          <span className={currentReview.wouldListenAgain ? "text-lime-400" : "text-neutral-400"}>
+          <span className={currentReview.wouldListenAgain ? "text-purple-500" : "text-neutral-400"}>
             {currentReview.wouldListenAgain ? "Would listen again" : "Wouldn't replay"}
           </span>
         )}

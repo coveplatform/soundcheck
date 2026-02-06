@@ -34,6 +34,13 @@ export async function GET(
       select: { isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
     });
 
+    // Also check for peer reviewer (ArtistProfile)
+    const artistProfile = await prisma.artistProfile.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true, completedOnboarding: true },
+    });
+    const isPeerReviewer = !reviewerProfile && !!artistProfile;
+
     if (reviewerProfile?.isRestricted) {
       return NextResponse.json(
         { error: "Reviewer account restricted" },
@@ -42,6 +49,20 @@ export async function GET(
     }
 
     if (reviewerProfile && (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed)) {
+      return NextResponse.json(
+        { error: "Please complete onboarding before reviewing" },
+        { status: 403 }
+      );
+    }
+
+    if (isPeerReviewer && !artistProfile?.completedOnboarding) {
+      return NextResponse.json(
+        { error: "Please complete onboarding before reviewing" },
+        { status: 403 }
+      );
+    }
+
+    if (!reviewerProfile && !artistProfile) {
       return NextResponse.json(
         { error: "Please complete onboarding before reviewing" },
         { status: 403 }
@@ -68,15 +89,23 @@ export async function GET(
             userId: true,
           },
         },
+        peerReviewerArtist: {
+          select: {
+            id: true,
+            userId: true,
+          },
+        },
       },
-    });
+    }) as any;
 
     if (!review) {
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    // Verify ownership
-    if (review.reviewer.userId !== session.user.id) {
+    // Verify ownership - check legacy reviewer OR peer reviewer
+    const isLegacyOwner = review.reviewer?.userId === session.user.id;
+    const isPeerOwner = (review as any).peerReviewerArtistId === artistProfile?.id;
+    if (!isLegacyOwner && !isPeerOwner) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

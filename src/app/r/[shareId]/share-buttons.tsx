@@ -69,7 +69,7 @@ export function ShareButtons({ shareId, trackTitle, score }: ShareButtonsProps) 
         onClick={handleCopyLink}
         className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
           copied
-            ? "bg-lime-500 border-black text-black"
+            ? "bg-purple-600 border-black text-black"
             : "bg-white border-black text-black hover:bg-neutral-100"
         }`}
       >

@@ -250,6 +250,72 @@ export async function getEligibleReviewers(
   return sortedByQuality;
 }
 
+/**
+ * Get eligible peer reviewers (ArtistProfile) for a PEER package track.
+ * Matches on reviewGenres, excludes the track owner.
+ */
+export async function getEligiblePeerReviewers(
+  trackId: string,
+  db: Prisma.TransactionClient | typeof prisma = prisma
+) {
+  const track = await db.track.findUnique({
+    where: { id: trackId },
+    include: {
+      genres: true,
+      artist: { select: { id: true, userId: true } },
+    },
+  });
+
+  if (!track) return [];
+
+  const trackGenreIds = track.genres.map((g) => g.id);
+  const genreIds = await expandGenresForMatchingWithDb(db, trackGenreIds);
+
+  // Find artist profiles that:
+  // 1. Have completed onboarding
+  // 2. Have matching review genres
+  // 3. Are NOT the track owner
+  // 4. Haven't already reviewed this track
+  const peerReviewers = await (db.artistProfile as any).findMany({
+    where: {
+      completedOnboarding: true,
+      // Exclude the track owner
+      id: { not: track.artist.id },
+      // Must have matching review genres
+      reviewGenres: {
+        some: {
+          id: { in: genreIds },
+        },
+      },
+      // Exclude if already assigned as peer reviewer for this track
+      peerReviews: {
+        none: {
+          trackId: track.id,
+        },
+      },
+      peerQueueEntries: {
+        none: {
+          trackId: track.id,
+        },
+      },
+      // Must have a verified email
+      user: {
+        emailVerified: { not: null },
+      },
+    },
+    include: {
+      reviewGenres: true,
+      user: { select: { id: true, email: true } },
+    },
+    orderBy: [
+      { totalPeerReviews: "desc" },
+      { peerReviewRating: "desc" },
+    ],
+  });
+
+  return peerReviewers;
+}
+
 export async function assignReviewersToRecentTracks(limit = 20) {
   const tracks = await prisma.track.findMany({
     where: {
@@ -324,79 +390,114 @@ export async function assignReviewersToTrack(trackId: string) {
 
     if (neededReviews <= 0) return;
 
-    const eligibleReviewers = await getEligibleReviewers(
-      trackId,
-      track.packageType,
-      tx
-    );
+    // PEER package: assign ArtistProfile peer reviewers
+    // Legacy packages: assign ListenerProfile reviewers
+    const isPeerPackage = track.packageType === "PEER";
 
-    const existingReviewerIds = new Set(track.reviews.map((r) => r.reviewerId));
-    const eligibleUnique = eligibleReviewers.filter(
-      (r) => !existingReviewerIds.has(r.id)
-    );
+    if (isPeerPackage) {
+      const peerReviewers = await getEligiblePeerReviewers(trackId, tx);
+      const peersToAssign = peerReviewers.slice(0, neededReviews);
 
-    const packageConfig = (PACKAGES as unknown as Record<string, { minProReviews?: number }>)[
-      track.packageType
-    ];
-    const proReviewCap = Math.max(0, packageConfig?.minProReviews ?? 0);
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 48);
 
-    const proShortfall = Math.max(
-      0,
-      Math.min(proReviewCap, track.reviewsRequested) - existingProCount
-    );
-    const proSlotsToReserve = Math.min(proShortfall, neededReviews);
+      if (peersToAssign.length > 0) {
+        await (tx.reviewQueue as any).createMany({
+          data: peersToAssign.map((peer: any) => ({
+            trackId,
+            reviewerId: peer.id, // placeholder - required field
+            artistReviewerId: peer.id,
+            expiresAt,
+            priority: 0,
+          })),
+          skipDuplicates: true,
+        });
 
-    const proCandidates = eligibleUnique.filter((r) => r.tier === "PRO");
-    const proToAssign = proCandidates.slice(
-      0,
-      Math.min(proSlotsToReserve, proCandidates.length)
-    );
-    const proToAssignIds = new Set(proToAssign.map((r) => r.id));
+        await (tx.review as any).createMany({
+          data: peersToAssign.map((peer: any) => ({
+            trackId,
+            reviewerId: peer.id, // placeholder - required field
+            peerReviewerArtistId: peer.id,
+            isPeerReview: true,
+            status: "ASSIGNED",
+          })),
+          skipDuplicates: true,
+        });
+      }
+    } else {
+      // Legacy flow for STARTER/STANDARD/PRO/DEEP_DIVE packages
+      const eligibleReviewers = await getEligibleReviewers(
+        trackId,
+        track.packageType,
+        tx
+      );
 
-    // If we couldn't fill all PRO slots, make remaining slots available to NORMAL reviewers
-    const unfilledProSlots = proSlotsToReserve - proToAssign.length;
-    const nonProSlots = neededReviews - proSlotsToReserve + unfilledProSlots;
+      const existingReviewerIds = new Set(track.reviews.map((r) => r.reviewerId));
+      const eligibleUnique = eligibleReviewers.filter(
+        (r) => !existingReviewerIds.has(r.id)
+      );
 
-    const additionalCandidates = eligibleUnique.filter(
-      (r) => !proToAssignIds.has(r.id) && r.tier !== "PRO"
-    );
-    const additionalToAssign = additionalCandidates.slice(
-      0,
-      Math.min(nonProSlots, additionalCandidates.length)
-    );
+      const packageConfig = (PACKAGES as unknown as Record<string, { minProReviews?: number }>)[
+        track.packageType
+      ];
+      const proReviewCap = Math.max(0, packageConfig?.minProReviews ?? 0);
 
-    const reviewersToAssign = [...proToAssign, ...additionalToAssign];
+      const proShortfall = Math.max(
+        0,
+        Math.min(proReviewCap, track.reviewsRequested) - existingProCount
+      );
+      const proSlotsToReserve = Math.min(proShortfall, neededReviews);
 
-    // Create queue entries
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 48); // 48 hour expiration
+      const proCandidates = eligibleUnique.filter((r) => r.tier === "PRO");
+      const proToAssign = proCandidates.slice(
+        0,
+        Math.min(proSlotsToReserve, proCandidates.length)
+      );
+      const proToAssignIds = new Set(proToAssign.map((r) => r.id));
 
-    const priority =
-      track.packageType === "PRO" || track.packageType === "DEEP_DIVE"
-        ? 10
-        : track.packageType === "STANDARD"
-          ? 5
-          : 0;
+      const unfilledProSlots = proSlotsToReserve - proToAssign.length;
+      const nonProSlots = neededReviews - proSlotsToReserve + unfilledProSlots;
 
-    if (reviewersToAssign.length > 0) {
-      await tx.reviewQueue.createMany({
-        data: reviewersToAssign.map((reviewer) => ({
-          trackId,
-          reviewerId: reviewer.id,
-          expiresAt,
-          priority,
-        })),
-        skipDuplicates: true,
-      });
+      const additionalCandidates = eligibleUnique.filter(
+        (r) => !proToAssignIds.has(r.id) && r.tier !== "PRO"
+      );
+      const additionalToAssign = additionalCandidates.slice(
+        0,
+        Math.min(nonProSlots, additionalCandidates.length)
+      );
 
-      await tx.review.createMany({
-        data: reviewersToAssign.map((reviewer) => ({
-          trackId,
-          reviewerId: reviewer.id,
-          status: "ASSIGNED",
-        })),
-        skipDuplicates: true,
-      });
+      const reviewersToAssign = [...proToAssign, ...additionalToAssign];
+
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 48);
+
+      const priority =
+        track.packageType === "PRO" || track.packageType === "DEEP_DIVE"
+          ? 10
+          : track.packageType === "STANDARD"
+            ? 5
+            : 0;
+
+      if (reviewersToAssign.length > 0) {
+        await tx.reviewQueue.createMany({
+          data: reviewersToAssign.map((reviewer) => ({
+            trackId,
+            reviewerId: reviewer.id,
+            expiresAt,
+            priority,
+          })),
+          skipDuplicates: true,
+        });
+
+        await tx.review.createMany({
+          data: reviewersToAssign.map((reviewer) => ({
+            trackId,
+            reviewerId: reviewer.id,
+            status: "ASSIGNED",
+          })),
+          skipDuplicates: true,
+        });
+      }
     }
 
     // Track.status is not updated here.

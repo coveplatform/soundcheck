@@ -598,7 +598,7 @@ export default function Home() {
 
             {/* Pro Tier */}
             <div className="bg-purple-600 text-white border-2 border-black p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] relative rounded-2xl">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-lime-500 text-black text-xs font-black px-3 py-1 border-2 border-black">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs font-black px-3 py-1 border-2 border-black">
                 MOST POPULAR
               </div>
 
@@ -612,27 +612,27 @@ export default function Home() {
 
               <div className="space-y-3 text-left mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <div className="h-2 w-2 bg-purple-600 flex-shrink-0" />
                   <span className="text-sm font-bold">10 credits/month (no reviewing required)</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <div className="h-2 w-2 bg-purple-600 flex-shrink-0" />
                   <span className="text-sm font-semibold">PRO-tier artist reviews</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <div className="h-2 w-2 bg-purple-600 flex-shrink-0" />
                   <span className="text-sm font-semibold">Priority queue (24h turnaround)</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <div className="h-2 w-2 bg-purple-600 flex-shrink-0" />
                   <span className="text-sm font-semibold">Sell your music (keep 85%)</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <div className="h-2 w-2 bg-purple-600 flex-shrink-0" />
                   <span className="text-sm font-semibold">Analytics dashboard</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
+                  <div className="h-2 w-2 bg-purple-600 flex-shrink-0" />
                   <span className="text-sm font-semibold">Unlimited uploads</span>
                 </div>
               </div>
@@ -640,7 +640,7 @@ export default function Home() {
               <Link href="/signup">
                 <Button
                   size="lg"
-                  className="w-full bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out"
+                  className="w-full bg-purple-600 text-white hover:bg-purple-500 active:bg-purple-700 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out"
                 >
                   Get started free <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
