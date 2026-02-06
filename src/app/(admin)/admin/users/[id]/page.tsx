@@ -25,7 +25,7 @@ export default async function AdminUserDetailPage({
           artistName: true,
           subscriptionStatus: true,
           subscriptionTier: true,
-          freeReviewCredits: true,
+          reviewCredits: true,
           stripeCustomerId: true,
           tracks: { select: { id: true } },
         },
@@ -109,7 +109,7 @@ export default async function AdminUserDetailPage({
             </div>
             <div>
               <div className="text-neutral-500">Review Credits</div>
-              <div className="font-medium">{user.artistProfile.freeReviewCredits ?? 0}</div>
+              <div className="font-medium">{user.artistProfile.reviewCredits ?? 0}</div>
             </div>
           </div>
 

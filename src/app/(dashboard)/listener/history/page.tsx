@@ -1,3 +1,5 @@
-export const dynamic = "force-dynamic";
+import { redirect } from "next/navigation";
 
-export { default } from "../../reviewer/history/page";
+export default function Page() {
+  redirect("/review/history");
+}

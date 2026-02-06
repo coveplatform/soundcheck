@@ -1,1 +1,5 @@
-export { default } from "../../reviewer/onboarding/page";
+import { redirect } from "next/navigation";
+
+export default function Page() {
+  redirect("/onboarding");
+}

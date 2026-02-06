@@ -152,26 +152,44 @@ export async function POST(request: Request) {
       );
     }
 
+    // Support both legacy reviewer profiles AND peer reviewers (artist profiles)
     const reviewerProfile = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
       select: { id: true, isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
     });
 
-    if (!reviewerProfile) {
+    const artistProfile = await prisma.artistProfile.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true, completedOnboarding: true },
+    });
+
+    const isPeerReviewer = !reviewerProfile && !!artistProfile;
+
+    if (!reviewerProfile && !artistProfile) {
       return NextResponse.json(
-        { error: "Reviewer profile not found" },
+        { error: "Profile not found" },
         { status: 404 }
       );
     }
 
-    if (reviewerProfile.isRestricted) {
+    if (reviewerProfile?.isRestricted) {
       return NextResponse.json(
         { error: "Reviewer account restricted" },
         { status: 403 }
       );
     }
 
-    if (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed) {
+    if (reviewerProfile && (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed)) {
+      // Legacy reviewer hasn't completed old onboarding
+      if (!artistProfile?.completedOnboarding) {
+        return NextResponse.json(
+          { error: "Please complete onboarding before submitting reviews" },
+          { status: 403 }
+        );
+      }
+    }
+
+    if (isPeerReviewer && !artistProfile?.completedOnboarding) {
       return NextResponse.json(
         { error: "Please complete onboarding before submitting reviews" },
         { status: 403 }
@@ -243,8 +261,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: weakestPartError }, { status: 400 });
     }
 
-    // Calculate earnings based on tier
-    const earnings = getTierRateCents(review.reviewer.tier);
+    // Calculate earnings: peer reviewers earn credits (0 cash), legacy reviewers earn cash
+    const earnings = isPeerReviewer ? 0 : getTierRateCents(review.reviewer.tier);
 
     const now = new Date();
     const startOfToday = new Date(now);
@@ -336,20 +354,32 @@ export async function POST(request: Request) {
         return { updated: false as const, reason: "UNKNOWN" as const };
       }
 
-      await tx.listenerProfile.update({
-        where: { id: review.reviewerId },
-        data: {
-          totalReviews: { increment: 1 },
-          pendingBalance: { increment: earnings },
-          totalEarnings: { increment: earnings },
-          lastReviewDate: now,
-          reviewsToday:
-            review.reviewer.lastReviewDate &&
-            review.reviewer.lastReviewDate >= startOfToday
-              ? { increment: 1 }
-              : 1,
-        },
-      });
+      // Update reviewer profile: legacy reviewers get cash, peer reviewers get credits
+      if (isPeerReviewer && artistProfile) {
+        await (tx.artistProfile as any).update({
+          where: { id: artistProfile.id },
+          data: {
+            reviewCredits: { increment: 1 },
+            totalCreditsEarned: { increment: 1 },
+            totalPeerReviews: { increment: 1 },
+          },
+        });
+      } else {
+        await tx.listenerProfile.update({
+          where: { id: review.reviewerId },
+          data: {
+            totalReviews: { increment: 1 },
+            pendingBalance: { increment: earnings },
+            totalEarnings: { increment: earnings },
+            lastReviewDate: now,
+            reviewsToday:
+              review.reviewer.lastReviewDate &&
+              review.reviewer.lastReviewDate >= startOfToday
+                ? { increment: 1 }
+                : 1,
+          },
+        });
+      }
 
       // Persist timestamp notes in normalized form (best-effort)
       if (data.timestamps && data.timestamps.length > 0) {

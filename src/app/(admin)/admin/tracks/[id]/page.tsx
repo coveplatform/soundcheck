@@ -157,7 +157,7 @@ export default async function AdminTrackDetailPage({
               </span>
             )}
             <span className="ml-2 text-sm text-neutral-400">
-              {track.artist.freeReviewCredits} credits remaining
+              {track.artist.reviewCredits} credits remaining
             </span>
           </div>
         </div>

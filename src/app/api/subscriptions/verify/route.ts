@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         subscriptionStatus: true,
         subscriptionTier: true,
         subscriptionCurrentPeriodEnd: true,
-        freeReviewCredits: true,
+        reviewCredits: true,
       },
     });
 
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
         status: "active",
         tier: artistProfile.subscriptionTier,
         currentPeriodEnd: artistProfile.subscriptionCurrentPeriodEnd,
-        credits: artistProfile.freeReviewCredits,
+        credits: artistProfile.reviewCredits,
         source: "database",
       });
     }
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
         status: artistProfile.subscriptionStatus || "none",
         tier: null,
         currentPeriodEnd: null,
-        credits: artistProfile.freeReviewCredits,
+        credits: artistProfile.reviewCredits,
         source: "database",
       });
     }
@@ -90,8 +90,8 @@ export async function POST(request: Request) {
             subscriptionStatus: "active",
             subscriptionTier: "pro",
             subscriptionCurrentPeriodEnd: currentPeriodEnd,
-            // Grant credits if this is a new activation
-            freeReviewCredits: Math.max(artistProfile.freeReviewCredits ?? 0, 20),
+            // Grant 10 credits for Pro activation
+            reviewCredits: { increment: 10 },
           },
         });
 
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
           status: "active",
           tier: "pro",
           currentPeriodEnd: currentPeriodEnd,
-          credits: updatedProfile.freeReviewCredits,
+          credits: updatedProfile.reviewCredits,
           source: "stripe_sync",
         });
       }
@@ -113,7 +113,7 @@ export async function POST(request: Request) {
         status: artistProfile.subscriptionStatus || "none",
         tier: artistProfile.subscriptionTier,
         currentPeriodEnd: artistProfile.subscriptionCurrentPeriodEnd,
-        credits: artistProfile.freeReviewCredits,
+        credits: artistProfile.reviewCredits,
         source: "stripe_verified",
       });
     } catch (stripeError) {
@@ -123,7 +123,7 @@ export async function POST(request: Request) {
         status: artistProfile.subscriptionStatus || "none",
         tier: artistProfile.subscriptionTier,
         currentPeriodEnd: artistProfile.subscriptionCurrentPeriodEnd,
-        credits: artistProfile.freeReviewCredits,
+        credits: artistProfile.reviewCredits,
         source: "database_fallback",
       });
     }

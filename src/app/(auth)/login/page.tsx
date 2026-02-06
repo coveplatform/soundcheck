@@ -49,12 +49,7 @@ export default function LoginPage() {
       .then((session) => {
         if (cancelled) return;
         if (session?.user) {
-          const defaultUrl = session.user.isArtist
-            ? "/artist/dashboard"
-            : session.user.isReviewer
-            ? "/reviewer/dashboard"
-            : "/";
-          router.replace(defaultUrl);
+          router.replace("/dashboard");
           router.refresh();
           return;
         }
@@ -121,13 +116,7 @@ export default function LoginPage() {
         }
         setIsLoading(false);
       } else {
-        const session = await getSession();
-        const defaultUrl = session?.user?.isArtist
-          ? "/artist/dashboard"
-          : session?.user?.isReviewer
-          ? "/reviewer/dashboard"
-          : "/";
-        const target = callbackUrl && callbackUrl !== "/" ? callbackUrl : defaultUrl;
+        const target = callbackUrl && callbackUrl !== "/" ? callbackUrl : "/dashboard";
         // Keep loading state active during navigation
         router.push(target);
         router.refresh();

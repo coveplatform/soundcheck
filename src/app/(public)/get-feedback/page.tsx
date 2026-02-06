@@ -1249,7 +1249,7 @@ export default function GetFeedbackPage() {
                       setEmail(nextEmail);
                       await captureLead();
 
-                      const callbackUrl = "/artist/dashboard";
+                      const callbackUrl = "/dashboard";
                       let exists = false;
                       try {
                         exists = await checkEmailExists(nextEmail);

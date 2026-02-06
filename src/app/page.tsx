@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Caveat } from "next/font/google";
 import { Button } from "@/components/ui/button";
-import { Headphones, ArrowRight, CheckCircle2, Lock } from "lucide-react";
+import { Headphones, ArrowRight, CheckCircle2, Lock, Upload, MessageSquare, Music } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
 import { TrackReportDemo } from "@/components/landing/track-report-demo";
@@ -99,11 +99,11 @@ export default function Home() {
       <section className=" overflow-visible bg-[#faf8f5]">
         <div className="max-w-3xl mx-auto px-4 py-12 sm:py-16 text-center relative">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-neutral-950 leading-[1.05]">
-            A home for your music to <span className="text-purple-600">grow</span>
+            Free feedback from <span className="text-purple-600">fellow artists</span>
           </h1>
 
           <p className="mt-6 text-neutral-700 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
-            Upload your tracks. Get real feedback from people who love your genre. Earn when others discover and share your music.
+            Upload your track, review others in your genre, and earn credits for feedback on your own music. No pay walls, no gatekeepers -- just artists helping artists grow.
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3">
@@ -115,7 +115,7 @@ export default function Home() {
                 Get started free <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <span className="text-sm text-neutral-500">Start free • 5 reviews included</span>
+            <span className="text-sm text-neutral-500">Earn credits by reviewing -- spend them on feedback</span>
           </div>
         </div>
       </section>
@@ -133,10 +133,70 @@ export default function Home() {
               <p className="text-[10px] sm:text-xs text-neutral-500">Avg turnaround</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl sm:text-4xl font-bold text-neutral-950 mb-1">$18,342</p>
-              <p className="text-[10px] sm:text-xs text-neutral-500">Paid to reviewers</p>
+              <p className="text-2xl sm:text-4xl font-bold text-neutral-950 mb-1">1,200+</p>
+              <p className="text-[10px] sm:text-xs text-neutral-500">Artists in the community</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-12 sm:py-16 bg-[#faf8f5]">
+        <div className="max-w-5xl mx-auto px-4">
+          <AnimatedSection className="text-center mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold">How it works</h2>
+            <p className="mt-3 text-neutral-600 max-w-2xl mx-auto">
+              A simple credit system that keeps feedback flowing. Give a review, get a review.
+            </p>
+          </AnimatedSection>
+
+          <AnimatedSection>
+            <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
+              {/* Step 1 */}
+              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
+                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Upload className="h-7 w-7 text-purple-600" />
+                </div>
+                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 1</div>
+                <h3 className="text-lg font-bold mb-2">Upload your track</h3>
+                <p className="text-sm text-neutral-600">
+                  Drop in your mix or stems. We match it with artists who know your genre.
+                </p>
+              </div>
+
+              {/* Step 2 */}
+              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
+                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Headphones className="h-7 w-7 text-purple-600" />
+                </div>
+                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 2</div>
+                <h3 className="text-lg font-bold mb-2">Review others</h3>
+                <p className="text-sm text-neutral-600">
+                  Listen to tracks in your genre and give honest, structured feedback. Each review earns you a credit.
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
+                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="h-7 w-7 text-purple-600" />
+                </div>
+                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 3</div>
+                <h3 className="text-lg font-bold mb-2">Get feedback</h3>
+                <p className="text-sm text-neutral-600">
+                  Spend credits to get reviews on your own tracks. The more you give, the more you get.
+                </p>
+              </div>
+            </div>
+
+            {/* Credit cycle reminder */}
+            <div className="mt-8 text-center">
+              <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-full px-5 py-2.5">
+                <Music className="h-4 w-4 text-purple-600" />
+                <span className="text-sm font-semibold text-purple-700">Give a review, earn a credit. Spend a credit, get a review.</span>
+              </div>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
@@ -154,7 +214,7 @@ export default function Home() {
           <AnimatedSection className="max-w-2xl mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold">See what&apos;s working</h2>
             <p className="mt-3 text-neutral-600">
-              Get multiple reviews on your track. We show you patterns. When 4 out of 5 people say the same thing, that&apos;s not taste—that&apos;s signal.
+              Get multiple reviews on your track. We show you patterns. When 4 out of 5 people say the same thing, that&apos;s not taste -- that&apos;s signal.
             </p>
           </AnimatedSection>
 
@@ -174,7 +234,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Artist Earnings - NEW */}
+      {/* Artist Earnings */}
       <section className="pb-12 sm:pb-16 pt-0 bg-neutral-900 text-neutral-50 overflow-visible font-sans">
         <div className="w-full overflow-hidden bg-purple-400/10">
           <div className="h-12 flex items-center">
@@ -191,9 +251,9 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-4 pt-6 sm:pt-8">
           <div className="grid gap-8 md:gap-10 md:grid-cols-2 lg:grid-cols-[1fr_380px] items-center">
             <AnimatedSection className="is-visible max-w-xl text-center md:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold">Fans discover and buy your music</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold">PRO artists sell their music</h2>
               <p className="mt-3 text-neutral-300">
-                Every track gets a public page. Share it anywhere. When listeners buy through your link, you earn $0.50 per sale. Reviewers who love your track can promote it to their audience and earn a commission—getting your music in front of the right people.
+                Every track gets a public page. Share it anywhere. When listeners buy through your link, you keep 85% of the sale. Upgrade to PRO to unlock selling and get your music discovered by the right people.
               </p>
 
               <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
@@ -220,11 +280,11 @@ export default function Home() {
                   <div className="text-[9px] font-bold text-white/80 uppercase tracking-wider">Your Balance</div>
                   <div className="text-lg font-extrabold text-white">$12.50</div>
                 </div>
-                
+
                 {/* Recent sales list */}
                 <div className="p-3 space-y-1.5">
                   <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider px-1 mb-2">Recent Sales</div>
-                  
+
                   <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
                     <img src="/activity-artwork/1.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
                     <div className="flex-1 min-w-0">
@@ -233,7 +293,7 @@ export default function Home() {
                     </div>
                     <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
                     <img src="/activity-artwork/5.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
                     <div className="flex-1 min-w-0">
@@ -242,7 +302,7 @@ export default function Home() {
                     </div>
                     <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
                     <img src="/activity-artwork/9.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
                     <div className="flex-1 min-w-0">
@@ -252,10 +312,10 @@ export default function Home() {
                     <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
                   </div>
                 </div>
-                
+
                 {/* Footer */}
                 <div className="px-4 py-2.5 bg-black/20 border-t border-white/5 text-center">
-                  <span className="text-[11px] text-neutral-400">Earn <span className="text-blue-400 font-semibold">$0.50</span> every time someone buys your track</span>
+                  <span className="text-[11px] text-neutral-400">PRO feature: Keep <span className="text-blue-400 font-semibold">85%</span> of every sale</span>
                 </div>
               </div>
             </AnimatedSection>
@@ -286,7 +346,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stem Upload Feature - NEW */}
+      {/* Stem Upload Feature */}
       <section className="pb-12 sm:pb-16 pt-0 bg-neutral-900 text-neutral-50 overflow-visible">
         <div className="w-full overflow-hidden bg-purple-400/10">
           <div className="h-12 flex items-center">
@@ -305,7 +365,7 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl font-bold">Drop in your DAW file. Get feedback on every layer.</h2>
             <p className="mt-3 text-neutral-300">
               Upload your Ableton Live Set (.als), Logic project, or exported stems.
-              Reviewers can mute/solo each element to give you precise feedback on your mix.
+              Fellow artists can mute/solo each element to give you precise feedback on your mix.
             </p>
           </AnimatedSection>
 
@@ -442,7 +502,7 @@ export default function Home() {
 
               <div className="mt-6 pt-6 border-t border-neutral-700">
                 <p className="text-sm text-neutral-400 text-center">
-                  No special software needed. Upload stems directly from your DAW, and reviewers use our built-in stem player.
+                  No special software needed. Upload stems directly from your DAW, and fellow artists use our built-in stem player to give precise feedback.
                 </p>
               </div>
             </div>
@@ -454,9 +514,9 @@ export default function Home() {
       <section className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
         <div className="max-w-5xl mx-auto px-4">
           <AnimatedSection className="max-w-2xl mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">A community of listeners</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold">A community of artists helping artists</h2>
             <p className="mt-3 text-neutral-600">
-              Your tracks are automatically shown to reviewers who selected your genre. They get paid to listen deeply and give structured feedback. When they love your music, they can promote it to their audience—getting your tracks heard by the right people.
+              Your tracks are automatically shown to artists who share your genre. Everyone reviews, everyone gets reviewed. Quality stays high because every reviewer is rated after each review.
             </p>
           </AnimatedSection>
 
@@ -486,32 +546,43 @@ export default function Home() {
       {/* Pricing */}
       <section id="pricing" className="py-16 bg-neutral-900 text-neutral-50">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-12">Simple Pricing</h2>
-          
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-4">Simple Pricing</h2>
+          <p className="text-center text-neutral-400 mb-12 max-w-xl mx-auto">
+            Start free and earn feedback by reviewing. Or go PRO to skip the queue and unlock premium features.
+          </p>
+
           <div className="grid md:grid-cols-2 gap-8">
             {/* Free Tier */}
             <div className="bg-neutral-800 border-2 border-neutral-700 rounded-2xl p-8">
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-purple-400 mb-2">Free</h3>
                 <div className="text-4xl font-extrabold">$0</div>
-                <p className="text-sm text-neutral-400 mt-2">Perfect to get started</p>
+                <p className="text-sm text-neutral-400 mt-2">Forever free</p>
               </div>
-              
+
               <div className="space-y-3 text-left">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">5 review credits</span>
+                  <span className="text-sm text-neutral-50">Upload tracks</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Up to 3 track uploads</span>
+                  <span className="text-sm text-neutral-50">Earn credits by reviewing others</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm text-neutral-50">Peer feedback from fellow artists</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm text-neutral-50">Genre matching</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                   <span className="text-sm text-neutral-50">Public track pages</span>
                 </div>
               </div>
-              
+
               <div className="mt-6">
                 <Link href="/signup">
                   <Button
@@ -526,11 +597,11 @@ export default function Home() {
             </div>
 
             {/* Pro Tier */}
-            <div className="bg-purple-600 text-white border-2 border-black p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] relative">
+            <div className="bg-purple-600 text-white border-2 border-black p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] relative rounded-2xl">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-lime-500 text-black text-xs font-black px-3 py-1 border-2 border-black">
                 MOST POPULAR
               </div>
-              
+
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-black mb-2">Pro</h3>
                 <div className="text-5xl font-black">
@@ -538,56 +609,44 @@ export default function Home() {
                 </div>
                 <p className="text-sm text-purple-100 mt-2 font-semibold">For serious artists</p>
               </div>
-              
+
               <div className="space-y-3 text-left mb-6">
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
-                  <span className="text-sm font-bold">20 review credits every month</span>
+                  <span className="text-sm font-bold">10 credits/month (no reviewing required)</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
-                  <span className="text-sm font-semibold">Unlimited track uploads</span>
+                  <span className="text-sm font-semibold">PRO-tier artist reviews</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
-                  <span className="text-sm font-semibold">Earn from sales</span>
+                  <span className="text-sm font-semibold">Priority queue (24h turnaround)</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
-                  <span className="text-sm font-semibold">Upload stems for detailed feedback</span>
+                  <span className="text-sm font-semibold">Sell your music (keep 85%)</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
-                  <span className="text-sm font-semibold">Auto-matched to genre reviewers</span>
+                  <span className="text-sm font-semibold">Analytics dashboard</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
-                  <span className="text-sm font-semibold">Priority review queue</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
-                  <span className="text-sm font-semibold">Full analytics & insights</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-lime-500 flex-shrink-0" />
-                  <span className="text-sm font-semibold">Affiliate link tracking</span>
+                  <span className="text-sm font-semibold">Unlimited uploads</span>
                 </div>
               </div>
-              
+
               <Link href="/signup">
                 <Button
                   size="lg"
                   className="w-full bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out"
                 >
-                  Start with Pro <ArrowRight className="ml-2 h-4 w-4" />
+                  Get started free <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>
           </div>
-
-          <p className="mt-8 text-center text-sm text-neutral-400 font-semibold">
-            Need more reviews? Buy extra credits for $4.95 per 5 reviews anytime.
-          </p>
         </div>
       </section>
 
@@ -599,35 +658,35 @@ export default function Home() {
             {[
               {
                 q: "What is MixReflect?",
-                a: "A platform where your music has a home. Upload tracks, get structured feedback from genre-matched listeners, and earn money when listeners choose to buy your music. It's part feedback tool, part discovery platform, part income stream.",
+                a: "A peer-to-peer feedback platform for music creators. Upload your tracks, review other artists in your genre, and earn credits you can spend to get feedback on your own music. It's artists helping artists -- no middlemen, no gatekeepers.",
               },
               {
-                q: "How do I earn money?",
-                a: "You earn $0.50 whenever someone buys your track through your public track page. Share your links anywhere, and get paid every time. Reviewers who love your music can also promote it to their audience and earn a commission, driving more sales your way.",
+                q: "How do credits work?",
+                a: "Every time you review another artist's track, you earn a credit. Spend that credit to get a review on one of your own tracks. It's a simple give-one-get-one system that keeps quality feedback flowing. PRO members get 10 credits per month included, no reviewing required.",
               },
               {
-                q: "How does sharing work?",
-                a: "When reviewers discover a track they love, they can share it with their audience. If their fans buy through that link, the reviewer earns a commission. It's a way for tastemakers to get rewarded for spreading good music—and artists benefit from the exposure.",
+                q: "Is it really free?",
+                a: "Yes. Free users can upload tracks and earn unlimited credits by reviewing others. There's no cap on how much feedback you can get -- just keep reviewing and keep earning. PRO is for artists who want credits without reviewing, plus premium features like selling music and analytics.",
+              },
+              {
+                q: "Who reviews my tracks?",
+                a: "Other artists on the platform who share your genre. Everyone is both an artist and a reviewer. After each review, you rate the quality -- low-rated reviewers lose access, so the feedback stays useful and honest.",
               },
               {
                 q: "Why do I need multiple reviews?",
                 a: "One person's feedback is just their taste. With multiple reviews, patterns emerge. If one person says your intro is too long, maybe they're wrong. If most reviewers say it, that's signal worth acting on.",
               },
               {
-                q: "Who are the reviewers?",
-                a: "Real listeners who selected genres they genuinely love. They're rated by artists after every review—low ratings mean they earn less and eventually lose access. Quality stays high because it has to.",
+                q: "What does PRO include?",
+                a: "PRO ($9.95/mo) gives you 10 credits every month without reviewing, access to PRO-tier artist reviews, priority queue with 24-hour turnaround, the ability to sell your music and keep 85%, an analytics dashboard, and unlimited uploads.",
               },
               {
                 q: "Is my music safe?",
-                a: "Yes. Your unreleased tracks are only heard by reviewers you're matched with. We never share, publish, or leak anything. Once you're ready to release, your track page becomes public.",
+                a: "Yes. Your unreleased tracks are only heard by genre-matched artists reviewing your work. We never share, publish, or leak anything. Once you're ready to release, your track page becomes public.",
               },
               {
-                q: "What do I get with my subscription?",
-                a: "20 reviews per month, unlimited track uploads, your own track pages, and earnings when listeners buy your track. Need more reviews? Add them anytime for $5.",
-              },
-              {
-                q: "Can I cancel?",
-                a: "Yes, anytime. Your tracks stay on the platform and keep earning—you just won't get new reviews until you resubscribe.",
+                q: "Can I cancel PRO?",
+                a: "Yes, anytime. Your tracks and any unspent credits stay on the platform. You can still earn credits by reviewing -- you just lose PRO perks like the monthly credit grant and priority queue.",
               },
             ].map((item, i, arr) => (
               <details
@@ -640,32 +699,6 @@ export default function Home() {
                 <p className="mt-3 text-neutral-700">{item.a}</p>
               </details>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* For Reviewers */}
-      <section id="for-reviewers" className="py-12 bg-neutral-900 text-neutral-50 border-t border-neutral-800">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex flex-col items-center text-center md:text-left md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-                <div className="h-10 w-10 bg-orange-500/20 border border-orange-500/30 rounded-xl flex items-center justify-center">
-                  <Headphones className="h-5 w-5 text-orange-300" />
-                </div>
-                <h2 className="text-2xl font-bold">Love discovering new music?</h2>
-              </div>
-              <p className="text-neutral-300">
-                Get paid to listen and give feedback. Earn $0.50–$1.50 per review.
-              </p>
-            </div>
-            <Link href="/signup" className="shrink-0 self-stretch md:self-auto">
-              <Button
-                className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
-              >
-                Become a Reviewer
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
@@ -699,7 +732,7 @@ export default function Home() {
               <span>Secure payments powered by</span>
               <span className="font-bold text-neutral-200 tracking-tight">Stripe</span>
             </div>
-            <span className="hidden sm:inline text-neutral-600">•</span>
+            <span className="hidden sm:inline text-neutral-600">&bull;</span>
             <div className="flex items-center gap-1.5">
               <svg className="h-4 w-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M9 12l2 2 4-4"/>

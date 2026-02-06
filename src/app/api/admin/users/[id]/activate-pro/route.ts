@@ -31,7 +31,7 @@ export async function POST(
             id: true,
             subscriptionStatus: true,
             subscriptionTier: true,
-            freeReviewCredits: true,
+            reviewCredits: true,
           },
         },
       },
@@ -54,8 +54,8 @@ export async function POST(
       data: {
         subscriptionStatus: "active",
         subscriptionTier: "pro",
-        // Grant 20 credits if they have less
-        freeReviewCredits: Math.max(user.artistProfile.freeReviewCredits ?? 0, 20),
+        // Grant 10 Pro credits
+        reviewCredits: { increment: 10 },
       },
     });
 
@@ -67,7 +67,7 @@ export async function POST(
       profile: {
         subscriptionStatus: updatedProfile.subscriptionStatus,
         subscriptionTier: updatedProfile.subscriptionTier,
-        freeReviewCredits: updatedProfile.freeReviewCredits,
+        reviewCredits: updatedProfile.reviewCredits,
       },
     });
   } catch (error) {

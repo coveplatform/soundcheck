@@ -374,7 +374,7 @@ export async function sendReviewProgressEmail(
       <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
         Your feedback is ready! Log in to read all reviews and rate them.
       </p>
-      ${emailButton("View Your Reviews", "https://mixreflect.com/artist/dashboard")}
+      ${emailButton("View Your Reviews", "https://mixreflect.com/dashboard")}
     `
     : `
       <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
@@ -391,7 +391,7 @@ export async function sendReviewProgressEmail(
       <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
         Reviews are coming in! You can already view completed reviews in your dashboard.
       </p>
-      ${emailButton("View Progress", "https://mixreflect.com/artist/dashboard", "secondary")}
+      ${emailButton("View Progress", "https://mixreflect.com/dashboard", "secondary")}
     `;
 
   await sendEmail({
@@ -468,7 +468,7 @@ export async function sendInvalidTrackLinkEmail(params: {
 }) {
   if (!params.to) return;
 
-  const trackPageUrl = `https://mixreflect.com/artist/tracks/${params.trackId}`;
+  const trackPageUrl = `https://mixreflect.com/tracks/${params.trackId}`;
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
@@ -538,7 +538,7 @@ export async function sendTrialReminderEmail(params: {
     <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Submit any track — SoundCloud, Bandcamp, or YouTube link — and get real feedback within 24 hours.
     </p>
-    ${emailButton("Submit Your Track", "https://mixreflect.com/artist/submit")}
+    ${emailButton("Submit Your Track", "https://mixreflect.com/submit")}
     <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
       <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
         Honest feedback on your music from real listeners.
@@ -628,7 +628,7 @@ export function previewTrialReminderEmail(artistName: string): string {
     <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Submit any track — SoundCloud, Bandcamp, or YouTube link — and get real feedback within 24 hours.
     </p>
-    ${emailButton("Submit Your Track", "https://mixreflect.com/artist/submit")}
+    ${emailButton("Submit Your Track", "https://mixreflect.com/submit")}
     <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
       <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
         Honest feedback on your music from real listeners.

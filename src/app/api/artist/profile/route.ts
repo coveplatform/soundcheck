@@ -63,7 +63,7 @@ export async function POST(request: Request) {
       data: {
         userId: session.user.id,
         artistName,
-        freeReviewCredits: 5,
+        reviewCredits: 2,
         ...(genreIds && genreIds.length > 0
           ? {
               genres: {
@@ -125,7 +125,7 @@ export async function GET() {
       ...profile,
       totalTracks: profile.tracks.length,
       subscriptionStatus: profile.subscriptionStatus,
-      freeReviewCredits: profile.freeReviewCredits,
+      reviewCredits: profile.reviewCredits,
     };
 
     return NextResponse.json(response);

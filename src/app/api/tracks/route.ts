@@ -14,7 +14,8 @@ const createTrackSchema = z.object({
   bpm: z.number().int().min(1).max(999).optional(),
   genreIds: z.array(z.string()).min(1, "Select at least one genre").max(3),
   feedbackFocus: z.string().max(1000).optional(),
-  packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE"]).optional(),
+  packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE", "PEER"]).optional(),
+  reviewsRequested: z.number().int().min(1).max(10).optional(),
   allowPurchase: z.boolean().optional(),
   isPublic: z.boolean().optional(),
   hasStems: z.boolean().optional(),
@@ -55,16 +56,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check subscription & upload limit
     const isSubscribed = artistProfile.subscriptionStatus === "active";
-    const hasFreeTrial = artistProfile.totalTracks < 1;
-
-    if (!isSubscribed && !hasFreeTrial) {
-      return NextResponse.json(
-        { error: "Subscribe to upload more tracks" },
-        { status: 403 }
-      );
-    }
 
     const body = await request.json();
     const data = createTrackSchema.parse(body);
@@ -108,8 +100,13 @@ export async function POST(request: Request) {
 
     const shouldRequestReviews = !!data.packageType;
 
-    const packageType: PackageType = (data.packageType ?? "STANDARD") as PackageType;
-    const packageDetails = PACKAGES[packageType];
+    const packageType: PackageType = (data.packageType ?? "PEER") as PackageType;
+    const isPeerPackage = packageType === "PEER";
+
+    // For PEER packages, reviewsRequested comes from credits spent
+    const reviewsRequested = isPeerPackage
+      ? (data.reviewsRequested ?? 0)
+      : PACKAGES[packageType].reviews;
 
     const createData = {
       artistId: artistProfile.id,
@@ -123,7 +120,8 @@ export async function POST(request: Request) {
       isPublic: data.isPublic ?? false,
       hasStems: data.hasStems ?? false,
       packageType,
-      reviewsRequested: shouldRequestReviews ? packageDetails.reviews : 0,
+      reviewsRequested: shouldRequestReviews ? reviewsRequested : 0,
+      creditsSpent: isPeerPackage && shouldRequestReviews ? reviewsRequested : 0,
       status: shouldRequestReviews ? undefined : ("UPLOADED" as any),
       // Only allow purchases for uploaded tracks AND Pro subscribers
       allowPurchase: sourceType === "UPLOAD" && isSubscribed ? (data.allowPurchase ?? false) : false,

@@ -41,7 +41,7 @@ export default async function AdminTracksPage({
       artist: {
         select: {
           subscriptionStatus: true,
-          freeReviewCredits: true,
+          reviewCredits: true,
           user: { select: { id: true, email: true } },
         },
       },
