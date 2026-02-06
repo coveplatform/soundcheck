@@ -64,7 +64,7 @@ The 87% of tracks that never got paid reviews represent latent demand. Those art
 
 ---
 
-## 3. Strategic Options
+## 3. Strategic Options Considered
 
 ### Option A: Keep Current Model, Improve Margins
 
@@ -73,14 +73,14 @@ The 87% of tracks that never got paid reviews represent latent demand. Those art
 - Use AI to supplement reviews → cheaper but artists will notice, erodes trust
 - **Verdict: Band-aid. Does not fix the structural margin problem.**
 
-### Option B: Peer-to-Peer Credit Exchange (Recommended Core Change)
+### Option B: Peer-to-Peer Credit Exchange
 
 Artists review other artists' tracks to earn credits. Use credits to get reviews on your own tracks.
 
 - Eliminates reviewer payouts entirely
-- Margins go from 15% to ~85%+ (just Stripe + infrastructure)
+- Margins go from 15% to ~94% (just Stripe + infrastructure)
 - Creates community engagement loop
-- **Verdict: Best structural fix. Solves the margin problem permanently.**
+- **Verdict: Best structural fix. Recommended path. Details below.**
 
 ### Option C: Full Pivot to Community/Social Platform
 
@@ -88,123 +88,220 @@ Artists review other artists' tracks to earn credits. Use credits to get reviews
 - Monetize via tools, promotion, distribution
 - **Verdict: Bigger bet, longer timeline, less proven. Not recommended yet.**
 
-### Option D: Hybrid (Recommended Strategy)
-
-Peer reviews as the base layer. Paid premium reviewers as an upgrade. Best of both worlds.
-
-- **Verdict: This is the path. Details below.**
-
 ---
 
-## 4. Recommended Model: Peer-to-Peer + Premium Hybrid
+## 4. Recommended Model: Peer-to-Peer Credit Exchange
 
-### How It Works
+### The Credit System
 
-#### Free Tier (The Engine)
+The entire model runs on one simple rule:
 
-1. Artist signs up and uploads a track
-2. To get reviews, they need **credits**
-3. To earn credits, they **review other artists' tracks**
-4. Exchange rate: **1 review given = 1 credit earned**
-5. Submitting a track for feedback costs 3-5 credits
-6. New users get 1-2 free credits to experience getting reviewed
+```
+1 credit = 1 review on your track
+1 review you give = 1 credit earned
+```
 
-**Cost to you per review: $0.00**
-**Margin on the free tier: 100% (no payment, no cost)**
+This ratio is critical. It's the only one that balances:
 
-This turns your biggest cost center into a community feature. Artists give better feedback than random listeners anyway — they understand production, mixing, arrangement, and songwriting.
+- Artist spends 5 credits → creates 5 review tasks
+- 5 other artists each complete 1 review → 5 credits created
+- Credits destroyed: 5. Credits created: 5. Net: 0.
 
-#### Quality Control for Peer Reviews
+No inflation. No deflation. Self-sustaining at any scale.
 
-This is the #1 risk. Lazy "nice track bro" reviews will kill the platform. Mitigations:
+### How It Works End-to-End
 
-- **Keep your existing structured review form** — it forces substantive feedback
-- **Minimum listen time (3 min)** — already built
+```
+STEP 1: Artist uploads a track
+        → Chooses how many peer reviews they want (3, 5, or 10)
+        → That many credits are deducted from their balance
+
+STEP 2: Track enters the "needs reviews" queue
+        → Genre-matched artists see it in their review feed
+        → Uses existing genre hierarchy matching (queue.ts)
+
+STEP 3: Another artist picks it up, listens 3+ minutes,
+        fills out the structured review form
+        → Quality gates check: word count, listen time, specificity
+        → If it passes: reviewer earns 1 credit
+        → If it fails (lazy review): no credit, review rejected
+
+STEP 4: Remaining review slots filled by other artists
+        → Track owner gets notified as reviews come in
+
+STEP 5: Track owner reads feedback, rates each review
+        → "Gem" reviews boost the reviewer's queue priority
+        → Flagged reviews deprioritize the reviewer
+```
+
+**Cost to the platform per review: $0.00**
+
+### New User Bootstrap
+
+```
+Artist signs up → gets 2 free credits
+  → Uploads first track, requests 2 reviews (spends 2 credits)
+  → Gets 2 reviews, sees value immediately
+  → Balance: 0 credits
+  → Reviews 5 other artists' tracks → earns 5 credits
+  → Submits second track for 5 reviews
+  → Cycle continues
+```
+
+The 2 free credits are the customer acquisition cost. In the current model, 1 free credit costs $0.50 in reviewer payout. In the new model, 2 free credits cost **$0.00** because they're fulfilled by other artists.
+
+### Supply/Demand Self-Correction
+
+The credit economy is self-balancing:
+
+```
+High demand (lots of tracks, few reviewers):
+  → Queue grows, artists who want fast feedback start reviewing to earn credits
+  → Supply increases to meet demand
+
+Low demand (few tracks, lots of reviewers):
+  → Nothing to review, can't earn credits
+  → Artists submit their own tracks to create demand
+  → Demand increases to meet supply
+```
+
+### Who Are PRO Reviewers?
+
+PRO reviewers are NOT a separate hired workforce. They are artists who have proven themselves on the platform:
+
+- **50+ reviews completed with 4.7+ average rating**, OR
+- **10+ gem reviews**
+
+This logic already exists in `calculateTier()` and `updateReviewerTier()` in `queue.ts`. PRO reviewers are simply the best artists on the platform who give the most valuable feedback.
+
+They review to earn credits just like everyone else. The "PRO" label means:
+- Their reviews get highlighted/shown first to the track owner
+- They get first pick of the review queue (newest, most interesting tracks)
+- They get a profile badge
+- Pro subscriber tracks get matched to them preferentially
+
+**No cash payouts to anyone. PRO is a status tier, not a payment tier.**
+
+### Quality Control
+
+This is the #1 risk. Lazy "nice track bro" reviews would kill the platform. Mitigations (most already built):
+
+- **Structured review form** — forces substantive feedback (first impression, production/vocal/originality scores, best/weakest parts with timestamps, engagement signals)
+- **3-minute minimum listen time** — enforced via heartbeat tracking (already built)
 - **Word count minimums** — already built
-- **Rating system** — artists rate reviews they receive. Low-rated reviewers get shadow-deprioritized
-- **Credit penalties** — reviews flagged as low-effort don't earn a credit
-- **"Gem" system** — already built. Excellent reviewers get priority queue placement
-- **Review rejection** — if a review doesn't meet quality thresholds, no credit awarded
-
-Most of this infrastructure already exists in your codebase. The quality gates in `src/lib/queue.ts` and the rating/flagging system can be reused directly.
+- **Credit denial** — reviews that fail quality checks earn 0 credits
+- **Rating system** — track owners rate reviews. Low-rated reviewers get deprioritized
+- **Gem/flag system** — already built. Excellent reviewers get priority, flagged reviewers get restricted
+- **Duplicate/spam detection** — already built
 
 ---
 
-### Pro Subscription: $9.95/month (The Revenue)
+## 5. Pro Subscription: $9.95/month
 
-This is where you make money. The key insight: **Pro isn't about getting reviews (everyone gets those for free via credits). Pro is about getting BETTER reviews and saving TIME.**
+### The Core Principle
 
-#### Pro Benefits
+**Pro is NOT about getting reviews** — everyone gets those for free via credits. **Pro is about saving time, getting higher quality, and unlocking revenue tools.**
 
-| Feature | Value to Artist | Cost to You |
-|---------|-----------------|-------------|
-| **Skip-the-line priority** | Tracks reviewed faster (24h vs 72h) | $0 (queue ordering) |
-| **5 monthly credits (no reviewing required)** | Convenience — don't have to review others | $0 (peer reviews) |
-| **Pro reviewer access** | 2-3 reviews from your vetted PRO tier reviewers per submission | $3.00-4.50/track |
-| **Detailed analytics dashboard** | See how your tracks compare across submissions | $0 (data you already have) |
-| **Public track page + sales** | Sell tracks, keep 85% | $0 (already built) |
-| **Stem/project file hosting** | Store and share production files | Minimal (S3 storage) |
-| **Profile badge + featured placement** | Social proof, discovery | $0 |
-| **Unlimited uploads** | Already built | Minimal (S3) |
+The free tier is deliberately good but effortful. You have to spend time reviewing others. For a working artist releasing regularly, time is the scarcity — not money.
 
-#### Pro Unit Economics
+### Pro Benefits
+
+| Feature | What It Means | Cost to Platform |
+|---------|---------------|-----------------|
+| **10 credits/month (no reviewing required)** | Don't have to review others to get feedback. Worth ~$8-10 at top-up prices — nearly pays for itself. | $0 (peer fulfilled) |
+| **PRO-tier artist reviews** | Tracks matched to top-rated artists first. Free users get whoever's available. | $0 (PRO reviewers earn credits, not cash) |
+| **Priority queue (24h turnaround)** | Tracks reviewed faster than free tier (48-72h) | $0 (queue ordering) |
+| **Track sales (keep 85%)** | Sell music on public track pages. **Gated to Pro only** (already built). | $0 (already built) |
+| **Affiliate system access** | Create tracked campaign links, see click/play/purchase analytics | $0 (already built) |
+| **Public track page + streaming** | Exposure to anyone with the link, play count tracking | $0 (already built) |
+| **Unlimited uploads + stems** | Free users limited to N uploads | Minimal (S3) |
+| **Analytics dashboard** | See how tracks compare across submissions | $0 (data exists) |
+| **Profile badge** | Social proof, discovery | $0 |
+
+### Pro Unit Economics
 
 | Line Item | Amount |
 |-----------|--------|
 | Gross revenue | $9.95/mo |
-| Stripe fees | -$0.59 |
-| Net after Stripe | $9.36 |
-| Reviewer cost (2-3 PRO reviews if used) | -$3.00 to -$4.50 |
-| **Gross profit** | **$4.86 - $6.36** |
-| **Gross margin** | **49% - 64%** |
+| Stripe fees (~2.9% + $0.30) | -$0.59 |
+| **Gross profit** | **$9.36** |
+| **Gross margin** | **~94%** |
 
-Compare this to the current model's 14.8% on STANDARD or -26.5% on subscription. This is a 3-5x margin improvement.
+No reviewer payouts. PRO reviewers earn credits, not cash. The only cost is Stripe.
 
-And importantly: if a Pro subscriber doesn't submit a track in a given month, your margin is ~94%. Subscription businesses thrive on this dynamic.
+If a Pro subscriber doesn't submit a track in a given month, margin stays 94%. If they do submit, reviews are fulfilled by peer artists at $0 cost. Subscription businesses thrive on this.
 
-#### Why Artists Would Pay
+Compare: current model loses 27% on every active subscriber. New model makes 94%.
 
-The free tier is deliberately designed to be **good but effortful**. You have to spend time reviewing others to earn credits. For a working artist releasing music regularly, time is the scarcity — not money. Pro lets you:
+### Why Artists Would Pay
 
-1. **Skip the work** — get credits without reviewing
-2. **Get expert feedback** — PRO tier reviewers are genuinely better
-3. **Move faster** — priority queue means faster turnaround
-4. **Sell your music** — track sales with 85% revenue share
-5. **Look professional** — badge, analytics, public page
+```
+FREE: Good feedback, but costs your time.
+PRO:  Same quality + expert reviews + saves time + sell your music.
+```
 
-This is the classic freemium conversion funnel: free is valuable, paid saves time and unlocks premium.
+1. **10 credits = skip the work** — don't review others, still get feedback
+2. **PRO-tier reviewers** — genuinely better feedback from experienced artists
+3. **24h turnaround** — faster than free tier's 48-72h
+4. **Track sales** — this alone can pay for the subscription. One $10 track sale and you're in profit. **Free users cannot sell tracks at all** (already gated in codebase).
+5. **Affiliate links** — promote your music with tracked campaigns
 
----
-
-## 5. What About Your Existing Paid Reviewers?
-
-Don't kill the reviewer program. Restructure it.
-
-### Keep PRO Reviewers as Premium-Only
-
-- PRO tier reviewers ($1.50/review) become exclusive to Pro subscribers
-- This gives Pro subs a tangible quality upgrade
-- Your best reviewers still get paid, maintaining quality
-- You just stop paying NORMAL tier reviewers — peer reviews replace them
-
-### Transition Path for NORMAL Reviewers
-
-- Notify NORMAL reviewers that the model is changing
-- Offer them the choice: become an artist (review for credits) or apply for PRO status
-- PRO applications require demonstrated quality (gem count, rating history)
-- This naturally filters your reviewer pool to only the best
-
-### Reviewer Economics After Change
-
-| Scenario | Monthly Cost |
-|----------|-------------|
-| Current: 45 tracks × 20 reviews × $0.50 avg | $450/mo in reviewer costs |
-| New: Only Pro subs get paid reviews (6 users × 3 PRO reviews × $1.50) | $27/mo in reviewer costs |
-| At scale: 100 Pro subs × 3 PRO reviews × $1.50 | $450/mo but with $636+ margin each |
+The track sales gate is the killer feature. It turns Pro from "a convenience upgrade" into "access to a revenue channel."
 
 ---
 
-## 6. Revenue Projections: Current vs. New Model
+## 6. Credit Top-Ups (Contextual Upsell, NOT a Separate Product)
+
+### The Simplicity Problem
+
+Three "ways to get reviews" is confusing:
+
+```
+CONFUSING:
+  Option 1: Review others for free credits
+  Option 2: Buy credit packs
+  Option 3: Subscribe to Pro
+  → "Which one do I pick?"
+```
+
+### The Solution: Two Products, One Upsell
+
+The marketing and landing page only talk about **Free vs Pro**. Simple.
+
+Credit top-ups are NOT marketed as a product. They're a **contextual upsell** shown only when a free user tries to submit a track with 0 credits:
+
+```
+"You need 5 credits to submit this track."
+
+  [Review tracks to earn credits]                        ← primary action
+  [Buy 5 credits for $4.95]                              ← secondary, subtle
+  [Upgrade to Pro — 10 credits/month + sell your music]  ← conversion upsell
+```
+
+### Top-Up Pricing
+
+| Pack | Price | Credits | Per Credit |
+|------|-------|---------|------------|
+| Small | $2.95 | 3 credits | $0.98 |
+| Medium | $7.95 | 10 credits | $0.80 |
+| Large | $14.95 | 25 credits | $0.60 |
+
+Margin: ~85-94% (peer reviews cost $0, only Stripe fees).
+
+### The Conversion Funnel
+
+```
+Free user buys top-ups twice ($9.90 spent)
+  → Platform shows: "You've spent $9.90 on credits. Pro is $9.95/mo
+     for 10 credits + track sales + priority."
+  → Natural upgrade path from impulse buyer to subscriber
+```
+
+Top-ups are the bridge between free and Pro, not a destination.
+
+---
+
+## 7. Revenue Projections
 
 ### Current Model (at current scale)
 
@@ -215,115 +312,107 @@ Don't kill the reviewer program. Restructure it.
 | Stripe fees | -$5 |
 | **Net** | **~$0 to -$5** |
 
-You're essentially breaking even or losing money.
+Breaking even or losing money.
 
 ### New Model (same 90 users)
 
 | Revenue Stream | Monthly |
 |----------------|---------|
-| Pro subscriptions (assume 10% convert = 9 users × $9.95) | $89.55 |
-| Reviewer costs (9 × 3 PRO reviews × $1.50) | -$40.50 |
+| Pro subscriptions (10% convert = 9 × $9.95) | $89.55 |
 | Stripe fees | -$8 |
-| **Net** | **~$41** |
+| **Net** | **~$81** |
 
-Not transformative yet, but profitable from day one.
+Profitable immediately. No reviewer costs.
 
-### New Model (at 500 users, achievable in 6-12 months with free tier growth)
+### New Model at 500 users
 
 | Revenue Stream | Monthly |
 |----------------|---------|
-| Pro subscriptions (10% = 50 users × $9.95) | $497.50 |
-| Reviewer costs (50 × 3 PRO reviews × $1.50) | -$225 |
-| Stripe fees | -$45 |
-| Credit top-ups (one-time purchases from free users) | +$100-200 |
+| Pro subscriptions (10% = 50 × $9.95) | $497.50 |
+| Credit top-ups (impulse purchases) | +$100-200 |
 | Track sales commissions (15%) | +$50-100 |
-| **Net** | **$377 - $527** |
+| Stripe fees | -$55 |
+| **Net** | **$592 - $742** |
 
-### New Model (at 2,000 users)
+### New Model at 2,000 users
 
 | Revenue Stream | Monthly |
 |----------------|---------|
 | Pro subscriptions (10% = 200 × $9.95) | $1,990 |
-| Reviewer costs | -$900 |
-| Stripe fees | -$180 |
 | Credit top-ups | +$400-800 |
 | Track sales commissions | +$200-500 |
-| **Net** | **$1,510 - $2,210** |
+| Stripe fees | -$220 |
+| **Net** | **$2,370 - $3,070** |
 
-The critical difference: **a free tier with peer reviews removes the acquisition cost barrier.** Getting to 500 or 2,000 users is dramatically easier when the product is free to try and use.
-
----
-
-## 7. Credit Top-Up Revenue (Bonus Stream)
-
-Some artists won't want to review others but also won't want a monthly subscription. Offer credit packs:
-
-| Pack | Price | Credits | Per Credit | Your Margin |
-|------|-------|---------|------------|-------------|
-| Small | $2.95 | 3 credits | $0.98 | ~85% |
-| Medium | $7.95 | 10 credits | $0.80 | ~85% |
-| Large | $14.95 | 25 credits | $0.60 | ~85% |
-
-Because credits are fulfilled by peer reviews (cost: $0), these are almost pure margin. Compare to current credit packs where each credit costs you $0.50-1.50 in reviewer payouts.
+The critical difference: **a free tier removes the acquisition barrier.** Getting to 500 or 2,000 users is dramatically easier when the product is free.
 
 ---
 
-## 8. Growth Strategy with Free Tier
-
-The free peer-review model unlocks growth channels that a paid-only model can't:
+## 8. Growth Strategy
 
 ### Viral Loop
-1. Artist A signs up, uploads track
-2. To get reviews, Artist A reviews 3-5 other tracks
-3. Artist A gets reviewed, loves it, uploads more
-4. Artist A tells producer friends about it
-5. Friends sign up (free!), repeat cycle
+
+```
+1. Artist signs up (free), uploads track
+2. To get reviews, reviews 3-5 other tracks
+3. Gets reviewed, loves it, uploads more
+4. Tells producer friends about it
+5. Friends sign up (free!), repeat
+```
 
 ### Lower Barrier to Entry
+
 - Current: "Pay $5-15 to find out if this is worth it"
 - New: "Upload a track and review a few others to get free feedback"
-- Free eliminates the biggest objection. The 87% of unpaid uploads convert to active users.
+- The 87% of unpaid uploads convert to active users instead of bouncing
 
 ### Community Network Effects
+
 - More artists = more tracks to review = faster feedback for everyone
 - Quality improves as community standards emerge
-- Artists form connections, collaborate, share each other's music
-- Platform becomes sticky — it's not just a tool, it's a community
+- Artists form connections, collaborate, share music
+- Platform becomes sticky — community, not just a tool
 
 ---
 
 ## 9. Implementation Priority
 
-### Phase 1: Core Credit Exchange (2-3 weeks of dev)
-1. Add `reviewCredits` field to ArtistProfile (you already have `freeReviewCredits`)
+### Phase 1: Core Credit Exchange (2-3 weeks)
+
+1. Repurpose `freeReviewCredits` on ArtistProfile → general `reviewCredits` balance
 2. Award 1 credit when an artist completes a peer review that passes quality checks
-3. Deduct credits when submitting a track for peer review (cost: 3-5 credits)
-4. Build the "review other artists" queue for artists (adapt existing reviewer queue)
-5. Allow artists to also be reviewers (currently separate profiles — may need linking)
+3. Deduct credits when submitting a track (1 credit per review requested)
+4. Build "review other artists" queue for artists (adapt existing reviewer queue UI)
+5. Allow artists to also be reviewers (link ArtistProfile ↔ ListenerProfile, or unify into single profile with dual capability)
+6. Give 2 free credits on signup
 
-### Phase 2: Restructure Pro Subscription (1 week)
-1. Update Pro benefits: 5 free credits/mo + priority queue + PRO reviewer access + analytics + sales
-2. Update pricing page and marketing copy
-3. Keep price at $9.95/mo (proven price point)
-4. Gate PRO reviewer allocation to Pro subscribers only
+### Phase 2: Restructure Pro ($9.95/month) (1 week)
 
-### Phase 3: Credit Top-Ups (1 week)
-1. Modify existing review-credits checkout to use new pricing ($2.95 / $7.95 / $14.95)
-2. Update credit pack UI
-3. These credits work the same way — just purchased instead of earned
+1. Update Pro benefits: 10 credits/mo + priority queue + PRO-tier matching + sales + analytics
+2. Remove paid reviewer payouts entirely — PRO tier is status only, no cash
+3. Gate track sales to Pro subscribers (already done)
+4. Update pricing page and marketing copy
+
+### Phase 3: Credit Top-Ups as Contextual Upsell (1 week)
+
+1. Modify existing review-credits checkout for new pricing ($2.95 / $7.95 / $14.95)
+2. Only surface at moment of need (0 credits + trying to submit)
+3. Show Pro upgrade alongside top-up option
+4. Track repeat top-up buyers for Pro conversion nudges
 
 ### Phase 4: Transition Existing Reviewers (1-2 weeks)
-1. Notify existing reviewer base about model change
-2. Offer PRO tier application to top reviewers
-3. Wind down NORMAL tier payouts over 30-day period
-4. Migrate reviewer queue to also include artist-reviewers
 
-### Phase 5: Growth & Marketing (Ongoing)
-1. Update landing page: lead with "Free feedback from fellow artists"
-2. SEO content around free music feedback
-3. Social media: showcase review quality, artist success stories
-4. Reddit/Discord/Twitter music production communities
-5. Consider referral bonus (1-2 extra credits for inviting an artist who uploads)
+1. Notify existing reviewer base about model change
+2. Convert best reviewers into artist accounts with PRO status preserved
+3. Wind down cash payouts over 30-day period
+4. Existing reviewer quality data (gems, ratings) carries over
+
+### Phase 5: Growth (Ongoing)
+
+1. Landing page: lead with "Free feedback from fellow artists"
+2. Music production communities (Reddit, Discord, Twitter)
+3. Referral bonus: 1-2 extra credits for inviting an artist who uploads
+4. SEO content around free music feedback
 
 ---
 
@@ -331,12 +420,12 @@ The free peer-review model unlocks growth channels that a paid-only model can't:
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
-| Peer review quality drops | High | High | Existing quality gates + credit denial for bad reviews + rating system |
-| Artists don't want to review others | Medium | High | Credit top-ups as escape valve + Pro subscription for convenience |
-| Existing paid reviewers leave | Medium | Low | Only keep PRO tier, they still get paid more ($1.50) |
-| Cold start: not enough tracks to review | Medium | Medium | Seed with initial tracks, offer bonus credits for early adopters |
-| Gaming/fake reviews for credits | Medium | High | Listening heartbeat verification + structured form + minimum word count + duplicate detection (all already built) |
-| Pro conversion lower than 10% | Medium | Medium | Credit top-ups still generate revenue + optimize Pro value prop over time |
+| Peer review quality drops | High | High | Existing quality gates + credit denial for bad reviews + gem/flag rating system |
+| Artists don't want to review others | Medium | High | Credit top-ups as escape valve + Pro for convenience |
+| Cold start: not enough tracks to review | Medium | Medium | Seed with initial tracks, bonus credits for early adopters |
+| Gaming/fake reviews for credits | Medium | High | Heartbeat verification + structured form + word count + duplicate detection (all built) |
+| Pro conversion lower than 10% | Medium | Medium | Top-ups still generate revenue + optimize Pro value over time |
+| Track sales don't generate meaningful revenue | Medium | Low | Sales are a Pro perk, not the primary revenue driver |
 
 ---
 
@@ -344,10 +433,10 @@ The free peer-review model unlocks growth channels that a paid-only model can't:
 
 | Question | Answer |
 |----------|--------|
-| **Should you change the business model?** | Yes. Current margins (15% to -27%) are not viable at any scale. |
-| **Should artists review each other for credits?** | Yes. This eliminates your #1 cost (reviewer payouts) and creates a growth flywheel. |
-| **How should you charge Pro subscribers?** | $9.95/mo for time-saving convenience (free credits, priority, PRO reviewers, analytics, sales). |
-| **What value does Pro give?** | Skip the reviewing work + get expert feedback + sell your music + move faster. |
-| **What about existing reviewers?** | Keep PRO tier as premium, wind down NORMAL tier, transition to peer model. |
-| **What's the biggest risk?** | Review quality. But your existing quality infrastructure handles most of this. |
-| **What's the expected margin improvement?** | From 15% to 49-64% on Pro, ~85% on credit packs, 100% on peer reviews. |
+| **Change the business model?** | Yes. Current margins (15% to -27%) are not viable at any scale. |
+| **Artists review each other for credits?** | Yes. 1 credit = 1 review received. 1 review given = 1 credit earned. Perfectly balanced, $0 cost. |
+| **Who are PRO reviewers?** | Not hired staff. They're artists with 50+ reviews and 4.7+ rating or 10+ gems. Status tier, not payment tier. |
+| **How to charge Pro?** | $9.95/mo. 10 free credits + PRO-tier matching + priority + track sales + analytics. |
+| **Is Pro valuable enough?** | Yes. 10 credits alone worth ~$8-10. Track sales gate is the killer feature — can't sell music without Pro. |
+| **Credit top-ups confusing?** | Not if handled right. Don't market them. Surface only at 0-credit submission moment alongside Pro upsell. |
+| **Expected margin?** | ~94% on Pro (vs -27% today). ~85-94% on top-ups (vs 15% today). 100% on peer reviews (vs negative today). |
