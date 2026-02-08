@@ -59,7 +59,7 @@ export function PayoutActions({
     }
 
     try {
-      const res = await fetch("/api/listener/profile", {
+      const res = await fetch("/api/reviewer/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ country: normalizedCountry }),
@@ -93,7 +93,7 @@ export function PayoutActions({
           return;
         }
 
-        const saveRes = await fetch("/api/listener/profile", {
+        const saveRes = await fetch("/api/reviewer/profile", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ country: normalizedCountry }),
@@ -108,7 +108,7 @@ export function PayoutActions({
         }
       }
 
-      const res = await fetch("/api/listener/stripe/connect", { method: "POST" });
+      const res = await fetch("/api/reviewer/stripe/connect", { method: "POST" });
       const data = await res.json();
       if (!res.ok) {
         if (maybeRedirectForAuth(res.status, data?.error)) {
@@ -130,7 +130,7 @@ export function PayoutActions({
     setIsReconnecting(true);
 
     try {
-      const res = await fetch("/api/listener/stripe/connect?reset=1", {
+      const res = await fetch("/api/reviewer/stripe/connect?reset=1", {
         method: "POST",
       });
       const data = await res.json();
@@ -154,7 +154,7 @@ export function PayoutActions({
     setIsOpeningDashboard(true);
 
     try {
-      const res = await fetch("/api/listener/stripe/dashboard", { method: "POST" });
+      const res = await fetch("/api/reviewer/stripe/dashboard", { method: "POST" });
       const data = await res.json();
       if (!res.ok) {
         if (maybeRedirectForAuth(res.status, data?.error)) {
@@ -176,7 +176,7 @@ export function PayoutActions({
     setIsRequestingPayout(true);
 
     try {
-      const res = await fetch("/api/listener/payouts", {
+      const res = await fetch("/api/reviewer/payouts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),

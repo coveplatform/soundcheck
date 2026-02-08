@@ -22,23 +22,14 @@ export async function middleware(request: NextRequest) {
 
   const isAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
   const isArtistPath = pathname === "/artist" || pathname.startsWith("/artist/");
-  const isReviewerPath =
-    pathname === "/reviewer" || pathname.startsWith("/reviewer/");
   const isListenerPath =
     pathname === "/listener" || pathname.startsWith("/listener/");
   const isAccountPath = pathname === "/account" || pathname.startsWith("/account/");
   const isApiAdminPath = pathname.startsWith("/api/admin/") || pathname === "/api/admin";
 
-  if (isReviewerPath) {
-    const url = request.nextUrl.clone();
-    url.pathname = pathname.replace(/^\/reviewer/, "/listener");
-    return NextResponse.redirect(url);
-  }
-
   if (
     !isAdminPath &&
     !isArtistPath &&
-    !isReviewerPath &&
     !isListenerPath &&
     !isAccountPath &&
     !isApiAdminPath
@@ -131,7 +122,6 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/artist/:path*",
-    "/reviewer/:path*",
     "/listener/:path*",
     "/account/:path*",
     "/api/admin/:path*",

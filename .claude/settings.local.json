@@ -60,7 +60,8 @@
       "Bash(copy .env .env.backup)",
       "Bash(echo:*)",
       "Bash(diff:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npm run db:generate:*)"
     ]
   }
 }

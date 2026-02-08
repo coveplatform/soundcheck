@@ -1,3 +1,11 @@
+// IMPORTANT: Load environment variables FIRST before any other imports
+import { config } from 'dotenv';
+import { resolve } from 'path';
+
+// Load .env.local first, then .env
+config({ path: resolve(__dirname, '../.env.local') });
+config({ path: resolve(__dirname, '../.env') });
+
 /**
  * Migration Script: Dual-Profile to Unified Artist Model
  *
@@ -16,15 +24,26 @@
  * - Transfer pending balances (kept in original profile for payouts)
  */
 
-// Load environment variables
-import { config } from 'dotenv';
-import { resolve } from 'path';
+// Create Prisma client directly to avoid module initialization issues
+import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-// Load .env.local first, then .env
-config({ path: resolve(__dirname, '../.env.local') });
-config({ path: resolve(__dirname, '../.env') });
+const databaseUrl =
+  process.env.DATABASE_URL ??
+  process.env.POSTGRES_PRISMA_URL ??
+  process.env.POSTGRES_URL_NON_POOLING ??
+  process.env.POSTGRES_URL;
 
-import { prisma } from '../src/lib/prisma';
+if (!databaseUrl) {
+  throw new Error(
+    'Database URL is not defined. Please set DATABASE_URL in .env.local or .env'
+  );
+}
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: databaseUrl }),
+  log: ['error', 'warn'],
+});
 
 interface MigrationStats {
   totalUsers: number;
@@ -198,7 +217,8 @@ main()
     console.error('❌ Migration failed:', error);
     process.exit(1);
   })
-  .then(() => {
+  .then(async () => {
     console.log('✅ Migration script completed successfully!');
+    await prisma.$disconnect();
     process.exit(0);
   });
