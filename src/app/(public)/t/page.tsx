@@ -41,16 +41,16 @@ export default function TrialLandingPage() {
       <main className="max-w-5xl mx-auto px-4 py-16 sm:py-24 min-h-[calc(100vh-3.5rem)] flex flex-col">
         <section className="text-center flex-1 flex flex-col justify-center">
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05]">
-            Get track feedback from <span className="text-lime-500">artists + listeners</span> in your music community.
+            Get track feedback from <span className="text-purple-600">artists + listeners</span> in your music community.
           </h1>
           <p className="mt-6 text-neutral-200 text-lg sm:text-xl font-bold leading-snug max-w-3xl mx-auto">
-            MixReflect is a <span className="text-orange-400">private feedback marketplace</span> — reviewers earn more for higher-quality reviews, and artists rate every review to keep quality high.
+            MixReflect is a <span className="text-purple-500">private feedback marketplace</span> — reviewers earn more for higher-quality reviews, and artists rate every review to keep quality high.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
               <Button
-                className="w-full sm:w-auto h-14 px-10 text-lg font-black bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[6px] active:translate-y-[6px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+                className="w-full sm:w-auto h-14 px-10 text-lg font-black bg-purple-600 text-black hover:bg-purple-500 active:bg-purple-700 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[6px] active:translate-y-[6px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
               >
                 Get started free
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -62,19 +62,19 @@ export default function TrialLandingPage() {
             <div className="max-w-5xl mx-auto">
               <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-neutral-800">
                 <div className="p-4 md:p-5 text-center">
-                  <p className="text-2xl md:text-3xl font-black text-lime-400">&lt;24h</p>
+                  <p className="text-2xl md:text-3xl font-black text-purple-500">&lt;24h</p>
                   <p className="text-xs md:text-sm text-neutral-400 mt-1">Turnaround</p>
                 </div>
                 <div className="p-4 md:p-5 text-center">
-                  <p className="text-2xl md:text-3xl font-black text-lime-400">Up to 20</p>
+                  <p className="text-2xl md:text-3xl font-black text-purple-500">Up to 20</p>
                   <p className="text-xs md:text-sm text-neutral-400 mt-1">Reviews</p>
                 </div>
                 <div className="p-4 md:p-5 text-center">
-                  <p className="text-2xl md:text-3xl font-black text-lime-400">Genre</p>
+                  <p className="text-2xl md:text-3xl font-black text-purple-500">Genre</p>
                   <p className="text-xs md:text-sm text-neutral-400 mt-1">Matched</p>
                 </div>
                 <div className="p-4 md:p-5 text-center">
-                  <p className="text-2xl md:text-3xl font-black text-lime-400">Private</p>
+                  <p className="text-2xl md:text-3xl font-black text-purple-500">Private</p>
                   <p className="text-xs md:text-sm text-neutral-400 mt-1">&amp; secure</p>
                 </div>
               </div>
@@ -82,7 +82,7 @@ export default function TrialLandingPage() {
           </section>
         </section>
 
-        <section className="mt-14 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-orange-400 text-black border-y-2 border-black py-12">
+        <section className="mt-14 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-purple-500 text-white border-y-2 border-black py-12">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h2 className="text-3xl sm:text-5xl font-black tracking-tight">
               See exactly what you&apos;ll get.
@@ -94,7 +94,7 @@ export default function TrialLandingPage() {
         </section>
 
         <section id="examples" className="mt-12 space-y-7">
-          <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(132,204,22,1)]">
+          <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(147,51,234,1)]">
             <div className="p-5 sm:p-7">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                 <div>
@@ -119,10 +119,10 @@ export default function TrialLandingPage() {
                       <div className="text-xs font-black text-neutral-400">WOULD LISTEN AGAIN</div>
                       <div className="mt-1 text-2xl font-black text-white">83%</div>
                     </div>
-                    <div className="text-xs font-black bg-lime-500 text-black border-2 border-black px-2 py-1">STRONG</div>
+                    <div className="text-xs font-black bg-purple-600 text-black border-2 border-black px-2 py-1">STRONG</div>
                   </div>
                   <div className="mt-3 h-3 border-2 border-black bg-neutral-800">
-                    <div className="h-full bg-lime-500" style={{ width: "83%" }} />
+                    <div className="h-full bg-purple-600" style={{ width: "83%" }} />
                   </div>
                 </div>
 
@@ -153,7 +153,7 @@ export default function TrialLandingPage() {
             </div>
           </div>
 
-          <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(251,146,60,1)]">
+          <div className="border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(168,85,247,1)]">
             <div className="p-5 sm:p-7">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                 <div>
@@ -180,14 +180,14 @@ export default function TrialLandingPage() {
                         <div className="font-black">0:45 Hook hits hard</div>
                         <div className="text-sm text-neutral-300">Melody lands + drums feel confident here.</div>
                       </div>
-                      <span className="px-2 py-1 border-2 border-black bg-lime-500 text-black text-xs font-black">15/20</span>
+                      <span className="px-2 py-1 border-2 border-black bg-purple-600 text-black text-xs font-black">15/20</span>
                     </div>
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="font-black">2:15 Breakdown feels fresh</div>
                         <div className="text-sm text-neutral-300">Nice contrast, keeps attention.</div>
                       </div>
-                      <span className="px-2 py-1 border-2 border-black bg-lime-500 text-black text-xs font-black">12/20</span>
+                      <span className="px-2 py-1 border-2 border-black bg-purple-600 text-black text-xs font-black">12/20</span>
                     </div>
                   </div>
                 </div>
@@ -244,11 +244,11 @@ export default function TrialLandingPage() {
                   </div>
 
                   <div className="mt-4 flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-black border-2 bg-lime-50 border-lime-500 text-lime-700">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-black border-2 bg-purple-50 border-purple-600 text-purple-700">
                       <ListMusic className="h-3 w-3" />
                       Would playlist
                     </span>
-                    <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-black border-2 bg-lime-50 border-lime-500 text-lime-700">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-black border-2 bg-purple-50 border-purple-600 text-purple-700">
                       <Share2 className="h-3 w-3" />
                       Would share
                     </span>
@@ -260,8 +260,8 @@ export default function TrialLandingPage() {
 
                   <div className="mt-6 grid gap-5">
                     <div>
-                      <div className="text-xs font-black text-lime-500 uppercase tracking-wide mb-1">What worked</div>
-                      <div className="pl-3 border-l-4 border-lime-500 text-neutral-200">
+                      <div className="text-xs font-black text-purple-600 uppercase tracking-wide mb-1">What worked</div>
+                      <div className="pl-3 border-l-4 border-purple-600 text-neutral-200">
                         The hook at 0:45 is instantly memorable. Drums and bass feel tight and controlled, which makes the drop hit harder. The 2:15 breakdown is a great reset that keeps the track from feeling repetitive.
                       </div>
                     </div>
@@ -292,7 +292,7 @@ export default function TrialLandingPage() {
 
           <div className="pt-2 flex items-center justify-center">
             <Link href="/signup?callbackUrl=%2Fartist%2Fonboarding">
-              <Button className="h-14 px-10 text-lg font-black bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[6px] active:translate-y-[6px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none">
+              <Button className="h-14 px-10 text-lg font-black bg-purple-600 text-black hover:bg-purple-500 active:bg-purple-700 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[6px] active:translate-y-[6px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none">
                 Get started free
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
@@ -300,7 +300,7 @@ export default function TrialLandingPage() {
           </div>
         </section>
 
-        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-lime-500 text-black border-y-2 border-black py-12">
+        <section className="mt-16 w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-purple-600 text-black border-y-2 border-black py-12">
           <div className="max-w-5xl mx-auto px-4">
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-center">
               Why get feedback on your music?
@@ -343,7 +343,7 @@ export default function TrialLandingPage() {
         <section className="mt-12">
           <div className="max-w-5xl mx-auto px-0">
             <h2 className="text-3xl font-black mb-8">FAQ</h2>
-            <div className="space-y-0 border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(251,146,60,1)]">
+            <div className="space-y-0 border-2 border-black bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(168,85,247,1)]">
               {[
                 {
                   q: "Why do I need multiple reviews instead of just one?",
@@ -469,7 +469,7 @@ export default function TrialLandingPage() {
             </div>
             <span className="hidden sm:inline text-neutral-700">•</span>
             <div className="flex items-center gap-1.5">
-              <svg className="h-4 w-4 text-lime-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg className="h-4 w-4 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M9 12l2 2 4-4"/>
                 <circle cx="12" cy="12" r="10"/>
               </svg>

@@ -8,7 +8,7 @@ import { PACKAGES, PackageType } from "@/lib/metadata";
 import { assignReviewersToTrack } from "@/lib/queue";
 
 const requestSchema = z.object({
-  desiredReviews: z.number().int().min(5).max(20),
+  desiredReviews: z.number().int().min(1).max(10),
 });
 
 export async function POST(
@@ -45,7 +45,7 @@ export async function POST(
           select: {
             userId: true,
             subscriptionStatus: true,
-            freeReviewCredits: true,
+            reviewCredits: true,
           }
         },
         reviews: { select: { id: true } },
@@ -83,30 +83,32 @@ export async function POST(
       );
     }
 
-    const isSubscribed = track.artist.subscriptionStatus === "active";
-    const desired = isSubscribed ? data.desiredReviews : 5;
+    const desired = data.desiredReviews;
     const cost = desired;
 
-    if (track.artist.freeReviewCredits < cost) {
+    if ((track.artist.reviewCredits ?? 0) < cost) {
       return NextResponse.json(
-        { error: "Not enough review tokens" },
+        { error: "Not enough credits. Earn more by reviewing tracks or buy a top-up." },
         { status: 403 }
       );
     }
 
-    const packageType: PackageType = desired > 5 ? "STANDARD" : "STARTER";
+    const packageType: PackageType = "PEER";
 
     await prisma.$transaction(async (tx) => {
       const updatedCredits = await (tx.artistProfile as any).updateMany({
         where: {
           id: track.artistId,
-          freeReviewCredits: {
+          reviewCredits: {
             gte: cost,
           },
         },
         data: {
-          freeReviewCredits: {
+          reviewCredits: {
             decrement: cost,
+          },
+          totalCreditsSpent: {
+            increment: cost,
           },
         },
       });
@@ -148,7 +150,7 @@ export async function POST(
 
     if (error instanceof Error && error.message === "INSUFFICIENT_TOKENS") {
       return NextResponse.json(
-        { error: "Not enough review tokens" },
+        { error: "Not enough credits" },
         { status: 403 }
       );
     }

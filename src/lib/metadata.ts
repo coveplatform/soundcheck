@@ -147,6 +147,16 @@ export const PACKAGES = {
     mix: "20 genre-matched reviewers",
     features: ["20 detailed reviews", "24-hour turnaround", "Written feedback", "Consensus highlights", "Pattern analysis"],
   },
+  // Peer review package - credit-based, no cash cost
+  PEER: {
+    name: "Peer Review",
+    reviews: 0, // dynamic - set by credits spent
+    minProReviews: 0,
+    price: 0, // free - uses credits
+    description: "Get feedback from fellow artists using credits",
+    mix: "Genre-matched peer artists",
+    features: ["Peer artist reviews", "Genre matching", "Earn credits by reviewing others"],
+  },
   // Legacy packages - kept for existing tracks, not shown in UI
   PRO: {
     name: "Maximum Signal",
@@ -168,6 +178,6 @@ export const PACKAGES = {
   },
 } as const;
 
-export const ACTIVE_PACKAGE_TYPES = ["STARTER", "STANDARD"] as const;
+export const ACTIVE_PACKAGE_TYPES = ["PEER"] as const;
 
 export type PackageType = keyof typeof PACKAGES;

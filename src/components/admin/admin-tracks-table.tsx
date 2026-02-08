@@ -24,7 +24,7 @@ export type AdminTrackRow = {
   reviewsRequested: number;
   artist: {
     subscriptionStatus: string | null;
-    freeReviewCredits: number;
+    reviewCredits: number;
     user: { id: string; email: string };
   };
   payment: { status: string | null; stripePaymentId: string | null } | null;
@@ -234,7 +234,7 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                           </span>
                         )}
                         <span className="text-xs text-neutral-400">
-                          {track.artist.freeReviewCredits} credits
+                          {track.artist.reviewCredits} credits
                         </span>
                       </span>
                     </div>

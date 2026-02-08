@@ -128,7 +128,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
             <Logo />
           </Link>
           <Link href="/signup">
-            <Button size="sm" className="bg-lime-500 text-black hover:bg-lime-400 font-bold text-xs border-2 border-black">
+            <Button size="sm" className="bg-purple-600 text-black hover:bg-purple-500 font-bold text-xs border-2 border-black">
               Get Feedback
             </Button>
           </Link>
@@ -156,12 +156,12 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
                 {review.track.title}
               </h1>
               <div className="flex items-center gap-3 mt-1">
-                <span className="text-2xl font-black text-lime-400">{roundedScore}</span>
+                <span className="text-2xl font-black text-purple-500">{roundedScore}</span>
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span
                       key={star}
-                      className={`text-lg ${star <= fullStars ? "text-lime-400" : "text-neutral-600"}`}
+                      className={`text-lg ${star <= fullStars ? "text-purple-500" : "text-neutral-600"}`}
                     >
                       ★
                     </span>
@@ -173,7 +173,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
 
           {/* Would Listen Again Badge */}
           {review.wouldListenAgain && (
-            <div className="px-4 py-3 border-b-2 border-black bg-lime-500">
+            <div className="px-4 py-3 border-b-2 border-black bg-purple-600">
               <div className="flex items-center gap-2 font-bold text-black">
                 <Check className="h-5 w-5" />
                 Would Listen Again
@@ -189,7 +189,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
                 {signals.map((signal) => (
                   <span
                     key={signal.label}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-lime-100 border-2 border-lime-500 text-lime-700"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-purple-100 border-2 border-purple-600 text-purple-700"
                   >
                     {signal.icon === "playlist" && <ListMusic className="h-3.5 w-3.5" />}
                     {signal.icon === "share" && <Share2 className="h-3.5 w-3.5" />}
@@ -205,7 +205,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
           {review.bestPart && (
             <div className="p-4 border-b-2 border-black">
               <div className="flex items-start gap-2 mb-2">
-                <span className="w-6 h-6 bg-lime-500 border border-black flex items-center justify-center text-xs font-bold flex-shrink-0">+</span>
+                <span className="w-6 h-6 bg-purple-600 border border-black flex items-center justify-center text-xs font-bold flex-shrink-0">+</span>
                 <h4 className="font-bold text-sm">What&apos;s Working</h4>
               </div>
               <p className="text-neutral-600 text-sm leading-relaxed pl-8">
@@ -243,7 +243,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
             Get 5-20 honest reviews from genre-matched listeners before you release.
           </p>
           <Link href="/signup">
-            <Button className="bg-lime-500 text-black hover:bg-lime-400 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none">
+            <Button className="bg-purple-600 text-black hover:bg-purple-500 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none">
               Get Feedback <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>

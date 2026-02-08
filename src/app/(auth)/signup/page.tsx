@@ -57,12 +57,7 @@ export default function SignupPage() {
       .then((session) => {
         if (cancelled) return;
         if (session?.user) {
-          const defaultUrl = session.user.isArtist
-            ? "/artist/dashboard"
-            : session.user.isReviewer
-            ? "/reviewer/dashboard"
-            : "/";
-          router.replace(defaultUrl);
+          router.replace("/dashboard");
           router.refresh();
           return;
         }
@@ -157,7 +152,7 @@ export default function SignupPage() {
 
       // Redirect to submit page or callback URL
       // Keep loading state active during navigation
-      router.push(callbackUrl || "/artist/submit");
+      router.push(callbackUrl || "/onboarding");
       router.refresh();
     } catch (err) {
       if (err instanceof TypeError && err.message.includes("fetch")) {
@@ -190,7 +185,7 @@ export default function SignupPage() {
           Back
         </Link>
         <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Get started free</h1>
-        <p className="mt-2 text-neutral-500">5 free review credits • Public track pages • Earn from sales</p>
+        <p className="mt-2 text-neutral-500">2 free credits • Earn more by reviewing • Upgrade to Pro anytime</p>
         <p className="mt-1 text-sm text-neutral-400">No credit card required • Upgrade anytime</p>
       </div>
 
@@ -289,7 +284,7 @@ export default function SignupPage() {
         type="button"
         variant="outline"
         className="w-full h-12 bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-400 font-bold transition-colors duration-150 ease-out motion-reduce:transition-none"
-        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/artist/submit" })}
+        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/onboarding" })}
       >
         <GoogleIcon className="h-5 w-5 mr-2" />
         Continue with Google

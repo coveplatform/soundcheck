@@ -30,10 +30,13 @@ async function handleReviewCreditsTopup(session: Stripe.Checkout.Session) {
       return;
     }
 
-    await prisma.artistProfile.updateMany({
+    await (prisma.artistProfile as any).updateMany({
       where: { id: artistProfileId },
       data: {
-        freeReviewCredits: {
+        reviewCredits: {
+          increment: creditsToAdd,
+        },
+        totalCreditsEarned: {
           increment: creditsToAdd,
         },
       },
@@ -101,14 +104,16 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       console.log(`Subscription activated for artist profile: ${artistProfile.id} (initial payment succeeded)`);
     }
 
-    // Grant free review credits for both initial and renewal payments
-    await (prisma.artistProfile as any).updateMany({
-      where: {
-        id: artistProfile.id,
-        OR: [{ freeReviewCredits: { lt: 20 } }, { freeReviewCredits: { equals: null } }],
-      },
+    // Grant 10 review credits for Pro subscribers (both initial and renewal)
+    await (prisma.artistProfile as any).update({
+      where: { id: artistProfile.id },
       data: {
-        freeReviewCredits: 20,
+        reviewCredits: {
+          increment: 10,
+        },
+        totalCreditsEarned: {
+          increment: 10,
+        },
       },
     });
   } catch (error) {
@@ -344,16 +349,16 @@ async function handleSubscriptionCheckoutComplete(session: Stripe.Checkout.Sessi
         },
       });
 
-      await (tx.artistProfile as any).updateMany({
-        where: {
-          id: artistProfileId,
-          OR: [
-            { freeReviewCredits: { lt: 20 } },
-            { freeReviewCredits: { equals: null } },
-          ],
-        },
+      // Grant 10 review credits for Pro subscription
+      await (tx.artistProfile as any).update({
+        where: { id: artistProfileId },
         data: {
-          freeReviewCredits: 20,
+          reviewCredits: {
+            increment: 10,
+          },
+          totalCreditsEarned: {
+            increment: 10,
+          },
         },
       });
     });

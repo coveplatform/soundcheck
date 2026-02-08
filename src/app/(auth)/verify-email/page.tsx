@@ -132,9 +132,9 @@ export default function VerifyEmailPage() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="bg-lime-50 border-2 border-lime-400 p-3 space-y-1">
-          <p className="text-sm font-semibold text-lime-800">Verification email sent!</p>
-          <p className="text-xs text-lime-700">
+        <div className="bg-purple-50 border-2 border-purple-500 p-3 space-y-1">
+          <p className="text-sm font-semibold text-purple-800">Verification email sent!</p>
+          <p className="text-xs text-purple-700">
             Click the link in the email to verify your account. The link expires in 24 hours.
           </p>
         </div>
@@ -155,9 +155,9 @@ export default function VerifyEmailPage() {
         )}
 
         {status === "resent" && (
-          <div className="bg-lime-100 border-2 border-lime-400 p-3">
-            <p className="text-sm font-semibold text-lime-800">New email sent!</p>
-            <p className="text-xs text-lime-700">
+          <div className="bg-purple-100 border-2 border-purple-500 p-3">
+            <p className="text-sm font-semibold text-purple-800">New email sent!</p>
+            <p className="text-xs text-purple-700">
               If that email exists in our system, a new verification link has been sent.
             </p>
           </div>

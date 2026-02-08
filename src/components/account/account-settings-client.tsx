@@ -13,24 +13,21 @@ export function AccountSettingsClient({
   initialName,
   artistName: initialArtistName,
   email,
-  isArtist,
-  isReviewer,
   hasPassword,
+  reviewCredits: initialReviewCredits,
   subscription,
 }: {
   initialName: string;
   artistName: string | null;
   email: string;
-  isArtist: boolean;
-  isReviewer: boolean;
   hasPassword: boolean;
+  reviewCredits: number;
   subscription: {
     status: string | null;
     tier: string | null;
     currentPeriodEnd: Date | null;
     canceledAt: Date | null;
     totalTracks: number;
-    reviewTokens?: number;
   } | null;
 }) {
   const router = useRouter();
@@ -55,7 +52,6 @@ export function AccountSettingsClient({
 
   const [isBuyingCredits, setIsBuyingCredits] = useState(false);
   const [buyCreditsError, setBuyCreditsError] = useState("");
-  const [buyCreditsQuantity, setBuyCreditsQuantity] = useState(10);
 
   // Subscription verification state (for handling redirect from Stripe checkout)
   const [isVerifyingSubscription, setIsVerifyingSubscription] = useState(false);
@@ -101,7 +97,7 @@ export function AccountSettingsClient({
     }
 
     // Handle subscription checkout success - poll until activated
-    if (checkoutSuccess && isArtist && subscription?.status !== "active") {
+    if (checkoutSuccess && subscription?.status !== "active") {
       setIsVerifyingSubscription(true);
 
       let attempts = 0;
@@ -130,7 +126,7 @@ export function AccountSettingsClient({
 
       poll();
     }
-  }, [searchParams, isArtist, subscription?.status, verifySubscription, router]);
+  }, [searchParams, subscription?.status, verifySubscription, router]);
 
   async function saveProfile() {
     setProfileError("");
@@ -143,7 +139,7 @@ export function AccountSettingsClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim() ? name.trim() : null,
-          artistName: isArtist && artistName.trim() ? artistName.trim() : undefined,
+          artistName: artistName.trim() ? artistName.trim() : undefined,
         }),
       });
 
@@ -163,9 +159,7 @@ export function AccountSettingsClient({
     }
   }
 
-  async function buyCredits(
-    payload: { kind: "quantity"; quantity: number } | { kind: "pack"; pack: 5 | 20 | 50 }
-  ) {
+  async function buyCredits(pack: 3 | 10 | 25) {
     setBuyCreditsError("");
     setIsBuyingCredits(true);
 
@@ -173,7 +167,7 @@ export function AccountSettingsClient({
       const res = await fetch("/api/review-credits/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ kind: "pack", pack }),
       });
 
       const data = await res.json().catch(() => null);
@@ -245,8 +239,7 @@ export function AccountSettingsClient({
   // Use verified subscription state if available (for immediate UI update after checkout)
   const effectiveSubscription = verifiedSubscription || subscription;
   const isSubscribed = effectiveSubscription?.status === "active";
-  const planLabel = isSubscribed ? "MixReflect Pro" : "Free";
-  const reviewTokens = verifiedSubscription?.credits ?? subscription?.reviewTokens ?? 0;
+  const reviewCredits = verifiedSubscription?.credits ?? initialReviewCredits;
 
   async function startCheckout() {
     setCheckoutError("");
@@ -278,197 +271,217 @@ export function AccountSettingsClient({
 
   return (
     <div className="space-y-6">
+      {/* Credit Balance Card */}
+      <Card variant="soft" elevated>
+        <CardHeader className="border-b border-purple-200 bg-purple-50">
+          <CardTitle className="text-lg text-purple-900">Credit Balance</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-purple-700">Review credits</p>
+              <p className="text-xs text-black/50 mt-0.5">Use credits to get reviews on your tracks</p>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-black text-purple-600 tabular-nums">{reviewCredits}</p>
+              <p className="text-xs text-black/40 font-medium">available</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/review"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-purple-600 hover:text-purple-800 transition-colors"
+            >
+              Earn more credits by reviewing
+              <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </div>
+
+          {/* Credit Top-Up */}
+          <div className="border-t border-purple-100 pt-4">
+            <p className="text-sm font-bold text-black mb-3">Top up credits</p>
+
+            {buyCreditsError ? (
+              <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium mb-3 rounded-lg">
+                {buyCreditsError}
+              </div>
+            ) : null}
+
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                onClick={() => buyCredits(3)}
+                disabled={isBuyingCredits}
+                className="flex flex-col items-center gap-1 rounded-xl border-2 border-purple-200 bg-purple-50 px-3 py-4 hover:border-purple-400 hover:bg-purple-100 transition-colors disabled:opacity-50"
+              >
+                <span className="text-lg font-black text-purple-700">3</span>
+                <span className="text-xs font-medium text-purple-500">credits</span>
+                <span className="text-sm font-bold text-black mt-1">$2.95</span>
+              </button>
+              <button
+                onClick={() => buyCredits(10)}
+                disabled={isBuyingCredits}
+                className="flex flex-col items-center gap-1 rounded-xl border-2 border-purple-300 bg-purple-100 px-3 py-4 hover:border-purple-400 hover:bg-purple-150 transition-colors disabled:opacity-50 ring-2 ring-purple-300 ring-offset-1"
+              >
+                <span className="text-lg font-black text-purple-700">10</span>
+                <span className="text-xs font-medium text-purple-500">credits</span>
+                <span className="text-sm font-bold text-black mt-1">$7.95</span>
+                <span className="text-[10px] font-bold text-purple-600 uppercase tracking-wide">Best value</span>
+              </button>
+              <button
+                onClick={() => buyCredits(25)}
+                disabled={isBuyingCredits}
+                className="flex flex-col items-center gap-1 rounded-xl border-2 border-purple-200 bg-purple-50 px-3 py-4 hover:border-purple-400 hover:bg-purple-100 transition-colors disabled:opacity-50"
+              >
+                <span className="text-lg font-black text-purple-700">25</span>
+                <span className="text-xs font-medium text-purple-500">credits</span>
+                <span className="text-sm font-bold text-black mt-1">$14.95</span>
+              </button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Subscription Card */}
-      {isArtist && subscription && (
-        <Card variant="soft" elevated>
-          <CardHeader className="border-b border-black/10">
-            <CardTitle className="text-lg">Subscription</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6 space-y-3">
-            {/* Verifying subscription after checkout */}
-            {isVerifyingSubscription ? (
-              <div className="bg-purple-50 border-2 border-purple-300 text-purple-800 text-sm p-4 font-medium rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="animate-spin h-4 w-4 border-2 border-purple-600 border-t-transparent rounded-full" />
-                  <span>Activating your subscription...</span>
+      <Card variant="soft" elevated>
+        <CardHeader className="border-b border-black/10">
+          <CardTitle className="text-lg">Subscription</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6 space-y-3">
+          {/* Verifying subscription after checkout */}
+          {isVerifyingSubscription ? (
+            <div className="bg-purple-50 border-2 border-purple-300 text-purple-800 text-sm p-4 font-medium rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="animate-spin h-4 w-4 border-2 border-purple-600 border-t-transparent rounded-full" />
+                <span>Activating your subscription...</span>
+              </div>
+            </div>
+          ) : null}
+
+          {/* Subscription just activated success message */}
+          {subscriptionJustActivated && !isVerifyingSubscription ? (
+            <div className="bg-emerald-50 border-2 border-emerald-300 text-emerald-800 text-sm p-4 font-medium rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-emerald-600 font-bold">&#10003;</span>
+                <span>Your Pro subscription is now active! You have {reviewCredits} review credits.</span>
+              </div>
+            </div>
+          ) : null}
+
+          {checkoutError ? (
+            <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
+              {checkoutError}
+            </div>
+          ) : null}
+
+          {isSubscribed ? (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-black">SoundCheck Pro</p>
+                  <p className="text-xs text-black/50">$9.95/month</p>
+                </div>
+                <div className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">
+                  Active
                 </div>
               </div>
-            ) : null}
-
-            {/* Subscription just activated success message */}
-            {subscriptionJustActivated && !isVerifyingSubscription ? (
-              <div className="bg-emerald-50 border-2 border-emerald-300 text-emerald-800 text-sm p-4 font-medium rounded-lg">
-                <div className="flex items-center gap-2">
-                  <span className="text-emerald-600 font-bold">&#10003;</span>
-                  <span>Your Pro subscription is now active! You have {reviewTokens} review credits.</span>
-                </div>
-              </div>
-            ) : null}
-
-            {checkoutError ? (
-              <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
-                {checkoutError}
-              </div>
-            ) : null}
-
-            {isSubscribed ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-bold text-black">MixReflect Pro</p>
-                    <p className="text-xs text-black/50">$9.95/month</p>
-                  </div>
-                  <div className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
-                    Active
-                  </div>
-                </div>
-                <div className="text-sm text-black/60">
-                  {subscription?.canceledAt ? (
-                    <p>
-                      Your subscription will end on{" "}
-                      {new Date(effectiveSubscription?.currentPeriodEnd ?? subscription?.currentPeriodEnd!).toLocaleDateString()}
-                    </p>
-                  ) : effectiveSubscription?.currentPeriodEnd ? (
-                    <p>
-                      Next billing date:{" "}
-                      {new Date(effectiveSubscription.currentPeriodEnd).toLocaleDateString()}
-                    </p>
-                  ) : null}
-                </div>
-
-                {/* Review Credits Section - Pro Only */}
-                {buyCreditsError ? (
-                  <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
-                    {buyCreditsError}
-                  </div>
+              <div className="text-sm text-black/60">
+                {subscription?.canceledAt ? (
+                  <p>
+                    Your subscription will end on{" "}
+                    {new Date(effectiveSubscription?.currentPeriodEnd ?? subscription?.currentPeriodEnd!).toLocaleDateString()}
+                  </p>
+                ) : effectiveSubscription?.currentPeriodEnd ? (
+                  <p>
+                    Next billing date:{" "}
+                    {new Date(effectiveSubscription.currentPeriodEnd).toLocaleDateString()}
+                  </p>
                 ) : null}
+              </div>
 
-                <div className="pt-3 border-t border-black/10">
-                  <div className="bg-white/60 border-2 border-black/10 rounded-2xl p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.08)] space-y-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-sm font-bold text-black">Review credits</p>
-                        <p className="text-xs text-black/60 mt-1">
-                          <span className="font-bold text-black">$1</span> per credit
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs font-mono text-black/40 uppercase tracking-widest">Balance</p>
-                        <p className="text-lg font-black text-black">{reviewTokens}</p>
-                      </div>
-                    </div>
+              <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-sm text-purple-800 space-y-1">
+                <p className="font-bold">Your Pro benefits:</p>
+                <p>10 credits/month + sell your music + priority queue + PRO-tier reviews</p>
+              </div>
 
-                    <div className="grid grid-cols-3 gap-2">
-                      <Button
-                        variant="airy"
-                        onClick={() => buyCredits({ kind: "pack", pack: 5 })}
-                        isLoading={isBuyingCredits}
-                        className="justify-between flex-col h-auto py-3"
-                      >
-                        <span className="font-black text-lg">+5</span>
-                        <span className="text-xs text-black/50">$5</span>
-                      </Button>
-                      <Button
-                        variant="airy"
-                        onClick={() => buyCredits({ kind: "pack", pack: 20 })}
-                        isLoading={isBuyingCredits}
-                        className="justify-between flex-col h-auto py-3"
-                      >
-                        <span className="font-black text-lg">+20</span>
-                        <span className="text-xs text-black/50">$18</span>
-                      </Button>
-                      <Button
-                        variant="airy"
-                        onClick={() => buyCredits({ kind: "pack", pack: 50 })}
-                        isLoading={isBuyingCredits}
-                        className="justify-between flex-col h-auto py-3"
-                      >
-                        <span className="font-black text-lg">+50</span>
-                        <span className="text-xs text-black/50">$40</span>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <Button
-                  variant="outline"
-                  onClick={async () => {
-                    try {
-                      const res = await fetch("/api/subscriptions/portal", {
-                        method: "POST",
-                      });
-                      const data = await res.json();
-                      if (data.url) {
-                        window.location.href = data.url;
-                      }
-                    } catch (error) {
-                      console.error("Portal error:", error);
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    const res = await fetch("/api/subscriptions/portal", {
+                      method: "POST",
+                    });
+                    const data = await res.json();
+                    if (data.url) {
+                      window.location.href = data.url;
                     }
-                  }}
-                >
-                  Manage Subscription
+                  } catch (error) {
+                    console.error("Portal error:", error);
+                  }
+                }}
+              >
+                Manage Subscription
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-black">Current plan</p>
+                  <p className="text-xs text-black/50">Free</p>
+                </div>
+                <div className="px-3 py-1 bg-neutral-100 text-neutral-700 text-xs font-bold rounded-full">
+                  Not subscribed
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 border-2 border-purple-200 rounded-2xl p-5 space-y-4">
+                <div>
+                  <p className="text-base font-black text-black mb-2">Upgrade to SoundCheck Pro</p>
+                  <p className="text-sm text-black/70">
+                    <span className="font-bold text-black">$9.95/month</span> · Cancel anytime
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">&#10003;</span>
+                    <div>
+                      <p className="text-sm font-bold text-black">10 credits every month</p>
+                      <p className="text-xs text-black/60">Automatically added to your balance each billing cycle</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">&#10003;</span>
+                    <div>
+                      <p className="text-sm font-bold text-black">Sell your music</p>
+                      <p className="text-xs text-black/60">Custom links and affiliate tracking for your tracks</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">&#10003;</span>
+                    <div>
+                      <p className="text-sm font-bold text-black">Priority queue</p>
+                      <p className="text-xs text-black/60">Your tracks get reviewed faster</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">&#10003;</span>
+                    <div>
+                      <p className="text-sm font-bold text-black">PRO-tier reviews</p>
+                      <p className="text-xs text-black/60">Detailed, high-quality feedback from experienced reviewers</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Button variant="primary" onClick={startCheckout} isLoading={isStartingCheckout} className="w-full">
+                  Upgrade to Pro — $9.95/month
                 </Button>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-bold text-black">Current plan</p>
-                    <p className="text-xs text-black/50">Free</p>
-                  </div>
-                  <div className="px-3 py-1 bg-neutral-100 text-neutral-700 text-xs font-bold rounded-full">
-                    Not subscribed
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 border-2 border-purple-200 rounded-2xl p-5 space-y-4">
-                  <div>
-                    <p className="text-base font-black text-black mb-2">Upgrade to MixReflect Pro</p>
-                    <p className="text-sm text-black/70">
-                      <span className="font-bold text-black">$9.95/month</span> · Cancel anytime
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">✓</span>
-                      <div>
-                        <p className="text-sm font-bold text-black">Analytics dashboard</p>
-                        <p className="text-xs text-black/60">Track trends, top tracks, and feedback patterns</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">✓</span>
-                      <div>
-                        <p className="text-sm font-bold text-black">Sales hub</p>
-                        <p className="text-xs text-black/60">Sell tracks with custom links and affiliate tracking</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">✓</span>
-                      <div>
-                        <p className="text-sm font-bold text-black">Unlimited uploads</p>
-                        <p className="text-xs text-black/60">Submit as many tracks as you want</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-black shrink-0">✓</span>
-                      <div>
-                        <p className="text-sm font-bold text-black">Priority support</p>
-                        <p className="text-xs text-black/60">Get help when you need it</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button variant="primary" onClick={startCheckout} isLoading={isStartingCheckout} className="w-full">
-                    Upgrade to Pro — $9.95/month
-                  </Button>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      )}
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       <Card variant="soft" elevated>
         <CardHeader className="border-b border-black/10">
@@ -486,39 +499,17 @@ export function AccountSettingsClient({
             </div>
           ) : null}
 
-          {/* Pure Artist: Show Artist Name only */}
-          {isArtist && !isReviewer && (
-            <div className="space-y-2">
-              <div className="text-sm text-neutral-600 font-bold">Artist name</div>
-              <Input value={artistName} onChange={(e) => setArtistName(e.target.value)} />
-              <div className="text-xs text-neutral-600 font-mono">How you appear to reviewers and listeners</div>
-            </div>
-          )}
+          <div className="space-y-2">
+            <div className="text-sm text-neutral-600 font-bold">Display name</div>
+            <Input value={name} onChange={(e) => setName(e.target.value)} />
+            <div className="text-xs text-neutral-600 font-mono">How you appear when reviewing tracks</div>
+          </div>
 
-          {/* Pure Reviewer: Show Display Name only */}
-          {!isArtist && isReviewer && (
-            <div className="space-y-2">
-              <div className="text-sm text-neutral-600 font-bold">Display name</div>
-              <Input value={name} onChange={(e) => setName(e.target.value)} />
-              <div className="text-xs text-neutral-600 font-mono">How you appear when reviewing tracks</div>
-            </div>
-          )}
-
-          {/* Dual Role: Show both fields */}
-          {isArtist && isReviewer && (
-            <>
-              <div className="space-y-2">
-                <div className="text-sm text-neutral-600 font-bold">Artist name</div>
-                <Input value={artistName} onChange={(e) => setArtistName(e.target.value)} />
-                <div className="text-xs text-neutral-600 font-mono">How you appear as an artist</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm text-neutral-600 font-bold">Reviewer name</div>
-                <Input value={name} onChange={(e) => setName(e.target.value)} />
-                <div className="text-xs text-neutral-600 font-mono">How you appear when reviewing tracks</div>
-              </div>
-            </>
-          )}
+          <div className="space-y-2">
+            <div className="text-sm text-neutral-600 font-bold">Artist name</div>
+            <Input value={artistName} onChange={(e) => setArtistName(e.target.value)} />
+            <div className="text-xs text-neutral-600 font-mono">How you appear when sharing your music</div>
+          </div>
 
           <div className="space-y-1">
             <div className="text-sm text-neutral-600 font-bold">Email</div>
@@ -529,22 +520,6 @@ export function AccountSettingsClient({
             <Button variant="primary" onClick={saveProfile} isLoading={isSavingProfile}>
               Save changes
             </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card variant="soft" elevated>
-        <CardHeader className="border-b border-black/10">
-          <CardTitle className="text-lg">Roles</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-6 space-y-2 text-sm">
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-neutral-600 font-medium">Artist</span>
-            <span className="font-bold text-black">{isArtist ? "Enabled" : "Not enabled"}</span>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-neutral-600 font-medium">Reviewer</span>
-            <span className="font-bold text-black">{isReviewer ? "Enabled" : "Not enabled"}</span>
           </div>
         </CardContent>
       </Card>

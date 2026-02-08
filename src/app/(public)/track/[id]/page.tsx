@@ -177,7 +177,7 @@ export default function PublicTrackPage() {
                 rel="noopener noreferrer"
                 className="inline-block"
               >
-                <Button className="bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                <Button className="bg-purple-500 hover:bg-purple-400 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Listen now
                 </Button>

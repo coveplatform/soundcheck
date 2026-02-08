@@ -46,7 +46,7 @@ export function StatCard({
               <p
                 className={cn(
                   "text-sm font-bold",
-                  trend.positive ? "text-lime-700" : "text-red-600"
+                  trend.positive ? "text-purple-700" : "text-red-600"
                 )}
               >
                 {trend.value}

@@ -40,7 +40,7 @@ export function YesNoToggle({
             baseClasses,
             "rounded-xl border",
             value === true
-              ? "bg-lime-400 text-black border-lime-500"
+              ? "bg-purple-600 text-white border-purple-600"
               : "bg-white/60 text-black border-black/10 hover:bg-white"
           )}
         >
@@ -72,7 +72,7 @@ export function YesNoToggle({
           baseClasses,
           "border-2 border-black",
           value === true
-            ? "bg-lime-500 text-black"
+            ? "bg-purple-600 text-white"
             : "bg-white text-black hover:bg-neutral-100"
         )}
       >

@@ -21,12 +21,12 @@ export function WordCounter({ text, minWords, className }: WordCounterProps) {
     <div className={cn("flex items-center justify-between", className)}>
       <p className={cn(
         "text-xs font-mono",
-        isComplete ? "text-lime-600" : "text-neutral-500"
+        isComplete ? "text-purple-600" : "text-neutral-500"
       )}>
         {wordCount}/{minWords} words
       </p>
       {isComplete && (
-        <span className="text-xs font-bold text-lime-600 flex items-center gap-1">
+        <span className="text-xs font-bold text-purple-600 flex items-center gap-1">
           <Check className="h-3 w-3" /> Complete
         </span>
       )}

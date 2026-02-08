@@ -27,7 +27,7 @@ export function EarningsMockup() {
             <span className="text-xs font-medium">This Month</span>
           </div>
           <p className="text-xl sm:text-2xl font-bold text-neutral-950 leading-none truncate">$127.50</p>
-          <p className="text-xs text-lime-600 flex items-center gap-1 mt-1">
+          <p className="text-xs text-purple-600 flex items-center gap-1 mt-1">
             <TrendingUp className="w-3 h-3" />
             +23% from last month
           </p>
@@ -62,7 +62,7 @@ export function EarningsMockup() {
             <div key={i} className="px-4 py-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  item.type === "sale" ? "bg-lime-100 text-lime-700" :
+                  item.type === "sale" ? "bg-purple-100 text-purple-700" :
                   item.type === "commission" ? "bg-blue-100 text-blue-700" :
                   "bg-orange-100 text-orange-700"
                 }`}>
@@ -75,7 +75,7 @@ export function EarningsMockup() {
                   <p className="text-xs text-neutral-400">{item.time}</p>
                 </div>
               </div>
-              <p className="font-semibold text-lime-700 text-sm sm:text-base flex-shrink-0">+${item.amount.toFixed(2)}</p>
+              <p className="font-semibold text-purple-700 text-sm sm:text-base flex-shrink-0">+${item.amount.toFixed(2)}</p>
             </div>
           ))}
         </div>

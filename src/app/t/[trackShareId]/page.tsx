@@ -195,7 +195,7 @@ export default function PublicTrackPage() {
           <Link href="/signup">
             <Button
               size="sm"
-              className="bg-lime-500 text-black hover:bg-lime-400 font-bold text-xs border-2 border-black"
+              className="bg-purple-600 text-black hover:bg-purple-500 font-bold text-xs border-2 border-black"
             >
               Get Feedback
             </Button>
@@ -207,7 +207,7 @@ export default function PublicTrackPage() {
         {/* Social Proof Banner */}
         {platformStats && (
           <div className="mb-8 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-lime-100 border-2 border-lime-400 text-lime-900 font-bold text-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 border-2 border-purple-500 text-purple-900 font-bold text-sm">
               <Users className="h-4 w-4" />
               <span>
                 Reviewed by {platformStats.activeListeners.toLocaleString()}+ active music listeners
@@ -263,7 +263,7 @@ export default function PublicTrackPage() {
                   {track.reviewStats && avgScore && (
                     <div className="mt-4 flex items-center gap-4">
                       <div className="flex items-center gap-1.5">
-                        <Star className="h-5 w-5 fill-lime-400 text-lime-400" />
+                        <Star className="h-5 w-5 fill-purple-500 text-purple-500" />
                         <span className="text-2xl font-bold">{avgScore}</span>
                         <span className="text-sm text-black/50">/5.0</span>
                       </div>
@@ -271,7 +271,7 @@ export default function PublicTrackPage() {
                         {track.reviewStats.totalReviews} {track.reviewStats.totalReviews === 1 ? "review" : "reviews"}
                       </div>
                       {track.reviewStats.wouldListenAgainPercent > 0 && (
-                        <div className="flex items-center gap-1 text-sm text-lime-700">
+                        <div className="flex items-center gap-1 text-sm text-purple-700">
                           <CheckCircle2 className="h-4 w-4" />
                           <span>{track.reviewStats.wouldListenAgainPercent}% would listen again</span>
                         </div>
@@ -285,7 +285,7 @@ export default function PublicTrackPage() {
                       <Button
                         onClick={handlePurchase}
                         disabled={purchasing}
-                        className="bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                        className="bg-purple-500 hover:bg-purple-400 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                       >
                         <Download className="h-4 w-4 mr-2" />
                         Buy & Download - ${(track.salePrice / 100).toFixed(2)}
@@ -331,7 +331,7 @@ export default function PublicTrackPage() {
                             <Button
                               onClick={handlePurchase}
                               disabled={purchasing}
-                              className="flex-1 bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold"
+                              className="flex-1 bg-purple-500 hover:bg-purple-400 text-black border-2 border-black font-bold"
                             >
                               {purchasing ? "Processing..." : `Pay $${((track.salePrice ?? 0) / 100).toFixed(2)}`}
                             </Button>
@@ -359,7 +359,7 @@ export default function PublicTrackPage() {
                           variant={isSalesMode ? "airy" : "default"}
                           className={
                             !isSalesMode
-                              ? "bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                              ? "bg-purple-500 hover:bg-purple-400 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                               : ""
                           }
                         >
@@ -420,7 +420,7 @@ export default function PublicTrackPage() {
               {platformStats?.activeListeners.toLocaleString()}+ active music fans.
             </p>
             <Link href="/signup">
-              <Button className="bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <Button className="bg-purple-500 hover:bg-purple-400 text-black border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
                 Get Feedback
                 <ExternalLink className="ml-2 h-4 w-4" />
               </Button>
