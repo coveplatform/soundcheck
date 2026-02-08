@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ArtistSidebar } from "@/components/dashboard/artist-sidebar";
+import { Sidebar } from "@/components/dashboard/sidebar";
 import { VerifyEmailBanner } from "@/components/ui/verify-email-banner";
 import { ArtistLayoutClient } from "@/components/dashboard/artist-layout-client";
 
@@ -13,38 +13,69 @@ export default async function ArtistLayout({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
-  const [user, artistProfile] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { emailVerified: true },
-    }),
-    prisma.artistProfile.findUnique({
+  // Fetch user for email verification
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { emailVerified: true },
+  });
+
+  // Fetch artist profile for sidebar
+  let artistProfile: any = null;
+  try {
+    artistProfile = await (prisma.artistProfile as any).findUnique({
       where: { userId: session.user.id },
       select: {
+        id: true,
         artistName: true,
-        totalEarnings: true,
+        reviewCredits: true,
+        subscriptionStatus: true,
       },
-    }),
-  ]);
+    });
+  } catch {
+    // Fallback without reviewCredits if column doesn't exist yet
+    artistProfile = await (prisma.artistProfile as any).findUnique({
+      where: { userId: session.user.id },
+      select: {
+        id: true,
+        artistName: true,
+        subscriptionStatus: true,
+      },
+    });
+  }
 
-  const artistName = artistProfile?.artistName || session.user.name || "Artist";
-  const hasEarnings = (artistProfile?.totalEarnings || 0) > 0;
+  if (!artistProfile) {
+    redirect("/onboarding");
+  }
+
+  const artistName = artistProfile.artistName || session.user.name || "Artist";
+  const credits: number = artistProfile.reviewCredits ?? 0;
+  const isPro = artistProfile.subscriptionStatus === "active";
+
+  // Count pending peer reviews
+  let pendingReviews = 0;
+  try {
+    pendingReviews = await (prisma.review as any).count({
+      where: {
+        peerReviewerArtistId: artistProfile.id,
+        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+      },
+    });
+  } catch {
+    pendingReviews = 0;
+  }
 
   return (
     <ArtistLayoutClient>
       <div className="min-h-screen bg-[#faf8f5]">
-        <ArtistSidebar
-          user={{
-            name: session.user.name,
-            email: session.user.email,
-            isReviewer: session.user.isReviewer,
-          }}
+        <Sidebar
           artistName={artistName}
-          hasEarnings={hasEarnings}
+          credits={credits}
+          isPro={isPro}
+          pendingReviews={pendingReviews}
         />
 
         {/* Main content with sidebar offset */}

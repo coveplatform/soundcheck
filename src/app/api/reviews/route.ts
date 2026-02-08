@@ -190,7 +190,8 @@ export async function POST(request: Request) {
       }
     }
 
-    if (isPeerReviewer && !artistProfile?.completedOnboarding) {
+    // If user only has artist profile (peer reviewer), check they completed onboarding
+    if (!reviewerProfile && artistProfile && !artistProfile.completedOnboarding) {
       return NextResponse.json(
         { error: "Please complete onboarding before submitting reviews" },
         { status: 403 }
