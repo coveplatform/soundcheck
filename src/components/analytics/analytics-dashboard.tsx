@@ -150,18 +150,18 @@ export function AnalyticsDashboard({
     <div className="space-y-12">
       {/* HERO SECTION - MASSIVE REVIEW COUNT */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-lime-100 via-yellow-50 to-orange-50 opacity-50" />
-        <div className="relative bg-gradient-to-br from-lime-400/10 to-green-400/10 rounded-3xl border-2 border-lime-300 p-6 sm:p-8">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-yellow-50 to-orange-50 opacity-50" />
+        <div className="relative bg-gradient-to-br from-purple-400/10 to-green-400/10 rounded-3xl border-2 border-purple-300 p-6 sm:p-8">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-2 border-black/10 mb-6">
-              <MessageSquare className="w-4 h-4 text-lime-600" />
+              <MessageSquare className="w-4 h-4 text-purple-600" />
               <span className="text-xs font-bold text-black/70 uppercase tracking-wider">
                 Total Feedback Received
               </span>
             </div>
 
             <div className="mb-6">
-              <div className="text-[72px] sm:text-[96px] lg:text-[120px] font-black leading-none tracking-tighter bg-gradient-to-br from-lime-600 via-green-600 to-emerald-600 bg-clip-text text-transparent">
+              <div className="text-[72px] sm:text-[96px] lg:text-[120px] font-black leading-none tracking-tighter bg-gradient-to-br from-purple-600 via-green-600 to-emerald-600 bg-clip-text text-transparent">
                 {displayStats.totalReviews}
               </div>
               <p className="text-lg sm:text-xl font-bold text-black/80 mt-3">
@@ -187,8 +187,8 @@ export function AnalyticsDashboard({
             </div>
 
             {improvementRate > 5 && (
-              <div className="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-white rounded-full border-2 border-lime-400 shadow-lg">
-                <TrendingUp className="w-5 h-5 text-lime-600" />
+              <div className="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-white rounded-full border-2 border-purple-400 shadow-lg">
+                <TrendingUp className="w-5 h-5 text-purple-600" />
                 <span className="text-sm font-bold">
                   You've improved by {improvementRate.toFixed(0)}% - keep it up!
                 </span>
@@ -252,7 +252,7 @@ export function AnalyticsDashboard({
                   <div key={category.name}>
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        {index === 0 && <Award className="h-4 w-4 text-lime-600" />}
+                        {index === 0 && <Award className="h-4 w-4 text-purple-600" />}
                         <span className="text-sm font-bold">{category.name}</span>
                       </div>
                       <span className="text-lg font-black">{category.score.toFixed(1)}</span>

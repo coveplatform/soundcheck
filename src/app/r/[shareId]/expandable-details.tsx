@@ -29,7 +29,7 @@ function TextBlock({ label, icon, value }: { label: string; icon: string; value:
   if (!value) return null;
 
   const iconColors: Record<string, string> = {
-    "+": "bg-lime-500",
+    "+": "bg-purple-600",
     "→": "bg-orange-400",
     "!": "bg-sky-400",
   };

@@ -273,7 +273,7 @@ export function ActivityFeed() {
     >
       {/* Artwork Square */}
       <div
-        className={`${activity.color} shadow-md flex items-center justify-center relative overflow-hidden rounded-2xl transition-transform transition-shadow duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none group-hover:shadow-lg group-hover:scale-[1.02] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-lime-300 group-focus-visible:outline-offset-2`}
+        className={`${activity.color} shadow-md flex items-center justify-center relative overflow-hidden rounded-2xl transition-transform transition-shadow duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none group-hover:shadow-lg group-hover:scale-[1.02] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-purple-400 group-focus-visible:outline-offset-2`}
         style={{ width: `${layout.cardSizePx}px`, height: `${layout.cardSizePx}px` }}
       >
         {shouldRenderArtwork ? (
@@ -306,7 +306,7 @@ export function ActivityFeed() {
         <p className={`${isCompact ? "text-[12px]" : "text-[13px]"} font-semibold text-neutral-700 truncate`}>{activity.artist}</p>
         <p
           className={`${isCompact ? "text-[12px]" : "text-[13px]"} font-semibold leading-tight ${
-            activity.type === "sale" ? "text-lime-700" : "text-neutral-700"
+            activity.type === "sale" ? "text-purple-700" : "text-neutral-700"
           }`}
         >
           {activity.metric}

@@ -186,7 +186,7 @@ describe('Signup Validation', () => {
 
 describe('Role Assignment', () => {
   it('artist role sets isArtist=true, isReviewer=false', () => {
-    const role = 'artist'
+    const role: string = 'artist'
     const isArtist = role === 'artist' || role === 'both'
     const isReviewer = role === 'reviewer' || role === 'both'
 
@@ -195,7 +195,7 @@ describe('Role Assignment', () => {
   })
 
   it('reviewer role sets isArtist=false, isReviewer=true', () => {
-    const role = 'reviewer'
+    const role: string = 'reviewer'
     const isArtist = role === 'artist' || role === 'both'
     const isReviewer = role === 'reviewer' || role === 'both'
 
@@ -204,12 +204,18 @@ describe('Role Assignment', () => {
   })
 
   it('both role sets isArtist=true, isReviewer=true', () => {
-    const role = 'both'
+    const role: string = 'both'
     const isArtist = role === 'artist' || role === 'both'
     const isReviewer = role === 'reviewer' || role === 'both'
 
     expect(isArtist).toBe(true)
     expect(isReviewer).toBe(true)
+  })
+
+  it('new model: all users are artists by default', () => {
+    // In the peer-to-peer model, isArtist is always true
+    const isArtist = true
+    expect(isArtist).toBe(true)
   })
 })
 

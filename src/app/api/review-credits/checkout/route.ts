@@ -10,7 +10,7 @@ const bodySchema = z
   .object({
     kind: z.enum(["quantity", "pack"]),
     quantity: z.number().int().min(1).max(200).optional(),
-    pack: z.union([z.literal(5), z.literal(20), z.literal(50)]).optional(),
+    pack: z.union([z.literal(3), z.literal(10), z.literal(25)]).optional(),
     trackId: z.string().min(1).optional(),
   })
   .refine(
@@ -66,19 +66,19 @@ export async function POST(request: Request) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     const successUrl = data.trackId
-      ? `${appUrl}/artist/tracks/${data.trackId}/request-reviews?credits=success`
-      : `${appUrl}/artist/account?credits=success`;
+      ? `${appUrl}/submit?credits=success`
+      : `${appUrl}/account?credits=success`;
 
     const cancelUrl = data.trackId
-      ? `${appUrl}/artist/tracks/${data.trackId}/request-reviews?credits=canceled`
-      : `${appUrl}/artist/account?credits=canceled`;
+      ? `${appUrl}/submit?credits=canceled`
+      : `${appUrl}/account?credits=canceled`;
 
     const currency = "aud";
 
-    const packPricing: Record<5 | 20 | 50, { amountCents: number; credits: number }> = {
-      5: { amountCents: 500, credits: 5 },
-      20: { amountCents: 1800, credits: 20 },
-      50: { amountCents: 4000, credits: 50 },
+    const packPricing: Record<3 | 10 | 25, { amountCents: number; credits: number }> = {
+      3: { amountCents: 295, credits: 3 },
+      10: { amountCents: 795, credits: 10 },
+      25: { amountCents: 1495, credits: 25 },
     };
 
     const creditsToAdd =

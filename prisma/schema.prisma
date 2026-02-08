@@ -127,6 +127,25 @@ model ArtistProfile {
 
   freeReviewCredits Int @default(1)
 
+  // Credit system (peer-to-peer reviews)
+  reviewCredits      Int @default(0) // Current credit balance
+  totalCreditsEarned Int @default(0) // Lifetime earned
+  totalCreditsSpent  Int @default(0) // Lifetime spent
+
+  // Peer review stats (for PRO tier calculation)
+  totalPeerReviews Int   @default(0) // Reviews given as peer
+  peerReviewRating Float @default(0) // Avg rating on reviews given
+  peerGemCount     Int   @default(0) // Gems received on peer reviews
+  peerFlagCount    Int   @default(0) // Flags received
+
+  // Genres willing to review (for peer review matching)
+  reviewGenres Genre[] @relation("ArtistReviewGenres")
+
+  // Onboarding
+  hasSeenWelcome       Boolean @default(false)
+  completedOnboarding  Boolean @default(false)
+  hasSeenCreditGuide   Boolean @default(false)
+
   // Earnings from track purchases
   pendingBalance Int @default(0) // in cents, available to withdraw
   totalEarnings  Int @default(0) // in cents, lifetime earnings
@@ -147,6 +166,10 @@ model ArtistProfile {
   updatedAt DateTime @updatedAt
 
   tracks Track[]
+
+  // Reviews given as peer reviewer
+  peerReviews      Review[]      @relation("PeerReviews")
+  peerQueueEntries ReviewQueue[] @relation("ArtistReviewQueue")
 }
 
 model ListenerProfile {
@@ -220,9 +243,10 @@ model Genre {
   name String @unique
   slug String @unique
 
-  artistProfiles   ArtistProfile[]   @relation("ArtistGenres")
-  listenerProfiles ListenerProfile[] @relation("ReviewerGenres")
-  tracks           Track[]           @relation("TrackGenres")
+  artistProfiles       ArtistProfile[]   @relation("ArtistGenres")
+  artistReviewProfiles ArtistProfile[]   @relation("ArtistReviewGenres")
+  listenerProfiles     ListenerProfile[] @relation("ReviewerGenres")
+  tracks               Track[]           @relation("TrackGenres")
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -269,6 +293,9 @@ model Track {
   packageType      PackageType
   reviewsRequested Int
   reviewsCompleted Int         @default(0)
+
+  // Credit-based submission
+  creditsSpent Int @default(0)
 
   // Promo tracking
   promoCode String? // Which promo code was used (null if paid normally)
@@ -334,6 +361,7 @@ enum PackageType {
   STANDARD  // 10 reviews, verified+
   PRO       // 10 reviews, pro only
   DEEP_DIVE // 25 reviews, mixed + 3 Pro
+  PEER      // Credit-based peer reviews
 }
 
 enum SharingMode {
@@ -390,6 +418,11 @@ model Review {
   track      Track           @relation(fields: [trackId], references: [id], onDelete: Cascade)
   reviewerId String
   reviewer   ListenerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  // Peer review support (artist reviewing another artist)
+  peerReviewerArtistId String?
+  peerReviewerArtist   ArtistProfile? @relation("PeerReviews", fields: [peerReviewerArtistId], references: [id], onDelete: SetNull)
+  isPeerReview         Boolean        @default(false)
 
   status ReviewStatus @default(ASSIGNED)
 
@@ -695,12 +728,17 @@ model ReviewQueue {
   reviewerId String
   reviewer   ListenerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
 
+  // Peer reviewer (artist reviewing for credits)
+  artistReviewerId String?
+  artistReviewer   ArtistProfile? @relation("ArtistReviewQueue", fields: [artistReviewerId], references: [id], onDelete: Cascade)
+
   priority   Int      @default(0) // Higher = more urgent
   assignedAt DateTime @default(now())
   expiresAt  DateTime // Auto-reassign if not completed
 
   @@unique([trackId, reviewerId])
   @@index([reviewerId, expiresAt])
+  @@index([artistReviewerId])
 }
 
 model RateLimit {

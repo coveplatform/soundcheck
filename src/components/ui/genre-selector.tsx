@@ -193,63 +193,38 @@ export function GenreSelector({
     return children.filter((g) => selectedIds.includes(g.id)).length;
   };
 
+  // Unified purple branding for all variants
+  const purpleStyles = {
+    light: {
+      selected: "bg-purple-600 border-purple-600 text-white",
+      unselected: "bg-white border-black/15 text-black hover:bg-purple-50 hover:border-purple-300",
+      chip: "bg-purple-600 border-purple-600 text-white",
+      parentSelected: "bg-purple-600 text-white",
+      parentUnselected: "bg-white hover:bg-purple-50",
+      categoryBorder: "border-black/15",
+      expandedBg: "bg-neutral-50",
+      expandedBorder: "border-black/15",
+      helperText: "text-neutral-500",
+      counterText: "text-neutral-500",
+      disabledBtn: "bg-neutral-200 border-neutral-300 text-neutral-400",
+    },
+    dark: {
+      selected: "bg-purple-600 border-purple-600 text-white",
+      unselected: "bg-transparent border-neutral-600 text-neutral-300 hover:border-purple-500 hover:text-white",
+      chip: "bg-purple-600 border-purple-600 text-white",
+      parentSelected: "bg-purple-600 text-white",
+      parentUnselected: "bg-neutral-900 hover:bg-neutral-800 text-white",
+      categoryBorder: "border-neutral-700",
+      expandedBg: "bg-neutral-900",
+      expandedBorder: "border-neutral-700",
+      helperText: "text-neutral-400",
+      counterText: "text-neutral-400",
+      disabledBtn: "bg-neutral-800 border-neutral-700 text-neutral-600",
+    },
+  };
   const variantStyles = {
-    artist: {
-      light: {
-        selected: "bg-lime-500 border-black text-black",
-        unselected: "bg-white border-black text-black hover:bg-lime-100",
-        chip: "bg-lime-500 border-black text-black",
-        parentSelected: "bg-lime-500",
-        parentUnselected: "bg-white hover:bg-lime-50",
-        categoryBorder: "border-black",
-        expandedBg: "bg-neutral-50",
-        expandedBorder: "border-black",
-        helperText: "text-neutral-500",
-        counterText: "text-neutral-500",
-        disabledBtn: "bg-neutral-200 border-neutral-300 text-neutral-400",
-      },
-      dark: {
-        selected: "bg-lime-500 border-lime-500 text-black",
-        unselected: "bg-transparent border-neutral-600 text-neutral-300 hover:border-lime-500 hover:text-white",
-        chip: "bg-lime-500 border-lime-500 text-black",
-        parentSelected: "bg-lime-500 text-black",
-        parentUnselected: "bg-neutral-900 hover:bg-neutral-800 text-white",
-        categoryBorder: "border-neutral-700",
-        expandedBg: "bg-neutral-900",
-        expandedBorder: "border-neutral-700",
-        helperText: "text-neutral-400",
-        counterText: "text-neutral-400",
-        disabledBtn: "bg-neutral-800 border-neutral-700 text-neutral-600",
-      },
-    },
-    reviewer: {
-      light: {
-        selected: "bg-orange-400 border-black text-black",
-        unselected: "bg-white border-black text-black hover:bg-orange-100",
-        chip: "bg-orange-400 border-black text-black",
-        parentSelected: "bg-orange-400",
-        parentUnselected: "bg-white hover:bg-orange-50",
-        categoryBorder: "border-black",
-        expandedBg: "bg-neutral-50",
-        expandedBorder: "border-black",
-        helperText: "text-neutral-500",
-        counterText: "text-neutral-500",
-        disabledBtn: "bg-neutral-200 border-neutral-300 text-neutral-400",
-      },
-      dark: {
-        selected: "bg-orange-400 border-orange-400 text-black",
-        unselected: "bg-transparent border-neutral-600 text-neutral-300 hover:border-orange-400 hover:text-white",
-        chip: "bg-orange-400 border-orange-400 text-black",
-        parentSelected: "bg-orange-400 text-black",
-        parentUnselected: "bg-neutral-900 hover:bg-neutral-800 text-white",
-        categoryBorder: "border-neutral-700",
-        expandedBg: "bg-neutral-900",
-        expandedBorder: "border-neutral-700",
-        helperText: "text-neutral-400",
-        counterText: "text-neutral-400",
-        disabledBtn: "bg-neutral-800 border-neutral-700 text-neutral-600",
-      },
-    },
+    artist: purpleStyles,
+    reviewer: purpleStyles,
   };
 
   const styles = variantStyles[variant][theme];
@@ -317,22 +292,15 @@ export function GenreSelector({
                     <div
                       className={cn(
                         "w-5 h-5 border-2 flex items-center justify-center flex-shrink-0",
-                        isDark ? "border-neutral-500" : "border-black",
-                        parentSelected ? (isDark ? "bg-lime-500 border-lime-500" : "bg-black") : (isDark ? "bg-neutral-800" : "bg-white")
+                        isDark ? "border-neutral-500" : "border-black/20",
+                        parentSelected ? "bg-purple-600 border-purple-600" : (isDark ? "bg-neutral-800" : "bg-white")
                       )}
                     >
                       {parentSelected && <Check className={cn("h-3 w-3", isDark ? "text-black" : "text-white")} />}
                     </div>
                     <span>{category.label}</span>
                     {childCount > 0 && !parentSelected && (
-                      <span
-                        className={cn(
-                          "text-xs font-mono px-1.5 py-0.5",
-                          variant === "artist"
-                            ? "bg-lime-500 text-black"
-                            : "bg-orange-400 text-black"
-                        )}
-                      >
+                      <span className="text-xs font-mono px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded">
                         +{childCount} specific
                       </span>
                     )}

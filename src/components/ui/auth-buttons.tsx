@@ -22,18 +22,14 @@ export function AuthButtons({
 
   if (session) {
     const user = session.user as { isArtist?: boolean; isReviewer?: boolean } | undefined;
-    const dashboardHref = user?.isArtist
-      ? "/artist/dashboard"
-      : user?.isReviewer
-        ? "/listener/dashboard"
-        : "/artist/onboarding";
+    const dashboardHref = "/dashboard";
 
     return (
       <Link href={dashboardHref}>
         <Button
           className={
             theme === "dark"
-              ? "bg-lime-500 text-black hover:bg-lime-400 font-medium border-2 border-lime-500"
+              ? "bg-purple-600 text-white hover:bg-purple-700 font-medium border-2 border-purple-600"
               : "bg-black text-white hover:bg-neutral-800 font-medium"
           }
         >
@@ -57,7 +53,7 @@ export function AuthButtons({
         <Button
           className={
             theme === "dark"
-              ? "bg-lime-500 text-black hover:bg-lime-400 font-medium border-2 border-lime-500"
+              ? "bg-purple-600 text-white hover:bg-purple-700 font-medium border-2 border-purple-600"
               : "bg-black text-white hover:bg-neutral-800 font-medium"
           }
         >

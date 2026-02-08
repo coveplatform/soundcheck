@@ -30,10 +30,13 @@ async function handleReviewCreditsTopup(session: Stripe.Checkout.Session) {
       return;
     }
 
-    await prisma.artistProfile.updateMany({
+    await (prisma.artistProfile as any).updateMany({
       where: { id: artistProfileId },
       data: {
-        freeReviewCredits: {
+        reviewCredits: {
+          increment: creditsToAdd,
+        },
+        totalCreditsEarned: {
           increment: creditsToAdd,
         },
       },
@@ -48,30 +51,69 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     const subscriptionId =
       typeof (invoice as any).subscription === "string" ? ((invoice as any).subscription as string) : null;
     const billingReason = typeof (invoice as any).billing_reason === "string" ? (invoice as any).billing_reason : null;
+    const customerId = typeof (invoice as any).customer === "string" ? ((invoice as any).customer as string) : null;
 
-    if (!subscriptionId || billingReason !== "subscription_cycle") {
+    if (!subscriptionId) {
       return;
     }
 
-    const artistProfile = await prisma.artistProfile.findFirst({
-      where: {
-        subscriptionId,
-        subscriptionStatus: "active",
-      },
-      select: { id: true },
+    // Handle both initial subscription payment and renewal payments
+    const isInitialPayment = billingReason === "subscription_create";
+    const isRenewalPayment = billingReason === "subscription_cycle";
+
+    if (!isInitialPayment && !isRenewalPayment) {
+      return;
+    }
+
+    // Try to find artist profile by subscriptionId first, then by customerId as fallback
+    let artistProfile = await prisma.artistProfile.findFirst({
+      where: { subscriptionId },
+      select: { id: true, subscriptionStatus: true },
     });
 
+    // Fallback: if not found by subscriptionId, try by stripeCustomerId (for initial payment race condition)
+    if (!artistProfile && customerId && isInitialPayment) {
+      artistProfile = await prisma.artistProfile.findFirst({
+        where: { stripeCustomerId: customerId },
+        select: { id: true, subscriptionStatus: true },
+      });
+
+      // If found by customerId, also save the subscriptionId
+      if (artistProfile) {
+        await prisma.artistProfile.update({
+          where: { id: artistProfile.id },
+          data: { subscriptionId },
+        });
+        console.log(`Saved subscriptionId for artist profile: ${artistProfile.id} (found by customerId)`);
+      }
+    }
+
     if (!artistProfile) {
+      console.error(`Artist profile not found for subscription: ${subscriptionId}, customer: ${customerId}`);
       return;
     }
 
-    await (prisma.artistProfile as any).updateMany({
-      where: {
-        id: artistProfile.id,
-        OR: [{ freeReviewCredits: { lt: 20 } }, { freeReviewCredits: { equals: null } }],
-      },
+    if (isInitialPayment) {
+      // Initial payment succeeded - activate the subscription
+      await prisma.artistProfile.update({
+        where: { id: artistProfile.id },
+        data: {
+          subscriptionStatus: "active",
+        },
+      });
+      console.log(`Subscription activated for artist profile: ${artistProfile.id} (initial payment succeeded)`);
+    }
+
+    // Grant 10 review credits for Pro subscribers (both initial and renewal)
+    await (prisma.artistProfile as any).update({
+      where: { id: artistProfile.id },
       data: {
-        freeReviewCredits: 20,
+        reviewCredits: {
+          increment: 10,
+        },
+        totalCreditsEarned: {
+          increment: 10,
+        },
       },
     });
   } catch (error) {
@@ -307,16 +349,16 @@ async function handleSubscriptionCheckoutComplete(session: Stripe.Checkout.Sessi
         },
       });
 
-      await (tx.artistProfile as any).updateMany({
-        where: {
-          id: artistProfileId,
-          OR: [
-            { freeReviewCredits: { lt: 20 } },
-            { freeReviewCredits: { equals: null } },
-          ],
-        },
+      // Grant 10 review credits for Pro subscription
+      await (tx.artistProfile as any).update({
+        where: { id: artistProfileId },
         data: {
-          freeReviewCredits: 20,
+          reviewCredits: {
+            increment: 10,
+          },
+          totalCreditsEarned: {
+            increment: 10,
+          },
         },
       });
     });

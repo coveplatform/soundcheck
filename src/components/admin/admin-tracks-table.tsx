@@ -7,6 +7,13 @@ import { Button } from "@/components/ui/button";
 import { RefundButton } from "@/components/admin/refund-button";
 import { DeleteTrackButton } from "@/components/admin/delete-track-button";
 
+const PACKAGE_NAMES: Record<string, string> = {
+  STARTER: "Listener Pulse",
+  STANDARD: "Release Ready",
+  PRO: "Maximum Signal",
+  DEEP_DIVE: "Deep Dive",
+};
+
 export type AdminTrackRow = {
   id: string;
   title: string;
@@ -14,7 +21,12 @@ export type AdminTrackRow = {
   packageType: string | null;
   promoCode: string | null;
   createdAt: Date;
-  artist: { user: { id: string; email: string } };
+  reviewsRequested: number;
+  artist: {
+    subscriptionStatus: string | null;
+    reviewCredits: number;
+    user: { id: string; email: string };
+  };
   payment: { status: string | null; stripePaymentId: string | null } | null;
 };
 
@@ -147,69 +159,102 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-100">
-            {tracks.map((track) => (
-              <tr key={track.id} className="text-neutral-700">
-                <td className="px-4 py-3 w-10">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-neutral-300"
-                    checked={selectedIds.has(track.id)}
-                    onChange={() => toggleSelection(track.id)}
-                    aria-label={`Select ${track.title}`}
-                  />
-                </td>
-                <td className="px-4 py-3">
-                  <Link className="underline" href={`/admin/tracks/${track.id}`}>
-                    {track.title}
-                  </Link>
-                </td>
-                <td className="px-4 py-3">{track.status}</td>
-                <td className="px-4 py-3">
-                  {track.promoCode ? (
-                    <span className="inline-flex items-center gap-1">
-                      <span className="px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
-                        PROMO
+            {tracks.map((track) => {
+              const isPro = track.artist.subscriptionStatus === "active";
+              const packageName = track.packageType
+                ? PACKAGE_NAMES[track.packageType] || track.packageType
+                : null;
+
+              return (
+                <tr key={track.id} className="text-neutral-700">
+                  <td className="px-4 py-3 w-10">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-neutral-300"
+                      checked={selectedIds.has(track.id)}
+                      onChange={() => toggleSelection(track.id)}
+                      aria-label={`Select ${track.title}`}
+                    />
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link className="underline" href={`/admin/tracks/${track.id}`}>
+                      {track.title}
+                    </Link>
+                    {track.reviewsRequested > 0 && (
+                      <span className="ml-2 text-xs text-neutral-400">
+                        ({track.reviewsRequested} reviews)
                       </span>
-                      <span className="text-neutral-400 text-xs">
-                        {track.promoCode}
+                    )}
+                  </td>
+                  <td className="px-4 py-3">{track.status}</td>
+                  <td className="px-4 py-3">
+                    {track.promoCode ? (
+                      <span className="inline-flex items-center gap-1">
+                        <span className="px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
+                          PROMO
+                        </span>
+                        <span className="text-neutral-400 text-xs">
+                          {track.promoCode}
+                        </span>
                       </span>
-                    </span>
-                  ) : (
-                    track.packageType
-                  )}
-                </td>
-                <td className="px-4 py-3">
-                  {!track.payment && track.status !== "PENDING_PAYMENT" ? (
-                    <span className="px-1.5 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded">
-                      FREE CREDITS
-                    </span>
-                  ) : (
-                    track.payment?.status ?? ""
-                  )}
-                </td>
-                <td className="px-4 py-3">
-                  <Link
-                    className="underline"
-                    href={`/admin/users/${track.artist.user.id}`}
-                  >
-                    {track.artist.user.email}
-                  </Link>
-                </td>
-                <td className="px-4 py-3">
-                  {new Date(track.createdAt).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex flex-col gap-2">
-                    {track.payment?.status === "COMPLETED" &&
-                    track.status !== "CANCELLED" &&
-                    track.payment.stripePaymentId ? (
-                      <RefundButton trackId={track.id} />
-                    ) : null}
-                    <DeleteTrackButton trackId={track.id} />
-                  </div>
-                </td>
-              </tr>
-            ))}
+                    ) : packageName ? (
+                      <span className="inline-flex flex-col">
+                        <span>{packageName}</span>
+                        <span className="text-xs text-neutral-400">{track.packageType}</span>
+                      </span>
+                    ) : (
+                      <span className="text-neutral-400">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {!track.payment && track.status !== "PENDING_PAYMENT" ? (
+                      <span className="px-1.5 py-0.5 text-xs font-bold bg-blue-100 text-blue-700 rounded">
+                        REVIEW CREDITS
+                      </span>
+                    ) : (
+                      track.payment?.status ?? ""
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col">
+                      <Link
+                        className="underline"
+                        href={`/admin/users/${track.artist.user.id}`}
+                      >
+                        {track.artist.user.email}
+                      </Link>
+                      <span className="inline-flex items-center gap-1 mt-0.5">
+                        {isPro ? (
+                          <span className="px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
+                            PRO
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.5 text-xs font-bold bg-neutral-100 text-neutral-500 rounded">
+                            FREE
+                          </span>
+                        )}
+                        <span className="text-xs text-neutral-400">
+                          {track.artist.reviewCredits} credits
+                        </span>
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    {new Date(track.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-2">
+                      {track.payment?.status === "COMPLETED" &&
+                      track.status !== "CANCELLED" &&
+                      track.payment.stripePaymentId ? (
+                        <RefundButton trackId={track.id} />
+                      ) : null}
+                      <DeleteTrackButton trackId={track.id} />
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

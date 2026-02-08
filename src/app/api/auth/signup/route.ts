@@ -13,7 +13,7 @@ const signupSchema = z.object({
     .string()
     .min(8, "Password must be at least 8 characters")
     .regex(PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE),
-  role: z.enum(["artist", "reviewer", "both"]),
+  role: z.enum(["artist", "reviewer", "both"]).optional().default("artist"),
   acceptedTerms: z.boolean(),
   referralSource: z.string().optional(),
 });
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
         email: normalizedEmail,
         password: hashedPassword,
         emailVerified: new Date(),
-        isArtist: role === "artist" || role === "both",
+        isArtist: true,
         isReviewer: role === "reviewer" || role === "both",
         referralSource,
       },

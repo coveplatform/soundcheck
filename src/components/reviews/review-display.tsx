@@ -120,7 +120,7 @@ export function ReviewDisplay({
                 <span
                   className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                     review.firstImpression === "STRONG_HOOK"
-                      ? "bg-lime-100 text-lime-700"
+                      ? "bg-purple-100 text-purple-700"
                       : review.firstImpression === "DECENT"
                       ? "bg-amber-100 text-amber-700"
                       : "bg-neutral-100 text-neutral-600"
@@ -156,7 +156,7 @@ export function ReviewDisplay({
                 title="Copy share link"
               >
                 {copied ? (
-                  <Check className="h-4 w-4 text-lime-600" />
+                  <Check className="h-4 w-4 text-purple-700" />
                 ) : (
                   <Link2 className="h-4 w-4" />
                 )}
@@ -190,8 +190,8 @@ export function ReviewDisplay({
           <span className="flex items-center gap-1">
             {review.wouldListenAgain ? (
               <>
-                <ThumbsUp className="h-3.5 w-3.5 text-lime-600" />
-                <strong className="text-lime-600">Would listen again</strong>
+                <ThumbsUp className="h-3.5 w-3.5 text-purple-700" />
+                <strong className="text-purple-700">Would listen again</strong>
               </>
             ) : (
               <>
@@ -209,7 +209,7 @@ export function ReviewDisplay({
           {review.wouldAddToPlaylist !== null && (
             <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 ${
               review.wouldAddToPlaylist
-                ? "bg-lime-50 border-lime-500 text-lime-700"
+                ? "bg-purple-50 border-purple-600 text-purple-700"
                 : "bg-neutral-50 border-neutral-300 text-neutral-500"
             }`}>
               <ListMusic className="h-3 w-3" />
@@ -219,7 +219,7 @@ export function ReviewDisplay({
           {review.wouldShare !== null && (
             <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 ${
               review.wouldShare
-                ? "bg-lime-50 border-lime-500 text-lime-700"
+                ? "bg-purple-50 border-purple-600 text-purple-700"
                 : "bg-neutral-50 border-neutral-300 text-neutral-500"
             }`}>
               <Share2 className="h-3 w-3" />
@@ -229,7 +229,7 @@ export function ReviewDisplay({
           {review.wouldFollow !== null && (
             <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 ${
               review.wouldFollow
-                ? "bg-lime-50 border-lime-500 text-lime-700"
+                ? "bg-purple-50 border-purple-600 text-purple-700"
                 : "bg-neutral-50 border-neutral-300 text-neutral-500"
             }`}>
               <UserPlus className="h-3 w-3" />
@@ -249,10 +249,10 @@ export function ReviewDisplay({
         )}
         {review.bestPart && (
           <div>
-            <h4 className="text-xs font-bold text-lime-700 uppercase tracking-wide mb-1.5">
+            <h4 className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-1.5">
               What Worked
             </h4>
-            <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-lime-500">
+            <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-purple-600">
               {review.bestPart}
             </p>
           </div>

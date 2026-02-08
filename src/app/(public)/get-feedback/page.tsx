@@ -1000,7 +1000,7 @@ export default function GetFeedbackPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-3">
-                <div className="border-l-4 border-lime-500 pl-3">
+                <div className="border-l-4 border-purple-600 pl-3">
                   <p className="text-xs font-bold text-purple-400 uppercase tracking-wide">What worked</p>
                   <p className="text-sm text-neutral-200 leading-relaxed">
                     The synth hook around 0:45 is genuinely catchy. Low end is tight and punchy.
@@ -1249,7 +1249,7 @@ export default function GetFeedbackPage() {
                       setEmail(nextEmail);
                       await captureLead();
 
-                      const callbackUrl = "/artist/dashboard";
+                      const callbackUrl = "/dashboard";
                       let exists = false;
                       try {
                         exists = await checkEmailExists(nextEmail);
@@ -1270,7 +1270,7 @@ export default function GetFeedbackPage() {
                         )}&callbackUrl=${encodeURIComponent(callbackUrl)}`
                       );
                     }}
-                    className="w-full h-11 text-base font-black bg-purple-500 text-black border-2 border-lime-500 hover:bg-lime-400"
+                    className="w-full h-11 text-base font-black bg-purple-500 text-black border-2 border-purple-600 hover:bg-purple-500"
                   >
                     Get started free
                     <ArrowRight className="h-4 w-4 ml-2" />
@@ -1367,9 +1367,9 @@ export default function GetFeedbackPage() {
                           }}
                           className={cn(
                             "border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-                            isDragging && "border-lime-500 bg-purple-500/10",
-                            !isDragging && !uploadedFileName && "border-neutral-700 hover:border-lime-500 hover:bg-neutral-900",
-                            uploadedFileName && !isUploading && "border-lime-500 bg-purple-500/10"
+                            isDragging && "border-purple-600 bg-purple-500/10",
+                            !isDragging && !uploadedFileName && "border-neutral-700 hover:border-purple-600 hover:bg-neutral-900",
+                            uploadedFileName && !isUploading && "border-purple-600 bg-purple-500/10"
                           )}
                         >
                           {isUploading ? (
@@ -1519,7 +1519,7 @@ export default function GetFeedbackPage() {
                       onClick={goToDetails}
                       className={cn(
                         "w-full h-14 text-lg font-black border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-                        "bg-purple-500 text-black border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                        "bg-purple-500 text-black border-purple-600 hover:bg-purple-500 shadow-[4px_4px_0px_0px_rgba(147,51,234,1)] hover:shadow-[2px_2px_0px_0px_rgba(147,51,234,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
                       )}
                     >
                       Next: confirm details
@@ -1560,7 +1560,7 @@ export default function GetFeedbackPage() {
               <div className="relative p-6 space-y-6">
                 <div className="flex items-start gap-4">
                   {matchingDone ? (
-                    <div className="h-12 w-12 bg-purple-500 flex items-center justify-center flex-shrink-0 shadow-[0_0_0_2px_rgba(132,204,22,1),0_0_40px_rgba(132,204,22,0.25)]">
+                    <div className="h-12 w-12 bg-purple-500 flex items-center justify-center flex-shrink-0 shadow-[0_0_0_2px_rgba(147,51,234,1),0_0_40px_rgba(147,51,234,0.25)]">
                       <Check className="h-6 w-6 text-black" />
                     </div>
                   ) : (
@@ -1611,16 +1611,16 @@ export default function GetFeedbackPage() {
                         key={label}
                         className={cn(
                           "flex items-center gap-3 border-2 p-3",
-                          isActive ? "border-lime-500 bg-purple-500/10" : "border-neutral-700 bg-neutral-950/30"
+                          isActive ? "border-purple-600 bg-purple-500/10" : "border-neutral-700 bg-neutral-950/30"
                         )}
                       >
                         <div
                           className={cn(
                             "h-7 w-7 flex items-center justify-center flex-shrink-0 border-2",
                             isComplete
-                              ? "bg-purple-500 border-lime-500"
+                              ? "bg-purple-500 border-purple-600"
                               : isActive
-                                ? "border-lime-500 bg-neutral-900"
+                                ? "border-purple-600 bg-neutral-900"
                                 : "border-neutral-700 bg-neutral-900"
                           )}
                         >
@@ -1799,7 +1799,7 @@ export default function GetFeedbackPage() {
                               className={cn(
                                 "h-4 w-4 flex items-center justify-center border",
                                 item.met
-                                  ? "bg-purple-500 border-lime-500 text-black"
+                                  ? "bg-purple-500 border-purple-600 text-black"
                                   : "bg-neutral-900 border-neutral-700 text-neutral-400"
                               )}
                             >
@@ -1926,7 +1926,7 @@ export default function GetFeedbackPage() {
               onClick={goToPackage}
               isLoading={isContinuingToPackage}
               disabled={isContinuingToPackage}
-              className="w-full h-14 text-lg font-black bg-purple-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none"
+              className="w-full h-14 text-lg font-black bg-purple-500 text-black border-2 border-purple-600 hover:bg-purple-500 shadow-[4px_4px_0px_0px_rgba(147,51,234,1)] hover:shadow-[2px_2px_0px_0px_rgba(147,51,234,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none"
             >
               Continue
               <ArrowRight className="h-5 w-5 ml-2" />
@@ -2002,7 +2002,7 @@ export default function GetFeedbackPage() {
                             className={cn(
                               "w-full p-4 border-2 text-left transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                               isSelected
-                                ? "border-lime-500 bg-purple-500/10"
+                                ? "border-purple-600 bg-purple-500/10"
                                 : "border-neutral-700 bg-neutral-900 hover:border-neutral-500"
                             )}
                           >
@@ -2033,7 +2033,7 @@ export default function GetFeedbackPage() {
                     <Button
                       onClick={handleSubmit}
                       isLoading={isSubmitting}
-                      className="w-full h-14 text-lg font-black bg-purple-500 text-black border-2 border-lime-500 hover:bg-lime-400 shadow-[4px_4px_0px_0px_rgba(132,204,22,1)] hover:shadow-[2px_2px_0px_0px_rgba(132,204,22,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none"
+                      className="w-full h-14 text-lg font-black bg-purple-500 text-black border-2 border-purple-600 hover:bg-purple-500 shadow-[4px_4px_0px_0px_rgba(147,51,234,1)] hover:shadow-[2px_2px_0px_0px_rgba(147,51,234,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none"
                     >
                       {isSubmitting ? "Submitting…" : "Continue to Checkout"}
                       <ArrowRight className="h-5 w-5 ml-2" />

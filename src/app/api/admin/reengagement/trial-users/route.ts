@@ -94,7 +94,7 @@ export async function POST(request: Request) {
       isArtist: true,
       trialReminderSentAt: null,
       artistProfile: {
-        freeReviewCredits: { gte: 1 },
+        reviewCredits: { gte: 1 },
         tracks: { none: {} },
       },
       ...(userIds && userIds.length > 0 ? { id: { in: userIds } } : {}),

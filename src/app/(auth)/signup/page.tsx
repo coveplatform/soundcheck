@@ -57,12 +57,7 @@ export default function SignupPage() {
       .then((session) => {
         if (cancelled) return;
         if (session?.user) {
-          const defaultUrl = session.user.isArtist
-            ? "/artist/dashboard"
-            : session.user.isReviewer
-            ? "/reviewer/dashboard"
-            : "/";
-          router.replace(defaultUrl);
+          router.replace("/dashboard");
           router.refresh();
           return;
         }
@@ -112,7 +107,18 @@ export default function SignupPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => null);
-        const errorMsg = data?.error || "Something went wrong";
+        let errorMsg = data?.error;
+        if (!errorMsg) {
+          if (response.status === 400) {
+            errorMsg = "Invalid signup details. Please check your email and password.";
+          } else if (response.status === 409) {
+            errorMsg = "An account with this email already exists. Try signing in instead.";
+          } else if (response.status >= 500) {
+            errorMsg = "Our servers are having issues. Please try again in a moment.";
+          } else {
+            errorMsg = "Failed to create account. Please try again.";
+          }
+        }
         setError(errorMsg);
         track("signup_failed", { error: errorMsg });
         setIsLoading(false);
@@ -146,10 +152,14 @@ export default function SignupPage() {
 
       // Redirect to submit page or callback URL
       // Keep loading state active during navigation
-      router.push(callbackUrl || "/artist/submit");
+      router.push(callbackUrl || "/onboarding");
       router.refresh();
-    } catch {
-      setError("Something went wrong");
+    } catch (err) {
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("Failed to create account. Please try again.");
+      }
       track("signup_failed", { error: "network_error" });
       setIsLoading(false);
     }
@@ -175,7 +185,7 @@ export default function SignupPage() {
           Back
         </Link>
         <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Get started free</h1>
-        <p className="mt-2 text-neutral-500">5 free review credits • Public track pages • Earn from sales</p>
+        <p className="mt-2 text-neutral-500">2 free credits • Earn more by reviewing • Upgrade to Pro anytime</p>
         <p className="mt-1 text-sm text-neutral-400">No credit card required • Upgrade anytime</p>
       </div>
 
@@ -274,7 +284,7 @@ export default function SignupPage() {
         type="button"
         variant="outline"
         className="w-full h-12 bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-400 font-bold transition-colors duration-150 ease-out motion-reduce:transition-none"
-        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/artist/submit" })}
+        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/onboarding" })}
       >
         <GoogleIcon className="h-5 w-5 mr-2" />
         Continue with Google

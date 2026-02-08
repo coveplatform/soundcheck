@@ -606,7 +606,7 @@ export function AudioPlayer({
               <button
                 type="button"
                 onClick={() => setIsEmbedInteractive(true)}
-                className="inline-flex items-center gap-2 px-4 py-3 bg-lime-500 text-black border-2 border-black font-black text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                className="inline-flex items-center gap-2 px-4 py-3 bg-purple-600 text-black border-2 border-black font-black text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
               >
                 <Play className="h-4 w-4" />
                 Tap to enable player
@@ -629,7 +629,7 @@ export function AudioPlayer({
                   "flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                   isPlaying
                     ? "bg-black text-white border-black"
-                    : "bg-lime-500 text-black border-black hover:bg-lime-400"
+                    : "bg-purple-600 text-black border-black hover:bg-purple-500"
                 )}
               >
                 {isPlaying ? (
@@ -675,7 +675,7 @@ export function AudioPlayer({
                 className={cn(
                   "flex items-center gap-1 px-3 py-1.5 text-xs font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                   timestampAdded
-                    ? "bg-lime-500 text-black border-lime-600 scale-105"
+                    ? "bg-purple-600 text-black border-purple-700 scale-105"
                     : !isPlaying && currentTime === 0
                     ? "bg-neutral-100 text-neutral-400 border-neutral-300 cursor-not-allowed"
                     : "bg-white text-black border-black hover:bg-neutral-100"
@@ -839,7 +839,7 @@ export function AudioPlayer({
                     className={cn(
                       "flex items-center gap-1 px-2 py-1 text-xs font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                       timestampAdded
-                        ? "bg-lime-500 text-black border-lime-600 scale-105"
+                        ? "bg-purple-600 text-black border-purple-700 scale-105"
                         : "bg-white text-black border-black hover:bg-neutral-100"
                     )}
                   >

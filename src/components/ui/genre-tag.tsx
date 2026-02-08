@@ -18,19 +18,19 @@ interface GenreTagProps {
 
 const variantStyles = {
   artist: {
-    selected: "bg-lime-500 text-black border-black",
-    unselected: "bg-white text-black border-black hover:bg-lime-100",
-    display: "bg-lime-100 text-lime-800 border-lime-300",
+    selected: "bg-purple-600 text-white border-purple-600",
+    unselected: "bg-white text-black border-black/15 hover:bg-purple-50",
+    display: "bg-purple-100 text-purple-800 border-purple-200",
   },
   reviewer: {
-    selected: "bg-orange-400 text-black border-black",
-    unselected: "bg-white text-black border-black hover:bg-orange-100",
-    display: "bg-orange-100 text-orange-800 border-orange-300",
+    selected: "bg-purple-600 text-white border-purple-600",
+    unselected: "bg-white text-black border-black/15 hover:bg-purple-50",
+    display: "bg-purple-100 text-purple-800 border-purple-200",
   },
   neutral: {
     selected: "bg-neutral-800 text-white border-black",
-    unselected: "bg-white text-black border-black hover:bg-neutral-100",
-    display: "bg-neutral-100 text-neutral-700 border-neutral-300",
+    unselected: "bg-white text-black border-black/15 hover:bg-neutral-100",
+    display: "bg-neutral-100 text-neutral-700 border-neutral-200",
   },
 };
 

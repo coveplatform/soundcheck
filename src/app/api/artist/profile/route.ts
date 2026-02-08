@@ -58,11 +58,12 @@ export async function POST(request: Request) {
     }
 
     // Create new profile
+    // Note: hasSeenWelcome will use database default (false) if the column exists
     const profile = await (prisma.artistProfile as any).create({
       data: {
         userId: session.user.id,
         artistName,
-        freeReviewCredits: 5,
+        reviewCredits: 2,
         ...(genreIds && genreIds.length > 0
           ? {
               genres: {
@@ -124,7 +125,7 @@ export async function GET() {
       ...profile,
       totalTracks: profile.tracks.length,
       subscriptionStatus: profile.subscriptionStatus,
-      freeReviewCredits: profile.freeReviewCredits,
+      reviewCredits: profile.reviewCredits,
     };
 
     return NextResponse.json(response);

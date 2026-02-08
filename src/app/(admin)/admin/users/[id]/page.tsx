@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { ForceVerifyEmailButton } from "@/components/admin/force-verify-email-button";
 import { ReviewerRestrictionToggle } from "@/components/admin/reviewer-restriction-toggle";
 import { EnableReviewerButton } from "@/components/admin/enable-reviewer-button";
+import { ActivateProButton } from "@/components/admin/activate-pro-button";
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,17 @@ export default async function AdminUserDetailPage({
   const user = await prisma.user.findUnique({
     where: { id },
     include: {
-      artistProfile: { select: { id: true, artistName: true, tracks: { select: { id: true } } } },
+      artistProfile: {
+        select: {
+          id: true,
+          artistName: true,
+          subscriptionStatus: true,
+          subscriptionTier: true,
+          reviewCredits: true,
+          stripeCustomerId: true,
+          tracks: { select: { id: true } },
+        },
+      },
       listenerProfile: {
         select: {
           id: true,
@@ -79,9 +90,36 @@ export default async function AdminUserDetailPage({
       {user.artistProfile ? (
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="font-medium">Artist profile</div>
-          <div className="mt-2 text-sm">
-            <div className="text-neutral-500">Name</div>
-            <div className="font-medium">{user.artistProfile.artistName}</div>
+          <div className="mt-3 grid md:grid-cols-3 gap-3 text-sm">
+            <div>
+              <div className="text-neutral-500">Name</div>
+              <div className="font-medium">{user.artistProfile.artistName}</div>
+            </div>
+            <div>
+              <div className="text-neutral-500">Subscription</div>
+              <div className="font-medium">
+                {user.artistProfile.subscriptionStatus === "active" ? (
+                  <span className="text-green-600">Pro (Active)</span>
+                ) : user.artistProfile.subscriptionStatus ? (
+                  <span className="text-amber-600">{user.artistProfile.subscriptionStatus}</span>
+                ) : (
+                  <span className="text-neutral-400">Free</span>
+                )}
+              </div>
+            </div>
+            <div>
+              <div className="text-neutral-500">Review Credits</div>
+              <div className="font-medium">{user.artistProfile.reviewCredits ?? 0}</div>
+            </div>
+          </div>
+
+          {/* Activate Pro Button */}
+          <div className="mt-4 pt-4 border-t border-neutral-100">
+            <div className="text-sm text-neutral-500 mb-2">Subscription Actions</div>
+            <ActivateProButton
+              userId={user.id}
+              currentStatus={user.artistProfile.subscriptionStatus}
+            />
           </div>
         </div>
       ) : null}
