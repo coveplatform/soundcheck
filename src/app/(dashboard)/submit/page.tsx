@@ -447,15 +447,6 @@ export default function SubmitTrackPage() {
   return (
     <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
       <div className="max-w-6xl">
-        {/* Step indicator */}
-        <StepIndicator
-          currentStep={step}
-          totalSteps={3}
-          labels={["Track", "Details", "Reviews"]}
-          variant="progress"
-          className="mb-6"
-        />
-
         {/* Error display */}
         {error && (
           <Card variant="soft" className="mb-6 bg-red-50 border-red-200">
@@ -469,14 +460,16 @@ export default function SubmitTrackPage() {
         {/* STEP 1: Upload your track                                         */}
         {/* ================================================================= */}
         {step === 1 && (
-          <div className="space-y-5">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-light tracking-tight">
-                Upload your track
+          <div className="space-y-6">
+            <div className="mb-12 pb-8 border-b border-neutral-200">
+              <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">
+                Submit Track
               </h1>
-              <p className="mt-1 text-sm text-neutral-500">
-                Share a link or upload an MP3
-              </p>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="text-neutral-500">Step 1 of 3</span>
+                <span className="text-neutral-300">&bull;</span>
+                <span className="text-neutral-500">Upload your track</span>
+              </div>
             </div>
 
             {/* Upload mode toggle */}
@@ -662,22 +655,25 @@ export default function SubmitTrackPage() {
         {/* STEP 2: Track details                                             */}
         {/* ================================================================= */}
         {step === 2 && (
-          <div className="space-y-5">
-            <button
-              onClick={goBack}
-              className="flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </button>
-
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-light tracking-tight">
-                Track details
+          <div className="space-y-6">
+            <div className="mb-12 pb-8 border-b border-neutral-200">
+              <div className="flex items-center gap-3 mb-4">
+                <button
+                  onClick={goBack}
+                  className="flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back
+                </button>
+              </div>
+              <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">
+                Track Details
               </h1>
-              <p className="mt-1 text-sm text-neutral-500">
-                Help us match you with the right reviewers
-              </p>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="text-neutral-500">Step 2 of 3</span>
+                <span className="text-neutral-300">&bull;</span>
+                <span className="text-neutral-500">Add title and genres</span>
+              </div>
             </div>
 
             {/* Title */}
@@ -764,22 +760,25 @@ export default function SubmitTrackPage() {
         {/* STEP 3: Request reviews (credit-based)                            */}
         {/* ================================================================= */}
         {step === 3 && (
-          <div className="space-y-5">
-            <button
-              onClick={goBack}
-              className="flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </button>
-
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-light tracking-tight">
-                Request reviews
+          <div className="space-y-6">
+            <div className="mb-12 pb-8 border-b border-neutral-200">
+              <div className="flex items-center gap-3 mb-4">
+                <button
+                  onClick={goBack}
+                  className="flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back
+                </button>
+              </div>
+              <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">
+                Request Reviews
               </h1>
-              <p className="mt-1 text-sm text-neutral-500">
-                How many reviews do you want?
-              </p>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="text-neutral-500">Step 3 of 3</span>
+                <span className="text-neutral-300">&bull;</span>
+                <span className="text-neutral-500">Choose review count</span>
+              </div>
             </div>
 
             {/* Credit balance */}

@@ -69,16 +69,17 @@ export default async function ReviewHistoryPage() {
 
   return (
     <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
-      <div className="mb-10">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">History</h1>
-        <p className="mt-2 text-sm text-black/40">
-          {reviews.length} completed review{reviews.length !== 1 ? "s" : ""}
-        </p>
-      </div>
+      <div className="max-w-6xl">
+        <div className="mb-12 pb-8 border-b border-neutral-200">
+          <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">History</h1>
+          <div className="text-sm text-neutral-500">
+            {reviews.length} completed review{reviews.length !== 1 ? "s" : ""}
+          </div>
+        </div>
 
-      <Card variant="soft" elevated>
-        <CardContent className="pt-6">
-          <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-4">past reviews</p>
+        <Card variant="soft" elevated>
+          <CardContent className="pt-6">
+            <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-4">past reviews</p>
 
           {reviews.length === 0 ? (
             <EmptyState
@@ -138,6 +139,7 @@ export default async function ReviewHistoryPage() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

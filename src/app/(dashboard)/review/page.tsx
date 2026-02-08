@@ -134,12 +134,15 @@ export default async function ReviewQueuePage({
 
       <div className="max-w-6xl">
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Review Queue</h1>
-          <p className="mt-2 text-sm text-black/40">
-            {pendingReviews.length} track{pendingReviews.length !== 1 ? "s" : ""} waiting for your feedback
-            {" "}&mdash; earn 1 credit per review
-          </p>
+        <div className="mb-12 pb-8 border-b border-neutral-200">
+          <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">Review Queue</h1>
+          <div className="flex items-center gap-4 text-sm">
+            <span className="text-neutral-500">
+              {pendingReviews.length} track{pendingReviews.length !== 1 ? "s" : ""} waiting
+            </span>
+            <span className="text-neutral-300">&bull;</span>
+            <span className="text-neutral-500">Earn 1 credit per review</span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
