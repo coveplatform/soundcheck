@@ -169,8 +169,8 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="pt-14 px-6 sm:px-8 lg:px-12 pb-20">
-      <div className="max-w-5xl mx-auto">
+    <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
+      <div className="max-w-6xl">
         {/* Welcome Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
           <div>

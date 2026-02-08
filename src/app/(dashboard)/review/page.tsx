@@ -100,7 +100,7 @@ export default async function ReviewQueuePage({
     : "--";
 
   return (
-    <div className="pt-14 px-6 sm:px-8 lg:px-12 pb-20">
+    <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
       {/* Notices */}
       {notice === "skipped" && (
         <div className="mb-6 rounded-2xl border border-purple-200 bg-purple-50 p-4">
@@ -132,7 +132,7 @@ export default async function ReviewQueuePage({
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl">
         {/* Header */}
         <div className="mb-10">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Review Queue</h1>

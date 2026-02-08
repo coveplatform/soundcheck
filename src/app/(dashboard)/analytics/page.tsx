@@ -60,7 +60,7 @@ export default async function AnalyticsPage() {
   if (tracks.length === 0 && isSubscribed) {
     return (
       <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 pb-8 border-b border-neutral-200">
             <div>
               <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">Analytics</h1>
@@ -304,7 +304,7 @@ export default async function AnalyticsPage() {
 
     return (
       <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 pb-8 border-b border-neutral-200">
             <div>
               <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">Analytics</h1>
@@ -411,7 +411,7 @@ export default async function AnalyticsPage() {
 
   return (
     <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 pb-8 border-b border-neutral-200">
           <div>
             <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">Analytics</h1>

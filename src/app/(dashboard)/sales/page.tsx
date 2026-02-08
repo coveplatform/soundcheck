@@ -517,7 +517,7 @@ export default async function SalesHubPage() {
   if (!isPro) {
     return (
       <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl">
           {header}
 
           <div className="relative">
@@ -595,7 +595,7 @@ export default async function SalesHubPage() {
 
   return (
     <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl">
         {header}
         {content}
       </div>
