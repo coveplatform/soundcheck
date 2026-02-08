@@ -67,16 +67,9 @@ export async function POST(
       );
     }
 
-    if (track.reviews.length > 0) {
-      return NextResponse.json(
-        { error: "This track already has reviews" },
-        { status: 400 }
-      );
-    }
-
-    const isEligibleUploadOnly = (track.status as any) === "UPLOADED";
-
-    if (!isEligibleUploadOnly) {
+    // Allow requesting more reviews on tracks that are UPLOADED, COMPLETED, or IN_PROGRESS
+    const eligibleStatuses = ["UPLOADED", "COMPLETED", "IN_PROGRESS", "QUEUED"];
+    if (!eligibleStatuses.includes(track.status as any)) {
       return NextResponse.json(
         { error: "Track is not eligible for requesting reviews" },
         { status: 400 }
@@ -117,24 +110,26 @@ export async function POST(
         throw new Error("INSUFFICIENT_TOKENS");
       }
 
-      const updatedTrack = await tx.track.updateMany({
-        where: {
-          id: track.id,
-          status: "UPLOADED",
-        },
+      // Determine new status based on current state
+      const currentReviewsCompleted = track.reviewsCompleted ?? 0;
+      const hasExistingReviews = track.reviews.length > 0;
+      const currentReviewsRequested = track.reviewsRequested ?? 0;
+      const newReviewsRequested = currentReviewsRequested + desired;
+
+      // If adding more reviews and already have some completed, go to IN_PROGRESS
+      // If no reviews yet, go to QUEUED
+      const newStatus = hasExistingReviews ? "IN_PROGRESS" : "QUEUED";
+
+      await tx.track.update({
+        where: { id: track.id },
         data: {
-          packageType,
-          reviewsRequested: desired,
-          reviewsCompleted: 0,
-          status: "QUEUED",
-          paidAt: new Date(),
-          completedAt: null,
+          packageType: hasExistingReviews ? track.packageType : packageType,
+          reviewsRequested: newReviewsRequested,
+          status: newStatus,
+          paidAt: track.paidAt ?? new Date(),
+          completedAt: null, // Clear completion if it was completed
         },
       });
-
-      if (updatedTrack.count === 0) {
-        throw new Error("TRACK_NOT_ELIGIBLE");
-      }
     });
 
     await assignReviewersToTrack(track.id);

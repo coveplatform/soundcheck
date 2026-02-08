@@ -28,12 +28,17 @@ export default async function SubmitSuccessPage({ searchParams }: SuccessPagePro
                 Track Submitted!
               </h1>
               {hasReviews ? (
-                <p className="mt-3 text-neutral-600">
-                  <span className="font-semibold text-purple-600">
-                    {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
-                  </span>{" "}
-                  requested &mdash; we&apos;re matching you with artists now.
-                </p>
+                <div className="mt-3 space-y-2">
+                  <p className="text-neutral-600">
+                    <span className="font-semibold text-purple-600">
+                      {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
+                    </span>{" "}
+                    requested &mdash; we&apos;re matching you with artists now.
+                  </p>
+                  <p className="text-sm text-neutral-500">
+                    You can request more reviews anytime from your track page when you have credits.
+                  </p>
+                </div>
               ) : (
                 <p className="mt-3 text-neutral-600">
                   Your track has been uploaded. You can request reviews any time
@@ -53,9 +58,10 @@ export default async function SubmitSuccessPage({ searchParams }: SuccessPagePro
                   <li>Reviewers are matched to your genres</li>
                   <li>Each reviewer listens and submits structured feedback</li>
                   <li>You&apos;ll be notified as reviews come in</li>
+                  <li className="font-medium text-purple-700">Want more? You can request additional reviews anytime</li>
                 </ol>
                 <p className="mt-3 text-xs text-neutral-500">
-                  Reviews typically arrive within 24&ndash;72 hours.
+                  Initial reviews typically arrive within 24&ndash;72 hours.
                 </p>
               </div>
             )}
