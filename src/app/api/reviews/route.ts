@@ -155,7 +155,7 @@ export async function POST(request: Request) {
     // Support both legacy reviewer profiles AND peer reviewers (artist profiles)
     const reviewerProfile = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
-      select: { id: true, isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
+      select: { id: true, isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true, tier: true },
     });
 
     const artistProfile = await prisma.artistProfile.findUnique({
@@ -163,8 +163,9 @@ export async function POST(request: Request) {
       select: { id: true, completedOnboarding: true },
     });
 
-    const isPeerReviewer = !reviewerProfile && !!artistProfile;
-
+    // Determine if user is a peer reviewer:
+    // - Must have artist profile
+    // - If they ALSO have reviewer profile, they can be either (check review type later)
     if (!reviewerProfile && !artistProfile) {
       return NextResponse.json(
         { error: "Profile not found" },
@@ -199,11 +200,12 @@ export async function POST(request: Request) {
     const body = await request.json();
     const data = submitReviewSchema.parse(body);
 
-    // Get the review and verify ownership
+    // Get the review and verify ownership (handle both peer and legacy reviews)
     const review = await prisma.review.findUnique({
       where: { id: data.reviewId },
       include: {
         reviewer: true,
+        peerReviewerArtist: { include: { user: true } },
         track: {
           include: {
             artist: { include: { user: true } },
@@ -216,8 +218,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    if (review.reviewer.userId !== session.user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Verify ownership - check if this is a peer review or legacy review
+    const isPeerReview = review.isPeerReview || !!review.peerReviewerArtistId;
+
+    if (isPeerReview) {
+      // Peer review - check if user owns the peer reviewer artist profile
+      if (!review.peerReviewerArtist || review.peerReviewerArtist.userId !== session.user.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    } else {
+      // Legacy review - check if user owns the reviewer profile
+      if (!review.reviewer || review.reviewer.userId !== session.user.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
     }
 
     if (review.status === "COMPLETED") {
@@ -262,7 +275,7 @@ export async function POST(request: Request) {
     }
 
     // Calculate earnings: peer reviewers earn credits (0 cash), legacy reviewers earn cash
-    const earnings = isPeerReviewer ? 0 : getTierRateCents(review.reviewer.tier);
+    const earnings = isPeerReview ? 0 : getTierRateCents(reviewerProfile!.tier);
 
     const now = new Date();
     const startOfToday = new Date(now);
@@ -355,7 +368,7 @@ export async function POST(request: Request) {
       }
 
       // Update reviewer profile: legacy reviewers get cash, peer reviewers get credits
-      if (isPeerReviewer && artistProfile) {
+      if (isPeerReview && artistProfile) {
         await (tx.artistProfile as any).update({
           where: { id: artistProfile.id },
           data: {

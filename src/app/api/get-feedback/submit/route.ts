@@ -23,7 +23,7 @@ const newUserSchema = z.object({
   duration: z.number().int().positive().max(60 * 60).optional().nullable(),
   genreIds: z.array(z.string()).min(1, "Select at least one genre").max(3),
   feedbackFocus: z.string().max(1000).optional(),
-  packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE"]),
+  packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE", "PEER"]),
 
   // Account info (required for new users)
   email: z.string().email("Invalid email address"),
@@ -41,7 +41,7 @@ const loggedInSchema = z.object({
   duration: z.number().int().positive().max(60 * 60).optional().nullable(),
   genreIds: z.array(z.string()).min(1, "Select at least one genre").max(3),
   feedbackFocus: z.string().max(1000).optional(),
-  packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE"]),
+  packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE", "PEER"]),
   // Optional artist name for users without a profile
   artistName: z.string().min(1).max(100).optional(),
 });
@@ -126,8 +126,72 @@ export async function POST(request: Request) {
         }
       }
 
-      // Go through paid checkout
+      // Handle PEER vs paid packages
       const packageDetails = PACKAGES[data.packageType];
+      const isPeerPackage = data.packageType === "PEER";
+
+      // For PEER packages, we need credits
+      if (isPeerPackage) {
+        // Default to 1 credit if not specified
+        const creditsToSpend = 1;
+        const currentCredits = (artistProfile as any).reviewCredits ?? 0;
+
+        if (currentCredits < creditsToSpend) {
+          return NextResponse.json(
+            { error: `Not enough credits. You have ${currentCredits}, need ${creditsToSpend}.` },
+            { status: 400 }
+          );
+        }
+
+        // Create track and deduct credits in a transaction
+        const track = await prisma.$transaction(async (tx) => {
+          // Deduct credits from artist
+          await tx.artistProfile.update({
+            where: { id: artistProfileId },
+            data: {
+              reviewCredits: { decrement: creditsToSpend },
+              totalCreditsSpent: { increment: creditsToSpend },
+            },
+          });
+
+          // Create track with QUEUED status (no payment needed)
+          return tx.track.create({
+            data: {
+              artistId: artistProfileId,
+              sourceUrl: data.sourceUrl,
+              sourceType,
+              title: data.title,
+              artworkUrl: data.artworkUrl,
+              duration: data.duration,
+              feedbackFocus: data.feedbackFocus,
+              packageType: data.packageType,
+              reviewsRequested: creditsToSpend,
+              creditsSpent: creditsToSpend,
+              status: "QUEUED", // Skip payment
+              paidAt: new Date(), // Mark as "paid" via credits
+              genres: {
+                connect: data.genreIds.map((id) => ({ id })),
+              },
+            },
+          });
+        });
+
+        // Mark lead as converted
+        const sessionEmail = (session?.user as { email?: string } | undefined)?.email;
+        if (sessionEmail) {
+          const normalizedEmail = sessionEmail.trim().toLowerCase();
+          await markLeadConverted(normalizedEmail);
+        }
+
+        return NextResponse.json({
+          success: true,
+          trackId: track.id,
+          checkoutUrl: null, // No checkout needed for PEER
+          signIn: false,
+        });
+      }
+
+      // Paid package flow
       const track = await prisma.track.create({
         data: {
           artistId: artistProfileId,

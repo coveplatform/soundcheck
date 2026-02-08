@@ -1,8 +1,9 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import { DashboardNav } from "@/components/dashboard/nav";
-import { DashboardBackdrop } from "@/components/dashboard/backdrop";
+import { prisma } from "@/lib/prisma";
+import { Sidebar } from "@/components/dashboard/sidebar";
+import { VerifyEmailBanner } from "@/components/ui/verify-email-banner";
 
 export default async function ReviewLayout({
   children,
@@ -11,17 +12,80 @@ export default async function ReviewLayout({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
+  // Fetch user for email verification
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { emailVerified: true },
+  });
+
+  // Fetch artist profile for sidebar
+  let artistProfile: any = null;
+  try {
+    artistProfile = await (prisma.artistProfile as any).findUnique({
+      where: { userId: session.user.id },
+      select: {
+        id: true,
+        artistName: true,
+        reviewCredits: true,
+        subscriptionStatus: true,
+      },
+    });
+  } catch {
+    // Fallback without reviewCredits if column doesn't exist yet
+    artistProfile = await (prisma.artistProfile as any).findUnique({
+      where: { userId: session.user.id },
+      select: {
+        id: true,
+        artistName: true,
+        subscriptionStatus: true,
+      },
+    });
+  }
+
+  if (!artistProfile) {
+    redirect("/onboarding");
+  }
+
+  const artistName = artistProfile.artistName || session.user.name || "Artist";
+  const credits: number = artistProfile.reviewCredits ?? 0;
+  const isPro = artistProfile.subscriptionStatus === "active";
+
+  // Count pending peer reviews
+  let pendingReviews = 0;
+  try {
+    pendingReviews = await (prisma.review as any).count({
+      where: {
+        peerReviewerArtistId: artistProfile.id,
+        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+      },
+    });
+  } catch {
+    pendingReviews = 0;
+  }
+
   return (
-    <div className="min-h-screen bg-[#faf8f5] relative">
-      <DashboardBackdrop />
-      <DashboardNav user={session.user} />
-      <main className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10 py-8 sm:py-12 pb-28 md:pb-12 md:pl-64 lg:pl-72">
-        {children}
-      </main>
+    <div className="min-h-screen bg-[#faf8f5]">
+      <Sidebar
+        artistName={artistName}
+        credits={credits}
+        isPro={isPro}
+        pendingReviews={pendingReviews}
+      />
+
+      {/* Main content with sidebar offset */}
+      <div className="md:pl-64">
+        {!user?.emailVerified && (
+          <div className="pt-6 px-6 sm:px-8">
+            <VerifyEmailBanner />
+          </div>
+        )}
+
+        <main className="pb-24 md:pb-8">{children}</main>
+      </div>
     </div>
   );
 }
