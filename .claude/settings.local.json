@@ -59,7 +59,8 @@
       "Bash(cross-env DATABASE_URL=\"postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" node:*)",
       "Bash(copy .env .env.backup)",
       "Bash(echo:*)",
-      "Bash(diff:*)"
+      "Bash(diff:*)",
+      "Bash(git push:*)"
     ]
   }
 }
