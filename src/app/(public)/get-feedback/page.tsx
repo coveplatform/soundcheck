@@ -1188,7 +1188,7 @@ export default function GetFeedbackPage() {
                         Create your project
                       </h2>
                       <p className="text-sm text-neutral-400 mt-1">
-                        Next you&apos;ll create your account and get 5 free reviews to start.
+                        Next you&apos;ll create your account and get 2 free credits to start.
                       </p>
                     </div>
 

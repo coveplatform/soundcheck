@@ -66,12 +66,15 @@ export default function ArtistOnboardingPage() {
           <p className="mt-2 text-neutral-500">Let&apos;s set up your artist profile</p>
           
           <div className="mt-6 p-4 bg-purple-50 border-2 border-purple-200 rounded-lg shadow-sm">
-            <p className="text-xs font-bold text-purple-900 uppercase tracking-wider mb-3">What&apos;s next:</p>
+            <p className="text-xs font-bold text-purple-900 uppercase tracking-wider mb-3">How it works:</p>
             <ol className="text-sm text-purple-900 space-y-2 list-decimal list-inside font-medium">
-              <li>Upload your first track</li>
-              <li>Request your 5 free reviews</li>
-              <li>Get detailed feedback in 24-48 hours</li>
+              <li>You start with <strong>2 free credits</strong></li>
+              <li>Upload tracks and spend credits to get peer reviews</li>
+              <li>Review other artists&apos; tracks to earn more credits</li>
             </ol>
+            <p className="text-xs text-purple-700 mt-3 font-medium">
+              💡 1 review you give = 1 credit earned
+            </p>
           </div>
         </div>
 
@@ -96,7 +99,7 @@ export default function ArtistOnboardingPage() {
               className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent"
             />
             <p className="text-sm text-neutral-500 mt-3">
-              This is how you&apos;ll appear to reviewers. You can pick genres when you submit a track.
+              This is how you&apos;ll appear to other artists. You can pick genres when you submit a track.
             </p>
           </div>
 

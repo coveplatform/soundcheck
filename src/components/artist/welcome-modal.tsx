@@ -63,7 +63,7 @@ export function WelcomeModal({ open, onDismiss, freeCredits }: WelcomeModalProps
                   <Check className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
                 </div>
                 <span className="text-sm text-neutral-700">
-                  <span className="font-semibold">{freeCredits} free reviews</span> from real listeners
+                  <span className="font-semibold">{freeCredits} free credits</span> to get peer reviews
                 </span>
               </div>
               <div className="flex items-center gap-3">
