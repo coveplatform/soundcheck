@@ -16,6 +16,14 @@
  * - Transfer pending balances (kept in original profile for payouts)
  */
 
+// Load environment variables
+import { config } from 'dotenv';
+import { resolve } from 'path';
+
+// Load .env.local first, then .env
+config({ path: resolve(__dirname, '../.env.local') });
+config({ path: resolve(__dirname, '../.env') });
+
 import { prisma } from '../src/lib/prisma';
 
 interface MigrationStats {
