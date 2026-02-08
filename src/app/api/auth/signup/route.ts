@@ -13,10 +13,9 @@ const signupSchema = z.object({
     .string()
     .min(8, "Password must be at least 8 characters")
     .regex(PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE),
-  // Role is always "artist" now - everyone can review via peer system
-  role: z.enum(["artist"]).optional().default("artist"),
   acceptedTerms: z.boolean(),
   referralSource: z.string().optional(),
+  // Note: 'role' field removed - everyone is both artist and reviewer in unified model
 });
 
 export async function POST(request: Request) {
@@ -40,7 +39,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { email, password, role, acceptedTerms, referralSource } = signupSchema.parse(body);
+    const { email, password, acceptedTerms, referralSource } = signupSchema.parse(body);
     const normalizedEmail = email.trim().toLowerCase();
 
     if (!acceptedTerms) {

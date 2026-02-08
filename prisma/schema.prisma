@@ -20,9 +20,9 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  // Role: can be both artist and reviewer
-  isArtist   Boolean @default(false)
-  isReviewer Boolean @default(false)
+  // Unified model: everyone is both artist and reviewer
+  isArtist   Boolean @default(true)
+  isReviewer Boolean @default(true) // DEPRECATED - kept for backwards compatibility
 
   // How did they hear about us?
   referralSource String?

@@ -34,6 +34,16 @@ interface MigrationStats {
 async function main() {
   console.log('🚀 Starting dual-profile migration...\n');
 
+  // Step 0: Set all users to isArtist=true and isReviewer=true (unified model)
+  console.log('📝 Step 1: Updating all users to unified model (isArtist=true, isReviewer=true)...');
+  const updateResult = await prisma.user.updateMany({
+    data: {
+      isArtist: true,
+      isReviewer: true,
+    },
+  });
+  console.log(`✓ Updated ${updateResult.count} users to unified model\n`);
+
   const stats: MigrationStats = {
     totalUsers: 0,
     usersWithBothProfiles: 0,
@@ -116,10 +126,13 @@ async function main() {
         stats.artistProfilesCreated++;
         stats.genresMigrated += user.listenerProfile.genres.length * 2;
 
-        // Update user to be marked as artist
+        // Update user to be marked as artist and reviewer (unified model)
         await prisma.user.update({
           where: { id: user.id },
-          data: { isArtist: true },
+          data: {
+            isArtist: true,
+            isReviewer: true, // Everyone can review in the unified model
+          },
         });
 
         console.log(`  ✓ Created ArtistProfile for ${user.email}`);
