@@ -87,7 +87,7 @@ async function main() {
 
     try {
       // Case 1: User has both profiles (dual-role)
-      if (hasArtist && hasListener) {
+      if (hasArtist && hasListener && user.listenerProfile && user.artistProfile) {
         stats.usersWithBothProfiles++;
         console.log(`✓ User ${user.email} has both profiles (keeping both for now)`);
 
@@ -106,7 +106,7 @@ async function main() {
         }
       }
       // Case 2: User has only ListenerProfile (paid reviewer, no artist profile)
-      else if (!hasArtist && hasListener) {
+      else if (!hasArtist && hasListener && user.listenerProfile) {
         stats.usersWithOnlyListener++;
         console.log(`⚠️  User ${user.email} has only ListenerProfile - creating ArtistProfile...`);
 
