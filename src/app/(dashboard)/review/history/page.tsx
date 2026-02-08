@@ -68,7 +68,7 @@ export default async function ReviewHistoryPage() {
   });
 
   return (
-    <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12">
+    <div>
       <div className="mb-10">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">History</h1>
         <p className="mt-2 text-sm text-black/40">
