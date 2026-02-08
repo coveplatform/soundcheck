@@ -453,7 +453,7 @@ export default function SubmitTrackPage() {
           totalSteps={3}
           labels={["Track", "Details", "Reviews"]}
           variant="progress"
-          className="mb-8"
+          className="mb-6"
         />
 
         {/* Error display */}
@@ -469,12 +469,12 @@ export default function SubmitTrackPage() {
         {/* STEP 1: Upload your track                                         */}
         {/* ================================================================= */}
         {step === 1 && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-light tracking-tight">
                 Upload your track
               </h1>
-              <p className="mt-2 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-neutral-500">
                 Share a link or upload an MP3
               </p>
             </div>
@@ -523,13 +523,13 @@ export default function SubmitTrackPage() {
             {/* Link mode */}
             {uploadMode === "link" && (
               <Card variant="soft" elevated>
-                <CardContent className="pt-6 space-y-4">
+                <CardContent className="pt-5 space-y-3">
                   <Input
                     placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
                     value={url}
                     onChange={(e) => handleUrlChange(e.target.value)}
                     className={cn(
-                      "h-12 rounded-xl border-neutral-200 bg-white focus:border-purple-500",
+                      "h-11 rounded-xl border-neutral-200 bg-white focus:border-purple-500",
                       urlError && "border-red-500"
                     )}
                     autoFocus
@@ -569,7 +569,7 @@ export default function SubmitTrackPage() {
             {/* File mode */}
             {uploadMode === "file" && (
               <Card variant="soft" elevated>
-                <CardContent className="pt-6">
+                <CardContent className="pt-5">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -601,7 +601,7 @@ export default function SubmitTrackPage() {
                       }
                     }}
                     className={cn(
-                      "rounded-xl border-2 border-dashed p-10 text-center cursor-pointer transition-colors duration-150",
+                      "rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-colors duration-150",
                       isDragging && "border-purple-400 bg-purple-50",
                       !isDragging &&
                         !uploadedFileName &&
@@ -662,7 +662,7 @@ export default function SubmitTrackPage() {
         {/* STEP 2: Track details                                             */}
         {/* ================================================================= */}
         {step === 2 && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <button
               onClick={goBack}
               className="flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
@@ -672,20 +672,20 @@ export default function SubmitTrackPage() {
             </button>
 
             <div>
-              <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-light tracking-tight">
                 Track details
               </h1>
-              <p className="mt-2 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-neutral-500">
                 Help us match you with the right reviewers
               </p>
             </div>
 
             {/* Title */}
             <Card variant="soft" elevated>
-              <CardContent className="pt-6">
+              <CardContent className="pt-5 pb-5">
                 <label
                   htmlFor="track-title"
-                  className="block text-xs font-mono tracking-widest text-neutral-400 uppercase mb-3"
+                  className="block text-xs font-mono tracking-widest text-neutral-400 uppercase mb-2"
                 >
                   Title
                 </label>
@@ -694,7 +694,7 @@ export default function SubmitTrackPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="What's your track called?"
-                  className="h-12 rounded-xl border-neutral-200 bg-white focus:border-purple-500"
+                  className="h-11 rounded-xl border-neutral-200 bg-white focus:border-purple-500"
                   autoFocus
                 />
               </CardContent>
@@ -702,8 +702,8 @@ export default function SubmitTrackPage() {
 
             {/* Genres */}
             <Card variant="soft" elevated>
-              <CardContent className="pt-6">
-                <p className="text-xs font-mono tracking-widest text-neutral-400 uppercase mb-3">
+              <CardContent className="pt-5">
+                <p className="text-xs font-mono tracking-widest text-neutral-400 uppercase mb-2">
                   Genre{" "}
                   <span className="normal-case text-neutral-300">(1-3)</span>
                 </p>
@@ -726,10 +726,10 @@ export default function SubmitTrackPage() {
 
             {/* Feedback focus (optional) */}
             <Card variant="soft" elevated>
-              <CardContent className="pt-6">
+              <CardContent className="pt-5">
                 <label
                   htmlFor="feedback-focus"
-                  className="block text-xs font-mono tracking-widest text-neutral-400 uppercase mb-3"
+                  className="block text-xs font-mono tracking-widest text-neutral-400 uppercase mb-2"
                 >
                   Feedback focus{" "}
                   <span className="normal-case text-neutral-300">(optional)</span>
@@ -739,7 +739,7 @@ export default function SubmitTrackPage() {
                   value={feedbackFocus}
                   onChange={(e) => setFeedbackFocus(e.target.value)}
                   placeholder="Anything you want reviewers to focus on? e.g. mix balance, arrangement, vocal processing..."
-                  rows={3}
+                  rows={2}
                   maxLength={1000}
                   className="w-full rounded-xl border-2 border-neutral-200 bg-white px-4 py-3 text-sm placeholder:text-neutral-400 focus:border-purple-500 focus:outline-none resize-none"
                 />
@@ -764,7 +764,7 @@ export default function SubmitTrackPage() {
         {/* STEP 3: Request reviews (credit-based)                            */}
         {/* ================================================================= */}
         {step === 3 && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <button
               onClick={goBack}
               className="flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
@@ -774,16 +774,16 @@ export default function SubmitTrackPage() {
             </button>
 
             <div>
-              <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-light tracking-tight">
                 Request reviews
               </h1>
-              <p className="mt-2 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-neutral-500">
                 How many reviews do you want?
               </p>
             </div>
 
             {/* Credit balance */}
-            <div className="flex items-center gap-3 rounded-xl bg-purple-50 border border-purple-200 px-5 py-4">
+            <div className="flex items-center gap-3 rounded-xl bg-purple-50 border border-purple-200 px-4 py-3">
               <Coins className="h-5 w-5 text-purple-600 flex-shrink-0" />
               <p className="text-sm font-medium text-purple-900">
                 You have{" "}
@@ -804,7 +804,7 @@ export default function SubmitTrackPage() {
                     type="button"
                     onClick={() => setReviewCount(option.value)}
                     className={cn(
-                      "relative flex flex-col items-center gap-1 rounded-xl border-2 p-4 transition-all duration-150",
+                      "relative flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all duration-150",
                       isSelected
                         ? "border-purple-600 bg-purple-50 ring-1 ring-purple-600"
                         : "border-neutral-200 bg-white hover:border-purple-300"
