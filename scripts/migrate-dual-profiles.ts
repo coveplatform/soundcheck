@@ -16,9 +16,7 @@
  * - Transfer pending balances (kept in original profile for payouts)
  */
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../src/lib/prisma';
 
 interface MigrationStats {
   totalUsers: number;
@@ -192,6 +190,7 @@ main()
     console.error('❌ Migration failed:', error);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
+  .then(() => {
+    console.log('✅ Migration script completed successfully!');
+    process.exit(0);
   });
