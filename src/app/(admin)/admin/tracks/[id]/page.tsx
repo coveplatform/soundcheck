@@ -264,7 +264,7 @@ export default async function AdminTrackDetailPage({
                     <td className="px-4 py-3">
                       <ReassignReviewerButton
                         trackId={track.id}
-                        currentReviewerId={q.ReviewerProfileId}
+                        currentReviewerId={q.reviewerId}
                         currentReviewerEmail={q.ReviewerProfile.User.email}
                       />
                     </td>

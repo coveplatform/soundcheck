@@ -20,8 +20,8 @@ export default async function AdminTracksPage({
             OR: [
               { title: { contains: q, mode: "insensitive" } },
               {
-                artist: {
-                  user: { email: { contains: q, mode: "insensitive" } },
+                ArtistProfile: {
+                  User: { email: { contains: q, mode: "insensitive" } },
                 },
               },
             ],
@@ -38,14 +38,14 @@ export default async function AdminTracksPage({
       promoCode: true,
       createdAt: true,
       reviewsRequested: true,
-      artist: {
+      ArtistProfile: {
         select: {
           subscriptionStatus: true,
           reviewCredits: true,
-          user: { select: { id: true, email: true } },
+          User: { select: { id: true, email: true } },
         },
       },
-      payment: { select: { status: true, stripePaymentId: true } },
+      Payment: { select: { status: true, stripePaymentId: true } },
     },
   });
 
