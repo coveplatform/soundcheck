@@ -83,7 +83,7 @@ async function main() {
   // Get all users with their profiles
   const users = await prisma.user.findMany({
     include: {
-      artistProfile: {
+      ArtistProfile: {
         include: {
           genres: true,
           reviewGenres: true,
