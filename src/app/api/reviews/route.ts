@@ -404,7 +404,7 @@ export async function POST(request: Request) {
       });
 
       const nextTrackStatus =
-        countedCompletedReviews >= review.track.ReviewRequested
+        countedCompletedReviews >= review.track.reviewsRequested
           ? ("COMPLETED" as const)
           : ("IN_PROGRESS" as const);
 
@@ -440,7 +440,7 @@ export async function POST(request: Request) {
         completedReviews: countedCompletedReviews,
         Track: {
           title: updatedTrack.title,
-          reviewsRequested: updatedTrack.ReviewRequested,
+          reviewsRequested: updatedTrack.reviewsRequested,
           artistEmail: updatedTrack.ArtistProfile.User?.email ?? null,
         },
       };
@@ -476,8 +476,8 @@ export async function POST(request: Request) {
 
     await updateReviewerTier(review.reviewerId);
 
-    const milestoneHalf = Math.ceil(result.track.ReviewRequested / 2);
-    const milestoneFull = result.track.ReviewRequested;
+    const milestoneHalf = Math.ceil(result.track.reviewsRequested / 2);
+    const milestoneFull = result.track.reviewsRequested;
 
     if (
       result.track.artistEmail &&
@@ -488,7 +488,7 @@ export async function POST(request: Request) {
         result.track.artistEmail,
         result.track.title,
         result.completedReviews,
-        result.track.ReviewRequested
+        result.track.reviewsRequested
       );
     }
 

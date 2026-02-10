@@ -269,7 +269,7 @@ describe('Queue Assignment Integration', () => {
       const countedCompletedReviews = 3
       const activeAssignments = 2
       const neededReviews =
-        track.ReviewRequested - countedCompletedReviews - activeAssignments
+        track.reviewsRequested - countedCompletedReviews - activeAssignments
 
       expect(neededReviews).toBe(5) // Need 5 more reviewers
     })

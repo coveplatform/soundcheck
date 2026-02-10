@@ -293,9 +293,9 @@ export default async function TracksPage() {
                   ).length;
                   const totalPurchases =
                     track.purchases.reduce((sum, p) => sum + p.amount, 0) / 100;
-                  const hasReviews = track.ReviewRequested > 0;
+                  const hasReviews = track.reviewsRequested > 0;
                   const reviewProgress = hasReviews
-                    ? completedReviews / track.ReviewRequested
+                    ? completedReviews / track.reviewsRequested
                     : 0;
 
                   return (
@@ -308,7 +308,7 @@ export default async function TracksPage() {
                       hasReviews={hasReviews}
                       reviewProgress={reviewProgress}
                       completedReviews={completedReviews}
-                      totalReviews={track.ReviewRequested}
+                      totalReviews={track.reviewsRequested}
                       earnings={totalPurchases}
                     />
                   );

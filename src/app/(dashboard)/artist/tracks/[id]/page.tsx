@@ -115,8 +115,8 @@ export default async function TrackDetailPage({
     (r) => r.countsTowardCompletion !== false
   ).length;
   const progress =
-    track.ReviewRequested > 0
-      ? Math.round((countedCompletedReviews / track.ReviewRequested) * 100)
+    track.reviewsRequested > 0
+      ? Math.round((countedCompletedReviews / track.reviewsRequested) * 100)
       : 0;
 
   // Calculate earnings
@@ -202,7 +202,7 @@ export default async function TrackDetailPage({
               )}
 
               {/* Stats Pills */}
-              {track.ReviewRequested > 0 && (
+              {track.reviewsRequested > 0 && (
                 <div className="flex flex-wrap items-center gap-3 text-sm">
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-black">{completedReviews}</span>

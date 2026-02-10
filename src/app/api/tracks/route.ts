@@ -94,7 +94,7 @@ export async function POST(request: Request) {
 
     // For PEER packages, reviewsRequested comes from credits spent
     const reviewsRequested = isPeerPackage
-      ? (data.ReviewRequested ?? 0)
+      ? (data.reviewsRequested ?? 0)
       : PACKAGES[packageType].Review;
 
     const createData = {

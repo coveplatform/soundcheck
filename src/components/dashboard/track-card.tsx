@@ -19,7 +19,7 @@ interface TrackCardProps {
 export function TrackCard({ track, priority = false }: TrackCardProps) {
   const badge = getTrackStatusBadge(track.status);
   const completed = track.Review.filter((r) => r.status === "COMPLETED").length;
-  const reviewCount = formatReviewCount(completed, track.ReviewRequested);
+  const reviewCount = formatReviewCount(completed, track.reviewsRequested);
   const action = getTrackAction(track);
 
   return (

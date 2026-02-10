@@ -212,7 +212,7 @@ describe('Track Submission Integration', () => {
         sourceUrl: trackData.sourceUrl,
         sourceType: trackData.sourceType,
         packageType: trackData.packageType,
-        reviewsRequested: trackData.ReviewRequested,
+        reviewsRequested: trackData.reviewsRequested,
       })
 
       prismaMock.track.create.mockResolvedValue(track)
@@ -225,7 +225,7 @@ describe('Track Submission Integration', () => {
       expect(created.title).toBe(trackData.title)
       expect(created.sourceUrl).toBe(trackData.sourceUrl)
       expect(created.packageType).toBe(trackData.packageType)
-      expect(created.ReviewRequested).toBe(trackData.ReviewRequested)
+      expect(created.reviewsRequested).toBe(trackData.reviewsRequested)
     })
 
     it('sets correct initial status for queued tracks', async () => {
@@ -235,7 +235,7 @@ describe('Track Submission Integration', () => {
       })
 
       expect(track.status).toBe('QUEUED')
-      expect(track.ReviewRequested).toBeGreaterThan(0)
+      expect(track.reviewsRequested).toBeGreaterThan(0)
     })
 
     it('sets correct initial status for uploaded tracks', async () => {
@@ -245,7 +245,7 @@ describe('Track Submission Integration', () => {
       })
 
       expect(track.status).toBe('UPLOADED')
-      expect(track.ReviewRequested).toBe(0)
+      expect(track.reviewsRequested).toBe(0)
     })
 
     it('tracks credits spent for PEER packages', async () => {
@@ -256,7 +256,7 @@ describe('Track Submission Integration', () => {
       })
 
       expect(track.packageType).toBe('PEER')
-      expect(track.creditsSpent).toBe(track.ReviewRequested)
+      expect(track.creditsSpent).toBe(track.reviewsRequested)
     })
 
     it('does not charge credits for paid packages', async () => {

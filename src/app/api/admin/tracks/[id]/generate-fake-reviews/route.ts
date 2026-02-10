@@ -257,7 +257,7 @@ export async function POST(
           increment: count,
         },
         // If all reviews are now completed, mark track as completed
-        ...(track.ReviewCompleted + count >= track.ReviewRequested
+        ...(track.reviewsCompleted + count >= track.reviewsRequested
           ? { status: "COMPLETED", completedAt: new Date() }
           : track.status === "PENDING_PAYMENT" || track.status === "UPLOADED"
           ? { status: "IN_PROGRESS" }

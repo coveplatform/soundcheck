@@ -301,7 +301,7 @@ describe('Review Submission Integration', () => {
       const user = createMockUser({ email: 'artist@example.com' })
 
       const completedReviews = 5 // 50%
-      const milestoneHalf = Math.ceil(track.ReviewRequested / 2)
+      const milestoneHalf = Math.ceil(track.reviewsRequested / 2)
 
       expect(completedReviews).toBe(milestoneHalf)
 
@@ -309,7 +309,7 @@ describe('Review Submission Integration', () => {
         user.email!,
         track.title,
         completedReviews,
-        track.ReviewRequested
+        track.reviewsRequested
       )
 
       expect(mockSendReviewProgressEmail).toHaveBeenCalledWith(
@@ -329,13 +329,13 @@ describe('Review Submission Integration', () => {
 
       const completedReviews = 10 // 100%
 
-      expect(completedReviews).toBe(track.ReviewRequested)
+      expect(completedReviews).toBe(track.reviewsRequested)
 
       await mockSendReviewProgressEmail(
         user.email!,
         track.title,
         completedReviews,
-        track.ReviewRequested
+        track.reviewsRequested
       )
 
       expect(mockSendReviewProgressEmail).toHaveBeenCalledWith(

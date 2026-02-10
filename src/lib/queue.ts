@@ -386,7 +386,7 @@ export async function assignReviewersToTrack(trackId: string) {
     ).length;
 
     const neededReviews =
-      track.ReviewRequested - countedCompletedReviews - activeAssignments;
+      track.reviewsRequested - countedCompletedReviews - activeAssignments;
 
     if (neededReviews <= 0) return;
 
@@ -444,7 +444,7 @@ export async function assignReviewersToTrack(trackId: string) {
 
       const proShortfall = Math.max(
         0,
-        Math.min(proReviewCap, track.ReviewRequested) - existingProCount
+        Math.min(proReviewCap, track.reviewsRequested) - existingProCount
       );
       const proSlotsToReserve = Math.min(proShortfall, neededReviews);
 

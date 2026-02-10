@@ -137,7 +137,7 @@ export async function POST(
         });
 
         const nextStatus =
-          countedCompletedReviews >= track.ReviewRequested
+          countedCompletedReviews >= track.reviewsRequested
             ? ("COMPLETED" as const)
             : countedCompletedReviews > 0
               ? ("IN_PROGRESS" as const)

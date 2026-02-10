@@ -91,7 +91,7 @@ describe('Stripe Webhook Integration', () => {
 
       // This would trigger assignReviewersToTrack(track.id)
       expect(track.status).toBe('QUEUED')
-      expect(track.ReviewRequested).toBe(10)
+      expect(track.reviewsRequested).toBe(10)
     })
   })
 

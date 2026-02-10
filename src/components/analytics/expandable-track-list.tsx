@@ -74,7 +74,7 @@ export function ExpandableTrackList({ tracks, variant = "all" }: ExpandableTrack
                   <div className="flex-1 min-w-0">
                     <p className="font-bold truncate text-sm sm:text-base">{track.title}</p>
                     <p className="text-xs text-black/50">
-                      {new Date(track.createdAt).toLocaleDateString()} · {track.ReviewCompleted} reviews
+                      {new Date(track.createdAt).toLocaleDateString()} · {track.reviewsCompleted} reviews
                     </p>
                   </div>
 

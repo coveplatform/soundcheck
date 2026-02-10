@@ -295,7 +295,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         trackTitle: result.trackTitle,
         artistEmail: result.artistEmail,
         packageType: track.packageType,
-        reviewsRequested: track.ReviewRequested,
+        reviewsRequested: track.reviewsRequested,
         isPromo: false,
       });
     }

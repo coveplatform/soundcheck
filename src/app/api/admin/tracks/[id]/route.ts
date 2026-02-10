@@ -159,7 +159,7 @@ export async function POST(
         id: track.id,
         status: track.status,
         Genre: track.Genre.map(g => g.name),
-        reviewsRequested: track.ReviewRequested,
+        reviewsRequested: track.reviewsRequested,
       },
       eligibleCount: eligibleReviewers.length,
       reviewerDebug,

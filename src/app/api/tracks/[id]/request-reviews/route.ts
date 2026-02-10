@@ -99,9 +99,9 @@ export async function POST(
       }
 
       // Determine new status based on current state
-      const currentReviewsCompleted = track.ReviewCompleted ?? 0;
+      const currentReviewsCompleted = track.reviewsCompleted ?? 0;
       const hasExistingReviews = track.Review.length > 0;
-      const currentReviewsRequested = track.ReviewRequested ?? 0;
+      const currentReviewsRequested = track.reviewsRequested ?? 0;
       const newReviewsRequested = currentReviewsRequested + desired;
 
       // If adding more reviews and already have some completed, go to IN_PROGRESS

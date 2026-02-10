@@ -2,7 +2,7 @@ import "next-auth";
 
 declare module "next-auth" {
   interface Session {
-    User: {
+    user: {
       id: string;
       email: string;
       emailVerified?: string | null;

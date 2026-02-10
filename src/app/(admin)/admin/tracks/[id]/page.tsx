@@ -188,7 +188,7 @@ export default async function AdminTrackDetailPage({
           <div>
             <div className="text-neutral-500">Reviews</div>
             <div className="font-medium">
-              {countedCompletedReviews} / {track.ReviewRequested}
+              {countedCompletedReviews} / {track.reviewsRequested}
             </div>
           </div>
           <div>
