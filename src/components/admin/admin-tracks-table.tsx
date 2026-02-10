@@ -22,12 +22,12 @@ export type AdminTrackRow = {
   promoCode: string | null;
   createdAt: Date;
   reviewsRequested: number;
-  artist: {
+  ArtistProfile: {
     subscriptionStatus: string | null;
     reviewCredits: number;
-    user: { id: string; email: string };
+    User: { id: string; email: string };
   };
-  payment: { status: string | null; stripePaymentId: string | null } | null;
+  Payment: { status: string | null; stripePaymentId: string | null } | null;
 };
 
 export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
@@ -160,7 +160,7 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
           </thead>
           <tbody className="divide-y divide-neutral-100">
             {tracks.map((track) => {
-              const isPro = track.artist.subscriptionStatus === "active";
+              const isPro = track.ArtistProfile.subscriptionStatus === "active";
               const packageName = track.packageType
                 ? PACKAGE_NAMES[track.packageType] || track.packageType
                 : null;
@@ -207,21 +207,21 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    {!track.payment && track.status !== "PENDING_PAYMENT" ? (
+                    {!track.Payment && track.status !== "PENDING_PAYMENT" ? (
                       <span className="px-1.5 py-0.5 text-xs font-bold bg-blue-100 text-blue-700 rounded">
                         REVIEW CREDITS
                       </span>
                     ) : (
-                      track.payment?.status ?? ""
+                      track.Payment?.status ?? ""
                     )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col">
                       <Link
                         className="underline"
-                        href={`/admin/users/${track.artist.user.id}`}
+                        href={`/admin/users/${track.ArtistProfile.user.id}`}
                       >
-                        {track.artist.user.email}
+                        {track.ArtistProfile.user.email}
                       </Link>
                       <span className="inline-flex items-center gap-1 mt-0.5">
                         {isPro ? (
@@ -234,7 +234,7 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                           </span>
                         )}
                         <span className="text-xs text-neutral-400">
-                          {track.artist.reviewCredits} credits
+                          {track.ArtistProfile.reviewCredits} credits
                         </span>
                       </span>
                     </div>
@@ -244,9 +244,9 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-2">
-                      {track.payment?.status === "COMPLETED" &&
+                      {track.Payment?.status === "COMPLETED" &&
                       track.status !== "CANCELLED" &&
-                      track.payment.stripePaymentId ? (
+                      track.Payment.stripePaymentId ? (
                         <RefundButton trackId={track.id} />
                       ) : null}
                       <DeleteTrackButton trackId={track.id} />

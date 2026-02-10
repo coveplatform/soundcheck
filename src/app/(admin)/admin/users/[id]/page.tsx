@@ -18,7 +18,7 @@ export default async function AdminUserDetailPage({
   const user = await prisma.user.findUnique({
     where: { id },
     include: {
-      artistProfile: {
+      ArtistProfile: {
         select: {
           id: true,
           artistName: true,
@@ -26,7 +26,7 @@ export default async function AdminUserDetailPage({
           subscriptionTier: true,
           reviewCredits: true,
           stripeCustomerId: true,
-          tracks: { select: { id: true } },
+          Track: { select: { id: true } },
         },
       },
       reviewerProfile: {
@@ -58,7 +58,7 @@ export default async function AdminUserDetailPage({
           <p className="text-neutral-500">{user.email}</p>
         </div>
         <div className="flex items-center gap-2">
-          {!user.reviewerProfile ? <EnableReviewerButton userId={user.id} /> : null}
+          {!user.ReviewerProfile ? <EnableReviewerButton userId={user.id} /> : null}
         </div>
       </div>
 
@@ -85,21 +85,21 @@ export default async function AdminUserDetailPage({
         </div>
       </div>
 
-      {user.artistProfile ? (
+      {user.ArtistProfile ? (
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="font-medium">Artist profile</div>
           <div className="mt-3 grid md:grid-cols-3 gap-3 text-sm">
             <div>
               <div className="text-neutral-500">Name</div>
-              <div className="font-medium">{user.artistProfile.artistName}</div>
+              <div className="font-medium">{user.ArtistProfile.artistName}</div>
             </div>
             <div>
               <div className="text-neutral-500">Subscription</div>
               <div className="font-medium">
-                {user.artistProfile.subscriptionStatus === "active" ? (
+                {user.ArtistProfile.subscriptionStatus === "active" ? (
                   <span className="text-green-600">Pro (Active)</span>
-                ) : user.artistProfile.subscriptionStatus ? (
-                  <span className="text-amber-600">{user.artistProfile.subscriptionStatus}</span>
+                ) : user.ArtistProfile.subscriptionStatus ? (
+                  <span className="text-amber-600">{user.ArtistProfile.subscriptionStatus}</span>
                 ) : (
                   <span className="text-neutral-400">Free</span>
                 )}
@@ -107,7 +107,7 @@ export default async function AdminUserDetailPage({
             </div>
             <div>
               <div className="text-neutral-500">Review Credits</div>
-              <div className="font-medium">{user.artistProfile.reviewCredits ?? 0}</div>
+              <div className="font-medium">{user.ArtistProfile.reviewCredits ?? 0}</div>
             </div>
           </div>
 
@@ -116,30 +116,30 @@ export default async function AdminUserDetailPage({
             <div className="text-sm text-neutral-500 mb-2">Subscription Actions</div>
             <ActivateProButton
               userId={user.id}
-              currentStatus={user.artistProfile.subscriptionStatus}
+              currentStatus={user.ArtistProfile.subscriptionStatus}
             />
           </div>
         </div>
       ) : null}
 
-      {user.reviewerProfile ? (
+      {user.ReviewerProfile ? (
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="flex items-center justify-between gap-4">
             <div className="font-medium">Reviewer profile</div>
             <ReviewerRestrictionToggle
-              reviewerId={user.reviewerProfile.id}
-              isRestricted={user.reviewerProfile.isRestricted}
+              reviewerId={user.ReviewerProfile.id}
+              isRestricted={user.ReviewerProfile.isRestricted}
             />
           </div>
           <div className="mt-3 grid md:grid-cols-3 gap-3 text-sm">
             <div>
               <div className="text-neutral-500">Tier</div>
-              <div className="font-medium">{user.reviewerProfile.tier}</div>
+              <div className="font-medium">{user.ReviewerProfile.tier}</div>
             </div>
             <div>
               <div className="text-neutral-500">Onboarding</div>
               <div className="font-medium">
-                {user.reviewerProfile.completedOnboarding && user.reviewerProfile.onboardingQuizPassed
+                {user.ReviewerProfile.completedOnboarding && user.ReviewerProfile.onboardingQuizPassed
                   ? "Complete"
                   : "Incomplete"}
               </div>
@@ -147,20 +147,20 @@ export default async function AdminUserDetailPage({
             <div>
               <div className="text-neutral-500">Stripe</div>
               <div className="font-medium">
-                {user.reviewerProfile.stripeAccountId ? "Connected" : "Not connected"}
+                {user.ReviewerProfile.stripeAccountId ? "Connected" : "Not connected"}
               </div>
             </div>
             <div>
               <div className="text-neutral-500">Total reviews</div>
-              <div className="font-medium">{user.reviewerProfile.totalReviews}</div>
+              <div className="font-medium">{user.ReviewerProfile.totalReviews}</div>
             </div>
             <div>
               <div className="text-neutral-500">Avg rating</div>
-              <div className="font-medium">{user.reviewerProfile.averageRating.toFixed(2)}</div>
+              <div className="font-medium">{user.ReviewerProfile.averageRating.toFixed(2)}</div>
             </div>
             <div>
               <div className="text-neutral-500">Flags</div>
-              <div className="font-medium">{user.reviewerProfile.flagCount}</div>
+              <div className="font-medium">{user.ReviewerProfile.flagCount}</div>
             </div>
           </div>
         </div>
@@ -172,9 +172,9 @@ export default async function AdminUserDetailPage({
         </Link>
       </div>
 
-      {user.artistProfile ? (
+      {user.ArtistProfile ? (
         <div className="text-sm text-neutral-500">
-          <span className="font-medium text-neutral-800">Track count:</span> {user.artistProfile.tracks.length}
+          <span className="font-medium text-neutral-800">Track count:</span> {user.ArtistProfile.tracks.length}
         </div>
       ) : null}
     </div>
