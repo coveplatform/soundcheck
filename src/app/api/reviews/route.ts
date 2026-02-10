@@ -419,7 +419,7 @@ export async function POST(request: Request) {
         select: {
           title: true,
           reviewsRequested: true,
-          artist: { select: { user: { select: { email: true } } } },
+          artist: { select: { User: { select: { email: true } } } },
         },
       });
 
@@ -441,7 +441,7 @@ export async function POST(request: Request) {
         track: {
           title: updatedTrack.title,
           reviewsRequested: updatedTrack.reviewsRequested,
-          artistEmail: updatedTrack.artist.user?.email ?? null,
+          artistEmail: updatedTrack.artist.User?.email ?? null,
         },
       };
     });

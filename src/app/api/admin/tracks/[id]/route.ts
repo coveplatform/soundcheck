@@ -87,7 +87,7 @@ export async function POST(
     const allReviewers = await prisma.reviewerProfile.findMany({
       include: {
         genres: true,
-        user: { select: { email: true, createdAt: true } },
+        User: { select: { email: true, createdAt: true } },
       },
     });
 
@@ -97,7 +97,7 @@ export async function POST(
     const reviewerDebug = allReviewers.map((r) => {
       const reasons: string[] = [];
 
-      const reviewerEmail = (r.user.email ?? "").trim().toLowerCase();
+      const reviewerEmail = (r.User.email ?? "").trim().toLowerCase();
       const isTestBypass = TEST_REVIEWER_EMAILS.includes(reviewerEmail);
 
       if (!r.completedOnboarding) reasons.push("onboarding not completed");
@@ -106,7 +106,7 @@ export async function POST(
 
       if (!isTestBypass) {
         const hoursSinceCreation =
-          (Date.now() - new Date(r.user.createdAt).getTime()) / (1000 * 60 * 60);
+          (Date.now() - new Date(r.User.createdAt).getTime()) / (1000 * 60 * 60);
         const minAge = Number(process.env.MIN_REVIEWER_ACCOUNT_AGE_HOURS ?? "24");
         if (hoursSinceCreation < minAge) {
           reasons.push(`account too new (${Math.round(hoursSinceCreation)}h < ${minAge}h)`);
@@ -133,7 +133,7 @@ export async function POST(
       const isEligible = eligibleReviewers.some(e => e.id === r.id);
 
       return {
-        email: r.user.email,
+        email: r.User.email,
         tier: r.tier,
         isEligible,
         reasons: reasons.length > 0 ? reasons : ["eligible"],
@@ -149,7 +149,7 @@ export async function POST(
       include: {
         reviews: { select: { reviewerId: true, status: true } },
         queueEntries: {
-          include: { reviewer: { include: { user: { select: { email: true } } } } }
+          include: { reviewer: { include: { User: { select: { email: true } } } } }
         },
       },
     });
@@ -164,7 +164,7 @@ export async function POST(
       eligibleCount: eligibleReviewers.length,
       reviewerDebug,
       afterAssignment: {
-        queueEntries: updatedTrack?.queueEntries.map(q => q.reviewer.user.email) ?? [],
+        queueEntries: updatedTrack?.queueEntries.map(q => q.reviewer.User.email) ?? [],
         reviews: updatedTrack?.reviews ?? [],
       },
     });

@@ -22,9 +22,9 @@ export default async function AdminReviewsPage({
       ...(q
         ? {
             OR: [
-              { track: { title: { contains: q, mode: "insensitive" } } },
-              { reviewer: { user: { email: { contains: q, mode: "insensitive" } } } },
-              { reviewer: { user: { name: { contains: q, mode: "insensitive" } } } },
+              { Track: { title: { contains: q, mode: "insensitive" } } },
+              { ReviewerProfile: { User: { email: { contains: q, mode: "insensitive" } } } },
+              { ReviewerProfile: { User: { name: { contains: q, mode: "insensitive" } } } },
             ],
           }
         : {}),
@@ -32,22 +32,22 @@ export default async function AdminReviewsPage({
     orderBy: { updatedAt: "desc" },
     take: 100,
     include: {
-      track: {
+      Track: {
         select: {
           id: true,
           title: true,
-          artist: {
+          ArtistProfile: {
             select: {
-              user: { select: { email: true } }
+              User: { select: { email: true } }
             }
           }
         }
       },
-      reviewer: {
+      ReviewerProfile: {
         select: {
           id: true,
           isRestricted: true,
-          user: { select: { email: true, name: true } },
+          User: { select: { email: true, name: true } },
         },
       },
     },
@@ -128,16 +128,16 @@ export default async function AdminReviewsPage({
                 <tr key={r.id} className={`text-neutral-700 ${r.wasFlagged ? "bg-red-50" : ""}`}>
                   <td className="px-4 py-3">
                     <Link
-                      href={`/admin/tracks/${r.track.id}`}
+                      href={`/admin/tracks/${r.Track.id}`}
                       className="font-medium hover:underline"
                     >
-                      {r.track.title.length > 30 ? r.track.title.slice(0, 30) + "..." : r.track.title}
+                      {r.Track.title.length > 30 ? r.Track.title.slice(0, 30) + "..." : r.Track.title}
                     </Link>
-                    <div className="text-xs text-neutral-500">{r.track.artist.user.email}</div>
+                    <div className="text-xs text-neutral-500">{r.Track.ArtistProfile.User.email}</div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="font-medium">{r.reviewer.user.name || "—"}</div>
-                    <div className="text-xs text-neutral-500">{r.reviewer.user.email}</div>
+                    <div className="font-medium">{r.ReviewerProfile.User.name || "—"}</div>
+                    <div className="text-xs text-neutral-500">{r.ReviewerProfile.User.email}</div>
                   </td>
                   <td className="px-4 py-3">
                     {r.avgScore !== null ? (
@@ -191,8 +191,8 @@ export default async function AdminReviewsPage({
                       )}
                       {r.wasFlagged && (
                         <ReviewerRestrictionToggle
-                          reviewerId={r.reviewer.id}
-                          isRestricted={r.reviewer.isRestricted}
+                          reviewerId={r.ReviewerProfile.id}
+                          isRestricted={r.ReviewerProfile.isRestricted}
                         />
                       )}
                     </div>

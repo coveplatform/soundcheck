@@ -23,15 +23,15 @@ export default async function AdminReviewPreviewPage({
   const review = await prisma.review.findUnique({
     where: { id },
     include: {
-      reviewer: {
+      ReviewerProfile: {
         include: {
-          user: { select: { name: true, email: true } },
+          User: { select: { name: true, email: true } },
         },
       },
-      track: {
+      Track: {
         include: {
-          artist: { include: { user: { select: { email: true, name: true } } } },
-          genres: true,
+          ArtistProfile: { include: { User: { select: { email: true, name: true } } } },
+          Genre: true,
         },
       },
     },
@@ -59,27 +59,27 @@ export default async function AdminReviewPreviewPage({
             <Music className="h-8 w-8 text-black" />
           </div>
           <div>
-            <h1 className="text-2xl font-black">{review.track.title}</h1>
+            <h1 className="text-2xl font-black">{review.Track.title}</h1>
             <GenreTagList
-              genres={review.track.genres}
+              genres={review.Track.Genre}
               variant="artist"
               size="sm"
             />
-            {review.track.feedbackFocus && (
+            {review.Track.feedbackFocus && (
               <p className="text-sm text-amber-600 font-medium mt-2">
-                Artist note: {review.track.feedbackFocus}
+                Artist note: {review.Track.feedbackFocus}
               </p>
             )}
           </div>
         </div>
         <a
-          href={review.track.sourceUrl}
+          href={review.Track.sourceUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
         >
           <ExternalLink className="h-4 w-4" />
-          {review.track.sourceType === "UPLOAD" ? "Download audio" : "View Track"}
+          {review.Track.sourceType === "UPLOAD" ? "Download audio" : "View Track"}
         </a>
       </div>
 
@@ -90,10 +90,10 @@ export default async function AdminReviewPreviewPage({
         </CardHeader>
         <CardContent>
           <AudioPlayer
-            sourceUrl={review.track.sourceUrl}
-            sourceType={review.track.sourceType}
+            sourceUrl={review.Track.sourceUrl}
+            sourceType={review.Track.sourceType}
             showListenTracker={false}
-            showWaveform={review.track.sourceType === "UPLOAD"}
+            showWaveform={review.Track.sourceType === "UPLOAD"}
           />
         </CardContent>
       </Card>
@@ -107,7 +107,13 @@ export default async function AdminReviewPreviewPage({
           <CardContent className="p-0">
             <div className="divide-y-2 divide-black">
               <ReviewDisplay
-                review={review}
+                review={{
+                  ...review,
+                  reviewer: {
+                    ...review.ReviewerProfile,
+                    user: review.ReviewerProfile.User,
+                  },
+                }}
                 index={0}
                 showControls={false}
               />

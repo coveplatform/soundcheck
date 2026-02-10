@@ -41,14 +41,14 @@ export async function POST(
 
     const review = await prisma.review.findUnique({
       where: { id },
-      include: { reviewer: { select: { userId: true } } },
+      include: { ReviewerProfile: { select: { userId: true } } },
     });
 
     if (!review) {
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    if (review.reviewer.userId !== session.user.id) {
+    if (review.ReviewerProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

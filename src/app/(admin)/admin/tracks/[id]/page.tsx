@@ -24,18 +24,18 @@ export default async function AdminTrackDetailPage({
   const track = await prisma.track.findUnique({
     where: { id },
     include: {
-      artist: {
-        include: { user: { select: { id: true, email: true } } },
+      ArtistProfile: {
+        include: { User: { select: { id: true, email: true } } },
       },
-      genres: true,
-      payment: true,
-      queueEntries: {
-        include: { reviewer: { include: { user: { select: { email: true } } } } },
+      Genre: true,
+      Payment: true,
+      ReviewQueue: {
+        include: { ReviewerProfile: { include: { User: { select: { email: true } } } } },
         orderBy: { assignedAt: "asc" },
       },
-      reviews: {
+      Review: {
         include: {
-          reviewer: { include: { user: { select: { email: true } } } },
+          ReviewerProfile: { include: { User: { select: { email: true } } } },
         },
         orderBy: { createdAt: "desc" },
       },
@@ -46,18 +46,18 @@ export default async function AdminTrackDetailPage({
     notFound();
   }
 
-  const countedCompletedReviews = track.reviews.filter(
+  const countedCompletedReviews = track.Review.filter(
     (r) => r.status === "COMPLETED" && r.countsTowardCompletion !== false
   ).length;
 
-  const hasStartedReviews = track.reviews.some(
+  const hasStartedReviews = track.Review.some(
     (r) => r.status === "IN_PROGRESS" || r.status === "COMPLETED"
   );
 
   const canRefund =
-    track.payment?.status === "COMPLETED" &&
+    track.Payment?.status === "COMPLETED" &&
     track.status !== "CANCELLED" &&
-    !!track.payment.stripePaymentId &&
+    !!track.Payment.stripePaymentId &&
     !hasStartedReviews;
 
   const canCancel =
@@ -125,8 +125,8 @@ export default async function AdminTrackDetailPage({
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="text-sm text-neutral-500">Payment</div>
           <div className="font-medium">
-            {track.payment?.status ? (
-              track.payment.status
+            {track.Payment?.status ? (
+              track.Payment.status
             ) : track.status !== "PENDING_PAYMENT" ? (
               <span className="px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-700 rounded">
                 REVIEW CREDITS
@@ -139,15 +139,15 @@ export default async function AdminTrackDetailPage({
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="text-sm text-neutral-500">Artist</div>
           <div className="font-medium">
-            <Link className="underline" href={`/admin/users/${track.artist.user.id}`}>
-              {track.artist.user.email}
+            <Link className="underline" href={`/admin/users/${track.ArtistProfile.User.id}`}>
+              {track.ArtistProfile.User.email}
             </Link>
           </div>
         </div>
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="text-sm text-neutral-500">Subscription</div>
           <div className="font-medium">
-            {track.artist.subscriptionStatus === "active" ? (
+            {track.ArtistProfile.subscriptionStatus === "active" ? (
               <span className="px-2 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
                 PRO
               </span>
@@ -157,7 +157,7 @@ export default async function AdminTrackDetailPage({
               </span>
             )}
             <span className="ml-2 text-sm text-neutral-400">
-              {track.artist.reviewCredits} credits remaining
+              {track.ArtistProfile.reviewCredits} credits remaining
             </span>
           </div>
         </div>
@@ -213,9 +213,9 @@ export default async function AdminTrackDetailPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
-                {track.reviews.map((r) => (
+                {track.Review.map((r) => (
                   <tr key={r.id} className="text-neutral-700">
-                    <td className="px-4 py-3">{r.reviewer.user.email}</td>
+                    <td className="px-4 py-3">{r.ReviewerProfile.User.email}</td>
                     <td className="px-4 py-3">{r.status}</td>
                     <td className="px-4 py-3">{r.wasFlagged ? "Yes" : "No"}</td>
                     <td className="px-4 py-3">{new Date(r.createdAt).toLocaleDateString()}</td>
@@ -231,7 +231,7 @@ export default async function AdminTrackDetailPage({
                     </td>
                   </tr>
                 ))}
-                {track.reviews.length === 0 ? (
+                {track.Review.length === 0 ? (
                   <tr>
                     <td className="px-4 py-6 text-center text-neutral-500" colSpan={5}>
                       No reviews yet
@@ -256,21 +256,21 @@ export default async function AdminTrackDetailPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
-                {track.queueEntries.map((q) => (
+                {track.ReviewQueue.map((q) => (
                   <tr key={q.id} className="text-neutral-700">
-                    <td className="px-4 py-3">{q.reviewer.user.email}</td>
+                    <td className="px-4 py-3">{q.ReviewerProfile.User.email}</td>
                     <td className="px-4 py-3">{new Date(q.assignedAt).toLocaleString()}</td>
                     <td className="px-4 py-3">{new Date(q.expiresAt).toLocaleString()}</td>
                     <td className="px-4 py-3">
                       <ReassignReviewerButton
                         trackId={track.id}
-                        currentReviewerId={q.reviewerId}
-                        currentReviewerEmail={q.reviewer.user.email}
+                        currentReviewerId={q.ReviewerProfileId}
+                        currentReviewerEmail={q.ReviewerProfile.User.email}
                       />
                     </td>
                   </tr>
                 ))}
-                {track.queueEntries.length === 0 ? (
+                {track.ReviewQueue.length === 0 ? (
                   <tr>
                     <td className="px-4 py-6 text-center text-neutral-500" colSpan={4}>
                       Queue is empty

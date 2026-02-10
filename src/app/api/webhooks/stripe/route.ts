@@ -247,7 +247,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
     const track = await prisma.track.findUnique({
       where: { id: trackId },
-      include: { artist: { include: { user: true } }, payment: true },
+      include: { artist: { include: { User: true } }, payment: true },
     });
 
     if (!track) {
