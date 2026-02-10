@@ -137,7 +137,7 @@ export default async function ArtistReviewersPage({
                         <span>·</span>
                         <span>{r.averageRating.toFixed(1)} avg</span>
                         <span>·</span>
-                        <span>{r._count.reviews} reviews</span>
+                        <span>{r._count.Review} reviews</span>
                       </div>
                     </div>
                   </div>

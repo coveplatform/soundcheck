@@ -81,7 +81,7 @@ export default async function ArtistReviewerProfilePage({
                   Avg rating: {reviewer.averageRating.toFixed(2)}
                 </span>
                 <span className="inline-flex items-center px-2.5 py-1 border-2 border-black bg-white font-bold">
-                  Reviews: {reviewer._count.reviews}
+                  Reviews: {reviewer._count.Review}
                 </span>
                 <span className="inline-flex items-center px-2.5 py-1 border-2 border-black bg-white font-bold">
                   Gems: {reviewer.gemCount}
