@@ -44,11 +44,11 @@ export default async function ReviewHistoryPage() {
       createdAt: true,
       paidAmount: true,
       artistRating: true,
-      track: {
+      Track: {
         select: {
           title: true,
-          genres: true,
-          artist: { select: { artistName: true } },
+          Genre: true,
+          ArtistProfile: { select: { artistName: true } },
         },
       },
     },
@@ -97,8 +97,8 @@ export default async function ReviewHistoryPage() {
                     <div className="min-w-0 flex-1">
                       <p className="text-base font-semibold text-black truncate">{review.track.title}</p>
                       <p className="text-sm text-neutral-600 truncate">
-                        {review.track.genres.map((g) => g.name).join(", ")}
-                        {review.track.artist?.artistName ? ` · ${review.track.artist.artistName}` : ""}
+                        {review.track.Genre.map((g) => g.name).join(", ")}
+                        {review.track.artist?.artistName ? ` · ${review.track.ArtistProfile.artistName}` : ""}
                       </p>
                     </div>
                   </div>

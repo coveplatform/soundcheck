@@ -141,13 +141,13 @@ export async function POST(
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
-        artist: {
+        ArtistProfile: {
           select: { userId: true },
         },
       },
     });
 
-    if (!track || track.artist.userId !== session.user.id) {
+    if (!track || track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 

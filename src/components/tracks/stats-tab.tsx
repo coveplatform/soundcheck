@@ -18,7 +18,7 @@ interface Review {
 }
 
 interface StatsTabProps {
-  reviews: Review[];
+  Review: Review[];
   platformAverages: {
     production: number;
     originality: number;

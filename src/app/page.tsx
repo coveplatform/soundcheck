@@ -691,7 +691,7 @@ export default function Home() {
               },
               {
                 q: "Who reviews my tracks?",
-                a: "Other artists on the platform who share your genre. Everyone is both an artist and a reviewer. After each review, you rate the quality -- low-rated reviewers lose access, so the feedback stays useful and honest.",
+                a: "Other artists on the platform who share your genre. Everyone is both an artist and a ReviewerProfile. After each review, you rate the quality -- low-rated reviewers lose access, so the feedback stays useful and honest.",
               },
               {
                 q: "Why do I need multiple reviews?",

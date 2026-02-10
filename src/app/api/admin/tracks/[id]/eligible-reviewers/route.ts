@@ -31,7 +31,7 @@ export async function GET(
     return NextResponse.json({
       reviewers: eligibleReviewers.map((r) => ({
         id: r.id,
-        email: r.user.email,
+        email: r.User.email,
         tier: r.tier,
       })),
     });

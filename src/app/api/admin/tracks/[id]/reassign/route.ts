@@ -38,7 +38,7 @@ export async function POST(
       where: { id: trackId },
       include: {
         queueEntries: true,
-        reviews: true,
+        Review: true,
       },
     });
 
@@ -57,7 +57,7 @@ export async function POST(
     const currentQueueEntry = track.queueEntries.find(
       (q) => q.reviewerId === currentReviewerId
     );
-    const currentReview = track.reviews.find(
+    const currentReview = track.Review.find(
       (r) =>
         r.reviewerId === currentReviewerId &&
         (r.status === "ASSIGNED" || r.status === "IN_PROGRESS")
@@ -73,7 +73,7 @@ export async function POST(
     // Verify new reviewer exists and isn't already assigned
     const newReviewer = await prisma.reviewerProfile.findUnique({
       where: { id: newReviewerId },
-      include: { user: { select: { email: true } } },
+      include: { User: { select: { email: true } } },
     });
 
     if (!newReviewer) {
@@ -83,7 +83,7 @@ export async function POST(
       );
     }
 
-    const existingAssignment = track.reviews.find(
+    const existingAssignment = track.Review.find(
       (r) => r.reviewerId === newReviewerId
     );
     const existingQueueEntry = track.queueEntries.find(
@@ -148,7 +148,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      message: `Reassigned from current reviewer to ${newReviewer.user.email}`,
+      message: `Reassigned from current reviewer to ${newReviewer.User.email}`,
     });
   } catch (error) {
     console.error("Reassign reviewer error:", error);

@@ -165,7 +165,7 @@ export async function POST(
         reviewsRequested: true,
         reviewsCompleted: true,
         status: true,
-        reviews: { select: { id: true } },
+        Review: { select: { id: true } },
       },
     });
 
@@ -238,7 +238,7 @@ export async function POST(
       const review = await prisma.review.create({
         data: {
           trackId: track.id,
-          reviewerId: reviewer.id,
+          reviewerId: ReviewerProfile.id,
           status: "COMPLETED",
           countsTowardCompletion: true,
           countsTowardAnalytics: true, // Include in analytics for realistic data
@@ -257,7 +257,7 @@ export async function POST(
           increment: count,
         },
         // If all reviews are now completed, mark track as completed
-        ...(track.reviewsCompleted + count >= track.reviewsRequested
+        ...(track.ReviewCompleted + count >= track.ReviewRequested
           ? { status: "COMPLETED", completedAt: new Date() }
           : track.status === "PENDING_PAYMENT" || track.status === "UPLOADED"
           ? { status: "IN_PROGRESS" }

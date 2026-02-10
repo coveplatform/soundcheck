@@ -381,7 +381,7 @@ export async function getPendingRenders() {
       },
     },
     include: {
-      artist: {
+      ArtistProfile: {
         select: {
           artistName: true,
         },
@@ -405,7 +405,7 @@ export async function getCompletedRenders(limit = 20) {
       },
     },
     include: {
-      artist: {
+      ArtistProfile: {
         select: {
           artistName: true,
         },

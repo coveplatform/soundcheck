@@ -53,9 +53,9 @@ export type ReviewData = {
   isGem: boolean;
   wasFlagged: boolean;
   flagReason: string | null;
-  reviewer: {
+  ReviewerProfile: {
     id: string;
-    user: {
+    User: {
       name: string | null;
     };
   };
@@ -90,14 +90,14 @@ export function ReviewDisplay({
           {/* Avatar */}
           {showControls ? (
             <Link
-              href={`/artist/reviewers/${review.reviewer.id}`}
+              href={`/artist/reviewers/${review.ReviewerProfile.id}`}
               className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black hover:from-neutral-200 hover:to-neutral-300 transition-colors"
             >
-              {getInitial(review.reviewer.user.name ?? "Reviewer")}
+              {getInitial(review.ReviewerProfile.User.name ?? "Reviewer")}
             </Link>
           ) : (
             <span className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black">
-              {getInitial(review.reviewer.user.name ?? "Reviewer")}
+              {getInitial(review.ReviewerProfile.User.name ?? "Reviewer")}
             </span>
           )}
 
@@ -106,14 +106,14 @@ export function ReviewDisplay({
             <div className="flex items-center gap-2 flex-wrap">
               {showControls ? (
                 <Link
-                  href={`/artist/reviewers/${review.reviewer.id}`}
+                  href={`/artist/reviewers/${review.ReviewerProfile.id}`}
                   className="font-bold text-sm text-black hover:underline truncate"
                 >
-                  {getFirstName(review.reviewer.user.name ?? "Reviewer")}
+                  {getFirstName(review.ReviewerProfile.User.name ?? "Reviewer")}
                 </Link>
               ) : (
                 <span className="font-bold text-sm text-black truncate">
-                  {getFirstName(review.reviewer.user.name ?? "Reviewer")}
+                  {getFirstName(review.ReviewerProfile.User.name ?? "Reviewer")}
                 </span>
               )}
               {review.firstImpression && (

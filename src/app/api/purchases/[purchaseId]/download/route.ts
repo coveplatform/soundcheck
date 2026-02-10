@@ -17,7 +17,7 @@ export async function GET(
     const purchase = await prisma.externalPurchase.findUnique({
       where: { id: purchaseId },
       include: {
-        track: {
+        Track: {
           select: {
             id: true,
             title: true,

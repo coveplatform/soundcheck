@@ -147,7 +147,7 @@ export async function getEligibleReviewers(
     completedOnboarding: true,
     onboardingQuizPassed: true,
     isRestricted: false,
-    user: {
+    User: {
       createdAt: {
         lte: cutoff,
       },
@@ -159,12 +159,12 @@ export async function getEligibleReviewers(
         notIn: TEST_REVIEWER_EMAILS,
       },
     },
-    genres: {
+    Genre: {
       some: {
         id: { in: genreIds },
       },
     },
-    reviews: {
+    Review: {
       none: {
         trackId: track.id,
       },
@@ -181,7 +181,7 @@ export async function getEligibleReviewers(
     completedOnboarding: true,
     onboardingQuizPassed: true,
     isRestricted: false,
-    user: {
+    User: {
       emailVerified: {
         not: null,
       },
@@ -190,7 +190,7 @@ export async function getEligibleReviewers(
       },
     },
     // Still exclude if they've already reviewed this track
-    reviews: {
+    Review: {
       none: {
         trackId: track.id,
       },
@@ -207,8 +207,8 @@ export async function getEligibleReviewers(
     db.reviewerProfile.findMany({
       where: regularWhere,
       include: {
-        genres: true,
-        user: { select: { id: true, email: true } },
+        Genre: true,
+        User: { select: { id: true, email: true } },
       },
       orderBy: [
         { tier: "desc" },
@@ -218,8 +218,8 @@ export async function getEligibleReviewers(
     db.reviewerProfile.findMany({
       where: testWhere,
       include: {
-        genres: true,
-        user: { select: { id: true, email: true } },
+        Genre: true,
+        User: { select: { id: true, email: true } },
       },
       orderBy: [
         { tier: "desc" },
@@ -261,8 +261,8 @@ export async function getEligiblePeerReviewers(
   const track = await db.track.findUnique({
     where: { id: trackId },
     include: {
-      genres: true,
-      artist: { select: { id: true, userId: true } },
+      Genre: true,
+      ArtistProfile: { select: { id: true, userId: true } },
     },
   });
 
@@ -280,7 +280,7 @@ export async function getEligiblePeerReviewers(
     where: {
       completedOnboarding: true,
       // Exclude the track owner
-      id: { not: track.artist.id },
+      id: { not: track.ArtistProfile.id },
       // Must have matching review genres
       reviewGenres: {
         some: {
@@ -299,13 +299,13 @@ export async function getEligiblePeerReviewers(
         },
       },
       // Must have a verified email
-      user: {
+      User: {
         emailVerified: { not: null },
       },
     },
     include: {
       reviewGenres: true,
-      user: { select: { id: true, email: true } },
+      User: { select: { id: true, email: true } },
     },
     orderBy: [
       { totalPeerReviews: "desc" },
@@ -348,11 +348,11 @@ export async function assignReviewersToTrack(trackId: string) {
     const track = await tx.track.findUnique({
       where: { id: trackId },
       include: {
-        reviews: {
+        Review: {
           select: {
             reviewerId: true,
             status: true,
-            reviewer: {
+            ReviewerProfile: {
               select: {
                 tier: true,
               },
@@ -381,12 +381,12 @@ export async function assignReviewersToTrack(trackId: string) {
     ]);
 
     const countedStatuses = new Set(["ASSIGNED", "IN_PROGRESS", "COMPLETED"]);
-    const existingProCount = track.reviews.filter(
+    const existingProCount = track.Review.filter(
       (r) => countedStatuses.has(r.status) && r.reviewer?.tier === "PRO"
     ).length;
 
     const neededReviews =
-      track.reviewsRequested - countedCompletedReviews - activeAssignments;
+      track.ReviewRequested - countedCompletedReviews - activeAssignments;
 
     if (neededReviews <= 0) return;
 
@@ -432,7 +432,7 @@ export async function assignReviewersToTrack(trackId: string) {
         tx
       );
 
-      const existingReviewerIds = new Set(track.reviews.map((r) => r.reviewerId));
+      const existingReviewerIds = new Set(track.Review.map((r) => r.reviewerId));
       const eligibleUnique = eligibleReviewers.filter(
         (r) => !existingReviewerIds.has(r.id)
       );
@@ -444,7 +444,7 @@ export async function assignReviewersToTrack(trackId: string) {
 
       const proShortfall = Math.max(
         0,
-        Math.min(proReviewCap, track.reviewsRequested) - existingProCount
+        Math.min(proReviewCap, track.ReviewRequested) - existingProCount
       );
       const proSlotsToReserve = Math.min(proShortfall, neededReviews);
 
@@ -482,7 +482,7 @@ export async function assignReviewersToTrack(trackId: string) {
         await tx.reviewQueue.createMany({
           data: reviewersToAssign.map((reviewer) => ({
             trackId,
-            reviewerId: reviewer.id,
+            reviewerId: ReviewerProfile.id,
             expiresAt,
             priority,
           })),
@@ -492,7 +492,7 @@ export async function assignReviewersToTrack(trackId: string) {
         await tx.review.createMany({
           data: reviewersToAssign.map((reviewer) => ({
             trackId,
-            reviewerId: reviewer.id,
+            reviewerId: ReviewerProfile.id,
             status: "ASSIGNED",
           })),
           skipDuplicates: true,
@@ -578,7 +578,7 @@ export async function assignTracksToTestReviewer(reviewerId: string, email: stri
   const availableTracks = await prisma.track.findMany({
     where: {
       status: { in: ["QUEUED", "IN_PROGRESS"] },
-      reviews: {
+      Review: {
         none: {
           reviewerId,
         },
@@ -641,10 +641,10 @@ export async function getReviewerQueue(reviewerId: string) {
       expiresAt: { gt: new Date() },
     },
     include: {
-      track: {
+      Track: {
         include: {
-          genres: true,
-          artist: true,
+          Genre: true,
+          ArtistProfile: true,
         },
       },
     },
@@ -669,28 +669,28 @@ export function calculateTier(
 export async function updateReviewerTier(reviewerId: string) {
   const reviewer = await prisma.reviewerProfile.findUnique({
     where: { id: reviewerId },
-    include: { user: { select: { email: true } } },
+    include: { User: { select: { email: true } } },
   });
 
   if (!reviewer) return;
 
-  const gemCount = reviewer.gemCount ?? 0;
+  const gemCount = ReviewerProfile.gemCount ?? 0;
   const newTier = gemCount >= 10
     ? ("PRO" as unknown as ReviewerTier)
-    : calculateTier(reviewer.totalReviews, reviewer.averageRating);
+    : calculateTier(ReviewerProfile.totalReviews, ReviewerProfile.averageRating);
 
-  if (newTier !== reviewer.tier) {
+  if (newTier !== ReviewerProfile.tier) {
     const tierRank = (tier: ReviewerTier) => (tier === "PRO" ? 2 : 1);
-    const isUpgrade = tierRank(newTier) > tierRank(reviewer.tier);
+    const isUpgrade = tierRank(newTier) > tierRank(ReviewerProfile.tier);
 
     await prisma.reviewerProfile.update({
       where: { id: reviewerId },
       data: { tier: newTier },
     });
 
-    if (isUpgrade && reviewer.user?.email) {
+    if (isUpgrade && ReviewerProfile.user?.email) {
       await sendTierChangeEmail({
-        to: reviewer.user.email,
+        to: ReviewerProfile.User.email,
         newTier,
         newRateCents: getTierRateCents(newTier),
       });

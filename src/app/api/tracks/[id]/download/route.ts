@@ -39,7 +39,7 @@ export async function GET(
         sourceUrl: true,
         sourceType: true,
         allowPurchase: true,
-        artist: {
+        ArtistProfile: {
           select: {
             artistName: true,
           },
@@ -67,7 +67,7 @@ export async function GET(
       where: {
         trackId_reviewerId: {
           trackId: track.id,
-          reviewerId: reviewer.id,
+          reviewerId: ReviewerProfile.id,
         },
       },
     });
@@ -83,7 +83,7 @@ export async function GET(
     // The sourceUrl is the public URL to the file
     return NextResponse.json({
       downloadUrl: track.sourceUrl,
-      filename: `${track.artist.artistName} - ${track.title}.mp3`,
+      filename: `${track.ArtistProfile.artistName} - ${track.title}.mp3`,
     });
   } catch (error) {
     console.error("Error getting download:", error);

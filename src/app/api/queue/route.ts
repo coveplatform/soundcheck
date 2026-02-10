@@ -46,10 +46,10 @@ export async function GET() {
         status: { in: ["ASSIGNED", "IN_PROGRESS"] },
       },
       include: {
-        track: {
+        Track: {
           include: {
-            genres: true,
-            artist: {
+            Genre: true,
+            ArtistProfile: {
               select: {
                 artistName: true,
               },

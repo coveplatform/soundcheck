@@ -34,11 +34,11 @@ describe('Queue Assignment Integration', () => {
       })
 
       // Mock track with genres
-      const trackWithGenres = { ...track, genres: [genre] }
+      const trackWithGenres = { ...track, Genre: [genre] }
       prismaMock.track.findUnique.mockResolvedValue(trackWithGenres as unknown as ReturnType<typeof createMockTrack>)
 
       // Mock eligible reviewers
-      const reviewerWithGenres = { ...reviewer, genres: [genre], user: { id: 'user-id', email: 'test@example.com' } }
+      const reviewerWithGenres = { ...reviewer, Genre: [genre], User: { id: 'user-id', email: 'test@example.com' } }
       prismaMock.reviewerProfile.findMany.mockResolvedValue([reviewerWithGenres as unknown as ReturnType<typeof createMockReviewerProfile>])
 
       const eligibleReviewers = await prismaMock.reviewerProfile.findMany({
@@ -46,7 +46,7 @@ describe('Queue Assignment Integration', () => {
           completedOnboarding: true,
           onboardingQuizPassed: true,
           isRestricted: false,
-          genres: { some: { id: genre.id } },
+          Genre: { some: { id: genre.id } },
         },
       })
 
@@ -122,7 +122,7 @@ describe('Queue Assignment Integration', () => {
 
       const eligibleReviewers = await prismaMock.reviewerProfile.findMany({
         where: {
-          user: { emailVerified: { not: null } }, // Will exclude our reviewer
+          User: { emailVerified: { not: null } }, // Will exclude our reviewer
         },
       })
 
@@ -137,7 +137,7 @@ describe('Queue Assignment Integration', () => {
 
       const eligibleReviewers = await prismaMock.reviewerProfile.findMany({
         where: {
-          reviews: { none: { trackId: track.id } }, // Exclude if already reviewed
+          Review: { none: { trackId: track.id } }, // Exclude if already reviewed
         },
       })
 
@@ -245,12 +245,12 @@ describe('Queue Assignment Integration', () => {
       prismaMock.review.createMany.mockResolvedValue({ count: 1 })
 
       const queueResult = await prismaMock.reviewQueue.createMany({
-        data: [{ trackId: track.id, reviewerId: reviewer.id, expiresAt: new Date(), priority: 5 }],
+        data: [{ trackId: track.id, reviewerId: ReviewerProfile.id, expiresAt: new Date(), priority: 5 }],
         skipDuplicates: true,
       })
 
       const reviewResult = await prismaMock.review.createMany({
-        data: [{ trackId: track.id, reviewerId: reviewer.id, status: 'ASSIGNED' }],
+        data: [{ trackId: track.id, reviewerId: ReviewerProfile.id, status: 'ASSIGNED' }],
         skipDuplicates: true,
       })
 
@@ -269,7 +269,7 @@ describe('Queue Assignment Integration', () => {
       const countedCompletedReviews = 3
       const activeAssignments = 2
       const neededReviews =
-        track.reviewsRequested - countedCompletedReviews - activeAssignments
+        track.ReviewRequested - countedCompletedReviews - activeAssignments
 
       expect(neededReviews).toBe(5) // Need 5 more reviewers
     })

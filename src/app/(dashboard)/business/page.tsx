@@ -39,9 +39,9 @@ export default async function BusinessPage() {
             include: {
               purchases: {
                 include: {
-                  reviewer: {
+                  ReviewerProfile: {
                     include: {
-                      user: { select: { name: true } },
+                      User: { select: { name: true } },
                     },
                   },
                 },
@@ -51,7 +51,7 @@ export default async function BusinessPage() {
                 where: { status: "COMPLETED" },
                 orderBy: { completedAt: "desc" },
               },
-              genres: true,
+              Genre: true,
               _count: {
                 select: {
                   externalPurchases: {
@@ -97,7 +97,7 @@ export default async function BusinessPage() {
         trackId: track.id,
         amount: purchase.amount,
         createdAt: purchase.createdAt.toISOString(),
-        buyerName: purchase.reviewer.user.name || "Anonymous",
+        buyerName: purchase.ReviewerProfile.User.name || "Anonymous",
         type: "internal" as const,
       }))
     );
@@ -141,13 +141,13 @@ export default async function BusinessPage() {
     // Fetch all affiliate links
     const allAffiliateLinks = await prisma.trackAffiliateLink.findMany({
       where: {
-        track: {
+        Track: {
           artistId: artistProfile.id,
         },
         isActive: true,
       },
       include: {
-        track: {
+        Track: {
           select: {
             id: true,
             title: true,

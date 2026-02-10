@@ -50,7 +50,7 @@ interface Render {
   abletonRenderStatus: "PENDING" | "RENDERING" | "COMPLETED" | "FAILED";
   createdAt: string;
   updatedAt: string;
-  artist: {
+  ArtistProfile: {
     artistName: string;
   };
   stems: Stem[];
@@ -221,7 +221,7 @@ export default function AbletonRendersPage() {
                       <div className="flex items-start justify-between gap-4 mb-3">
                         <div className="min-w-0">
                           <h3 className="font-medium text-lg truncate">{render.title}</h3>
-                          <p className="text-sm text-black/40">by {render.artist.artistName}</p>
+                          <p className="text-sm text-black/40">by {render.ArtistProfile.artistName}</p>
                         </div>
 
                         {/* Status Badge */}

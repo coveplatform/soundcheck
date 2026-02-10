@@ -15,7 +15,7 @@ export async function GET(
   const review = await prisma.review.findUnique({
     where: { shareId },
     include: {
-      track: { select: { title: true, artworkUrl: true } },
+      Track: { select: { title: true, artworkUrl: true } },
     },
   });
 

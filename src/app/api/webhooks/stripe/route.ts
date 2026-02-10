@@ -187,7 +187,7 @@ export async function POST(request: Request) {
       break;
     }
 
-    case "invoice.payment_succeeded": {
+    case "invoice.Payment_succeeded": {
       const invoice = event.data.object as Stripe.Invoice;
       await handleInvoicePaymentSucceeded(invoice);
       break;
@@ -247,7 +247,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
     const track = await prisma.track.findUnique({
       where: { id: trackId },
-      include: { artist: { include: { User: true } }, payment: true },
+      include: { ArtistProfile: { include: { User: true } }, Payment: true },
     });
 
     if (!track) {
@@ -256,10 +256,10 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     }
 
     if (track.status === "CANCELLED") {
-      if (track.payment?.status !== "REFUNDED" && session.payment_intent) {
+      if (track.Payment?.status !== "REFUNDED" && session.Payment_intent) {
         try {
           await stripe.refunds.create({
-            payment_intent: session.payment_intent as string,
+            payment_intent: session.Payment_intent as string,
           }, {
             idempotencyKey: `webhook_refund_${session.id}`,
           });
@@ -279,7 +279,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     const result = await finalizePaidCheckoutSession({
       stripeSessionId: session.id,
       trackId,
-      stripePaymentId: (session.payment_intent as string) || null,
+      stripePaymentId: (session.Payment_intent as string) || null,
       amountTotalCents:
         typeof session.amount_total === "number" ? session.amount_total : null,
       completedAt,
@@ -295,7 +295,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         trackTitle: result.trackTitle,
         artistEmail: result.artistEmail,
         packageType: track.packageType,
-        reviewsRequested: track.reviewsRequested,
+        reviewsRequested: track.ReviewRequested,
         isPromo: false,
       });
     }
@@ -434,12 +434,12 @@ async function handleExternalPurchaseComplete(
     const purchase = await prisma.externalPurchase.findUnique({
       where: { id: purchaseId },
       include: {
-        track: {
+        Track: {
           select: {
             id: true,
             title: true,
             sourceUrl: true,
-            artist: {
+            ArtistProfile: {
               select: {
                 id: true,
                 artistName: true,
@@ -477,7 +477,7 @@ async function handleExternalPurchaseComplete(
         where: { id: purchaseId },
         data: {
           status: "COMPLETED",
-          stripePaymentIntentId: (session.payment_intent as string) || "unknown",
+          stripePaymentIntentId: (session.Payment_intent as string) || "unknown",
           downloadUrl,
           completedAt,
         },
@@ -485,7 +485,7 @@ async function handleExternalPurchaseComplete(
 
       // Credit artist
       await tx.artistProfile.update({
-        where: { id: purchase.track.artist.id },
+        where: { id: purchase.track.ArtistProfile.id },
         data: {
           pendingBalance: { increment: purchase.artistAmount },
           totalEarnings: { increment: purchase.artistAmount },
@@ -495,7 +495,7 @@ async function handleExternalPurchaseComplete(
       // Credit affiliate commission if applicable
       if (purchase.affiliateUserId && purchase.affiliateCommission > 0) {
         // Check if user is an artist or reviewer
-        const user = await tx.user.findUnique({
+        const user = await tx.User.findUnique({
           where: { id: purchase.affiliateUserId },
           select: {
             isArtist: true,
@@ -549,7 +549,7 @@ async function handleExternalPurchaseComplete(
       buyerEmail: purchase.buyerEmail,
       buyerName: purchase.buyerName || undefined,
       trackTitle: purchase.track.title,
-      artistName: purchase.track.artist.artistName,
+      artistName: purchase.track.ArtistProfile.artistName,
       downloadUrl: downloadUrl || undefined,
       purchaseId: purchase.id,
     }).catch((err) => {

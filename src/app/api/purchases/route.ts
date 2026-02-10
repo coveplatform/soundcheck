@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     }
 
     // Check sufficient balance
-    if (reviewer.pendingBalance < PURCHASE_AMOUNT_CENTS) {
+    if (ReviewerProfile.pendingBalance < PURCHASE_AMOUNT_CENTS) {
       return NextResponse.json(
         { error: "Insufficient balance. You need at least $0.50 to purchase a track." },
         { status: 400 }
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
         sourceUrl: true,
         allowPurchase: true,
         artistId: true,
-        artist: {
+        ArtistProfile: {
           select: {
             id: true,
             artistName: true,
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
       where: {
         trackId_reviewerId: {
           trackId: track.id,
-          reviewerId: reviewer.id,
+          reviewerId: ReviewerProfile.id,
         },
       },
     });
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
     // Validate referral if provided
     let validatedReferral: { reviewerId: string; shareId: string } | null = null;
     if (referral) {
-      const isValid = await validateReferral(referral, reviewer.id, trackId);
+      const isValid = await validateReferral(referral, ReviewerProfile.id, trackId);
       if (isValid) {
         validatedReferral = referral;
       }
@@ -150,7 +150,7 @@ export async function POST(request: Request) {
       // Deduct from reviewer balance
       const updated = await tx.reviewerProfile.updateMany({
         where: {
-          id: reviewer.id,
+          id: ReviewerProfile.id,
           pendingBalance: { gte: PURCHASE_AMOUNT_CENTS },
         },
         data: { pendingBalance: { decrement: PURCHASE_AMOUNT_CENTS } },
@@ -185,7 +185,7 @@ export async function POST(request: Request) {
       return tx.purchase.create({
         data: {
           trackId: track.id,
-          reviewerId: reviewer.id,
+          reviewerId: ReviewerProfile.id,
           amount: PURCHASE_AMOUNT_CENTS,
           referredByReviewerId: validatedReferral?.reviewerId ?? null,
           referralShareId: validatedReferral?.shareId ?? null,
@@ -249,17 +249,17 @@ export async function GET() {
     }
 
     const purchases = await prisma.purchase.findMany({
-      where: { reviewerId: reviewer.id },
+      where: { reviewerId: ReviewerProfile.id },
       select: {
         id: true,
         amount: true,
         createdAt: true,
-        track: {
+        Track: {
           select: {
             id: true,
             title: true,
             sourceUrl: true,
-            artist: {
+            ArtistProfile: {
               select: {
                 artistName: true,
               },

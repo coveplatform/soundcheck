@@ -484,7 +484,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       funnels.review.complete(
         review.track.id,
         review.id,
-        data.earnings || getTierEarningsCents(review.reviewer.tier)
+        data.earnings || getTierEarningsCents(review.ReviewerProfile.tier)
       );
 
       try {
@@ -833,7 +833,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               <div>
                 <CardTitle className="text-xl">{review.track.title}</CardTitle>
                 <p className="text-sm text-neutral-600">
-                  {review.track.genres.map((g) => g.name).join(", ")}
+                  {review.track.Genre.map((g) => g.name).join(", ")}
                 </p>
               </div>
             </div>
@@ -960,7 +960,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-lime-500 border-2 border-black mb-4 rounded-full">
           <DollarSign className="h-5 w-5 text-black" />
           <span className="font-black text-lg">
-            +{formatCurrency(getTierEarningsCents(review.reviewer.tier))}
+            +{formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier))}
           </span>
         </div>
         <p className="text-neutral-600 mb-6">
@@ -975,7 +975,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               <div>
                 <p className="font-bold text-black">{review.track.title}</p>
                 {review.track.artist?.artistName && (
-                  <p className="text-sm text-neutral-500">{review.track.artist.artistName}</p>
+                  <p className="text-sm text-neutral-500">{review.track.ArtistProfile.artistName}</p>
                 )}
               </div>
             </div>
@@ -1066,7 +1066,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <div>
               <CardTitle className="text-xl">{review.track.title}</CardTitle>
               <p className="text-sm text-neutral-600">
-                {review.track.genres.map((g) => g.name).join(", ")}
+                {review.track.Genre.map((g) => g.name).join(", ")}
               </p>
             </div>
           </div>
@@ -1592,7 +1592,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <div className="min-w-0">
               <p className="text-neutral-400 text-sm font-medium">You&apos;ll earn</p>
               <p className="text-3xl font-black text-lime-500">
-                {formatCurrency(getTierEarningsCents(review.reviewer.tier))}
+                {formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier))}
               </p>
               {draftSavedAt ? (
                 <p className="text-neutral-400 text-xs font-mono mt-2">
@@ -1657,7 +1657,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             className="w-full"
           >
             {canSubmit && meetsTextMinimum
-              ? `Submit Review & Earn ${formatCurrency(getTierEarningsCents(review.reviewer.tier))}`
+              ? `Submit Review & Earn ${formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier))}`
               : "Complete requirements to submit"}
           </Button>
         </CardContent>

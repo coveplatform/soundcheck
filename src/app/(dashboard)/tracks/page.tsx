@@ -49,9 +49,9 @@ export default async function TracksPage() {
     include: {
       tracks: {
         include: {
-          genres: true,
+          Genre: true,
           // Only include reviews and purchases if Pro (for grid view - all users see tracks)
-          reviews: isPro ? {
+          Review: isPro ? {
             where: {
               status: "COMPLETED",
             },
@@ -89,17 +89,17 @@ export default async function TracksPage() {
   const pendingBalance = basicProfile.pendingBalance / 100;
 
   // Calculate portfolio analytics data (ONLY for Pro users)
-  const tracksWithReviews = isPro ? tracks.filter(t => t.reviews && t.reviews.length > 0) : [];
+  const tracksWithReviews = isPro ? tracks.filter(t => t.Review && t.Review.length > 0) : [];
   const hasAnalyticsData = tracksWithReviews.length > 0;
 
   let portfolioData = null;
 
   if (isPro && hasAnalyticsData) {
-    const totalReviews = tracks.reduce((sum, t) => sum + t.reviews.length, 0);
+    const totalReviews = tracks.reduce((sum, t) => sum + t.Review.length, 0);
     const totalTracks = tracksWithReviews.length;
 
     // Calculate overall averages
-    const allReviews = tracks.flatMap((t) => t.reviews);
+    const allReviews = tracks.flatMap((t) => t.Review);
     const avgProduction =
       allReviews.reduce((sum, r) => sum + (r.productionScore || 0), 0) / (allReviews.length || 1);
     const avgOriginality =
@@ -110,9 +110,9 @@ export default async function TracksPage() {
 
     // Calculate highest score
     const trackScores = tracksWithReviews.map((t) => {
-      const production = t.reviews.reduce((sum, r) => sum + (r.productionScore || 0), 0) / (t.reviews.length || 1);
-      const vocals = t.reviews.reduce((sum, r) => sum + (r.vocalScore || 0), 0) / (t.reviews.length || 1);
-      const originality = t.reviews.reduce((sum, r) => sum + (r.originalityScore || 0), 0) / (t.reviews.length || 1);
+      const production = t.Review.reduce((sum, r) => sum + (r.productionScore || 0), 0) / (t.Review.length || 1);
+      const vocals = t.Review.reduce((sum, r) => sum + (r.vocalScore || 0), 0) / (t.Review.length || 1);
+      const originality = t.Review.reduce((sum, r) => sum + (r.originalityScore || 0), 0) / (t.Review.length || 1);
       return (production + vocals + originality) / 3;
     });
     const highestScore = trackScores.length > 0 ? Math.max(...trackScores) : 0;
@@ -123,23 +123,23 @@ export default async function TracksPage() {
     const recentAvg =
       recentTracks.reduce((sum, t) => {
         const trackAvg =
-          t.reviews.reduce(
+          t.Review.reduce(
             (s, r) =>
               s +
               ((r.productionScore || 0) + (r.originalityScore || 0) + (r.vocalScore || 0)) / 3,
             0
-          ) / (t.reviews.length || 1);
+          ) / (t.Review.length || 1);
         return sum + trackAvg;
       }, 0) / (recentTracks.length || 1);
     const earlierAvg =
       earlierTracks.reduce((sum, t) => {
         const trackAvg =
-          t.reviews.reduce(
+          t.Review.reduce(
             (s, r) =>
               s +
               ((r.productionScore || 0) + (r.originalityScore || 0) + (r.vocalScore || 0)) / 3,
             0
-          ) / (t.reviews.length || 1);
+          ) / (t.Review.length || 1);
         return sum + trackAvg;
       }, 0) / (earlierTracks.length || 1);
     const improvementRate = tracksWithReviews.length >= 3 ? ((recentAvg - earlierAvg) / earlierAvg) * 100 : 0;
@@ -160,22 +160,22 @@ export default async function TracksPage() {
     // Prepare track data
     const trackData = tracksWithReviews.map((t) => {
       const production =
-        t.reviews.reduce((sum, r) => sum + (r.productionScore || 0), 0) / (t.reviews.length || 1);
+        t.Review.reduce((sum, r) => sum + (r.productionScore || 0), 0) / (t.Review.length || 1);
       const vocals =
-        t.reviews.reduce((sum, r) => sum + (r.vocalScore || 0), 0) / (t.reviews.length || 1);
+        t.Review.reduce((sum, r) => sum + (r.vocalScore || 0), 0) / (t.Review.length || 1);
       const originality =
-        t.reviews.reduce((sum, r) => sum + (r.originalityScore || 0), 0) / (t.reviews.length || 1);
+        t.Review.reduce((sum, r) => sum + (r.originalityScore || 0), 0) / (t.Review.length || 1);
       const avgScore = (production + vocals + originality) / 3;
 
-      const listenAgain = t.reviews.filter((r) => r.wouldListenAgain).length;
-      const listenAgainPercent = Math.round((listenAgain / (t.reviews.length || 1)) * 100);
+      const listenAgain = t.Review.filter((r) => r.wouldListenAgain).length;
+      const listenAgainPercent = Math.round((listenAgain / (t.Review.length || 1)) * 100);
 
-      const playlistYes = t.reviews.filter((r) => r.wouldAddToPlaylist === true).length;
-      const playlistTotal = t.reviews.filter((r) => r.wouldAddToPlaylist !== null).length;
+      const playlistYes = t.Review.filter((r) => r.wouldAddToPlaylist === true).length;
+      const playlistTotal = t.Review.filter((r) => r.wouldAddToPlaylist !== null).length;
       const playlistPercent = playlistTotal > 0 ? Math.round((playlistYes / playlistTotal) * 100) : 0;
 
-      const shareYes = t.reviews.filter((r) => r.wouldShare === true).length;
-      const shareTotal = t.reviews.filter((r) => r.wouldShare !== null).length;
+      const shareYes = t.Review.filter((r) => r.wouldShare === true).length;
+      const shareTotal = t.Review.filter((r) => r.wouldShare !== null).length;
       const sharePercent = shareTotal > 0 ? Math.round((shareYes / shareTotal) * 100) : 0;
 
       const trackEarnings = t.purchases.reduce((sum, p) => sum + p.amount, 0) / 100;
@@ -186,7 +186,7 @@ export default async function TracksPage() {
         artworkUrl: t.artworkUrl,
         createdAt: t.createdAt,
         completedAt: t.completedAt,
-        reviewsCompleted: t.reviews.length,
+        reviewsCompleted: t.Review.length,
         avgScore,
         categoryScores: { production, vocals, originality },
         engagement: {
@@ -212,7 +212,7 @@ export default async function TracksPage() {
     const reviewVelocityTracks = tracksWithReviews.map((t) => ({
       createdAt: t.createdAt,
       completedAt: t.completedAt,
-      reviewsCompleted: t.reviews.length,
+      reviewsCompleted: t.Review.length,
       title: t.title,
     }));
     const reviewVelocity = calculateReviewVelocity(reviewVelocityTracks);
@@ -288,14 +288,14 @@ export default async function TracksPage() {
                 </Link>
 
                 {tracks.map((track) => {
-                  const completedReviews = track.reviews.filter(
+                  const completedReviews = track.Review.filter(
                     (r) => r.status === "COMPLETED"
                   ).length;
                   const totalPurchases =
                     track.purchases.reduce((sum, p) => sum + p.amount, 0) / 100;
-                  const hasReviews = track.reviewsRequested > 0;
+                  const hasReviews = track.ReviewRequested > 0;
                   const reviewProgress = hasReviews
-                    ? completedReviews / track.reviewsRequested
+                    ? completedReviews / track.ReviewRequested
                     : 0;
 
                   return (
@@ -308,7 +308,7 @@ export default async function TracksPage() {
                       hasReviews={hasReviews}
                       reviewProgress={reviewProgress}
                       completedReviews={completedReviews}
-                      totalReviews={track.reviewsRequested}
+                      totalReviews={track.ReviewRequested}
                       earnings={totalPurchases}
                     />
                   );
@@ -504,7 +504,7 @@ function generateTrendData(tracks: any[]) {
   const monthMap = new Map<string, { production: number[]; vocals: number[]; originality: number[] }>();
 
   tracks.forEach((track) => {
-    track.reviews.forEach((review: any) => {
+    track.Review.forEach((review: any) => {
       const date = new Date(review.createdAt || track.createdAt);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 

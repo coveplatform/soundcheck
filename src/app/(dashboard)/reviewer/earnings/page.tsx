@@ -20,12 +20,12 @@ export default async function EarningsPage() {
   const reviewerProfile = await prisma.reviewerProfile.findUnique({
     where: { userId: session.user.id },
     include: {
-      reviews: {
+      Review: {
         where: { status: "COMPLETED" },
         orderBy: { createdAt: "desc" },
         take: 20,
         include: {
-          track: {
+          Track: {
             select: { title: true },
           },
         },
@@ -54,7 +54,7 @@ export default async function EarningsPage() {
   thisMonth.setDate(1);
   thisMonth.setHours(0, 0, 0, 0);
 
-  const monthlyReviews = reviewerProfile.reviews.filter(
+  const monthlyReviews = reviewerProfile.Review.filter(
     (r) => new Date(r.createdAt) >= thisMonth
   );
   const monthlyEarnings = monthlyReviews.reduce(
@@ -114,7 +114,7 @@ export default async function EarningsPage() {
             <CardContent className="pt-6">
               <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-4">recent earnings</p>
               
-              {reviewerProfile.reviews.length === 0 ? (
+              {reviewerProfile.Review.length === 0 ? (
                 <EmptyState
                   title="No reviews completed yet"
                   description="Your review earnings will show up here."
@@ -122,7 +122,7 @@ export default async function EarningsPage() {
                 />
               ) : (
                 <div className="space-y-2">
-                  {reviewerProfile.reviews.map((review: any) => (
+                  {reviewerProfile.Review.map((review: any) => (
                     <div
                       key={review.id}
                       className="flex items-center justify-between gap-3 rounded-2xl bg-white/60 border border-black/10 px-4 py-3"

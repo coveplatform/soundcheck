@@ -109,9 +109,9 @@ export default async function AdminReviewPreviewPage({
               <ReviewDisplay
                 review={{
                   ...review,
-                  reviewer: {
+                  ReviewerProfile: {
                     ...review.ReviewerProfile,
-                    user: review.ReviewerProfile.User,
+                    User: review.ReviewerProfile.User,
                   },
                 }}
                 index={0}

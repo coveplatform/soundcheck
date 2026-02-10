@@ -25,19 +25,19 @@ export async function POST(request: Request) {
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
-        payment: true,
+        Payment: true,
       },
     });
 
-    if (!track || !track.payment) {
+    if (!track || !track.Payment) {
       return NextResponse.json({ error: "Payment not found" }, { status: 404 });
     }
 
-    if (track.status === "CANCELLED" && track.payment.status === "REFUNDED") {
+    if (track.status === "CANCELLED" && track.Payment.status === "REFUNDED") {
       return NextResponse.json({ success: true });
     }
 
-    if (track.payment.status === "REFUNDED") {
+    if (track.Payment.status === "REFUNDED") {
       return NextResponse.json({ success: true });
     }
 
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!track.payment.stripePaymentId) {
+    if (!track.Payment.stripePaymentId) {
       return NextResponse.json(
         { error: "Missing Stripe payment intent" },
         { status: 400 }
@@ -65,16 +65,16 @@ export async function POST(request: Request) {
 
     await stripe.refunds.create(
       {
-        payment_intent: track.payment.stripePaymentId,
+        payment_intent: track.Payment.stripePaymentId,
       },
       {
-        idempotencyKey: `admin_refund_${track.payment.id}`,
+        idempotencyKey: `admin_refund_${track.Payment.id}`,
       }
     );
 
     await prisma.$transaction([
       prisma.payment.update({
-        where: { id: track.payment.id },
+        where: { id: track.Payment.id },
         data: { status: "REFUNDED" },
       }),
       prisma.track.update({

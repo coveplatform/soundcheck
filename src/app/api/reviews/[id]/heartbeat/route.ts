@@ -32,7 +32,7 @@ export async function POST(
       );
     }
 
-    if (reviewer && (!reviewer.completedOnboarding || !reviewer.onboardingQuizPassed)) {
+    if (reviewer && (!ReviewerProfile.completedOnboarding || !ReviewerProfile.onboardingQuizPassed)) {
       return NextResponse.json(
         { error: "Please complete onboarding before reviewing" },
         { status: 403 }

@@ -60,8 +60,8 @@ export default async function DashboardPage() {
             status: true,
             reviewsRequested: true,
             reviewsCompleted: true,
-            genres: true,
-            reviews: {
+            Genre: true,
+            Review: {
               select: { status: true },
             },
           },
@@ -86,8 +86,8 @@ export default async function DashboardPage() {
             status: true,
             reviewsRequested: true,
             reviewsCompleted: true,
-            genres: true,
-            reviews: {
+            Genre: true,
+            Review: {
               select: { status: true },
             },
           },
@@ -118,18 +118,18 @@ export default async function DashboardPage() {
       where: {
         peerReviewerArtistId: artistProfile.id,
         status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-        track: {
+        Track: {
           status: { not: "COMPLETED" },
         },
       },
       select: {
         id: true,
         createdAt: true,
-        track: {
+        Track: {
           select: {
             title: true,
-            genres: true,
-            artist: {
+            Genre: true,
+            ArtistProfile: {
               select: { artistName: true },
             },
           },

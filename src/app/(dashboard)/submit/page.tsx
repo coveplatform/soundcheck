@@ -139,7 +139,7 @@ export default function SubmitTrackPage() {
           setGenres(data);
         }
       } catch (err) {
-        console.error("Failed to load genres:", err);
+        console.error("Failed to load Genre:", err);
       }
     }
     loadGenres();

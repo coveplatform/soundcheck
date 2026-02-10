@@ -17,13 +17,13 @@ export interface Review {
   addressedArtistNote?: "YES" | "PARTIALLY" | "NO" | null;
   nextActions?: string | null;
   timestamps?: Array<{ seconds: number; note: string }> | null;
-  track: {
+  Track: {
     id: string;
     title: string;
     sourceUrl: string;
     sourceType: string;
     feedbackFocus: string | null;
-    genres: { id: string; name: string }[];
+    Genre: { id: string; name: string }[];
     allowPurchase: boolean;
     hasStems: boolean;
     abletonProjectData?: unknown | null;
@@ -38,7 +38,7 @@ export interface Review {
       artistName: string;
     };
   };
-  reviewer: {
+  ReviewerProfile: {
     tier: string;
   };
 }

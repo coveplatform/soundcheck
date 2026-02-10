@@ -21,12 +21,12 @@ export async function GET(
         sourceType: true,
         viewCount: true,
         isPublic: true,
-        artist: {
+        ArtistProfile: {
           select: {
             artistName: true,
           },
         },
-        genres: {
+        Genre: {
           select: {
             id: true,
             name: true,

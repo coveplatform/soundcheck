@@ -22,8 +22,8 @@ export async function POST(
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
-        payment: true,
-        artist: true,
+        Payment: true,
+        ArtistProfile: true,
       },
     });
 
@@ -39,7 +39,7 @@ export async function POST(
     }
 
     // Only allow if no payment or payment is still PENDING
-    if (track.payment && track.payment.status !== "PENDING") {
+    if (track.Payment && track.Payment.status !== "PENDING") {
       return NextResponse.json(
         { error: "Track already has a completed payment" },
         { status: 400 }
@@ -49,9 +49,9 @@ export async function POST(
     const now = new Date();
 
     // Create or update payment record to $0 COMPLETED, and queue the track
-    const paymentOp = track.payment
+    const paymentOp = track.Payment
       ? prisma.payment.update({
-          where: { id: track.payment.id },
+          where: { id: track.Payment.id },
           data: {
             amount: 0,
             stripeSessionId: `admin_free_${track.id}_${now.getTime()}`,

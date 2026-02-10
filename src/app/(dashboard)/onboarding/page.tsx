@@ -37,7 +37,7 @@ export default function OnboardingPage() {
           setGenres(data);
         }
       } catch (err) {
-        console.error("Failed to fetch genres:", err);
+        console.error("Failed to fetch Genre:", err);
       } finally {
         setIsLoadingGenres(false);
       }

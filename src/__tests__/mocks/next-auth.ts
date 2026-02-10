@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 
 export const mockSession = {
-  user: {
+  User: {
     id: 'test-user-id',
     email: 'test@example.com',
     name: 'Test User',
@@ -21,7 +21,7 @@ vi.mock('next-auth', () => ({
 export function mockAuthenticatedSession(overrides = {}) {
   mockGetServerSession.mockResolvedValue({
     ...mockSession,
-    user: { ...mockSession.user, ...overrides },
+    User: { ...mockSession.user, ...overrides },
   })
 }
 

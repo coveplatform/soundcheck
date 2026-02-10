@@ -6,7 +6,7 @@ import { ReviewDisplay, type ReviewData } from "./review-display";
 import { cn } from "@/lib/utils";
 
 type ReviewCarouselProps = {
-  reviews: ReviewData[];
+  Review: ReviewData[];
   showControls?: boolean;
 };
 

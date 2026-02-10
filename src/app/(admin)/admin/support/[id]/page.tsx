@@ -10,7 +10,7 @@ type AdminTicketDetail = {
   status: string;
   createdAt: Date;
   updatedAt: Date;
-  user: { id: string; email: string; name: string | null };
+  User: { id: string; email: string; name: string | null };
   messages: Array<{
     id: string;
     authorType: string;
@@ -39,7 +39,7 @@ export default async function AdminSupportTicketPage({
       status: true,
       createdAt: true,
       updatedAt: true,
-      user: { select: { id: true, email: true, name: true } },
+      User: { select: { id: true, email: true, name: true } },
       messages: {
         orderBy: { createdAt: "asc" },
         select: { id: true, authorType: true, authorEmail: true, body: true, createdAt: true },
@@ -72,14 +72,14 @@ export default async function AdminSupportTicketPage({
           <div className="mt-2 text-sm">
             <div className="text-neutral-500">Email</div>
             <div className="font-medium">
-              <Link className="underline" href={`/admin/users/${ticket.user.id}`}>
-                {ticket.user.email}
+              <Link className="underline" href={`/admin/users/${ticket.User.id}`}>
+                {ticket.User.email}
               </Link>
             </div>
           </div>
           <div className="mt-3 text-sm">
             <div className="text-neutral-500">Name</div>
-            <div className="font-medium">{ticket.user.name ?? ""}</div>
+            <div className="font-medium">{ticket.User.name ?? ""}</div>
           </div>
           <div className="mt-3 text-sm">
             <div className="text-neutral-500">Created</div>

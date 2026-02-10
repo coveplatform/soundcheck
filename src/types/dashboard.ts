@@ -21,8 +21,8 @@ export type DashboardArtistProfile = Prisma.ArtistProfileGetPayload<{
         status: true;
         reviewsRequested: true;
         reviewsCompleted: true;
-        genres: true;
-        reviews: {
+        Genre: true;
+        Review: {
           select: { status: true };
         };
       };
@@ -45,8 +45,8 @@ export type MinimalArtistProfile = Prisma.ArtistProfileGetPayload<{
         status: true;
         reviewsRequested: true;
         reviewsCompleted: true;
-        genres: true;
-        reviews: {
+        Genre: true;
+        Review: {
           select: { status: true };
         };
       };
@@ -62,11 +62,11 @@ export type PendingPeerReview = Prisma.ReviewGetPayload<{
   select: {
     id: true;
     createdAt: true;
-    track: {
+    Track: {
       select: {
         title: true;
-        genres: true;
-        artist: {
+        Genre: true;
+        ArtistProfile: {
           select: { artistName: true };
         };
       };

@@ -28,7 +28,7 @@ export async function POST(
     const review = await prisma.review.findUnique({
       where: { id },
       include: {
-        track: { include: { artist: true } },
+        Track: { include: { ArtistProfile: true } },
       },
     });
 
@@ -36,7 +36,7 @@ export async function POST(
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    if (review.track.artist.userId !== session.user.id) {
+    if (review.track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -81,10 +81,10 @@ export async function POST(
         },
       });
 
-      const shouldRestrict = reviewer.flagCount > 3;
+      const shouldRestrict = ReviewerProfile.flagCount > 3;
       const reviewerAfter = shouldRestrict
         ? await tx.reviewerProfile.update({
-            where: { id: reviewer.id },
+            where: { id: ReviewerProfile.id },
             data: { isRestricted: true },
             select: { id: true, flagCount: true, isRestricted: true },
           })
@@ -137,7 +137,7 @@ export async function POST(
         });
 
         const nextStatus =
-          countedCompletedReviews >= track.reviewsRequested
+          countedCompletedReviews >= track.ReviewRequested
             ? ("COMPLETED" as const)
             : countedCompletedReviews > 0
               ? ("IN_PROGRESS" as const)
@@ -158,7 +158,7 @@ export async function POST(
       // Ensure the flagged review's track gets a replacement review assigned.
       affectedTrackIds = Array.from(new Set([...affectedTrackIds, updatedReview.trackId]));
 
-      return { updatedReview, reviewer: reviewerAfter, affectedTrackIds };
+      return { updatedReview, ReviewerProfile: reviewerAfter, affectedTrackIds };
     });
 
     if (result.affectedTrackIds.length > 0) {
@@ -174,7 +174,7 @@ export async function POST(
         wasFlagged: result.updatedReview.wasFlagged,
         flagReason: result.updatedReview.flagReason,
       },
-      reviewer: result.reviewer,
+      ReviewerProfile: result.reviewer,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

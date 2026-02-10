@@ -22,7 +22,7 @@ export async function POST(
 
     const track = await prisma.track.findUnique({
       where: { id },
-      include: { payment: true },
+      include: { Payment: true },
     });
 
     if (!track) {
@@ -56,10 +56,10 @@ export async function POST(
         where: { trackId: track.id, status: { in: ["ASSIGNED", "IN_PROGRESS"] } },
         data: { status: "EXPIRED" },
       }),
-      ...(track.payment?.status === "PENDING"
+      ...(track.Payment?.status === "PENDING"
         ? [
             prisma.payment.update({
-              where: { id: track.payment.id },
+              where: { id: track.Payment.id },
               data: { status: "FAILED" },
             }),
           ]

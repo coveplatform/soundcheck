@@ -113,7 +113,7 @@ export default function GetFeedbackPage() {
           setGenres(data);
         }
       } catch (error) {
-        console.error("Failed to fetch genres:", error);
+        console.error("Failed to fetch Genre:", error);
       }
     }
     fetchGenres();
@@ -648,7 +648,7 @@ export default function GetFeedbackPage() {
       if (!artistName.trim()) errors.artistName = "Required";
     }
 
-    if (selectedGenres.length === 0) errors.genres = "Select at least one genre";
+    if (selectedGenres.length === 0) errors.Genre = "Select at least one genre";
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -1918,7 +1918,7 @@ export default function GetFeedbackPage() {
                 </div>
               )}
 
-              {fieldErrors.genres && <p className="text-xs text-red-500 mt-2">{fieldErrors.genres}</p>}
+              {fieldErrors.Genre && <p className="text-xs text-red-500 mt-2">{fieldErrors.Genre}</p>}
             </div>
 
             {/* Continue button */}
@@ -2017,7 +2017,7 @@ export default function GetFeedbackPage() {
                                   )}
                                 </div>
                                 <p className="text-sm text-neutral-400 mt-1">
-                                  {details.reviews} review{details.reviews > 1 ? "s" : ""} • {details.description}
+                                  {details.Review} review{details.Review > 1 ? "s" : ""} • {details.description}
                                 </p>
                               </div>
                               <div className="text-right">

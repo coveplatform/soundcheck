@@ -60,17 +60,17 @@ export async function GET(
     const review = await prisma.review.findUnique({
       where: { id },
       include: {
-        track: {
+        Track: {
           include: {
-            genres: true,
-            artist: {
+            Genre: true,
+            ArtistProfile: {
               select: {
                 artistName: true,
               },
             },
           },
         },
-        reviewer: {
+        ReviewerProfile: {
           select: {
             id: true,
             tier: true,
@@ -129,9 +129,9 @@ export async function PATCH(
     const review = await prisma.review.findUnique({
       where: { id },
       include: {
-        track: {
+        Track: {
           include: {
-            artist: true,
+            ArtistProfile: true,
           },
         },
       },
@@ -148,7 +148,7 @@ export async function PATCH(
       );
     }
 
-    if (review.track.artist.userId !== session.user.id) {
+    if (review.track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

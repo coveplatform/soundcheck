@@ -94,8 +94,8 @@ export async function POST(request: Request) {
 
     // For PEER packages, reviewsRequested comes from credits spent
     const reviewsRequested = isPeerPackage
-      ? (data.reviewsRequested ?? 0)
-      : PACKAGES[packageType].reviews;
+      ? (data.ReviewRequested ?? 0)
+      : PACKAGES[packageType].Review;
 
     const createData = {
       artistId: artistProfile.id,
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
       abletonProjectData: data.abletonProjectData,
       // Auto-trigger render if Ableton project is uploaded
       abletonRenderStatus: data.abletonProjectUrl ? AbletonRenderStatus.PENDING : data.abletonRenderStatus,
-      genres: {
+      Genre: {
         connect: data.genreIds.map((id) => ({ id })),
       },
     };
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
       track = await prisma.track.create({
         data: createData,
         include: {
-          genres: true,
+          Genre: true,
         },
       });
     } catch (e) {
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
         track = await prisma.track.create({
           data: fallbackData as any,
           include: {
-            genres: true,
+            Genre: true,
           },
         });
       } else {
@@ -190,7 +190,7 @@ export async function GET(request: Request) {
         ...(status && { status: status as never }),
       },
       include: {
-        genres: true,
+        Genre: true,
         _count: {
           select: { Review: true },
         },

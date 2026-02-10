@@ -44,7 +44,7 @@ export async function POST(
         id: true,
         trackShareId: true,
         sharingEnabled: true,
-        artist: {
+        ArtistProfile: {
           select: {
             userId: true,
           },
@@ -56,7 +56,7 @@ export async function POST(
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
-    if (track.artist.userId !== session.user.id) {
+    if (track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json(
         { error: "You don't have permission to manage this track" },
         { status: 403 }
@@ -152,7 +152,7 @@ export async function GET(
       select: {
         id: true,
         trackShareId: true,
-        artist: {
+        ArtistProfile: {
           select: {
             userId: true,
           },
@@ -164,7 +164,7 @@ export async function GET(
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
-    if (track.artist.userId !== session.user.id) {
+    if (track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json(
         { error: "You don't have permission to view this track" },
         { status: 403 }

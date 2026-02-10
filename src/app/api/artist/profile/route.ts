@@ -45,7 +45,7 @@ export async function POST(request: Request) {
           artistName,
           ...(genreIds !== undefined
             ? {
-                genres: {
+                Genre: {
                   set: genreIds.map((id) => ({ id })),
                 },
               }
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
         reviewCredits: 2,
         ...(genreIds && genreIds.length > 0
           ? {
-              genres: {
+              Genre: {
                 connect: genreIds.map((id) => ({ id })),
               },
             }
@@ -109,7 +109,7 @@ export async function GET() {
     const profile = await prisma.artistProfile.findUnique({
       where: { userId: session.user.id },
       include: {
-        genres: true,
+        Genre: true,
         tracks: {
           select: { id: true },
         },

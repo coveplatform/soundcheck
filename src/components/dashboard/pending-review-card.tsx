@@ -29,10 +29,10 @@ export function PendingReviewCard({ review }: PendingReviewCardProps) {
               {formatRelativeDate(review.createdAt)}
             </p>
           </div>
-          {review.track.genres && review.track.genres.length > 0 && (
+          {review.track.Genre && review.track.Genre.length > 0 && (
             <div className="mt-1">
               <GenreTagList
-                genres={review.track.genres}
+                genres={review.track.Genre}
                 variant="neutral"
                 size="sm"
                 maxDisplay={2}

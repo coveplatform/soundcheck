@@ -32,7 +32,7 @@ export async function POST(
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
-        artist: {
+        ArtistProfile: {
           select: {
             userId: true,
             subscriptionStatus: true,
@@ -45,7 +45,7 @@ export async function POST(
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
-    if (track.artist.userId !== session.user.id) {
+    if (track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json(
         { error: "You don't have permission to configure this track" },
         { status: 403 }
@@ -66,7 +66,7 @@ export async function POST(
     // Validate SALES mode requirements
     if (config.sharingMode === "SALES") {
       // Check Pro subscription
-      const isPro = track.artist.subscriptionStatus === "active";
+      const isPro = track.ArtistProfile.subscriptionStatus === "active";
 
       if (!isPro) {
         return NextResponse.json(
@@ -153,7 +153,7 @@ export async function GET(
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
-        artist: {
+        ArtistProfile: {
           select: {
             userId: true,
             subscriptionStatus: true,
@@ -166,14 +166,14 @@ export async function GET(
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
-    if (track.artist.userId !== session.user.id) {
+    if (track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json(
         { error: "You don't have permission to view this track" },
         { status: 403 }
       );
     }
 
-    const isPro = track.artist.subscriptionStatus === "active";
+    const isPro = track.ArtistProfile.subscriptionStatus === "active";
     const isEligibleForSharing = track.sourceType === "UPLOAD";
     const isEligibleForSales = isEligibleForSharing && isPro;
 

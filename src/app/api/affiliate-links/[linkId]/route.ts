@@ -32,7 +32,7 @@ export async function PATCH(
       select: {
         id: true,
         createdByUserId: true,
-        track: {
+        Track: {
           select: {
             trackShareId: true,
           },

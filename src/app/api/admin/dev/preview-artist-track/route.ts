@@ -116,7 +116,7 @@ export async function POST() {
       create: {
         userId: adminUserId,
         artistName: "Preview Artist",
-        genres: { connect: [{ id: genre.id }] },
+        Genre: { connect: [{ id: genre.id }] },
       },
     });
 
@@ -155,7 +155,7 @@ export async function POST() {
             tier: i < 2 ? "PRO" : "NORMAL",
             completedOnboarding: true,
             onboardingQuizPassed: true,
-            genres: { connect: [{ id: genre.id }] },
+            Genre: { connect: [{ id: genre.id }] },
           },
         });
 
@@ -177,7 +177,7 @@ export async function POST() {
           reviewsCompleted: 5,
           paidAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
           completedAt: new Date(),
-          genres: { connect: [{ id: genre.id }] },
+          Genre: { connect: [{ id: genre.id }] },
         },
       });
 

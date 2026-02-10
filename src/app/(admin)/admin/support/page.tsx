@@ -8,7 +8,7 @@ type AdminTicketListItem = {
   status: string;
   createdAt: Date;
   updatedAt: Date;
-  user: { email: string };
+  User: { email: string };
   messages: Array<{ body: string; createdAt: Date; authorType: string }>;
   _count: { messages: number };
 };
@@ -34,7 +34,7 @@ export default async function AdminSupportPage({
             OR: [
               { id: { contains: q, mode: "insensitive" } },
               { subject: { contains: q, mode: "insensitive" } },
-              { user: { email: { contains: q, mode: "insensitive" } } },
+              { User: { email: { contains: q, mode: "insensitive" } } },
             ],
           }
         : {}),
@@ -47,7 +47,7 @@ export default async function AdminSupportPage({
       status: true,
       createdAt: true,
       updatedAt: true,
-      user: { select: { email: true } },
+      User: { select: { email: true } },
       messages: {
         orderBy: { createdAt: "desc" },
         take: 1,
@@ -109,7 +109,7 @@ export default async function AdminSupportPage({
                     <div className="text-xs text-neutral-500 font-mono mt-1">{t.id}</div>
                   </td>
                   <td className="px-4 py-3">{t.status}</td>
-                  <td className="px-4 py-3">{t.user.email}</td>
+                  <td className="px-4 py-3">{t.User.email}</td>
                   <td className="px-4 py-3">{new Date(t.updatedAt).toLocaleString()}</td>
                   <td className="px-4 py-3">{t._count.messages}</td>
                 </tr>

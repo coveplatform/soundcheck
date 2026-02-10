@@ -14,11 +14,11 @@ interface ReviewWithTrack {
   id: string;
   status: string;
   createdAt: Date;
-  track: {
+  Track: {
     title: string;
     feedbackFocus: string | null;
-    genres: Array<{ id: string; name: string }>;
-    artist: {
+    Genre: Array<{ id: string; name: string }>;
+    ArtistProfile: {
       artistName: string;
     };
   };
@@ -63,15 +63,15 @@ export default async function ReviewQueuePage({
       where: {
         peerReviewerArtistId: artistProfile.id,
         status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-        track: {
+        Track: {
           status: { not: "COMPLETED" },
         },
       },
       include: {
-        track: {
+        Track: {
           include: {
-            genres: true,
-            artist: {
+            Genre: true,
+            ArtistProfile: {
               select: { artistName: true },
             },
           },
@@ -164,10 +164,10 @@ export default async function ReviewQueuePage({
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-base font-semibold text-black truncate">{review.track.title}</p>
-                          <p className="text-sm text-neutral-600 mb-1">by {review.track.artist.artistName}</p>
+                          <p className="text-sm text-neutral-600 mb-1">by {review.track.ArtistProfile.artistName}</p>
                           <div className="flex items-center gap-2 flex-wrap">
                             <GenreTagList
-                              genres={review.track.genres}
+                              genres={review.track.Genre}
                               variant="neutral"
                               size="sm"
                               maxDisplay={2}

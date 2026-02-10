@@ -29,14 +29,14 @@ export async function POST(
     const track = await prisma.track.findUnique({
       where: { id },
       include: {
-        artist: {
+        ArtistProfile: {
           select: {
             userId: true,
             subscriptionStatus: true,
             reviewCredits: true,
           }
         },
-        reviews: { select: { id: true } },
+        Review: { select: { id: true } },
       },
     });
 
@@ -44,7 +44,7 @@ export async function POST(
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
-    if (track.artist.userId !== session.user.id) {
+    if (track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -67,7 +67,7 @@ export async function POST(
     const desired = data.desiredReviews;
     const cost = desired;
 
-    if ((track.artist.reviewCredits ?? 0) < cost) {
+    if ((track.ArtistProfile.reviewCredits ?? 0) < cost) {
       return NextResponse.json(
         { error: "Not enough credits. Earn more by reviewing tracks or buy a top-up." },
         { status: 403 }
@@ -99,9 +99,9 @@ export async function POST(
       }
 
       // Determine new status based on current state
-      const currentReviewsCompleted = track.reviewsCompleted ?? 0;
-      const hasExistingReviews = track.reviews.length > 0;
-      const currentReviewsRequested = track.reviewsRequested ?? 0;
+      const currentReviewsCompleted = track.ReviewCompleted ?? 0;
+      const hasExistingReviews = track.Review.length > 0;
+      const currentReviewsRequested = track.ReviewRequested ?? 0;
       const newReviewsRequested = currentReviewsRequested + desired;
 
       // If adding more reviews and already have some completed, go to IN_PROGRESS

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 interface ReviewsTabProps {
-  reviews: any[];
+  Review: any[];
   isFreeTier?: boolean;
   trackId: string;
 }

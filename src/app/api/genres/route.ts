@@ -9,7 +9,7 @@ export async function GET() {
 
     return NextResponse.json(genres);
   } catch (error) {
-    console.error("Error fetching genres:", error);
+    console.error("Error fetching Genre:", error);
     return NextResponse.json(
       { error: "Failed to fetch genres" },
       { status: 500 }

@@ -12,17 +12,17 @@ interface ReviewerDebug {
 }
 
 interface DebugResult {
-  track: {
+  Track: {
     id: string;
     status: string;
-    genres: string[];
+    Genre: string[];
     reviewsRequested: number;
   };
   eligibleCount: number;
   reviewerDebug: ReviewerDebug[];
   afterAssignment: {
     queueEntries: string[];
-    reviews: { reviewerId: string; status: string }[];
+    Review: { reviewerId: string; status: string }[];
   };
 }
 
@@ -76,7 +76,7 @@ export function DebugAssignButton({ trackId }: { trackId: string }) {
           <div>
             <div className="font-bold mb-2">Track Info</div>
             <div className="text-neutral-600">
-              Status: {result.track.status} | Genres: {result.track.genres.join(", ")} | Reviews requested: {result.track.reviewsRequested}
+              Status: {result.track.status} | Genres: {result.track.Genre.join(", ")} | Reviews requested: {result.track.ReviewRequested}
             </div>
           </div>
 
@@ -103,8 +103,8 @@ export function DebugAssignButton({ trackId }: { trackId: string }) {
               Queue: {result.afterAssignment.queueEntries.length > 0 ? result.afterAssignment.queueEntries.join(", ") : "empty"}
             </div>
             <div className="text-neutral-600">
-              Reviews: {result.afterAssignment.reviews.length > 0
-                ? result.afterAssignment.reviews.map(r => r.status).join(", ")
+              Reviews: {result.afterAssignment.Review.length > 0
+                ? result.afterAssignment.Review.map(r => r.status).join(", ")
                 : "none"}
             </div>
           </div>

@@ -45,20 +45,20 @@ export default async function TrackDetailPage({
     prisma.track.findUnique({
       where: { id },
       include: {
-        artist: {
-          include: { user: true },
+        ArtistProfile: {
+          include: { User: true },
         },
-        genres: true,
-        payment: true,
+        Genre: true,
+        Payment: true,
         stems: {
           orderBy: { order: "asc" },
         },
-        reviews: {
+        Review: {
           where: { status: "COMPLETED" },
           include: {
-            reviewer: {
+            ReviewerProfile: {
               include: {
-                user: { select: { name: true } },
+                User: { select: { name: true } },
               },
             },
           },
@@ -66,9 +66,9 @@ export default async function TrackDetailPage({
         },
         purchases: {
           include: {
-            reviewer: {
+            ReviewerProfile: {
               include: {
-                user: { select: { name: true } },
+                User: { select: { name: true } },
               },
             },
           },
@@ -102,21 +102,21 @@ export default async function TrackDetailPage({
   }
 
   // Verify ownership
-  if (track.artist.userId !== session.user.id) {
+  if (track.ArtistProfile.userId !== session.user.id) {
     notFound();
   }
 
   // Check subscription status
-  const isSubscribed = track.artist.subscriptionStatus === "active";
+  const isSubscribed = track.ArtistProfile.subscriptionStatus === "active";
   const isFreeTier = !isSubscribed;
 
-  const completedReviews = track.reviews.length;
-  const countedCompletedReviews = track.reviews.filter(
+  const completedReviews = track.Review.length;
+  const countedCompletedReviews = track.Review.filter(
     (r) => r.countsTowardCompletion !== false
   ).length;
   const progress =
-    track.reviewsRequested > 0
-      ? Math.round((countedCompletedReviews / track.reviewsRequested) * 100)
+    track.ReviewRequested > 0
+      ? Math.round((countedCompletedReviews / track.ReviewRequested) * 100)
       : 0;
 
   // Calculate earnings
@@ -188,9 +188,9 @@ export default async function TrackDetailPage({
               </div>
 
               {/* Genre Pills */}
-              {track.genres.length > 0 && (
+              {track.Genre.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 mb-3">
-                  {track.genres.map((genre) => (
+                  {track.Genre.map((genre) => (
                     <span
                       key={genre.id}
                       className="px-2.5 py-0.5 bg-white border border-black/20 rounded-full text-xs font-bold text-black/70"
@@ -202,7 +202,7 @@ export default async function TrackDetailPage({
               )}
 
               {/* Stats Pills */}
-              {track.reviewsRequested > 0 && (
+              {track.ReviewRequested > 0 && (
                 <div className="flex flex-wrap items-center gap-3 text-sm">
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-black">{completedReviews}</span>
@@ -237,7 +237,7 @@ export default async function TrackDetailPage({
                 isPro={isSubscribed}
                 statsTab={
                   <StatsTab
-                    reviews={track.reviews}
+                    reviews={track.Review}
                     platformAverages={{
                       production: platformStats._avg.productionScore ?? 0,
                       originality: platformStats._avg.originalityScore ?? 0,
@@ -248,7 +248,7 @@ export default async function TrackDetailPage({
                 }
                 reviewsTab={
                   <ReviewsTab
-                    reviews={track.reviews}
+                    reviews={track.Review}
                     isFreeTier={isFreeTier}
                     trackId={track.id}
                   />
@@ -285,7 +285,7 @@ export default async function TrackDetailPage({
                       linkIssueNotifiedAt: track.linkIssueNotifiedAt,
                       feedbackFocus: track.feedbackFocus,
                     }}
-                    payment={track.payment}
+                    payment={track.Payment}
                     canUpdateSource={canUpdateSource}
                   />
                 }

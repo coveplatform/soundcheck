@@ -16,7 +16,7 @@ import {
 import Link from "next/link";
 
 interface SalesTabProps {
-  track: {
+  Track: {
     id: string;
     title: string;
     sourceType: string;
@@ -30,8 +30,8 @@ interface SalesTabProps {
     id: string;
     amount: number;
     createdAt: Date;
-    reviewer: {
-      user: {
+    ReviewerProfile: {
+      User: {
         name: string | null;
       };
     };
@@ -70,7 +70,7 @@ export function SalesTab({
       id: p.id,
       amount: p.amount,
       date: p.createdAt,
-      buyer: p.reviewer.user.name || "Anonymous",
+      buyer: p.ReviewerProfile.User.name || "Anonymous",
       type: "internal" as const,
       affiliateCode: null
     })),

@@ -11,7 +11,7 @@ interface Genre {
 }
 
 interface GenreSelectorProps {
-  genres: Genre[];
+  Genre: Genre[];
   selectedIds: string[];
   onToggle: (id: string) => void;
   maxSelections?: number;
@@ -223,8 +223,8 @@ export function GenreSelector({
     },
   };
   const variantStyles = {
-    artist: purpleStyles,
-    reviewer: purpleStyles,
+    ArtistProfile: purpleStyles,
+    ReviewerProfile: purpleStyles,
   };
 
   const styles = variantStyles[variant][theme];
@@ -335,7 +335,7 @@ export function GenreSelector({
                   <p className={cn("text-xs font-medium mb-3", styles.helperText)}>
                     {parentSelected
                       ? "You're matched with all sub-genres. Pick specific ones to narrow:"
-                      : "Or pick specific sub-genres:"}
+                      : "Or pick specific sub-Genre:"}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {childGenres.map((genre) => {

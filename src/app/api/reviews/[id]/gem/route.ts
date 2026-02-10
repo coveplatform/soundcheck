@@ -24,9 +24,9 @@ export async function POST(
         status: true,
         isGem: true,
         reviewerId: true,
-        track: {
+        Track: {
           select: {
-            artist: { select: { userId: true } },
+            ArtistProfile: { select: { userId: true } },
           },
         },
       },
@@ -36,7 +36,7 @@ export async function POST(
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    if (review.track.artist.userId !== session.user.id) {
+    if (review.track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -98,9 +98,9 @@ export async function DELETE(
         status: true,
         isGem: true,
         reviewerId: true,
-        track: {
+        Track: {
           select: {
-            artist: { select: { userId: true } },
+            ArtistProfile: { select: { userId: true } },
           },
         },
       },
@@ -110,7 +110,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    if (review.track.artist.userId !== session.user.id) {
+    if (review.track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

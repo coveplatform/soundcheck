@@ -20,7 +20,7 @@ describe('Signup Validation', () => {
     it('accepts valid email addresses', () => {
       const validEmails = [
         'user@example.com',
-        'artist.name@music.co',
+        'ArtistProfile.name@music.co',
         'reviewer+test@gmail.com',
         'a@b.io',
       ]

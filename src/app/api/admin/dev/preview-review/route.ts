@@ -47,7 +47,7 @@ export async function POST() {
       create: {
         userId: artistUser.id,
         artistName: "Test Artist",
-        genres: { connect: [{ id: genre.id }] },
+        Genre: { connect: [{ id: genre.id }] },
       },
     });
 
@@ -65,7 +65,7 @@ export async function POST() {
         tier: "PRO",
         completedOnboarding: true,
         onboardingQuizPassed: true,
-        genres: { connect: [{ id: genre.id }] },
+        Genre: { connect: [{ id: genre.id }] },
       },
     });
 
@@ -91,7 +91,7 @@ export async function POST() {
           packageType: "STANDARD",
           reviewsRequested: 3,
           reviewsCompleted: 0,
-          genres: { connect: [{ id: genre.id }] },
+          Genre: { connect: [{ id: genre.id }] },
         },
       });
 

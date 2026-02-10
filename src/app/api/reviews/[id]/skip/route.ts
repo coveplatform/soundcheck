@@ -43,8 +43,8 @@ export async function POST(
     const review = await prisma.review.findUnique({
       where: { id },
       include: {
-        reviewer: { select: { userId: true, id: true } },
-        track: { select: { id: true } },
+        ReviewerProfile: { select: { userId: true, id: true } },
+        Track: { select: { id: true } },
       },
     });
 
@@ -52,7 +52,7 @@ export async function POST(
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    if (review.reviewer.userId !== session.user.id) {
+    if (review.ReviewerProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -68,7 +68,7 @@ export async function POST(
 
     const skipsToday = await prisma.review.count({
       where: {
-        reviewerId: review.reviewer.id,
+        reviewerId: review.ReviewerProfile.id,
         status: "SKIPPED",
         updatedAt: { gte: startOfDay },
       },
@@ -90,7 +90,7 @@ export async function POST(
     await prisma.reviewQueue.deleteMany({
       where: {
         trackId: review.track.id,
-        reviewerId: review.reviewer.id,
+        reviewerId: review.ReviewerProfile.id,
       },
     });
 

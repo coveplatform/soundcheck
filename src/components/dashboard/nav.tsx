@@ -10,7 +10,7 @@ import { Logo } from "@/components/ui/logo";
 import { useEffect, useRef, useState } from "react";
 
 interface DashboardNavProps {
-  user: {
+  User: {
     name?: string | null;
     email: string;
     isArtist: boolean;
@@ -77,7 +77,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
     : "/account";
 
   const sectionConfig = {
-    artist: {
+    ArtistProfile: {
       label: "Artist",
       color: "bg-lime-500",
       hoverColor: "hover:bg-lime-400",

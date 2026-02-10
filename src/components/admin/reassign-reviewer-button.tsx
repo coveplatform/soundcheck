@@ -119,7 +119,7 @@ export function ReassignReviewerButton({
           onChange={(e) => setSelectedReviewerId(e.target.value)}
           disabled={isLoading}
         >
-          <option value="">Select a reviewer...</option>
+          <option value="">Select a ReviewerProfile...</option>
           {eligibleReviewers.map((r) => (
             <option key={r.id} value={r.id}>
               {r.email} ({r.tier})

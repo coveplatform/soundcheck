@@ -13,7 +13,7 @@ export async function finalizePaidCheckoutSession(params: {
   trackTitle: string | null;
 }> {
   return prisma.$transaction(async (tx) => {
-    const existingPayment = await tx.payment.findUnique({
+    const existingPayment = await tx.Payment.findUnique({
       where: { stripeSessionId: params.stripeSessionId },
       select: { id: true, trackId: true, status: true },
     });
@@ -34,7 +34,7 @@ export async function finalizePaidCheckoutSession(params: {
     }
 
     if (existingPayment) {
-      await tx.payment.update({
+      await tx.Payment.update({
         where: { id: existingPayment.id },
         data: {
           status: "COMPLETED",
@@ -44,7 +44,7 @@ export async function finalizePaidCheckoutSession(params: {
       });
     } else {
       try {
-        await tx.payment.create({
+        await tx.Payment.create({
           data: {
             trackId: params.trackId,
             amount: params.amountTotalCents ?? 0,
@@ -65,8 +65,8 @@ export async function finalizePaidCheckoutSession(params: {
         status: true,
         paidAt: true,
         artistId: true,
-        payment: { select: { amount: true, stripeSessionId: true } },
-        artist: { select: { user: { select: { email: true } } } },
+        Payment: { select: { amount: true, stripeSessionId: true } },
+        ArtistProfile: { select: { User: { select: { email: true } } } },
       },
     });
 
@@ -79,9 +79,9 @@ export async function finalizePaidCheckoutSession(params: {
       };
     }
 
-    if (track.payment && track.payment.stripeSessionId !== params.stripeSessionId) {
+    if (track.Payment && track.Payment.stripeSessionId !== params.stripeSessionId) {
       throw new Error(
-        `Track ${params.trackId} payment session mismatch (${track.payment.stripeSessionId} !== ${params.stripeSessionId})`
+        `Track ${params.trackId} payment session mismatch (${track.Payment.stripeSessionId} !== ${params.stripeSessionId})`
       );
     }
 
@@ -98,7 +98,7 @@ export async function finalizePaidCheckoutSession(params: {
     });
 
     if (firstQueue.count > 0) {
-      const amountSpent = params.amountTotalCents ?? track.payment?.amount ?? 0;
+      const amountSpent = params.amountTotalCents ?? track.Payment?.amount ?? 0;
 
       await tx.artistProfile.update({
         where: { id: track.artistId },
@@ -112,7 +112,7 @@ export async function finalizePaidCheckoutSession(params: {
     return {
       trackId: track.id,
       queuedNow: firstQueue.count > 0,
-      artistEmail: track.artist.user?.email ?? null,
+      artistEmail: track.ArtistProfile.user?.email ?? null,
       trackTitle: track.title ?? null,
     };
   });

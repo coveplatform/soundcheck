@@ -55,7 +55,7 @@ export function CompletedReview({
             <div>
               <CardTitle className="text-xl">{review.track.title}</CardTitle>
               <p className="text-sm text-neutral-600">
-                {review.track.genres.map((g) => g.name).join(", ")}
+                {review.track.Genre.map((g) => g.name).join(", ")}
               </p>
             </div>
           </div>
@@ -198,7 +198,7 @@ export function CompletedReview({
                 <div>
                   <p className="font-bold text-lg">Love this track?</p>
                   <p className="text-sm text-neutral-600">
-                    Purchase it for $0.50 to download and support the artist.
+                    Purchase it for $0.50 to download and support the ArtistProfile.
                   </p>
                   {reviewerBalance !== null && (
                     <p className="text-xs text-neutral-500 mt-1">

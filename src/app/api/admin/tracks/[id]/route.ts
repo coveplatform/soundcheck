@@ -73,8 +73,8 @@ export async function POST(
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
-        genres: true,
-        reviews: { select: { reviewerId: true, status: true } },
+        Genre: true,
+        Review: { select: { reviewerId: true, status: true } },
         queueEntries: { select: { reviewerId: true } },
       },
     });
@@ -86,7 +86,7 @@ export async function POST(
     // Get all reviewers to show why they might not be eligible
     const allReviewers = await prisma.reviewerProfile.findMany({
       include: {
-        genres: true,
+        Genre: true,
         User: { select: { email: true, createdAt: true } },
       },
     });
@@ -113,18 +113,18 @@ export async function POST(
         }
       }
 
-      const trackGenreSlugs = track.genres.map(g => g.slug);
-      const reviewerGenreSlugs = r.genres.map(g => g.slug);
+      const trackGenreSlugs = track.Genre.map(g => g.slug);
+      const reviewerGenreSlugs = r.Genre.map(g => g.slug);
       if (!isTestBypass) {
         const hasGenreMatch = trackGenreSlugs.some(tg => reviewerGenreSlugs.includes(tg));
         if (!hasGenreMatch) {
           reasons.push(
-            `no genre match (track: ${trackGenreSlugs.join(", ")} | reviewer: ${reviewerGenreSlugs.join(", ")})`
+            `no genre match (track: ${trackGenreSlugs.join(", ")} | ReviewerProfile: ${reviewerGenreSlugs.join(", ")})`
           );
         }
       }
 
-      const hasExistingReview = track.reviews.some(rev => rev.reviewerId === r.id);
+      const hasExistingReview = track.Review.some(rev => rev.reviewerId === r.id);
       if (hasExistingReview) reasons.push("already has review entry for this track");
 
       const hasQueueEntry = track.queueEntries.some(q => q.reviewerId === r.id);
@@ -147,25 +147,25 @@ export async function POST(
     const updatedTrack = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
-        reviews: { select: { reviewerId: true, status: true } },
+        Review: { select: { reviewerId: true, status: true } },
         queueEntries: {
-          include: { reviewer: { include: { User: { select: { email: true } } } } }
+          include: { ReviewerProfile: { include: { User: { select: { email: true } } } } }
         },
       },
     });
 
     return NextResponse.json({
-      track: {
+      Track: {
         id: track.id,
         status: track.status,
-        genres: track.genres.map(g => g.name),
-        reviewsRequested: track.reviewsRequested,
+        Genre: track.Genre.map(g => g.name),
+        reviewsRequested: track.ReviewRequested,
       },
       eligibleCount: eligibleReviewers.length,
       reviewerDebug,
       afterAssignment: {
-        queueEntries: updatedTrack?.queueEntries.map(q => q.reviewer.User.email) ?? [],
-        reviews: updatedTrack?.reviews ?? [],
+        queueEntries: updatedTrack?.queueEntries.map(q => q.ReviewerProfile.User.email) ?? [],
+        Review: updatedTrack?.Review ?? [],
       },
     });
   } catch (error) {

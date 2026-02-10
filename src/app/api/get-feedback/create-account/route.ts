@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     const result = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
+      const user = await tx.User.create({
         data: {
           email: normalizedEmail,
           password: hashedPassword,
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
           userId: user.id,
           artistName: data.artistName,
           reviewCredits: 2,
-          genres: {
+          Genre: {
             connect: data.genreIds.map((id) => ({ id })),
           },
         },

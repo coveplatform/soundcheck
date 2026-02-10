@@ -32,25 +32,25 @@ export async function GET(
         showReviewsOnPublicPage: true,
         publicPlayCount: true,
         duration: true,
-        genres: {
+        Genre: {
           select: {
             id: true,
             name: true,
             slug: true,
           },
         },
-        artist: {
+        ArtistProfile: {
           select: {
             id: true,
             artistName: true,
-            user: {
+            User: {
               select: {
                 id: true,
               },
             },
           },
         },
-        reviews: {
+        Review: {
           where: {
             status: "COMPLETED",
           },
@@ -70,10 +70,10 @@ export async function GET(
             perceivedGenre: true,
             similarArtists: true,
             createdAt: true,
-            reviewer: {
+            ReviewerProfile: {
               select: {
                 tier: true,
-                user: {
+                User: {
                   select: {
                     name: true,
                   },
@@ -116,7 +116,7 @@ export async function GET(
     }
 
     // Calculate aggregate review stats
-    const reviews = track.showReviewsOnPublicPage ? track.reviews : [];
+    const reviews = track.showReviewsOnPublicPage ? track.Review : [];
 
     const avgScores = reviews.length > 0 ? {
       production: reviews.reduce((sum, r) => sum + (r.productionScore || 0), 0) / reviews.length,
@@ -135,7 +135,7 @@ export async function GET(
 
     // Return public track data
     return NextResponse.json({
-      track: {
+      Track: {
         id: track.id,
         trackShareId,
         title: track.title,
@@ -146,16 +146,16 @@ export async function GET(
         salePrice: track.salePrice,
         publicPlayCount: track.publicPlayCount,
         duration: track.duration,
-        genres: track.genres,
-        artist: {
-          id: track.artist.id,
-          artistName: track.artist.artistName,
+        Genre: track.Genre,
+        ArtistProfile: {
+          id: track.ArtistProfile.id,
+          artistName: track.ArtistProfile.artistName,
         },
         reviewStats: avgScores ? {
           averageScores: avgScores,
           totalReviews: reviews.length,
           wouldListenAgainPercent,
-          reviews: track.showReviewsOnPublicPage ? reviews.slice(0, 3) : [], // Show max 3 reviews
+          Review: track.showReviewsOnPublicPage ? reviews.slice(0, 3) : [], // Show max 3 reviews
         } : null,
       },
       platformStats: {

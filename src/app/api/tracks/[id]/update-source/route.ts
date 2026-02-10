@@ -29,7 +29,7 @@ export async function POST(
     const track = await prisma.track.findUnique({
       where: { id },
       include: {
-        artist: { select: { userId: true } },
+        ArtistProfile: { select: { userId: true } },
       },
     });
 
@@ -37,7 +37,7 @@ export async function POST(
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
-    if (track.artist.userId !== session.user.id) {
+    if (track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

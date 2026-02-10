@@ -151,7 +151,7 @@ export async function POST(request: Request) {
       select: { id: true, completedOnboarding: true },
     });
 
-    // Determine if user is a peer reviewer:
+    // Determine if user is a peer ReviewerProfile:
     // - Must have artist profile
     // - If they ALSO have reviewer profile, they can be either (check review type later)
     if (!reviewerProfile && !artistProfile) {
@@ -193,11 +193,11 @@ export async function POST(request: Request) {
     const review = await prisma.review.findUnique({
       where: { id: data.reviewId },
       include: {
-        reviewer: true,
-        peerReviewerArtist: { include: { user: true } },
-        track: {
+        ReviewerProfile: true,
+        peerReviewerArtist: { include: { User: true } },
+        Track: {
           include: {
-            artist: { include: { user: true } },
+            ArtistProfile: { include: { User: true } },
           },
         },
       },
@@ -217,7 +217,7 @@ export async function POST(request: Request) {
       }
     } else {
       // Legacy review - check if user owns the reviewer profile
-      if (!review.reviewer || review.reviewer.userId !== session.user.id) {
+      if (!review.reviewer || review.ReviewerProfile.userId !== session.user.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
     }
@@ -375,8 +375,8 @@ export async function POST(request: Request) {
             totalEarnings: { increment: earnings },
             lastReviewDate: now,
             reviewsToday:
-              review.reviewer.lastReviewDate &&
-              review.reviewer.lastReviewDate >= startOfToday
+              review.ReviewerProfile.lastReviewDate &&
+              review.ReviewerProfile.lastReviewDate >= startOfToday
                 ? { increment: 1 }
                 : 1,
           },
@@ -404,7 +404,7 @@ export async function POST(request: Request) {
       });
 
       const nextTrackStatus =
-        countedCompletedReviews >= review.track.reviewsRequested
+        countedCompletedReviews >= review.track.ReviewRequested
           ? ("COMPLETED" as const)
           : ("IN_PROGRESS" as const);
 
@@ -419,7 +419,7 @@ export async function POST(request: Request) {
         select: {
           title: true,
           reviewsRequested: true,
-          artist: { select: { User: { select: { email: true } } } },
+          ArtistProfile: { select: { User: { select: { email: true } } } },
         },
       });
 
@@ -438,10 +438,10 @@ export async function POST(request: Request) {
         updated: true as const,
         updatedReview,
         completedReviews: countedCompletedReviews,
-        track: {
+        Track: {
           title: updatedTrack.title,
-          reviewsRequested: updatedTrack.reviewsRequested,
-          artistEmail: updatedTrack.artist.User?.email ?? null,
+          reviewsRequested: updatedTrack.ReviewRequested,
+          artistEmail: updatedTrack.ArtistProfile.User?.email ?? null,
         },
       };
     });
@@ -476,8 +476,8 @@ export async function POST(request: Request) {
 
     await updateReviewerTier(review.reviewerId);
 
-    const milestoneHalf = Math.ceil(result.track.reviewsRequested / 2);
-    const milestoneFull = result.track.reviewsRequested;
+    const milestoneHalf = Math.ceil(result.track.ReviewRequested / 2);
+    const milestoneFull = result.track.ReviewRequested;
 
     if (
       result.track.artistEmail &&
@@ -488,7 +488,7 @@ export async function POST(request: Request) {
         result.track.artistEmail,
         result.track.title,
         result.completedReviews,
-        result.track.reviewsRequested
+        result.track.ReviewRequested
       );
     }
 

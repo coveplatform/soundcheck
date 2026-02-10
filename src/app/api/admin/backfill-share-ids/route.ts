@@ -27,7 +27,7 @@ export async function POST() {
       },
       select: {
         id: true,
-        track: {
+        Track: {
           select: {
             title: true,
           },
@@ -60,7 +60,7 @@ export async function POST() {
       success: true,
       message: `Updated ${reviewsWithoutShareId.length} reviews with share IDs`,
       updated: reviewsWithoutShareId.length,
-      reviews: reviewsWithoutShareId.map((r) => ({
+      Review: reviewsWithoutShareId.map((r) => ({
         id: r.id,
         trackTitle: r.track.title,
       })),

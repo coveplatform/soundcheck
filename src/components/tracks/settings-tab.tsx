@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 interface SettingsTabProps {
-  track: {
+  Track: {
     id: string;
     title: string;
     sourceUrl: string;
@@ -21,7 +21,7 @@ interface SettingsTabProps {
     linkIssueNotifiedAt: Date | null;
     feedbackFocus: string | null;
   };
-  payment: {
+  Payment: {
     status: string;
   } | null;
   canUpdateSource: boolean;

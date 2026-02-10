@@ -17,7 +17,7 @@ export default async function AdminReviewersPage({
       ...(restrictedOnly ? { isRestricted: true } : {}),
       ...(q
         ? {
-            user: {
+            User: {
               email: { contains: q, mode: "insensitive" },
             },
           }

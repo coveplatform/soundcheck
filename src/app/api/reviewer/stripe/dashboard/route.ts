@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (reviewer && (!reviewer.completedOnboarding || !reviewer.onboardingQuizPassed)) {
+    if (reviewer && (!ReviewerProfile.completedOnboarding || !ReviewerProfile.onboardingQuizPassed)) {
       return NextResponse.json(
         { error: "Please complete onboarding before continuing" },
         { status: 403 }
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
     const stripe = getStripe();
     const loginLink = await stripe.accounts.createLoginLink(
-      reviewer.stripeAccountId
+      ReviewerProfile.stripeAccountId
     );
 
     return NextResponse.json({ url: loginLink.url });

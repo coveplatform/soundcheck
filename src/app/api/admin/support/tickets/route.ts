@@ -25,7 +25,7 @@ export async function GET(request: Request) {
               OR: [
                 { id: { contains: q, mode: "insensitive" } },
                 { subject: { contains: q, mode: "insensitive" } },
-                { user: { email: { contains: q, mode: "insensitive" } } },
+                { User: { email: { contains: q, mode: "insensitive" } } },
               ],
             }
           : {}),
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
         status: true,
         createdAt: true,
         updatedAt: true,
-        user: { select: { email: true } },
+        User: { select: { email: true } },
         messages: {
           orderBy: { createdAt: "desc" },
           take: 1,

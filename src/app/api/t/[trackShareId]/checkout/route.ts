@@ -33,7 +33,7 @@ export async function POST(
         sharingEnabled: true,
         sharingMode: true,
         salePrice: true,
-        artist: {
+        ArtistProfile: {
           select: {
             id: true,
             artistName: true,
@@ -93,7 +93,7 @@ export async function POST(
 
     // Calculate revenue split
     const totalAmount = track.salePrice; // cents
-    const platformFeePercent = track.artist.subscriptionStatus === "active" ? 0.15 : 0.20; // Pro: 15%, Free: 20%
+    const platformFeePercent = track.ArtistProfile.subscriptionStatus === "active" ? 0.15 : 0.20; // Pro: 15%, Free: 20%
     const affiliateCommissionPercent = 0.10; // 10%
 
     const platformFee = Math.round(totalAmount * platformFeePercent);
@@ -130,11 +130,11 @@ export async function POST(
             currency: "usd", // Could be made dynamic based on account settings
             product_data: {
               name: track.title,
-              description: `Digital download by ${track.artist.artistName}`,
+              description: `Digital download by ${track.ArtistProfile.artistName}`,
               metadata: {
                 trackId: track.id,
                 trackShareId,
-                artistName: track.artist.artistName,
+                artistName: track.ArtistProfile.artistName,
               },
             },
             unit_amount: totalAmount,
@@ -149,7 +149,7 @@ export async function POST(
         trackId: track.id,
         trackShareId,
         buyerEmail: data.buyerEmail,
-        artistId: track.artist.id,
+        artistId: track.ArtistProfile.id,
         affiliateCode: affiliateLink?.code || "",
         affiliateUserId: affiliateLink?.createdByUserId || "",
       },

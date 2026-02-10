@@ -42,14 +42,14 @@ export async function POST(request: Request) {
       );
     }
 
-    if (reviewer.isRestricted) {
+    if (ReviewerProfile.isRestricted) {
       return NextResponse.json(
         { error: "Reviewer account restricted" },
         { status: 403 }
       );
     }
 
-    if (!reviewer.completedOnboarding || !reviewer.onboardingQuizPassed) {
+    if (!ReviewerProfile.completedOnboarding || !ReviewerProfile.onboardingQuizPassed) {
       return NextResponse.json(
         { error: "Please complete onboarding before connecting Stripe" },
         { status: 403 }
@@ -61,11 +61,11 @@ export async function POST(request: Request) {
       url.searchParams.get("reset") === "1" ||
       url.searchParams.get("reconnect") === "1";
 
-    let accountId = reviewer.stripeAccountId;
+    let accountId = ReviewerProfile.stripeAccountId;
 
     if (reset && accountId) {
       await prisma.reviewerProfile.update({
-        where: { id: reviewer.id },
+        where: { id: ReviewerProfile.id },
         data: { stripeAccountId: null },
       });
       accountId = null;
@@ -74,15 +74,15 @@ export async function POST(request: Request) {
     if (bypassPayments) {
       if (!accountId) {
         const connectedAt = new Date();
-        accountId = `bypass_${reviewer.id}`;
+        accountId = `bypass_${ReviewerProfile.id}`;
         await prisma.reviewerProfile.update({
-          where: { id: reviewer.id },
+          where: { id: ReviewerProfile.id },
           data: { stripeAccountId: accountId },
         });
         await prisma.$executeRaw`
           UPDATE "ReviewerProfile"
           SET "stripeConnectedAt" = ${connectedAt}, "updatedAt" = ${connectedAt}
-          WHERE "id" = ${reviewer.id} AND "stripeConnectedAt" IS NULL
+          WHERE "id" = ${ReviewerProfile.id} AND "stripeConnectedAt" IS NULL
         `;
       }
 
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       const rows = await prisma.$queryRaw<Array<{ country: string | null }>>`
         SELECT "country"
         FROM "ReviewerProfile"
-        WHERE "id" = ${reviewer.id}
+        WHERE "id" = ${ReviewerProfile.id}
         LIMIT 1
       `;
 
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
           transfers: { requested: true },
         },
         metadata: {
-          reviewerId: reviewer.id,
+          reviewerId: ReviewerProfile.id,
         },
       });
 
@@ -127,14 +127,14 @@ export async function POST(request: Request) {
       const connectedAt = new Date();
 
       await prisma.reviewerProfile.update({
-        where: { id: reviewer.id },
+        where: { id: ReviewerProfile.id },
         data: { stripeAccountId: accountId },
       });
 
       await prisma.$executeRaw`
         UPDATE "ReviewerProfile"
         SET "stripeConnectedAt" = ${connectedAt}, "updatedAt" = ${connectedAt}
-        WHERE "id" = ${reviewer.id} AND "stripeConnectedAt" IS NULL
+        WHERE "id" = ${ReviewerProfile.id} AND "stripeConnectedAt" IS NULL
       `;
     }
 

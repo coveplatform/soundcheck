@@ -84,7 +84,7 @@ export async function POST(request: Request) {
             userId: session.user.id,
             artistName: profileName,
             reviewCredits: 2,
-            genres: {
+            Genre: {
               connect: data.genreIds.map((id) => ({ id })),
             },
           },
@@ -168,7 +168,7 @@ export async function POST(request: Request) {
               creditsSpent: creditsToSpend,
               status: "QUEUED", // Skip payment
               paidAt: new Date(), // Mark as "paid" via credits
-              genres: {
+              Genre: {
                 connect: data.genreIds.map((id) => ({ id })),
               },
             },
@@ -201,8 +201,8 @@ export async function POST(request: Request) {
           duration: data.duration,
           feedbackFocus: data.feedbackFocus,
           packageType: data.packageType,
-          reviewsRequested: packageDetails.reviews,
-          genres: {
+          reviewsRequested: packageDetails.Review,
+          Genre: {
             connect: data.genreIds.map((id) => ({ id })),
           },
         },
@@ -273,7 +273,7 @@ export async function POST(request: Request) {
               userId: existingUser.id,
               artistName: profileName,
               reviewCredits: 2,
-              genres: {
+              Genre: {
                 connect: data.genreIds.map((id) => ({ id })),
               },
             },
@@ -326,8 +326,8 @@ export async function POST(request: Request) {
             duration: data.duration,
             feedbackFocus: data.feedbackFocus,
             packageType: data.packageType,
-            reviewsRequested: packageDetails.reviews,
-            genres: {
+            reviewsRequested: packageDetails.Review,
+            Genre: {
               connect: data.genreIds.map((id) => ({ id })),
             },
           },
@@ -377,7 +377,7 @@ export async function POST(request: Request) {
       // Create everything in a transaction
       const result = await prisma.$transaction(async (tx) => {
         // 1. Create user
-        const user = await tx.user.create({
+        const user = await tx.User.create({
           data: {
             email: normalizedEmail,
             password: hashedPassword,
@@ -393,7 +393,7 @@ export async function POST(request: Request) {
             userId: user.id,
             artistName: data.artistName,
             reviewCredits: 2,
-            genres: {
+            Genre: {
               connect: data.genreIds.map((id) => ({ id })),
             },
           },
@@ -410,8 +410,8 @@ export async function POST(request: Request) {
             duration: data.duration,
             feedbackFocus: data.feedbackFocus,
             packageType: data.packageType,
-            reviewsRequested: packageDetails.reviews,
-            genres: {
+            reviewsRequested: packageDetails.Review,
+            Genre: {
               connect: data.genreIds.map((id) => ({ id })),
             },
           },

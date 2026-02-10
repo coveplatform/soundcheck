@@ -131,7 +131,7 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
 export const PACKAGES = {
   STARTER: {
     name: "Listener Pulse",
-    reviews: 5,
+    Review: 5,
     minProReviews: 0,
     price: 495, // cents
     description: "Get a feel for how listeners react",
@@ -140,7 +140,7 @@ export const PACKAGES = {
   },
   STANDARD: {
     name: "Release Ready",
-    reviews: 20,
+    Review: 20,
     minProReviews: 2,
     price: 1495,
     description: "Maximum clarity with pattern insights",
@@ -150,7 +150,7 @@ export const PACKAGES = {
   // Peer review package - credit-based, no cash cost
   PEER: {
     name: "Peer Review",
-    reviews: 0, // dynamic - set by credits spent
+    Review: 0, // dynamic - set by credits spent
     minProReviews: 0,
     price: 0, // free - uses credits
     description: "Get feedback from fellow artists using credits",
@@ -160,7 +160,7 @@ export const PACKAGES = {
   // Legacy packages - kept for existing tracks, not shown in UI
   PRO: {
     name: "Maximum Signal",
-    reviews: 20,
+    Review: 20,
     minProReviews: 5,
     price: 2995,
     description: "Highest confidence before you release",
@@ -169,7 +169,7 @@ export const PACKAGES = {
   },
   DEEP_DIVE: {
     name: "Deep Dive",
-    reviews: 20,
+    Review: 20,
     minProReviews: 5,
     price: 2995,
     description: "Maximum signal from multiple perspectives",

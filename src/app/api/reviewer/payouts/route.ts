@@ -52,23 +52,23 @@ export async function POST(request: Request) {
       );
     }
 
-    if (reviewer.isRestricted) {
+    if (ReviewerProfile.isRestricted) {
       return NextResponse.json(
         { error: "Reviewer account restricted" },
         { status: 403 }
       );
     }
 
-    if (!reviewer.completedOnboarding || !reviewer.onboardingQuizPassed) {
+    if (!ReviewerProfile.completedOnboarding || !ReviewerProfile.onboardingQuizPassed) {
       return NextResponse.json(
         { error: "Please complete onboarding before requesting payouts" },
         { status: 403 }
       );
     }
 
-    const requested = amountCents ?? reviewer.pendingBalance;
+    const requested = amountCents ?? ReviewerProfile.pendingBalance;
 
-    if (requested > reviewer.pendingBalance) {
+    if (requested > ReviewerProfile.pendingBalance) {
       return NextResponse.json(
         { error: "Insufficient balance" },
         { status: 400 }
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
         payout = await prisma.$transaction(async (tx) => {
           const reserved = await tx.reviewerProfile.updateMany({
             where: {
-              id: reviewer.id,
+              id: ReviewerProfile.id,
               pendingBalance: { gte: requested },
             },
             data: { pendingBalance: { decrement: requested } },
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
 
           return tx.payout.create({
             data: {
-              reviewerId: reviewer.id,
+              reviewerId: ReviewerProfile.id,
               amount: requested,
               method: "MANUAL",
               status: "COMPLETED",
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, payout, bypassed: true });
     }
 
-    const stripeAccountId = reviewer.stripeAccountId;
+    const stripeAccountId = ReviewerProfile.stripeAccountId;
     if (!stripeAccountId) {
       return NextResponse.json(
         { error: "Stripe account not connected" },
@@ -126,7 +126,7 @@ export async function POST(request: Request) {
       const rows = await prisma.$queryRaw<Array<{ stripeConnectedAt: Date | null }>>`
         SELECT "stripeConnectedAt"
         FROM "ReviewerProfile"
-        WHERE "id" = ${reviewer.id}
+        WHERE "id" = ${ReviewerProfile.id}
         LIMIT 1
       `;
       const connectedAt = rows[0]?.stripeConnectedAt;
@@ -167,7 +167,7 @@ export async function POST(request: Request) {
       payout = await prisma.$transaction(async (tx) => {
         const reserved = await tx.reviewerProfile.updateMany({
           where: {
-            id: reviewer.id,
+            id: ReviewerProfile.id,
             pendingBalance: { gte: requested },
           },
           data: { pendingBalance: { decrement: requested } },
@@ -179,7 +179,7 @@ export async function POST(request: Request) {
 
         return tx.payout.create({
           data: {
-            reviewerId: reviewer.id,
+            reviewerId: ReviewerProfile.id,
             amount: requested,
             method: "STRIPE_CONNECT",
             status: "PROCESSING",
@@ -208,7 +208,7 @@ export async function POST(request: Request) {
           destination: stripeAccountId,
           metadata: {
             payoutId: payout.id,
-            reviewerId: reviewer.id,
+            reviewerId: ReviewerProfile.id,
           },
         },
         {
@@ -235,7 +235,7 @@ export async function POST(request: Request) {
 
         if (updated.count > 0) {
           await tx.reviewerProfile.update({
-            where: { id: reviewer.id },
+            where: { id: ReviewerProfile.id },
             data: { pendingBalance: { increment: requested } },
           });
         }

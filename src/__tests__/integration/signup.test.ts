@@ -29,8 +29,8 @@ describe('Signup Flow Integration', () => {
         isReviewer: false,
       })
 
-      prismaMock.user.findUnique.mockResolvedValue(null) // No existing user
-      prismaMock.user.create.mockResolvedValue(newUser)
+      prismaMock.User.findUnique.mockResolvedValue(null) // No existing user
+      prismaMock.User.create.mockResolvedValue(newUser)
       prismaMock.emailVerificationToken.create.mockResolvedValue({
         id: 'token-id',
         userId: newUser.id,
@@ -41,12 +41,12 @@ describe('Signup Flow Integration', () => {
       })
 
       // Simulate the signup logic
-      const existingUser = await prismaMock.user.findUnique({
+      const existingUser = await prismaMock.User.findUnique({
         where: { email: 'new@example.com' },
       })
       expect(existingUser).toBeNull()
 
-      const user = await prismaMock.user.create({
+      const user = await prismaMock.User.create({
         data: {
           email: 'new@example.com',
           password: 'hashed-password',
@@ -63,9 +63,9 @@ describe('Signup Flow Integration', () => {
 
     it('rejects duplicate email addresses', async () => {
       const existingUser = createMockUser({ email: 'existing@example.com' })
-      prismaMock.user.findUnique.mockResolvedValue(existingUser)
+      prismaMock.User.findUnique.mockResolvedValue(existingUser)
 
-      const found = await prismaMock.user.findUnique({
+      const found = await prismaMock.User.findUnique({
         where: { email: 'existing@example.com' },
       })
 
@@ -75,7 +75,7 @@ describe('Signup Flow Integration', () => {
 
     it('creates email verification token after signup', async () => {
       const newUser = createMockUser()
-      prismaMock.user.create.mockResolvedValue(newUser)
+      prismaMock.User.create.mockResolvedValue(newUser)
 
       const tokenData = {
         id: 'token-id',
@@ -106,9 +106,9 @@ describe('Signup Flow Integration', () => {
         isArtist: true,
         isReviewer: false,
       })
-      prismaMock.user.create.mockResolvedValue(artistUser)
+      prismaMock.User.create.mockResolvedValue(artistUser)
 
-      const user = await prismaMock.user.create({
+      const user = await prismaMock.User.create({
         data: {
           email: 'artist@example.com',
           password: 'hashed',
@@ -127,9 +127,9 @@ describe('Signup Flow Integration', () => {
         isArtist: false,
         isReviewer: true,
       })
-      prismaMock.user.create.mockResolvedValue(reviewerUser)
+      prismaMock.User.create.mockResolvedValue(reviewerUser)
 
-      const user = await prismaMock.user.create({
+      const user = await prismaMock.User.create({
         data: {
           email: 'reviewer@example.com',
           password: 'hashed',
@@ -148,9 +148,9 @@ describe('Signup Flow Integration', () => {
         isArtist: true,
         isReviewer: true,
       })
-      prismaMock.user.create.mockResolvedValue(bothUser)
+      prismaMock.User.create.mockResolvedValue(bothUser)
 
-      const user = await prismaMock.user.create({
+      const user = await prismaMock.User.create({
         data: {
           email: 'both@example.com',
           password: 'hashed',
@@ -183,9 +183,9 @@ describe('Signup Flow Integration', () => {
       const unverifiedUser = createMockUser({ emailVerified: null })
       const verifiedUser = { ...unverifiedUser, emailVerified: new Date() }
 
-      prismaMock.user.update.mockResolvedValue(verifiedUser)
+      prismaMock.User.update.mockResolvedValue(verifiedUser)
 
-      const updated = await prismaMock.user.update({
+      const updated = await prismaMock.User.update({
         where: { id: unverifiedUser.id },
         data: { emailVerified: new Date() },
       })
@@ -223,7 +223,7 @@ describe('Password Reset Flow Integration', () => {
 
   it('creates reset token for existing user', async () => {
     const user = createMockUser({ email: 'user@example.com' })
-    prismaMock.user.findUnique.mockResolvedValue(user)
+    prismaMock.User.findUnique.mockResolvedValue(user)
 
     const tokenData = {
       id: 'reset-token-id',
@@ -235,7 +235,7 @@ describe('Password Reset Flow Integration', () => {
     }
     prismaMock.passwordResetToken.create.mockResolvedValue(tokenData)
 
-    const found = await prismaMock.user.findUnique({
+    const found = await prismaMock.User.findUnique({
       where: { email: 'user@example.com' },
     })
     expect(found).not.toBeNull()
@@ -258,9 +258,9 @@ describe('Password Reset Flow Integration', () => {
     const user = createMockUser()
     const updatedUser = { ...user, password: 'new-hashed-password' }
 
-    prismaMock.user.update.mockResolvedValue(updatedUser)
+    prismaMock.User.update.mockResolvedValue(updatedUser)
 
-    const updated = await prismaMock.user.update({
+    const updated = await prismaMock.User.update({
       where: { id: user.id },
       data: { password: 'new-hashed-password' },
     })

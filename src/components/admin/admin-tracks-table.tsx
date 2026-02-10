@@ -180,9 +180,9 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                     <Link className="underline" href={`/admin/tracks/${track.id}`}>
                       {track.title}
                     </Link>
-                    {track.reviewsRequested > 0 && (
+                    {track.ReviewRequested > 0 && (
                       <span className="ml-2 text-xs text-neutral-400">
-                        ({track.reviewsRequested} reviews)
+                        ({track.ReviewRequested} reviews)
                       </span>
                     )}
                   </td>
@@ -219,9 +219,9 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                     <div className="flex flex-col">
                       <Link
                         className="underline"
-                        href={`/admin/users/${track.ArtistProfile.user.id}`}
+                        href={`/admin/users/${track.ArtistProfile.User.id}`}
                       >
-                        {track.ArtistProfile.user.email}
+                        {track.ArtistProfile.User.email}
                       </Link>
                       <span className="inline-flex items-center gap-1 mt-0.5">
                         {isPro ? (

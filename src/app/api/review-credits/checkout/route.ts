@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       select: {
         id: true,
         stripeCustomerId: true,
-        user: { select: { email: true, name: true } },
+        User: { select: { email: true, name: true } },
       },
     });
 
@@ -47,8 +47,8 @@ export async function POST(request: Request) {
     let customerId = artistProfile.stripeCustomerId;
     if (!customerId) {
       const customer = await stripe.customers.create({
-        email: artistProfile.user.email,
-        name: artistProfile.user.name || undefined,
+        email: artistProfile.User.email,
+        name: artistProfile.User.name || undefined,
         metadata: {
           userId: session.user.id,
           artistProfileId: artistProfile.id,

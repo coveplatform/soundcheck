@@ -27,11 +27,11 @@ describe('Stripe Webhook Integration', () => {
   describe('checkout.session.completed', () => {
     it('updates payment status to COMPLETED', async () => {
       const payment = createMockPayment({ status: 'PENDING' })
-      const completedPayment = { ...payment, status: 'COMPLETED' as const, completedAt: new Date() }
+      const completedPayment = { ...Payment, status: 'COMPLETED' as const, completedAt: new Date() }
 
-      prismaMock.payment.update.mockResolvedValue(completedPayment)
+      prismaMock.Payment.update.mockResolvedValue(completedPayment)
 
-      const updated = await prismaMock.payment.update({
+      const updated = await prismaMock.Payment.update({
         where: { stripeSessionId: payment.stripeSessionId },
         data: { status: 'COMPLETED', completedAt: new Date() },
       })
@@ -63,7 +63,7 @@ describe('Stripe Webhook Integration', () => {
       prismaMock.artistProfile.update.mockResolvedValue(updatedArtist)
 
       const updated = await prismaMock.artistProfile.update({
-        where: { id: artist.id },
+        where: { id: ArtistProfile.id },
         data: { totalSpent: { increment: payment.amount } },
       })
 
@@ -91,18 +91,18 @@ describe('Stripe Webhook Integration', () => {
 
       // This would trigger assignReviewersToTrack(track.id)
       expect(track.status).toBe('QUEUED')
-      expect(track.reviewsRequested).toBe(10)
+      expect(track.ReviewRequested).toBe(10)
     })
   })
 
   describe('checkout.session.expired', () => {
     it('updates payment status to FAILED', async () => {
       const payment = createMockPayment({ status: 'PENDING' })
-      const failedPayment = { ...payment, status: 'FAILED' as const }
+      const failedPayment = { ...Payment, status: 'FAILED' as const }
 
-      prismaMock.payment.update.mockResolvedValue(failedPayment)
+      prismaMock.Payment.update.mockResolvedValue(failedPayment)
 
-      const updated = await prismaMock.payment.update({
+      const updated = await prismaMock.Payment.update({
         where: { stripeSessionId: payment.stripeSessionId },
         data: { status: 'FAILED' },
       })
@@ -133,9 +133,9 @@ describe('Stripe Webhook Integration', () => {
     it('handles duplicate webhook events gracefully', async () => {
       const payment = createMockPayment({ status: 'COMPLETED' })
 
-      prismaMock.payment.findUnique.mockResolvedValue(payment)
+      prismaMock.Payment.findUnique.mockResolvedValue(payment)
 
-      const existingPayment = await prismaMock.payment.findUnique({
+      const existingPayment = await prismaMock.Payment.findUnique({
         where: { stripeSessionId: payment.stripeSessionId },
       })
 
@@ -165,10 +165,10 @@ describe('Checkout Session Creation', () => {
   describe('Session Data', () => {
     it('includes correct line item for package', () => {
       const PACKAGES = {
-        STARTER: { price: 495, name: 'Listener Pulse', reviews: 5 },
-        STANDARD: { price: 1495, name: 'Release Ready', reviews: 10 },
-        PRO: { price: 2995, name: 'Maximum Signal', reviews: 20 },
-        DEEP_DIVE: { price: 2995, name: 'Deep Dive', reviews: 20 },
+        STARTER: { price: 495, name: 'Listener Pulse', Review: 5 },
+        STANDARD: { price: 1495, name: 'Release Ready', Review: 10 },
+        PRO: { price: 2995, name: 'Maximum Signal', Review: 20 },
+        DEEP_DIVE: { price: 2995, name: 'Deep Dive', Review: 20 },
       }
 
       const packageType = 'STANDARD' as keyof typeof PACKAGES
@@ -179,7 +179,7 @@ describe('Checkout Session Creation', () => {
           currency: 'usd',
           product_data: {
             name: `MixReflect ${pkg.name} Package`,
-            description: `${pkg.reviews} reviews for your track`,
+            description: `${pkg.Review} reviews for your track`,
           },
           unit_amount: pkg.price,
         },
@@ -228,9 +228,9 @@ describe('Checkout Session Creation', () => {
         status: 'PENDING',
       })
 
-      prismaMock.payment.create.mockResolvedValue(payment)
+      prismaMock.Payment.create.mockResolvedValue(payment)
 
-      const created = await prismaMock.payment.create({
+      const created = await prismaMock.Payment.create({
         data: {
           trackId: track.id,
           stripeSessionId,
@@ -269,11 +269,11 @@ describe('Refund Processing', () => {
 
   it('updates payment status to REFUNDED', async () => {
     const payment = createMockPayment({ status: 'COMPLETED' })
-    const refundedPayment = { ...payment, status: 'REFUNDED' as const }
+    const refundedPayment = { ...Payment, status: 'REFUNDED' as const }
 
-    prismaMock.payment.update.mockResolvedValue(refundedPayment)
+    prismaMock.Payment.update.mockResolvedValue(refundedPayment)
 
-    const updated = await prismaMock.payment.update({
+    const updated = await prismaMock.Payment.update({
       where: { id: payment.id },
       data: { status: 'REFUNDED' },
     })

@@ -31,7 +31,7 @@ export async function GET(
         status: true,
         createdAt: true,
         updatedAt: true,
-        user: { select: { id: true, email: true, name: true } },
+        User: { select: { id: true, email: true, name: true } },
         messages: {
           orderBy: { createdAt: "asc" },
           select: {

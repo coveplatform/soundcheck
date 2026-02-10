@@ -4,12 +4,12 @@ import { useState } from "react";
 import { Play } from "lucide-react";
 
 const TRACKS = [
-  { title: "Neon Pulse", artist: "Maya Kim", genre: "Electronic", color: "from-cyan-500 to-blue-600", reviews: 12, artwork: 1 },
-  { title: "Golden Hour", artist: "James Cole", genre: "Lo-Fi", color: "from-amber-500 to-orange-600", reviews: 8, artwork: 2 },
-  { title: "Street Lights", artist: "DJ Nova", genre: "House", color: "from-pink-500 to-rose-600", reviews: 15, artwork: 3 },
-  { title: "Echoes", artist: "Sarah Moon", genre: "Ambient", color: "from-violet-500 to-purple-600", reviews: 6, artwork: 4 },
-  { title: "City Rain", artist: "Tom West", genre: "Hip-Hop", color: "from-green-500 to-teal-600", reviews: 19, artwork: 5 },
-  { title: "Drift Away", artist: "Luna Park", genre: "Indie", color: "from-red-500 to-pink-600", reviews: 11, artwork: 6 },
+  { title: "Neon Pulse", ArtistProfile: "Maya Kim", genre: "Electronic", color: "from-cyan-500 to-blue-600", Review: 12, artwork: 1 },
+  { title: "Golden Hour", ArtistProfile: "James Cole", genre: "Lo-Fi", color: "from-amber-500 to-orange-600", Review: 8, artwork: 2 },
+  { title: "Street Lights", ArtistProfile: "DJ Nova", genre: "House", color: "from-pink-500 to-rose-600", Review: 15, artwork: 3 },
+  { title: "Echoes", ArtistProfile: "Sarah Moon", genre: "Ambient", color: "from-violet-500 to-purple-600", Review: 6, artwork: 4 },
+  { title: "City Rain", ArtistProfile: "Tom West", genre: "Hip-Hop", color: "from-green-500 to-teal-600", Review: 19, artwork: 5 },
+  { title: "Drift Away", ArtistProfile: "Luna Park", genre: "Indie", color: "from-red-500 to-pink-600", Review: 11, artwork: 6 },
 ];
 
 export function DiscoverMockup() {
@@ -57,7 +57,7 @@ export function DiscoverMockup() {
               </div>
               {/* Review count badge */}
               <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs font-medium text-neutral-700">
-                {track.reviews} reviews
+                {track.Review} reviews
               </div>
             </div>
 

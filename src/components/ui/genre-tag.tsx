@@ -17,12 +17,12 @@ interface GenreTagProps {
 }
 
 const variantStyles = {
-  artist: {
+  ArtistProfile: {
     selected: "bg-purple-600 text-white border-purple-600",
     unselected: "bg-white text-black border-black/15 hover:bg-purple-50",
     display: "bg-purple-100 text-purple-800 border-purple-200",
   },
-  reviewer: {
+  ReviewerProfile: {
     selected: "bg-purple-600 text-white border-purple-600",
     unselected: "bg-white text-black border-black/15 hover:bg-purple-50",
     display: "bg-purple-100 text-purple-800 border-purple-200",

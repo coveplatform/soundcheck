@@ -22,9 +22,9 @@ export async function POST(
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
-        artist: {
+        ArtistProfile: {
           include: {
-            user: {
+            User: {
               select: { email: true },
             },
           },
@@ -36,7 +36,7 @@ export async function POST(
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
-    const artistEmail = track.artist.user.email;
+    const artistEmail = track.ArtistProfile.User.email;
 
     // Update track to mark that we notified about link issue
     await prisma.track.update({

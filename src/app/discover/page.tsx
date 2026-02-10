@@ -36,7 +36,7 @@ const DEMO_TILES = Array.from({ length: 20 }).map((_, idx) => {
       "Skyline",
       "Velvet Noise",
     ][idx] ?? `Demo Track ${i}`,
-    artist: [
+    ArtistProfile: [
       "Maya Kim",
       "James Cole",
       "DJ Nova",
@@ -76,7 +76,7 @@ export default async function DiscoverPage({
     },
     ...(selectedGenreSlug
       ? {
-          genres: {
+          Genre: {
             some: {
               slug: selectedGenreSlug,
             },
@@ -94,8 +94,8 @@ export default async function DiscoverPage({
     createdAt: true,
     reviewsRequested: true,
     reviewsCompleted: true,
-    genres: { select: { id: true, name: true } },
-    artist: { select: { artistName: true } },
+    Genre: { select: { id: true, name: true } },
+    ArtistProfile: { select: { artistName: true } },
   };
 
   const genres = await prisma.genre.findMany({

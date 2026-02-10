@@ -17,10 +17,10 @@ type PublicTrack = {
   sourceType: string;
   viewCount: number;
   isPublic: boolean;
-  artist: {
+  ArtistProfile: {
     artistName: string;
   };
-  genres: Array<{
+  Genre: Array<{
     id: string;
     name: string;
   }>;
@@ -147,11 +147,11 @@ export default function PublicTrackPage() {
             <h1 className="text-3xl sm:text-4xl font-bold text-black mt-2 break-words">
               {track.title}
             </h1>
-            <p className="text-lg text-black/60 mt-2">{track.artist.artistName}</p>
+            <p className="text-lg text-black/60 mt-2">{track.ArtistProfile.artistName}</p>
 
             {/* Genre Pills */}
             <div className="flex flex-wrap items-center gap-2 mt-4">
-              {track.genres.map((genre) => (
+              {track.Genre.map((genre) => (
                 <span
                   key={genre.id}
                   className="px-3 py-1 bg-white border-2 border-black rounded-full text-sm font-bold text-black"

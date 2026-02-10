@@ -7,7 +7,7 @@ interface Activity {
   id: number;
   type: "review" | "sale";
   title: string;
-  artist: string;
+  ArtistProfile: string;
   timeAgo: string;
   metric: string;
   artwork: number;
@@ -15,18 +15,18 @@ interface Activity {
 }
 
 const ACTIVITIES: Activity[] = [
-  { id: 1, type: "review", title: "Neon Pulse", artist: "Maya Kim", timeAgo: "just now", metric: "5 reviews", artwork: 1, color: "bg-gradient-to-br from-purple-500 to-blue-600" },
-  { id: 2, type: "sale", title: "Late Night Taxi", artist: "Marcus T.", timeAgo: "1m ago", metric: "$0.50 sale", artwork: 2, color: "bg-gradient-to-br from-orange-500 to-red-600" },
-  { id: 3, type: "review", title: "Golden Hour", artist: "James Cole", timeAgo: "2m ago", metric: "8 reviews", artwork: 3, color: "bg-gradient-to-br from-green-500 to-teal-600" },
-  { id: 4, type: "review", title: "Street Lights", artist: "DJ Nova", timeAgo: "3m ago", metric: "4 reviews", artwork: 4, color: "bg-gradient-to-br from-pink-500 to-rose-600" },
-  { id: 5, type: "sale", title: "City Rain", artist: "Tom West", timeAgo: "5m ago", metric: "$0.50 sale", artwork: 5, color: "bg-gradient-to-br from-amber-500 to-orange-600" },
-  { id: 6, type: "review", title: "Echoes", artist: "Sarah Moon", timeAgo: "6m ago", metric: "6 reviews", artwork: 6, color: "bg-gradient-to-br from-violet-500 to-purple-600" },
-  { id: 7, type: "review", title: "Drift Away", artist: "Luna Park", timeAgo: "8m ago", metric: "7 reviews", artwork: 7, color: "bg-gradient-to-br from-cyan-500 to-blue-600" },
-  { id: 8, type: "sale", title: "After Hours", artist: "Kira Lane", timeAgo: "10m ago", metric: "$0.50 sale", artwork: 8, color: "bg-gradient-to-br from-lime-500 to-green-600" },
-  { id: 9, type: "review", title: "Soft Focus", artist: "Aiden Grey", timeAgo: "12m ago", metric: "9 reviews", artwork: 9, color: "bg-gradient-to-br from-red-500 to-pink-600" },
-  { id: 10, type: "review", title: "Static Bloom", artist: "Rae Winter", timeAgo: "14m ago", metric: "3 reviews", artwork: 10, color: "bg-gradient-to-br from-indigo-500 to-violet-600" },
-  { id: 11, type: "sale", title: "Low Tide", artist: "Niko Vale", timeAgo: "16m ago", metric: "$0.50 sale", artwork: 11, color: "bg-gradient-to-br from-yellow-500 to-amber-600" },
-  { id: 12, type: "review", title: "Night Garden", artist: "Ivy Stone", timeAgo: "18m ago", metric: "6 reviews", artwork: 12, color: "bg-gradient-to-br from-teal-500 to-cyan-600" },
+  { id: 1, type: "review", title: "Neon Pulse", ArtistProfile: "Maya Kim", timeAgo: "just now", metric: "5 reviews", artwork: 1, color: "bg-gradient-to-br from-purple-500 to-blue-600" },
+  { id: 2, type: "sale", title: "Late Night Taxi", ArtistProfile: "Marcus T.", timeAgo: "1m ago", metric: "$0.50 sale", artwork: 2, color: "bg-gradient-to-br from-orange-500 to-red-600" },
+  { id: 3, type: "review", title: "Golden Hour", ArtistProfile: "James Cole", timeAgo: "2m ago", metric: "8 reviews", artwork: 3, color: "bg-gradient-to-br from-green-500 to-teal-600" },
+  { id: 4, type: "review", title: "Street Lights", ArtistProfile: "DJ Nova", timeAgo: "3m ago", metric: "4 reviews", artwork: 4, color: "bg-gradient-to-br from-pink-500 to-rose-600" },
+  { id: 5, type: "sale", title: "City Rain", ArtistProfile: "Tom West", timeAgo: "5m ago", metric: "$0.50 sale", artwork: 5, color: "bg-gradient-to-br from-amber-500 to-orange-600" },
+  { id: 6, type: "review", title: "Echoes", ArtistProfile: "Sarah Moon", timeAgo: "6m ago", metric: "6 reviews", artwork: 6, color: "bg-gradient-to-br from-violet-500 to-purple-600" },
+  { id: 7, type: "review", title: "Drift Away", ArtistProfile: "Luna Park", timeAgo: "8m ago", metric: "7 reviews", artwork: 7, color: "bg-gradient-to-br from-cyan-500 to-blue-600" },
+  { id: 8, type: "sale", title: "After Hours", ArtistProfile: "Kira Lane", timeAgo: "10m ago", metric: "$0.50 sale", artwork: 8, color: "bg-gradient-to-br from-lime-500 to-green-600" },
+  { id: 9, type: "review", title: "Soft Focus", ArtistProfile: "Aiden Grey", timeAgo: "12m ago", metric: "9 reviews", artwork: 9, color: "bg-gradient-to-br from-red-500 to-pink-600" },
+  { id: 10, type: "review", title: "Static Bloom", ArtistProfile: "Rae Winter", timeAgo: "14m ago", metric: "3 reviews", artwork: 10, color: "bg-gradient-to-br from-indigo-500 to-violet-600" },
+  { id: 11, type: "sale", title: "Low Tide", ArtistProfile: "Niko Vale", timeAgo: "16m ago", metric: "$0.50 sale", artwork: 11, color: "bg-gradient-to-br from-yellow-500 to-amber-600" },
+  { id: 12, type: "review", title: "Night Garden", ArtistProfile: "Ivy Stone", timeAgo: "18m ago", metric: "6 reviews", artwork: 12, color: "bg-gradient-to-br from-teal-500 to-cyan-600" },
 ];
 
 export function ActivityFeed() {

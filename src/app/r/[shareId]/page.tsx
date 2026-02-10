@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ shareId: 
   const review = await prisma.review.findUnique({
     where: { shareId },
     include: {
-      track: { select: { title: true } },
+      Track: { select: { title: true } },
     },
   });
 
@@ -78,17 +78,17 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
   const review = await prisma.review.findUnique({
     where: { shareId },
     include: {
-      track: {
+      Track: {
         select: {
           id: true,
           title: true,
           artworkUrl: true,
         },
       },
-      reviewer: {
+      ReviewerProfile: {
         select: {
           id: true,
-          user: { select: { name: true } },
+          User: { select: { name: true } },
         },
       },
     },
@@ -116,7 +116,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
     <div className="min-h-screen bg-neutral-50 pt-14">
       {/* Referral tracking for affiliate commission */}
       <ReferralTracker
-        reviewerId={review.reviewer.id}
+        reviewerId={review.ReviewerProfile.id}
         shareId={shareId}
         trackId={review.track.id}
       />

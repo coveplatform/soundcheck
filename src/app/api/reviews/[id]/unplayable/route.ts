@@ -45,16 +45,16 @@ export async function POST(
     const review = await prisma.review.findUnique({
       where: { id },
       include: {
-        reviewer: { select: { id: true, userId: true } },
-        track: {
+        ReviewerProfile: { select: { id: true, userId: true } },
+        Track: {
           select: {
             id: true,
             title: true,
             sourceUrl: true,
             linkIssueNotifiedAt: true,
-            artist: {
+            ArtistProfile: {
               include: {
-                user: { select: { email: true } },
+                User: { select: { email: true } },
               },
             },
           },
@@ -66,7 +66,7 @@ export async function POST(
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    if (review.reviewer.userId !== session.user.id) {
+    if (review.ReviewerProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -89,7 +89,7 @@ export async function POST(
       prisma.reviewQueue.deleteMany({
         where: {
           trackId: review.track.id,
-          reviewerId: review.reviewer.id,
+          reviewerId: review.ReviewerProfile.id,
         },
       }),
       // Set linkIssueNotifiedAt if not already set
@@ -106,7 +106,7 @@ export async function POST(
     // Send email to artist if this is the first report
     if (shouldNotifyArtist) {
       await sendInvalidTrackLinkEmail({
-        to: review.track.artist.user.email,
+        to: review.track.ArtistProfile.User.email,
         trackTitle: review.track.title,
         trackId: review.track.id,
         sourceUrl: review.track.sourceUrl,

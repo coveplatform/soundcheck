@@ -20,12 +20,12 @@ export async function POST(
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
-        artist: {
+        ArtistProfile: {
           select: {
             id: true,
             userId: true,
             stripeCustomerId: true,
-            user: { select: { email: true, name: true } },
+            User: { select: { email: true, name: true } },
           },
         },
       },
@@ -35,7 +35,7 @@ export async function POST(
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
-    if (track.artist.userId !== session.user.id) {
+    if (track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -50,19 +50,19 @@ export async function POST(
     const packageDetails = PACKAGES[track.packageType];
 
     // Create or get customer
-    let customerId = track.artist.stripeCustomerId;
+    let customerId = track.ArtistProfile.stripeCustomerId;
     if (!customerId) {
       const customer = await stripe.customers.create({
-        email: track.artist.user.email,
-        name: track.artist.user.name || undefined,
+        email: track.ArtistProfile.User.email,
+        name: track.ArtistProfile.User.name || undefined,
         metadata: {
           userId: session.user.id,
-          artistProfileId: track.artist.id,
+          artistProfileId: track.ArtistProfile.id,
         },
       });
       customerId = customer.id;
       await prisma.artistProfile.update({
-        where: { id: track.artist.id },
+        where: { id: track.ArtistProfile.id },
         data: { stripeCustomerId: customerId },
       });
     }
@@ -80,7 +80,7 @@ export async function POST(
             currency: "aud",
             product_data: {
               name: `${packageDetails.name} Package`,
-              description: `${packageDetails.reviews} reviews for: ${track.title}`,
+              description: `${packageDetails.Review} reviews for: ${track.title}`,
             },
             unit_amount: packageDetails.price,
           },
@@ -92,7 +92,7 @@ export async function POST(
       metadata: {
         trackId: track.id,
         userId: session.user.id,
-        artistProfileId: track.artist.id,
+        artistProfileId: track.ArtistProfile.id,
       },
     });
 

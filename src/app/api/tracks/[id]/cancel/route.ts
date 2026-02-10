@@ -22,8 +22,8 @@ export async function POST(
     const track = await prisma.track.findUnique({
       where: { id },
       include: {
-        artist: true,
-        payment: true,
+        ArtistProfile: true,
+        Payment: true,
       },
     });
 
@@ -32,10 +32,10 @@ export async function POST(
     }
 
     if (track.status === "CANCELLED") {
-      return NextResponse.json({ success: true, refunded: track.payment?.status === "REFUNDED" });
+      return NextResponse.json({ success: true, refunded: track.Payment?.status === "REFUNDED" });
     }
 
-    if (track.artist.userId !== session.user.id) {
+    if (track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -62,8 +62,8 @@ export async function POST(
 
     let refunded = false;
 
-    if (track.payment?.status === "COMPLETED") {
-      if (!track.payment.stripePaymentId) {
+    if (track.Payment?.status === "COMPLETED") {
+      if (!track.Payment.stripePaymentId) {
         return NextResponse.json(
           { error: "Missing Stripe payment intent" },
           { status: 400 }
@@ -74,7 +74,7 @@ export async function POST(
 
       await stripe.refunds.create(
         {
-          payment_intent: track.payment.stripePaymentId,
+          payment_intent: track.Payment.stripePaymentId,
         },
         {
           idempotencyKey: `track_cancel_${track.id}`,
@@ -96,16 +96,16 @@ export async function POST(
         where: { trackId: track.id, status: { in: ["ASSIGNED", "IN_PROGRESS"] } },
         data: { status: "EXPIRED" },
       }),
-      ...(track.payment
+      ...(track.Payment
         ? [
             prisma.payment.update({
-              where: { id: track.payment.id },
+              where: { id: track.Payment.id },
               data: {
                 status: refunded
                   ? "REFUNDED"
-                  : track.payment.status === "PENDING"
+                  : track.Payment.status === "PENDING"
                   ? "FAILED"
-                  : track.payment.status,
+                  : track.Payment.status,
               },
             }),
           ]

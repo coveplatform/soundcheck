@@ -18,8 +18,8 @@ interface TrackCardProps {
 
 export function TrackCard({ track, priority = false }: TrackCardProps) {
   const badge = getTrackStatusBadge(track.status);
-  const completed = track.reviews.filter((r) => r.status === "COMPLETED").length;
-  const reviewCount = formatReviewCount(completed, track.reviewsRequested);
+  const completed = track.Review.filter((r) => r.status === "COMPLETED").length;
+  const reviewCount = formatReviewCount(completed, track.ReviewRequested);
   const action = getTrackAction(track);
 
   return (
@@ -60,10 +60,10 @@ export function TrackCard({ track, priority = false }: TrackCardProps) {
             {reviewCount}
           </span>
         </div>
-        {track.genres && track.genres.length > 0 && (
+        {track.Genre && track.Genre.length > 0 && (
           <div className="mt-2">
             <GenreTagList
-              genres={track.genres}
+              genres={track.Genre}
               variant="neutral"
               size="sm"
               maxDisplay={3}

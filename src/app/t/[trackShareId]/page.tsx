@@ -19,12 +19,12 @@ type PublicTrack = {
   salePrice: number | null;
   publicPlayCount: number;
   duration: number | null;
-  genres: Array<{
+  Genre: Array<{
     id: string;
     name: string;
     slug: string;
   }>;
-  artist: {
+  ArtistProfile: {
     id: string;
     artistName: string;
   };
@@ -36,7 +36,7 @@ type PublicTrack = {
     };
     totalReviews: number;
     wouldListenAgainPercent: number;
-    reviews: Array<any>;
+    Review: Array<any>;
   } | null;
 };
 
@@ -163,7 +163,7 @@ export default function PublicTrackPage() {
             <h2 className="text-xl font-bold text-black">{error || "Track not found"}</h2>
             <p className="mt-2 text-sm text-black/60">
               {error === "This track is not publicly shared"
-                ? "This track is private and only accessible to the artist."
+                ? "This track is private and only accessible to the ArtistProfile."
                 : "The track you're looking for doesn't exist or has been removed."}
             </p>
             <div className="mt-6">
@@ -245,11 +245,11 @@ export default function PublicTrackPage() {
                   <h1 className="text-3xl sm:text-4xl font-bold text-black mt-2 break-words">
                     {track.title}
                   </h1>
-                  <p className="text-lg text-black/60 mt-2">{track.artist.artistName}</p>
+                  <p className="text-lg text-black/60 mt-2">{track.ArtistProfile.artistName}</p>
 
                   {/* Genre Pills */}
                   <div className="flex flex-wrap items-center gap-2 mt-4">
-                    {track.genres.map((genre) => (
+                    {track.Genre.map((genre) => (
                       <span
                         key={genre.id}
                         className="px-3 py-1 bg-white border-2 border-black rounded-full text-sm font-bold text-black"
@@ -381,13 +381,13 @@ export default function PublicTrackPage() {
             </div>
 
             {/* Reviews Preview (if enabled) */}
-            {track.reviewStats && track.reviewStats.reviews.length > 0 && (
+            {track.reviewStats && track.reviewStats.Review.length > 0 && (
               <div className="border-t-2 border-black/10 p-6 sm:p-8 bg-neutral-50">
                 <h3 className="text-xs font-bold font-mono text-black/40 uppercase tracking-widest mb-4">
                   What Listeners Are Saying
                 </h3>
                 <div className="space-y-4">
-                  {track.reviewStats.reviews.slice(0, 2).map((review) => (
+                  {track.reviewStats.Review.slice(0, 2).map((review) => (
                     <div key={review.id} className="bg-white border-2 border-black/10 p-4 rounded-xl">
                       {review.bestPart && (
                         <p className="text-sm text-black/80 italic">
@@ -396,7 +396,7 @@ export default function PublicTrackPage() {
                         </p>
                       )}
                       <div className="flex items-center gap-2 mt-2 text-xs text-black/50">
-                        {review.reviewer.tier === "PRO" && (
+                        {review.ReviewerProfile.tier === "PRO" && (
                           <span className="px-2 py-0.5 bg-purple-100 text-purple-700 font-bold rounded">
                             PRO
                           </span>

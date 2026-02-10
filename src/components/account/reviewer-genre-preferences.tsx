@@ -36,7 +36,7 @@ export function ReviewerGenrePreferences({
           setGenres(data);
         }
       } catch (error) {
-        console.error("Failed to fetch genres:", error);
+        console.error("Failed to fetch Genre:", error);
       } finally {
         setIsLoadingGenres(false);
       }

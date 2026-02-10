@@ -28,7 +28,7 @@ describe('URL Source Detection', () => {
 
     it('detects Bandcamp URLs', () => {
       const bandcampUrls = [
-        'https://artist.bandcamp.com/track/song-name',
+        'https://ArtistProfile.bandcamp.com/track/song-name',
         'https://label.bandcamp.com/album/album-name',
         'http://music.bandcamp.com/track/test',
       ]
@@ -82,7 +82,7 @@ describe('URL Validation', () => {
     })
 
     it('accepts valid Bandcamp URL', () => {
-      const result = validateTrackUrl('https://artist.bandcamp.com/track/song')
+      const result = validateTrackUrl('https://ArtistProfile.bandcamp.com/track/song')
       expect(result.valid).toBe(true)
     })
 
@@ -131,7 +131,7 @@ describe('Metadata Extraction', () => {
 
     it('extracts title from Bandcamp URL', async () => {
       const metadata = await fetchTrackMetadata(
-        'https://artist.bandcamp.com/track/cool-song-name'
+        'https://ArtistProfile.bandcamp.com/track/cool-song-name'
       )
 
       expect(metadata).not.toBeNull()
@@ -175,28 +175,28 @@ describe('Package Configuration', () => {
     })
 
     it('STARTER package has correct configuration', () => {
-      expect(PACKAGES.STARTER.reviews).toBe(5)
+      expect(PACKAGES.STARTER.Review).toBe(5)
       expect(PACKAGES.STARTER.minProReviews).toBe(0)
       expect(PACKAGES.STARTER.price).toBe(495)
       expect(PACKAGES.STARTER.name).toBe('Listener Pulse')
     })
 
     it('STANDARD package has correct configuration', () => {
-      expect(PACKAGES.STANDARD.reviews).toBe(20)
+      expect(PACKAGES.STANDARD.Review).toBe(20)
       expect(PACKAGES.STANDARD.minProReviews).toBe(2)
       expect(PACKAGES.STANDARD.price).toBe(1495)
       expect(PACKAGES.STANDARD.name).toBe('Release Ready')
     })
 
     it('PRO package has correct configuration', () => {
-      expect(PACKAGES.PRO.reviews).toBe(20)
+      expect(PACKAGES.PRO.Review).toBe(20)
       expect(PACKAGES.PRO.minProReviews).toBe(5)
       expect(PACKAGES.PRO.price).toBe(2995)
       expect(PACKAGES.PRO.name).toBe('Maximum Signal')
     })
 
     it('DEEP_DIVE package has correct configuration', () => {
-      expect(PACKAGES.DEEP_DIVE.reviews).toBe(20)
+      expect(PACKAGES.DEEP_DIVE.Review).toBe(20)
       expect(PACKAGES.DEEP_DIVE.minProReviews).toBe(5)
       expect(PACKAGES.DEEP_DIVE.price).toBe(2995)
       expect(PACKAGES.DEEP_DIVE.name).toBe('Deep Dive')
@@ -223,10 +223,10 @@ describe('Package Configuration', () => {
 
   describe('Package pricing logic', () => {
     it('calculates correct price per review', () => {
-      const starterPerReview = PACKAGES.STARTER.price / PACKAGES.STARTER.reviews
-      const standardPerReview = PACKAGES.STANDARD.price / PACKAGES.STANDARD.reviews
-      const proPerReview = PACKAGES.PRO.price / PACKAGES.PRO.reviews
-      const deepDivePerReview = PACKAGES.DEEP_DIVE.price / PACKAGES.DEEP_DIVE.reviews
+      const starterPerReview = PACKAGES.STARTER.price / PACKAGES.STARTER.Review
+      const standardPerReview = PACKAGES.STANDARD.price / PACKAGES.STANDARD.Review
+      const proPerReview = PACKAGES.PRO.price / PACKAGES.PRO.Review
+      const deepDivePerReview = PACKAGES.DEEP_DIVE.price / PACKAGES.DEEP_DIVE.Review
 
       expect(starterPerReview).toBeCloseTo(99.0, 1) // $0.99 per review
       expect(standardPerReview).toBeCloseTo(74.75, 2) // $0.7475 per review
@@ -235,9 +235,9 @@ describe('Package Configuration', () => {
     })
 
     it('higher tiers cost more per review', () => {
-      const proPerReview = PACKAGES.PRO.price / PACKAGES.PRO.reviews
-      const standardPerReview = PACKAGES.STANDARD.price / PACKAGES.STANDARD.reviews
-      const starterPerReview = PACKAGES.STARTER.price / PACKAGES.STARTER.reviews
+      const proPerReview = PACKAGES.PRO.price / PACKAGES.PRO.Review
+      const standardPerReview = PACKAGES.STANDARD.price / PACKAGES.STANDARD.Review
+      const starterPerReview = PACKAGES.STARTER.price / PACKAGES.STARTER.Review
 
       expect(proPerReview).toBeGreaterThan(standardPerReview)
     })

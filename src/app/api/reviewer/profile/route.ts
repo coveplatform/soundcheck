@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       const profile = await prisma.reviewerProfile.update({
         where: { userId: session.user.id },
         data: {
-          genres: {
+          Genre: {
             set: genreIds.map((id) => ({ id })),
           },
           country: country ?? undefined,
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     const profile = await prisma.reviewerProfile.create({
       data: {
         userId: session.user.id,
-        genres: {
+        Genre: {
           connect: genreIds.map((id) => ({ id })),
         },
         country: country ?? undefined,
@@ -211,7 +211,7 @@ export async function PATCH(request: Request) {
           { status: 400 }
         );
       }
-      if (profile.genres.length < 3) {
+      if (profile.Genre.length < 3) {
         return NextResponse.json(
           { error: "Please select at least 3 genres" },
           { status: 400 }
