@@ -52,11 +52,10 @@ export function createMockArtistProfile(
     totalEarnings: 0,
     stripeAccountId: null,
     stripeConnectedAt: null,
-    freeReviewCredits: 1,
     hasSeenWelcome: false,
     completedOnboarding: false,
     hasSeenCreditGuide: false,
-    reviewCredits: 0,
+    reviewCredits: 1,
     totalCreditsEarned: 0,
     totalCreditsSpent: 0,
     totalPeerReviews: 0,
@@ -89,6 +88,8 @@ export function createMockReviewerProfile(
     spotifyId: null,
     lastfmUsername: null,
     stripeAccountId: null,
+    stripeConnectedAt: null,
+    country: null,
     onboardingQuizScore: 0,
     onboardingQuizPassed: true,
     onboardingQuizCompletedAt: new Date(),
@@ -98,10 +99,11 @@ export function createMockReviewerProfile(
     completedOnboarding: true,
     reviewsToday: 0,
     lastReviewDate: null,
+    affiliateEarnings: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
-  } as any
+  }
 }
 
 export function createMockGenre(overrides: Partial<Genre> = {}): Genre {
@@ -127,17 +129,30 @@ export function createMockTrack(overrides: Partial<Track> = {}): Track {
     feedbackFocus: null,
     isPublic: false,
     allowPurchase: false,
+    trackShareId: null,
+    sharingEnabled: false,
+    sharingMode: null,
+    salePrice: null,
+    showReviewsOnPublicPage: true,
+    publicPlayCount: 0,
     status: 'QUEUED',
     packageType: 'STANDARD',
     reviewsRequested: 10,
     reviewsCompleted: 0,
+    creditsSpent: 0,
     promoCode: null,
     createdAt: new Date(),
     paidAt: new Date(),
     completedAt: null,
     linkIssueNotifiedAt: null,
+    viewCount: 0,
+    lastViewedAt: null,
+    hasStems: false,
+    abletonProjectUrl: null,
+    abletonProjectData: null,
+    abletonRenderStatus: null,
     ...overrides,
-  } as any
+  }
 }
 
 export function createMockReview(overrides: Partial<Review> = {}): Review {
@@ -145,7 +160,12 @@ export function createMockReview(overrides: Partial<Review> = {}): Review {
     id: generateId(),
     trackId: generateId(),
     reviewerId: generateId(),
+    peerReviewerArtistId: null,
+    isPeerReview: false,
     status: 'ASSIGNED',
+    reviewSchemaVersion: 1,
+    countsTowardCompletion: true,
+    countsTowardAnalytics: true,
     listenDuration: 0,
     lastHeartbeat: null,
     firstImpression: null,
@@ -153,6 +173,9 @@ export function createMockReview(overrides: Partial<Review> = {}): Review {
     vocalScore: null,
     originalityScore: null,
     wouldListenAgain: null,
+    wouldAddToPlaylist: null,
+    wouldShare: null,
+    wouldFollow: null,
     perceivedGenre: null,
     similarArtists: null,
     bestPart: null,
@@ -160,15 +183,19 @@ export function createMockReview(overrides: Partial<Review> = {}): Review {
     weakestPart: null,
     weakestTimestamp: null,
     additionalNotes: null,
+    addressedArtistNote: null,
+    nextActions: null,
+    timestamps: null,
     paidAmount: 0,
     artistRating: null,
     isGem: false,
     wasFlagged: false,
     flagReason: null,
+    shareId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
-  } as any
+  }
 }
 
 export function createMockPayment(overrides: Partial<Payment> = {}): Payment {

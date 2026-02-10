@@ -17,18 +17,6 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { emailVerified: true },
-    });
-
-    if (!user?.emailVerified) {
-      return NextResponse.json(
-        { error: "Please verify your email to continue" },
-        { status: 403 }
-      );
-    }
-
     const reviewerProfile = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
       select: { isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
@@ -133,18 +121,6 @@ export async function PATCH(
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { emailVerified: true },
-    });
-
-    if (!user?.emailVerified) {
-      return NextResponse.json(
-        { error: "Please verify your email to continue" },
-        { status: 403 }
-      );
     }
 
     const body = await request.json();

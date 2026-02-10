@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { SupportedPlatforms } from "@/components/ui/supported-platforms";
-import { StepIndicator } from "@/components/ui/step-indicator";
 import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, detectSource } from "@/lib/metadata";
 import {
@@ -23,6 +22,7 @@ import {
   Star,
   Coins,
   Sparkles,
+  CheckCircle2,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -50,10 +50,15 @@ interface ArtistProfile {
 // Constants
 // ---------------------------------------------------------------------------
 
-const REVIEW_OPTIONS = [
-  { value: 3, label: "3 reviews", credits: 3, recommended: false },
-  { value: 5, label: "5 reviews", credits: 5, recommended: true },
-  { value: 10, label: "10 reviews", credits: 10, recommended: false },
+// Benefits that unlock at different review counts
+const REVIEW_BENEFITS = [
+  { minReviews: 1, label: "Get initial feedback", icon: "💬" },
+  { minReviews: 3, label: "Start seeing patterns", icon: "📊" },
+  { minReviews: 5, label: "Reliable consensus", icon: "✓" },
+  { minReviews: 8, label: "Detailed insights", icon: "🔍" },
+  { minReviews: 12, label: "Statistical significance", icon: "📈" },
+  { minReviews: 20, label: "Comprehensive feedback", icon: "⭐" },
+  { minReviews: 30, label: "Expert-level analysis", icon: "🎯" },
 ] as const;
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
@@ -94,6 +99,7 @@ export default function SubmitTrackPage() {
 
   // ---- step 3: reviews state ----------------------------------------------
   const [reviewCount, setReviewCount] = useState<number>(5);
+  const [isDraggingSlider, setIsDraggingSlider] = useState(false);
 
   // ---- shared UI state ----------------------------------------------------
   const [error, setError] = useState("");
@@ -387,7 +393,12 @@ export default function SubmitTrackPage() {
   const handleBuyCredits = useCallback(async () => {
     setIsBuyingCredits(true);
     try {
-      const pack = creditDeficit <= 5 ? 5 : creditDeficit <= 20 ? 20 : 50;
+      // Calculate the best pack size based on deficit
+      let pack: 3 | 10 | 25;
+      if (creditDeficit <= 3) pack = 3;
+      else if (creditDeficit <= 10) pack = 10;
+      else pack = 25;
+
       const res = await fetch("/api/review-credits/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -434,8 +445,8 @@ export default function SubmitTrackPage() {
 
   if (profileLoading) {
     return (
-      <div className="pt-16 px-6 sm:px-8 lg:px-12">
-        <div className="max-w-6xl min-h-[60vh] flex items-center justify-center">
+      <div className="pt-8 pb-24">
+        <div className="max-w-3xl mx-auto px-6 sm:px-8 min-h-[60vh] flex items-center justify-center">
           <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
         </div>
       </div>
@@ -445,15 +456,62 @@ export default function SubmitTrackPage() {
   // ---- render ---------------------------------------------------------------
 
   return (
-    <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
-      <div className="max-w-6xl">
+    <div className="pt-8 pb-24">
+      <div className="max-w-3xl mx-auto px-6 sm:px-8">
+        {/* Header with step indicator */}
+        <div className="mb-8 pb-6 border-b border-black/10">
+          <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40">
+            Submit
+          </p>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black mt-2">
+            Submit Track
+          </h1>
+
+          {/* Step indicator */}
+          <div className="flex items-center gap-2 mt-6">
+            {[1, 2, 3].map((s) => (
+              <div key={s} className="flex items-center gap-2">
+                <div
+                  className={cn(
+                    "flex items-center justify-center h-8 w-8 rounded-full border-2 transition-all",
+                    s < step
+                      ? "bg-purple-600 border-purple-600"
+                      : s === step
+                      ? "bg-purple-600 border-purple-600"
+                      : "bg-white border-neutral-200"
+                  )}
+                >
+                  {s < step ? (
+                    <CheckCircle2 className="h-4 w-4 text-white" />
+                  ) : (
+                    <span
+                      className={cn(
+                        "text-sm font-bold",
+                        s === step ? "text-white" : "text-neutral-400"
+                      )}
+                    >
+                      {s}
+                    </span>
+                  )}
+                </div>
+                {s < 3 && (
+                  <div
+                    className={cn(
+                      "h-0.5 w-12 transition-colors",
+                      s < step ? "bg-purple-600" : "bg-neutral-200"
+                    )}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Error display */}
         {error && (
-          <Card variant="soft" className="mb-6 bg-red-50 border-red-200">
-            <CardContent className="py-4">
-              <p className="text-sm text-red-700 font-medium">{error}</p>
-            </CardContent>
-          </Card>
+          <div className="mb-6 rounded-2xl border-2 border-red-200 bg-red-50 p-4">
+            <p className="text-sm text-red-700 font-medium">{error}</p>
+          </div>
         )}
 
         {/* ================================================================= */}
@@ -461,15 +519,9 @@ export default function SubmitTrackPage() {
         {/* ================================================================= */}
         {step === 1 && (
           <div className="space-y-6">
-            <div className="mb-12 pb-8 border-b border-neutral-200">
-              <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">
-                Submit Track
-              </h1>
-              <div className="flex items-center gap-4 text-sm">
-                <span className="text-neutral-500">Step 1 of 3</span>
-                <span className="text-neutral-300">&bull;</span>
-                <span className="text-neutral-500">Upload your track</span>
-              </div>
+            <div>
+              <h2 className="text-xl font-semibold text-black mb-1">Upload your track</h2>
+              <p className="text-sm text-neutral-600">Choose how you want to add your music</p>
             </div>
 
             {/* Upload mode toggle */}
@@ -483,10 +535,10 @@ export default function SubmitTrackPage() {
                   setError("");
                 }}
                 className={cn(
-                  "flex items-center justify-center gap-2 p-3 rounded-xl border-2 font-medium transition-all duration-150",
+                  "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 font-semibold transition-all",
                   uploadMode === "link"
-                    ? "border-purple-600 bg-purple-600 text-white"
-                    : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300"
+                    ? "border-purple-600 bg-purple-600 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    : "border-neutral-200 bg-white text-neutral-700 hover:border-purple-300"
                 )}
               >
                 <Link2 className="h-4 w-4" />
@@ -502,148 +554,146 @@ export default function SubmitTrackPage() {
                   setError("");
                 }}
                 className={cn(
-                  "flex items-center justify-center gap-2 p-3 rounded-xl border-2 font-medium transition-all duration-150",
+                  "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 font-semibold transition-all",
                   uploadMode === "file"
-                    ? "border-purple-600 bg-purple-600 text-white"
-                    : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300"
+                    ? "border-purple-600 bg-purple-600 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    : "border-neutral-200 bg-white text-neutral-700 hover:border-purple-300"
                 )}
               >
                 <Upload className="h-4 w-4" />
-                File
+                Upload
               </button>
             </div>
 
             {/* Link mode */}
             {uploadMode === "link" && (
-              <Card variant="soft" elevated>
-                <CardContent className="pt-5 space-y-3">
-                  <Input
-                    placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
-                    value={url}
-                    onChange={(e) => handleUrlChange(e.target.value)}
-                    className={cn(
-                      "h-11 rounded-xl border-neutral-200 bg-white focus:border-purple-500",
-                      urlError && "border-red-500"
-                    )}
-                    autoFocus
-                  />
-                  <SupportedPlatforms activeSource={sourceType} variant="compact" />
-                  {urlError && (
-                    <p className="text-sm text-red-600 font-medium">{urlError}</p>
+              <div className="space-y-3">
+                <Input
+                  placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
+                  value={url}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  className={cn(
+                    "h-12 rounded-xl border-2 border-neutral-200 bg-white focus:border-purple-500",
+                    urlError && "border-red-500"
                   )}
-                  {isLoadingMetadata && (
-                    <div className="flex items-center gap-2 text-sm text-neutral-500">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Getting track info...
+                  autoFocus
+                />
+                <SupportedPlatforms activeSource={sourceType} variant="compact" />
+                {urlError && (
+                  <p className="text-sm text-red-600 font-medium">{urlError}</p>
+                )}
+                {isLoadingMetadata && (
+                  <div className="flex items-center gap-2 text-sm text-neutral-500">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Getting track info...
+                  </div>
+                )}
+                {url && !urlError && !isLoadingMetadata && title && (
+                  <div className="rounded-xl border-2 border-emerald-200 bg-emerald-50 p-4 flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                      <Music className="h-5 w-5 text-emerald-600" />
                     </div>
-                  )}
-                  {url && !urlError && !isLoadingMetadata && title && (
-                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                        <Music className="h-5 w-5 text-emerald-600" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-emerald-600" />
+                        <span className="text-sm font-medium text-emerald-700">
+                          Track detected
+                        </span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-emerald-600" />
-                          <span className="text-sm font-medium text-emerald-700">
-                            Track detected
-                          </span>
-                        </div>
-                        <p className="font-medium text-neutral-900 truncate mt-0.5">
-                          {title}
-                        </p>
-                      </div>
+                      <p className="font-medium text-neutral-900 truncate mt-0.5">
+                        {title}
+                      </p>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* File mode */}
             {uploadMode === "file" && (
-              <Card variant="soft" elevated>
-                <CardContent className="pt-5">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="audio/mpeg,audio/mp3,.mp3"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) void handleFileUpload(file);
-                    }}
-                    className="hidden"
-                  />
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsDragging(true);
-                    }}
-                    onDragLeave={() => setIsDragging(false)}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      setIsDragging(false);
-                      const file = e.dataTransfer.files?.[0];
-                      if (
-                        file &&
-                        (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))
-                      ) {
-                        void handleFileUpload(file);
-                      } else {
-                        setError("Please upload an MP3 file");
-                      }
-                    }}
-                    className={cn(
-                      "rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-colors duration-150",
-                      isDragging && "border-purple-400 bg-purple-50",
-                      !isDragging &&
-                        !uploadedFileName &&
-                        "border-neutral-300 hover:border-purple-400 hover:bg-purple-50/50",
-                      uploadedFileName &&
-                        !isUploading &&
-                        "border-emerald-400 bg-emerald-50"
-                    )}
-                  >
-                    {isUploading ? (
-                      <div className="flex flex-col items-center gap-3">
-                        <Loader2 className="h-10 w-10 animate-spin text-purple-600" />
-                        <p className="font-medium text-neutral-600">Uploading...</p>
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="audio/mpeg,audio/mp3,.mp3"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void handleFileUpload(file);
+                  }}
+                  className="hidden"
+                />
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    const file = e.dataTransfer.files?.[0];
+                    if (
+                      file &&
+                      (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))
+                    ) {
+                      void handleFileUpload(file);
+                    } else {
+                      setError("Please upload an MP3 file");
+                    }
+                  }}
+                  className={cn(
+                    "rounded-xl border-2 border-dashed p-12 text-center cursor-pointer transition-all",
+                    isDragging && "border-purple-400 bg-purple-50",
+                    !isDragging &&
+                      !uploadedFileName &&
+                      "border-neutral-300 hover:border-purple-400 hover:bg-purple-50/50",
+                    uploadedFileName &&
+                      !isUploading &&
+                      "border-emerald-400 bg-emerald-50"
+                  )}
+                >
+                  {isUploading ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <Loader2 className="h-12 w-12 animate-spin text-purple-600" />
+                      <p className="font-medium text-neutral-600">Uploading...</p>
+                    </div>
+                  ) : uploadedFileName ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-14 w-14 rounded-full bg-emerald-500 flex items-center justify-center">
+                        <Check className="h-7 w-7 text-white" />
                       </div>
-                    ) : uploadedFileName ? (
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="h-12 w-12 rounded-full bg-emerald-500 flex items-center justify-center">
-                          <Check className="h-6 w-6 text-white" />
-                        </div>
-                        <p className="font-medium text-neutral-900">
+                      <div>
+                        <p className="font-semibold text-neutral-900">
                           {uploadedFileName}
                         </p>
-                        <p className="text-sm text-neutral-500">Click to change</p>
+                        <p className="text-sm text-neutral-500 mt-1">Click to change</p>
                       </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
-                          <Upload className="h-6 w-6 text-purple-600" />
-                        </div>
-                        <p className="font-medium text-neutral-900">
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-14 w-14 rounded-full bg-purple-100 flex items-center justify-center">
+                        <Upload className="h-7 w-7 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-neutral-900">
                           Drop your MP3 here
                         </p>
-                        <p className="text-sm text-neutral-500">
+                        <p className="text-sm text-neutral-500 mt-1">
                           or click to browse (max 25 MB)
                         </p>
                       </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
 
             {/* Continue button */}
             <Button
               onClick={goForward}
               disabled={!hasValidSource}
-              variant="primary"
-              size="lg"
-              className="w-full"
+              className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl"
             >
               Continue
               <ArrowRight className="h-4 w-4 ml-2" />
@@ -656,99 +706,83 @@ export default function SubmitTrackPage() {
         {/* ================================================================= */}
         {step === 2 && (
           <div className="space-y-6">
-            <div className="mb-12 pb-8 border-b border-neutral-200">
-              <div className="flex items-center gap-3 mb-4">
-                <button
-                  onClick={goBack}
-                  className="flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back
-                </button>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-black mb-1">Track details</h2>
+                <p className="text-sm text-neutral-600">Add title and genres</p>
               </div>
-              <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">
-                Track Details
-              </h1>
-              <div className="flex items-center gap-4 text-sm">
-                <span className="text-neutral-500">Step 2 of 3</span>
-                <span className="text-neutral-300">&bull;</span>
-                <span className="text-neutral-500">Add title and genres</span>
-              </div>
+              <button
+                onClick={goBack}
+                className="flex items-center gap-1 text-sm text-neutral-500 hover:text-black transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </button>
             </div>
 
             {/* Title */}
-            <Card variant="soft" elevated>
-              <CardContent className="pt-5 pb-5">
-                <label
-                  htmlFor="track-title"
-                  className="block text-xs font-mono tracking-widest text-neutral-400 uppercase mb-2"
-                >
-                  Title
-                </label>
-                <Input
-                  id="track-title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="What's your track called?"
-                  className="h-11 rounded-xl border-neutral-200 bg-white focus:border-purple-500"
-                  autoFocus
-                />
-              </CardContent>
-            </Card>
+            <div>
+              <label
+                htmlFor="track-title"
+                className="block text-sm font-medium text-neutral-700 mb-2"
+              >
+                Title
+              </label>
+              <Input
+                id="track-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="What's your track called?"
+                className="h-12 rounded-xl border-2 border-neutral-200 bg-white focus:border-purple-500"
+                autoFocus
+              />
+            </div>
 
             {/* Genres */}
-            <Card variant="soft" elevated>
-              <CardContent className="pt-5">
-                <p className="text-xs font-mono tracking-widest text-neutral-400 uppercase mb-2">
-                  Genre{" "}
-                  <span className="normal-case text-neutral-300">(1-3)</span>
-                </p>
-                {genres.length === 0 ? (
-                  <div className="flex items-center gap-2 text-sm text-neutral-500">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading genres...
-                  </div>
-                ) : (
-                  <GenreSelector
-                    genres={genres}
-                    selectedIds={selectedGenres}
-                    onToggle={toggleGenre}
-                    maxSelections={3}
-                    variant="artist"
-                  />
-                )}
-              </CardContent>
-            </Card>
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Genres <span className="text-neutral-400">(select 1-3)</span>
+              </label>
+              {genres.length === 0 ? (
+                <div className="flex items-center gap-2 text-sm text-neutral-500">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading genres...
+                </div>
+              ) : (
+                <GenreSelector
+                  genres={genres}
+                  selectedIds={selectedGenres}
+                  onToggle={toggleGenre}
+                  maxSelections={3}
+                  variant="artist"
+                />
+              )}
+            </div>
 
             {/* Feedback focus (optional) */}
-            <Card variant="soft" elevated>
-              <CardContent className="pt-5">
-                <label
-                  htmlFor="feedback-focus"
-                  className="block text-xs font-mono tracking-widest text-neutral-400 uppercase mb-2"
-                >
-                  Feedback focus{" "}
-                  <span className="normal-case text-neutral-300">(optional)</span>
-                </label>
-                <textarea
-                  id="feedback-focus"
-                  value={feedbackFocus}
-                  onChange={(e) => setFeedbackFocus(e.target.value)}
-                  placeholder="Anything you want reviewers to focus on? e.g. mix balance, arrangement, vocal processing..."
-                  rows={2}
-                  maxLength={1000}
-                  className="w-full rounded-xl border-2 border-neutral-200 bg-white px-4 py-3 text-sm placeholder:text-neutral-400 focus:border-purple-500 focus:outline-none resize-none"
-                />
-              </CardContent>
-            </Card>
+            <div>
+              <label
+                htmlFor="feedback-focus"
+                className="block text-sm font-medium text-neutral-700 mb-2"
+              >
+                Feedback focus <span className="text-neutral-400">(optional)</span>
+              </label>
+              <textarea
+                id="feedback-focus"
+                value={feedbackFocus}
+                onChange={(e) => setFeedbackFocus(e.target.value)}
+                placeholder="Anything you want reviewers to focus on? e.g. mix balance, arrangement, vocal processing..."
+                rows={3}
+                maxLength={1000}
+                className="w-full rounded-xl border-2 border-neutral-200 bg-white px-4 py-3 text-sm placeholder:text-neutral-400 focus:border-purple-500 focus:outline-none resize-none"
+              />
+            </div>
 
             {/* Continue button */}
             <Button
               onClick={goForward}
               disabled={!hasValidDetails}
-              variant="primary"
-              size="lg"
-              className="w-full"
+              className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl"
             >
               Continue
               <ArrowRight className="h-4 w-4 ml-2" />
@@ -761,28 +795,22 @@ export default function SubmitTrackPage() {
         {/* ================================================================= */}
         {step === 3 && (
           <div className="space-y-6">
-            <div className="mb-12 pb-8 border-b border-neutral-200">
-              <div className="flex items-center gap-3 mb-4">
-                <button
-                  onClick={goBack}
-                  className="flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back
-                </button>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-black mb-1">Request reviews</h2>
+                <p className="text-sm text-neutral-600">How many reviews do you want?</p>
               </div>
-              <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">
-                Request Reviews
-              </h1>
-              <div className="flex items-center gap-4 text-sm">
-                <span className="text-neutral-500">Step 3 of 3</span>
-                <span className="text-neutral-300">&bull;</span>
-                <span className="text-neutral-500">Choose review count</span>
-              </div>
+              <button
+                onClick={goBack}
+                className="flex items-center gap-1 text-sm text-neutral-500 hover:text-black transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </button>
             </div>
 
             {/* Credit balance */}
-            <div className="flex items-center gap-3 rounded-xl bg-purple-50 border border-purple-200 px-4 py-3">
+            <div className="flex items-center gap-3 rounded-xl bg-purple-50 border-2 border-purple-200 px-4 py-3">
               <Coins className="h-5 w-5 text-purple-600 flex-shrink-0" />
               <p className="text-sm font-medium text-purple-900">
                 You have{" "}
@@ -793,47 +821,85 @@ export default function SubmitTrackPage() {
               </p>
             </div>
 
-            {/* Review count selector */}
-            <div className="grid grid-cols-3 gap-3">
-              {REVIEW_OPTIONS.map((option) => {
-                const isSelected = reviewCount === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setReviewCount(option.value)}
-                    className={cn(
-                      "relative flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all duration-150",
-                      isSelected
-                        ? "border-purple-600 bg-purple-50 ring-1 ring-purple-600"
-                        : "border-neutral-200 bg-white hover:border-purple-300"
-                    )}
-                  >
-                    {option.recommended && (
-                      <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wide">
-                        Recommended
-                      </span>
-                    )}
-                    <Star
+            {/* Review count slider */}
+            <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 shadow-sm">
+              {/* Large display */}
+              <div className="text-center mb-6">
+                <div className="inline-flex items-baseline gap-2">
+                  <span className="text-5xl font-bold text-purple-600 tabular-nums">
+                    {reviewCount}
+                  </span>
+                  <span className="text-xl text-neutral-600 font-medium">
+                    {reviewCount === 1 ? "review" : "reviews"}
+                  </span>
+                </div>
+                <p className="text-sm text-neutral-600 mt-2">
+                  {reviewCount} {reviewCount === 1 ? "credit" : "credits"} required
+                </p>
+              </div>
+
+              {/* Slider */}
+              <div className="mb-6">
+                <div className="relative">
+                  <input
+                    type="range"
+                    min="1"
+                    max="50"
+                    value={reviewCount}
+                    onChange={(e) => setReviewCount(parseInt(e.target.value))}
+                    onMouseDown={() => setIsDraggingSlider(true)}
+                    onMouseUp={() => setIsDraggingSlider(false)}
+                    onTouchStart={() => setIsDraggingSlider(true)}
+                    onTouchEnd={() => setIsDraggingSlider(false)}
+                    className="w-full h-3 bg-neutral-200 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-600 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-purple-600 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:transition-transform [&::-moz-range-thumb]:hover:scale-110"
+                    style={{
+                      background: `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${((reviewCount - 1) / 49) * 100}%, rgb(229 231 235) ${((reviewCount - 1) / 49) * 100}%, rgb(229 231 235) 100%)`
+                    }}
+                  />
+
+                  {/* Quick select markers */}
+                  <div className="flex justify-between mt-2 px-1">
+                    {[1, 5, 10, 20, 30, 50].map((mark) => (
+                      <button
+                        key={mark}
+                        type="button"
+                        onClick={() => setReviewCount(mark)}
+                        className={cn(
+                          "text-xs font-medium transition-colors",
+                          reviewCount === mark
+                            ? "text-purple-600"
+                            : "text-neutral-400 hover:text-purple-600"
+                        )}
+                      >
+                        {mark}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Unlocked benefits - show current level */}
+              <div className="text-center py-4 border-t border-neutral-200">
+                <div className="flex items-center justify-center gap-1.5 mb-3">
+                  {REVIEW_BENEFITS.map((benefit) => (
+                    <div
+                      key={benefit.label}
                       className={cn(
-                        "h-5 w-5",
-                        isSelected ? "text-purple-600" : "text-neutral-400"
+                        "h-1.5 w-8 rounded-full transition-all duration-300",
+                        reviewCount >= benefit.minReviews
+                          ? "bg-purple-600"
+                          : "bg-neutral-200"
                       )}
                     />
-                    <span
-                      className={cn(
-                        "text-lg font-bold",
-                        isSelected ? "text-purple-600" : "text-neutral-900"
-                      )}
-                    >
-                      {option.value}
-                    </span>
-                    <span className="text-xs text-neutral-500">
-                      {option.credits} credits
-                    </span>
-                  </button>
-                );
-              })}
+                  ))}
+                </div>
+                <p className="text-sm font-medium text-neutral-900">
+                  {REVIEW_BENEFITS.filter((b) => reviewCount >= b.minReviews).slice(-1)[0]?.label || "Select reviews"}
+                </p>
+                <p className="text-xs text-neutral-400 mt-1">
+                  Current insight level
+                </p>
+              </div>
             </div>
 
             {/* Enough credits -- submit */}
@@ -842,9 +908,7 @@ export default function SubmitTrackPage() {
                 onClick={handleSubmit}
                 disabled={isSubmitting}
                 isLoading={isSubmitting}
-                variant="primary"
-                size="lg"
-                className="w-full"
+                className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl"
               >
                 Submit for Review
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -854,20 +918,18 @@ export default function SubmitTrackPage() {
             {/* Not enough credits */}
             {!hasEnoughCredits && (
               <div className="space-y-4">
-                <Card variant="soft" className="bg-amber-50 border-amber-200">
-                  <CardContent className="py-4">
-                    <p className="text-sm text-amber-800 font-medium">
-                      You need {creditDeficit} more{" "}
-                      {creditDeficit === 1 ? "credit" : "credits"} for{" "}
-                      {reviewCount} reviews.
-                    </p>
-                  </CardContent>
-                </Card>
+                <div className="rounded-xl bg-amber-50 border-2 border-amber-200 p-4">
+                  <p className="text-sm text-amber-800 font-medium">
+                    You need {creditDeficit} more{" "}
+                    {creditDeficit === 1 ? "credit" : "credits"} for{" "}
+                    {reviewCount} reviews.
+                  </p>
+                </div>
 
                 <div className="space-y-3">
                   {/* Primary: earn credits */}
-                  <Link href="/review" className="block">
-                    <Button variant="primary" size="lg" className="w-full">
+                  <Link href="/review">
+                    <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl">
                       <Sparkles className="h-4 w-4 mr-2" />
                       Review tracks to earn credits
                     </Button>
@@ -878,18 +940,19 @@ export default function SubmitTrackPage() {
                     onClick={handleBuyCredits}
                     disabled={isBuyingCredits}
                     isLoading={isBuyingCredits}
-                    variant="outline"
-                    size="lg"
-                    className="w-full"
+                    className="w-full border-2 border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 h-12 rounded-xl font-semibold"
                   >
-                    Buy {creditDeficit <= 5 ? 5 : creditDeficit <= 20 ? 20 : 50}{" "}
-                    credits
+                    Buy {creditDeficit <= 3 ? 3 : creditDeficit <= 10 ? 10 : 25} credits — {
+                      creditDeficit <= 3 ? "$2.95" :
+                      creditDeficit <= 10 ? "$7.95" :
+                      "$14.95"
+                    }
                   </Button>
 
                   {/* Upsell: upgrade to Pro */}
-                  <Link href="/account" className="block">
-                    <Button variant="ghost" size="lg" className="w-full">
-                      Upgrade to Pro &mdash; 10 credits/month
+                  <Link href="/account">
+                    <Button className="w-full border-2 border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 h-12 rounded-xl font-medium">
+                      Upgrade to Pro — 10 credits/month
                     </Button>
                   </Link>
                 </div>

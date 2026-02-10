@@ -276,7 +276,7 @@ export async function getEligiblePeerReviewers(
   // 2. Have matching review genres
   // 3. Are NOT the track owner
   // 4. Haven't already reviewed this track
-  const peerReviewers = await (db.artistProfile as any).findMany({
+  const peerReviewers = await db.artistProfile.findMany({
     where: {
       completedOnboarding: true,
       // Exclude the track owner
@@ -402,7 +402,7 @@ export async function assignReviewersToTrack(trackId: string) {
       expiresAt.setHours(expiresAt.getHours() + 48);
 
       if (peersToAssign.length > 0) {
-        await (tx.reviewQueue as any).createMany({
+        await tx.reviewQueue.createMany({
           data: peersToAssign.map((peer: any) => ({
             trackId,
             reviewerId: peer.id, // placeholder - required field
@@ -413,7 +413,7 @@ export async function assignReviewersToTrack(trackId: string) {
           skipDuplicates: true,
         });
 
-        await (tx.review as any).createMany({
+        await tx.review.createMany({
           data: peersToAssign.map((peer: any) => ({
             trackId,
             reviewerId: peer.id, // placeholder - required field

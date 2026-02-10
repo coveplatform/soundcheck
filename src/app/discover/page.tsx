@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TrackStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { Logo } from "@/components/ui/logo";
@@ -71,7 +72,7 @@ export default async function DiscoverPage({
   const trackWhere = {
     isPublic: true,
     status: {
-      in: ["UPLOADED", "QUEUED", "IN_PROGRESS", "COMPLETED"],
+      in: ["UPLOADED", "QUEUED", "IN_PROGRESS", "COMPLETED"] as TrackStatus[],
     },
     ...(selectedGenreSlug
       ? {
@@ -82,7 +83,7 @@ export default async function DiscoverPage({
           },
         }
       : {}),
-  } as any;
+  };
 
   const trackSelect = {
     id: true,
@@ -95,23 +96,24 @@ export default async function DiscoverPage({
     reviewsCompleted: true,
     genres: { select: { id: true, name: true } },
     artist: { select: { artistName: true } },
-  } as any;
+  };
 
   const genres = await prisma.genre.findMany({
     select: { id: true, name: true, slug: true },
     orderBy: { name: "asc" },
   });
 
-  let tracks: any[] = [];
+  type DiscoverTrack = Awaited<ReturnType<typeof prisma.track.findMany<{ where: typeof trackWhere; select: typeof trackSelect }>>>[number];
+  let tracks: DiscoverTrack[] = [];
   let requiresMigration = false;
 
   try {
-    tracks = (await (prisma.track as any).findMany({
+    tracks = await prisma.track.findMany({
       where: trackWhere,
       select: trackSelect,
       orderBy: { createdAt: "desc" },
       take: 60,
-    })) as any[];
+    });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     if (message.includes("Unknown argument `isPublic`")) {

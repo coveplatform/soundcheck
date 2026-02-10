@@ -164,12 +164,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           }
 
           if (response.status === 403) {
-            if (typeof message === "string" && message.toLowerCase().includes("verify")) {
-              // Keep loading state active during navigation
-              router.push("/verify-email");
-              router.refresh();
-              return;
-            }
             if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
               // Keep loading state active during navigation
               router.push("/onboarding");
@@ -466,12 +460,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         }
 
         if (response.status === 403) {
-          if (typeof message === "string" && message.toLowerCase().includes("verify")) {
-            // Keep loading state active during navigation
-            router.push("/verify-email");
-            router.refresh();
-            return;
-          }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
             // Keep loading state active during navigation
             router.push("/onboarding");
@@ -544,12 +532,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         }
 
         if (response.status === 403) {
-          if (typeof message === "string" && message.toLowerCase().includes("verify")) {
-            // Keep loading state active during navigation
-            router.push("/verify-email");
-            router.refresh();
-            return;
-          }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
             // Keep loading state active during navigation
             router.push("/onboarding");
@@ -613,12 +595,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         }
 
         if (response.status === 403) {
-          if (typeof message === "string" && message.toLowerCase().includes("verify")) {
-            // Keep loading state active during navigation
-            router.push("/verify-email");
-            router.refresh();
-            return;
-          }
           if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
             // Keep loading state active during navigation
             router.push("/onboarding");
@@ -747,11 +723,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
         if (res.status === 403) {
           const msg = typeof message === "string" ? message.toLowerCase() : "";
-          if (msg.includes("verify")) {
-            router.push("/verify-email");
-            router.refresh();
-            return;
-          }
           if (msg.includes("onboarding")) {
             router.push("/onboarding");
             router.refresh();

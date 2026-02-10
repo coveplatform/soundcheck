@@ -87,7 +87,7 @@ export async function POST(
     const allReviewers = await prisma.listenerProfile.findMany({
       include: {
         genres: true,
-        user: { select: { email: true, createdAt: true, emailVerified: true } },
+        user: { select: { email: true, createdAt: true } },
       },
     });
 
@@ -103,7 +103,6 @@ export async function POST(
       if (!r.completedOnboarding) reasons.push("onboarding not completed");
       if (!r.onboardingQuizPassed) reasons.push("quiz not passed");
       if (r.isRestricted) reasons.push("restricted");
-      if (!r.user.emailVerified) reasons.push("email not verified");
 
       if (!isTestBypass) {
         const hoursSinceCreation =

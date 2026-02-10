@@ -164,10 +164,11 @@ describe('Metadata Extraction', () => {
 
 describe('Package Configuration', () => {
   describe('PACKAGES', () => {
-    it('has all four package types', () => {
+    it('has all five package types', () => {
       expect(Object.keys(PACKAGES)).toEqual([
         'STARTER',
         'STANDARD',
+        'PEER',
         'PRO',
         'DEEP_DIVE',
       ])

@@ -140,18 +140,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { emailVerified: true },
-    });
-
-    if (!user?.emailVerified) {
-      return NextResponse.json(
-        { error: "Please verify your email to submit reviews" },
-        { status: 403 }
-      );
-    }
-
     // Support both legacy reviewer profiles AND peer reviewers (artist profiles)
     const reviewerProfile = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },
@@ -370,7 +358,7 @@ export async function POST(request: Request) {
 
       // Update reviewer profile: legacy reviewers get cash, peer reviewers get credits
       if (isPeerReview && artistProfile) {
-        await (tx.artistProfile as any).update({
+        await tx.artistProfile.update({
           where: { id: artistProfile.id },
           data: {
             reviewCredits: { increment: 1 },

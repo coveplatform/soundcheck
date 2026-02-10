@@ -4,8 +4,7 @@ import Link from "next/link";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatRelativeDate } from "@/lib/utils";
 import { Music, Star } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -16,16 +15,6 @@ export default async function ReviewHistoryPage() {
 
   if (!session?.user?.id) {
     redirect("/login");
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { emailVerified: true, email: true },
-  });
-
-  if (!user?.emailVerified) {
-    const email = user?.email ? `?email=${encodeURIComponent(user.email)}` : "";
-    redirect(`/verify-email${email}`);
   }
 
   const reviewerProfile = await prisma.listenerProfile.findUnique({
@@ -68,25 +57,30 @@ export default async function ReviewHistoryPage() {
   });
 
   return (
-    <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
-      <div className="max-w-6xl">
-        <div className="mb-12 pb-8 border-b border-neutral-200">
-          <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">History</h1>
-          <div className="text-sm text-neutral-500">
+    <div className="pt-8 pb-24">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8">
+        {/* Header */}
+        <div className="mb-10 pb-6 border-b border-neutral-200">
+          <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40">Review</p>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black mt-2">
+            Review History
+          </h1>
+          <p className="text-sm text-neutral-600 mt-3">
             {reviews.length} completed review{reviews.length !== 1 ? "s" : ""}
-          </div>
+          </p>
         </div>
 
-        <Card variant="soft" elevated>
-          <CardContent className="pt-6">
-            <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-4">past reviews</p>
+        <div className="border-2 border-neutral-200 rounded-2xl bg-white p-6 shadow-sm">
+          <p className="text-[11px] font-mono tracking-[0.2em] text-black/40 uppercase mb-4">
+            Past Reviews
+          </p>
 
           {reviews.length === 0 ? (
             <EmptyState
               doodle="star"
               title="No completed reviews yet"
               description="Your submitted reviews will show up here."
-              className="py-12"
+              className="py-8"
             />
           ) : (
             <div className="space-y-2">
@@ -94,51 +88,52 @@ export default async function ReviewHistoryPage() {
                 <Link
                   key={review.id}
                   href={`/listener/review/${review.id}`}
-                  className="flex items-center justify-between gap-3 rounded-2xl bg-white/60 border border-black/10 px-4 py-3 hover:bg-white transition-colors duration-150 ease-out"
+                  className="flex items-center justify-between gap-4 rounded-2xl border-2 border-neutral-200 bg-white px-4 py-4 shadow-sm transition-all duration-150 hover:shadow-md hover:border-neutral-300"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-10 w-10 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
-                      <Music className="h-5 w-5 text-orange-600" />
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="h-12 w-12 rounded-xl bg-purple-100 border-2 border-purple-200 flex items-center justify-center flex-shrink-0">
+                      <Music className="h-5 w-5 text-purple-600" />
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-black truncate">{review.track.title}</p>
-                      <p className="text-xs text-black/40 truncate">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-base font-semibold text-black truncate">{review.track.title}</p>
+                      <p className="text-sm text-neutral-600 truncate">
                         {review.track.genres.map((g) => g.name).join(", ")}
-                        {review.track.artist?.artistName ? ` \u00b7 ${review.track.artist.artistName}` : ""}
+                        {review.track.artist?.artistName ? ` · ${review.track.artist.artistName}` : ""}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-4 flex-shrink-0">
                     <div className="text-right hidden sm:block">
-                      <p className="text-sm font-medium text-emerald-600">{formatCurrency(review.paidAmount)}</p>
-                      <div className="flex items-center justify-end gap-0.5 mt-0.5">
+                      <p className="text-sm font-bold text-emerald-600">{formatCurrency(review.paidAmount)}</p>
+                      <div className="flex items-center justify-end gap-0.5 mt-1">
                         {review.artistRating !== null && review.artistRating !== undefined ? (
                           [1, 2, 3, 4, 5].map((i) => (
                             <Star
                               key={i}
                               className={
                                 i <= (review.artistRating ?? 0)
-                                  ? "h-3 w-3 text-amber-500 fill-amber-500"
-                                  : "h-3 w-3 text-black/20"
+                                  ? "h-3.5 w-3.5 text-amber-500 fill-amber-500"
+                                  : "h-3.5 w-3.5 text-neutral-300"
                               }
                             />
                           ))
                         ) : (
-                          <span className="text-xs text-black/30">No rating</span>
+                          <span className="text-xs text-neutral-400">No rating</span>
                         )}
                       </div>
                     </div>
-                    <span className="text-xs text-black/40">
-                      {new Date(review.createdAt).toLocaleDateString()}
-                    </span>
+                    <div className="text-right">
+                      <span className="text-xs text-neutral-500 font-medium">
+                        {formatRelativeDate(review.createdAt)}
+                      </span>
+                    </div>
                   </div>
                 </Link>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
       </div>
     </div>
   );

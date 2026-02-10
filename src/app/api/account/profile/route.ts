@@ -30,7 +30,7 @@ export async function PATCH(request: Request) {
 
     // Update artist name if provided and user is an artist
     if (artistName !== undefined && session.user.isArtist) {
-      await (prisma.artistProfile as any).update({
+      await prisma.artistProfile.update({
         where: { userId: session.user.id },
         data: { artistName },
       });

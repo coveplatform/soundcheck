@@ -9,33 +9,71 @@ import { Plus, Music, DollarSign, MessageSquare, CheckCircle2, Sparkles } from "
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { TracksViewToggle } from "@/components/tracks/tracks-view-toggle";
+import { PortfolioView } from "@/components/tracks/portfolio-view";
+import {
+  analyzeFeedbackPatterns,
+  calculateReviewVelocity,
+  generateEarningsData,
+} from "@/lib/analytics-helpers";
 
 export const dynamic = "force-dynamic";
 
-export default async function ArtistTracksPage() {
+export default async function TracksPage() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     redirect("/login");
   }
 
+  // First, get basic artist profile to check Pro status
+  const basicProfile = await prisma.artistProfile.findUnique({
+    where: { userId: session.user.id },
+    select: {
+      id: true,
+      subscriptionStatus: true,
+      totalEarnings: true,
+      pendingBalance: true,
+    },
+  });
+
+  if (!basicProfile) {
+    redirect("/onboarding");
+  }
+
+  const isPro = basicProfile.subscriptionStatus === "active";
+
+  // SECURITY: Only fetch detailed analytics data (reviews, purchases) for Pro users
   const artistProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
     include: {
       tracks: {
         include: {
           genres: true,
-          reviews: {
+          // Only include reviews and purchases if Pro (for grid view - all users see tracks)
+          reviews: isPro ? {
+            where: {
+              status: "COMPLETED",
+            },
             select: {
               id: true,
               status: true,
+              productionScore: true,
+              originalityScore: true,
+              vocalScore: true,
+              wouldListenAgain: true,
+              wouldAddToPlaylist: true,
+              wouldShare: true,
+              wouldFollow: true,
+              countsTowardAnalytics: true,
+              createdAt: true,
             },
-          },
-          purchases: {
+          } : false,
+          purchases: isPro ? {
             select: {
               amount: true,
             },
-          },
+          } : false,
         },
         orderBy: { createdAt: "desc" },
       },
@@ -47,85 +85,245 @@ export default async function ArtistTracksPage() {
   }
 
   const tracks = artistProfile.tracks;
-  const totalEarnings = artistProfile.totalEarnings / 100;
-  const pendingBalance = artistProfile.pendingBalance / 100;
+  const totalEarnings = basicProfile.totalEarnings / 100;
+  const pendingBalance = basicProfile.pendingBalance / 100;
+
+  // Calculate portfolio analytics data (ONLY for Pro users)
+  const tracksWithReviews = isPro ? tracks.filter(t => t.reviews && t.reviews.length > 0) : [];
+  const hasAnalyticsData = tracksWithReviews.length > 0;
+
+  let portfolioData = null;
+
+  if (isPro && hasAnalyticsData) {
+    const totalReviews = tracks.reduce((sum, t) => sum + t.reviews.length, 0);
+    const totalTracks = tracksWithReviews.length;
+
+    // Calculate overall averages
+    const allReviews = tracks.flatMap((t) => t.reviews);
+    const avgProduction =
+      allReviews.reduce((sum, r) => sum + (r.productionScore || 0), 0) / (allReviews.length || 1);
+    const avgOriginality =
+      allReviews.reduce((sum, r) => sum + (r.originalityScore || 0), 0) / (allReviews.length || 1);
+    const avgVocals =
+      allReviews.reduce((sum, r) => sum + (r.vocalScore || 0), 0) / (allReviews.length || 1);
+    const overallAvg = (avgProduction + avgOriginality + avgVocals) / 3;
+
+    // Calculate highest score
+    const trackScores = tracksWithReviews.map((t) => {
+      const production = t.reviews.reduce((sum, r) => sum + (r.productionScore || 0), 0) / (t.reviews.length || 1);
+      const vocals = t.reviews.reduce((sum, r) => sum + (r.vocalScore || 0), 0) / (t.reviews.length || 1);
+      const originality = t.reviews.reduce((sum, r) => sum + (r.originalityScore || 0), 0) / (t.reviews.length || 1);
+      return (production + vocals + originality) / 3;
+    });
+    const highestScore = trackScores.length > 0 ? Math.max(...trackScores) : 0;
+
+    // Calculate improvement
+    const recentTracks = tracksWithReviews.slice(0, 3);
+    const earlierTracks = tracksWithReviews.slice(-3);
+    const recentAvg =
+      recentTracks.reduce((sum, t) => {
+        const trackAvg =
+          t.reviews.reduce(
+            (s, r) =>
+              s +
+              ((r.productionScore || 0) + (r.originalityScore || 0) + (r.vocalScore || 0)) / 3,
+            0
+          ) / (t.reviews.length || 1);
+        return sum + trackAvg;
+      }, 0) / (recentTracks.length || 1);
+    const earlierAvg =
+      earlierTracks.reduce((sum, t) => {
+        const trackAvg =
+          t.reviews.reduce(
+            (s, r) =>
+              s +
+              ((r.productionScore || 0) + (r.originalityScore || 0) + (r.vocalScore || 0)) / 3,
+            0
+          ) / (t.reviews.length || 1);
+        return sum + trackAvg;
+      }, 0) / (earlierTracks.length || 1);
+    const improvementRate = tracksWithReviews.length >= 3 ? ((recentAvg - earlierAvg) / earlierAvg) * 100 : 0;
+
+    // Calculate engagement
+    const wouldListenAgain = allReviews.filter((r) => r.wouldListenAgain).length;
+    const wouldListenAgainPercent = Math.round(
+      (wouldListenAgain / (allReviews.length || 1)) * 100
+    );
+
+    // Categories
+    const categories = [
+      { name: "Production", score: avgProduction, color: "bg-purple-500" },
+      { name: "Originality", score: avgOriginality, color: "bg-purple-500" },
+      { name: "Vocals", score: avgVocals, color: "bg-blue-500" },
+    ].sort((a, b) => b.score - a.score);
+
+    // Prepare track data
+    const trackData = tracksWithReviews.map((t) => {
+      const production =
+        t.reviews.reduce((sum, r) => sum + (r.productionScore || 0), 0) / (t.reviews.length || 1);
+      const vocals =
+        t.reviews.reduce((sum, r) => sum + (r.vocalScore || 0), 0) / (t.reviews.length || 1);
+      const originality =
+        t.reviews.reduce((sum, r) => sum + (r.originalityScore || 0), 0) / (t.reviews.length || 1);
+      const avgScore = (production + vocals + originality) / 3;
+
+      const listenAgain = t.reviews.filter((r) => r.wouldListenAgain).length;
+      const listenAgainPercent = Math.round((listenAgain / (t.reviews.length || 1)) * 100);
+
+      const playlistYes = t.reviews.filter((r) => r.wouldAddToPlaylist === true).length;
+      const playlistTotal = t.reviews.filter((r) => r.wouldAddToPlaylist !== null).length;
+      const playlistPercent = playlistTotal > 0 ? Math.round((playlistYes / playlistTotal) * 100) : 0;
+
+      const shareYes = t.reviews.filter((r) => r.wouldShare === true).length;
+      const shareTotal = t.reviews.filter((r) => r.wouldShare !== null).length;
+      const sharePercent = shareTotal > 0 ? Math.round((shareYes / shareTotal) * 100) : 0;
+
+      const trackEarnings = t.purchases.reduce((sum, p) => sum + p.amount, 0) / 100;
+
+      return {
+        id: t.id,
+        title: t.title,
+        artworkUrl: t.artworkUrl,
+        createdAt: t.createdAt,
+        completedAt: t.completedAt,
+        reviewsCompleted: t.reviews.length,
+        avgScore,
+        categoryScores: { production, vocals, originality },
+        engagement: {
+          listenAgain: listenAgainPercent,
+          playlist: playlistPercent,
+          share: sharePercent,
+        },
+        earnings: trackEarnings,
+      };
+    });
+
+    // Generate trend data
+    const trendData = generateTrendData(tracksWithReviews);
+
+    // Generate earnings data
+    const earningsDataTracks = trackData.map((t) => ({
+      createdAt: t.createdAt,
+      earnings: t.earnings,
+    }));
+    const earningsData = generateEarningsData(earningsDataTracks);
+
+    // Calculate review velocity
+    const reviewVelocityTracks = tracksWithReviews.map((t) => ({
+      createdAt: t.createdAt,
+      completedAt: t.completedAt,
+      reviewsCompleted: t.reviews.length,
+      title: t.title,
+    }));
+    const reviewVelocity = calculateReviewVelocity(reviewVelocityTracks);
+
+    // Analyze feedback patterns
+    const feedbackPatterns = analyzeFeedbackPatterns(allReviews);
+
+    portfolioData = {
+      trackData,
+      totalReviews,
+      totalEarnings: artistProfile.totalEarnings / 100,
+      totalTracks,
+      overallAvg,
+      highestScore,
+      improvementRate,
+      wouldListenAgainPercent,
+      categories,
+      trendData,
+      earningsData,
+      reviewVelocity,
+      feedbackPatterns,
+    };
+  }
 
   return (
-    <div className="pt-16 px-6 sm:px-8 lg:px-12 pb-20">
-      <div className="max-w-6xl">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 pb-8 border-b border-neutral-200">
-          <div>
-            <h1 className="text-5xl sm:text-6xl font-light tracking-tight mb-3">Tracks</h1>
-            <div className="flex items-center gap-4 text-sm">
-              <span className="text-neutral-500">{tracks.length} {tracks.length === 1 ? "Track" : "Tracks"}</span>
-              {totalEarnings > 0 && (
-                <>
-                  <span className="text-neutral-300">&bull;</span>
-                  <span className="font-semibold text-teal-600">${totalEarnings.toFixed(2)} earned</span>
-                </>
-              )}
-            </div>
+    <div className="pt-8 pb-24">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8">
+        {/* Header */}
+        <div className="mb-10 pb-6 border-b border-black/10">
+          <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40 mb-2">
+            Tracks
+          </p>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black">
+            My Music
+          </h1>
+          <div className="flex items-center gap-4 text-sm mt-2">
+            <span className="text-black/60">{tracks.length} {tracks.length === 1 ? "track" : "tracks"}</span>
+            {totalEarnings > 0 && (
+              <>
+                <span className="text-black/20">&bull;</span>
+                <span className="font-semibold text-teal-600">${totalEarnings.toFixed(2)} earned</span>
+              </>
+            )}
           </div>
-
-          {pendingBalance > 0 && (
-            <div className="px-4 py-2 bg-purple-50 border border-purple-200 rounded-lg">
-              <span className="text-sm font-bold text-purple-700">${pendingBalance.toFixed(2)} pending</span>
-            </div>
-          )}
         </div>
 
-        {tracks.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-            <Link
-              href="/submit"
-              className="group aspect-square"
-            >
-              <Card
-                variant="soft"
-                interactive
-                className="h-full border-2 border-dashed border-black/10 bg-white/40 hover:bg-white/60 hover:border-black/20"
-              >
-                <div className="h-full flex flex-col items-center justify-center gap-3">
-                  <div className="h-12 w-12 rounded-full bg-black/5 group-hover:bg-black flex items-center justify-center transition-colors duration-150 ease-out motion-reduce:transition-none">
-                    <Plus className="h-5 w-5 text-black/40 group-hover:text-white transition-colors duration-150 ease-out motion-reduce:transition-none" />
-                  </div>
-                  <span className="text-sm text-black/50 group-hover:text-black transition-colors duration-150 ease-out motion-reduce:transition-none">
-                    Upload track
-                  </span>
-                </div>
-              </Card>
-            </Link>
+        {/* View Toggle */}
+        <TracksViewToggle
+          isPro={isPro}
+          gridView={
+            tracks.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+                <Link
+                  href="/submit"
+                  className="group aspect-square"
+                >
+                  <Card
+                    variant="soft"
+                    interactive
+                    className="h-full border-2 border-dashed border-black/10 bg-white/40 hover:bg-white/60 hover:border-black/20"
+                  >
+                    <div className="h-full flex flex-col items-center justify-center gap-3">
+                      <div className="h-12 w-12 rounded-full bg-black/5 group-hover:bg-black flex items-center justify-center transition-colors duration-150 ease-out motion-reduce:transition-none">
+                        <Plus className="h-5 w-5 text-black/40 group-hover:text-white transition-colors duration-150 ease-out motion-reduce:transition-none" />
+                      </div>
+                      <span className="text-sm text-black/50 group-hover:text-black transition-colors duration-150 ease-out motion-reduce:transition-none">
+                        Upload track
+                      </span>
+                    </div>
+                  </Card>
+                </Link>
 
-            {tracks.map((track) => {
-              const completedReviews = track.reviews.filter(
-                (r) => r.status === "COMPLETED"
-              ).length;
-              const totalPurchases =
-                track.purchases.reduce((sum, p) => sum + p.amount, 0) / 100;
-              const hasReviews = track.reviewsRequested > 0;
-              const reviewProgress = hasReviews
-                ? completedReviews / track.reviewsRequested
-                : 0;
+                {tracks.map((track) => {
+                  const completedReviews = track.reviews.filter(
+                    (r) => r.status === "COMPLETED"
+                  ).length;
+                  const totalPurchases =
+                    track.purchases.reduce((sum, p) => sum + p.amount, 0) / 100;
+                  const hasReviews = track.reviewsRequested > 0;
+                  const reviewProgress = hasReviews
+                    ? completedReviews / track.reviewsRequested
+                    : 0;
 
-              return (
-                <TrackCard
-                  key={track.id}
-                  id={track.id}
-                  title={track.title}
-                  artworkUrl={track.artworkUrl}
-                  status={track.status}
-                  hasReviews={hasReviews}
-                  reviewProgress={reviewProgress}
-                  completedReviews={completedReviews}
-                  totalReviews={track.reviewsRequested}
-                  earnings={totalPurchases}
-                />
-              );
-            })}
-          </div>
-        )}
+                  return (
+                    <TrackCard
+                      key={track.id}
+                      id={track.id}
+                      title={track.title}
+                      artworkUrl={track.artworkUrl}
+                      status={track.status}
+                      hasReviews={hasReviews}
+                      reviewProgress={reviewProgress}
+                      completedReviews={completedReviews}
+                      totalReviews={track.reviewsRequested}
+                      earnings={totalPurchases}
+                    />
+                  );
+                })}
+              </div>
+            )
+          }
+          portfolioView={
+            <PortfolioView
+              isPro={isPro}
+              hasData={hasAnalyticsData}
+              {...portfolioData}
+            />
+          }
+        />
       </div>
     </div>
   );
@@ -299,4 +497,54 @@ function EmptyState() {
       </Link>
     </div>
   );
+}
+
+// Helper function to generate trend data grouped by month
+function generateTrendData(tracks: any[]) {
+  const monthMap = new Map<string, { production: number[]; vocals: number[]; originality: number[] }>();
+
+  tracks.forEach((track) => {
+    track.reviews.forEach((review: any) => {
+      const date = new Date(review.createdAt || track.createdAt);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+      if (!monthMap.has(monthKey)) {
+        monthMap.set(monthKey, { production: [], vocals: [], originality: [] });
+      }
+
+      const month = monthMap.get(monthKey)!;
+      if (review.productionScore) month.production.push(review.productionScore);
+      if (review.vocalScore) month.vocals.push(review.vocalScore);
+      if (review.originalityScore) month.originality.push(review.originalityScore);
+    });
+  });
+
+  const trendData = Array.from(monthMap.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([month, scores]) => {
+      const avgProduction = scores.production.length > 0
+        ? scores.production.reduce((a, b) => a + b, 0) / scores.production.length
+        : 0;
+      const avgVocals = scores.vocals.length > 0
+        ? scores.vocals.reduce((a, b) => a + b, 0) / scores.vocals.length
+        : 0;
+      const avgOriginality = scores.originality.length > 0
+        ? scores.originality.reduce((a, b) => a + b, 0) / scores.originality.length
+        : 0;
+      const overall = (avgProduction + avgVocals + avgOriginality) / 3;
+
+      const [year, monthNum] = month.split("-");
+      const date = new Date(parseInt(year), parseInt(monthNum) - 1);
+      const monthLabel = date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+
+      return {
+        month: monthLabel,
+        production: avgProduction,
+        vocals: avgVocals,
+        originality: avgOriginality,
+        overall,
+      };
+    });
+
+  return trendData;
 }

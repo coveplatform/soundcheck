@@ -30,7 +30,7 @@ async function handleReviewCreditsTopup(session: Stripe.Checkout.Session) {
       return;
     }
 
-    await (prisma.artistProfile as any).updateMany({
+    await prisma.artistProfile.updateMany({
       where: { id: artistProfileId },
       data: {
         reviewCredits: {
@@ -105,7 +105,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     }
 
     // Grant 10 review credits for Pro subscribers (both initial and renewal)
-    await (prisma.artistProfile as any).update({
+    await prisma.artistProfile.update({
       where: { id: artistProfile.id },
       data: {
         reviewCredits: {
@@ -350,7 +350,7 @@ async function handleSubscriptionCheckoutComplete(session: Stripe.Checkout.Sessi
       });
 
       // Grant 10 review credits for Pro subscription
-      await (tx.artistProfile as any).update({
+      await tx.artistProfile.update({
         where: { id: artistProfileId },
         data: {
           reviewCredits: {

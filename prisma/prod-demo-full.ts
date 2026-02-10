@@ -408,7 +408,7 @@ async function main() {
         artistName: "Aurora Nights",
         totalTracks: 1,
         totalSpent: 2999,
-        freeReviewCredits: 0,
+        reviewCredits: 0,
         genres: { connect: [{ id: houseGenre.id }, { id: deepHouseGenre.id }] },
       }
     });

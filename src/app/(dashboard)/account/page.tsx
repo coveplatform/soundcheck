@@ -31,7 +31,7 @@ export default async function AccountPage() {
   });
 
   // Get artist profile for credit balance and subscription info
-  const artistProfile = await (prisma.artistProfile as any).findUnique({
+  const artistProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
     select: {
       artistName: true,
@@ -42,17 +42,25 @@ export default async function AccountPage() {
       totalTracks: true,
       reviewCredits: true,
     },
-  } as any);
+  });
 
   const initialGenreIds = (reviewerProfile?.genres ?? []).map((g) => g.id);
   const isReviewer = Boolean(reviewerProfile);
 
   return (
-    <div className="pt-14 sm:pt-16 px-4 sm:px-6 lg:px-12">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-10">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Account</h1>
-          <p className="mt-2 text-sm text-black/40">Profile, credits, and settings</p>
+    <div className="pt-8 pb-24">
+      <div className="max-w-2xl mx-auto px-6 sm:px-8">
+        {/* Header */}
+        <div className="mb-10 pb-6 border-b border-black/10">
+          <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40 mb-2">
+            Settings
+          </p>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black">
+            Account
+          </h1>
+          <p className="text-sm text-black/50 mt-2">
+            Manage your profile, subscription, and preferences
+          </p>
         </div>
 
         <div className="space-y-6">
@@ -68,13 +76,13 @@ export default async function AccountPage() {
             reviewCredits={artistProfile?.reviewCredits ?? 0}
             subscription={
               artistProfile
-                ? ({
+                ? {
                     status: artistProfile.subscriptionStatus || null,
                     tier: artistProfile.subscriptionTier || null,
                     currentPeriodEnd: artistProfile.subscriptionCurrentPeriodEnd || null,
                     canceledAt: artistProfile.subscriptionCanceledAt || null,
                     totalTracks: artistProfile.totalTracks,
-                  } as any)
+                  }
                 : null
             }
           />

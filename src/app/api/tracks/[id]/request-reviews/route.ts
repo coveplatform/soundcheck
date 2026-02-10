@@ -22,23 +22,11 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { emailVerified: true },
-    });
-
-    if (!user?.emailVerified) {
-      return NextResponse.json(
-        { error: "Please verify your email to continue" },
-        { status: 403 }
-      );
-    }
-
     const { id } = await params;
     const body = await request.json();
     const data = requestSchema.parse(body);
 
-    const track = (await (prisma.track as any).findUnique({
+    const track = await prisma.track.findUnique({
       where: { id },
       include: {
         artist: {
@@ -50,7 +38,7 @@ export async function POST(
         },
         reviews: { select: { id: true } },
       },
-    })) as any;
+    });
 
     if (!track) {
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
@@ -60,7 +48,7 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if ((track.status as any) === "CANCELLED") {
+    if (track.status === "CANCELLED") {
       return NextResponse.json(
         { error: "Cancelled tracks cannot be updated" },
         { status: 400 }
@@ -69,7 +57,7 @@ export async function POST(
 
     // Allow requesting more reviews on tracks that are UPLOADED, COMPLETED, or IN_PROGRESS
     const eligibleStatuses = ["UPLOADED", "COMPLETED", "IN_PROGRESS", "QUEUED"];
-    if (!eligibleStatuses.includes(track.status as any)) {
+    if (!eligibleStatuses.includes(track.status)) {
       return NextResponse.json(
         { error: "Track is not eligible for requesting reviews" },
         { status: 400 }
@@ -89,7 +77,7 @@ export async function POST(
     const packageType: PackageType = "PEER";
 
     await prisma.$transaction(async (tx) => {
-      const updatedCredits = await (tx.artistProfile as any).updateMany({
+      const updatedCredits = await tx.artistProfile.updateMany({
         where: {
           id: track.artistId,
           reviewCredits: {

@@ -10,8 +10,7 @@ import {
   Music,
   Upload,
   Headphones,
-  BarChart3,
-  Share2,
+  DollarSign,
   Settings,
   LogOut,
   Coins,
@@ -45,8 +44,7 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
   ];
 
   const proLinks = [
-    { href: "/analytics", label: "Analytics", icon: BarChart3, proOnly: true },
-    { href: "/sales", label: "Sales", icon: Share2, proOnly: true },
+    { href: "/business", label: "Business", icon: DollarSign, proOnly: true },
   ];
 
   const isActive = (href: string) =>
@@ -111,7 +109,7 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
           <div className="my-4 border-t border-black/8" />
 
           <p className="px-4 mb-2 text-[10px] font-mono tracking-widest text-black/35 uppercase">
-            Earn Credits
+            Reviews
           </p>
           <div className="space-y-1">
             {reviewLinks.map((link) => (
@@ -119,13 +117,20 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
             ))}
           </div>
 
-          <div className="my-4 border-t border-black/8" />
+          {proLinks.length > 0 && (
+            <>
+              <div className="my-4 border-t border-black/8" />
 
-          <div className="space-y-1">
-            {proLinks.map((link) => (
-              <NavLink key={link.href} {...link} />
-            ))}
-          </div>
+              <p className="px-4 mb-2 text-[10px] font-mono tracking-widest text-black/35 uppercase">
+                Business
+              </p>
+              <div className="space-y-1">
+                {proLinks.map((link) => (
+                  <NavLink key={link.href} {...link} />
+                ))}
+              </div>
+            </>
+          )}
         </nav>
 
         {/* Credit Balance */}

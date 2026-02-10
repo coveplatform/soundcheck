@@ -21,15 +21,8 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { email: true, emailVerified: true },
+      select: { email: true },
     });
-
-    if (!user?.emailVerified) {
-      return NextResponse.json(
-        { error: "Please verify your email to continue" },
-        { status: 403 }
-      );
-    }
 
     const reviewer = await prisma.listenerProfile.findUnique({
       where: { userId: session.user.id },

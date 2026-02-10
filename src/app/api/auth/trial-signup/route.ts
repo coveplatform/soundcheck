@@ -77,7 +77,7 @@ export async function POST(request: Request) {
         select: { id: true },
       });
 
-      await (tx.artistProfile as any).create({
+      await tx.artistProfile.create({
         data: {
           userId: user.id,
           artistName: normalizedArtistName,

@@ -13,7 +13,7 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
-  password      String?   // For credentials auth
+  password      String? // For credentials auth
   name          String?
   image         String?
   emailVerified DateTime?
@@ -36,9 +36,9 @@ model User {
   accounts        Account[]
   sessions        Session[]
 
-  passwordResetTokens    PasswordResetToken[]
+  passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
-  supportTickets         SupportTicket[]
+  supportTickets          SupportTicket[]
 
   // Affiliate system
   createdAffiliateLinks TrackAffiliateLink[] @relation("CreatedAffiliateLinks")
@@ -82,11 +82,11 @@ model VerificationToken {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  tokenHash String   @unique
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
 
@@ -96,11 +96,11 @@ model PasswordResetToken {
 }
 
 model EmailVerificationToken {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  tokenHash String   @unique
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
 
@@ -125,10 +125,8 @@ model ArtistProfile {
   totalTracks Int @default(0)
   totalSpent  Int @default(0) // in cents
 
-  freeReviewCredits Int @default(1)
-
   // Credit system (peer-to-peer reviews)
-  reviewCredits      Int @default(0) // Current credit balance
+  reviewCredits      Int @default(1) // Current credit balance (new users get 1 free credit)
   totalCreditsEarned Int @default(0) // Lifetime earned
   totalCreditsSpent  Int @default(0) // Lifetime spent
 
@@ -142,21 +140,21 @@ model ArtistProfile {
   reviewGenres Genre[] @relation("ArtistReviewGenres")
 
   // Onboarding
-  hasSeenWelcome       Boolean @default(false)
-  completedOnboarding  Boolean @default(false)
-  hasSeenCreditGuide   Boolean @default(false)
+  hasSeenWelcome      Boolean @default(false)
+  completedOnboarding Boolean @default(false)
+  hasSeenCreditGuide  Boolean @default(false)
 
   // Earnings from track purchases
   pendingBalance Int @default(0) // in cents, available to withdraw
   totalEarnings  Int @default(0) // in cents, lifetime earnings
 
   // Subscription (for unlimited uploads)
-  stripeCustomerId        String?   // Stripe customer ID for subscriptions
-  subscriptionStatus      String?   // active, canceled, past_due, etc.
-  subscriptionId          String?   // Stripe subscription ID
-  subscriptionTier        String?   // pro (for now just one tier)
+  stripeCustomerId             String? // Stripe customer ID for subscriptions
+  subscriptionStatus           String? // active, canceled, past_due, etc.
+  subscriptionId               String? // Stripe subscription ID
+  subscriptionTier             String? // pro (for now just one tier)
   subscriptionCurrentPeriodEnd DateTime? // When current period ends
-  subscriptionCanceledAt  DateTime? // When they canceled (still active until period end)
+  subscriptionCanceledAt       DateTime? // When they canceled (still active until period end)
 
   // Stripe Connect for payouts
   stripeAccountId   String?   @unique
@@ -199,19 +197,19 @@ model ListenerProfile {
 
   country String?
 
-  onboardingQuizScore      Int      @default(0)
-  onboardingQuizPassed     Boolean  @default(false)
+  onboardingQuizScore       Int       @default(0)
+  onboardingQuizPassed      Boolean   @default(false)
   onboardingQuizCompletedAt DateTime?
 
   // Quality flags
-  gemCount       Int     @default(0)
-  flagCount      Int     @default(0)
-  isRestricted   Boolean @default(false)
+  gemCount            Int     @default(0)
+  flagCount           Int     @default(0)
+  isRestricted        Boolean @default(false)
   completedOnboarding Boolean @default(false)
 
   // Daily limits
-  reviewsToday     Int      @default(0)
-  lastReviewDate   DateTime?
+  reviewsToday   Int       @default(0)
+  lastReviewDate DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -219,7 +217,7 @@ model ListenerProfile {
   reviews      Review[]
   queueEntries ReviewQueue[]
   payouts      Payout[]
-  purchases    Purchase[] @relation("PurchasesByReviewer")
+  purchases    Purchase[]    @relation("PurchasesByReviewer")
 
   // Affiliate system
   referralPurchases Purchase[] @relation("ReferralPurchases")
@@ -254,7 +252,7 @@ model Genre {
 // ─────────────────────────────────────────────────────────────
 
 model Track {
-  id       String @id @default(cuid())
+  id       String        @id @default(cuid())
   artistId String
   artist   ArtistProfile @relation(fields: [artistId], references: [id], onDelete: Cascade)
 
@@ -279,12 +277,12 @@ model Track {
   allowPurchase Boolean @default(false) // Artist opt-in to allow reviewers to buy
 
   // Public sharing & sales (NEW - for affiliate/monetization system)
-  trackShareId    String?      @unique // Short ID for public links e.g., `/t/[trackShareId]`
-  sharingEnabled  Boolean      @default(false) // Whether public sharing is enabled
-  sharingMode     SharingMode? // EXPOSURE or SALES
-  salePrice       Int?         // cents (e.g., 500 = $5.00), null if not for sale
-  showReviewsOnPublicPage Boolean @default(true) // Show reviews on public share page
-  publicPlayCount Int @default(0) // Plays from public share page
+  trackShareId            String?      @unique // Short ID for public links e.g., `/t/[trackShareId]`
+  sharingEnabled          Boolean      @default(false) // Whether public sharing is enabled
+  sharingMode             SharingMode? // EXPOSURE or SALES
+  salePrice               Int? // cents (e.g., 500 = $5.00), null if not for sale
+  showReviewsOnPublicPage Boolean      @default(true) // Show reviews on public share page
+  publicPlayCount         Int          @default(0) // Plays from public share page
 
   // Submission status
   status TrackStatus @default(PENDING_PAYMENT)
@@ -311,19 +309,19 @@ model Track {
   lastViewedAt DateTime? // When track was last viewed
 
   // Stem support
-  hasStems Boolean @default(false)
+  hasStems Boolean     @default(false)
   stems    TrackStem[]
 
   // Ableton project support
-  abletonProjectUrl    String? // S3 URL to uploaded project ZIP
-  abletonProjectData   Json?   // Parsed project metadata (tempo, tracks, plugins, etc.)
-  abletonRenderStatus  AbletonRenderStatus? // Status of cloud rendering
+  abletonProjectUrl   String? // S3 URL to uploaded project ZIP
+  abletonProjectData  Json? // Parsed project metadata (tempo, tracks, plugins, etc.)
+  abletonRenderStatus AbletonRenderStatus? // Status of cloud rendering
 
   // Relations
-  payment      Payment?
-  reviews      Review[]
-  queueEntries ReviewQueue[]
-  purchases    Purchase[]
+  payment           Payment?
+  reviews           Review[]
+  queueEntries      ReviewQueue[]
+  purchases         Purchase[]
   externalPurchases ExternalPurchase[]
   affiliateLinks    TrackAffiliateLink[]
 
@@ -334,10 +332,10 @@ model Track {
 }
 
 enum AbletonRenderStatus {
-  PENDING     // Project uploaded, waiting to render
-  RENDERING   // Cloud instance is rendering stems
-  COMPLETED   // Stems rendered and stored
-  FAILED      // Rendering failed
+  PENDING // Project uploaded, waiting to render
+  RENDERING // Cloud instance is rendering stems
+  COMPLETED // Stems rendered and stored
+  FAILED // Rendering failed
 }
 
 enum TrackSource {
@@ -350,23 +348,23 @@ enum TrackSource {
 enum TrackStatus {
   UPLOADED
   PENDING_PAYMENT
-  QUEUED      // Paid, waiting for reviewers
+  QUEUED // Paid, waiting for reviewers
   IN_PROGRESS // Some reviews complete
-  COMPLETED   // All reviews done
+  COMPLETED // All reviews done
   CANCELLED
 }
 
 enum PackageType {
-  STARTER   // 5 reviews, mixed
-  STANDARD  // 10 reviews, verified+
-  PRO       // 10 reviews, pro only
+  STARTER // 5 reviews, mixed
+  STANDARD // 10 reviews, verified+
+  PRO // 10 reviews, pro only
   DEEP_DIVE // 25 reviews, mixed + 3 Pro
-  PEER      // Credit-based peer reviews
+  PEER // Credit-based peer reviews
 }
 
 enum SharingMode {
   EXPOSURE // Free streaming/plays, track engagement
-  SALES    // Paid downloads with revenue split
+  SALES // Paid downloads with revenue split
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -374,18 +372,18 @@ enum SharingMode {
 // ─────────────────────────────────────────────────────────────
 
 model TrackStem {
-  id       String   @id @default(cuid())
-  trackId  String
-  track    Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  id      String @id @default(cuid())
+  trackId String
+  track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
 
   // Storage
-  stemUrl  String // S3 URL or local path
+  stemUrl String // S3 URL or local path
 
   // Metadata
   stemType StemType
-  label    String   // User-provided name (e.g., "Lead Vocals", "Kick Drum")
-  order    Int      // Display order in mixer (0 = first)
-  duration Int?     // Seconds (for validation)
+  label    String // User-provided name (e.g., "Lead Vocals", "Kick Drum")
+  order    Int // Display order in mixer (0 = first)
+  duration Int? // Seconds (for validation)
 
   // Processing metadata (optional, for future features)
   waveformData Json? // Pre-computed waveform peaks
@@ -398,14 +396,14 @@ model TrackStem {
 }
 
 enum StemType {
-  MASTER  // Full mix (always present for stem uploads)
-  DRUMS   // All percussion
-  BASS    // Bass instruments
-  SYNTHS  // Synthesizers, keys
-  VOCALS  // All vocals (lead + backing)
-  MELODY  // Melodic instruments (guitar, piano, etc.)
-  FX      // Effects, atmospheres
-  OTHER   // Custom/other
+  MASTER // Full mix (always present for stem uploads)
+  DRUMS // All percussion
+  BASS // Bass instruments
+  SYNTHS // Synthesizers, keys
+  VOCALS // All vocals (lead + backing)
+  MELODY // Melodic instruments (guitar, piano, etc.)
+  FX // Effects, atmospheres
+  OTHER // Custom/other
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -426,12 +424,12 @@ model Review {
 
   status ReviewStatus @default(ASSIGNED)
 
-  reviewSchemaVersion Int     @default(1)
+  reviewSchemaVersion    Int     @default(1)
   countsTowardCompletion Boolean @default(true)
   countsTowardAnalytics  Boolean @default(true)
 
   // Listen tracking
-  listenDuration Int @default(0) // seconds actually listened
+  listenDuration Int       @default(0) // seconds actually listened
   lastHeartbeat  DateTime?
 
   // Structured feedback
@@ -452,9 +450,9 @@ model Review {
 
   // Qualitative feedback
   bestPart          String?
-  bestPartTimestamp Int?    // seconds
+  bestPartTimestamp Int? // seconds
   weakestPart       String?
-  weakestTimestamp  Int?    // seconds
+  weakestTimestamp  Int? // seconds
   additionalNotes   String?
 
   addressedArtistNote AddressedArtistNote?
@@ -467,9 +465,9 @@ model Review {
   paidAmount Int @default(0) // cents
 
   // Quality tracking
-  artistRating Int?     // 1-5, set by artist
-  isGem        Boolean  @default(false)
-  wasFlagged   Boolean  @default(false)
+  artistRating Int? // 1-5, set by artist
+  isGem        Boolean @default(false)
+  wasFlagged   Boolean @default(false)
   flagReason   String?
 
   // Sharing
@@ -487,7 +485,7 @@ model Review {
 model ReviewTimestamp {
   id       String @id @default(cuid())
   reviewId String
-  review   Review  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 
   seconds Int
   note    String
@@ -499,11 +497,11 @@ model ReviewTimestamp {
 }
 
 enum ReviewStatus {
-  ASSIGNED    // Reviewer assigned, not started
+  ASSIGNED // Reviewer assigned, not started
   IN_PROGRESS // Listening/reviewing
-  COMPLETED   // Submitted
-  EXPIRED     // Timed out, reassigned
-  SKIPPED     // Reviewer skipped
+  COMPLETED // Submitted
+  EXPIRED // Timed out, reassigned
+  SKIPPED // Reviewer skipped
 }
 
 enum AddressedArtistNote {
@@ -542,11 +540,11 @@ model SupportTicket {
 }
 
 model SupportMessage {
-  id       String @id @default(cuid())
+  id       String        @id @default(cuid())
   ticketId String
   ticket   SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
-  authorType  SupportMessageAuthorType
+  authorType   SupportMessageAuthorType
   authorUserId String?
   authorEmail  String?
 
@@ -572,10 +570,10 @@ model Payment {
   trackId String @unique
   track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
 
-  amount           Int    // cents
-  stripeSessionId  String @unique
-  stripePaymentId  String?
-  status           PaymentStatus @default(PENDING)
+  amount          Int // cents
+  stripeSessionId String        @unique
+  stripePaymentId String?
+  status          PaymentStatus @default(PENDING)
 
   createdAt   DateTime  @default(now())
   completedAt DateTime?
@@ -593,7 +591,7 @@ model Payout {
   reviewerId String
   reviewer   ListenerProfile @relation(fields: [reviewerId], references: [id])
 
-  amount Int          // cents
+  amount Int // cents
   method PayoutMethod
   status PayoutStatus
 
@@ -625,7 +623,7 @@ model Purchase {
   reviewerId String
   reviewer   ListenerProfile @relation("PurchasesByReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
 
-  amount    Int      // cents (50 = $0.50)
+  amount    Int // cents (50 = $0.50)
   createdAt DateTime @default(now())
 
   // Referral tracking for affiliate commission
@@ -651,10 +649,10 @@ model ExternalPurchase {
   buyerName  String?
 
   // Payment via Stripe
-  amount                 Int     // cents (full sale price, e.g., 500 for $5)
-  stripePaymentIntentId  String  @unique
+  amount                  Int // cents (full sale price, e.g., 500 for $5)
+  stripePaymentIntentId   String                 @unique
   stripeCheckoutSessionId String?
-  status                 ExternalPurchaseStatus @default(PENDING)
+  status                  ExternalPurchaseStatus @default(PENDING)
 
   // Revenue split
   platformFee         Int // cents kept by platform (e.g., 20% = 100¢)
@@ -682,10 +680,10 @@ model ExternalPurchase {
 }
 
 enum ExternalPurchaseStatus {
-  PENDING   // Checkout created, not paid
+  PENDING // Checkout created, not paid
   COMPLETED // Payment successful
-  FAILED    // Payment failed
-  REFUNDED  // Purchase refunded
+  FAILED // Payment failed
+  REFUNDED // Purchase refunded
 }
 
 // Track affiliate link management for campaigns
@@ -722,9 +720,9 @@ model TrackAffiliateLink {
 // ─────────────────────────────────────────────────────────────
 
 model ReviewQueue {
-  id        String @id @default(cuid())
-  trackId   String
-  track     Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  id         String          @id @default(cuid())
+  trackId    String
+  track      Track           @relation(fields: [trackId], references: [id], onDelete: Cascade)
   reviewerId String
   reviewer   ListenerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
 
@@ -764,12 +762,12 @@ model StripeWebhookEvent {
 
 // Lead capture for users who aren't ready to submit
 model LeadCapture {
-  id        String   @id @default(cuid())
-  email     String
+  id         String  @id @default(cuid())
+  email      String
   artistName String?
-  source    String   @default("get-feedback") // where they signed up
-  reminded  Boolean  @default(false)
-  converted Boolean  @default(false) // did they come back and submit?
+  source     String  @default("get-feedback") // where they signed up
+  reminded   Boolean @default(false)
+  converted  Boolean @default(false) // did they come back and submit?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

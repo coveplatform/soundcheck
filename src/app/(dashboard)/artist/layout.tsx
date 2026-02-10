@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/dashboard/sidebar";
-import { VerifyEmailBanner } from "@/components/ui/verify-email-banner";
 import { ArtistLayoutClient } from "@/components/dashboard/artist-layout-client";
 
 export default async function ArtistLayout({
@@ -17,16 +16,10 @@ export default async function ArtistLayout({
     redirect("/login");
   }
 
-  // Fetch user for email verification
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { emailVerified: true },
-  });
-
   // Fetch artist profile for sidebar
   let artistProfile: any = null;
   try {
-    artistProfile = await (prisma.artistProfile as any).findUnique({
+    artistProfile = await prisma.artistProfile.findUnique({
       where: { userId: session.user.id },
       select: {
         id: true,
@@ -37,7 +30,7 @@ export default async function ArtistLayout({
     });
   } catch {
     // Fallback without reviewCredits if column doesn't exist yet
-    artistProfile = await (prisma.artistProfile as any).findUnique({
+    artistProfile = await prisma.artistProfile.findUnique({
       where: { userId: session.user.id },
       select: {
         id: true,
@@ -58,7 +51,7 @@ export default async function ArtistLayout({
   // Count pending peer reviews
   let pendingReviews = 0;
   try {
-    pendingReviews = await (prisma.review as any).count({
+    pendingReviews = await prisma.review.count({
       where: {
         peerReviewerArtistId: artistProfile.id,
         status: { in: ["ASSIGNED", "IN_PROGRESS"] },
@@ -80,12 +73,6 @@ export default async function ArtistLayout({
 
         {/* Main content with sidebar offset */}
         <div className="md:pl-64">
-          {!user?.emailVerified && (
-            <div className="pt-6 px-6 sm:px-8">
-              <VerifyEmailBanner />
-            </div>
-          )}
-
           <main className="pb-24 md:pb-8">
             {children}
           </main>

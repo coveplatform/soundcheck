@@ -58,17 +58,10 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { emailVerified: true, artistProfile: { select: { id: true } } },
+      select: { artistProfile: { select: { id: true } } },
     });
 
-    if (!user?.emailVerified) {
-      return NextResponse.json(
-        { error: "Please verify your email to upload stems" },
-        { status: 403 }
-      );
-    }
-
-    if (!user.artistProfile) {
+    if (!user?.artistProfile) {
       return NextResponse.json(
         { error: "Artist profile required" },
         { status: 403 }

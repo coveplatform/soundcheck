@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { GenreSelector } from "@/components/ui/genre-selector";
 
 interface Genre {
@@ -26,6 +25,7 @@ export function ReviewerGenrePreferences({
   const [isLoadingGenres, setIsLoadingGenres] = useState(true);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     async function fetchGenres() {
@@ -94,48 +94,91 @@ export function ReviewerGenrePreferences({
     JSON.stringify([...selectedGenres].sort()) !==
     JSON.stringify([...initialGenreIds].sort());
 
+  const selectedGenreNames = genres
+    .filter((g) => selectedGenres.includes(g.id))
+    .map((g) => g.name);
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Genre Preferences</CardTitle>
-        <CardDescription>
-          Select 3-5 genres you want to listen to. You&apos;ll be matched with tracks in these genres.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="bg-white border-2 border-neutral-200 rounded-2xl shadow-sm overflow-hidden">
+      <div className="border-b border-neutral-200 px-6 py-4">
+        <h3 className="text-lg font-bold text-neutral-950">Genre Preferences</h3>
+        <p className="text-sm text-neutral-600 mt-1">
+          {isEditing
+            ? "Select 3-5 genres you want to listen to. You'll be matched with tracks in these genres."
+            : "Genres you'll review"}
+        </p>
+      </div>
+      <div className="p-6 space-y-4">
         {error && (
-          <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
+          <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium rounded-lg">
             {error}
           </div>
         )}
         {saved && (
-          <div className="bg-lime-50 border-2 border-lime-500 text-lime-800 text-sm p-3 font-medium">
+          <div className="bg-emerald-50 border-2 border-emerald-200 text-emerald-800 text-sm p-3 font-medium rounded-lg">
             Genre preferences saved
           </div>
         )}
 
         {isLoadingGenres ? (
           <div className="text-sm text-neutral-600">Loading genres...</div>
-        ) : (
-          <GenreSelector
-            genres={genres}
-            selectedIds={selectedGenres}
-            onToggle={toggleGenre}
-            minSelections={3}
-            maxSelections={5}
-            variant="reviewer"
-          />
-        )}
+        ) : isEditing ? (
+          <>
+            <div className="max-w-xl">
+              <GenreSelector
+                genres={genres}
+                selectedIds={selectedGenres}
+                onToggle={toggleGenre}
+                minSelections={3}
+                maxSelections={5}
+                variant="reviewer"
+              />
+            </div>
 
-        <Button
-          variant="primary"
-          onClick={handleSave}
-          isLoading={isLoading}
-          disabled={!hasChanges || selectedGenres.length < 3}
-        >
-          Save genre preferences
-        </Button>
-      </CardContent>
-    </Card>
+            <div className="flex gap-3">
+              <Button
+                variant="primary"
+                onClick={async () => {
+                  await handleSave();
+                  setIsEditing(false);
+                }}
+                isLoading={isLoading}
+                disabled={!hasChanges || selectedGenres.length < 3}
+              >
+                Save genre preferences
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSelectedGenres(initialGenreIds);
+                  setIsEditing(false);
+                  setError("");
+                }}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-2">
+              {selectedGenreNames.map((name) => (
+                <span
+                  key={name}
+                  className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
+
+            <Button variant="outline" onClick={() => setIsEditing(true)}>
+              Change genres
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
   );
 }

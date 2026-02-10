@@ -19,18 +19,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { emailVerified: true },
-    });
-
-    if (!user?.emailVerified) {
-      return NextResponse.json(
-        { error: "Please verify your email to upload tracks" },
-        { status: 403 }
-      );
-    }
-
     const formData = await request.formData();
     const file = formData.get("file");
 

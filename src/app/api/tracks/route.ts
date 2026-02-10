@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { TrackStatus, AbletonRenderStatus } from "@prisma/client";
 import { z } from "zod";
 import { detectSource, PACKAGES, PackageType } from "@/lib/metadata";
 
@@ -30,18 +31,6 @@ export async function POST(request: Request) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { emailVerified: true },
-    });
-
-    if (!user?.emailVerified) {
-      return NextResponse.json(
-        { error: "Please verify your email to submit a track" },
-        { status: 403 }
-      );
     }
 
     // Get artist profile
@@ -122,18 +111,18 @@ export async function POST(request: Request) {
       packageType,
       reviewsRequested: shouldRequestReviews ? reviewsRequested : 0,
       creditsSpent: isPeerPackage && shouldRequestReviews ? reviewsRequested : 0,
-      status: shouldRequestReviews ? undefined : ("UPLOADED" as any),
+      status: shouldRequestReviews ? undefined : TrackStatus.UPLOADED,
       // Only allow purchases for uploaded tracks AND Pro subscribers
       allowPurchase: sourceType === "UPLOAD" && isSubscribed ? (data.allowPurchase ?? false) : false,
       // Ableton project data
       abletonProjectUrl: data.abletonProjectUrl,
       abletonProjectData: data.abletonProjectData,
       // Auto-trigger render if Ableton project is uploaded
-      abletonRenderStatus: data.abletonProjectUrl ? "PENDING" : data.abletonRenderStatus,
+      abletonRenderStatus: data.abletonProjectUrl ? AbletonRenderStatus.PENDING : data.abletonRenderStatus,
       genres: {
         connect: data.genreIds.map((id) => ({ id })),
       },
-    } as any;
+    };
 
     let track;
     try {
@@ -146,7 +135,8 @@ export async function POST(request: Request) {
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       if (message.includes("Unknown argument `isPublic`")) {
-        const { isPublic: _ignored, ...fallbackData } = createData as Record<string, unknown>;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { isPublic: _ignored, ...fallbackData } = createData;
         track = await prisma.track.create({
           data: fallbackData as any,
           include: {

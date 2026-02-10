@@ -17,16 +17,6 @@ export default async function EarningsPage() {
     redirect("/login");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { emailVerified: true, email: true },
-  });
-
-  if (!user?.emailVerified) {
-    const email = user?.email ? `?email=${encodeURIComponent(user.email)}` : "";
-    redirect(`/verify-email${email}`);
-  }
-
   const reviewerProfile = await prisma.listenerProfile.findUnique({
     where: { userId: session.user.id },
     include: {

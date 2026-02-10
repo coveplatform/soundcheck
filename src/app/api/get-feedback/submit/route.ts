@@ -55,8 +55,7 @@ export async function POST(request: Request) {
 
     const markLeadConverted = async (normalizedEmail: string) => {
       try {
-        const leadCapture = (prisma as any).leadCapture as any;
-        await leadCapture.updateMany({
+        await prisma.leadCapture.updateMany({
           where: { email: normalizedEmail, source: "get-feedback" },
           data: { converted: true },
         });
@@ -80,7 +79,7 @@ export async function POST(request: Request) {
         // Create profile with genres from the track
         // Use provided artistName, fall back to user name, then "Artist"
         const profileName = data.artistName?.trim() || session.user.name || "Artist";
-        artistProfile = await (prisma.artistProfile as any).create({
+        artistProfile = await prisma.artistProfile.create({
           data: {
             userId: session.user.id,
             artistName: profileName,
@@ -98,7 +97,7 @@ export async function POST(request: Request) {
         });
       }
 
-      const artistProfileId = (artistProfile as any)?.id as string | undefined;
+      const artistProfileId = artistProfile?.id;
       if (!artistProfileId) {
         return NextResponse.json({ error: "Artist profile not found" }, { status: 404 });
       }
@@ -134,7 +133,7 @@ export async function POST(request: Request) {
       if (isPeerPackage) {
         // Default to 1 credit if not specified
         const creditsToSpend = 1;
-        const currentCredits = (artistProfile as any).reviewCredits ?? 0;
+        const currentCredits = artistProfile.reviewCredits ?? 0;
 
         if (currentCredits < creditsToSpend) {
           return NextResponse.json(
@@ -269,7 +268,7 @@ export async function POST(request: Request) {
 
         if (!artistProfile) {
           const profileName = data.artistName.trim() || existingUser.name || "Artist";
-          artistProfile = await (prisma.artistProfile as any).create({
+          artistProfile = await prisma.artistProfile.create({
             data: {
               userId: existingUser.id,
               artistName: profileName,
@@ -286,7 +285,7 @@ export async function POST(request: Request) {
           });
         }
 
-        const artistProfileId = (artistProfile as any)?.id as string | undefined;
+        const artistProfileId = artistProfile?.id;
         if (!artistProfileId) {
           return NextResponse.json({ error: "Artist profile not found" }, { status: 404 });
         }
@@ -389,7 +388,7 @@ export async function POST(request: Request) {
         });
 
         // 2. Create artist profile
-        const artistProfile = await (tx.artistProfile as any).create({
+        const artistProfile = await tx.artistProfile.create({
           data: {
             userId: user.id,
             artistName: data.artistName,

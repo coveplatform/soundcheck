@@ -61,7 +61,23 @@
       "Bash(echo:*)",
       "Bash(diff:*)",
       "Bash(git push:*)",
-      "Bash(npm run db:generate:*)"
+      "Bash(npm run db:generate:*)",
+      "Bash(npm run db:studio:*)",
+      "Bash(node update-pro.js:*)",
+      "Bash(python3:*)",
+      "Bash(while read file)",
+      "Bash(do)",
+      "Bash(done)",
+      "Bash(npm test:*)",
+      "Bash(npx playwright:*)",
+      "Bash(npm run test:e2e:*)",
+      "Bash(npx prettier:*)",
+      "Bash(xargs:*)",
+      "Bash(curl:*)",
+      "Bash(netstat:*)",
+      "Bash(start /B npm run dev:*)",
+      "Bash(npx concurrently:*)",
+      "Bash(tasklist:*)"
     ]
   }
 }

@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
     // Create new profile
     // Note: hasSeenWelcome will use database default (false) if the column exists
-    const profile = await (prisma.artistProfile as any).create({
+    const profile = await prisma.artistProfile.create({
       data: {
         userId: session.user.id,
         artistName,
@@ -106,7 +106,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const profile = await (prisma.artistProfile as any).findUnique({
+    const profile = await prisma.artistProfile.findUnique({
       where: { userId: session.user.id },
       include: {
         genres: true,
