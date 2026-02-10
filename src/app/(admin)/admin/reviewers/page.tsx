@@ -26,7 +26,7 @@ export default async function AdminReviewersPage({
     orderBy: { createdAt: "desc" },
     take: 50,
     include: {
-      user: { select: { email: true, createdAt: true } },
+      User: { select: { email: true, createdAt: true } },
     },
   });
 
@@ -79,7 +79,7 @@ export default async function AdminReviewersPage({
             <tbody className="divide-y divide-neutral-100">
               {reviewers.map((r) => (
                 <tr key={r.id} className="text-neutral-700">
-                  <td className="px-4 py-3">{r.user.email}</td>
+                  <td className="px-4 py-3">{r.User.email}</td>
                   <td className="px-4 py-3">{r.tier}</td>
                   <td className="px-4 py-3">{r.totalReviews}</td>
                   <td className="px-4 py-3">{r.averageRating.toFixed(2)}</td>
