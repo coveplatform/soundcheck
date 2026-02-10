@@ -48,9 +48,9 @@ export default async function ArtistReviewersPage({
       ...(q
         ? {
             OR: [
-              { user: { name: { contains: q, mode: "insensitive" } } },
+              { User: { name: { contains: q, mode: "insensitive" } } },
               {
-                genres: {
+                Genre: {
                   some: {
                     name: { contains: q, mode: "insensitive" },
                   },
@@ -61,8 +61,8 @@ export default async function ArtistReviewersPage({
         : {}),
     },
     include: {
-      user: { select: { name: true } },
-      genres: { select: { id: true, name: true } },
+      User: { select: { name: true } },
+      Genre: { select: { id: true, name: true } },
       _count: { select: { Review: true } },
     },
     orderBy: [{ lastReviewDate: "desc" }, { totalReviews: "desc" }, { averageRating: "desc" }],
@@ -126,11 +126,11 @@ export default async function ArtistReviewersPage({
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <span className="h-10 w-10 rounded-xl bg-purple-100 flex items-center justify-center text-sm font-bold text-purple-700 flex-shrink-0">
-                      {getInitial(r.user.name ?? "Reviewer")}
+                      {getInitial(r.User.name ?? "Reviewer")}
                     </span>
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-black truncate">
-                        {getFirstName(r.user.name ?? "Reviewer")}
+                        {getFirstName(r.User.name ?? "Reviewer")}
                       </p>
                       <div className="flex items-center gap-2 text-xs text-black/40">
                         <span>{r.tier}</span>
@@ -142,7 +142,7 @@ export default async function ArtistReviewersPage({
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1 flex-shrink-0 max-w-[200px] justify-end">
-                    {r.genres.slice(0, 2).map((g) => (
+                    {r.Genre.slice(0, 2).map((g) => (
                       <span
                         key={g.id}
                         className="px-2 py-0.5 rounded-full bg-black/5 text-black/50 text-xs"
@@ -150,8 +150,8 @@ export default async function ArtistReviewersPage({
                         {g.name}
                       </span>
                     ))}
-                    {r.genres.length > 2 && (
-                      <span className="text-xs text-black/30">+{r.genres.length - 2}</span>
+                    {r.Genre.length > 2 && (
+                      <span className="text-xs text-black/30">+{r.Genre.length - 2}</span>
                     )}
                   </div>
                 </Link>
