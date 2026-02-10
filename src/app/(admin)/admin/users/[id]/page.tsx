@@ -29,7 +29,7 @@ export default async function AdminUserDetailPage({
           Track: { select: { id: true } },
         },
       },
-      reviewerProfile: {
+      ReviewerProfile: {
         select: {
           id: true,
           tier: true,
@@ -174,7 +174,7 @@ export default async function AdminUserDetailPage({
 
       {user.ArtistProfile ? (
         <div className="text-sm text-neutral-500">
-          <span className="font-medium text-neutral-800">Track count:</span> {user.ArtistProfile.tracks.length}
+          <span className="font-medium text-neutral-800">Track count:</span> {user.ArtistProfile.Track.length}
         </div>
       ) : null}
     </div>
