@@ -96,27 +96,46 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className=" overflow-visible bg-[#faf8f5]">
-        <div className="max-w-3xl mx-auto px-4 py-12 sm:py-16 text-center relative">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-neutral-950 leading-[1.05]">
-            Free feedback from <span className="text-purple-600">fellow artists</span>
+      <section className="overflow-visible bg-gradient-to-b from-purple-50 to-[#faf8f5]">
+        <div className="max-w-4xl mx-auto px-4 py-16 sm:py-24 text-center relative">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 bg-purple-100 border border-purple-200 rounded-full px-4 py-2 mb-8">
+            <div className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
+            <span className="text-sm font-semibold text-purple-700">1,200+ artists giving each other feedback right now</span>
+          </div>
+
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-neutral-950 leading-[1.05]">
+            Get real feedback.<br />
+            <span className="text-purple-600">From real artists.</span>
           </h1>
 
-          <p className="mt-6 text-neutral-700 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
-            Upload your track, review others in your genre, and earn credits for feedback on your own music. No pay walls, no gatekeepers -- just artists helping artists grow.
+          <p className="mt-8 text-neutral-700 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto font-medium">
+            Upload your track and get detailed reviews from fellow producers in your genre. No bots, no randos—just artists who actually know what they're talking about.
           </p>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-3">
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/signup">
               <Button
                 size="lg"
-                className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+                className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-lg px-8 py-6 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] transition-all duration-150 ease-out"
               >
-                Get started free <ArrowRight className="ml-2 h-4 w-4" />
+                Start for free <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <span className="text-sm text-neutral-500">Earn credits by reviewing -- spend them on feedback</span>
+            <Link href="#examples">
+              <Button
+                variant="outline"
+                size="lg"
+                className="bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-50 font-bold text-lg px-8 py-6"
+              >
+                See examples
+              </Button>
+            </Link>
           </div>
+
+          <p className="mt-6 text-sm text-neutral-500">
+            Start with <span className="font-bold text-purple-600">1 free credit</span> • Earn more by reviewing • No credit card required
+          </p>
         </div>
       </section>
 
@@ -140,214 +159,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-12 sm:py-16 bg-[#faf8f5]">
-        <div className="max-w-5xl mx-auto px-4">
-          <AnimatedSection className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">How it works</h2>
-            <p className="mt-3 text-neutral-600 max-w-2xl mx-auto">
-              A simple credit system that keeps feedback flowing. Give a review, get a review.
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection>
-            <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
-              {/* Step 1 */}
-              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
-                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Upload className="h-7 w-7 text-purple-600" />
-                </div>
-                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 1</div>
-                <h3 className="text-lg font-bold mb-2">Upload your track</h3>
-                <p className="text-sm text-neutral-600">
-                  Drop in your mix or stems. We match it with artists who know your genre.
-                </p>
-              </div>
-
-              {/* Step 2 */}
-              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
-                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Headphones className="h-7 w-7 text-purple-600" />
-                </div>
-                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 2</div>
-                <h3 className="text-lg font-bold mb-2">Review others</h3>
-                <p className="text-sm text-neutral-600">
-                  Listen to tracks in your genre and give honest, structured feedback. Each review earns you a credit.
-                </p>
-              </div>
-
-              {/* Step 3 */}
-              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
-                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <MessageSquare className="h-7 w-7 text-purple-600" />
-                </div>
-                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 3</div>
-                <h3 className="text-lg font-bold mb-2">Get feedback</h3>
-                <p className="text-sm text-neutral-600">
-                  Spend credits to get reviews on your own tracks. The more you give, the more you get.
-                </p>
-              </div>
-            </div>
-
-            {/* Credit cycle reminder */}
-            <div className="mt-8 text-center">
-              <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-full px-5 py-2.5">
-                <Music className="h-4 w-4 text-purple-600" />
-                <span className="text-sm font-semibold text-purple-700">Give a review, earn a credit. Spend a credit, get a review.</span>
-              </div>
-            </div>
-          </AnimatedSection>
-        </div>
-      </section>
-
-      {/* Live Activity */}
-      <section className="py-10  overflow-hidden bg-[#faf8f5]">
-        <div className="mb-6">
-          <OnlineListeners />
-        </div>
-        <ActivityFeed />
-      </section>
-
-      {/* Track Report */}
-      <section id="examples" className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
-        <div className="max-w-6xl mx-auto px-4">
-          <AnimatedSection className="max-w-2xl mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">See what&apos;s working</h2>
-            <p className="mt-3 text-neutral-600">
-              Get multiple reviews on your track. We show you patterns. When 4 out of 5 people say the same thing, that&apos;s not taste -- that&apos;s signal.
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection className="relative">
-            {/* Decorative doodles */}
-            <Sparkle className="pointer-events-none absolute top-6 -right-10 sm:-right-28 lg:-right-44 w-14 h-14 sm:w-20 sm:h-20 text-orange-300 opacity-90 -rotate-12" />
-            <img
-              src="/doodles/report-doodle.png"
-              alt=""
-              className="pointer-events-none absolute top-56 -left-24 sm:-left-40 lg:-left-56 w-48 h-48 sm:w-56 sm:h-56 rotate-[-8deg] hidden lg:block"
-            />
-            <Squiggle className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-40 w-16 h-16 sm:w-28 sm:h-28 text-orange-300 opacity-70 rotate-12" />
-            <Dots className="pointer-events-none absolute -bottom-10 right-2 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 text-purple-400 opacity-80 rotate-6" />
-
-            <TrackReportDemo />
-          </AnimatedSection>
-        </div>
-      </section>
-
-      {/* Artist Earnings */}
-      <section className="pb-12 sm:pb-16 pt-0 bg-neutral-900 text-neutral-50 overflow-visible font-sans">
-        <div className="w-full overflow-hidden bg-purple-400/10">
-          <div className="h-12 flex items-center">
-            <div
-              className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-purple-300 text-3xl font-bold leading-none`}
-            >
-              {Array.from({ length: 60 }).map((_, i) => (
-                <span key={i}>new</span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="max-w-5xl mx-auto px-4 pt-6 sm:pt-8">
-          <div className="grid gap-8 md:gap-10 md:grid-cols-2 lg:grid-cols-[1fr_380px] items-center">
-            <AnimatedSection className="is-visible max-w-xl text-center md:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold">PRO artists sell their music</h2>
-              <p className="mt-3 text-neutral-300">
-                Every track gets a public page. Share it anywhere. When listeners buy through your link, you keep 85% of the sale. Upgrade to PRO to unlock selling and get your music discovered by the right people.
-              </p>
-
-              <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-                <Link href="/signup">
-                  <Button
-                    size="lg"
-                    className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
-                  >
-                    Get started free <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link href="#pricing">
-                  <Button variant="outline" size="lg" className="bg-white/10 text-neutral-50 border-white/20 hover:bg-white/15">
-                    See pricing
-                  </Button>
-                </Link>
-              </div>
-            </AnimatedSection>
-
-            <AnimatedSection className="is-visible w-full max-w-sm mx-auto md:mx-0 md:max-w-none">
-              <div className="bg-neutral-800 border-2 border-neutral-700 rounded-2xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
-                {/* Header with balance */}
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 px-3 py-2 border-b-2 border-black/20">
-                  <div className="text-[9px] font-bold text-white/80 uppercase tracking-wider">Your Balance</div>
-                  <div className="text-lg font-extrabold text-white">$12.50</div>
-                </div>
-
-                {/* Recent sales list */}
-                <div className="p-3 space-y-1.5">
-                  <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider px-1 mb-2">Recent Sales</div>
-
-                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
-                    <img src="/activity-artwork/1.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] font-semibold text-white truncate">Neon Pulse</div>
-                      <div className="text-[11px] text-neutral-500">2 min ago</div>
-                    </div>
-                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
-                    <img src="/activity-artwork/5.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] font-semibold text-white truncate">Late Night Taxi</div>
-                      <div className="text-[11px] text-neutral-500">via @lofi_curator · 8 min ago</div>
-                    </div>
-                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
-                    <img src="/activity-artwork/9.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] font-semibold text-white truncate">Golden Hour</div>
-                      <div className="text-[11px] text-neutral-500">15 min ago</div>
-                    </div>
-                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="px-4 py-2.5 bg-black/20 border-t border-white/5 text-center">
-                  <span className="text-[11px] text-neutral-400">PRO feature: Keep <span className="text-blue-400 font-semibold">85%</span> of every sale</span>
-                </div>
-              </div>
-            </AnimatedSection>
-          </div>
-        </div>
-      </section>
-
-      {/* Your Music Has a Home */}
-      <section className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
-        <div className="max-w-5xl mx-auto px-4">
-          <AnimatedSection className="max-w-2xl mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">Your music has a home</h2>
-            <p className="mt-3 text-neutral-600">
-              Every track you upload gets its own page. Listeners can discover it, listen, and if they like it, buy it and share it with their audience.
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection className="relative">
-            {/* Decorative doodles */}
-            <Sparkle className="pointer-events-none absolute -top-10 -left-10 sm:-left-24 lg:-left-40 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-90 rotate-12" />
-            <Star className="pointer-events-none absolute top-6 -left-6 sm:-left-16 lg:-left-24 w-12 h-12 sm:w-14 sm:h-14 text-purple-400 opacity-90 -rotate-12" />
-            <Squiggle className="pointer-events-none absolute -bottom-10 -right-10 sm:-right-28 lg:-right-44 w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 text-orange-300 opacity-60 rotate-6" />
-
-            <BrowserMockup url="mixreflect.com/track/midnight-drive">
-              <TrackPageMockup />
-            </BrowserMockup>
-          </AnimatedSection>
-        </div>
-      </section>
-
-      {/* Stem Upload Feature */}
-      <section className="pb-12 sm:pb-16 pt-0 bg-neutral-900 text-neutral-50 overflow-visible">
+      {/* Stem Upload Feature - MOVED UP */}
+      <section className="pb-12 sm:pb-16 pt-8 bg-neutral-900 text-neutral-50 overflow-visible">
         <div className="w-full overflow-hidden bg-purple-400/10">
           <div className="h-12 flex items-center">
             <div
@@ -509,6 +322,214 @@ export default function Home() {
           </AnimatedSection>
         </div>
       </section>
+
+      {/* Track Report - "See what's working" - MOVED UP */}
+      <section id="examples" className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
+        <div className="max-w-6xl mx-auto px-4">
+          <AnimatedSection className="max-w-2xl mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold">See what&apos;s working</h2>
+            <p className="mt-3 text-neutral-600">
+              Get multiple reviews on your track. We show you patterns. When 4 out of 5 people say the same thing, that&apos;s not taste -- that&apos;s signal.
+            </p>
+          </AnimatedSection>
+
+          <AnimatedSection className="relative">
+            {/* Decorative doodles */}
+            <Sparkle className="pointer-events-none absolute top-6 -right-10 sm:-right-28 lg:-right-44 w-14 h-14 sm:w-20 sm:h-20 text-orange-300 opacity-90 -rotate-12" />
+            <img
+              src="/doodles/report-doodle.png"
+              alt=""
+              className="pointer-events-none absolute top-56 -left-24 sm:-left-40 lg:-left-56 w-48 h-48 sm:w-56 sm:h-56 rotate-[-8deg] hidden lg:block"
+            />
+            <Squiggle className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-40 w-16 h-16 sm:w-28 sm:h-28 text-orange-300 opacity-70 rotate-12" />
+            <Dots className="pointer-events-none absolute -bottom-10 right-2 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 text-purple-400 opacity-80 rotate-6" />
+
+            <TrackReportDemo />
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* Live Activity - STAYS HERE */}
+      <section className="py-10  overflow-hidden bg-[#faf8f5]">
+        <div className="mb-6">
+          <OnlineListeners />
+        </div>
+        <ActivityFeed />
+      </section>
+
+      {/* How It Works - MOVED DOWN */}
+      <section className="py-12 sm:py-16 bg-[#faf8f5]">
+        <div className="max-w-5xl mx-auto px-4">
+          <AnimatedSection className="text-center mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold">How it works</h2>
+            <p className="mt-3 text-neutral-600 max-w-2xl mx-auto">
+              A simple credit system that keeps feedback flowing. Give a review, get a review.
+            </p>
+          </AnimatedSection>
+
+          <AnimatedSection>
+            <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
+              {/* Step 1 */}
+              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
+                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Upload className="h-7 w-7 text-purple-600" />
+                </div>
+                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 1</div>
+                <h3 className="text-lg font-bold mb-2">Upload your track</h3>
+                <p className="text-sm text-neutral-600">
+                  Drop in your mix or stems. We match it with artists who know your genre.
+                </p>
+              </div>
+
+              {/* Step 2 */}
+              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
+                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Headphones className="h-7 w-7 text-purple-600" />
+                </div>
+                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 2</div>
+                <h3 className="text-lg font-bold mb-2">Review others</h3>
+                <p className="text-sm text-neutral-600">
+                  Listen to tracks in your genre and give honest, structured feedback. Each review earns you a credit.
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
+                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="h-7 w-7 text-purple-600" />
+                </div>
+                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 3</div>
+                <h3 className="text-lg font-bold mb-2">Get feedback</h3>
+                <p className="text-sm text-neutral-600">
+                  Spend credits to get reviews on your own tracks. The more you give, the more you get.
+                </p>
+              </div>
+            </div>
+
+            {/* Credit cycle reminder */}
+            <div className="mt-8 text-center">
+              <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-full px-5 py-2.5">
+                <Music className="h-4 w-4 text-purple-600" />
+                <span className="text-sm font-semibold text-purple-700">Give a review, earn a credit. Spend a credit, get a review.</span>
+              </div>
+            </div>
+          </AnimatedSection>
+        </div>
+      </section>
+
+
+      {/* Artist Earnings */}
+      <section className="pb-12 sm:pb-16 pt-0 bg-neutral-900 text-neutral-50 overflow-visible font-sans">
+        <div className="w-full overflow-hidden bg-purple-400/10">
+          <div className="h-12 flex items-center">
+            <div
+              className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-purple-300 text-3xl font-bold leading-none`}
+            >
+              {Array.from({ length: 60 }).map((_, i) => (
+                <span key={i}>new</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-5xl mx-auto px-4 pt-6 sm:pt-8">
+          <div className="grid gap-8 md:gap-10 md:grid-cols-2 lg:grid-cols-[1fr_380px] items-center">
+            <AnimatedSection className="is-visible max-w-xl text-center md:text-left">
+              <h2 className="text-2xl sm:text-3xl font-bold">PRO artists sell their music</h2>
+              <p className="mt-3 text-neutral-300">
+                Every track gets a public page. Share it anywhere. When listeners buy through your link, you keep 85% of the sale. Upgrade to PRO to unlock selling and get your music discovered by the right people.
+              </p>
+
+              <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+                <Link href="/signup">
+                  <Button
+                    size="lg"
+                    className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+                  >
+                    Get started free <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="#pricing">
+                  <Button variant="outline" size="lg" className="bg-white/10 text-neutral-50 border-white/20 hover:bg-white/15">
+                    See pricing
+                  </Button>
+                </Link>
+              </div>
+            </AnimatedSection>
+
+            <AnimatedSection className="is-visible w-full max-w-sm mx-auto md:mx-0 md:max-w-none">
+              <div className="bg-neutral-800 border-2 border-neutral-700 rounded-2xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
+                {/* Header with balance */}
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 px-3 py-2 border-b-2 border-black/20">
+                  <div className="text-[9px] font-bold text-white/80 uppercase tracking-wider">Your Balance</div>
+                  <div className="text-lg font-extrabold text-white">$12.50</div>
+                </div>
+
+                {/* Recent sales list */}
+                <div className="p-3 space-y-1.5">
+                  <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider px-1 mb-2">Recent Sales</div>
+
+                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
+                    <img src="/activity-artwork/1.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] font-semibold text-white truncate">Neon Pulse</div>
+                      <div className="text-[11px] text-neutral-500">2 min ago</div>
+                    </div>
+                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
+                    <img src="/activity-artwork/5.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] font-semibold text-white truncate">Late Night Taxi</div>
+                      <div className="text-[11px] text-neutral-500">via @lofi_curator · 8 min ago</div>
+                    </div>
+                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
+                    <img src="/activity-artwork/9.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] font-semibold text-white truncate">Golden Hour</div>
+                      <div className="text-[11px] text-neutral-500">15 min ago</div>
+                    </div>
+                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="px-4 py-2.5 bg-black/20 border-t border-white/5 text-center">
+                  <span className="text-[11px] text-neutral-400">PRO feature: Keep <span className="text-blue-400 font-semibold">85%</span> of every sale</span>
+                </div>
+              </div>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
+      {/* Your Music Has a Home */}
+      <section className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
+        <div className="max-w-5xl mx-auto px-4">
+          <AnimatedSection className="max-w-2xl mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold">Your music has a home</h2>
+            <p className="mt-3 text-neutral-600">
+              Every track you upload gets its own page. Listeners can discover it, listen, and if they like it, buy it and share it with their audience.
+            </p>
+          </AnimatedSection>
+
+          <AnimatedSection className="relative">
+            {/* Decorative doodles */}
+            <Sparkle className="pointer-events-none absolute -top-10 -left-10 sm:-left-24 lg:-left-40 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-90 rotate-12" />
+            <Star className="pointer-events-none absolute top-6 -left-6 sm:-left-16 lg:-left-24 w-12 h-12 sm:w-14 sm:h-14 text-purple-400 opacity-90 -rotate-12" />
+            <Squiggle className="pointer-events-none absolute -bottom-10 -right-10 sm:-right-28 lg:-right-44 w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 text-orange-300 opacity-60 rotate-6" />
+
+            <BrowserMockup url="mixreflect.com/track/midnight-drive">
+              <TrackPageMockup />
+            </BrowserMockup>
+          </AnimatedSection>
+        </div>
+      </section>
+
 
       {/* Discover & Review */}
       <section className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
