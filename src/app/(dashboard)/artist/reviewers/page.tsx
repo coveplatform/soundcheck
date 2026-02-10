@@ -63,7 +63,7 @@ export default async function ArtistReviewersPage({
     include: {
       user: { select: { name: true } },
       genres: { select: { id: true, name: true } },
-      _count: { select: { reviews: true } },
+      _count: { select: { Review: true } },
     },
     orderBy: [{ lastReviewDate: "desc" }, { totalReviews: "desc" }, { averageRating: "desc" }],
     take: 50,

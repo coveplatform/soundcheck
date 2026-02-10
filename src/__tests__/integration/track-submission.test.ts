@@ -219,7 +219,7 @@ describe('Track Submission Integration', () => {
 
       const created = await prismaMock.track.create({
         data: track as any,
-        include: { genres: true },
+        include: { Genre: true },
       })
 
       expect(created.title).toBe(trackData.title)

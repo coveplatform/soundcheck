@@ -76,7 +76,7 @@ export async function POST(request: Request) {
           },
           country: country ?? undefined,
         },
-        include: { genres: true },
+        include: { Genre: true },
       });
 
       return NextResponse.json(profile);
@@ -91,7 +91,7 @@ export async function POST(request: Request) {
         },
         country: country ?? undefined,
       },
-      include: { genres: true },
+      include: { Genre: true },
     });
 
     // Update user to mark as reviewer
@@ -127,7 +127,7 @@ export async function GET() {
 
     const profile = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
-      include: { genres: true },
+      include: { Genre: true },
     });
 
     if (!profile) {
@@ -157,7 +157,7 @@ export async function PATCH(request: Request) {
 
     let profile = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
-      include: { genres: true },
+      include: { Genre: true },
     });
 
     if (!profile) {
@@ -173,7 +173,7 @@ export async function PATCH(request: Request) {
         data: {
           userId: session.user.id,
         },
-        include: { genres: true },
+        include: { Genre: true },
       });
 
       await prisma.user.update({

@@ -27,7 +27,7 @@ export default async function AccountPage() {
   // Get listener profile with genres (for reviewer genre preferences)
   const reviewerProfile = await prisma.reviewerProfile.findUnique({
     where: { userId: session.user.id },
-    select: { genres: { select: { id: true } } },
+    select: { Genre: { select: { id: true } } },
   });
 
   // Get artist profile for credit balance and subscription info
@@ -44,7 +44,7 @@ export default async function AccountPage() {
     },
   });
 
-  const initialGenreIds = (reviewerProfile?.genres ?? []).map((g) => g.id);
+  const initialGenreIds = (reviewerProfile?.Genre ?? []).map((g) => g.id);
   const isReviewer = Boolean(reviewerProfile);
 
   return (

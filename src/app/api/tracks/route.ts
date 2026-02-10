@@ -192,7 +192,7 @@ export async function GET(request: Request) {
       include: {
         genres: true,
         _count: {
-          select: { reviews: true },
+          select: { Review: true },
         },
       },
       orderBy: { createdAt: "desc" },

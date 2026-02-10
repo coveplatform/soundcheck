@@ -51,7 +51,7 @@ export async function POST(request: Request) {
               }
             : {}),
         },
-        include: { genres: true },
+        include: { Genre: true },
       });
 
       return NextResponse.json(profile);
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
             }
           : {}),
       },
-      include: { genres: true },
+      include: { Genre: true },
     });
 
     // Update user to mark as artist

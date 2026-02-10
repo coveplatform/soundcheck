@@ -119,12 +119,12 @@ export async function getEligibleReviewers(
 ) {
   const track = await db.track.findUnique({
     where: { id: trackId },
-    include: { genres: true },
+    include: { Genre: true },
   });
 
   if (!track) return [];
 
-  const trackGenreIds = track.genres.map((g) => g.id);
+  const trackGenreIds = track.Genre.map((g) => g.id);
 
   // Expand genres to include parent/child relationships for matching
   // e.g., track with "deep-house" will match reviewers with "electronic" OR "deep-house"
@@ -268,7 +268,7 @@ export async function getEligiblePeerReviewers(
 
   if (!track) return [];
 
-  const trackGenreIds = track.genres.map((g) => g.id);
+  const trackGenreIds = track.Genre.map((g) => g.id);
   const genreIds = await expandGenresForMatchingWithDb(db, trackGenreIds);
 
   // Find artist profiles that:

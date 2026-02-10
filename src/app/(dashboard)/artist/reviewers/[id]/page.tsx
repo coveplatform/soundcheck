@@ -34,9 +34,9 @@ export default async function ArtistReviewerProfilePage({
   const reviewer = await prisma.reviewerProfile.findUnique({
     where: { id },
     include: {
-      user: { select: { name: true } },
-      genres: { select: { id: true, name: true } },
-      _count: { select: { reviews: true } },
+      User: { select: { name: true } },
+      Genre: { select: { id: true, name: true } },
+      _count: { select: { Review: true } },
     },
   });
 
@@ -44,7 +44,7 @@ export default async function ArtistReviewerProfilePage({
     notFound();
   }
 
-  const fullName = reviewer.user.name ?? "Reviewer";
+  const fullName = reviewer.User.name ?? "Reviewer";
   const firstName = fullName.trim().split(/\s+/g)[0] || "Reviewer";
   const initial = (fullName.trim()[0] || "?").toUpperCase();
 
@@ -95,8 +95,8 @@ export default async function ArtistReviewerProfilePage({
 
           <div>
             <h2 className="text-sm font-black mb-2">Genres</h2>
-            {reviewer.genres.length > 0 ? (
-              <GenreTagList genres={reviewer.genres} variant="neutral" size="sm" />
+            {reviewer.Genre.length > 0 ? (
+              <GenreTagList genres={reviewer.Genre} variant="neutral" size="sm" />
             ) : (
               <p className="text-sm text-neutral-600">No genres listed.</p>
             )}
