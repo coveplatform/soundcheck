@@ -25,6 +25,7 @@ export default async function DashboardLayout({
         artistName: true,
         reviewCredits: true,
         subscriptionStatus: true,
+        completedOnboarding: true,
       },
     });
   } catch {
@@ -35,13 +36,18 @@ export default async function DashboardLayout({
         id: true,
         artistName: true,
         subscriptionStatus: true,
+        completedOnboarding: true,
       },
     });
   }
 
-  // If no artist profile, redirect to onboarding
-  if (!artistProfile) {
-    redirect("/onboarding");
+  // If no artist profile OR onboarding not completed, show simple layout (for /onboarding page)
+  if (!artistProfile || !artistProfile.completedOnboarding) {
+    return (
+      <div className="min-h-screen bg-[#faf8f5]">
+        {children}
+      </div>
+    );
   }
 
   const artistName = artistProfile.artistName || session.user.name || "Artist";
