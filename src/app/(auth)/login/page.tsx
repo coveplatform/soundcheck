@@ -40,7 +40,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [needsVerificationEmail, setNeedsVerificationEmail] = useState<string | null>(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
 
   useEffect(() => {
@@ -67,10 +66,6 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!authError) return;
-    if (authError === "EmailNotVerified") {
-      setError("Please verify your email before signing in.");
-      return;
-    }
 
     if (authError === "CredentialsSignin") {
       setError("Invalid email or password");
@@ -88,7 +83,6 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setNeedsVerificationEmail(null);
     setIsLoading(true);
 
     try {
@@ -105,10 +99,7 @@ export default function LoginPage() {
       }
 
       if (result?.error) {
-        if (result.error === "EmailNotVerified") {
-          setNeedsVerificationEmail(email);
-          setError("Please verify your email before signing in.");
-        } else if (result.error.startsWith("TooManyAttempts:")) {
+        if (result.error.startsWith("TooManyAttempts:")) {
           const seconds = result.error.split(":")[1];
           setError(`Too many login attempts. Please try again in ${seconds} seconds.`);
         } else {
@@ -159,14 +150,6 @@ export default function LoginPage() {
         {error && (
           <div className="text-red-400 text-sm py-3 px-4 bg-red-500/10 border-l-2 border-red-500">
             {error}
-            {needsVerificationEmail && (
-              <Link
-                href={`/verify-email?email=${encodeURIComponent(needsVerificationEmail)}`}
-                className="block mt-2 underline underline-offset-4 hover:text-red-300"
-              >
-                Resend verification email
-              </Link>
-            )}
           </div>
         )}
 

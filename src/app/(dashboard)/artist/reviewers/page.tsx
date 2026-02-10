@@ -37,7 +37,7 @@ export default async function ArtistReviewersPage({
   const now = new Date();
   const cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  const reviewers = await prisma.listenerProfile.findMany({
+  const reviewers = await prisma.reviewerProfile.findMany({
     where: {
       isRestricted: false,
       ...(active === "1"

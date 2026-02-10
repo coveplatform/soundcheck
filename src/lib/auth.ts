@@ -124,7 +124,7 @@ export const authOptions: NextAuthOptions = {
             isReviewer: true,
             emailVerified: true,
             artistProfile: { select: { id: true } },
-            listenerProfile: { select: { id: true } },
+            reviewerProfile: { select: { id: true } },
           },
         });
         const db = dbUser as null | {
@@ -133,16 +133,16 @@ export const authOptions: NextAuthOptions = {
           isReviewer: boolean;
           emailVerified: Date | null;
           artistProfile?: { id: string } | null;
-          listenerProfile?: { id: string } | null;
+          reviewerProfile?: { id: string } | null;
         };
         if (db) {
           token.id = db.id;
           token.isArtist = db.isArtist;
           token.isReviewer = db.isReviewer;
           token.artistProfileId = db.artistProfile?.id;
-          const listenerProfileId = db.listenerProfile?.id;
-          token.listenerProfileId = listenerProfileId;
-          token.reviewerProfileId = listenerProfileId;
+          const reviewerProfileId = db.reviewerProfile?.id;
+          token.listenerProfileId = reviewerProfileId;
+          token.reviewerProfileId = reviewerProfileId;
           token.emailVerified = db.emailVerified ? db.emailVerified.toISOString() : null;
         }
       }

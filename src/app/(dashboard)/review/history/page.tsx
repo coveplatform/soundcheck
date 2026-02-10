@@ -17,7 +17,7 @@ export default async function ReviewHistoryPage() {
     redirect("/login");
   }
 
-  const reviewerProfile = await prisma.listenerProfile.findUnique({
+  const reviewerProfile = await prisma.reviewerProfile.findUnique({
     where: { userId: session.user.id },
     select: { id: true, isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
   });

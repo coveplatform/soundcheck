@@ -39,9 +39,9 @@ describe('Review Submission Integration', () => {
 
     it('rejects submission from restricted reviewer', async () => {
       const reviewer = createMockReviewerProfile({ isRestricted: true })
-      prismaMock.listenerProfile.findUnique.mockResolvedValue(reviewer)
+      prismaMock.reviewerProfile.findUnique.mockResolvedValue(reviewer)
 
-      const found = await prismaMock.listenerProfile.findUnique({
+      const found = await prismaMock.reviewerProfile.findUnique({
         where: { userId: 'user-id' },
         select: { isRestricted: true },
       })
@@ -54,9 +54,9 @@ describe('Review Submission Integration', () => {
         completedOnboarding: false,
         onboardingQuizPassed: false,
       })
-      prismaMock.listenerProfile.findUnique.mockResolvedValue(reviewer)
+      prismaMock.reviewerProfile.findUnique.mockResolvedValue(reviewer)
 
-      const found = await prismaMock.listenerProfile.findUnique({
+      const found = await prismaMock.reviewerProfile.findUnique({
         where: { userId: 'user-id' },
         select: { completedOnboarding: true, onboardingQuizPassed: true },
       })
@@ -75,7 +75,7 @@ describe('Review Submission Integration', () => {
       })
 
       prismaMock.user.findUnique.mockResolvedValue(user)
-      prismaMock.listenerProfile.findUnique.mockResolvedValue(reviewer)
+      prismaMock.reviewerProfile.findUnique.mockResolvedValue(reviewer)
 
       const foundUser = await prismaMock.user.findUnique({
         where: { id: user.id },
@@ -83,7 +83,7 @@ describe('Review Submission Integration', () => {
       })
       expect(foundUser?.emailVerified).not.toBeNull()
 
-      const foundReviewer = await prismaMock.listenerProfile.findUnique({
+      const foundReviewer = await prismaMock.reviewerProfile.findUnique({
         where: { userId: user.id },
       })
       expect(foundReviewer?.completedOnboarding).toBe(true)
@@ -192,9 +192,9 @@ describe('Review Submission Integration', () => {
       const reviewer = createMockReviewerProfile({ totalReviews: 10 })
       const updatedReviewer = { ...reviewer, totalReviews: 11 }
 
-      prismaMock.listenerProfile.update.mockResolvedValue(updatedReviewer)
+      prismaMock.reviewerProfile.update.mockResolvedValue(updatedReviewer)
 
-      const updated = await prismaMock.listenerProfile.update({
+      const updated = await prismaMock.reviewerProfile.update({
         where: { id: reviewer.id },
         data: { totalReviews: { increment: 1 } },
       })
@@ -215,9 +215,9 @@ describe('Review Submission Integration', () => {
         totalEarnings: reviewer.totalEarnings + earnings,
       }
 
-      prismaMock.listenerProfile.update.mockResolvedValue(updatedReviewer)
+      prismaMock.reviewerProfile.update.mockResolvedValue(updatedReviewer)
 
-      const updated = await prismaMock.listenerProfile.update({
+      const updated = await prismaMock.reviewerProfile.update({
         where: { id: reviewer.id },
         data: {
           pendingBalance: { increment: earnings },
@@ -234,9 +234,9 @@ describe('Review Submission Integration', () => {
       const reviewer = createMockReviewerProfile({ lastReviewDate: null })
       const updatedReviewer = { ...reviewer, lastReviewDate: now }
 
-      prismaMock.listenerProfile.update.mockResolvedValue(updatedReviewer)
+      prismaMock.reviewerProfile.update.mockResolvedValue(updatedReviewer)
 
-      const updated = await prismaMock.listenerProfile.update({
+      const updated = await prismaMock.reviewerProfile.update({
         where: { id: reviewer.id },
         data: { lastReviewDate: now },
       })

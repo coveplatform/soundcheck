@@ -23,7 +23,7 @@ export async function POST(
     const user = await prisma.user.findUnique({
       where: { id },
       include: {
-        listenerProfile: true,
+        reviewerProfile: true,
       },
     });
 
@@ -32,7 +32,7 @@ export async function POST(
     }
 
     // If already a reviewer with a profile, just ensure they're marked as reviewer
-    if (user.listenerProfile) {
+    if (user.reviewerProfile) {
       await prisma.user.update({
         where: { id },
         data: { isReviewer: true },
@@ -40,12 +40,12 @@ export async function POST(
       return NextResponse.json({
         success: true,
         message: "User already has reviewer profile",
-        reviewerProfileId: user.listenerProfile.id,
+        reviewerProfileId: user.reviewerProfile.id,
       });
     }
 
     // Create reviewer profile and mark user as reviewer
-    const reviewerProfile = await prisma.listenerProfile.create({
+    const reviewerProfile = await prisma.reviewerProfile.create({
       data: {
         userId: id,
         // New admin-enabled reviewers start with basic setup

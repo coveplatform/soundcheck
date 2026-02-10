@@ -30,10 +30,6 @@ export function PayoutActions({
 
     if (status === 403) {
       const msg = typeof message === "string" ? message.toLowerCase() : "";
-      if (msg.includes("verify")) {
-        window.location.href = "/verify-email";
-        return true;
-      }
       if (msg.includes("onboarding")) {
         window.location.href = "/listener/onboarding";
         return true;

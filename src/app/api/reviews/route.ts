@@ -141,7 +141,7 @@ export async function POST(request: Request) {
     }
 
     // Support both legacy reviewer profiles AND peer reviewers (artist profiles)
-    const reviewerProfile = await prisma.listenerProfile.findUnique({
+    const reviewerProfile = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
       select: { id: true, isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true, tier: true },
     });
@@ -367,7 +367,7 @@ export async function POST(request: Request) {
           },
         });
       } else {
-        await tx.listenerProfile.update({
+        await tx.reviewerProfile.update({
           where: { id: review.reviewerId },
           data: {
             totalReviews: { increment: 1 },

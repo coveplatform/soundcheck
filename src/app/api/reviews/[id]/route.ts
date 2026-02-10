@@ -17,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const reviewerProfile = await prisma.listenerProfile.findUnique({
+    const reviewerProfile = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
       select: { isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
     });

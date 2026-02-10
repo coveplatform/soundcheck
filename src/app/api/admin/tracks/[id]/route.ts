@@ -84,7 +84,7 @@ export async function POST(
     }
 
     // Get all reviewers to show why they might not be eligible
-    const allReviewers = await prisma.listenerProfile.findMany({
+    const allReviewers = await prisma.reviewerProfile.findMany({
       include: {
         genres: true,
         user: { select: { email: true, createdAt: true } },

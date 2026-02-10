@@ -26,7 +26,7 @@ export async function DELETE() {
       );
     }
 
-    const reviewer = await prisma.listenerProfile.findUnique({
+    const reviewer = await prisma.reviewerProfile.findUnique({
       where: { userId },
       select: { id: true, pendingBalance: true },
     });

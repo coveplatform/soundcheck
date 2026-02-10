@@ -18,7 +18,7 @@ export async function GET(
     const { id: trackId } = await params;
 
     // Get reviewer profile
-    const reviewer = await prisma.listenerProfile.findUnique({
+    const reviewer = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
       select: { id: true },
     });

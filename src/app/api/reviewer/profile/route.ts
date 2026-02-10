@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     const { genreIds, country } = createProfileSchema.parse(body);
 
     // Check if profile already exists
-    const existingProfile = await prisma.listenerProfile.findUnique({
+    const existingProfile = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
     });
 
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
 
     if (existingProfile) {
       // Update existing profile
-      const profile = await prisma.listenerProfile.update({
+      const profile = await prisma.reviewerProfile.update({
         where: { userId: session.user.id },
         data: {
           genres: {
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     }
 
     // Create new profile
-    const profile = await prisma.listenerProfile.create({
+    const profile = await prisma.reviewerProfile.create({
       data: {
         userId: session.user.id,
         genres: {
@@ -125,7 +125,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const profile = await prisma.listenerProfile.findUnique({
+    const profile = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
       include: { genres: true },
     });
@@ -155,7 +155,7 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { completedOnboarding, quizAnswers, country } = patchProfileSchema.parse(body);
 
-    let profile = await prisma.listenerProfile.findUnique({
+    let profile = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
       include: { genres: true },
     });
@@ -169,7 +169,7 @@ export async function PATCH(request: Request) {
         );
       }
 
-      profile = await prisma.listenerProfile.create({
+      profile = await prisma.reviewerProfile.create({
         data: {
           userId: session.user.id,
         },
@@ -186,7 +186,7 @@ export async function PATCH(request: Request) {
       const score = scoreQuiz(quizAnswers);
       const passed = score >= 3;
 
-      const updated = await prisma.listenerProfile.update({
+      const updated = await prisma.reviewerProfile.update({
         where: { id: profile.id },
         data: {
           onboardingQuizScore: score,
@@ -226,7 +226,7 @@ export async function PATCH(request: Request) {
       }
     }
 
-    const updated = await prisma.listenerProfile.update({
+    const updated = await prisma.reviewerProfile.update({
       where: { id: profile.id },
       data: {
         completedOnboarding: completedOnboarding ?? undefined,

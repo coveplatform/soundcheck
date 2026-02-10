@@ -24,7 +24,7 @@ export async function getPlatformStats(): Promise<PlatformStats> {
 
   // Calculate active listeners (reviewed in last 30 days)
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const activeListenerCount = await prisma.listenerProfile.count({
+  const activeListenerCount = await prisma.reviewerProfile.count({
     where: {
       lastReviewDate: {
         gte: thirtyDaysAgo,

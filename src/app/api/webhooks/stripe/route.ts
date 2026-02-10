@@ -501,7 +501,7 @@ async function handleExternalPurchaseComplete(
             isArtist: true,
             isReviewer: true,
             artistProfile: { select: { id: true } },
-            listenerProfile: { select: { id: true } },
+            reviewerProfile: { select: { id: true } },
           },
         });
 
@@ -514,10 +514,10 @@ async function handleExternalPurchaseComplete(
               totalEarnings: { increment: purchase.affiliateCommission },
             },
           });
-        } else if (user?.isReviewer && user.listenerProfile) {
+        } else if (user?.isReviewer && user.reviewerProfile) {
           // Credit to listener profile
-          await tx.listenerProfile.update({
-            where: { id: user.listenerProfile.id },
+          await tx.reviewerProfile.update({
+            where: { id: user.reviewerProfile.id },
             data: {
               pendingBalance: { increment: purchase.affiliateCommission },
               totalEarnings: { increment: purchase.affiliateCommission },

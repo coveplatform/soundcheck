@@ -69,7 +69,7 @@ export async function POST(
         },
       });
 
-      const reviewer = await tx.listenerProfile.update({
+      const reviewer = await tx.reviewerProfile.update({
         where: { id: updatedReview.reviewerId },
         data: {
           flagCount: { increment: 1 },
@@ -83,7 +83,7 @@ export async function POST(
 
       const shouldRestrict = reviewer.flagCount > 3;
       const reviewerAfter = shouldRestrict
-        ? await tx.listenerProfile.update({
+        ? await tx.reviewerProfile.update({
             where: { id: reviewer.id },
             data: { isRestricted: true },
             select: { id: true, flagCount: true, isRestricted: true },

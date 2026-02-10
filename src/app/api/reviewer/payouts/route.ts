@@ -29,11 +29,11 @@ export async function POST(request: Request) {
     const { amountCents } = requestPayoutSchema.parse(body);
 
     const prismaWithListener = prisma as unknown as typeof prisma & {
-      listenerProfile?: typeof prisma.listenerProfile;
+      reviewerProfile?: typeof prisma.reviewerProfile;
     };
-    const listenerProfileModel =
-      prismaWithListener.listenerProfile ?? prisma.listenerProfile;
-    const reviewer = await listenerProfileModel.findUnique({
+    const reviewerProfileModel =
+      prismaWithListener.reviewerProfile ?? prisma.reviewerProfile;
+    const reviewer = await reviewerProfileModel.findUnique({
       where: { userId: session.user.id },
       select: {
         id: true,
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
       let payout;
       try {
         payout = await prisma.$transaction(async (tx) => {
-          const reserved = await tx.listenerProfile.updateMany({
+          const reserved = await tx.reviewerProfile.updateMany({
             where: {
               id: reviewer.id,
               pendingBalance: { gte: requested },
@@ -165,7 +165,7 @@ export async function POST(request: Request) {
     let payout;
     try {
       payout = await prisma.$transaction(async (tx) => {
-        const reserved = await tx.listenerProfile.updateMany({
+        const reserved = await tx.reviewerProfile.updateMany({
           where: {
             id: reviewer.id,
             pendingBalance: { gte: requested },
@@ -234,7 +234,7 @@ export async function POST(request: Request) {
         });
 
         if (updated.count > 0) {
-          await tx.listenerProfile.update({
+          await tx.reviewerProfile.update({
             where: { id: reviewer.id },
             data: { pendingBalance: { increment: requested } },
           });

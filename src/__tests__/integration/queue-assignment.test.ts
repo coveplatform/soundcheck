@@ -39,9 +39,9 @@ describe('Queue Assignment Integration', () => {
 
       // Mock eligible reviewers
       const reviewerWithGenres = { ...reviewer, genres: [genre], user: { id: 'user-id', email: 'test@example.com' } }
-      prismaMock.listenerProfile.findMany.mockResolvedValue([reviewerWithGenres as unknown as ReturnType<typeof createMockReviewerProfile>])
+      prismaMock.reviewerProfile.findMany.mockResolvedValue([reviewerWithGenres as unknown as ReturnType<typeof createMockReviewerProfile>])
 
-      const eligibleReviewers = await prismaMock.listenerProfile.findMany({
+      const eligibleReviewers = await prismaMock.reviewerProfile.findMany({
         where: {
           completedOnboarding: true,
           onboardingQuizPassed: true,
@@ -59,9 +59,9 @@ describe('Queue Assignment Integration', () => {
         onboardingQuizPassed: true,
       })
 
-      prismaMock.listenerProfile.findMany.mockResolvedValue([])
+      prismaMock.reviewerProfile.findMany.mockResolvedValue([])
 
-      const eligibleReviewers = await prismaMock.listenerProfile.findMany({
+      const eligibleReviewers = await prismaMock.reviewerProfile.findMany({
         where: {
           completedOnboarding: true, // Will exclude our reviewer
           onboardingQuizPassed: true,
@@ -77,9 +77,9 @@ describe('Queue Assignment Integration', () => {
         onboardingQuizPassed: false,
       })
 
-      prismaMock.listenerProfile.findMany.mockResolvedValue([])
+      prismaMock.reviewerProfile.findMany.mockResolvedValue([])
 
-      const eligibleReviewers = await prismaMock.listenerProfile.findMany({
+      const eligibleReviewers = await prismaMock.reviewerProfile.findMany({
         where: {
           completedOnboarding: true,
           onboardingQuizPassed: true, // Will exclude our reviewer
@@ -96,9 +96,9 @@ describe('Queue Assignment Integration', () => {
         isRestricted: true,
       })
 
-      prismaMock.listenerProfile.findMany.mockResolvedValue([])
+      prismaMock.reviewerProfile.findMany.mockResolvedValue([])
 
-      const eligibleReviewers = await prismaMock.listenerProfile.findMany({
+      const eligibleReviewers = await prismaMock.reviewerProfile.findMany({
         where: {
           completedOnboarding: true,
           onboardingQuizPassed: true,
@@ -118,9 +118,9 @@ describe('Queue Assignment Integration', () => {
         isRestricted: false,
       })
 
-      prismaMock.listenerProfile.findMany.mockResolvedValue([])
+      prismaMock.reviewerProfile.findMany.mockResolvedValue([])
 
-      const eligibleReviewers = await prismaMock.listenerProfile.findMany({
+      const eligibleReviewers = await prismaMock.reviewerProfile.findMany({
         where: {
           user: { emailVerified: { not: null } }, // Will exclude our reviewer
         },
@@ -133,9 +133,9 @@ describe('Queue Assignment Integration', () => {
       const track = createMockTrack()
       const reviewer = createMockReviewerProfile()
 
-      prismaMock.listenerProfile.findMany.mockResolvedValue([])
+      prismaMock.reviewerProfile.findMany.mockResolvedValue([])
 
-      const eligibleReviewers = await prismaMock.listenerProfile.findMany({
+      const eligibleReviewers = await prismaMock.reviewerProfile.findMany({
         where: {
           reviews: { none: { trackId: track.id } }, // Exclude if already reviewed
         },

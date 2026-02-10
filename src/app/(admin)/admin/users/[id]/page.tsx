@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
-import { ForceVerifyEmailButton } from "@/components/admin/force-verify-email-button";
 import { ReviewerRestrictionToggle } from "@/components/admin/reviewer-restriction-toggle";
 import { EnableReviewerButton } from "@/components/admin/enable-reviewer-button";
 import { ActivateProButton } from "@/components/admin/activate-pro-button";
@@ -30,7 +29,7 @@ export default async function AdminUserDetailPage({
           tracks: { select: { id: true } },
         },
       },
-      listenerProfile: {
+      reviewerProfile: {
         select: {
           id: true,
           tier: true,
@@ -59,8 +58,7 @@ export default async function AdminUserDetailPage({
           <p className="text-neutral-500">{user.email}</p>
         </div>
         <div className="flex items-center gap-2">
-          {!user.emailVerified ? <ForceVerifyEmailButton userId={user.id} /> : null}
-          {!user.listenerProfile ? <EnableReviewerButton userId={user.id} /> : null}
+          {!user.reviewerProfile ? <EnableReviewerButton userId={user.id} /> : null}
         </div>
       </div>
 
@@ -124,24 +122,24 @@ export default async function AdminUserDetailPage({
         </div>
       ) : null}
 
-      {user.listenerProfile ? (
+      {user.reviewerProfile ? (
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="flex items-center justify-between gap-4">
             <div className="font-medium">Reviewer profile</div>
             <ReviewerRestrictionToggle
-              reviewerId={user.listenerProfile.id}
-              isRestricted={user.listenerProfile.isRestricted}
+              reviewerId={user.reviewerProfile.id}
+              isRestricted={user.reviewerProfile.isRestricted}
             />
           </div>
           <div className="mt-3 grid md:grid-cols-3 gap-3 text-sm">
             <div>
               <div className="text-neutral-500">Tier</div>
-              <div className="font-medium">{user.listenerProfile.tier}</div>
+              <div className="font-medium">{user.reviewerProfile.tier}</div>
             </div>
             <div>
               <div className="text-neutral-500">Onboarding</div>
               <div className="font-medium">
-                {user.listenerProfile.completedOnboarding && user.listenerProfile.onboardingQuizPassed
+                {user.reviewerProfile.completedOnboarding && user.reviewerProfile.onboardingQuizPassed
                   ? "Complete"
                   : "Incomplete"}
               </div>
@@ -149,20 +147,20 @@ export default async function AdminUserDetailPage({
             <div>
               <div className="text-neutral-500">Stripe</div>
               <div className="font-medium">
-                {user.listenerProfile.stripeAccountId ? "Connected" : "Not connected"}
+                {user.reviewerProfile.stripeAccountId ? "Connected" : "Not connected"}
               </div>
             </div>
             <div>
               <div className="text-neutral-500">Total reviews</div>
-              <div className="font-medium">{user.listenerProfile.totalReviews}</div>
+              <div className="font-medium">{user.reviewerProfile.totalReviews}</div>
             </div>
             <div>
               <div className="text-neutral-500">Avg rating</div>
-              <div className="font-medium">{user.listenerProfile.averageRating.toFixed(2)}</div>
+              <div className="font-medium">{user.reviewerProfile.averageRating.toFixed(2)}</div>
             </div>
             <div>
               <div className="text-neutral-500">Flags</div>
-              <div className="font-medium">{user.listenerProfile.flagCount}</div>
+              <div className="font-medium">{user.reviewerProfile.flagCount}</div>
             </div>
           </div>
         </div>

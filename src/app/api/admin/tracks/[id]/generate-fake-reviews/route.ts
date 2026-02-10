@@ -185,7 +185,7 @@ export async function POST(
     for (const { email, name } of reviewerData) {
       let user = await prisma.user.findUnique({
         where: { email },
-        include: { listenerProfile: true },
+        include: { reviewerProfile: true },
       });
 
       // Create demo user and listener profile if doesn't exist
@@ -197,25 +197,25 @@ export async function POST(
             password: passwordHash,
             emailVerified: new Date(),
             isReviewer: true,
-            listenerProfile: {
+            reviewerProfile: {
               create: {
                 tier: "NORMAL",
               },
             },
           },
-          include: { listenerProfile: true },
+          include: { reviewerProfile: true },
         });
       } else if (!user.name) {
         // Update existing user with name if missing
         user = await prisma.user.update({
           where: { email },
           data: { name },
-          include: { listenerProfile: true },
+          include: { reviewerProfile: true },
         });
       }
 
-      if (user.listenerProfile) {
-        reviewers.push(user.listenerProfile);
+      if (user.reviewerProfile) {
+        reviewers.push(user.reviewerProfile);
       }
     }
 

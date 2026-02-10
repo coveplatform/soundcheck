@@ -51,7 +51,7 @@ export default async function AdminUsersPage({
       isArtist: true,
       isReviewer: true,
       createdAt: true,
-      listenerProfile: {
+      reviewerProfile: {
         select: {
           completedOnboarding: true,
           onboardingQuizPassed: true,
@@ -169,7 +169,7 @@ export default async function AdminUsersPage({
                   </td>
                   <td className="px-4 py-3">
                     {u.isReviewer ? (
-                      u.listenerProfile?.completedOnboarding && u.listenerProfile?.onboardingQuizPassed ? (
+                      u.reviewerProfile?.completedOnboarding && u.reviewerProfile?.onboardingQuizPassed ? (
                         <span className="text-green-600">Active</span>
                       ) : (
                         <span className="text-orange-500">Onboarding</span>

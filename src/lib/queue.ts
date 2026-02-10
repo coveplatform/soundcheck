@@ -143,7 +143,7 @@ export async function getEligibleReviewers(
   );
 
   // Regular reviewers: must match genre and meet account age requirement
-  const regularWhere: Prisma.ListenerProfileWhereInput = {
+  const regularWhere: Prisma.ReviewerProfileWhereInput = {
     completedOnboarding: true,
     onboardingQuizPassed: true,
     isRestricted: false,
@@ -177,7 +177,7 @@ export async function getEligibleReviewers(
   };
 
   // Test reviewers: NO genre restriction, NO account age requirement
-  const testWhere: Prisma.ListenerProfileWhereInput = {
+  const testWhere: Prisma.ReviewerProfileWhereInput = {
     completedOnboarding: true,
     onboardingQuizPassed: true,
     isRestricted: false,
@@ -204,7 +204,7 @@ export async function getEligibleReviewers(
 
   // Fetch both regular and test reviewers
   const [regularReviewers, testReviewers] = await Promise.all([
-    db.listenerProfile.findMany({
+    db.reviewerProfile.findMany({
       where: regularWhere,
       include: {
         genres: true,
@@ -215,7 +215,7 @@ export async function getEligibleReviewers(
         { averageRating: "desc" },
       ],
     }),
-    db.listenerProfile.findMany({
+    db.reviewerProfile.findMany({
       where: testWhere,
       include: {
         genres: true,
@@ -391,7 +391,7 @@ export async function assignReviewersToTrack(trackId: string) {
     if (neededReviews <= 0) return;
 
     // PEER package: assign ArtistProfile peer reviewers
-    // Legacy packages: assign ListenerProfile reviewers
+    // Legacy packages: assign ReviewerProfile reviewers
     const isPeerPackage = track.packageType === "PEER";
 
     if (isPeerPackage) {
@@ -667,7 +667,7 @@ export function calculateTier(
 
 // Update reviewer tier
 export async function updateReviewerTier(reviewerId: string) {
-  const reviewer = await prisma.listenerProfile.findUnique({
+  const reviewer = await prisma.reviewerProfile.findUnique({
     where: { id: reviewerId },
     include: { user: { select: { email: true } } },
   });
@@ -683,7 +683,7 @@ export async function updateReviewerTier(reviewerId: string) {
     const tierRank = (tier: ReviewerTier) => (tier === "PRO" ? 2 : 1);
     const isUpgrade = tierRank(newTier) > tierRank(reviewer.tier);
 
-    await prisma.listenerProfile.update({
+    await prisma.reviewerProfile.update({
       where: { id: reviewerId },
       data: { tier: newTier },
     });
@@ -707,7 +707,7 @@ export async function updateReviewerAverageRating(reviewerId: string) {
     _avg: { artistRating: true },
   });
 
-  await prisma.listenerProfile.update({
+  await prisma.reviewerProfile.update({
     where: { id: reviewerId },
     data: {
       averageRating: agg._avg.artistRating ?? 0,

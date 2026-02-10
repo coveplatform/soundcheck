@@ -20,7 +20,7 @@ export async function POST(
 
     await request.json().catch(() => ({}));
 
-    const reviewer = await prisma.listenerProfile.findUnique({
+    const reviewer = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
       select: { isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
     });

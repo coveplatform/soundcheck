@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       select: { email: true },
     });
 
-    const reviewer = await prisma.listenerProfile.findUnique({
+    const reviewer = await prisma.reviewerProfile.findUnique({
       where: { userId: session.user.id },
       select: {
         id: true,
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     let accountId = reviewer.stripeAccountId;
 
     if (reset && accountId) {
-      await prisma.listenerProfile.update({
+      await prisma.reviewerProfile.update({
         where: { id: reviewer.id },
         data: { stripeAccountId: null },
       });
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
       if (!accountId) {
         const connectedAt = new Date();
         accountId = `bypass_${reviewer.id}`;
-        await prisma.listenerProfile.update({
+        await prisma.reviewerProfile.update({
           where: { id: reviewer.id },
           data: { stripeAccountId: accountId },
         });
@@ -126,7 +126,7 @@ export async function POST(request: Request) {
       accountId = account.id;
       const connectedAt = new Date();
 
-      await prisma.listenerProfile.update({
+      await prisma.reviewerProfile.update({
         where: { id: reviewer.id },
         data: { stripeAccountId: accountId },
       });

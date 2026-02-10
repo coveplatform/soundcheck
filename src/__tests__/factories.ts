@@ -7,16 +7,13 @@ import type { ReviewerTier } from '@prisma/client'
 import type {
   User,
   ArtistProfile,
-  ListenerProfile,
+  ReviewerProfile,
   Track,
   Review,
   Genre,
   Payment,
   ReviewQueue,
 } from '@prisma/client'
-
-// Alias for backwards compatibility in tests
-type ReviewerProfile = ListenerProfile;
 
 let idCounter = 0
 const generateId = () => `test-id-${++idCounter}`

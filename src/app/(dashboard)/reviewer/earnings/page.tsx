@@ -17,7 +17,7 @@ export default async function EarningsPage() {
     redirect("/login");
   }
 
-  const reviewerProfile = await prisma.listenerProfile.findUnique({
+  const reviewerProfile = await prisma.reviewerProfile.findUnique({
     where: { userId: session.user.id },
     include: {
       reviews: {

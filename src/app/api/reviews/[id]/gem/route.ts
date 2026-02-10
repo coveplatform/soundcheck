@@ -58,7 +58,7 @@ export async function POST(
         select: { id: true, isGem: true, reviewerId: true },
       });
 
-      await tx.listenerProfile.update({
+      await tx.reviewerProfile.update({
         where: { id: updatedReview.reviewerId },
         data: { gemCount: { increment: 1 } },
         select: { id: true },
@@ -132,7 +132,7 @@ export async function DELETE(
         select: { id: true, isGem: true, reviewerId: true },
       });
 
-      await tx.listenerProfile.update({
+      await tx.reviewerProfile.update({
         where: { id: updatedReview.reviewerId },
         data: { gemCount: { decrement: 1 } },
         select: { id: true },
