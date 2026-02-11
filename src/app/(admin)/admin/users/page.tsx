@@ -50,6 +50,12 @@ export default async function AdminUsersPage({
       isArtist: true,
       isReviewer: true,
       createdAt: true,
+      ArtistProfile: {
+        select: {
+          completedOnboarding: true,
+          totalPeerReviews: true,
+        },
+      },
       ReviewerProfile: {
         select: {
           completedOnboarding: true,
@@ -162,8 +168,10 @@ export default async function AdminUsersPage({
                   </td>
                   <td className="px-4 py-3">
                     {u.isReviewer ? (
-                      u.ReviewerProfile?.completedOnboarding && u.ReviewerProfile?.onboardingQuizPassed ? (
-                        <span className="text-green-600">Active</span>
+                      // Peer reviewers complete onboarding via ArtistProfile, legacy via ReviewerProfile
+                      u.ArtistProfile?.completedOnboarding ||
+                      (u.ReviewerProfile?.completedOnboarding && u.ReviewerProfile?.onboardingQuizPassed) ? (
+                        <span className="text-green-600">Active{u.ArtistProfile?.totalPeerReviews ? ` (${u.ArtistProfile.totalPeerReviews} reviews)` : ""}</span>
                       ) : (
                         <span className="text-orange-500">Onboarding</span>
                       )
