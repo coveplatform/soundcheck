@@ -44,6 +44,7 @@ export default async function ReviewQueuePage({
       totalPeerReviews: true,
       peerReviewRating: true,
       peerGemCount: true,
+      subscriptionStatus: true,
       Genre_ArtistReviewGenres: {
         select: { id: true, name: true },
       },
@@ -53,6 +54,19 @@ export default async function ReviewQueuePage({
   if (!artistProfile) {
     redirect("/onboarding");
   }
+
+  const isPro = artistProfile.subscriptionStatus === "active";
+  const MAX_REVIEWS_PER_DAY = 5;
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const reviewsTodayCount = await prisma.review.count({
+    where: {
+      peerReviewerArtistId: artistProfile.id,
+      status: "COMPLETED",
+      updatedAt: { gte: startOfToday },
+    },
+  });
+  const reviewsRemaining = isPro ? null : Math.max(0, MAX_REVIEWS_PER_DAY - reviewsTodayCount);
 
   // Fetch reviews user has already claimed (in progress)
   const claimedReviews: ClaimedReview[] = await prisma.review.findMany({
@@ -162,12 +176,18 @@ export default async function ReviewQueuePage({
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black mt-2">
             Review Queue
           </h1>
-          <div className="flex items-center gap-3 text-sm text-neutral-600 mt-3">
+          <div className="flex items-center gap-3 text-sm text-neutral-600 mt-3 flex-wrap">
             <span>
               {totalQueue} track{totalQueue !== 1 ? "s" : ""} available
             </span>
             <span className="text-neutral-300">•</span>
             <span>Earn 1 credit per review</span>
+            <span className="text-neutral-300">•</span>
+            {isPro ? (
+              <span className="text-lime-600 font-semibold">Unlimited reviews (Pro)</span>
+            ) : (
+              <span>{reviewsRemaining} of {MAX_REVIEWS_PER_DAY} reviews left today</span>
+            )}
           </div>
         </div>
 

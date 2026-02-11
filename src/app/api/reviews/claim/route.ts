@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
   const artistProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
-    select: { id: true, completedOnboarding: true, peerFlagCount: true },
+    select: { id: true, completedOnboarding: true, peerFlagCount: true, subscriptionStatus: true },
   });
 
   if (!artistProfile) {
@@ -32,6 +32,29 @@ export async function POST(request: Request) {
 
   if (!artistProfile.completedOnboarding) {
     return NextResponse.json({ error: "Complete onboarding first" }, { status: 403 });
+  }
+
+  // Daily review cap: 5/day for free users, unlimited for pro
+  const isPro = artistProfile.subscriptionStatus === "active";
+  if (!isPro) {
+    const MAX_REVIEWS_PER_DAY = 5;
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const reviewsTodayCount = await prisma.review.count({
+      where: {
+        peerReviewerArtistId: artistProfile.id,
+        status: "COMPLETED",
+        updatedAt: { gte: startOfToday },
+      },
+    });
+
+    if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
+      return NextResponse.json(
+        { error: "You've reached the daily limit of 5 reviews. Upgrade to Pro for unlimited reviews!" },
+        { status: 429 }
+      );
+    }
   }
 
   try {

@@ -271,23 +271,33 @@ export async function POST(request: Request) {
     startOfToday.setHours(0, 0, 0, 0);
     const heartbeatCutoff = new Date(now.getTime() - 2 * 60 * 1000);
 
-    // Daily review cap: 5 reviews per user per day
-    const MAX_REVIEWS_PER_DAY = 5;
-    const reviewsTodayCount = await prisma.review.count({
-      where: {
-        status: "COMPLETED",
-        updatedAt: { gte: startOfToday },
-        ...(isPeerReview && review.peerReviewerArtistId
-          ? { peerReviewerArtistId: review.peerReviewerArtistId }
-          : { reviewerId: review.reviewerId }),
-      },
-    });
+    // Daily review cap: 5/day for free users, unlimited for pro
+    const reviewerSubscription = isPeerReview && review.peerReviewerArtistId
+      ? await prisma.artistProfile.findUnique({
+          where: { id: review.peerReviewerArtistId },
+          select: { subscriptionStatus: true },
+        })
+      : null;
+    const isProReviewer = reviewerSubscription?.subscriptionStatus === "active";
 
-    if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
-      return NextResponse.json(
-        { error: "You've reached the daily limit of 5 reviews. Come back tomorrow!" },
-        { status: 429 }
-      );
+    if (!isProReviewer) {
+      const MAX_REVIEWS_PER_DAY = 5;
+      const reviewsTodayCount = await prisma.review.count({
+        where: {
+          status: "COMPLETED",
+          updatedAt: { gte: startOfToday },
+          ...(isPeerReview && review.peerReviewerArtistId
+            ? { peerReviewerArtistId: review.peerReviewerArtistId }
+            : { reviewerId: review.reviewerId }),
+        },
+      });
+
+      if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
+        return NextResponse.json(
+          { error: "You've reached the daily limit of 5 reviews. Upgrade to Pro for unlimited reviews!" },
+          { status: 429 }
+        );
+      }
     }
 
     const result = await prisma.$transaction(async (tx) => {
