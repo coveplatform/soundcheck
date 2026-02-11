@@ -5,6 +5,7 @@ import { Headphones, ArrowRight, CheckCircle2, Lock, Upload, MessageSquare, Musi
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
 import { TrackReportDemo } from "@/components/landing/track-report-demo";
+import { PeerModelSection } from "@/components/landing/peer-model-section";
 import { ActivityFeed } from "@/components/landing/activity-feed";
 import { BrowserMockup } from "@/components/landing/browser-mockup";
 import { TrackPageMockup } from "@/components/landing/track-page-mockup";
@@ -107,6 +108,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Peer Model — why it works */}
+      <PeerModelSection />
+
       {/* Social Proof Stats */}
       <section className="py-14 sm:py-20 bg-[#faf8f5]">
         <div className="max-w-5xl mx-auto px-4">
@@ -126,7 +130,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
 
       {/* Artist Earnings */}
       <section className="pb-12 sm:pb-16 pt-0 bg-neutral-900 text-neutral-50 overflow-visible font-sans">
@@ -465,7 +468,7 @@ export default function Home() {
               },
               {
                 q: "Who reviews my tracks?",
-                a: "Other artists on the platform who share your genre. Everyone is both an artist and a ReviewerProfile. After each review, you rate the quality -- low-rated reviewers lose access, so the feedback stays useful and honest.",
+                a: "Other artists on the platform who share your genre. Everyone is both an artist and a reviewer. After each review, you rate the quality -- low-rated reviewers lose access, so the feedback stays useful and honest.",
               },
               {
                 q: "Why do I need multiple reviews?",
