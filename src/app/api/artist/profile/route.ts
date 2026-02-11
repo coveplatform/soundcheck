@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidateTag } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
@@ -7,6 +8,7 @@ import { z } from "zod";
 const createProfileSchema = z.object({
   artistName: z.string().min(1, "Artist name is required").max(100),
   genreIds: z.array(z.string()).max(5).optional(),
+  completedOnboarding: z.boolean().optional(),
 });
 
 export async function POST(request: Request) {
@@ -30,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { artistName, genreIds } = createProfileSchema.parse(body);
+    const { artistName, genreIds, completedOnboarding } = createProfileSchema.parse(body);
 
     // Check if profile already exists
     const existingProfile = await prisma.artistProfile.findUnique({
@@ -43,6 +45,7 @@ export async function POST(request: Request) {
         where: { userId: session.user.id },
         data: {
           artistName,
+          ...(completedOnboarding ? { completedOnboarding: true } : {}),
           ...(genreIds !== undefined
             ? {
                 Genre_ArtistGenres: {
@@ -54,6 +57,7 @@ export async function POST(request: Request) {
         include: { Genre_ArtistGenres: true },
       });
 
+      revalidateTag("sidebar", { expire: 0 });
       return NextResponse.json(profile);
     }
 
@@ -64,6 +68,7 @@ export async function POST(request: Request) {
         userId: session.user.id,
         artistName,
         reviewCredits: 2,
+        ...(completedOnboarding ? { completedOnboarding: true } : {}),
         ...(genreIds && genreIds.length > 0
           ? {
               Genre_ArtistGenres: {
@@ -81,6 +86,7 @@ export async function POST(request: Request) {
       data: { isArtist: true },
     });
 
+    revalidateTag("sidebar", { expire: 0 });
     return NextResponse.json(profile, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {

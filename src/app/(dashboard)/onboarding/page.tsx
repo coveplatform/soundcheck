@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { StepIndicator } from "@/components/ui/step-indicator";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { ArrowRight, ArrowLeft, Music, RefreshCw, Gift, Loader2 } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 interface Genre {
   id: string;
@@ -119,8 +120,8 @@ export default function OnboardingPage() {
         {step === 1 && (
           <>
             <div className="mb-8 text-center">
-              <div className="mx-auto w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center mb-4">
-                <Music className="h-7 w-7 text-purple-600" />
+              <div className="mx-auto w-14 h-14 rounded-2xl bg-lime-100 flex items-center justify-center mb-4">
+                <Music className="h-7 w-7 text-lime-600" />
               </div>
               <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
                 What&apos;s your artist name?
@@ -145,7 +146,7 @@ export default function OnboardingPage() {
                     placeholder="Your artist or project name"
                     value={artistName}
                     onChange={(e) => setArtistName(e.target.value)}
-                    className="w-full rounded-xl border border-black/10 bg-white/60 px-4 py-3 text-base text-black placeholder:text-black/30 focus:bg-white focus:border-purple-600 focus:ring-1 focus:ring-purple-600 outline-none transition-colors"
+                    className="w-full rounded-xl border border-black/10 bg-white/60 px-4 py-3 text-base text-black placeholder:text-black/30 focus:bg-white focus:border-lime-600 focus:ring-1 focus:ring-lime-600 outline-none transition-colors"
                   />
                 </div>
 
@@ -243,6 +244,9 @@ export default function OnboardingPage() {
         {step === 3 && (
           <>
             <div className="mb-8 text-center">
+              <div className="flex justify-center mb-4">
+                <Logo className="scale-125" />
+              </div>
               <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
                 You&apos;re all set!
               </h1>
@@ -255,8 +259,8 @@ export default function OnboardingPage() {
               <CardContent className="pt-6 space-y-6">
                 <div className="space-y-3">
                   <div className="flex items-start gap-4 p-4 rounded-xl bg-white/60 border border-black/10">
-                    <div className="h-10 w-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
-                      <Gift className="h-5 w-5 text-purple-600" />
+                    <div className="h-10 w-10 rounded-xl bg-lime-100 flex items-center justify-center flex-shrink-0">
+                      <Gift className="h-5 w-5 text-lime-600" />
                     </div>
                     <div>
                       <h3 className="font-medium text-black">You have 2 free credits to start</h3>
@@ -267,8 +271,8 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="flex items-start gap-4 p-4 rounded-xl bg-white/60 border border-black/10">
-                    <div className="h-10 w-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
-                      <Music className="h-5 w-5 text-purple-600" />
+                    <div className="h-10 w-10 rounded-xl bg-lime-100 flex items-center justify-center flex-shrink-0">
+                      <Music className="h-5 w-5 text-lime-600" />
                     </div>
                     <div>
                       <h3 className="font-medium text-black">Each credit = 1 review on your track</h3>
@@ -279,8 +283,8 @@ export default function OnboardingPage() {
                   </div>
 
                   <div className="flex items-start gap-4 p-4 rounded-xl bg-white/60 border border-black/10">
-                    <div className="h-10 w-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
-                      <RefreshCw className="h-5 w-5 text-purple-600" />
+                    <div className="h-10 w-10 rounded-xl bg-lime-100 flex items-center justify-center flex-shrink-0">
+                      <RefreshCw className="h-5 w-5 text-lime-600" />
                     </div>
                     <div>
                       <h3 className="font-medium text-black">Earn more by reviewing others</h3>
@@ -291,8 +295,8 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-purple-50 border border-purple-200">
-                  <p className="text-sm text-purple-900 font-medium text-center">
+                <div className="p-4 rounded-xl bg-lime-50 border border-lime-200">
+                  <p className="text-sm text-lime-900 font-medium text-center">
                     Give feedback &rarr; Earn credits &rarr; Get feedback
                   </p>
                 </div>
