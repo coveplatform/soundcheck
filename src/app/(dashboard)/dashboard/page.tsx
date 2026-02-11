@@ -131,37 +131,34 @@ export default async function DashboardPage() {
     return completedReviews.some((r) => new Date(r.createdAt).getTime() > viewedAt);
   });
 
-  // Fetch pending peer reviews
-  let pendingPeerReviews: PendingPeerReview[] = [];
-  try {
-    pendingPeerReviews = await prisma.review.findMany({
-      where: {
-        peerReviewerArtistId: artistProfile.id,
-        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-        Track: {
-          status: { not: "COMPLETED" },
-        },
-      },
-      select: {
-        id: true,
-        createdAt: true,
-        Track: {
-          select: {
-            title: true,
-            artworkUrl: true,
-            Genre: true,
-            ArtistProfile: {
-              select: { artistName: true },
-            },
-          },
-        },
-      },
-      take: 3,
-      orderBy: { createdAt: "asc" },
-    });
-  } catch {
-    pendingPeerReviews = [];
-  }
+  // Fetch available tracks in the review queue (claim model)
+  const excludeTrackIds = await prisma.review.findMany({
+    where: { peerReviewerArtistId: artistProfile.id },
+    select: { trackId: true },
+  }).then((r: { trackId: string }[]) => r.map((x) => x.trackId)).catch(() => [] as string[]);
+
+  const availableTracksRaw = await prisma.track.findMany({
+    where: {
+      packageType: "PEER",
+      status: { in: ["QUEUED", "IN_PROGRESS"] },
+      artistId: { not: artistProfile.id },
+      id: { notIn: excludeTrackIds },
+    },
+    select: {
+      id: true,
+      title: true,
+      artworkUrl: true,
+      createdAt: true,
+      reviewsRequested: true,
+      Genre: true,
+      ArtistProfile: { select: { artistName: true } },
+      _count: { select: { Review: { where: { status: { in: ["ASSIGNED", "IN_PROGRESS", "COMPLETED"] } } } } },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+  const availableQueueTracks = availableTracksRaw
+    .filter((t) => t._count.Review < t.reviewsRequested)
+    .slice(0, 3);
 
   // Fetch highest rated track of the day (community feature)
   type TopTrack = { id: string; title: string; artworkUrl: string | null; artistName: string; avgScore: number };
@@ -231,7 +228,7 @@ export default async function DashboardPage() {
     peerGemCount:
       "peerGemCount" in artistProfile ? artistProfile.peerGemCount : undefined,
     tracks,
-    pendingPeerReviews,
+    pendingPeerReviews: [],
   });
 
   // Get personalized guidance
@@ -239,7 +236,7 @@ export default async function DashboardPage() {
     tracks,
     reviewCredits: credits,
     subscriptionStatus: artistProfile.subscriptionStatus,
-    pendingPeerReviews,
+    pendingPeerReviews: availableQueueTracks.map((t) => ({ id: t.id, createdAt: t.createdAt, Track: { title: t.title, artworkUrl: t.artworkUrl, Genre: t.Genre, ArtistProfile: t.ArtistProfile } })),
     totalPeerReviews:
       "totalPeerReviews" in artistProfile
         ? artistProfile.totalPeerReviews
@@ -375,9 +372,9 @@ export default async function DashboardPage() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <h2 className="text-base font-bold text-black">Tracks to Review</h2>
-                  {pendingPeerReviews.length > 0 && (
+                  {availableQueueTracks.length > 0 && (
                     <span className="text-[10px] font-bold bg-lime-100 text-lime-700 px-1.5 py-0.5 rounded-full">
-                      {pendingPeerReviews.length}
+                      {availableQueueTracks.length}
                     </span>
                   )}
                 </div>
@@ -389,10 +386,37 @@ export default async function DashboardPage() {
                 </Link>
               </div>
 
-              {pendingPeerReviews.length > 0 ? (
+              {availableQueueTracks.length > 0 ? (
                 <div className="space-y-2">
-                  {pendingPeerReviews.map((review) => (
-                    <PendingReviewCard key={review.id} review={review} />
+                  {availableQueueTracks.map((track) => (
+                    <Link
+                      key={track.id}
+                      href="/review"
+                      className="group flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/90 hover:border-black/12"
+                    >
+                      <div className="w-14 sm:w-16 aspect-square flex-shrink-0 relative">
+                        {track.artworkUrl ? (
+                          <Image
+                            src={track.artworkUrl}
+                            alt={track.title}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
+                            <Music className="h-5 w-5 text-neutral-400" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1 py-3 px-3 sm:px-4">
+                        <p className="text-sm font-semibold text-black truncate">{track.title}</p>
+                        <p className="text-xs text-black/40 truncate">by {track.ArtistProfile.artistName}</p>
+                      </div>
+                      <div className="flex items-center pr-3 sm:pr-4">
+                        <span className="text-xs font-semibold text-lime-700">Review →</span>
+                      </div>
+                    </Link>
                   ))}
                 </div>
               ) : (

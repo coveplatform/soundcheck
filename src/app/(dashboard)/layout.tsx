@@ -34,14 +34,28 @@ const getSidebarData = unstable_cache(
 
     if (!artistProfile) return null;
 
+    // Count available tracks in the review queue (not just claimed)
     let pendingReviews = 0;
     try {
-      pendingReviews = await prisma.review.count({
+      const excludeTrackIds = await prisma.review.findMany({
+        where: { peerReviewerArtistId: artistProfile.id },
+        select: { trackId: true },
+      });
+      const excludeIds = excludeTrackIds.map((r: { trackId: string }) => r.trackId);
+
+      const availableTracks = await prisma.track.findMany({
         where: {
-          peerReviewerArtistId: artistProfile.id,
-          status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+          packageType: "PEER",
+          status: { in: ["QUEUED", "IN_PROGRESS"] },
+          artistId: { not: artistProfile.id },
+          id: { notIn: excludeIds },
+        },
+        select: {
+          reviewsRequested: true,
+          _count: { select: { Review: { where: { status: { in: ["ASSIGNED", "IN_PROGRESS", "COMPLETED"] } } } } },
         },
       });
+      pendingReviews = availableTracks.filter((t: any) => t._count.Review < t.reviewsRequested).length;
     } catch {
       pendingReviews = 0;
     }

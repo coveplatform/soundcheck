@@ -214,7 +214,7 @@ export default async function ReviewQueuePage({
                       key={review.id}
                       className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
                     >
-                      <div className="w-16 sm:w-20 flex-shrink-0 relative">
+                      <div className="w-16 sm:w-20 aspect-square flex-shrink-0 relative">
                         {review.Track.artworkUrl ? (
                           <Image src={review.Track.artworkUrl} alt={review.Track.title} fill className="object-cover" sizes="80px" />
                         ) : (
@@ -267,7 +267,7 @@ export default async function ReviewQueuePage({
                       key={track.id}
                       className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
                     >
-                      <div className="w-16 sm:w-20 flex-shrink-0 relative">
+                      <div className="w-16 sm:w-20 aspect-square flex-shrink-0 relative">
                         {track.artworkUrl ? (
                           <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="80px" />
                         ) : (
