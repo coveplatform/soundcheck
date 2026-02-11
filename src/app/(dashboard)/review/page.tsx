@@ -283,11 +283,6 @@ export default async function ReviewQueuePage({
                           <div className="flex items-center gap-2 flex-wrap">
                             <GenreTagList genres={track.Genre} variant="neutral" size="sm" maxDisplay={2} />
                           </div>
-                          {track.feedbackFocus && (
-                            <p className="text-xs text-neutral-500 font-medium mt-1">
-                              Focus: {track.feedbackFocus}
-                            </p>
-                          )}
                         </div>
                         <ClaimButton trackId={track.id} />
                       </div>
