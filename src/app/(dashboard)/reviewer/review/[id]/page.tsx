@@ -425,6 +425,17 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     setIsSubmitting(true);
 
     try {
+      // Send a final heartbeat to sync server listenDuration before submitting
+      try {
+        await fetch(`/api/reviews/${review.id}/heartbeat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: "{}",
+        });
+      } catch {
+        // Non-fatal: submission will still attempt
+      }
+
       const response = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
