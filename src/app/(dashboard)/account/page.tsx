@@ -49,7 +49,7 @@ export default async function AccountPage() {
 
   return (
     <div className="pt-8 pb-24">
-      <div className="max-w-2xl mx-auto px-6 sm:px-8">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="mb-10 pb-6 border-b border-black/10">
           <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40 mb-2">

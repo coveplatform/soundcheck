@@ -13,7 +13,7 @@ export default async function SubmitSuccessPage({ searchParams }: SuccessPagePro
   const hasReviews = reviewCount > 0;
 
   return (
-    <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12 pb-12">
+    <div className="pt-14 sm:pt-16 px-4 sm:px-6 lg:px-12 pb-12">
       <div className="max-w-lg mx-auto">
         <Card variant="soft" elevated>
           <CardContent className="pt-8 pb-8 text-center space-y-6">

@@ -446,7 +446,7 @@ export default function SubmitTrackPage() {
   if (profileLoading) {
     return (
       <div className="pt-8 pb-24">
-        <div className="max-w-3xl mx-auto px-6 sm:px-8 min-h-[60vh] flex items-center justify-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 min-h-[60vh] flex items-center justify-center">
           <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
         </div>
       </div>
@@ -457,7 +457,7 @@ export default function SubmitTrackPage() {
 
   return (
     <div className="pt-8 pb-24">
-      <div className="max-w-3xl mx-auto px-6 sm:px-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6">
         {/* Header with step indicator */}
         <div className="mb-8 pb-6 border-b border-black/10">
           <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40">

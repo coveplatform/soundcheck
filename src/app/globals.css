@@ -185,3 +185,12 @@ details:not(.details-no-marker)[open] summary::before {
 .stagger-children.is-visible > *:nth-child(6) { animation-delay: 400ms; }
 .stagger-children.is-visible > *:nth-child(7) { animation-delay: 480ms; }
 .stagger-children.is-visible > *:nth-child(8) { animation-delay: 560ms; }
+
+/* Hide scrollbar but allow scrolling */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

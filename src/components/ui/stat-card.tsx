@@ -44,13 +44,17 @@ export function StatCard({
         >
           <Icon className={cn("h-3.5 w-3.5", iconColor)} />
         </div>
-        <p className="text-lg font-bold leading-none text-black tabular-nums">{value}</p>
-        {trend && (
-          <p className={cn("text-[10px] font-bold", trend.positive ? "text-emerald-600" : "text-red-600")}>
-            {trend.value}
-          </p>
-        )}
-        <p className="text-xs text-black/40 leading-none">{label}</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <p className="text-lg font-bold leading-none text-black tabular-nums">{value}</p>
+            {trend && (
+              <p className={cn("text-[10px] font-bold", trend.positive ? "text-emerald-600" : "text-red-600")}>
+                {trend.value}
+              </p>
+            )}
+          </div>
+          <p className="text-xs text-black/40 leading-none mt-1 truncate">{label}</p>
+        </div>
       </div>
     </div>
   );

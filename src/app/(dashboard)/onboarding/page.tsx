@@ -108,7 +108,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-12 bg-[#faf8f5]">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-12 bg-[#faf8f5]">
       <div className="w-full max-w-lg">
         {/* Step Indicator */}
         <div className="mb-8">

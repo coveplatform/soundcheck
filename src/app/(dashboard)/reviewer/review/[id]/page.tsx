@@ -754,7 +754,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-6">
         <Skeleton className="h-8 w-32" />
         <div className="rounded-3xl border border-black/10 bg-white/70 p-6 space-y-4">
           <Skeleton className="h-6 w-1/2" />
@@ -778,7 +778,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   if (error && !review) {
     return (
-      <div className="max-w-md mx-auto text-center py-20">
+      <div className="max-w-md mx-auto px-4 sm:px-6 text-center py-20">
         <div className="w-16 h-16 bg-red-100 border-2 border-black flex items-center justify-center mx-auto mb-6">
           <Music className="h-8 w-8 text-red-600" />
         </div>
@@ -809,7 +809,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   if (review.status === "COMPLETED") {
     return (
-      <div className="max-w-3xl mx-auto space-y-10">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-10">
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/listener/history"
@@ -952,7 +952,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     const canPurchase = review.Track.sourceType === "UPLOAD" && review.Track.allowPurchase;
 
     return (
-      <div className="max-w-md mx-auto text-center py-20">
+      <div className="max-w-md mx-auto px-4 sm:px-6 text-center py-20">
         <div className="w-16 h-16 bg-lime-500 border-2 border-black flex items-center justify-center mx-auto mb-6">
           <Check className="h-8 w-8 text-black" />
         </div>
@@ -1019,7 +1019,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <button

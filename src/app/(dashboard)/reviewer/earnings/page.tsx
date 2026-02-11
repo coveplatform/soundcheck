@@ -63,7 +63,7 @@ export default async function EarningsPage() {
   );
 
   return (
-    <div className="pt-14 sm:pt-16 px-6 sm:px-8 lg:px-12">
+    <div className="pt-14 sm:pt-16 px-4 sm:px-6 lg:px-12">
       {/* Header */}
       <div className="mb-10">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight">Earnings</h1>

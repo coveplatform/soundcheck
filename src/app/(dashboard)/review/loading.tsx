@@ -1,7 +1,7 @@
 export default function ReviewLoading() {
   return (
     <div className="pt-8 pb-24">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="animate-pulse">
           {/* Header skeleton */}
           <div className="mb-10 pb-6 border-b border-neutral-200">

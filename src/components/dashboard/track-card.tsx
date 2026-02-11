@@ -73,13 +73,14 @@ export function TrackCard({ track, priority = false }: TrackCardProps) {
       </div>
 
       {/* Action */}
-      <Link href={action.href}>
+      <Link href={action.href} className="flex-shrink-0">
         <Button
           variant="outline"
           size="sm"
-          className="border-black/20 text-black hover:bg-black/5 hover:border-black/30 transition-colors duration-150 ease-out motion-reduce:transition-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          className="border-black/20 text-black hover:bg-black/5 hover:border-black/30 transition-colors duration-150 ease-out motion-reduce:transition-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 text-xs sm:text-sm px-2.5 sm:px-3"
         >
-          {action.label}
+          <span className="hidden sm:inline">{action.label}</span>
+          <span className="sm:hidden">View</span>
         </Button>
       </Link>
     </div>

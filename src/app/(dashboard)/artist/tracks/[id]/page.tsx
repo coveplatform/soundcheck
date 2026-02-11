@@ -145,7 +145,7 @@ export default async function TrackDetailPage({
     <div className="pt-8 pb-24">
       <TrackFeedbackViewTracker trackId={track.id} reviewCount={completedReviews} />
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Link */}
         <Link
           href="/artist/tracks"

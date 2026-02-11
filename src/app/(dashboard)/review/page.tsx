@@ -90,7 +90,7 @@ export default async function ReviewQueuePage({
 
   return (
     <div className="pt-8 pb-24">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Notices */}
         {notice === "skipped" && (
           <div className="mb-6 rounded-2xl border-2 border-purple-200 bg-purple-50 p-4 shadow-sm">

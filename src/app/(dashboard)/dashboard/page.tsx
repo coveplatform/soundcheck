@@ -174,7 +174,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="pt-8 pb-24">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section - Reduced height */}
         <div className="mb-10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between pb-6 border-b border-black/10">
@@ -191,7 +191,7 @@ export default async function DashboardPage() {
             </div>
 
             {/* Credits and CTA */}
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <Tooltip
                 content={
                   credits > 0
@@ -199,7 +199,7 @@ export default async function DashboardPage() {
                     : "Earn by reviewing tracks"
                 }
               >
-                <div className="rounded-xl border-2 border-neutral-200 bg-white px-4 py-3 shadow-sm">
+                <div className="rounded-xl border-2 border-neutral-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 shadow-sm">
                   <div className="flex items-baseline gap-2">
                     <p className="text-2xl font-bold text-black tabular-nums">
                       {credits}
