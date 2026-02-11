@@ -5,49 +5,6 @@ import { ArrowRight, ChevronLeft, ChevronRight, Music, Play, TrendingUp, Message
 
 type Tab = "analytics" | "consensus" | "reviews";
 
-// Circular progress component
-function CircleProgress({ value, label, color }: { value: number; label: string; color: string }) {
-  const radius = 36;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (value / 100) * circumference;
-
-  return (
-    <div className="flex flex-col items-center">
-      <div className="relative w-24 h-24">
-        <svg className="w-24 h-24 transform -rotate-90">
-          <circle
-            cx="48"
-            cy="48"
-            r={radius}
-            stroke="currentColor"
-            strokeWidth="6"
-            fill="none"
-            className="text-neutral-200"
-          />
-          <circle
-            cx="48"
-            cy="48"
-            r={radius}
-            stroke={color}
-            strokeWidth="6"
-            fill="none"
-            strokeLinecap="round"
-            style={{
-              strokeDasharray: circumference,
-              strokeDashoffset: strokeDashoffset,
-              transition: 'stroke-dashoffset 0.5s ease'
-            }}
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xl font-extrabold text-neutral-950">{value}%</span>
-        </div>
-      </div>
-      <span className="text-xs text-neutral-600 mt-2 text-center">{label}</span>
-    </div>
-  );
-}
-
 export function TrackReportDemo() {
   const [activeTab, setActiveTab] = useState<Tab>("analytics");
   const [missingArtwork, setMissingArtwork] = useState(false);
@@ -229,56 +186,66 @@ export function TrackReportDemo() {
           {/* Analytics Tab */}
           {activeTab === "analytics" && (
             <div className="space-y-6">
-              {/* Listener Response - Circle Charts */}
-              <div>
-                <h4 className="text-xs font-semibold text-neutral-500 mb-4 tracking-wider">LISTENER RESPONSE</h4>
-                <div className="grid grid-cols-3 gap-4 sm:gap-6">
-                  <CircleProgress value={85} label="Would Replay" color="#84cc16" />
-                  <CircleProgress value={67} label="Would Playlist" color="#84cc16" />
-                  <CircleProgress value={52} label="Would Share" color="#fb923c" />
+              {/* Big score + listener response stats */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                {/* Average score — hero number */}
+                <div className="bg-purple-600 border-2 border-black rounded-2xl p-5 sm:p-6 text-center sm:text-left flex-shrink-0 sm:w-40 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tighter">4.2</div>
+                  <div className="text-xs font-bold text-white/70 mt-1 uppercase tracking-wider">Avg rating</div>
+                  <div className="flex items-center justify-center sm:justify-start gap-0.5 mt-2">
+                    {[1,2,3,4].map(i => <div key={i} className="w-3 h-3 rounded-full bg-white" />)}
+                    <div className="w-3 h-3 rounded-full bg-white/30" />
+                  </div>
+                </div>
+
+                {/* Listener response — bold stat cards */}
+                <div className="flex-1 grid grid-cols-3 gap-2 sm:gap-3">
+                  <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-3 sm:p-4 text-center">
+                    <div className="text-2xl sm:text-3xl font-black text-purple-700 leading-none">85%</div>
+                    <div className="text-[10px] sm:text-xs font-bold text-purple-600/70 mt-1.5">Would replay</div>
+                  </div>
+                  <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-3 sm:p-4 text-center">
+                    <div className="text-2xl sm:text-3xl font-black text-purple-700 leading-none">67%</div>
+                    <div className="text-[10px] sm:text-xs font-bold text-purple-600/70 mt-1.5">Would playlist</div>
+                  </div>
+                  <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-3 sm:p-4 text-center">
+                    <div className="text-2xl sm:text-3xl font-black text-orange-600 leading-none">52%</div>
+                    <div className="text-[10px] sm:text-xs font-bold text-orange-500/70 mt-1.5">Would share</div>
+                  </div>
                 </div>
               </div>
 
-              {/* Rating Distribution - Bar Chart */}
+              {/* Rating Distribution — chunky bars */}
               <div>
-                <h4 className="text-xs font-semibold text-neutral-500 mb-4 tracking-wider">RATING DISTRIBUTION</h4>
-                <div className="bg-[#faf8f5] border border-neutral-200 p-4">
-                  <div className="space-y-2">
-                    {[
-                      { stars: 5, count: 8, percent: 40 },
-                      { stars: 4, count: 7, percent: 35 },
-                      { stars: 3, count: 4, percent: 20 },
-                      { stars: 2, count: 1, percent: 5 },
-                      { stars: 1, count: 0, percent: 0 },
-                    ].map((row) => (
-                      <div key={row.stars} className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-neutral-500 w-12">{row.stars} star</span>
-                        <div className="flex-1 h-4 bg-neutral-200 rounded-sm overflow-hidden">
-                          <div
-                            className={`h-full ${row.stars >= 4 ? 'bg-purple-500' : row.stars === 3 ? 'bg-yellow-500' : 'bg-orange-500'}`}
-                            style={{ width: `${row.percent}%` }}
-                          />
-                        </div>
-                        <span className="text-xs font-bold text-neutral-600 w-8">{row.count}</span>
+                <h4 className="text-[10px] font-bold text-neutral-400 mb-3 tracking-[0.15em] uppercase">Rating breakdown</h4>
+                <div className="space-y-1.5">
+                  {[
+                    { stars: 5, count: 8, percent: 40, color: "bg-purple-600" },
+                    { stars: 4, count: 7, percent: 35, color: "bg-purple-400" },
+                    { stars: 3, count: 4, percent: 20, color: "bg-orange-400" },
+                    { stars: 2, count: 1, percent: 5, color: "bg-orange-300" },
+                    { stars: 1, count: 0, percent: 0, color: "bg-neutral-300" },
+                  ].map((row) => (
+                    <div key={row.stars} className="flex items-center gap-2.5">
+                      <span className="text-xs font-black text-neutral-400 w-5 text-right">{row.stars}</span>
+                      <div className="flex-1 h-5 bg-neutral-100 rounded-md overflow-hidden">
+                        <div
+                          className={`h-full rounded-md ${row.color} transition-all duration-500 ease-out`}
+                          style={{ width: `${Math.max(row.percent, 2)}%` }}
+                        />
                       </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-neutral-200 flex items-center justify-between">
-                    <span className="text-xs text-neutral-500">Average Rating</span>
-                    <span className="text-lg font-extrabold text-neutral-950">4.2<span className="text-neutral-500 text-sm">/5</span></span>
-                  </div>
+                      <span className="text-xs font-bold text-neutral-500 w-5">{row.count}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-purple-500/10 border border-purple-500/30 p-4 text-center">
-                  <div className="text-2xl font-extrabold text-purple-700">75%</div>
-                  <div className="text-xs text-neutral-600 mt-1">Positive Sentiment</div>
-                </div>
-                <div className="bg-orange-400/10 border border-orange-400/30 p-4 text-center">
-                  <div className="text-2xl font-extrabold text-orange-700">3</div>
-                  <div className="text-xs text-neutral-600 mt-1">Areas to Improve</div>
+              {/* Bottom insight — replaces old quick stats */}
+              <div className="bg-neutral-950 border-2 border-black rounded-xl p-4 flex items-center gap-4">
+                <div className="text-3xl font-black text-white leading-none">75%</div>
+                <div>
+                  <p className="text-sm font-bold text-white">Positive sentiment</p>
+                  <p className="text-xs text-neutral-500">3 areas flagged for improvement across 20 reviews</p>
                 </div>
               </div>
             </div>
