@@ -18,6 +18,7 @@ import {
   History,
   MoreHorizontal,
   X,
+  Compass,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -134,6 +135,29 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
               </div>
             </>
           )}
+
+          <div className="my-4 border-t border-black/8" />
+
+          <p className="px-4 mb-2 text-[10px] font-mono tracking-widest text-black/35 uppercase">
+            Explore
+          </p>
+          <div className="group relative">
+            <div
+              className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-neutral-400 cursor-default border-l-2 border-transparent"
+            >
+              <Compass className="w-4 h-4 opacity-50" />
+              <span className="flex-1">Discover</span>
+              <span className="text-[9px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                SOON
+              </span>
+            </div>
+            <div className="absolute left-full top-0 ml-2 w-56 p-3 bg-white rounded-xl border border-neutral-200 shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 ease-out z-50">
+              <p className="text-xs font-semibold text-black mb-1">Discover Music</p>
+              <p className="text-[11px] text-neutral-500 leading-relaxed">
+                Browse tracks from the community, listen to new music, purchase songs, and share affiliate links to earn.
+              </p>
+            </div>
+          </div>
         </nav>
 
         {/* Credit Balance */}
@@ -262,6 +286,10 @@ function MobileBottomNav({
     { href: "/account", label: "Settings", icon: Settings },
   ];
 
+  const comingSoonLinks = [
+    { label: "Discover", icon: Compass, description: "Browse, listen & share music" },
+  ];
+
   const moreIsActive = moreLinks.some((l) => isActive(l.href));
 
   return (
@@ -335,6 +363,22 @@ function MobileBottomNav({
                       </span>
                     )}
                   </Link>
+                );
+              })}
+              <div className="my-1 border-t border-neutral-100" />
+              {comingSoonLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <div
+                    key={link.label}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-400 cursor-default"
+                  >
+                    <Icon className="w-4 h-4 opacity-50 flex-shrink-0" />
+                    <span className="flex-1">{link.label}</span>
+                    <span className="text-[9px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                      SOON
+                    </span>
+                  </div>
                 );
               })}
               <div className="my-1 border-t border-neutral-100" />
