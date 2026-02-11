@@ -214,16 +214,14 @@ export default async function ReviewQueuePage({
                       key={review.id}
                       className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
                     >
-                      <div className="flex-shrink-0 self-stretch">
-                        <div className="h-full aspect-square relative bg-neutral-100">
-                          {review.Track.artworkUrl ? (
-                            <Image src={review.Track.artworkUrl} alt={review.Track.title} fill className="object-cover" sizes="120px" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Music className="h-5 w-5 text-neutral-400" />
-                            </div>
-                          )}
-                        </div>
+                      <div className="w-[100px] flex-shrink-0 self-stretch relative bg-neutral-100">
+                        {review.Track.artworkUrl ? (
+                          <Image src={review.Track.artworkUrl} alt={review.Track.title} fill className="object-cover" sizes="100px" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Music className="h-5 w-5 text-neutral-400" />
+                          </div>
+                        )}
                       </div>
                       <div className="flex items-center justify-between gap-4 flex-1 min-w-0 px-4 py-3.5">
                         <div className="min-w-0 flex-1">
@@ -269,16 +267,14 @@ export default async function ReviewQueuePage({
                       key={track.id}
                       className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
                     >
-                      <div className="flex-shrink-0 self-stretch">
-                        <div className="h-full aspect-square relative bg-neutral-100">
-                          {track.artworkUrl ? (
-                            <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="120px" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Music className="h-5 w-5 text-neutral-400" />
-                            </div>
-                          )}
-                        </div>
+                      <div className="w-[100px] flex-shrink-0 self-stretch relative bg-neutral-100">
+                        {track.artworkUrl ? (
+                          <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="100px" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Music className="h-5 w-5 text-neutral-400" />
+                          </div>
+                        )}
                       </div>
                       <div className="flex items-center justify-between gap-4 flex-1 min-w-0 px-4 py-3.5">
                         <div className="min-w-0 flex-1">
