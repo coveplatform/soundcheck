@@ -290,34 +290,34 @@ export default function Home() {
             {/* Free Tier */}
             <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-8">
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-lime-400 mb-2">Free</h3>
+                <h3 className="text-2xl font-bold text-purple-400 mb-2">Free</h3>
                 <div className="text-4xl font-extrabold">$0</div>
                 <p className="text-sm text-neutral-400 mt-2">Forever free</p>
               </div>
 
               <div className="space-y-3 text-left">
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                   <span className="text-sm text-neutral-50"><span className="font-bold">2 free credits</span> to start</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                   <span className="text-sm text-neutral-50">Upload tracks &amp; get peer reviews</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                   <span className="text-sm text-neutral-50"><span className="font-bold">5 reviews per day</span> to earn credits</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                   <span className="text-sm text-neutral-50">Genre-matched feedback</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                   <span className="text-sm text-neutral-50">Buy credit packs anytime</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-lime-400 flex-shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                   <span className="text-sm text-neutral-50">Public track pages</span>
                 </div>
               </div>
@@ -336,8 +336,8 @@ export default function Home() {
             </div>
 
             {/* Pro Tier */}
-            <div className="bg-lime-500 text-black border border-lime-400 p-8 shadow-lg relative rounded-2xl">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-black text-lime-400 text-xs font-black px-3 py-1 rounded-full">
+            <div className="bg-purple-600 text-white border border-purple-500 p-8 shadow-lg relative rounded-2xl">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-black text-purple-300 text-xs font-black px-3 py-1 rounded-full">
                 MOST POPULAR
               </div>
 
@@ -346,32 +346,32 @@ export default function Home() {
                 <div className="text-5xl font-black">
                   $9.95<span className="text-xl font-black">/mo</span>
                 </div>
-                <p className="text-sm text-black/60 mt-2 font-semibold">For serious artists</p>
+                <p className="text-sm text-white/60 mt-2 font-semibold">For serious artists</p>
               </div>
 
               <div className="space-y-3 text-left mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-black flex-shrink-0 rounded-full" />
+                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
                   <span className="text-sm font-bold">Everything in Free, plus:</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-black flex-shrink-0 rounded-full" />
+                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
                   <span className="text-sm font-bold">40 credits/month (no reviewing required)</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-black flex-shrink-0 rounded-full" />
+                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
                   <span className="text-sm font-bold">Unlimited reviews per day</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-black flex-shrink-0 rounded-full" />
+                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
                   <span className="text-sm font-semibold">Sell your music &amp; keep 85%</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-black flex-shrink-0 rounded-full" />
+                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
                   <span className="text-sm font-semibold">Portfolio analytics dashboard</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 bg-black flex-shrink-0 rounded-full" />
+                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
                   <span className="text-sm font-semibold">Business &amp; earnings dashboard</span>
                 </div>
               </div>
@@ -379,7 +379,7 @@ export default function Home() {
               <Link href="/signup">
                 <Button
                   size="lg"
-                  className="w-full bg-black text-lime-400 hover:bg-neutral-900 active:bg-neutral-800 font-black rounded-xl border border-black shadow-lg transition-colors duration-150 ease-out"
+                  className="w-full bg-white text-purple-700 hover:bg-purple-50 active:bg-purple-100 font-black rounded-xl border border-white shadow-lg transition-colors duration-150 ease-out"
                 >
                   Get started free <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
