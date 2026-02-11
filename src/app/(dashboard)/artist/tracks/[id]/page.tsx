@@ -50,7 +50,7 @@ export default async function TrackDetailPage({
         },
         Genre: true,
         Payment: true,
-        stems: {
+        TrackStem: {
           orderBy: { order: "asc" },
         },
         Review: {
@@ -64,9 +64,9 @@ export default async function TrackDetailPage({
           },
           orderBy: { createdAt: "asc" },
         },
-        purchases: {
+        Purchase: {
           include: {
-            ReviewerProfile: {
+            ReviewerProfile_Purchase_reviewerIdToReviewerProfile: {
               include: {
                 User: { select: { name: true } },
               },
@@ -74,7 +74,7 @@ export default async function TrackDetailPage({
           },
           orderBy: { createdAt: "desc" },
         },
-        externalPurchases: {
+        ExternalPurchase: {
           where: { status: "COMPLETED" },
           orderBy: { completedAt: "desc" },
         },

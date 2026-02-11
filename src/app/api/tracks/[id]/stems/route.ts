@@ -37,7 +37,7 @@ export async function GET(
       where: { id },
       select: {
         hasStems: true,
-        stems: {
+        Stem: {
           orderBy: { order: "asc" },
         },
       },
@@ -177,7 +177,7 @@ export async function POST(
         where: { id },
         data: { hasStems: true },
         include: {
-          stems: {
+          Stem: {
             orderBy: { order: "asc" },
           },
         },

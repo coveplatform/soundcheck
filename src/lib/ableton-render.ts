@@ -84,7 +84,7 @@ export async function getRenderStatus(trackId: string): Promise<RenderProgress |
     select: {
       id: true,
       abletonRenderStatus: true,
-      stems: {
+      Stem: {
         select: {
           stemUrl: true,
           stemType: true,

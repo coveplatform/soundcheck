@@ -37,7 +37,7 @@ export default async function BusinessPage() {
         include: {
           tracks: {
             include: {
-              purchases: {
+              Purchase: {
                 include: {
                   ReviewerProfile: {
                     include: {
@@ -47,14 +47,14 @@ export default async function BusinessPage() {
                 },
                 orderBy: { createdAt: "desc" },
               },
-              externalPurchases: {
+              ExternalPurchase: {
                 where: { status: "COMPLETED" },
                 orderBy: { completedAt: "desc" },
               },
               Genre: true,
               _count: {
                 select: {
-                  externalPurchases: {
+                  ExternalPurchase: {
                     where: { status: "COMPLETED" },
                   },
                 },
