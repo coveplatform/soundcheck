@@ -306,6 +306,22 @@ export default async function DashboardPage() {
               <StatCardGrid stats={stats} />
             </section>
 
+            {/* Mobile Pro Upsell - visible only on small screens */}
+            {!isSubscribed && (
+              <Link href="/account" className="block lg:hidden">
+                <div className="flex items-center gap-3 rounded-xl border border-purple-200 bg-gradient-to-r from-purple-50 via-white to-purple-50 px-4 py-3 active:scale-[0.99] transition-transform duration-100 ease-out">
+                  <div className="h-8 w-8 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
+                    <ArrowRight className="h-3.5 w-3.5 text-white rotate-[-45deg]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-black">Upgrade to Pro</p>
+                    <p className="text-[11px] text-neutral-500">40 credits/mo + listener revenue</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-purple-400 flex-shrink-0" />
+                </div>
+              </Link>
+            )}
+
             {/* Your Tracks */}
             <section aria-label="Your tracks">
               <div className="flex items-center justify-between mb-3">

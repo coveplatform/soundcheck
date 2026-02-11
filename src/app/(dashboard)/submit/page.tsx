@@ -930,7 +930,7 @@ export default function SubmitTrackPage() {
                   <Globe className={cn("h-5 w-5", isPublic ? "text-purple-600" : "text-neutral-400")} />
                   <span className={cn("text-sm font-semibold", isPublic ? "text-purple-700" : "text-neutral-600")}>Public</span>
                   <span className="text-[11px] text-neutral-500 text-center leading-snug">
-                    Anyone with the link can listen and view reviews on your track
+                    Discoverable by the community, eligible for Top Rated charts, and shareable via link
                   </span>
                 </button>
               </div>
