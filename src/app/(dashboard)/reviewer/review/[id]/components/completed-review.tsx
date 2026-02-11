@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AudioPlayer } from "@/components/audio/audio-player";
-import { StemPlayer } from "@/components/audio/stem-player";
 import { ArrowLeft, Music, DollarSign, Download, ShoppingCart } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { Review } from "../types";
@@ -34,7 +33,7 @@ export function CompletedReview({
     <div className="max-w-3xl mx-auto space-y-10">
       <div className="flex items-center justify-between gap-4">
         <Link
-          href="/listener/history"
+          href="/review/history"
           className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -61,20 +60,12 @@ export function CompletedReview({
           </div>
         </CardHeader>
         <CardContent className="pt-6">
-          {review.Track.hasStems && review.Track.TrackStem && review.Track.TrackStem.length > 0 ? (
-            <StemPlayer
-              trackId={review.Track.id}
-              stems={review.Track.TrackStem}
-              showListenTracker={false}
-            />
-          ) : (
-            <AudioPlayer
-              sourceUrl={review.Track.sourceUrl}
-              sourceType={review.Track.sourceType}
-              showListenTracker={false}
-              showWaveform={review.Track.sourceType === "UPLOAD"}
-            />
-          )}
+          <AudioPlayer
+            sourceUrl={review.Track.sourceUrl}
+            sourceType={review.Track.sourceType}
+            showListenTracker={false}
+            showWaveform={review.Track.sourceType === "UPLOAD"}
+          />
         </CardContent>
       </Card>
 

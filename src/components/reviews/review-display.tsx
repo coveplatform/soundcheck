@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
-import { ThumbsUp, ThumbsDown, ListMusic, Share2, UserPlus, Link2, Check } from "lucide-react";
+import { ThumbsUp, ThumbsDown, ListMusic, Share2, UserPlus } from "lucide-react";
 import { ReviewRating } from "@/components/artist/review-rating";
 import { ReviewFlag } from "@/components/artist/review-flag";
 import { ReviewGem } from "@/components/artist/review-gem";
@@ -72,16 +71,6 @@ export function ReviewDisplay({
   index: _index,
   showControls = true,
 }: ReviewDisplayProps) {
-  const [copied, setCopied] = useState(false);
-
-  const handleShare = async () => {
-    if (!review.shareId) return;
-    const url = `${window.location.origin}/r/${review.shareId}`;
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
     <article className="p-6">
       {/* Clean header: Reviewer info */}
@@ -149,19 +138,6 @@ export function ReviewDisplay({
             />
             <div className="flex-1" />
             <ReviewGem reviewId={review.id} initialIsGem={review.isGem ?? false} compact />
-            {review.shareId && (
-              <button
-                onClick={handleShare}
-                className="p-2 text-neutral-500 hover:text-black hover:bg-neutral-100 rounded transition-colors"
-                title="Copy share link"
-              >
-                {copied ? (
-                  <Check className="h-4 w-4 text-purple-700" />
-                ) : (
-                  <Link2 className="h-4 w-4" />
-                )}
-              </button>
-            )}
           </div>
         )}
       </header>

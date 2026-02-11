@@ -8,13 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AudioPlayer } from "@/components/audio/audio-player";
-import { StemPlayer } from "@/components/audio/stem-player";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScoreInput } from "@/components/ui/score-input";
 import { YesNoToggle } from "@/components/ui/yes-no-toggle";
 import { WordCounter, countWords } from "@/components/ui/word-counter";
 import { ErrorAlert } from "@/components/ui/error-alert";
-import { ProjectStructure } from "@/components/ableton/project-structure";
 import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, Download, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
@@ -144,7 +142,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
             const notice = data.status === "SKIPPED" ? "skipped" : "expired";
             // Keep loading state active during navigation
-            router.push(`/listener/queue?notice=${notice}`);
+            router.push(`/review?notice=${notice}`);
             router.refresh();
             return;
           }
@@ -557,7 +555,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       }
 
       // Keep loading state active during navigation
-      router.push("/listener/queue?notice=skipped");
+      router.push("/review?notice=skipped");
       router.refresh();
     } catch {
       setError("Failed to skip review");
@@ -620,7 +618,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       }
 
       // Keep loading state active during navigation
-      router.push("/listener/queue?notice=unplayable");
+      router.push("/review?notice=unplayable");
       router.refresh();
     } catch {
       setError("Failed to mark review unplayable");
@@ -784,7 +782,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </div>
         <h2 className="text-2xl font-black mb-2">Something went wrong</h2>
         <p className="text-neutral-600 mb-6">{error}</p>
-        <Link href="/listener/queue">
+        <Link href="/review">
           <Button variant="outline">Back to Queue</Button>
         </Link>
       </div>
@@ -793,26 +791,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   if (!review) return null;
 
-  const stems = Array.isArray(review.Track.TrackStem) ? review.Track.TrackStem : [];
-
-  const isZipUpload =
-    review.Track.sourceType === "UPLOAD" &&
-    typeof review.Track.sourceUrl === "string" &&
-    review.Track.sourceUrl.toLowerCase().endsWith(".zip");
-
-  const hasPlayableStems =
-    Boolean(review.Track.hasStems) &&
-    stems.length > 0 &&
-    stems.every(
-      (s) => typeof s.stemUrl === "string" && !s.stemUrl.toLowerCase().endsWith(".zip")
-    );
-
   if (review.status === "COMPLETED") {
     return (
       <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-10">
         <div className="flex items-center justify-between gap-4">
           <Link
-            href="/listener/history"
+            href="/review/history"
             className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -839,27 +823,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           </CardHeader>
           <CardContent className="pt-6">
-            {hasPlayableStems ? (
-              <StemPlayer
-                trackId={review.Track.id}
-                stems={stems}
-                showListenTracker={false}
-              />
-            ) : isZipUpload ? (
-              <div className="rounded-xl border-2 border-black bg-white p-4">
-                <p className="text-sm font-bold">Audio will be available after rendering</p>
-                <p className="mt-1 text-sm text-neutral-600">
-                  This track was uploaded as an Ableton project ZIP. Once rendering finishes, you&apos;ll be able to listen here.
-                </p>
-              </div>
-            ) : (
-              <AudioPlayer
-                sourceUrl={review.Track.sourceUrl}
-                sourceType={review.Track.sourceType}
-                showListenTracker={false}
-                showWaveform={review.Track.sourceType === "UPLOAD"}
-              />
-            )}
+            <AudioPlayer
+              sourceUrl={review.Track.sourceUrl}
+              sourceType={review.Track.sourceType}
+              showListenTracker={false}
+              showWaveform={review.Track.sourceType === "UPLOAD"}
+            />
           </CardContent>
         </Card>
 
@@ -1011,7 +980,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
         )}
 
-        <Link href="/listener/queue">
+        <Link href="/review">
           <Button variant="primary">Continue Listening</Button>
         </Link>
       </div>
@@ -1026,7 +995,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           type="button"
           onClick={() => {
             if (!confirmLeave()) return;
-            router.push("/listener/queue");
+            router.push("/review");
             router.refresh();
           }}
           className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 hover:text-black transition-colors"
@@ -1079,35 +1048,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           )}
         </CardHeader>
         <CardContent className="pt-6 space-y-4">
-          {hasPlayableStems ? (
-            <StemPlayer
-              trackId={review.Track.id}
-              stems={stems}
-              minListenTime={MIN_LISTEN_SECONDS}
-              initialListenTime={listenTime}
-              onTimeUpdate={(seconds) => setPlayerSeconds(seconds)}
-              onListenProgress={(seconds) => {
-                setListenTime((prev) => Math.max(prev, seconds));
-                void maybeSendHeartbeat();
-              }}
-              onMinimumReached={() => {
-                setCanSubmit(true);
-                funnels.review.minimumReached(review.Track.id, MIN_LISTEN_SECONDS);
-              }}
-              showListenTracker
-              onAddTimestamp={(seconds) => {
-              addTimestampNote(seconds);
-            }}
-          />
-          ) : isZipUpload ? (
-            <div className="rounded-xl border-2 border-black bg-white p-4">
-              <p className="text-sm font-bold">Audio will be available after rendering</p>
-              <p className="mt-1 text-sm text-neutral-600">
-                This track was uploaded as an Ableton project ZIP. Once rendering finishes, you&apos;ll be able to listen and submit.
-              </p>
-            </div>
-          ) : (
-            <AudioPlayer
+          <AudioPlayer
               sourceUrl={review.Track.sourceUrl}
               sourceType={review.Track.sourceType}
               showWaveform={review.Track.sourceType === "UPLOAD"}
@@ -1127,14 +1068,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               }}
               showListenTracker
             />
-          )}
         </CardContent>
       </Card>
-
-      {/* Project Structure (for Ableton projects) */}
-      {Boolean(review.Track.abletonProjectData) && (
-        <ProjectStructure projectData={review.Track.abletonProjectData as any} />
-      )}
 
       <Card variant="soft" elevated>
         <CardContent className="pt-6">

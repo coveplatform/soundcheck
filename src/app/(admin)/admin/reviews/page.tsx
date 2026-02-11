@@ -180,15 +180,6 @@ export default async function AdminReviewsPage({
                       >
                         View
                       </Link>
-                      {r.shareId && (
-                        <Link
-                          href={`/r/${r.shareId}`}
-                          target="_blank"
-                          className="text-xs text-neutral-500 hover:underline"
-                        >
-                          Share
-                        </Link>
-                      )}
                       {r.wasFlagged && (
                         <ReviewerRestrictionToggle
                           reviewerId={r.ReviewerProfile.id}

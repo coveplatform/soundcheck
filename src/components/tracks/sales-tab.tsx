@@ -199,37 +199,6 @@ export function SalesTab({
                 />
               </div>
 
-              {track.sharingEnabled && track.trackShareId && (
-                <div className="p-4 bg-white border border-black/10 rounded-xl">
-                  <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-2">
-                    Public Link
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 text-sm bg-neutral-100 px-3 py-2 rounded font-mono">
-                      {process.env.NEXT_PUBLIC_APP_URL}/t/{track.trackShareId}
-                    </code>
-                    <Button
-                      size="sm"
-                      variant="airy"
-                      onClick={() => {
-                        const url = `${process.env.NEXT_PUBLIC_APP_URL}/t/${track.trackShareId}`;
-                        navigator.clipboard.writeText(url);
-                      }}
-                    >
-                      Copy
-                    </Button>
-                    <a
-                      href={`${process.env.NEXT_PUBLIC_APP_URL}/t/${track.trackShareId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Button size="sm" variant="airy">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </a>
-                  </div>
-                </div>
-              )}
             </div>
           ) : (
             <div className="text-center py-6">
@@ -284,16 +253,7 @@ export function SalesTab({
                         )}
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="airy"
-                      onClick={() => {
-                        const url = `${process.env.NEXT_PUBLIC_APP_URL}/t/${track.trackShareId}?ref=${link.code}`;
-                        navigator.clipboard.writeText(url);
-                      }}
-                    >
-                      Copy Link
-                    </Button>
+                    <span className="text-xs text-black/40 font-mono">{link.code}</span>
                   </div>
                 </div>
               ))}

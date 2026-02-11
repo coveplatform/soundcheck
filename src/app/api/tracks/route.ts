@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { TrackStatus, AbletonRenderStatus } from "@prisma/client";
+import { TrackStatus } from "@prisma/client";
 import { z } from "zod";
 import { detectSource, PACKAGES, PackageType } from "@/lib/metadata";
 
@@ -19,10 +19,6 @@ const createTrackSchema = z.object({
   reviewsRequested: z.number().int().min(1).max(10).optional(),
   allowPurchase: z.boolean().optional(),
   isPublic: z.boolean().optional(),
-  hasStems: z.boolean().optional(),
-  abletonProjectUrl: z.string().optional(),
-  abletonProjectData: z.any().optional(),
-  abletonRenderStatus: z.enum(["PENDING", "RENDERING", "COMPLETED", "FAILED"]).optional(),
 });
 
 export async function POST(request: Request) {
@@ -52,14 +48,13 @@ export async function POST(request: Request) {
 
     console.log("Track creation - sourceUrl:", data.sourceUrl);
     console.log("Track creation - sourceType:", data.sourceType);
-    console.log("Track creation - abletonProjectUrl:", data.abletonProjectUrl);
 
     let sourceType = data.sourceType ?? detectSource(data.sourceUrl);
 
     if (data.sourceType === "UPLOAD") {
       const isLocalUpload =
         data.sourceUrl.startsWith("/uploads/") ||
-        (data.sourceUrl.startsWith("/ableton-projects/") && data.sourceUrl.toLowerCase().endsWith(".zip"));
+        false;
       let isRemoteUpload = false;
 
       if (!isLocalUpload) {
@@ -107,18 +102,12 @@ export async function POST(request: Request) {
       bpm: data.bpm,
       feedbackFocus: data.feedbackFocus,
       isPublic: data.isPublic ?? false,
-      hasStems: data.hasStems ?? false,
       packageType,
       reviewsRequested: shouldRequestReviews ? reviewsRequested : 0,
       creditsSpent: isPeerPackage && shouldRequestReviews ? reviewsRequested : 0,
       status: shouldRequestReviews ? undefined : TrackStatus.UPLOADED,
       // Only allow purchases for uploaded tracks AND Pro subscribers
       allowPurchase: sourceType === "UPLOAD" && isSubscribed ? (data.allowPurchase ?? false) : false,
-      // Ableton project data
-      abletonProjectUrl: data.abletonProjectUrl,
-      abletonProjectData: data.abletonProjectData,
-      // Auto-trigger render if Ableton project is uploaded
-      abletonRenderStatus: data.abletonProjectUrl ? AbletonRenderStatus.PENDING : data.abletonRenderStatus,
       Genre: {
         connect: data.genreIds.map((id) => ({ id })),
       },

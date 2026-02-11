@@ -2,7 +2,6 @@
 
 import { ReactNode, Suspense } from "react";
 import { SessionProvider as NextAuthSessionProvider } from "next-auth/react";
-import { AnalyticsProvider } from "./analytics-provider";
 import { ClarityScript } from "./clarity-script";
 import { TikTokPixel } from "./tiktok-pixel";
 import { RedditPixel } from "./reddit-pixel";
@@ -13,19 +12,16 @@ export function Providers({ children }: { children: ReactNode }) {
     <NextAuthSessionProvider>
       <Suspense fallback={null}>
         <NavigationProgress />
-        <AnalyticsProvider>
-          <ClarityScript />
-          <TikTokPixel />
-          <RedditPixel />
-          {children}
-        </AnalyticsProvider>
+        <ClarityScript />
+        <TikTokPixel />
+        <RedditPixel />
+        {children}
       </Suspense>
     </NextAuthSessionProvider>
   );
 }
 
 // Re-export individual providers for flexibility
-export { AnalyticsProvider } from "./analytics-provider";
 export { ClarityScript } from "./clarity-script";
 export { TikTokPixel, trackTikTokEvent } from "./tiktok-pixel";
 export { RedditPixel, trackRedditEvent, redditEvents } from "./reddit-pixel";

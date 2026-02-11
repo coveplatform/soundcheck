@@ -231,46 +231,6 @@ export async function sendPasswordResetEmail(params: {
   });
 }
 
-export async function sendEmailVerificationEmail(params: {
-  to: string;
-  verifyUrl: string;
-}) {
-  if (!params.to) return;
-
-  const content = `
-    <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
-        Welcome to MixReflect
-      </div>
-    </div>
-    <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
-      Verify your email address
-    </h1>
-    <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
-      Thanks for signing up! Please confirm your email address to complete your account setup and get started.
-    </p>
-    ${emailButton("Verify Email Address", params.verifyUrl)}
-    <p style="margin: 0 0 24px; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
-      This link will expire in <strong>24 hours</strong>.
-    </p>
-    <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px;">
-      <p style="margin: 0 0 8px; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-        If the button doesn't work, copy and paste this link into your browser:
-      </p>
-      <p style="margin: 0; font-size: 12px; color: ${COLORS.gray}; word-break: break-all; text-align: center;">
-        <a href="${params.verifyUrl}" style="color: ${COLORS.black};">${params.verifyUrl}</a>
-      </p>
-    </div>
-  `;
-
-  await sendEmail({
-    to: params.to,
-    subject: "Verify your email - MixReflect",
-    html: emailWrapper(content),
-    required: true,
-  });
-}
-
 export async function sendFinishLaterEmail(params: {
   to: string;
   resumeUrl: string;

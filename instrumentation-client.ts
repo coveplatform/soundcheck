@@ -1,1 +1,0 @@
-// Instrumentation client — no-op

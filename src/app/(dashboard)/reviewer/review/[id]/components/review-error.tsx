@@ -16,7 +16,7 @@ export function ReviewError({ error }: ReviewErrorProps) {
       </div>
       <h2 className="text-2xl font-black mb-2">Something went wrong</h2>
       <p className="text-neutral-600 mb-6">{error}</p>
-      <Link href="/listener/queue">
+      <Link href="/review">
         <Button variant="outline">Back to Queue</Button>
       </Link>
     </div>

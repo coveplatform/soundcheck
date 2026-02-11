@@ -25,15 +25,6 @@ export interface Review {
     feedbackFocus: string | null;
     Genre: { id: string; name: string }[];
     allowPurchase: boolean;
-    hasStems: boolean;
-    abletonProjectData?: unknown | null;
-    TrackStem?: Array<{
-      id: string;
-      stemUrl: string;
-      stemType: string;
-      label: string;
-      order: number;
-    }>;
     ArtistProfile?: {
       artistName: string;
     };

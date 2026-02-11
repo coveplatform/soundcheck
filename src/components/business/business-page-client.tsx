@@ -448,16 +448,7 @@ export function BusinessPageClient({
                                   )}
                                 </div>
                               </div>
-                              <Button
-                                size="sm"
-                                variant="airy"
-                                onClick={() => {
-                                  const url = `${process.env.NEXT_PUBLIC_APP_URL}/t/${link.trackShareId}?ref=${link.code}`;
-                                  handleCopyLink(url);
-                                }}
-                              >
-                                Copy Link
-                              </Button>
+                              <span className="text-xs text-black/40 font-mono">{link.code}</span>
                             </div>
                           </div>
                         ))}

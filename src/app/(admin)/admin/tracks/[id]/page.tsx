@@ -9,7 +9,6 @@ import { DeleteTrackButton } from "@/components/admin/delete-track-button";
 import { DebugAssignButton } from "@/components/admin/debug-assign-button";
 import { NotifyInvalidLinkButton } from "@/components/admin/notify-invalid-link-button";
 import { ReassignReviewerButton } from "@/components/admin/reassign-reviewer-button";
-import { GenerateFakeReviewsButton } from "@/components/admin/generate-fake-reviews-button";
 import { AudioPlayer } from "@/components/audio/audio-player";
 
 export const dynamic = 'force-dynamic';
@@ -290,16 +289,6 @@ export default async function AdminTrackDetailPage({
           <DebugAssignButton trackId={track.id} />
         </div>
       ) : null}
-
-      {/* Generate Fake Reviews */}
-      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-        <div className="text-sm text-neutral-500 mb-3">Demo Reviews</div>
-        <p className="text-sm text-neutral-600 mb-3">
-          Generate realistic demo reviews with detailed feedback from real-sounding reviewers.
-          These reviews count toward analytics and appear indistinguishable from real reviews.
-        </p>
-        <GenerateFakeReviewsButton trackId={track.id} />
-      </div>
 
       <div>
         <Link className="text-sm text-neutral-600 hover:text-neutral-900 underline" href="/admin/tracks">

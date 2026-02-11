@@ -7,8 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TrackFeedbackViewTracker } from "@/components/artist/track-feedback-view-tracker";
 import { AudioPlayer } from "@/components/audio/audio-player";
-import { StemPlayer } from "@/components/audio/stem-player";
-import { ProjectStructure } from "@/components/ableton/project-structure";
 import { TrackDashboardTabs } from "@/components/tracks/track-dashboard-tabs";
 import { StatsTab } from "@/components/tracks/stats-tab";
 import { ReviewsTab } from "@/components/tracks/reviews-tab";
@@ -50,9 +48,6 @@ export default async function TrackDetailPage({
         },
         Genre: true,
         Payment: true,
-        TrackStem: {
-          orderBy: { order: "asc" },
-        },
         Review: {
           where: { status: "COMPLETED" },
           include: {
@@ -125,19 +120,6 @@ export default async function TrackDetailPage({
     (sum, p) => sum + p.artistAmount,
     0
   );
-
-  const isZipUpload =
-    track.sourceType === "UPLOAD" &&
-    typeof track.sourceUrl === "string" &&
-    track.sourceUrl.toLowerCase().endsWith(".zip");
-
-  const hasPlayableStems =
-    Boolean(track.hasStems) &&
-    Array.isArray(track.TrackStem) &&
-    track.TrackStem.length > 0 &&
-    track.TrackStem.every(
-      (s) => typeof s.stemUrl === "string" && !s.stemUrl.toLowerCase().endsWith(".zip")
-    );
 
   const canUpdateSource = track.status !== "CANCELLED" && completedReviews === 0;
 
@@ -321,20 +303,7 @@ export default async function TrackDetailPage({
                 <p className="text-xs font-mono tracking-widest uppercase text-black/40 mb-4">
                   Listen
                 </p>
-                {hasPlayableStems ? (
-                  <StemPlayer
-                    trackId={track.id}
-                    stems={track.TrackStem}
-                    showListenTracker={false}
-                  />
-                ) : isZipUpload ? (
-                  <div className="rounded-lg border-2 border-black/10 bg-neutral-50 p-4">
-                    <p className="text-sm font-bold">Rendering in progress</p>
-                    <p className="mt-1 text-xs text-black/60">
-                      Audio will be available after your Ableton project finishes rendering.
-                    </p>
-                  </div>
-                ) : (
+                {(
                   <AudioPlayer
                     sourceUrl={track.sourceUrl}
                     sourceType={track.sourceType}
@@ -380,95 +349,6 @@ export default async function TrackDetailPage({
               </Card>
             )}
 
-            {/* Ableton Project Structure */}
-            {track.abletonProjectData && (
-              <Card variant="soft" elevated>
-                <CardContent className="pt-6">
-                  <p className="text-xs font-mono tracking-widest uppercase text-black/40 mb-3">
-                    Project Structure
-                  </p>
-                  {track.abletonProjectData && (
-                    <ProjectStructure
-                      projectData={track.abletonProjectData as {
-                        projectName?: string;
-                        tempo: number;
-                        timeSignature?: string;
-                        trackCount: number;
-                        sampleCount?: number;
-                        tracks: Array<{ name: string; type: "audio" | "midi" | "return" | "master"; sampleCount?: number; plugins?: string[]; color?: number }>;
-                        plugins?: string[];
-                      }}
-                    />
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Ableton Rendering Status */}
-            {track.abletonRenderStatus && (
-              <Card variant="soft" elevated>
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0">
-                      {track.abletonRenderStatus === "PENDING" && (
-                        <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
-                          <Clock className="h-5 w-5 text-amber-600" />
-                        </div>
-                      )}
-                      {track.abletonRenderStatus === "RENDERING" && (
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
-                        </div>
-                      )}
-                      {track.abletonRenderStatus === "COMPLETED" && (
-                        <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                          <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                        </div>
-                      )}
-                      {track.abletonRenderStatus === "FAILED" && (
-                        <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
-                          <XCircle className="h-5 w-5 text-red-600" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      {track.abletonRenderStatus === "PENDING" && (
-                        <>
-                          <p className="text-sm font-bold text-amber-900">Rendering queued</p>
-                          <p className="text-xs text-amber-700 mt-1">
-                            Your project is waiting to be rendered.
-                          </p>
-                        </>
-                      )}
-                      {track.abletonRenderStatus === "RENDERING" && (
-                        <>
-                          <p className="text-sm font-bold text-blue-900">Rendering...</p>
-                          <p className="text-xs text-blue-700 mt-1">
-                            Creating stems. Usually takes a few minutes.
-                          </p>
-                        </>
-                      )}
-                      {track.abletonRenderStatus === "COMPLETED" && (
-                        <>
-                          <p className="text-sm font-bold text-emerald-900">Render complete</p>
-                          <p className="text-xs text-emerald-700 mt-1">
-                            Stems ready for reviewers to analyze.
-                          </p>
-                        </>
-                      )}
-                      {track.abletonRenderStatus === "FAILED" && (
-                        <>
-                          <p className="text-sm font-bold text-red-900">Rendering failed</p>
-                          <p className="text-xs text-red-700 mt-1">
-                            Please contact support.
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
       </div>

@@ -68,9 +68,6 @@ export async function GET(
                 artistName: true,
               },
             },
-            TrackStem: {
-              orderBy: { order: "asc" },
-            },
           },
         },
         ReviewerProfile: {
