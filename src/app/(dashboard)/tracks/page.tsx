@@ -350,7 +350,7 @@ function TrackCard({
   const isPending = status === "PENDING_PAYMENT";
   const isReviewing = status === "IN_PROGRESS" || status === "QUEUED";
   const isComplete = status === "COMPLETED";
-  const isUploaded = status === "UPLOADED";
+  const isUploaded = status === "UPLOADED" || isPending;
 
   return (
     <Link href={`/artist/tracks/${id}`} className="group block">
@@ -391,12 +391,6 @@ function TrackCard({
                 Uploaded
               </span>
             </div>
-          ) : isPending ? (
-            <div className="absolute top-2 left-2">
-              <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/80 text-black/50 border border-black/10 backdrop-blur-sm">
-                Pending
-              </span>
-            </div>
           ) : null}
 
           {/* Review progress bar */}
@@ -433,7 +427,7 @@ function TrackCard({
             </div>
           ) : (
             <p className={cn("text-xs", isUploaded ? "text-purple-600 font-medium" : "text-black/30")}>
-              {isUploaded ? "Request reviews →" : isPending ? "Payment pending" : "No reviews yet"}
+              {isUploaded ? "Request reviews →" : "No reviews yet"}
             </p>
           )}
         </div>

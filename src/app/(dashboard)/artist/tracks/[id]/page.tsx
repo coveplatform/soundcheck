@@ -101,6 +101,14 @@ export default async function TrackDetailPage({
     notFound();
   }
 
+  // Mark feedback as viewed (fire-and-forget so it doesn't slow page load)
+  if (track.Review.length > 0) {
+    prisma.track.update({
+      where: { id },
+      data: { feedbackViewedAt: new Date() },
+    }).catch(() => {});
+  }
+
   // Check subscription status
   const isSubscribed = track.ArtistProfile.subscriptionStatus === "active";
   const isFreeTier = !isSubscribed;
@@ -278,11 +286,11 @@ export default async function TrackDetailPage({
                   <Music className="h-16 w-16 text-black/20 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-black mb-2">No reviews yet</h3>
                   <p className="text-sm text-black/60 mb-6 max-w-md mx-auto">
-                    {track.status === "UPLOADED"
+                    {track.status === "UPLOADED" || track.status === "PENDING_PAYMENT"
                       ? "Request reviews to start getting feedback on your track."
                       : "Reviews will appear here once they're completed."}
                   </p>
-                  {track.status === "UPLOADED" && (
+                  {(track.status === "UPLOADED" || track.status === "PENDING_PAYMENT") && (
                     <Link href={`/artist/tracks/${track.id}/request-reviews`}>
                       <Button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:shadow-[3px_3px_0_rgba(0,0,0,0.6)] active:shadow-[1px_1px_0_rgba(0,0,0,0.6)] transition-all">
                         Request reviews
@@ -320,7 +328,7 @@ export default async function TrackDetailPage({
                 <p className="text-xs font-mono tracking-widest uppercase text-black/40 mb-2">
                   Quick Actions
                 </p>
-                {(track.status === "UPLOADED" || track.status === "COMPLETED") && (
+                {(track.status === "UPLOADED" || track.status === "PENDING_PAYMENT" || track.status === "COMPLETED") && (
                   <Link href={`/artist/tracks/${track.id}/request-reviews`} className="block">
                     <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:shadow-[3px_3px_0_rgba(0,0,0,0.6)] active:shadow-[1px_1px_0_rgba(0,0,0,0.6)] active:translate-x-[1px] active:translate-y-[1px] transition-all">
                       {track.status === "COMPLETED" ? "Request more reviews" : "Request reviews"}

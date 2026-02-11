@@ -60,9 +60,10 @@ export default async function DashboardPage() {
             status: true,
             reviewsRequested: true,
             reviewsCompleted: true,
+            feedbackViewedAt: true,
             Genre: true,
             Review: {
-              select: { status: true },
+              select: { status: true, createdAt: true },
             },
           },
           orderBy: { createdAt: "desc" },
@@ -86,9 +87,10 @@ export default async function DashboardPage() {
             status: true,
             reviewsRequested: true,
             reviewsCompleted: true,
+            feedbackViewedAt: true,
             Genre: true,
             Review: {
-              select: { status: true },
+              select: { status: true, createdAt: true },
             },
           },
           orderBy: { createdAt: "desc" },
@@ -111,10 +113,15 @@ export default async function DashboardPage() {
   const isSubscribed = artistProfile.subscriptionStatus === "active";
   const tracks = artistProfile.Track ?? [];
 
-  // Detect tracks with feedback waiting
+  // Detect tracks with NEW feedback (completed reviews since last viewed)
   const tracksWithFeedback = tracks.filter((t) => {
-    const completed = t.Review.filter((r) => r.status === "COMPLETED").length;
-    return completed > 0 && (t.status === "IN_PROGRESS" || t.status === "COMPLETED");
+    const completedReviews = t.Review.filter((r) => r.status === "COMPLETED");
+    if (completedReviews.length === 0) return false;
+    // If artist has never viewed feedback, any completed review counts
+    if (!t.feedbackViewedAt) return true;
+    // Check if any review was completed after the last time the artist viewed
+    const viewedAt = new Date(t.feedbackViewedAt).getTime();
+    return completedReviews.some((r) => new Date(r.createdAt).getTime() > viewedAt);
   });
 
   // Fetch pending peer reviews
@@ -231,7 +238,7 @@ export default async function DashboardPage() {
         : undefined,
   });
 
-  const showSideRail = !hasSeenCreditGuide || !isSubscribed || whatsNext;
+  const showSideRail = true;
 
   return (
     <div className="pt-6 pb-24 overflow-x-hidden">
@@ -298,43 +305,6 @@ export default async function DashboardPage() {
             <section aria-label="Dashboard statistics">
               <StatCardGrid stats={stats} />
             </section>
-
-            {/* Highest Rated Today */}
-            {topRatedTrack && (
-              <section aria-label="Highest rated today">
-                <div className="flex items-center gap-3 rounded-2xl border border-amber-200/80 bg-gradient-to-r from-amber-50 via-white to-amber-50 px-4 py-3">
-                  <div className="h-10 w-10 rounded-lg overflow-hidden bg-neutral-100 border border-black/5 flex-shrink-0">
-                    {topRatedTrack.artworkUrl ? (
-                      <Image
-                        src={topRatedTrack.artworkUrl}
-                        alt={topRatedTrack.title}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-200 to-amber-300">
-                        <Music className="h-4 w-4 text-amber-600" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <Trophy className="h-3 w-3 text-amber-500" />
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600">Top Rated Today</span>
-                    </div>
-                    <p className="text-sm font-semibold text-black truncate mt-0.5">
-                      {topRatedTrack.title}
-                      <span className="font-normal text-black/40"> · {topRatedTrack.artistName}</span>
-                    </p>
-                  </div>
-                  <div className="flex items-baseline gap-0.5 flex-shrink-0">
-                    <span className="text-lg font-black text-amber-600">{topRatedTrack.avgScore}</span>
-                    <span className="text-[10px] text-amber-500/70">/5</span>
-                  </div>
-                </div>
-              </section>
-            )}
 
             {/* Your Tracks */}
             <section aria-label="Your tracks">
@@ -412,10 +382,54 @@ export default async function DashboardPage() {
             </section>
           </div>
 
-          {showSideRail && (
-            <aside className="space-y-4 mt-2 lg:mt-0 lg:sticky lg:top-6 h-fit" aria-label="Sidebar">
+          <aside className="space-y-4 mt-2 lg:mt-0 lg:sticky lg:top-6 h-fit" aria-label="Sidebar">
               {whatsNext && <WhatsNextCard {...whatsNext} />}
               {!hasSeenCreditGuide && <CreditGuide />}
+
+              {/* Top Rated Today */}
+              <div className="border border-amber-200/60 rounded-2xl bg-gradient-to-br from-amber-50/80 via-white to-amber-50/50 p-4">
+                <div className="flex items-center gap-1.5 mb-3">
+                  <Trophy className="h-3.5 w-3.5 text-amber-500" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600">Top Rated Today</span>
+                </div>
+                {topRatedTrack ? (
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-lg overflow-hidden bg-neutral-100 border border-black/5 flex-shrink-0">
+                      {topRatedTrack.artworkUrl ? (
+                        <Image
+                          src={topRatedTrack.artworkUrl}
+                          alt={topRatedTrack.title}
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-200 to-amber-300">
+                          <Music className="h-5 w-5 text-amber-600" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-black truncate">{topRatedTrack.title}</p>
+                      <p className="text-xs text-black/40 truncate">{topRatedTrack.artistName}</p>
+                    </div>
+                    <div className="flex flex-col items-center flex-shrink-0">
+                      <span className="text-xl font-black text-amber-600 leading-none">{topRatedTrack.avgScore}</span>
+                      <span className="text-[9px] text-amber-500/60 font-medium">/5</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center flex-shrink-0">
+                      <Music className="h-5 w-5 text-amber-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-black/40">No ratings yet today</p>
+                      <p className="text-xs text-black/25">Submit a track to be featured</p>
+                    </div>
+                  </div>
+                )}
+              </div>
               {!isSubscribed && (
                 <div className="border border-purple-200 rounded-2xl bg-gradient-to-br from-purple-50 via-white to-purple-100 p-5">
                   <div className="flex items-center gap-3 mb-3">
@@ -438,7 +452,6 @@ export default async function DashboardPage() {
                 </div>
               )}
             </aside>
-          )}
         </div>
 
         <MobileStickyCTA show={tracks.length === 0 || credits > 0} />

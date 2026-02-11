@@ -30,7 +30,7 @@ export function TracksViewToggle({
     <div>
       {/* View Toggle */}
       <div className="border-b-2 border-neutral-200 mb-8">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-2">
           <button
             onClick={() => handleViewChange("grid")}
             className={cn(

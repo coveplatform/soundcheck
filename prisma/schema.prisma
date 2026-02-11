@@ -373,6 +373,7 @@ model Track {
   abletonProjectUrl       String?
   abletonProjectData      Json?
   abletonRenderStatus     AbletonRenderStatus?
+  feedbackViewedAt        DateTime?
   lastViewedAt            DateTime?
   viewCount               Int                  @default(0)
   publicPlayCount         Int                  @default(0)

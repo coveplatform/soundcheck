@@ -22,7 +22,13 @@ export function TrackCard({ track, priority = false, compact = false }: TrackCar
   const completed = track.Review.filter((r) => r.status === "COMPLETED").length;
   const reviewCount = formatReviewCount(completed, track.reviewsRequested);
   const action = getTrackAction(track);
-  const hasFeedback = completed > 0 && (track.status === "IN_PROGRESS" || track.status === "COMPLETED");
+  // Only show "new" badge for reviews completed after last viewed
+  const completedReviews = track.Review.filter((r) => r.status === "COMPLETED");
+  const newFeedbackCount = completedReviews.filter((r) => {
+    if (!track.feedbackViewedAt) return true;
+    return new Date(r.createdAt).getTime() > new Date(track.feedbackViewedAt).getTime();
+  }).length;
+  const hasFeedback = newFeedbackCount > 0;
 
   return (
     <div className={`group flex items-center gap-3 sm:gap-4 rounded-2xl border border-black/8 bg-white px-3 sm:px-4 py-3 transition-colors duration-150 ease-out hover:bg-white/90 hover:border-black/12 motion-reduce:transition-none ${compact ? '' : 'sm:py-4'}`}>
@@ -64,7 +70,7 @@ export function TrackCard({ track, priority = false, compact = false }: TrackCar
           {hasFeedback && (
             <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded-full">
               <MessageCircle className="h-2.5 w-2.5" />
-              {completed} new
+              {newFeedbackCount} new
             </span>
           )}
         </div>

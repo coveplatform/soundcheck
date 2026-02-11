@@ -24,6 +24,8 @@ import {
   Sparkles,
   CheckCircle2,
   ImagePlus,
+  Globe,
+  Lock,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -100,6 +102,7 @@ export default function SubmitTrackPage() {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [feedbackFocus, setFeedbackFocus] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
 
   // ---- step 3: reviews state ----------------------------------------------
   const [reviewCount, setReviewCount] = useState<number>(5);
@@ -368,7 +371,7 @@ export default function SubmitTrackPage() {
           genreIds: selectedGenres,
           feedbackFocus: feedbackFocus.trim() || undefined,
           packageType: "STARTER",
-          isPublic: false,
+          isPublic,
         }),
       });
 
@@ -437,7 +440,7 @@ export default function SubmitTrackPage() {
           artworkUrl: artworkUrl || undefined,
           genreIds: selectedGenres,
           feedbackFocus: feedbackFocus.trim() || undefined,
-          isPublic: false,
+          isPublic,
         }),
       });
 
@@ -890,6 +893,47 @@ export default function SubmitTrackPage() {
                 maxLength={1000}
                 className="w-full rounded-xl border-2 border-neutral-200 bg-white px-4 py-3 text-sm placeholder:text-neutral-400 focus:border-purple-500 focus:outline-none resize-none"
               />
+            </div>
+
+            {/* Visibility */}
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-3">
+                Visibility
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsPublic(false)}
+                  className={cn(
+                    "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-150 ease-out",
+                    !isPublic
+                      ? "border-purple-500 bg-purple-50/60"
+                      : "border-neutral-200 bg-white hover:border-neutral-300"
+                  )}
+                >
+                  <Lock className={cn("h-5 w-5", !isPublic ? "text-purple-600" : "text-neutral-400")} />
+                  <span className={cn("text-sm font-semibold", !isPublic ? "text-purple-700" : "text-neutral-600")}>Private</span>
+                  <span className="text-[11px] text-neutral-500 text-center leading-snug">
+                    Only you and assigned reviewers can access this track
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsPublic(true)}
+                  className={cn(
+                    "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-150 ease-out",
+                    isPublic
+                      ? "border-purple-500 bg-purple-50/60"
+                      : "border-neutral-200 bg-white hover:border-neutral-300"
+                  )}
+                >
+                  <Globe className={cn("h-5 w-5", isPublic ? "text-purple-600" : "text-neutral-400")} />
+                  <span className={cn("text-sm font-semibold", isPublic ? "text-purple-700" : "text-neutral-600")}>Public</span>
+                  <span className="text-[11px] text-neutral-500 text-center leading-snug">
+                    Anyone with the link can listen and view reviews on your track
+                  </span>
+                </button>
+              </div>
             </div>
 
             {/* Continue button */}

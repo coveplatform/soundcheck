@@ -21,9 +21,10 @@ export type DashboardArtistProfile = Prisma.ArtistProfileGetPayload<{
         status: true;
         reviewsRequested: true;
         reviewsCompleted: true;
+        feedbackViewedAt: true;
         Genre: true;
         Review: {
-          select: { status: true };
+          select: { status: true; createdAt: true };
         };
       };
     };
@@ -45,9 +46,10 @@ export type MinimalArtistProfile = Prisma.ArtistProfileGetPayload<{
         status: true;
         reviewsRequested: true;
         reviewsCompleted: true;
+        feedbackViewedAt: true;
         Genre: true;
         Review: {
-          select: { status: true };
+          select: { status: true; createdAt: true };
         };
       };
     };

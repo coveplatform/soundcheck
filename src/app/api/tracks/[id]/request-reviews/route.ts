@@ -56,7 +56,7 @@ export async function POST(
     }
 
     // Allow requesting more reviews on tracks that are UPLOADED, COMPLETED, or IN_PROGRESS
-    const eligibleStatuses = ["UPLOADED", "COMPLETED", "IN_PROGRESS", "QUEUED"];
+    const eligibleStatuses = ["UPLOADED", "PENDING_PAYMENT", "COMPLETED", "IN_PROGRESS", "QUEUED"];
     if (!eligibleStatuses.includes(track.status)) {
       return NextResponse.json(
         { error: "Track is not eligible for requesting reviews" },

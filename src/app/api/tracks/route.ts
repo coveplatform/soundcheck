@@ -105,7 +105,7 @@ export async function POST(request: Request) {
       packageType,
       reviewsRequested: shouldRequestReviews ? reviewsRequested : 0,
       creditsSpent: isPeerPackage && shouldRequestReviews ? reviewsRequested : 0,
-      status: shouldRequestReviews ? undefined : TrackStatus.UPLOADED,
+      status: TrackStatus.UPLOADED,
       // Only allow purchases for uploaded tracks AND Pro subscribers
       allowPurchase: sourceType === "UPLOAD" && isSubscribed ? (data.allowPurchase ?? false) : false,
       Genre: {

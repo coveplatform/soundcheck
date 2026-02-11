@@ -143,6 +143,7 @@ export function createMockTrack(overrides: Partial<Track> = {}): Track {
     completedAt: null,
     linkIssueNotifiedAt: null,
     viewCount: 0,
+    feedbackViewedAt: null,
     lastViewedAt: null,
     hasStems: false,
     abletonProjectUrl: null,
