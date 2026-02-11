@@ -41,9 +41,7 @@ export default async function TrackDetailPage({
   console.log("[TrackDetail] userId:", session.user.id, "trackId:", id);
 
   // Fetch all data needed for the dashboard tabs
-  let track: any, platformStats: any;
-  try {
-    [track, platformStats] = await Promise.all([
+  const [track, platformStats] = await Promise.all([
     prisma.track.findUnique({
       where: { id },
       include: {
@@ -95,10 +93,6 @@ export default async function TrackDetailPage({
       },
     }),
   ]);
-  } catch (err) {
-    console.error("[TrackDetail] Query failed for trackId:", id, err);
-    notFound();
-  }
 
   if (!track) {
     console.log("[TrackDetail] Track not found:", id);
