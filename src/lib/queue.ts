@@ -386,33 +386,10 @@ export async function assignReviewersToTrack(trackId: string) {
     const isPeerPackage = track.packageType === "PEER";
 
     if (isPeerPackage) {
-      const peerReviewers = await getEligiblePeerReviewers(trackId, tx);
-      const peersToAssign = peerReviewers.slice(0, neededReviews);
-
-      const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 48);
-
-      if (peersToAssign.length > 0) {
-        await tx.reviewQueue.createMany({
-          data: peersToAssign.map((peer) => ({
-            trackId,
-            artistReviewerId: peer.id,
-            expiresAt,
-            priority: 0,
-          })),
-          skipDuplicates: true,
-        });
-
-        await tx.review.createMany({
-          data: peersToAssign.map((peer) => ({
-            trackId,
-            peerReviewerArtistId: peer.id,
-            isPeerReview: true,
-            status: "ASSIGNED",
-          })),
-          skipDuplicates: true,
-        });
-      }
+      // PEER tracks use a claim model: users browse available tracks in /review
+      // and claim them on-click via POST /api/reviews/claim.
+      // No proactive assignment needed.
+      return;
     } else {
       // Legacy flow for STARTER/STANDARD/PRO/DEEP_DIVE packages
       const eligibleReviewers = await getEligibleReviewers(

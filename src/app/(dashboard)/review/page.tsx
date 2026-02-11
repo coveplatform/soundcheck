@@ -7,20 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Music, ArrowRight, Star, Gem, MessageSquare, Tag } from "lucide-react";
 import { GenreTagList } from "@/components/ui/genre-tag";
 import { EmptyState } from "@/components/ui/empty-state";
+import { ClaimButton } from "./claim-button";
 
 export const dynamic = "force-dynamic";
 
-interface ReviewWithTrack {
+interface ClaimedReview {
   id: string;
   status: string;
-  createdAt: Date;
   Track: {
+    id: string;
     title: string;
     feedbackFocus: string | null;
     Genre: Array<{ id: string; name: string }>;
-    ArtistProfile: {
-      artistName: string;
-    };
+    ArtistProfile: { artistName: string };
   };
 }
 
@@ -55,34 +54,70 @@ export default async function ReviewQueuePage({
     redirect("/onboarding");
   }
 
-  // Fetch pending peer reviews - wrap in try/catch since peerReviewerArtistId
-  // may not exist on the Review model yet during migration
-  let pendingReviews: ReviewWithTrack[] = [];
-  try {
-    pendingReviews = await prisma.review.findMany({
-      where: {
-        peerReviewerArtistId: artistProfile.id,
-        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-        Track: {
-          status: { not: "COMPLETED" },
+  // Fetch reviews user has already claimed (in progress)
+  const claimedReviews: ClaimedReview[] = await prisma.review.findMany({
+    where: {
+      peerReviewerArtistId: artistProfile.id,
+      status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+      Track: { status: { not: "COMPLETED" } },
+    },
+    include: {
+      Track: {
+        include: {
+          Genre: true,
+          ArtistProfile: { select: { artistName: true } },
         },
       },
-      include: {
-        Track: {
-          include: {
-            Genre: true,
-            ArtistProfile: {
-              select: { artistName: true },
+    },
+    orderBy: { createdAt: "asc" },
+  }) as unknown as ClaimedReview[];
+
+  const claimedTrackIds = claimedReviews.map((r) => r.Track.id);
+
+  // Fetch track IDs this user has already reviewed/skipped (any terminal status)
+  const pastReviewTrackIds = await prisma.review.findMany({
+    where: {
+      peerReviewerArtistId: artistProfile.id,
+      status: { in: ["COMPLETED", "SKIPPED", "EXPIRED"] },
+    },
+    select: { trackId: true },
+  });
+  const excludeTrackIds = [
+    ...claimedTrackIds,
+    ...pastReviewTrackIds.map((r) => r.trackId),
+  ];
+
+  // Available tracks: PEER package, QUEUED/IN_PROGRESS, not own tracks,
+  // not already reviewed, still need more reviews
+  const availableTracksResult = await prisma.track.findMany({
+    where: {
+      packageType: "PEER",
+      status: { in: ["QUEUED", "IN_PROGRESS"] },
+      artistId: { not: artistProfile.id },
+      id: { notIn: excludeTrackIds },
+    },
+    include: {
+      Genre: true,
+      ArtistProfile: { select: { artistName: true } },
+      _count: {
+        select: {
+          Review: {
+            where: {
+              status: { in: ["ASSIGNED", "IN_PROGRESS", "COMPLETED"] },
             },
           },
         },
       },
-      orderBy: { createdAt: "asc" },
-    }) as unknown as ReviewWithTrack[];
-  } catch {
-    // peerReviewerArtistId may not exist yet during migration - fall back to empty
-    pendingReviews = [];
-  }
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  // Filter to only tracks that still need more reviewers
+  const available = availableTracksResult.filter(
+    (t) => t._count.Review < t.reviewsRequested
+  );
+
+  const totalQueue = claimedReviews.length + available.length;
 
   const avgRating = artistProfile.peerReviewRating
     ? (artistProfile.peerReviewRating as number).toFixed(1)
@@ -93,19 +128,19 @@ export default async function ReviewQueuePage({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Notices */}
         {notice === "skipped" && (
-          <div className="mb-6 rounded-2xl border-2 border-purple-200 bg-purple-50 p-4 shadow-sm">
+          <div className="mb-6 rounded-2xl border border-lime-200 bg-lime-50 p-4 shadow-sm">
             <p className="text-sm font-bold text-black">Track skipped.</p>
-            <p className="text-sm text-neutral-600 mt-1">We removed it from your queue and reassigned it.</p>
-            <Link href="/review" className="text-sm font-semibold text-purple-600 hover:text-purple-700 mt-2 inline-block transition-colors">
+            <p className="text-sm text-neutral-600 mt-1">It&apos;s been removed from your queue.</p>
+            <Link href="/review" className="text-sm font-semibold text-lime-700 hover:text-lime-800 mt-2 inline-block transition-colors">
               Dismiss
             </Link>
           </div>
         )}
 
         {notice === "expired" && (
-          <div className="mb-6 rounded-2xl border-2 border-red-200 bg-red-50 p-4 shadow-sm">
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 shadow-sm">
             <p className="text-sm font-bold text-black">Review expired.</p>
-            <p className="text-sm text-neutral-600 mt-1">This review timed out and was reassigned.</p>
+            <p className="text-sm text-neutral-600 mt-1">This review timed out.</p>
             <Link href="/review" className="text-sm font-semibold text-red-600 hover:text-red-700 mt-2 inline-block transition-colors">
               Dismiss
             </Link>
@@ -113,9 +148,9 @@ export default async function ReviewQueuePage({
         )}
 
         {notice === "unplayable" && (
-          <div className="mb-6 rounded-2xl border-2 border-red-200 bg-red-50 p-4 shadow-sm">
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 shadow-sm">
             <p className="text-sm font-bold text-black">Audio issue reported.</p>
-            <p className="text-sm text-neutral-600 mt-1">We removed it from your queue and reassigned it.</p>
+            <p className="text-sm text-neutral-600 mt-1">It&apos;s been removed from your queue.</p>
             <Link href="/review" className="text-sm font-semibold text-red-600 hover:text-red-700 mt-2 inline-block transition-colors">
               Dismiss
             </Link>
@@ -129,7 +164,7 @@ export default async function ReviewQueuePage({
           </h1>
           <div className="flex items-center gap-3 text-sm text-neutral-600 mt-3">
             <span>
-              {pendingReviews.length} track{pendingReviews.length !== 1 ? "s" : ""} waiting
+              {totalQueue} track{totalQueue !== 1 ? "s" : ""} available
             </span>
             <span className="text-neutral-300">•</span>
             <span>Earn 1 credit per review</span>
@@ -138,62 +173,84 @@ export default async function ReviewQueuePage({
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
           {/* Main Content */}
-          <div>
-            <div className="border border-black/8 rounded-xl bg-white/60 p-5">
-              <p className="text-[11px] font-mono tracking-[0.2em] text-black/40 uppercase mb-4">
-                Tracks to Review
-              </p>
-
-              {pendingReviews.length === 0 ? (
-                <EmptyState
-                  doodle="music"
-                  title="No tracks to review"
-                  description="No tracks in your genre right now. Check back soon!"
-                  className="py-8"
-                />
-              ) : (
+          <div className="space-y-6">
+            {/* Already claimed / in-progress */}
+            {claimedReviews.length > 0 && (
+              <div className="border border-black/8 rounded-xl bg-white/60 p-5">
+                <p className="text-[11px] font-mono tracking-[0.2em] text-black/40 uppercase mb-4">
+                  Continue Reviewing
+                </p>
                 <div className="space-y-3">
-                  {pendingReviews.map((review) => (
+                  {claimedReviews.map((review) => (
                     <div
                       key={review.id}
                       className="flex items-center justify-between gap-4 rounded-xl border border-black/8 bg-white px-4 py-3.5 transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="h-9 w-9 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                          <Music className="h-4 w-4 text-purple-600" />
+                        <div className="h-9 w-9 rounded-lg bg-lime-100 flex items-center justify-center flex-shrink-0">
+                          <Music className="h-4 w-4 text-lime-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-base font-semibold text-black truncate">{review.Track.title}</p>
                           <p className="text-sm text-neutral-600 mb-1">by {review.Track.ArtistProfile.artistName}</p>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <GenreTagList
-                              genres={review.Track.Genre}
-                              variant="neutral"
-                              size="sm"
-                              maxDisplay={2}
-                            />
-                            {review.status === "IN_PROGRESS" && (
-                              <span className="text-[10px] font-mono tracking-wider uppercase px-2 py-1 rounded-full bg-purple-100 text-purple-700 border border-purple-200">
-                                In progress
-                              </span>
-                            )}
+                            <GenreTagList genres={review.Track.Genre} variant="neutral" size="sm" maxDisplay={2} />
+                            <span className="text-[10px] font-mono tracking-wider uppercase px-2 py-1 rounded-full bg-lime-100 text-lime-700 border border-lime-200">
+                              {review.status === "IN_PROGRESS" ? "In progress" : "Claimed"}
+                            </span>
                           </div>
-                          {review.Track.feedbackFocus && (
-                            <p className="text-xs text-purple-600 font-medium mt-1">
-                              Focus: {review.Track.feedbackFocus}
+                        </div>
+                      </div>
+                      <Link href={`/reviewer/review/${review.id}`} className="flex-shrink-0">
+                        <Button size="sm" variant="primary">
+                          Continue
+                          <ArrowRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Available tracks to claim */}
+            <div className="border border-black/8 rounded-xl bg-white/60 p-5">
+              <p className="text-[11px] font-mono tracking-[0.2em] text-black/40 uppercase mb-4">
+                Available Tracks
+              </p>
+
+              {available.length === 0 ? (
+                <EmptyState
+                  doodle="music"
+                  title="No tracks to review"
+                  description="No tracks available right now. Check back soon!"
+                  className="py-8"
+                />
+              ) : (
+                <div className="space-y-3">
+                  {available.map((track) => (
+                    <div
+                      key={track.id}
+                      className="flex items-center justify-between gap-4 rounded-xl border border-black/8 bg-white px-4 py-3.5 transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="h-9 w-9 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0">
+                          <Music className="h-4 w-4 text-neutral-500" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-base font-semibold text-black truncate">{track.title}</p>
+                          <p className="text-sm text-neutral-600 mb-1">by {track.ArtistProfile.artistName}</p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <GenreTagList genres={track.Genre} variant="neutral" size="sm" maxDisplay={2} />
+                          </div>
+                          {track.feedbackFocus && (
+                            <p className="text-xs text-neutral-500 font-medium mt-1">
+                              Focus: {track.feedbackFocus}
                             </p>
                           )}
                         </div>
                       </div>
-                      <Link href={`/review/${review.id}`} className="flex-shrink-0">
-                        <Button
-                          size="sm"
-                          className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-semibold transition-colors duration-150 ease-out"
-                        >
-                          Review
-                          <ArrowRight className="h-4 w-4 ml-1" />
-                        </Button>
-                      </Link>
+                      <ClaimButton trackId={track.id} />
                     </div>
                   ))}
                 </div>
@@ -210,8 +267,8 @@ export default async function ReviewQueuePage({
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="h-7 w-7 rounded-md bg-purple-100 flex items-center justify-center">
-                      <MessageSquare className="h-3.5 w-3.5 text-purple-600" />
+                    <div className="h-7 w-7 rounded-md bg-lime-100 flex items-center justify-center">
+                      <MessageSquare className="h-3.5 w-3.5 text-lime-600" />
                     </div>
                     <span className="text-xs text-black/50">Credits</span>
                   </div>
@@ -220,8 +277,8 @@ export default async function ReviewQueuePage({
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="h-7 w-7 rounded-md bg-emerald-100 flex items-center justify-center">
-                      <Music className="h-3.5 w-3.5 text-emerald-600" />
+                    <div className="h-7 w-7 rounded-md bg-neutral-100 flex items-center justify-center">
+                      <Music className="h-3.5 w-3.5 text-neutral-600" />
                     </div>
                     <span className="text-xs text-black/50">Reviews</span>
                   </div>
@@ -254,7 +311,7 @@ export default async function ReviewQueuePage({
             {artistProfile.Genre_ArtistReviewGenres && artistProfile.Genre_ArtistReviewGenres.length > 0 && (
               <div className="border border-black/8 rounded-xl bg-white/60 p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Tag className="h-3.5 w-3.5 text-purple-600" />
+                  <Tag className="h-3.5 w-3.5 text-black/40" />
                   <p className="text-[11px] font-mono tracking-[0.2em] text-black/40 uppercase">
                     Your Review Genres
                   </p>
