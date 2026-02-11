@@ -1261,7 +1261,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                 className={cn(
                   "flex-1 py-2.5 px-3 text-sm font-bold transition-colors duration-150 ease-out rounded-lg border",
                   wouldListenAgain === true
-                    ? "border-lime-400 bg-lime-500 text-black"
+                    ? "border-purple-400 bg-purple-600 text-white"
                     : "border-black/10 bg-white text-black hover:bg-neutral-50"
                 )}
               >
@@ -1300,7 +1300,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     className={cn(
                       "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
                       wouldAddToPlaylist === true
-                        ? "border-lime-400 bg-lime-500 text-black"
+                        ? "border-purple-400 bg-purple-600 text-white"
                         : "border-black/10 bg-white text-black hover:bg-neutral-50"
                     )}
                   >
@@ -1331,7 +1331,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     className={cn(
                       "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
                       wouldShare === true
-                        ? "border-lime-400 bg-lime-500 text-black"
+                        ? "border-purple-400 bg-purple-600 text-white"
                         : "border-black/10 bg-white text-black hover:bg-neutral-50"
                     )}
                   >
@@ -1362,7 +1362,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     className={cn(
                       "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
                       wouldFollow === true
-                        ? "border-lime-400 bg-lime-500 text-black"
+                        ? "border-purple-400 bg-purple-600 text-white"
                         : "border-black/10 bg-white text-black hover:bg-neutral-50"
                     )}
                   >
