@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidateTag } from "next/cache";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -109,6 +110,7 @@ export async function POST(
 
     await assignReviewersToTrack(review.Track.id);
 
+    revalidateTag("sidebar", { expire: 0 });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error marking review unplayable:", error);

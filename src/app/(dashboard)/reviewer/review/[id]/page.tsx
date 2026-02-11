@@ -13,7 +13,15 @@ import { ScoreInput } from "@/components/ui/score-input";
 import { YesNoToggle } from "@/components/ui/yes-no-toggle";
 import { WordCounter, countWords } from "@/components/ui/word-counter";
 import { ErrorAlert } from "@/components/ui/error-alert";
-import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, Download, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, Download, ShoppingCart, SkipForward, VolumeX } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
 import { funnels, track } from "@/lib/analytics";
@@ -45,6 +53,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSkipping, setIsSkipping] = useState(false);
   const [isMarkingUnplayable, setIsMarkingUnplayable] = useState(false);
+  const [showSkipDialog, setShowSkipDialog] = useState(false);
+  const [showUnplayableDialog, setShowUnplayableDialog] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
@@ -502,10 +512,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const handleSkip = async () => {
     if (!review) return;
 
-    if (!confirmLeave()) {
-      return;
-    }
-
+    setShowSkipDialog(false);
     setError("");
     setIsSkipping(true);
     track("reviewer_track_skipped", { trackId: review.Track.id });
@@ -566,10 +573,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const handleUnplayable = async () => {
     if (!review) return;
 
-    if (!confirmLeave()) {
-      return;
-    }
-
+    setShowUnplayableDialog(false);
     setError("");
     setIsMarkingUnplayable(true);
 
@@ -1016,7 +1020,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <Button
             variant="outline"
             size="sm"
-            onClick={handleUnplayable}
+            onClick={() => setShowUnplayableDialog(true)}
             isLoading={isMarkingUnplayable}
             className="w-full sm:w-auto"
           >
@@ -1025,7 +1029,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <Button
             variant="destructive"
             size="sm"
-            onClick={handleSkip}
+            onClick={() => setShowSkipDialog(true)}
             isLoading={isSkipping}
             className="w-full sm:w-auto"
           >
@@ -1609,6 +1613,80 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </CardContent>
       </Card>
     </div>
+
+      {/* Skip Track Dialog */}
+      <Dialog open={showSkipDialog} onOpenChange={setShowSkipDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-2">
+              <SkipForward className="h-6 w-6 text-red-600" />
+            </div>
+            <DialogTitle className="text-center">Skip this track?</DialogTitle>
+            <DialogDescription className="text-center">
+              This will remove it from your queue. You have a limited number of skips per day.
+              {isDirty && (
+                <span className="block mt-2 font-medium text-amber-600">
+                  You have unsaved review progress that will be lost.
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-row gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setShowSkipDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              className="flex-1"
+              onClick={handleSkip}
+              isLoading={isSkipping}
+            >
+              Skip Track
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Audio Not Working Dialog */}
+      <Dialog open={showUnplayableDialog} onOpenChange={setShowUnplayableDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-2">
+              <VolumeX className="h-6 w-6 text-amber-600" />
+            </div>
+            <DialogTitle className="text-center">Report audio not working?</DialogTitle>
+            <DialogDescription className="text-center">
+              This will notify the artist that their track link may be broken and remove it from your queue.
+              {isDirty && (
+                <span className="block mt-2 font-medium text-amber-600">
+                  You have unsaved review progress that will be lost.
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-row gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setShowUnplayableDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              className="flex-1"
+              onClick={handleUnplayable}
+              isLoading={isMarkingUnplayable}
+            >
+              Report Issue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
