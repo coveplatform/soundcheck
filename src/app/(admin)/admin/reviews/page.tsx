@@ -50,6 +50,11 @@ export default async function AdminReviewsPage({
           User: { select: { email: true, name: true } },
         },
       },
+      ArtistProfile: {
+        select: {
+          User: { select: { email: true, name: true } },
+        },
+      },
     },
   });
 
@@ -136,8 +141,8 @@ export default async function AdminReviewsPage({
                     <div className="text-xs text-neutral-500">{r.Track.ArtistProfile.User.email}</div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="font-medium">{r.ReviewerProfile.User.name || "—"}</div>
-                    <div className="text-xs text-neutral-500">{r.ReviewerProfile.User.email}</div>
+                    <div className="font-medium">{r.ReviewerProfile?.User.name || r.ArtistProfile?.User?.name || "—"}</div>
+                    <div className="text-xs text-neutral-500">{r.ReviewerProfile?.User.email || r.ArtistProfile?.User?.email || "—"}</div>
                   </td>
                   <td className="px-4 py-3">
                     {r.avgScore !== null ? (
@@ -180,7 +185,7 @@ export default async function AdminReviewsPage({
                       >
                         View
                       </Link>
-                      {r.wasFlagged && (
+                      {r.wasFlagged && r.ReviewerProfile && (
                         <ReviewerRestrictionToggle
                           reviewerId={r.ReviewerProfile.id}
                           isRestricted={r.ReviewerProfile.isRestricted}

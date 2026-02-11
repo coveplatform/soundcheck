@@ -1,53 +1,101 @@
 /**
  * Seed script: populate the review queue with real tracks.
  *
- * Usage:
- *   1. Drop MP3 files into ./seed-tracks/ folder
- *   2. Set env vars (or they'll be read from .env):
- *        DATABASE_URL, UPLOADS_S3_BUCKET, UPLOADS_S3_REGION,
- *        UPLOADS_S3_ACCESS_KEY_ID, UPLOADS_S3_SECRET_ACCESS_KEY,
- *        UPLOADS_PUBLIC_BASE_URL
- *   3. Run:  npx tsx scripts/seed-tracks.ts
+ * Folder structure:
+ *   seed-tracks/
+ *     electronic/   → matched to Electronic umbrella + sub-genres
+ *     hiphop/       → matched to Hip-Hop & R&B umbrella + sub-genres
+ *     pop/          → matched to Pop & Dance umbrella + sub-genres
+ *     rock/         → matched to Rock & Metal umbrella + sub-genres
+ *     other/        → matched to Other umbrella + sub-genres
  *
- * What it does:
- *   - Creates a fake User + ArtistProfile for each persona
- *   - Uploads each MP3 to S3
- *   - Creates a Track record (status QUEUED, public, with genres)
- *   - Calls assignReviewersToTrack so real reviewers see them
+ * File naming: "Artist Name - Track Title.mp3"
+ *
+ * Usage:
+ *   1. Drop MP3 files into the genre subfolders
+ *   2. Set env vars: DATABASE_URL, UPLOADS_S3_BUCKET, UPLOADS_S3_REGION,
+ *      UPLOADS_S3_ACCESS_KEY_ID, UPLOADS_S3_SECRET_ACCESS_KEY, UPLOADS_PUBLIC_BASE_URL
+ *   3. Run:  npx tsx scripts/seed-tracks.ts
  */
 
-import { readFileSync, readdirSync } from "fs";
-import { join } from "path";
+import { readFileSync, readdirSync, existsSync } from "fs";
+import { join, basename } from "path";
 import { randomBytes } from "crypto";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { prisma } from "../src/lib/prisma";
 import { assignReviewersToTrack } from "../src/lib/queue";
 
 // ---------------------------------------------------------------------------
-// Personas — each gets one track. Add more as needed.
+// Folder → genre slug mapping (umbrella + random sub-genre per track)
 // ---------------------------------------------------------------------------
-const PERSONAS = [
-  { name: "Luna Voss", email: "luna.voss@seed.mixreflect.com", genres: ["electronic", "synthwave"], title: "Neon Drift", focus: "How's the synth layering? Trying to nail that retro-future vibe." },
-  { name: "Jamal Carter", email: "jamal.carter@seed.mixreflect.com", genres: ["hip-hop", "trap"], title: "Late Night Grind", focus: "Focus on the vocal mix — does the 808 hit hard enough?" },
-  { name: "Rosie Chen", email: "rosie.chen@seed.mixreflect.com", genres: ["indie-pop", "bedroom-pop"], title: "Paper Planes", focus: "Is the chorus catchy? Wondering if the bridge feels too long." },
-  { name: "Kai Bergström", email: "kai.bergstrom@seed.mixreflect.com", genres: ["techno", "minimal"], title: "Carbon Loop", focus: "Does the build work? Trying a more stripped-back arrangement." },
-  { name: "Aria Malone", email: "aria.malone@seed.mixreflect.com", genres: ["rnb", "neo-soul"], title: "Golden Hour", focus: "Vocal clarity — does it sit well in the mix?" },
-  { name: "Tomás Reyes", email: "tomas.reyes@seed.mixreflect.com", genres: ["rock", "indie-rock"], title: "Rust & Bone", focus: "Guitar tone and overall energy. Too compressed?" },
-  { name: "Yuki Tanaka", email: "yuki.tanaka@seed.mixreflect.com", genres: ["lo-fi", "lo-fi-hip-hop"], title: "Rainfall Tape", focus: "Vibe check — does it feel chill enough for studying?" },
-  { name: "Elara Storm", email: "elara.storm@seed.mixreflect.com", genres: ["edm", "future-bass"], title: "Supernova", focus: "Drop impact — does it hit? Any frequency clashes?" },
-  { name: "Marcus Webb", email: "marcus.webb@seed.mixreflect.com", genres: ["boom-bap", "conscious-hip-hop"], title: "Old Souls", focus: "Sample chops and overall groove. How's the kick pattern?" },
-  { name: "Freya Lindqvist", email: "freya.lindqvist@seed.mixreflect.com", genres: ["house", "deep-house"], title: "Velvet Floor", focus: "Bassline groove and mix balance. Club-ready?" },
-  { name: "Devon Park", email: "devon.park@seed.mixreflect.com", genres: ["drill", "uk-rap"], title: "Cold Outside", focus: "Does the slide bass cut through? Flow feedback appreciated." },
-  { name: "Sage Holloway", email: "sage.holloway@seed.mixreflect.com", genres: ["singer-songwriter", "folk"], title: "Autumn Letters", focus: "Vocal emotion and acoustic guitar tone." },
-  { name: "Niko Petrov", email: "niko.petrov@seed.mixreflect.com", genres: ["drum-and-bass", "jungle"], title: "Fracture Point", focus: "Break patterns and sub bass. Too busy or just right?" },
-  { name: "Isla Fernandez", email: "isla.fernandez@seed.mixreflect.com", genres: ["pop", "electropop"], title: "Glitter & Gold", focus: "Production polish — is it radio-ready? Hook strength?" },
-  { name: "Axel Drummond", email: "axel.drummond@seed.mixreflect.com", genres: ["metal", "metalcore"], title: "Iron Veil", focus: "Guitar tone and drum punch. Does the breakdown land?" },
-  { name: "Mina Okafor", email: "mina.okafor@seed.mixreflect.com", genres: ["soul", "jazz"], title: "Candlelight", focus: "Piano and vocal interplay. Too much reverb?" },
-  { name: "Zephyr Blake", email: "zephyr.blake@seed.mixreflect.com", genres: ["experimental", "electronica"], title: "Static Garden", focus: "Texture and sound design — is it cohesive or chaotic?" },
-  { name: "Lena Fischer", email: "lena.fischer@seed.mixreflect.com", genres: ["trance", "progressive-house"], title: "Aurora", focus: "Build-up tension and release. Melody memorable?" },
-  { name: "Omar Hassan", email: "omar.hassan@seed.mixreflect.com", genres: ["phonk", "trap"], title: "Midnight Drift", focus: "Cowbell pattern and distortion levels. Too aggressive?" },
-  { name: "Violet Marsh", email: "violet.marsh@seed.mixreflect.com", genres: ["dream-pop", "synth-pop"], title: "Underwater Stars", focus: "Atmosphere and reverb tails. Does it feel dreamy enough?" },
-];
+const FOLDER_GENRES: Record<string, { umbrella: string; subGenres: string[] }> = {
+  electronic: {
+    umbrella: "electronic",
+    subGenres: ["house", "deep-house", "techno", "synthwave", "edm", "future-bass", "trance", "lo-fi", "drum-and-bass", "progressive-house", "minimal"],
+  },
+  hiphop: {
+    umbrella: "hip-hop-rnb",
+    subGenres: ["hip-hop", "trap", "rnb", "boom-bap", "drill", "phonk", "lo-fi-hip-hop"],
+  },
+  pop: {
+    umbrella: "pop-dance",
+    subGenres: ["pop", "indie-pop", "electropop", "synth-pop", "bedroom-pop", "dream-pop"],
+  },
+  rock: {
+    umbrella: "rock-metal",
+    subGenres: ["rock", "indie-rock", "metal", "punk", "alternative", "metalcore"],
+  },
+  other: {
+    umbrella: "other",
+    subGenres: ["jazz", "soul", "funk", "folk", "singer-songwriter", "classical", "experimental", "reggae", "world"],
+  },
+};
+
+// Feedback focus templates per genre folder
+const FOCUS_TEMPLATES: Record<string, string[]> = {
+  electronic: [
+    "How's the mix balance? Does the low end cut through?",
+    "Drop impact — does it hit hard enough?",
+    "Synth layering and texture — cohesive or cluttered?",
+    "Build-up tension and release. Does the arrangement flow?",
+    "Bassline groove and overall energy. Club-ready?",
+    "Sound design and atmosphere. Is it immersive?",
+    "Frequency balance — any clashes or muddy areas?",
+    "Melodic hooks — memorable enough?",
+  ],
+  hiphop: [
+    "Vocal mix — does it sit right? 808 punch?",
+    "Flow and delivery feedback. Does the rhythm hit?",
+    "Sample chops and overall groove. Kick pattern?",
+    "Bass and low end. Hard enough for the car?",
+    "Beat structure and arrangement. Too repetitive?",
+    "Hook strength — is it catchy?",
+    "Lyrical clarity vs the instrumental balance.",
+  ],
+  pop: [
+    "Is the chorus catchy enough? Hook strength?",
+    "Production polish — radio-ready?",
+    "Vocal clarity and presence in the mix.",
+    "Arrangement flow — does the bridge work?",
+    "Overall vibe and emotional impact.",
+    "Is it too busy or just right?",
+  ],
+  rock: [
+    "Guitar tone and overall energy. Too compressed?",
+    "Drum punch and mix balance.",
+    "Does the breakdown land?",
+    "Vocal energy and presence in the mix.",
+    "Overall arrangement — does it build properly?",
+    "Raw energy vs polish — right balance?",
+  ],
+  other: [
+    "Vocal emotion and instrument interplay.",
+    "Atmosphere and feel — does it convey the mood?",
+    "Arrangement and pacing. Too long or just right?",
+    "Mix clarity — can you hear every element?",
+    "Overall vibe — what feeling does it leave you with?",
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // S3 helpers
@@ -86,6 +134,22 @@ async function uploadToS3(s3: S3Client, bucket: string, filePath: string): Promi
 }
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+function parseFilename(filename: string): { artistName: string; title: string } {
+  const name = filename.replace(/\.mp3$/i, "");
+  const parts = name.split(" - ");
+  if (parts.length >= 2) {
+    return { artistName: parts[0].trim(), title: parts.slice(1).join(" - ").trim() };
+  }
+  return { artistName: name, title: name };
+}
+
+function pickRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 async function main() {
@@ -96,53 +160,70 @@ async function main() {
     throw new Error("Missing env: UPLOADS_S3_BUCKET, UPLOADS_PUBLIC_BASE_URL");
   }
 
-  // 1. Read MP3 files
   const seedDir = join(__dirname, "..", "seed-tracks");
-  let mp3Files: string[];
-  try {
-    mp3Files = readdirSync(seedDir)
+  if (!existsSync(seedDir)) {
+    console.error(`\n❌ No seed-tracks/ folder found.\n`);
+    process.exit(1);
+  }
+
+  // 1. Collect all MP3s from subfolders
+  type TrackEntry = { filePath: string; folder: string; artistName: string; title: string };
+  const entries: TrackEntry[] = [];
+
+  for (const folder of Object.keys(FOLDER_GENRES)) {
+    const folderPath = join(seedDir, folder);
+    if (!existsSync(folderPath)) continue;
+
+    const files = readdirSync(folderPath)
       .filter((f) => f.toLowerCase().endsWith(".mp3"))
-      .sort()
-      .map((f) => join(seedDir, f));
-  } catch {
-    console.error(`\n❌ No seed-tracks/ folder found. Create it and add MP3 files.\n`);
+      .sort();
+
+    for (const file of files) {
+      const { artistName, title } = parseFilename(file);
+      entries.push({
+        filePath: join(folderPath, file),
+        folder,
+        artistName,
+        title,
+      });
+    }
+  }
+
+  if (entries.length === 0) {
+    console.error(`\n❌ No MP3 files found in seed-tracks/ subfolders.\n`);
     process.exit(1);
   }
 
-  if (mp3Files.length === 0) {
-    console.error(`\n❌ No MP3 files found in seed-tracks/\n`);
-    process.exit(1);
-  }
-
-  console.log(`Found ${mp3Files.length} MP3 files`);
-  console.log(`Using ${Math.min(mp3Files.length, PERSONAS.length)} personas\n`);
+  console.log(`Found ${entries.length} tracks across ${new Set(entries.map((e) => e.folder)).size} genre folders\n`);
 
   // 2. Load genre map
   const allGenres = await prisma.genre.findMany({ select: { id: true, slug: true } });
   const genreMap = new Map(allGenres.map((g) => [g.slug, g.id]));
 
   const s3 = getS3Client();
-  const count = Math.min(mp3Files.length, PERSONAS.length);
   const createdTrackIds: string[] = [];
 
-  for (let i = 0; i < count; i++) {
-    const persona = PERSONAS[i];
-    const mp3Path = mp3Files[i];
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+    const folderGenres = FOLDER_GENRES[entry.folder];
+    const focusTemplates = FOCUS_TEMPLATES[entry.folder] ?? FOCUS_TEMPLATES.other;
 
-    console.log(`[${i + 1}/${count}] ${persona.name} — "${persona.title}"`);
+    console.log(`[${i + 1}/${entries.length}] ${entry.artistName} — "${entry.title}" (${entry.folder})`);
 
     // 3. Upload MP3 to S3
-    console.log(`  Uploading ${mp3Path.split(/[\\/]/).pop()}...`);
-    const sourceUrl = await uploadToS3(s3, bucket, mp3Path);
+    console.log(`  Uploading...`);
+    const sourceUrl = await uploadToS3(s3, bucket, entry.filePath);
     console.log(`  → ${sourceUrl}`);
 
     // 4. Create User + ArtistProfile
+    const email = `${entry.artistName.toLowerCase().replace(/[^a-z0-9]/g, ".")}@seed.mixreflect.com`;
+
     const user = await prisma.user.upsert({
-      where: { email: persona.email },
+      where: { email },
       update: {},
       create: {
-        email: persona.email,
-        name: persona.name,
+        email,
+        name: entry.artistName,
         emailVerified: new Date(),
         isArtist: true,
         isReviewer: false,
@@ -157,7 +238,7 @@ async function main() {
       artistProfile = await prisma.artistProfile.create({
         data: {
           userId: user.id,
-          artistName: persona.name,
+          artistName: entry.artistName,
           completedOnboarding: true,
           reviewCredits: 0,
           totalCreditsSpent: 5,
@@ -165,8 +246,9 @@ async function main() {
       });
     }
 
-    // 5. Resolve genre IDs
-    const genreIds = persona.genres
+    // 5. Resolve genre IDs: umbrella + 1 random sub-genre
+    const genreSlugs = [folderGenres.umbrella, pickRandom(folderGenres.subGenres)];
+    const genreIds = genreSlugs
       .map((slug) => genreMap.get(slug))
       .filter(Boolean) as string[];
 
@@ -176,8 +258,8 @@ async function main() {
         artistId: artistProfile.id,
         sourceUrl,
         sourceType: "UPLOAD",
-        title: persona.title,
-        feedbackFocus: persona.focus,
+        title: entry.title,
+        feedbackFocus: pickRandom(focusTemplates),
         isPublic: true,
         packageType: "PEER",
         reviewsRequested: 5,
@@ -188,14 +270,13 @@ async function main() {
       },
     });
 
-    // Increment totalTracks
     await prisma.artistProfile.update({
       where: { id: artistProfile.id },
       data: { totalTracks: { increment: 1 } },
     });
 
     createdTrackIds.push(track.id);
-    console.log(`  ✓ Track ${track.id} created (QUEUED, 5 reviews requested)\n`);
+    console.log(`  ✓ Track ${track.id} created (QUEUED, genres: ${genreSlugs.join(", ")})\n`);
   }
 
   // 7. Assign reviewers

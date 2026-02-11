@@ -193,7 +193,7 @@ model RateLimit {
 model Review {
   id                     String @id @default(cuid())
   trackId                String
-  reviewerId             String
+  reviewerId             String?
   status                 ReviewStatus         @default(ASSIGNED)
   listenDuration         Int                  @default(0)
   lastHeartbeat          DateTime?
@@ -229,11 +229,12 @@ model Review {
   isPeerReview           Boolean              @default(false)
   peerReviewerArtistId   String?
   ArtistProfile          ArtistProfile?       @relation(fields: [peerReviewerArtistId], references: [id])
-  ReviewerProfile        ReviewerProfile      @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  ReviewerProfile        ReviewerProfile?     @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
   Track                  Track                @relation(fields: [trackId], references: [id], onDelete: Cascade)
   ReviewTimestamp        ReviewTimestamp[]
 
   @@unique([trackId, reviewerId])
+  @@unique([trackId, peerReviewerArtistId])
   @@index([reviewerId, status])
   @@index([status])
   @@index([trackId])
@@ -242,16 +243,17 @@ model Review {
 model ReviewQueue {
   id               String @id @default(cuid())
   trackId          String
-  reviewerId       String
+  reviewerId       String?
   priority         Int             @default(0)
   assignedAt       DateTime        @default(now())
   expiresAt        DateTime
   artistReviewerId String?
   ArtistProfile    ArtistProfile?  @relation(fields: [artistReviewerId], references: [id], onDelete: Cascade)
-  ReviewerProfile  ReviewerProfile @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  ReviewerProfile  ReviewerProfile? @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
   Track            Track           @relation(fields: [trackId], references: [id], onDelete: Cascade)
 
   @@unique([trackId, reviewerId])
+  @@unique([trackId, artistReviewerId])
   @@index([artistReviewerId])
   @@index([reviewerId, expiresAt])
 }

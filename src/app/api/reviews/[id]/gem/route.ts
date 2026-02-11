@@ -58,11 +58,13 @@ export async function POST(
         select: { id: true, isGem: true, reviewerId: true },
       });
 
-      await tx.reviewerProfile.update({
-        where: { id: updatedReview.reviewerId },
-        data: { gemCount: { increment: 1 } },
-        select: { id: true },
-      });
+      if (updatedReview.reviewerId) {
+        await tx.reviewerProfile.update({
+          where: { id: updatedReview.reviewerId },
+          data: { gemCount: { increment: 1 } },
+          select: { id: true },
+        });
+      }
 
       return updatedReview;
     });
@@ -132,11 +134,13 @@ export async function DELETE(
         select: { id: true, isGem: true, reviewerId: true },
       });
 
-      await tx.reviewerProfile.update({
-        where: { id: updatedReview.reviewerId },
-        data: { gemCount: { decrement: 1 } },
-        select: { id: true },
-      });
+      if (updatedReview.reviewerId) {
+        await tx.reviewerProfile.update({
+          where: { id: updatedReview.reviewerId },
+          data: { gemCount: { decrement: 1 } },
+          select: { id: true },
+        });
+      }
 
       return updatedReview;
     });

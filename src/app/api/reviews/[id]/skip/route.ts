@@ -19,31 +19,13 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const reviewerProfile = await prisma.reviewerProfile.findUnique({
-      where: { userId: session.user.id },
-      select: { isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
-    });
-
-    if (reviewerProfile?.isRestricted) {
-      return NextResponse.json(
-        { error: "Reviewer account restricted" },
-        { status: 403 }
-      );
-    }
-
-    if (reviewerProfile && (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed)) {
-      return NextResponse.json(
-        { error: "Please complete onboarding before reviewing" },
-        { status: 403 }
-      );
-    }
-
     await request.json().catch(() => ({}));
 
     const review = await prisma.review.findUnique({
       where: { id },
       include: {
-        ReviewerProfile: { select: { userId: true, id: true } },
+        ReviewerProfile: { select: { userId: true, id: true, isRestricted: true } },
+        ArtistProfile: { select: { userId: true, id: true } },
         Track: { select: { id: true } },
       },
     });
@@ -52,8 +34,21 @@ export async function POST(
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    if (review.ReviewerProfile.userId !== session.user.id) {
+    // Ownership check: peer review uses ArtistProfile, legacy uses ReviewerProfile
+    const isPeer = review.isPeerReview || !!review.peerReviewerArtistId;
+    const isOwner = isPeer
+      ? review.ArtistProfile?.userId === session.user.id
+      : review.ReviewerProfile?.userId === session.user.id;
+
+    if (!isOwner) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (review.ReviewerProfile?.isRestricted) {
+      return NextResponse.json(
+        { error: "Reviewer account restricted" },
+        { status: 403 }
+      );
     }
 
     if (review.status !== "ASSIGNED" && review.status !== "IN_PROGRESS") {
@@ -66,9 +61,12 @@ export async function POST(
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
 
+    // Count skips today for this reviewer (peer or legacy)
     const skipsToday = await prisma.review.count({
       where: {
-        reviewerId: review.ReviewerProfile.id,
+        ...(isPeer
+          ? { peerReviewerArtistId: review.peerReviewerArtistId }
+          : { reviewerId: review.reviewerId }),
         status: "SKIPPED",
         updatedAt: { gte: startOfDay },
       },
@@ -87,10 +85,13 @@ export async function POST(
       select: { id: true },
     });
 
+    // Delete queue entry: peer uses artistReviewerId, legacy uses reviewerId
     await prisma.reviewQueue.deleteMany({
       where: {
         trackId: review.Track.id,
-        reviewerId: review.ReviewerProfile.id,
+        ...(isPeer
+          ? { artistReviewerId: review.peerReviewerArtistId }
+          : { reviewerId: review.reviewerId }),
       },
     });
 

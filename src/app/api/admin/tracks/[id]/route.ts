@@ -164,7 +164,7 @@ export async function POST(
       eligibleCount: eligibleReviewers.length,
       reviewerDebug,
       afterAssignment: {
-        ReviewQueue: updatedTrack?.ReviewQueue.map(q => q.ReviewerProfile.User.email) ?? [],
+        ReviewQueue: updatedTrack?.ReviewQueue.map(q => q.ReviewerProfile?.User.email ?? "Peer") ?? [],
         Review: updatedTrack?.Review ?? [],
       },
     });

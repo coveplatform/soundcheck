@@ -29,12 +29,16 @@ export default async function AdminTrackDetailPage({
       Genre: true,
       Payment: true,
       ReviewQueue: {
-        include: { ReviewerProfile: { include: { User: { select: { email: true } } } } },
+        include: {
+          ReviewerProfile: { include: { User: { select: { email: true } } } },
+          ArtistProfile: { include: { User: { select: { email: true } } } },
+        },
         orderBy: { assignedAt: "asc" },
       },
       Review: {
         include: {
           ReviewerProfile: { include: { User: { select: { email: true } } } },
+          ArtistProfile: { include: { User: { select: { email: true } } } },
         },
         orderBy: { createdAt: "desc" },
       },
@@ -214,7 +218,7 @@ export default async function AdminTrackDetailPage({
               <tbody className="divide-y divide-neutral-100">
                 {track.Review.map((r) => (
                   <tr key={r.id} className="text-neutral-700">
-                    <td className="px-4 py-3">{r.ReviewerProfile.User.email}</td>
+                    <td className="px-4 py-3">{r.ReviewerProfile?.User.email || r.ArtistProfile?.User?.email || "Peer"}</td>
                     <td className="px-4 py-3">{r.status}</td>
                     <td className="px-4 py-3">{r.wasFlagged ? "Yes" : "No"}</td>
                     <td className="px-4 py-3">{new Date(r.createdAt).toLocaleDateString()}</td>
@@ -257,15 +261,17 @@ export default async function AdminTrackDetailPage({
               <tbody className="divide-y divide-neutral-100">
                 {track.ReviewQueue.map((q) => (
                   <tr key={q.id} className="text-neutral-700">
-                    <td className="px-4 py-3">{q.ReviewerProfile.User.email}</td>
+                    <td className="px-4 py-3">{q.ReviewerProfile?.User.email || q.ArtistProfile?.User?.email || "Peer"}</td>
                     <td className="px-4 py-3">{new Date(q.assignedAt).toLocaleString()}</td>
                     <td className="px-4 py-3">{new Date(q.expiresAt).toLocaleString()}</td>
                     <td className="px-4 py-3">
-                      <ReassignReviewerButton
-                        trackId={track.id}
-                        currentReviewerId={q.reviewerId}
-                        currentReviewerEmail={q.ReviewerProfile.User.email}
-                      />
+                      {q.reviewerId && q.ReviewerProfile ? (
+                        <ReassignReviewerButton
+                          trackId={track.id}
+                          currentReviewerId={q.reviewerId}
+                          currentReviewerEmail={q.ReviewerProfile.User.email}
+                        />
+                      ) : null}
                     </td>
                   </tr>
                 ))}

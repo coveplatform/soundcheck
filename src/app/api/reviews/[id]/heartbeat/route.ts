@@ -20,36 +20,33 @@ export async function POST(
 
     await request.json().catch(() => ({}));
 
-    const reviewer = await prisma.reviewerProfile.findUnique({
-      where: { userId: session.user.id },
-      select: { isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
-    });
-
-    if (reviewer?.isRestricted) {
-      return NextResponse.json(
-        { error: "Reviewer account restricted" },
-        { status: 403 }
-      );
-    }
-
-    if (reviewer && (!reviewer.completedOnboarding || !reviewer.onboardingQuizPassed)) {
-      return NextResponse.json(
-        { error: "Please complete onboarding before reviewing" },
-        { status: 403 }
-      );
-    }
-
     const review = await prisma.review.findUnique({
       where: { id },
-      include: { ReviewerProfile: { select: { userId: true } } },
+      include: {
+        ReviewerProfile: { select: { userId: true, isRestricted: true } },
+        ArtistProfile: { select: { userId: true } },
+      },
     });
 
     if (!review) {
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    if (review.ReviewerProfile.userId !== session.user.id) {
+    // Ownership check: peer review uses ArtistProfile, legacy uses ReviewerProfile
+    const isPeer = review.isPeerReview || !!review.peerReviewerArtistId;
+    const isOwner = isPeer
+      ? review.ArtistProfile?.userId === session.user.id
+      : review.ReviewerProfile?.userId === session.user.id;
+
+    if (!isOwner) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (review.ReviewerProfile?.isRestricted) {
+      return NextResponse.json(
+        { error: "Reviewer account restricted" },
+        { status: 403 }
+      );
     }
 
     if (review.status === "COMPLETED" || review.status === "EXPIRED" || review.status === "SKIPPED") {

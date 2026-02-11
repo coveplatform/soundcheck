@@ -17,46 +17,6 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const reviewerProfile = await prisma.reviewerProfile.findUnique({
-      where: { userId: session.user.id },
-      select: { isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
-    });
-
-    // Also check for peer reviewer (ArtistProfile)
-    const artistProfile = await prisma.artistProfile.findUnique({
-      where: { userId: session.user.id },
-      select: { id: true, completedOnboarding: true },
-    });
-    const isPeerReviewer = !reviewerProfile && !!artistProfile;
-
-    if (reviewerProfile?.isRestricted) {
-      return NextResponse.json(
-        { error: "Reviewer account restricted" },
-        { status: 403 }
-      );
-    }
-
-    if (reviewerProfile && (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed)) {
-      return NextResponse.json(
-        { error: "Please complete onboarding before reviewing" },
-        { status: 403 }
-      );
-    }
-
-    if (isPeerReviewer && !artistProfile?.completedOnboarding) {
-      return NextResponse.json(
-        { error: "Please complete onboarding before reviewing" },
-        { status: 403 }
-      );
-    }
-
-    if (!reviewerProfile && !artistProfile) {
-      return NextResponse.json(
-        { error: "Please complete onboarding before reviewing" },
-        { status: 403 }
-      );
-    }
-
     const review = await prisma.review.findUnique({
       where: { id },
       include: {
@@ -75,6 +35,7 @@ export async function GET(
             id: true,
             tier: true,
             userId: true,
+            isRestricted: true,
           },
         },
         ArtistProfile: {
@@ -84,17 +45,27 @@ export async function GET(
           },
         },
       },
-    }) as any;
+    });
 
     if (!review) {
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    // Verify ownership - check legacy reviewer OR peer reviewer
-    const isLegacyOwner = review.reviewer?.userId === session.user.id;
-    const isPeerOwner = (review as any).peerReviewerArtistId === artistProfile?.id;
-    if (!isLegacyOwner && !isPeerOwner) {
+    // Ownership check: peer review uses ArtistProfile, legacy uses ReviewerProfile
+    const isPeer = review.isPeerReview || !!review.peerReviewerArtistId;
+    const isOwner = isPeer
+      ? review.ArtistProfile?.userId === session.user.id
+      : review.ReviewerProfile?.userId === session.user.id;
+
+    if (!isOwner) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (review.ReviewerProfile?.isRestricted) {
+      return NextResponse.json(
+        { error: "Reviewer account restricted" },
+        { status: 403 }
+      );
     }
 
     return NextResponse.json(review);

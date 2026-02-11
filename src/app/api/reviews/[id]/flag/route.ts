@@ -51,6 +51,8 @@ export async function POST(
       return NextResponse.json({ error: "Review already flagged" }, { status: 400 });
     }
 
+    const isPeerReview = review.isPeerReview || !!review.peerReviewerArtistId;
+
     const result = await prisma.$transaction(async (tx) => {
       const updatedReview = await tx.review.update({
         where: { id },
@@ -65,37 +67,46 @@ export async function POST(
           wasFlagged: true,
           flagReason: true,
           reviewerId: true,
+          peerReviewerArtistId: true,
           trackId: true,
         },
       });
 
-      const reviewer = await tx.reviewerProfile.update({
-        where: { id: updatedReview.reviewerId },
-        data: {
-          flagCount: { increment: 1 },
-        },
-        select: {
-          id: true,
-          flagCount: true,
-          isRestricted: true,
-        },
-      });
+      let reviewerInfo: { id: string; flagCount: number; isRestricted: boolean } | null = null;
+      let shouldRestrict = false;
 
-      const shouldRestrict = reviewer.flagCount > 3;
-      const reviewerAfter = shouldRestrict
-        ? await tx.reviewerProfile.update({
-            where: { id: reviewer.id },
-            data: { isRestricted: true },
-            select: { id: true, flagCount: true, isRestricted: true },
-          })
-        : reviewer;
+      if (isPeerReview && updatedReview.peerReviewerArtistId) {
+        // Peer review: increment flag count on ArtistProfile
+        const peerProfile = await tx.artistProfile.update({
+          where: { id: updatedReview.peerReviewerArtistId },
+          data: { peerFlagCount: { increment: 1 } },
+          select: { id: true, peerFlagCount: true },
+        });
+        reviewerInfo = { id: peerProfile.id, flagCount: peerProfile.peerFlagCount, isRestricted: false };
+        // Peer reviewers don't get "restricted" the same way
+      } else if (updatedReview.reviewerId) {
+        // Legacy review: increment flag count on ReviewerProfile
+        const reviewer = await tx.reviewerProfile.update({
+          where: { id: updatedReview.reviewerId },
+          data: { flagCount: { increment: 1 } },
+          select: { id: true, flagCount: true, isRestricted: true },
+        });
+        shouldRestrict = reviewer.flagCount > 3;
+        reviewerInfo = shouldRestrict
+          ? await tx.reviewerProfile.update({
+              where: { id: reviewer.id },
+              data: { isRestricted: true },
+              select: { id: true, flagCount: true, isRestricted: true },
+            })
+          : reviewer;
+      }
 
       let affectedTrackIds: string[] = [];
 
-      if (shouldRestrict) {
+      if (shouldRestrict && reviewerInfo) {
         const activeReviews = await tx.review.findMany({
           where: {
-            reviewerId: reviewerAfter.id,
+            reviewerId: reviewerInfo.id,
             status: { in: ["ASSIGNED", "IN_PROGRESS"] },
           },
           select: { trackId: true },
@@ -104,12 +115,12 @@ export async function POST(
         affectedTrackIds = Array.from(new Set(activeReviews.map((r) => r.trackId)));
 
         await tx.reviewQueue.deleteMany({
-          where: { reviewerId: reviewerAfter.id },
+          where: { reviewerId: reviewerInfo.id },
         });
 
         await tx.review.updateMany({
           where: {
-            reviewerId: reviewerAfter.id,
+            reviewerId: reviewerInfo.id,
             status: { in: ["ASSIGNED", "IN_PROGRESS"] },
           },
           data: { status: "EXPIRED" },
@@ -117,14 +128,9 @@ export async function POST(
       }
 
       // Recalculate track status based on counted completed reviews.
-      // IN_PROGRESS means at least 1 counted review submitted.
       const track = await tx.track.findUnique({
         where: { id: updatedReview.trackId },
-        select: {
-          id: true,
-          status: true,
-          reviewsRequested: true,
-        },
+        select: { id: true, status: true, reviewsRequested: true },
       });
 
       if (track && track.status !== "CANCELLED") {
@@ -155,10 +161,9 @@ export async function POST(
         });
       }
 
-      // Ensure the flagged review's track gets a replacement review assigned.
       affectedTrackIds = Array.from(new Set([...affectedTrackIds, updatedReview.trackId]));
 
-      return { updatedReview, ReviewerProfile: reviewerAfter, affectedTrackIds };
+      return { updatedReview, reviewerInfo, affectedTrackIds };
     });
 
     if (result.affectedTrackIds.length > 0) {
@@ -174,7 +179,7 @@ export async function POST(
         wasFlagged: result.updatedReview.wasFlagged,
         flagReason: result.updatedReview.flagReason,
       },
-      reviewer: result.ReviewerProfile,
+      reviewer: result.reviewerInfo,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

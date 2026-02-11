@@ -299,7 +299,9 @@ export async function POST(request: Request) {
           const updated = await tx.review.updateMany({
             where: {
               id: data.reviewId,
-              reviewerId: review.reviewerId,
+              ...(isPeerReview
+                ? { peerReviewerArtistId: review.peerReviewerArtistId }
+                : { reviewerId: review.reviewerId }),
               status: { in: ["ASSIGNED", "IN_PROGRESS"] },
               listenDuration: { gte: MIN_LISTEN_SECONDS },
               lastHeartbeat: { gte: heartbeatCutoff },
@@ -385,7 +387,7 @@ export async function POST(request: Request) {
             totalPeerReviews: { increment: 1 },
           },
         });
-      } else {
+      } else if (review.reviewerId && review.ReviewerProfile) {
         await tx.reviewerProfile.update({
           where: { id: review.reviewerId },
           data: {
@@ -445,7 +447,9 @@ export async function POST(request: Request) {
       await tx.reviewQueue.deleteMany({
         where: {
           trackId: review.trackId,
-          reviewerId: review.reviewerId,
+          ...(isPeerReview
+            ? { artistReviewerId: review.peerReviewerArtistId }
+            : { reviewerId: review.reviewerId }),
         },
       });
 

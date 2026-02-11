@@ -37,7 +37,7 @@ const GENRE_HIERARCHY: Record<string, string[]> = {
   ],
   "hip-hop-rnb": ["hip-hop", "trap", "rnb", "boom-bap", "drill"],
   "rock-metal": ["rock", "indie-rock", "alternative", "metal", "punk"],
-  "pop-parent": ["pop", "indie-pop", "electropop", "synth-pop"],
+  "pop-dance": ["pop", "indie-pop", "electropop", "synth-pop"],
   other: [
     "jazz", "soul", "funk", "reggae", "country", "folk", "classical",
     "world", "experimental", "singer-songwriter",
@@ -393,32 +393,10 @@ export async function assignReviewersToTrack(trackId: string) {
       expiresAt.setHours(expiresAt.getHours() + 48);
 
       if (peersToAssign.length > 0) {
-        // Ensure each peer reviewer has a ReviewerProfile (required by FK constraints)
-        const peerData: { artistProfileId: string; reviewerProfileId: string }[] = [];
-        for (const peer of peersToAssign) {
-          let rp = await tx.reviewerProfile.findUnique({
-            where: { userId: (peer as any).User.id },
-          });
-          if (!rp) {
-            rp = await tx.reviewerProfile.create({
-              data: {
-                userId: (peer as any).User.id,
-                completedOnboarding: true,
-                onboardingQuizPassed: true,
-              },
-            });
-          }
-          peerData.push({
-            artistProfileId: peer.id,
-            reviewerProfileId: rp.id,
-          });
-        }
-
         await tx.reviewQueue.createMany({
-          data: peerData.map((d) => ({
+          data: peersToAssign.map((peer) => ({
             trackId,
-            reviewerId: d.reviewerProfileId,
-            artistReviewerId: d.artistProfileId,
+            artistReviewerId: peer.id,
             expiresAt,
             priority: 0,
           })),
@@ -426,10 +404,9 @@ export async function assignReviewersToTrack(trackId: string) {
         });
 
         await tx.review.createMany({
-          data: peerData.map((d) => ({
+          data: peersToAssign.map((peer) => ({
             trackId,
-            reviewerId: d.reviewerProfileId,
-            peerReviewerArtistId: d.artistProfileId,
+            peerReviewerArtistId: peer.id,
             isPeerReview: true,
             status: "ASSIGNED",
           })),
@@ -530,6 +507,7 @@ export async function expireAndReassignExpiredQueueEntries(): Promise<{
     select: {
       trackId: true,
       reviewerId: true,
+      artistReviewerId: true,
     },
   });
 
@@ -539,16 +517,27 @@ export async function expireAndReassignExpiredQueueEntries(): Promise<{
 
   const affectedTrackIds = Array.from(new Set(expired.map((e) => e.trackId)));
 
-  const updateOr = expired.map((e) => ({ trackId: e.trackId, reviewerId: e.reviewerId }));
+  // Build match conditions: legacy uses reviewerId, peer uses peerReviewerArtistId/artistReviewerId
+  const reviewOr = expired.map((e) =>
+    e.reviewerId
+      ? { trackId: e.trackId, reviewerId: e.reviewerId }
+      : { trackId: e.trackId, peerReviewerArtistId: e.artistReviewerId! }
+  );
+  const queueOr = expired.map((e) =>
+    e.reviewerId
+      ? { trackId: e.trackId, reviewerId: e.reviewerId }
+      : { trackId: e.trackId, artistReviewerId: e.artistReviewerId! }
+  );
 
   const chunkSize = 200;
-  for (let i = 0; i < updateOr.length; i += chunkSize) {
-    const chunk = updateOr.slice(i, i + chunkSize);
+  for (let i = 0; i < reviewOr.length; i += chunkSize) {
+    const reviewChunk = reviewOr.slice(i, i + chunkSize);
+    const queueChunk = queueOr.slice(i, i + chunkSize);
 
     await prisma.$transaction(async (tx) => {
       await tx.review.updateMany({
         where: {
-          OR: chunk,
+          OR: reviewChunk,
           status: { in: ["ASSIGNED", "IN_PROGRESS"] },
         },
         data: { status: "EXPIRED" },
@@ -556,7 +545,7 @@ export async function expireAndReassignExpiredQueueEntries(): Promise<{
 
       await tx.reviewQueue.deleteMany({
         where: {
-          OR: chunk,
+          OR: queueChunk,
         },
       });
     });
@@ -678,7 +667,8 @@ export function calculateTier(
 }
 
 // Update reviewer tier
-export async function updateReviewerTier(reviewerId: string) {
+export async function updateReviewerTier(reviewerId: string | null) {
+  if (!reviewerId) return; // Peer reviews don't have ReviewerProfile
   const reviewer = await prisma.reviewerProfile.findUnique({
     where: { id: reviewerId },
     include: { User: { select: { email: true } } },
@@ -710,7 +700,8 @@ export async function updateReviewerTier(reviewerId: string) {
   }
 }
 
-export async function updateReviewerAverageRating(reviewerId: string) {
+export async function updateReviewerAverageRating(reviewerId: string | null) {
+  if (!reviewerId) return; // Peer reviews don't have ReviewerProfile
   const agg = await prisma.review.aggregate({
     where: {
       reviewerId,

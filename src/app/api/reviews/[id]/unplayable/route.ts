@@ -20,32 +20,11 @@ export async function POST(
 
     await request.json().catch(() => ({}));
 
-    const reviewerProfile = await prisma.reviewerProfile.findUnique({
-      where: { userId: session.user.id },
-      select: { isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
-    });
-
-    if (reviewerProfile?.isRestricted) {
-      return NextResponse.json(
-        { error: "Reviewer account restricted" },
-        { status: 403 }
-      );
-    }
-
-    if (
-      reviewerProfile &&
-      (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed)
-    ) {
-      return NextResponse.json(
-        { error: "Please complete onboarding before reviewing" },
-        { status: 403 }
-      );
-    }
-
     const review = await prisma.review.findUnique({
       where: { id },
       include: {
-        ReviewerProfile: { select: { id: true, userId: true } },
+        ReviewerProfile: { select: { id: true, userId: true, isRestricted: true } },
+        ArtistProfile: { select: { id: true, userId: true } },
         Track: {
           select: {
             id: true,
@@ -66,8 +45,21 @@ export async function POST(
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    if (review.ReviewerProfile.userId !== session.user.id) {
+    // Ownership check: peer review uses ArtistProfile, legacy uses ReviewerProfile
+    const isPeer = review.isPeerReview || !!review.peerReviewerArtistId;
+    const isOwner = isPeer
+      ? review.ArtistProfile?.userId === session.user.id
+      : review.ReviewerProfile?.userId === session.user.id;
+
+    if (!isOwner) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (review.ReviewerProfile?.isRestricted) {
+      return NextResponse.json(
+        { error: "Reviewer account restricted" },
+        { status: 403 }
+      );
     }
 
     if (review.status !== "ASSIGNED" && review.status !== "IN_PROGRESS") {
@@ -89,7 +81,9 @@ export async function POST(
       prisma.reviewQueue.deleteMany({
         where: {
           trackId: review.Track.id,
-          reviewerId: review.ReviewerProfile.id,
+          ...(isPeer
+            ? { artistReviewerId: review.peerReviewerArtistId }
+            : { reviewerId: review.reviewerId }),
         },
       }),
       // Set linkIssueNotifiedAt if not already set
