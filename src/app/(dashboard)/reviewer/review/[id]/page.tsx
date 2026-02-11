@@ -1183,12 +1183,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             )}
             <div className="grid grid-cols-5 gap-1.5">
               {([
-                { score: 1, emoji: "😴", short: "Nope" },
-                { score: 2, emoji: "😐", short: "Meh" },
-                { score: 3, emoji: "🤔", short: "Decent" },
-                { score: 4, emoji: "😮", short: "Good" },
-                { score: 5, emoji: "🔥", short: "Hooked" },
-              ] as const).map(({ score, emoji, short }) => {
+                { score: 1, num: "1", short: "Nah" },
+                { score: 2, num: "2", short: "Meh" },
+                { score: 3, num: "3", short: "Solid" },
+                { score: 4, num: "4", short: "Into it" },
+                { score: 5, num: "5", short: "Hooked" },
+              ] as const).map(({ score, num, short }) => {
                 const isSelected = firstImpressionTouched && firstImpressionScore === score;
                 return (
                   <button
@@ -1200,14 +1200,14 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                       setFirstImpression(firstImpressionEnumFromScore(score));
                     }}
                     className={cn(
-                      "flex flex-col items-center gap-1 py-3 px-1 rounded-xl border-2 cursor-pointer transition-all duration-150 ease-out motion-reduce:transition-none",
+                      "flex flex-col items-center gap-0.5 py-3 px-1 rounded-xl border-2 cursor-pointer transition-colors duration-150 ease-out motion-reduce:transition-none",
                       isSelected
                         ? firstImpressionColor(score)
                         : "border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 text-neutral-600"
                     )}
                   >
-                    <span className="text-xl leading-none">{emoji}</span>
-                    <span className="text-[11px] font-bold leading-tight">{short}</span>
+                    <span className="text-lg font-black leading-none">{num}</span>
+                    <span className="text-[10px] font-semibold leading-tight">{short}</span>
                   </button>
                 );
               })}
