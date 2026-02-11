@@ -265,7 +265,7 @@ export default async function ReviewQueuePage({
                   {available.map((track) => (
                     <div
                       key={track.id}
-                      className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
+                      className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12 min-h-[100px]"
                     >
                       <div className="w-[100px] flex-shrink-0 self-stretch relative bg-neutral-100">
                         {track.artworkUrl ? (
