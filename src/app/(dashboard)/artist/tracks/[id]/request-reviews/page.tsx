@@ -7,7 +7,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Music } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 // Benefits that unlock at different review counts
@@ -35,6 +36,14 @@ export default function RequestReviewsPage() {
   const [reviewTokens, setReviewTokens] = useState<number>(0);
   const [desiredReviews, setDesiredReviews] = useState<number>(5);
   const [isDraggingSlider, setIsDraggingSlider] = useState(false);
+
+  const [trackInfo, setTrackInfo] = useState<{
+    title: string;
+    artworkUrl: string | null;
+    status: string;
+    genres: { id: string; name: string }[];
+    sourceUrl: string | null;
+  } | null>(null);
 
   const buyCredits = async (payload: { kind: "quantity"; quantity: number } | { kind: "pack"; pack: 5 | 20 | 50 }) => {
     if (isBuyingCredits) return;
@@ -67,17 +76,32 @@ export default function RequestReviewsPage() {
     let cancelled = false;
     async function load() {
       try {
-        const res = await fetch("/api/artist/profile");
-        if (!res.ok) {
-          if (cancelled) return;
-          setIsLoadingProfile(false);
-          return;
+        const [profileRes, trackRes] = await Promise.all([
+          fetch("/api/artist/profile"),
+          trackId ? fetch(`/api/tracks/${trackId}`) : null,
+        ]);
+
+        if (profileRes.ok) {
+          const data = (await profileRes.json()) as any;
+          if (!cancelled) {
+            setIsSubscribed(data?.subscriptionStatus === "active");
+            setReviewTokens(typeof data?.reviewCredits === "number" ? data.reviewCredits : 0);
+            setDesiredReviews(data?.subscriptionStatus === "active" ? 20 : 5);
+          }
         }
-        const data = (await res.json()) as any;
-        if (cancelled) return;
-        setIsSubscribed(data?.subscriptionStatus === "active");
-        setReviewTokens(typeof data?.reviewCredits === "number" ? data.reviewCredits : 0);
-        setDesiredReviews(data?.subscriptionStatus === "active" ? 20 : 5);
+
+        if (trackRes?.ok) {
+          const tData = (await trackRes.json()) as any;
+          if (!cancelled && tData) {
+            setTrackInfo({
+              title: tData.title ?? "Untitled",
+              artworkUrl: tData.artworkUrl ?? null,
+              status: tData.status ?? "",
+              genres: tData.Genre ?? tData.genres ?? [],
+              sourceUrl: tData.sourceUrl ?? null,
+            });
+          }
+        }
       } catch {
         if (cancelled) return;
       } finally {
@@ -88,7 +112,7 @@ export default function RequestReviewsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [trackId]);
 
   const requestReviews = async () => {
     if (!trackId) {
@@ -148,6 +172,44 @@ export default function RequestReviewsPage() {
               Get feedback from fellow artists in your genre
             </p>
           </div>
+
+          {/* Track Info Panel */}
+          {trackInfo && (
+            <div className="flex items-center gap-4 rounded-2xl border border-black/8 bg-white px-4 py-4 mb-6">
+              <div className="relative flex-shrink-0">
+                <div className="w-16 h-16 rounded-xl overflow-hidden bg-neutral-100 border border-black/5">
+                  {trackInfo.artworkUrl ? (
+                    <Image
+                      src={trackInfo.artworkUrl}
+                      alt={trackInfo.title}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-neutral-200 to-neutral-300">
+                      <Music className="h-6 w-6 text-neutral-400" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-base font-semibold text-black truncate">{trackInfo.title}</p>
+                {trackInfo.genres.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {trackInfo.genres.slice(0, 3).map((g: any) => (
+                      <span
+                        key={g.id}
+                        className="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-500 border border-neutral-200"
+                      >
+                        {g.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 border-2 border-red-200 text-red-700 text-sm p-4 font-medium mb-6 rounded-2xl">
