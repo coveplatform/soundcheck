@@ -185,67 +185,100 @@ export function TrackReportDemo() {
         <div className="relative">
           {/* Analytics Tab */}
           {activeTab === "analytics" && (
-            <div className="space-y-6">
-              {/* Big score + listener response stats */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                {/* Average score — hero number */}
-                <div className="bg-purple-600 border-2 border-black rounded-2xl p-5 sm:p-6 text-center sm:text-left flex-shrink-0 sm:w-40 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tighter">4.2</div>
-                  <div className="text-xs font-bold text-white/70 mt-1 uppercase tracking-wider">Avg rating</div>
-                  <div className="flex items-center justify-center sm:justify-start gap-0.5 mt-2">
-                    {[1,2,3,4].map(i => <div key={i} className="w-3 h-3 rounded-full bg-white" />)}
-                    <div className="w-3 h-3 rounded-full bg-white/30" />
+            <div className="space-y-5">
+              {/* Hero row: radial gauge + listener signals */}
+              <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 items-stretch">
+                {/* Radial gauge — the visual centrepiece */}
+                <div className="flex-shrink-0 flex flex-col items-center justify-center sm:w-44">
+                  <div className="relative w-32 h-32 sm:w-36 sm:h-36">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                      <defs>
+                        <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#9333ea" />
+                          <stop offset="100%" stopColor="#c084fc" />
+                        </linearGradient>
+                      </defs>
+                      <circle cx="50" cy="50" r="42" stroke="#f3f4f6" strokeWidth="7" fill="none" />
+                      <circle
+                        cx="50" cy="50" r="42"
+                        stroke="url(#scoreGrad)"
+                        strokeWidth="7"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeDasharray={`${2 * Math.PI * 42}`}
+                        strokeDashoffset={`${2 * Math.PI * 42 * (1 - 0.84)}`}
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-4xl sm:text-5xl font-black text-neutral-950 leading-none tracking-tighter">4.2</span>
+                      <span className="text-[10px] font-bold text-neutral-400 mt-0.5 uppercase tracking-wider">out of 5</span>
+                    </div>
                   </div>
+                  <p className="text-xs font-bold text-neutral-500 mt-2">20 reviews</p>
                 </div>
 
-                {/* Listener response — bold stat cards */}
-                <div className="flex-1 grid grid-cols-3 gap-2 sm:gap-3">
-                  <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-3 sm:p-4 text-center">
-                    <div className="text-2xl sm:text-3xl font-black text-purple-700 leading-none">85%</div>
-                    <div className="text-[10px] sm:text-xs font-bold text-purple-600/70 mt-1.5">Would replay</div>
-                  </div>
-                  <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-3 sm:p-4 text-center">
-                    <div className="text-2xl sm:text-3xl font-black text-purple-700 leading-none">67%</div>
-                    <div className="text-[10px] sm:text-xs font-bold text-purple-600/70 mt-1.5">Would playlist</div>
-                  </div>
-                  <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-3 sm:p-4 text-center">
-                    <div className="text-2xl sm:text-3xl font-black text-orange-600 leading-none">52%</div>
-                    <div className="text-[10px] sm:text-xs font-bold text-orange-500/70 mt-1.5">Would share</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Rating Distribution — chunky bars */}
-              <div>
-                <h4 className="text-[10px] font-bold text-neutral-400 mb-3 tracking-[0.15em] uppercase">Rating breakdown</h4>
-                <div className="space-y-1.5">
+                {/* Listener signals — horizontal progress bars */}
+                <div className="flex-1 flex flex-col justify-center gap-3">
+                  <h4 className="text-[10px] font-bold text-neutral-400 tracking-[0.15em] uppercase">Listener signals</h4>
                   {[
-                    { stars: 5, count: 8, percent: 40, color: "bg-purple-600" },
-                    { stars: 4, count: 7, percent: 35, color: "bg-purple-400" },
-                    { stars: 3, count: 4, percent: 20, color: "bg-orange-400" },
-                    { stars: 2, count: 1, percent: 5, color: "bg-orange-300" },
-                    { stars: 1, count: 0, percent: 0, color: "bg-neutral-300" },
-                  ].map((row) => (
-                    <div key={row.stars} className="flex items-center gap-2.5">
-                      <span className="text-xs font-black text-neutral-400 w-5 text-right">{row.stars}</span>
-                      <div className="flex-1 h-5 bg-neutral-100 rounded-md overflow-hidden">
+                    { label: "Would listen again", value: 85, color: "bg-purple-600" },
+                    { label: "Would add to playlist", value: 67, color: "bg-purple-400" },
+                    { label: "Would share with a friend", value: 52, color: "bg-orange-400" },
+                    { label: "Would follow artist", value: 40, color: "bg-orange-300" },
+                  ].map((s) => (
+                    <div key={s.label}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-semibold text-neutral-600">{s.label}</span>
+                        <span className="text-xs font-black text-neutral-950">{s.value}%</span>
+                      </div>
+                      <div className="h-2.5 bg-neutral-100 rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-md ${row.color} transition-all duration-500 ease-out`}
-                          style={{ width: `${Math.max(row.percent, 2)}%` }}
+                          className={`h-full rounded-full ${s.color}`}
+                          style={{ width: `${s.value}%` }}
                         />
                       </div>
-                      <span className="text-xs font-bold text-neutral-500 w-5">{row.count}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Bottom insight — replaces old quick stats */}
-              <div className="bg-neutral-950 border-2 border-black rounded-xl p-4 flex items-center gap-4">
-                <div className="text-3xl font-black text-white leading-none">75%</div>
-                <div>
-                  <p className="text-sm font-bold text-white">Positive sentiment</p>
-                  <p className="text-xs text-neutral-500">3 areas flagged for improvement across 20 reviews</p>
+              {/* Rating distribution + sentiment — side by side */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                {/* Rating bars */}
+                <div className="flex-1">
+                  <h4 className="text-[10px] font-bold text-neutral-400 mb-2.5 tracking-[0.15em] uppercase">Rating breakdown</h4>
+                  <div className="space-y-1.5">
+                    {[
+                      { stars: 5, count: 8, percent: 40, color: "bg-purple-600" },
+                      { stars: 4, count: 7, percent: 35, color: "bg-purple-500" },
+                      { stars: 3, count: 4, percent: 20, color: "bg-orange-400" },
+                      { stars: 2, count: 1, percent: 5, color: "bg-orange-300" },
+                      { stars: 1, count: 0, percent: 0, color: "bg-neutral-300" },
+                    ].map((row) => (
+                      <div key={row.stars} className="flex items-center gap-2">
+                        <span className="text-[11px] font-black text-neutral-400 w-4 text-right">{row.stars}</span>
+                        <div className="flex-1 h-4 bg-neutral-100 rounded-md overflow-hidden">
+                          <div
+                            className={`h-full rounded-md ${row.color}`}
+                            style={{ width: `${Math.max(row.percent, 2)}%` }}
+                          />
+                        </div>
+                        <span className="text-[11px] font-bold text-neutral-400 w-4">{row.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sentiment + key insight */}
+                <div className="sm:w-48 flex flex-col gap-3">
+                  <div className="bg-purple-600 rounded-xl p-4 flex-1 flex flex-col justify-center">
+                    <div className="text-3xl font-black text-white leading-none">75%</div>
+                    <div className="text-[11px] font-bold text-white/70 mt-1">Positive sentiment</div>
+                  </div>
+                  <div className="bg-neutral-950 rounded-xl p-4 flex-1 flex flex-col justify-center">
+                    <div className="text-3xl font-black text-orange-400 leading-none">3</div>
+                    <div className="text-[11px] font-bold text-neutral-500 mt-1">Areas to improve</div>
+                  </div>
                 </div>
               </div>
             </div>
