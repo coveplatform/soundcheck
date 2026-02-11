@@ -100,11 +100,11 @@ export function getTrackAction(track: {
   if (track.status === "UPLOADED" || track.reviewsRequested === 0) {
     return {
       label: "Request Reviews",
-      href: `/tracks/${track.id}/request-reviews`,
+      href: `/artist/tracks/${track.id}/request-reviews`,
     };
   }
   return {
     label: "View Reviews",
-    href: `/tracks/${track.id}`,
+    href: `/artist/tracks/${track.id}`,
   };
 }
