@@ -4,6 +4,7 @@ import {
   PendingPeerReview,
   WhatsNextGuidance,
 } from "@/types/dashboard";
+import { isPeerReviewerPro, PRO_TIER_MIN_REVIEWS, PRO_TIER_MIN_RATING, TIER_RATES } from "@/lib/queue";
 
 /**
  * Calculate dashboard stats with priority ordering
@@ -22,6 +23,22 @@ export function calculateDashboardStats(profile: {
   const totalTracks = profile.tracks.length;
   const pendingCount = profile.pendingPeerReviews?.length ?? 0;
 
+  const isProTier = isPeerReviewerPro(totalPeerReviews, peerReviewRating);
+  const reviewsToGo = Math.max(0, PRO_TIER_MIN_REVIEWS - totalPeerReviews);
+  const proRate = `$${(TIER_RATES.PRO / 100).toFixed(2)}`;
+
+  const reviewsTooltip = isProTier
+    ? `PRO Reviewer — you earn 1 credit + ${proRate} cash per review`
+    : reviewsToGo > 0
+      ? `${reviewsToGo} more review${reviewsToGo !== 1 ? "s" : ""} to unlock PRO (${proRate}/review)`
+      : `Maintain a ${PRO_TIER_MIN_RATING}+ rating to unlock PRO (${proRate}/review)`;
+
+  const ratingTooltip = isProTier
+    ? `PRO Reviewer — keep your rating above ${PRO_TIER_MIN_RATING} to stay PRO`
+    : peerReviewRating >= PRO_TIER_MIN_RATING
+      ? `On track for PRO! Complete ${PRO_TIER_MIN_REVIEWS} reviews to unlock ${proRate}/review`
+      : `Reach ${PRO_TIER_MIN_RATING}+ with ${PRO_TIER_MIN_REVIEWS} reviews to earn ${proRate}/review`;
+
   const stats: DashboardStat[] = [
     {
       id: "tracks",
@@ -37,11 +54,12 @@ export function calculateDashboardStats(profile: {
     {
       id: "reviews-given",
       iconName: "headphones",
-      iconBg: "bg-emerald-100",
-      iconColor: "text-emerald-700",
+      iconBg: isProTier ? "bg-purple-100" : "bg-emerald-100",
+      iconColor: isProTier ? "text-purple-700" : "text-emerald-700",
       value: totalPeerReviews,
-      label: "Reviews Given",
+      label: isProTier ? "Reviews (PRO)" : "Reviews Given",
       href: "/review/history",
+      tooltip: reviewsTooltip,
       ariaLabel: "View your review history",
       priority: pendingCount > 0 ? 1 : 3,
     },
@@ -52,7 +70,7 @@ export function calculateDashboardStats(profile: {
       iconColor: "text-amber-700",
       value: peerReviewRating > 0 ? peerReviewRating.toFixed(1) : "—",
       label: "Avg Rating",
-      tooltip: "Average rating on reviews you've given",
+      tooltip: ratingTooltip,
       ariaLabel: `Your average review rating is ${
         peerReviewRating > 0 ? peerReviewRating.toFixed(1) : "not available"
       }`,

@@ -318,6 +318,10 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm text-neutral-50">Unlock <span className="font-bold">$1.50/review</span> as PRO Reviewer</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                   <span className="text-sm text-neutral-50">Public track pages</span>
                 </div>
               </div>
@@ -402,6 +406,10 @@ export default function Home() {
               {
                 q: "How do credits work?",
                 a: "Every time you review another artist's track, you earn a credit. Spend that credit to get a review on one of your own tracks. It's a simple give-one-get-one system that keeps quality feedback flowing. PRO members get 40 credits per month included, no reviewing required.",
+              },
+              {
+                q: "Can I get paid for reviewing?",
+                a: "Yes. Complete 25 reviews with an average artist rating of 4.5 or higher and you'll unlock PRO Reviewer status. PRO Reviewers earn $1.50 cash per review on top of the usual credit. You can track your progress in the review queue sidebar.",
               },
               {
                 q: "Is it really free?",

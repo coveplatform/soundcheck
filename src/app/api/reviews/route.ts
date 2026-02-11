@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { updateReviewerTier, getTierRateCents, updateReviewerAverageRating } from "@/lib/queue";
+import { updateReviewerTier, getTierRateCents, updateReviewerAverageRating, isPeerReviewerPro, TIER_RATES } from "@/lib/queue";
 import { sendReviewProgressEmail } from "@/lib/email";
 import { randomBytes } from "crypto";
 
@@ -263,22 +263,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: weakestPartError }, { status: 400 });
     }
 
-    // Calculate earnings: peer reviewers earn credits (0 cash), legacy reviewers earn cash
-    const earnings = isPeerReview ? 0 : getTierRateCents(reviewerProfile!.tier);
+    // Fetch peer reviewer stats for tier check and daily cap
+    const peerReviewerProfile = isPeerReview && review.peerReviewerArtistId
+      ? await prisma.artistProfile.findUnique({
+          where: { id: review.peerReviewerArtistId },
+          select: { subscriptionStatus: true, totalPeerReviews: true, peerReviewRating: true },
+        })
+      : null;
+
+    // Calculate earnings: PRO-tier peer reviewers earn $1.50 cash, legacy reviewers use their tier rate
+    const peerIsProTier = peerReviewerProfile
+      ? isPeerReviewerPro(peerReviewerProfile.totalPeerReviews, peerReviewerProfile.peerReviewRating)
+      : false;
+    const earnings = isPeerReview
+      ? (peerIsProTier ? TIER_RATES.PRO : 0)
+      : getTierRateCents(reviewerProfile!.tier);
 
     const now = new Date();
     const startOfToday = new Date(now);
     startOfToday.setHours(0, 0, 0, 0);
     const heartbeatCutoff = new Date(now.getTime() - 2 * 60 * 1000);
 
-    // Daily review cap: 5/day for free users, unlimited for pro
-    const reviewerSubscription = isPeerReview && review.peerReviewerArtistId
-      ? await prisma.artistProfile.findUnique({
-          where: { id: review.peerReviewerArtistId },
-          select: { subscriptionStatus: true },
-        })
-      : null;
-    const isProReviewer = reviewerSubscription?.subscriptionStatus === "active";
+    // Daily review cap: 5/day for free users, unlimited for pro subscribers
+    const isProReviewer = peerReviewerProfile?.subscriptionStatus === "active";
 
     if (!isProReviewer) {
       const MAX_REVIEWS_PER_DAY = 5;
@@ -387,7 +394,7 @@ export async function POST(request: Request) {
         return { updated: false as const, reason: "UNKNOWN" as const };
       }
 
-      // Update reviewer profile: legacy reviewers get cash, peer reviewers get credits
+      // Update reviewer profile: peer reviewers get credits (+ cash if PRO tier), legacy reviewers get cash
       if (isPeerReview && artistProfile) {
         await tx.artistProfile.update({
           where: { id: artistProfile.id },
@@ -395,6 +402,10 @@ export async function POST(request: Request) {
             reviewCredits: { increment: 1 },
             totalCreditsEarned: { increment: 1 },
             totalPeerReviews: { increment: 1 },
+            ...(earnings > 0 ? {
+              pendingBalance: { increment: earnings },
+              totalEarnings: { increment: earnings },
+            } : {}),
           },
         });
       } else if (review.reviewerId && review.ReviewerProfile) {

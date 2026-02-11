@@ -102,6 +102,10 @@ export const TIER_RATES = {
   PRO: 150,
 } as const;
 
+// PRO tier requirements
+export const PRO_TIER_MIN_REVIEWS = 25;
+export const PRO_TIER_MIN_RATING = 4.5;
+
 function getNonProTierValue(): ReviewerTier {
   const enumObj = ReviewerTier as unknown as Record<string, ReviewerTier | undefined>;
   return enumObj.NORMAL ?? ("NORMAL" as unknown as ReviewerTier);
@@ -637,10 +641,18 @@ export function calculateTier(
   totalReviews: number,
   averageRating: number
 ): ReviewerTier {
-  if (totalReviews >= 50 && averageRating >= 4.7) {
+  if (totalReviews >= PRO_TIER_MIN_REVIEWS && averageRating >= PRO_TIER_MIN_RATING) {
     return "PRO" as unknown as ReviewerTier;
   }
   return getNonProTierValue();
+}
+
+// Calculate tier for peer reviewers (ArtistProfile-based)
+export function isPeerReviewerPro(
+  totalPeerReviews: number,
+  peerReviewRating: number
+): boolean {
+  return totalPeerReviews >= PRO_TIER_MIN_REVIEWS && peerReviewRating >= PRO_TIER_MIN_RATING;
 }
 
 // Update reviewer tier

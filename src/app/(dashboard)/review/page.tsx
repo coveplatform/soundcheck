@@ -5,7 +5,8 @@ import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
-import { Music, ArrowRight, Star, Gem, MessageSquare, Tag } from "lucide-react";
+import { Music, ArrowRight, Star, Gem, MessageSquare, Tag, DollarSign, TrendingUp } from "lucide-react";
+import { isPeerReviewerPro, PRO_TIER_MIN_REVIEWS, PRO_TIER_MIN_RATING, TIER_RATES } from "@/lib/queue";
 import { GenreTagList } from "@/components/ui/genre-tag";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ClaimButton } from "./claim-button";
@@ -352,6 +353,73 @@ export default async function ReviewQueuePage({
                 </div>
               </div>
             </div>
+
+            {/* Earnings Info */}
+            {(() => {
+              const totalReviews = artistProfile.totalPeerReviews ?? 0;
+              const rating = artistProfile.peerReviewRating ?? 0;
+              const isProTier = isPeerReviewerPro(totalReviews, rating);
+              const reviewsNeeded = Math.max(0, PRO_TIER_MIN_REVIEWS - totalReviews);
+              const ratingMet = rating >= PRO_TIER_MIN_RATING;
+              const reviewProgress = Math.min(100, Math.round((totalReviews / PRO_TIER_MIN_REVIEWS) * 100));
+
+              return (
+                <div className="border border-black/8 rounded-xl bg-white/60 p-4">
+                  <p className="text-[11px] font-mono tracking-[0.2em] text-black/40 uppercase mb-3">
+                    Earnings
+                  </p>
+                  {isProTier ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="h-7 w-7 rounded-md bg-purple-100 flex items-center justify-center">
+                          <DollarSign className="h-3.5 w-3.5 text-purple-600" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-purple-600">PRO Reviewer</span>
+                          <p className="text-xs text-black/50">${(TIER_RATES.PRO / 100).toFixed(2)} per review</p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-neutral-500 mt-1">
+                        You earn 1 credit <span className="font-semibold">+ ${(TIER_RATES.PRO / 100).toFixed(2)} cash</span> per review
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-7 w-7 rounded-md bg-neutral-100 flex items-center justify-center">
+                          <TrendingUp className="h-3.5 w-3.5 text-neutral-500" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold">1 credit per review</span>
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-purple-50 border border-purple-100 p-3 space-y-2">
+                        <p className="text-xs font-bold text-purple-700">Unlock PRO Reviewer</p>
+                        <p className="text-xs text-purple-600/80">
+                          Complete {PRO_TIER_MIN_REVIEWS} reviews with a {PRO_TIER_MIN_RATING}+ avg rating to earn <span className="font-bold">${(TIER_RATES.PRO / 100).toFixed(2)} cash</span> per review
+                        </p>
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between text-[10px] text-purple-600/70">
+                            <span>Reviews: {totalReviews}/{PRO_TIER_MIN_REVIEWS}</span>
+                            <span>{reviewProgress}%</span>
+                          </div>
+                          <div className="h-1.5 bg-purple-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-purple-500 rounded-full transition-all duration-300"
+                              style={{ width: `${reviewProgress}%` }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-[10px] text-purple-600/70">
+                            <span>Avg rating: {rating > 0 ? rating.toFixed(1) : "—"}/{PRO_TIER_MIN_RATING}</span>
+                            <span>{ratingMet ? "✓" : `${reviewsNeeded > 0 ? "" : "Needs improvement"}`}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Review Genres */}
             {artistProfile.Genre_ArtistReviewGenres && artistProfile.Genre_ArtistReviewGenres.length > 0 && (
