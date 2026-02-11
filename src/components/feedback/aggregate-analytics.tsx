@@ -58,8 +58,8 @@ function topFrequencies(items: string[], limit: number) {
 
 function getScoreLabel(score: number): { label: string; color: string } {
   // Absolute quality labels based on 1-5 scale
-  if (score >= 4.5) return { label: "Exceptional", color: "text-lime-600" };
-  if (score >= 4.0) return { label: "Strong", color: "text-lime-600" };
+  if (score >= 4.5) return { label: "Exceptional", color: "text-purple-700" };
+  if (score >= 4.0) return { label: "Strong", color: "text-purple-700" };
   if (score >= 3.5) return { label: "Solid", color: "text-neutral-600" };
   if (score >= 3.0) return { label: "Average", color: "text-neutral-500" };
   if (score >= 2.5) return { label: "Developing", color: "text-amber-600" };
@@ -85,7 +85,7 @@ function ComparisonIndicator({ score, platformAvg }: { score: number; platformAv
   if (diff > 0.2) {
     return (
       <div
-        className="flex items-center gap-1 text-xs text-lime-600 font-medium"
+        className="flex items-center gap-1 text-xs text-purple-700 font-medium"
         title={`Platform average: ${platformAvg.toFixed(1)}`}
       >
         <TrendingUp className="h-3 w-3" />

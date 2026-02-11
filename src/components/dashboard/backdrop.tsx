@@ -12,7 +12,7 @@ export function DashboardBackdrop({ className }: { className?: string }) {
         className
       )}
     >
-      <div className="absolute -top-48 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-lime-500/10 blur-3xl" />
+      <div className="absolute -top-48 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-purple-600/10 blur-3xl" />
       <div className="absolute -top-56 -left-40 h-[420px] w-[420px] rounded-full bg-orange-400/10 blur-3xl" />
       <div className="absolute -bottom-56 -right-40 h-[520px] w-[520px] rounded-full bg-purple-400/10 blur-3xl" />
 

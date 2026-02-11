@@ -23,7 +23,7 @@ export function FeedbackPatterns({
         {/* Praise */}
         <div className="bg-gradient-to-br from-lime-50 to-green-50 rounded-2xl p-6 border-2 border-lime-200">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-lime-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center">
               <ThumbsUp className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -44,7 +44,7 @@ export function FeedbackPatterns({
                   className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-lime-200"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black text-lime-600">
+                    <span className="text-xs font-black text-purple-700">
                       #{index + 1}
                     </span>
                     <span className="text-sm font-medium">{item.word}</span>
@@ -133,7 +133,7 @@ export function FeedbackPatterns({
           {consistentStrengths.length > 0 && (
             <div className="bg-white rounded-xl p-6 border-2 border-black/5">
               <div className="flex items-center gap-2 mb-4">
-                <ThumbsUp className="w-5 h-5 text-lime-600" />
+                <ThumbsUp className="w-5 h-5 text-purple-700" />
                 <p className="text-sm font-bold">Consistent Strengths</p>
               </div>
               <div className="space-y-2">
@@ -142,7 +142,7 @@ export function FeedbackPatterns({
                     key={strength}
                     className="flex items-center gap-2 text-sm text-black/70"
                   >
-                    <span className="text-lime-600 font-black">✓</span>
+                    <span className="text-purple-700 font-black">✓</span>
                     <span>{strength}</span>
                   </div>
                 ))}

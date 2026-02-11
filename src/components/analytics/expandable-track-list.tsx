@@ -53,7 +53,7 @@ export function ExpandableTrackList({ tracks, variant = "all" }: ExpandableTrack
             >
               <div className="flex items-center gap-3 sm:gap-4">
                 {variant === "top" && (
-                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-lime-400 to-lime-600 flex items-center justify-center text-white font-black text-sm">
+                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-lime-400 to-purple-700 flex items-center justify-center text-white font-black text-sm">
                     {index + 1}
                   </div>
                 )}
@@ -144,7 +144,7 @@ export function ExpandableTrackList({ tracks, variant = "all" }: ExpandableTrack
                   <p className="text-xs font-mono text-black/40 uppercase">Category Breakdown</p>
                   <div className="space-y-2">
                     {[
-                      { name: "Production", score: track.categoryScores.production, color: "bg-lime-500" },
+                      { name: "Production", score: track.categoryScores.production, color: "bg-purple-600" },
                       { name: "Originality", score: track.categoryScores.originality, color: "bg-purple-500" },
                       { name: "Vocals", score: track.categoryScores.vocals, color: "bg-blue-500" },
                     ].map((category) => (

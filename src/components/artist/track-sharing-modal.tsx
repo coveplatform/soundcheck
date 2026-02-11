@@ -218,7 +218,7 @@ export function TrackSharingModal({
                       className={cn(
                         "w-full p-4 border rounded-lg text-left transition-colors",
                         sharingMode === "EXPOSURE"
-                          ? "border-lime-500 bg-lime-50"
+                          ? "border-purple-600 bg-lime-50"
                           : "border-neutral-200 bg-white hover:border-neutral-300"
                       )}
                     >
@@ -235,7 +235,7 @@ export function TrackSharingModal({
                           </ul>
                         </div>
                         {sharingMode === "EXPOSURE" && (
-                          <div className="h-5 w-5 rounded-full bg-lime-500 flex items-center justify-center flex-shrink-0">
+                          <div className="h-5 w-5 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
                             <Check className="h-3 w-3 text-white" />
                           </div>
                         )}
@@ -247,7 +247,7 @@ export function TrackSharingModal({
                       className={cn(
                         "w-full p-4 border rounded-lg transition-colors",
                         !canSell && "bg-neutral-50",
-                        sharingMode === "SALES" && canSell && "border-lime-500 bg-lime-50",
+                        sharingMode === "SALES" && canSell && "border-purple-600 bg-lime-50",
                         canSell && sharingMode !== "SALES" && "border-neutral-200 bg-white"
                       )}
                     >
@@ -274,7 +274,7 @@ export function TrackSharingModal({
                             </ul>
                           </div>
                           {sharingMode === "SALES" && canSell && (
-                            <div className="h-5 w-5 rounded-full bg-lime-500 flex items-center justify-center flex-shrink-0">
+                            <div className="h-5 w-5 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
                               <Check className="h-3 w-3 text-white" />
                             </div>
                           )}

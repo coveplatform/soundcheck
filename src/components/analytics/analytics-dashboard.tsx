@@ -151,10 +151,10 @@ export function AnalyticsDashboard({
       {/* HERO SECTION - MASSIVE REVIEW COUNT */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-yellow-50 to-orange-50 opacity-50" />
-        <div className="relative bg-gradient-to-br from-purple-400/10 to-green-400/10 rounded-3xl border-2 border-purple-300 p-6 sm:p-8">
+        <div className="relative bg-gradient-to-br from-purple-500/10 to-green-400/10 rounded-3xl border-2 border-purple-300 p-6 sm:p-8">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-2 border-black/10 mb-6">
-              <MessageSquare className="w-4 h-4 text-purple-600" />
+              <MessageSquare className="w-4 h-4 text-purple-700" />
               <span className="text-xs font-bold text-black/70 uppercase tracking-wider">
                 Total Feedback Received
               </span>
@@ -187,7 +187,7 @@ export function AnalyticsDashboard({
             </div>
 
             {improvementRate > 5 && (
-              <div className="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-white rounded-full border-2 border-purple-400 shadow-lg">
+              <div className="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-white rounded-full border-2 border-purple-500 shadow-lg">
                 <TrendingUp className="w-5 h-5 text-purple-600" />
                 <span className="text-sm font-bold">
                   You've improved by {improvementRate.toFixed(0)}% - keep it up!

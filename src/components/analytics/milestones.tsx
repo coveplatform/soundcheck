@@ -59,7 +59,7 @@ export function Milestones({ totalReviews, totalEarnings, totalTracks, highestSc
       completed: totalReviews >= 100,
       progress: Math.min(totalReviews, 100),
       target: 100,
-      color: "from-lime-400 to-green-400",
+      color: "from-purple-500 to-green-400",
     },
     {
       id: "first_5_star",
@@ -85,7 +85,7 @@ export function Milestones({ totalReviews, totalEarnings, totalTracks, highestSc
       completed: totalEarnings >= 100,
       progress: Math.min(totalEarnings, 100),
       target: 100,
-      color: "from-green-400 to-lime-400",
+      color: "from-green-400 to-purple-500",
     },
     {
       id: "5_tracks",
@@ -119,7 +119,7 @@ export function Milestones({ totalReviews, totalEarnings, totalTracks, highestSc
         </div>
         <div className="h-3 w-full bg-white rounded-full overflow-hidden border-2 border-black">
           <div
-            className="h-full bg-gradient-to-r from-lime-400 to-green-500 transition-all duration-500"
+            className="h-full bg-gradient-to-r from-purple-500 to-green-500 transition-all duration-500"
             style={{ width: `${completionPercent}%` }}
           />
         </div>
@@ -176,7 +176,7 @@ export function Milestones({ totalReviews, totalEarnings, totalTracks, highestSc
                     <div>
                       <div className="h-1.5 w-full bg-black/10 rounded-full overflow-hidden mb-1">
                         <div
-                          className="h-full bg-lime-400 transition-all duration-300"
+                          className="h-full bg-purple-500 transition-all duration-300"
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
@@ -187,7 +187,7 @@ export function Milestones({ totalReviews, totalEarnings, totalTracks, highestSc
                   )}
 
                   {milestone.completed && (
-                    <div className="flex items-center gap-1 text-xs font-bold text-lime-600">
+                    <div className="flex items-center gap-1 text-xs font-bold text-purple-700">
                       <span>✓</span>
                       <span>Unlocked</span>
                     </div>
