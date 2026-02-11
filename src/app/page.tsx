@@ -86,8 +86,8 @@ export default function Home() {
       <section id="examples" className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
         <div className="max-w-6xl mx-auto px-4">
           <AnimatedSection className="max-w-2xl mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">See what&apos;s working</h2>
-            <p className="mt-3 text-neutral-600">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">See what&apos;s working</h2>
+            <p className="mt-5 text-neutral-600 text-lg max-w-xl">
               Get multiple reviews on your track. We show you patterns. When 4 out of 5 people say the same thing, that&apos;s not taste -- that&apos;s signal.
             </p>
           </AnimatedSection>
