@@ -147,7 +147,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             return;
           }
           if (data.status !== "COMPLETED") {
-            funnels.review.start(data.track.id, data.id);
+            funnels.review.start(data.Track.id, data.id);
           }
           setIsLoading(false);
         } else {
@@ -752,6 +752,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   if (isLoading) {
     return (
+      <div className="pt-8 pb-24">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-6">
         <Skeleton className="h-8 w-32" />
         <div className="rounded-3xl border border-black/10 bg-white/70 p-6 space-y-4">
@@ -771,20 +772,23 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <Skeleton className="h-10 w-full" />
         </div>
       </div>
+      </div>
     );
   }
 
   if (error && !review) {
     return (
+      <div className="pt-8 pb-24">
       <div className="max-w-md mx-auto px-4 sm:px-6 text-center py-20">
-        <div className="w-16 h-16 bg-red-100 border-2 border-black flex items-center justify-center mx-auto mb-6">
-          <Music className="h-8 w-8 text-red-600" />
+        <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <Music className="h-8 w-8 text-red-400" />
         </div>
         <h2 className="text-2xl font-black mb-2">Something went wrong</h2>
         <p className="text-neutral-600 mb-6">{error}</p>
         <Link href="/review">
           <Button variant="outline">Back to Queue</Button>
         </Link>
+      </div>
       </div>
     );
   }
@@ -793,6 +797,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   if (review.status === "COMPLETED") {
     return (
+      <div className="pt-8 pb-24">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-10">
         <div className="flex items-center justify-between gap-4">
           <Link
@@ -811,8 +816,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         <Card variant="soft" elevated>
           <CardHeader className="border-b border-black/10">
             <div className="flex items-start gap-4">
-              <div className="h-12 w-12 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
-                <Music className="h-6 w-6 text-black" />
+              <div className="h-12 w-12 bg-neutral-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Music className="h-6 w-6 text-neutral-400" />
               </div>
               <div>
                 <CardTitle className="text-xl">{review.Track.title}</CardTitle>
@@ -908,6 +913,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </CardContent>
         </Card>
       </div>
+      </div>
     );
   }
 
@@ -922,11 +928,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
     return (
       <div className="max-w-md mx-auto px-4 sm:px-6 text-center py-20">
-        <div className="w-16 h-16 bg-lime-500 border-2 border-black flex items-center justify-center mx-auto mb-6">
+        <div className="w-16 h-16 bg-lime-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <Check className="h-8 w-8 text-black" />
         </div>
         <h2 className="text-2xl font-black mb-2">Review Submitted!</h2>
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-lime-500 border-2 border-black mb-4 rounded-full">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-lime-500 border border-lime-400 mb-4 rounded-full">
           <DollarSign className="h-5 w-5 text-black" />
           <span className="font-black text-lg">
             {review.ReviewerProfile
@@ -990,6 +996,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   }
 
   return (
+    <div className="pt-8 pb-24">
     <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1031,20 +1038,20 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       <Card variant="soft" elevated>
         <CardHeader className="border-b border-black/10">
           <div className="flex items-start gap-4">
-            <div className="h-12 w-12 bg-neutral-100 border-2 border-black flex items-center justify-center flex-shrink-0">
-              <Music className="h-6 w-6 text-black" />
+            <div className="h-12 w-12 bg-neutral-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Music className="h-6 w-6 text-neutral-400" />
             </div>
             <div>
               <CardTitle className="text-xl">{review.Track.title}</CardTitle>
-              <p className="text-sm text-neutral-600">
+              <p className="text-sm text-neutral-500">
                 {review.Track.Genre.map((g) => g.name).join(", ")}
               </p>
             </div>
           </div>
           {review.Track.feedbackFocus && (
-            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-2xl">
-              <p className="text-sm font-bold text-amber-800">
-                Artist note: <span className="font-medium">{review.Track.feedbackFocus}</span>
+            <div className="mt-4 p-3 bg-amber-50/60 border border-amber-200/60 rounded-2xl">
+              <p className="text-sm text-amber-800">
+                <span className="font-semibold">Artist note:</span> {review.Track.feedbackFocus}
               </p>
             </div>
           )}
@@ -1089,7 +1096,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               <button
                 type="button"
                 onClick={() => addTimestampNote(playerSeconds)}
-                className="px-3 py-1.5 text-xs font-bold border-2 border-black bg-white hover:bg-neutral-100 transition-colors"
+                className="px-3 py-1.5 text-xs font-semibold border border-black/10 rounded-lg bg-white hover:bg-neutral-50 transition-colors duration-150 ease-out"
               >
                 + Add at {formatTimestamp(playerSeconds)}
               </button>
@@ -1113,10 +1120,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                       }, 300);
                     }}
                     className={cn(
-                      "px-2 py-1 text-xs font-mono border-2 transition-colors",
+                      "px-2 py-1 text-xs font-mono rounded-lg border transition-colors duration-150 ease-out",
                       t.note.trim()
-                        ? "border-lime-500 bg-lime-50 text-lime-800 hover:bg-lime-100"
-                        : "border-amber-400 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                        ? "border-lime-300 bg-lime-50 text-lime-800 hover:bg-lime-100"
+                        : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
                     )}
                   >
                     {formatTimestamp(t.seconds)}
@@ -1136,7 +1143,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
           {error && (
-            <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
+            <div className="bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm p-3 font-medium">
               {error}
             </div>
           )}
@@ -1146,7 +1153,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             ref={firstImpressionRef}
             className={cn(
               "space-y-3 p-4 -m-4 rounded-lg transition-colors",
-              validationIssues.some((i) => i.section === "firstImpression") && "bg-red-50 border-2 border-red-300"
+              validationIssues.some((i) => i.section === "firstImpression") && "bg-red-50/60 border border-red-200 rounded-xl"
             )}
           >
             <Label className="text-base font-bold">First Impression (after 30 seconds)</Label>
@@ -1159,11 +1166,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <div className="space-y-3">
               {/* Current selection display */}
               {firstImpressionTouched ? (
-                <div className={cn("px-3 py-2 border-2 text-sm font-bold transition-colors", firstImpressionColor(firstImpressionScore))}>
+                <div className={cn("px-3 py-2 border rounded-xl text-sm font-bold transition-colors duration-150 ease-out", firstImpressionColor(firstImpressionScore))}>
                   {firstImpressionLabel(firstImpressionScore)}
                 </div>
               ) : (
-                <div className="px-3 py-2 border-2 border-dashed border-neutral-300 text-sm text-neutral-500">
+                <div className="px-3 py-2 border border-dashed border-neutral-200 rounded-xl text-sm text-neutral-500">
                   Tap a point below to rate your first impression
                 </div>
               )}
@@ -1180,10 +1187,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                       setFirstImpression(firstImpressionEnumFromScore(score));
                     }}
                     className={cn(
-                      "flex-1 py-3 text-xs font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                      "flex-1 py-3 text-xs font-bold rounded-lg border transition-colors duration-150 ease-out motion-reduce:transition-none",
                       firstImpressionTouched && firstImpressionScore === score
                         ? firstImpressionColor(score)
-                        : "border-neutral-200 bg-neutral-50 hover:border-neutral-400 hover:bg-white text-neutral-600"
+                        : "border-black/10 bg-neutral-50 hover:border-neutral-300 hover:bg-white text-neutral-600"
                     )}
                   >
                     {score}
@@ -1202,7 +1209,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             ref={scoresRef}
             className={cn(
               "p-4 -m-4 rounded-lg transition-colors",
-              validationIssues.some((i) => i.section === "scores") && "bg-red-50 border-2 border-red-300"
+              validationIssues.some((i) => i.section === "scores") && "bg-red-50/60 border border-red-200 rounded-xl"
             )}
           >
             {validationIssues.some((i) => i.section === "scores") && (
@@ -1237,7 +1244,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             ref={wouldListenAgainRef}
             className={cn(
               "space-y-3 p-4 -m-4 rounded-lg transition-colors",
-              validationIssues.some((i) => i.section === "wouldListenAgain") && "bg-red-50 border-2 border-red-300"
+              validationIssues.some((i) => i.section === "wouldListenAgain") && "bg-red-50/60 border border-red-200 rounded-xl"
             )}
           >
             <Label className="text-base font-bold">Would you listen to this again?</Label>
@@ -1252,10 +1259,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                 type="button"
                 onClick={() => setWouldListenAgain(true)}
                 className={cn(
-                  "flex-1 py-2.5 px-3 text-sm font-bold transition-colors border-2 border-black",
+                  "flex-1 py-2.5 px-3 text-sm font-bold transition-colors duration-150 ease-out rounded-lg border",
                   wouldListenAgain === true
-                    ? "bg-lime-500 text-black"
-                    : "bg-white text-black hover:bg-neutral-100"
+                    ? "border-lime-400 bg-lime-500 text-black"
+                    : "border-black/10 bg-white text-black hover:bg-neutral-50"
                 )}
               >
                 Yes
@@ -1264,10 +1271,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                 type="button"
                 onClick={() => setWouldListenAgain(false)}
                 className={cn(
-                  "flex-1 py-2.5 px-3 text-sm font-bold transition-colors border-2 border-black",
+                  "flex-1 py-2.5 px-3 text-sm font-bold transition-colors duration-150 ease-out rounded-lg border",
                   wouldListenAgain === false
-                    ? "bg-neutral-800 text-white"
-                    : "bg-white text-black hover:bg-neutral-100"
+                    ? "border-neutral-700 bg-neutral-800 text-white"
+                    : "border-black/10 bg-white text-black hover:bg-neutral-50"
                 )}
               >
                 No
@@ -1276,7 +1283,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Listener Signals */}
-          <div className="space-y-4 p-4 bg-neutral-50 border-2 border-black mt-4">
+          <div className="space-y-4 p-4 bg-neutral-50/60 border border-black/10 rounded-2xl mt-4">
             <div>
               <Label className="text-base font-bold">Quick Listener Signals</Label>
               <p className="text-xs text-neutral-600 mt-1">Help the artist understand how listeners might engage with this track</p>
@@ -1291,10 +1298,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldAddToPlaylist(true)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
                       wouldAddToPlaylist === true
-                        ? "bg-lime-500 text-black"
-                        : "bg-white text-black hover:bg-neutral-100"
+                        ? "border-lime-400 bg-lime-500 text-black"
+                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
                     )}
                   >
                     Yes
@@ -1303,10 +1310,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldAddToPlaylist(false)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
                       wouldAddToPlaylist === false
-                        ? "bg-neutral-800 text-white"
-                        : "bg-white text-black hover:bg-neutral-100"
+                        ? "border-neutral-700 bg-neutral-800 text-white"
+                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
                     )}
                   >
                     No
@@ -1322,10 +1329,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldShare(true)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
                       wouldShare === true
-                        ? "bg-lime-500 text-black"
-                        : "bg-white text-black hover:bg-neutral-100"
+                        ? "border-lime-400 bg-lime-500 text-black"
+                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
                     )}
                   >
                     Yes
@@ -1334,10 +1341,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldShare(false)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
                       wouldShare === false
-                        ? "bg-neutral-800 text-white"
-                        : "bg-white text-black hover:bg-neutral-100"
+                        ? "border-neutral-700 bg-neutral-800 text-white"
+                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
                     )}
                   >
                     No
@@ -1353,10 +1360,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldFollow(true)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
                       wouldFollow === true
-                        ? "bg-lime-500 text-black"
-                        : "bg-white text-black hover:bg-neutral-100"
+                        ? "border-lime-400 bg-lime-500 text-black"
+                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
                     )}
                   >
                     Yes
@@ -1365,10 +1372,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldFollow(false)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors border-2 border-black",
+                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
                       wouldFollow === false
-                        ? "bg-neutral-800 text-white"
-                        : "bg-white text-black hover:bg-neutral-100"
+                        ? "border-neutral-700 bg-neutral-800 text-white"
+                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
                     )}
                   >
                     No
@@ -1401,7 +1408,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Best Part */}
-          <div ref={bestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-lg transition-colors", validationIssues.some((i) => i.section === "bestPart") && "bg-red-50 border-2 border-red-300")}>
+          <div ref={bestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-lg transition-colors", validationIssues.some((i) => i.section === "bestPart") && "bg-red-50/60 border border-red-200 rounded-xl")}>
             <Label htmlFor="best" className="text-base font-bold">Best part of the track *</Label>
             {validationIssues.some((i) => i.section === "bestPart") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "bestPart")?.message}</p>)}
             <textarea
@@ -1409,7 +1416,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               placeholder="What stood out to you? What worked well?"
               value={bestPart}
               onChange={(e) => setBestPart(e.target.value)}
-              className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+              className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
             />
             <div className="flex items-center justify-between">
               <p className={cn(
@@ -1427,7 +1434,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Weakest Part */}
-          <div ref={weakestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-lg transition-colors", validationIssues.some((i) => i.section === "weakestPart") && "bg-red-50 border-2 border-red-300")}>
+          <div ref={weakestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-lg transition-colors", validationIssues.some((i) => i.section === "weakestPart") && "bg-red-50/60 border border-red-200 rounded-xl")}>
             <Label htmlFor="weakest" className="text-base font-bold">Weakest part / Areas for improvement *</Label>
             {validationIssues.some((i) => i.section === "weakestPart") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "weakestPart")?.message}</p>)}
             <textarea
@@ -1435,7 +1442,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               placeholder="What could be better? Be constructive."
               value={weakestPart}
               onChange={(e) => setWeakestPart(e.target.value)}
-              className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+              className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
             />
             <div className="flex items-center justify-between">
               <p className={cn(
@@ -1459,13 +1466,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               placeholder="Any other thoughts..."
               value={additionalNotes}
               onChange={(e) => setAdditionalNotes(e.target.value)}
-              className="w-full px-3 py-2 border-2 border-black text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+              className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
             />
           </div>
 
           {/* Timestamped notes - edit section */}
           {timestampNotes.length > 0 && (
-            <div ref={timestampNotesRef} className="space-y-3 p-4 bg-neutral-50 border-2 border-neutral-200">
+            <div ref={timestampNotesRef} className="space-y-3 p-4 bg-neutral-50/60 border border-black/10 rounded-2xl">
               <div className="flex items-center justify-between gap-3">
                 <Label className="text-base font-bold">
                   Timestamp Notes
@@ -1480,13 +1487,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                   <div
                     key={t.id}
                     className={cn(
-                      "border-2 p-3 bg-white transition-colors",
-                      t.note.trim() ? "border-lime-400" : "border-amber-400"
+                      "border p-3 bg-white rounded-xl transition-colors duration-150 ease-out",
+                      t.note.trim() ? "border-lime-300" : "border-amber-300"
                     )}
                   >
                     <div className="flex items-center justify-between gap-3 mb-2">
                       <span className={cn(
-                        "px-2 py-0.5 text-xs font-mono font-bold",
+                        "px-2 py-0.5 text-xs font-mono font-bold rounded-md",
                         t.note.trim() ? "bg-lime-100 text-lime-800" : "bg-amber-100 text-amber-800"
                       )}>
                         {formatTimestamp(t.seconds)}
@@ -1602,6 +1609,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </CardContent>
       </Card>
     </div>
+    </div>
   );
 }
-

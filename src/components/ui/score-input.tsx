@@ -39,7 +39,7 @@ export function ScoreInput({
     <div className="space-y-3">
       <Label className={cn("font-bold", hasError && "text-red-600")}>{label}</Label>
       <div className={cn(
-        "flex gap-1 p-2 border-2 bg-white rounded-xl",
+        "flex gap-1 p-2 border bg-white rounded-xl",
         hasError ? "border-red-400" : "border-black/10"
       )}>
         {Array.from({ length: maxScore }, (_, i) => i + 1).map((score) => (

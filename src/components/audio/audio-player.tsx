@@ -563,7 +563,7 @@ export function AudioPlayer({
     return (
       <div className="space-y-4">
         {/* Embedded Player */}
-        <div className="relative rounded-xl overflow-hidden bg-neutral-950 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <div className="relative rounded-xl overflow-hidden bg-neutral-950 border border-black/10">
           {sourceType === "SOUNDCLOUD" ? (
             <iframe
               ref={scIframeRef}
@@ -606,7 +606,7 @@ export function AudioPlayer({
               <button
                 type="button"
                 onClick={() => setIsEmbedInteractive(true)}
-                className="inline-flex items-center gap-2 px-4 py-3 bg-purple-600 text-black border-2 border-black font-black text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                className="inline-flex items-center gap-2 px-4 py-3 bg-lime-500 text-black border border-lime-400 rounded-xl font-black text-sm shadow-lg"
               >
                 <Play className="h-4 w-4" />
                 Tap to enable player
@@ -617,7 +617,7 @@ export function AudioPlayer({
 
         {/* Manual tracking toggle for Bandcamp (no JS API available) */}
         {sourceType === "BANDCAMP" && showListenTracker && (
-          <div className="bg-white border-2 border-black rounded-xl p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="bg-white border border-black/10 rounded-2xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
             <div className="flex items-center justify-between">
               <div className="text-sm text-neutral-600">
                 <span className="font-medium">Tracking listen time</span>
@@ -626,10 +626,10 @@ export function AudioPlayer({
                 type="button"
                 onClick={() => setIsPlaying(!isPlaying)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                  "flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg border transition-colors duration-150 ease-out motion-reduce:transition-none",
                   isPlaying
                     ? "bg-black text-white border-black"
-                    : "bg-purple-600 text-black border-black hover:bg-purple-500"
+                    : "bg-lime-500 text-black border-lime-400 hover:bg-lime-400"
                 )}
               >
                 {isPlaying ? (
@@ -653,7 +653,7 @@ export function AudioPlayer({
 
         {/* Current time and timestamp button for embedded players */}
         {onAddTimestamp && sourceType !== "BANDCAMP" && (
-          <div className="bg-white border-2 border-black rounded-xl p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="bg-white border border-black/10 rounded-2xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-mono text-neutral-600">
                 <span>Current: {formatTime(currentTime)}</span>
@@ -673,12 +673,12 @@ export function AudioPlayer({
                 }}
                 disabled={!isPlaying && currentTime === 0}
                 className={cn(
-                  "flex items-center gap-1 px-3 py-1.5 text-xs font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                  "flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg border transition-colors duration-150 ease-out motion-reduce:transition-none",
                   timestampAdded
-                    ? "bg-purple-600 text-black border-purple-700 scale-105"
+                    ? "bg-lime-500 text-black border-lime-400 scale-105"
                     : !isPlaying && currentTime === 0
-                    ? "bg-neutral-100 text-neutral-400 border-neutral-300 cursor-not-allowed"
-                    : "bg-white text-black border-black hover:bg-neutral-100"
+                    ? "bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed"
+                    : "bg-white text-black border-black/10 hover:bg-neutral-50"
                 )}
               >
                 {timestampAdded ? (
@@ -703,7 +703,7 @@ export function AudioPlayer({
         )}
 
         {showListenTracker ? (
-          <div className="bg-white border-2 border-black rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="bg-white border border-black/10 rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-bold">Listen Progress</span>
               <span className="text-sm font-mono text-neutral-500">
@@ -837,10 +837,10 @@ export function AudioPlayer({
                       setTimeout(() => setTimestampAdded(false), 1500);
                     }}
                     className={cn(
-                      "flex items-center gap-1 px-2 py-1 text-xs font-bold border-2 transition-colors transition-shadow transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                      "flex items-center gap-1 px-2 py-1 text-xs font-bold rounded-lg border transition-colors duration-150 ease-out motion-reduce:transition-none",
                       timestampAdded
-                        ? "bg-purple-600 text-black border-purple-700 scale-105"
-                        : "bg-white text-black border-black hover:bg-neutral-100"
+                        ? "bg-lime-500 text-black border-lime-400 scale-105"
+                        : "bg-white text-black border-black/10 hover:bg-neutral-50"
                     )}
                   >
                     {timestampAdded ? (
@@ -867,7 +867,7 @@ export function AudioPlayer({
         </div>
       ) : null}
 
-      <div className="bg-white border-2 border-black rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+      <div className="bg-white border border-black/10 rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.04)]">
         {/* Controls */}
         <div className="flex items-center gap-4">
           <button
@@ -941,7 +941,7 @@ export function AudioPlayer({
         </div>
 
         {showListenTracker ? (
-          <div className="mt-4 pt-4 border-t-2 border-neutral-100">
+          <div className="mt-4 pt-4 border-t border-neutral-100">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-bold">Listen Progress</span>
               <span className="text-sm font-mono text-neutral-500">
