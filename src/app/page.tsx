@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Caveat } from "next/font/google";
 import { Button } from "@/components/ui/button";
-import { Headphones, ArrowRight, CheckCircle2, Lock, Upload, MessageSquare, Music } from "lucide-react";
+import { ArrowRight, CheckCircle2, Lock } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
 import { TrackReportDemo } from "@/components/landing/track-report-demo";
@@ -224,8 +224,8 @@ export default function Home() {
       <section className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
         <div className="max-w-5xl mx-auto px-4">
           <AnimatedSection className="max-w-2xl mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">Your music has a home</h2>
-            <p className="mt-3 text-neutral-600">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">Your music has a home</h2>
+            <p className="mt-5 text-neutral-600 text-lg max-w-xl">
               Every track you upload gets its own page. Listeners can discover it, listen, and if they like it, buy it and share it with their audience.
             </p>
           </AnimatedSection>
@@ -248,8 +248,8 @@ export default function Home() {
       <section className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
         <div className="max-w-5xl mx-auto px-4">
           <AnimatedSection className="max-w-2xl mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">A community of artists helping artists</h2>
-            <p className="mt-3 text-neutral-600">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">A community of artists helping artists</h2>
+            <p className="mt-5 text-neutral-600 text-lg max-w-xl">
               Your tracks are automatically shown to artists who share your genre. Everyone reviews, everyone gets reviewed. Quality stays high because every reviewer is rated after each review.
             </p>
           </AnimatedSection>
@@ -267,65 +267,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-12 sm:py-16 bg-[#faf8f5]">
-        <div className="max-w-5xl mx-auto px-4">
-          <AnimatedSection className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">How it works</h2>
-            <p className="mt-3 text-neutral-600 max-w-2xl mx-auto">
-              A simple credit system that keeps feedback flowing. Give a review, get a review.
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection>
-            <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
-              {/* Step 1 */}
-              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
-                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Upload className="h-7 w-7 text-purple-600" />
-                </div>
-                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 1</div>
-                <h3 className="text-lg font-bold mb-2">Upload your track</h3>
-                <p className="text-sm text-neutral-600">
-                  Drop in your mix or stems. We match it with artists who know your genre.
-                </p>
-              </div>
-
-              {/* Step 2 */}
-              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
-                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Headphones className="h-7 w-7 text-purple-600" />
-                </div>
-                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 2</div>
-                <h3 className="text-lg font-bold mb-2">Review others</h3>
-                <p className="text-sm text-neutral-600">
-                  Listen to tracks in your genre and give honest, structured feedback. Each review earns you a credit.
-                </p>
-              </div>
-
-              {/* Step 3 */}
-              <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 text-center shadow-sm">
-                <div className="h-14 w-14 bg-purple-100 border-2 border-purple-200 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <MessageSquare className="h-7 w-7 text-purple-600" />
-                </div>
-                <div className={`${caveat.className} text-purple-600 text-lg mb-1`}>Step 3</div>
-                <h3 className="text-lg font-bold mb-2">Get feedback</h3>
-                <p className="text-sm text-neutral-600">
-                  Spend credits to get reviews on your own tracks. The more you give, the more you get.
-                </p>
-              </div>
-            </div>
-
-            {/* Credit cycle reminder */}
-            <div className="mt-8 text-center">
-              <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-full px-5 py-2.5">
-                <Music className="h-4 w-4 text-purple-600" />
-                <span className="text-sm font-semibold text-purple-700">Give a review, earn a credit. Spend a credit, get a review.</span>
-              </div>
-            </div>
-          </AnimatedSection>
-        </div>
-      </section>
 
       {/* Social Proof */}
       <section className="py-16  bg-[#faf8f5]">
