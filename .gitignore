@@ -56,3 +56,6 @@ next-env.d.ts
 .env.localnul
 
 public/ableton-projects/
+
+# seed data
+/seed-tracks/
