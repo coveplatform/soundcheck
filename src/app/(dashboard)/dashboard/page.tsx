@@ -246,7 +246,7 @@ export default async function DashboardPage() {
   const showSideRail = true;
 
   return (
-    <div className="pt-6 pb-24 overflow-x-hidden">
+    <div className="pt-8 pb-24 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Compact Hero */}
         <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-5 mb-5 border-b border-black/10">
