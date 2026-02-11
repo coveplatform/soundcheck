@@ -22,18 +22,6 @@
   }
 }
 
-/* Reset native button styling for Safari/macOS */
-button {
-  -webkit-appearance: none;
-  appearance: none;
-  background-color: transparent;
-  color: inherit;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font: inherit;
-}
-
 html,
 body {
   width: 100%;
