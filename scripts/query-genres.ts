@@ -1,30 +1,28 @@
 import { prisma } from "../src/lib/prisma";
 async function main() {
-  // Check track + reviews
-  const track = await prisma.track.findUnique({
-    where: { id: "cmk7ph6ql000004l8bzi302sx" },
-    select: {
-      id: true, title: true, status: true, reviewsRequested: true, reviewsCompleted: true,
-      ArtistProfile: { select: { id: true, userId: true, artistName: true } },
-      Review: { select: { id: true, status: true } },
-    },
-  });
-  console.log("Track:", JSON.stringify(track, null, 2));
+  const id = "cmk7ph6ql000004l8bzi302sx";
 
-  // Check user simlimsd3's artist profile and tracks
-  const simli = await prisma.user.findUnique({
-    where: { email: "simlimsd3@gmail.com" },
-    select: {
-      id: true,
-      ArtistProfile: {
-        select: {
-          id: true,
-          Track: { select: { id: true, title: true, status: true }, take: 5 },
-        },
-      },
-    },
-  });
-  console.log("\nSimli user+tracks:", JSON.stringify(simli, null, 2));
+  // Test if feedbackViewedAt column exists by selecting it
+  try {
+    const t = await prisma.track.findUnique({
+      where: { id },
+      select: { feedbackViewedAt: true },
+    });
+    console.log("feedbackViewedAt select OK:", t);
+  } catch (err: any) {
+    console.error("feedbackViewedAt select FAILED:", err.message);
+  }
+
+  // Test the update
+  try {
+    await prisma.track.update({
+      where: { id },
+      data: { feedbackViewedAt: new Date() },
+    });
+    console.log("feedbackViewedAt update OK");
+  } catch (err: any) {
+    console.error("feedbackViewedAt update FAILED:", err.message);
+  }
 
   await prisma.$disconnect();
 }

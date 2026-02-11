@@ -38,8 +38,12 @@ export default async function TrackDetailPage({
     redirect("/login");
   }
 
+  console.log("[TrackDetail] userId:", session.user.id, "trackId:", id);
+
   // Fetch all data needed for the dashboard tabs
-  const [track, platformStats] = await Promise.all([
+  let track: any, platformStats: any;
+  try {
+    [track, platformStats] = await Promise.all([
     prisma.track.findUnique({
       where: { id },
       include: {
@@ -91,13 +95,19 @@ export default async function TrackDetailPage({
       },
     }),
   ]);
+  } catch (err) {
+    console.error("[TrackDetail] Query failed for trackId:", id, err);
+    notFound();
+  }
 
   if (!track) {
+    console.log("[TrackDetail] Track not found:", id);
     notFound();
   }
 
   // Verify ownership
   if (track.ArtistProfile.userId !== session.user.id) {
+    console.log("[TrackDetail] Ownership mismatch:", track.ArtistProfile.userId, "!==", session.user.id);
     notFound();
   }
 
