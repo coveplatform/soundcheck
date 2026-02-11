@@ -421,7 +421,7 @@ export default function Home() {
               },
               {
                 q: "Is my music safe?",
-                a: "Yes. Your unreleased tracks are only heard by genre-matched artists reviewing your work. We never share, publish, or leak anything. Once you're ready to release, your track page becomes public.",
+                a: "Yes. Your unreleased tracks are only heard by genre-matched artists reviewing your work. We never share, publish, or leak anything. You can choose to allow your music to be public and discoverable.",
               },
               {
                 q: "Can I cancel PRO?",
