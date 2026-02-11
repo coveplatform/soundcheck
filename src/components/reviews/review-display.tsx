@@ -57,7 +57,13 @@ export type ReviewData = {
     User: {
       name: string | null;
     };
-  };
+  } | null;
+  ArtistProfile?: {
+    id: string;
+    User: {
+      name: string | null;
+    };
+  } | null;
 };
 
 type ReviewDisplayProps = {
@@ -71,38 +77,41 @@ export function ReviewDisplay({
   index: _index,
   showControls = true,
 }: ReviewDisplayProps) {
+  const reviewerName = review.ReviewerProfile?.User?.name ?? review.ArtistProfile?.User?.name ?? "Reviewer";
+  const reviewerProfileId = review.ReviewerProfile?.id ?? review.ArtistProfile?.id;
+
   return (
     <article className="p-6">
       {/* Clean header: Reviewer info */}
       <header className="mb-5">
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          {showControls ? (
+          {showControls && reviewerProfileId ? (
             <Link
-              href={`/artist/reviewers/${review.ReviewerProfile.id}`}
+              href={`/artist/reviewers/${reviewerProfileId}`}
               className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black hover:from-neutral-200 hover:to-neutral-300 transition-colors"
             >
-              {getInitial(review.ReviewerProfile.User.name ?? "Reviewer")}
+              {getInitial(reviewerName)}
             </Link>
           ) : (
             <span className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black">
-              {getInitial(review.ReviewerProfile.User.name ?? "Reviewer")}
+              {getInitial(reviewerName)}
             </span>
           )}
 
           {/* Name + Date + Impression */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              {showControls ? (
+              {showControls && reviewerProfileId ? (
                 <Link
-                  href={`/artist/reviewers/${review.ReviewerProfile.id}`}
+                  href={`/artist/reviewers/${reviewerProfileId}`}
                   className="font-bold text-sm text-black hover:underline truncate"
                 >
-                  {getFirstName(review.ReviewerProfile.User.name ?? "Reviewer")}
+                  {getFirstName(reviewerName)}
                 </Link>
               ) : (
                 <span className="font-bold text-sm text-black truncate">
-                  {getFirstName(review.ReviewerProfile.User.name ?? "Reviewer")}
+                  {getFirstName(reviewerName)}
                 </span>
               )}
               {review.firstImpression && (

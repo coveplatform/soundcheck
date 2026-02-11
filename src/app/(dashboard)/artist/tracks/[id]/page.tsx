@@ -58,6 +58,11 @@ export default async function TrackDetailPage({
                 User: { select: { name: true } },
               },
             },
+            ArtistProfile: {
+              include: {
+                User: { select: { name: true } },
+              },
+            },
           },
           orderBy: { createdAt: "asc" },
         },
