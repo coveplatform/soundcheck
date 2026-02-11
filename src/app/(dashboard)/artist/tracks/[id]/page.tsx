@@ -78,7 +78,7 @@ export default async function TrackDetailPage({
           where: { status: "COMPLETED" },
           orderBy: { completedAt: "desc" },
         },
-        affiliateLinks: {
+        TrackAffiliateLink: {
           where: { isActive: true },
           orderBy: { createdAt: "desc" },
         },
@@ -120,8 +120,8 @@ export default async function TrackDetailPage({
       : 0;
 
   // Calculate earnings
-  const totalInternalEarnings = track.purchases.reduce((sum, p) => sum + p.amount, 0);
-  const totalExternalEarnings = track.externalPurchases.reduce(
+  const totalInternalEarnings = track.Purchase.reduce((sum, p) => sum + p.amount, 0);
+  const totalExternalEarnings = track.ExternalPurchase.reduce(
     (sum, p) => sum + p.artistAmount,
     0
   );
@@ -133,9 +133,9 @@ export default async function TrackDetailPage({
 
   const hasPlayableStems =
     Boolean(track.hasStems) &&
-    Array.isArray(track.stems) &&
-    track.stems.length > 0 &&
-    track.stems.every(
+    Array.isArray(track.TrackStem) &&
+    track.TrackStem.length > 0 &&
+    track.TrackStem.every(
       (s) => typeof s.stemUrl === "string" && !s.stemUrl.toLowerCase().endsWith(".zip")
     );
 
@@ -237,7 +237,7 @@ export default async function TrackDetailPage({
                 isPro={isSubscribed}
                 statsTab={
                   <StatsTab
-                    reviews={track.Review}
+                    Review={track.Review}
                     platformAverages={{
                       production: platformStats._avg.productionScore ?? 0,
                       originality: platformStats._avg.originalityScore ?? 0,
@@ -248,7 +248,7 @@ export default async function TrackDetailPage({
                 }
                 reviewsTab={
                   <ReviewsTab
-                    reviews={track.Review}
+                    Review={track.Review}
                     isFreeTier={isFreeTier}
                     trackId={track.id}
                   />
@@ -266,9 +266,9 @@ export default async function TrackDetailPage({
                         trackShareId: track.trackShareId,
                         publicPlayCount: track.publicPlayCount,
                       }}
-                      internalPurchases={track.purchases}
-                      externalPurchases={track.externalPurchases}
-                      affiliateLinks={track.affiliateLinks}
+                      internalPurchases={track.Purchase}
+                      externalPurchases={track.ExternalPurchase}
+                      affiliateLinks={track.TrackAffiliateLink}
                       totalInternalEarnings={totalInternalEarnings}
                       totalExternalEarnings={totalExternalEarnings}
                     />
@@ -324,7 +324,7 @@ export default async function TrackDetailPage({
                 {hasPlayableStems ? (
                   <StemPlayer
                     trackId={track.id}
-                    stems={track.stems}
+                    stems={track.TrackStem}
                     showListenTracker={false}
                   />
                 ) : isZipUpload ? (
