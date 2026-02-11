@@ -370,7 +370,6 @@ export default function SubmitTrackPage() {
           artworkUrl: artworkUrl || undefined,
           genreIds: selectedGenres,
           feedbackFocus: feedbackFocus.trim() || undefined,
-          packageType: "STARTER",
           isPublic,
         }),
       });

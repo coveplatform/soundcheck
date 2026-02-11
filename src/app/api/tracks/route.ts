@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TrackStatus } from "@prisma/client";
 import { z } from "zod";
-import { detectSource, PACKAGES, PackageType } from "@/lib/metadata";
+import { detectSource, PackageType } from "@/lib/metadata";
 
 const createTrackSchema = z.object({
   sourceUrl: z.string().min(1, "Track source is required"),
@@ -82,15 +82,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const shouldRequestReviews = !!data.packageType;
-
-    const packageType: PackageType = (data.packageType ?? "PEER") as PackageType;
-    const isPeerPackage = packageType === "PEER";
-
-    // For PEER packages, reviewsRequested comes from credits spent
-    const reviewsRequested = isPeerPackage
-      ? (data.reviewsRequested ?? 0)
-      : PACKAGES[packageType].Review;
+    // Track creation always starts with 0 reviews requested.
+    // The /request-reviews endpoint handles credit validation and sets the real count.
+    const packageType: PackageType = "PEER";
 
     const createData = {
       artistId: artistProfile.id,
@@ -103,8 +97,8 @@ export async function POST(request: Request) {
       feedbackFocus: data.feedbackFocus,
       isPublic: data.isPublic ?? false,
       packageType,
-      reviewsRequested: shouldRequestReviews ? reviewsRequested : 0,
-      creditsSpent: isPeerPackage && shouldRequestReviews ? reviewsRequested : 0,
+      reviewsRequested: 0,
+      creditsSpent: 0,
       status: TrackStatus.UPLOADED,
       // Only allow purchases for uploaded tracks AND Pro subscribers
       allowPurchase: sourceType === "UPLOAD" && isSubscribed ? (data.allowPurchase ?? false) : false,
