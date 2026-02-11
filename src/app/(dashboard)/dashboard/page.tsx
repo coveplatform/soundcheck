@@ -173,7 +173,7 @@ export default async function DashboardPage() {
   const showSideRail = !hasSeenCreditGuide || !isSubscribed || whatsNext;
 
   return (
-    <div className="pt-8 pb-24">
+    <div className="pt-8 pb-24 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section - Reduced height */}
         <div className="mb-10">
@@ -182,7 +182,7 @@ export default async function DashboardPage() {
               <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40">
                 Dashboard
               </p>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black mt-2">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black mt-2 break-words">
                 Welcome back, {artistProfile.artistName}
               </h1>
               <p className="text-sm text-black/50 mt-2 max-w-xl">
@@ -237,7 +237,7 @@ export default async function DashboardPage() {
             showSideRail ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""
           }`}
         >
-          <div className="space-y-10">
+          <div className="space-y-10 min-w-0">
             {/* Stats Section */}
             <section aria-label="Dashboard statistics">
               <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40 mb-4">

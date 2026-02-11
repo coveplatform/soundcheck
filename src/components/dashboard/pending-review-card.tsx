@@ -11,7 +11,7 @@ interface PendingReviewCardProps {
 
 export function PendingReviewCard({ review }: PendingReviewCardProps) {
   return (
-    <div className="group flex items-center justify-between gap-4 rounded-2xl border-2 border-neutral-200 bg-white px-4 py-4 shadow-sm transition-all duration-200 ease-out hover:shadow-md motion-reduce:transition-none">
+    <div className="group flex items-center justify-between gap-4 rounded-2xl border-2 border-neutral-200 bg-white px-4 py-4 shadow-sm transition-shadow duration-200 ease-out hover:shadow-md motion-reduce:transition-none">
       <div className="flex items-center gap-4 flex-1 min-w-0">
         <div className="h-12 w-12 rounded-xl bg-purple-100 border-2 border-purple-200 flex items-center justify-center flex-shrink-0">
           <Headphones className="h-5 w-5 text-purple-600" />

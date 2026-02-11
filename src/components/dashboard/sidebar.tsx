@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -15,6 +16,8 @@ import {
   LogOut,
   Coins,
   History,
+  MoreHorizontal,
+  X,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -206,41 +209,147 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
       </aside>
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-neutral-200">
-        <div className="flex items-center justify-around py-3 px-2">
-          {[
-            { href: "/dashboard", label: "Home", icon: Home },
-            { href: "/tracks", label: "Tracks", icon: Music },
-            { href: "/submit", label: "Submit", icon: Upload },
-            { href: "/review", label: "Review", icon: Headphones },
-            { href: "/account", label: "Account", icon: Settings },
-          ].map((link) => {
-            const Icon = link.icon;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-0",
-                  isActive(link.href) ? "text-purple-600" : "text-neutral-400"
-                )}
-              >
-                <div className="relative">
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  {link.href === "/review" && pendingReviews > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
-                      {pendingReviews}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[10px] font-medium truncate max-w-full">
-                  {link.label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      <MobileBottomNav
+        isActive={isActive}
+        pendingReviews={pendingReviews}
+        isPro={isPro}
+      />
     </>
+  );
+}
+
+function MobileBottomNav({
+  isActive,
+  pendingReviews,
+  isPro,
+}: {
+  isActive: (href: string) => boolean;
+  pendingReviews: number;
+  isPro: boolean;
+}) {
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!moreOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [moreOpen]);
+
+  // Close menu on route change
+  const pathname = usePathname();
+  useEffect(() => {
+    setMoreOpen(false);
+  }, [pathname]);
+
+  const primaryLinks = [
+    { href: "/dashboard", label: "Home", icon: Home },
+    { href: "/tracks", label: "Tracks", icon: Music },
+    { href: "/submit", label: "Submit", icon: Upload },
+    { href: "/review", label: "Review", icon: Headphones },
+  ];
+
+  const moreLinks = [
+    { href: "/business", label: "Business", icon: DollarSign, proOnly: true },
+    { href: "/reviewer/earnings", label: "Earnings", icon: Coins },
+    { href: "/review/history", label: "Review History", icon: History },
+    { href: "/account", label: "Settings", icon: Settings },
+  ];
+
+  const moreIsActive = moreLinks.some((l) => isActive(l.href));
+
+  return (
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-neutral-200">
+      <div className="flex items-center justify-around py-3 px-2">
+        {primaryLinks.map((link) => {
+          const Icon = link.icon;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-0",
+                isActive(link.href) ? "text-purple-600" : "text-neutral-400"
+              )}
+            >
+              <div className="relative">
+                <Icon className="w-5 h-5 flex-shrink-0" />
+                {link.href === "/review" && pendingReviews > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                    {pendingReviews}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] font-medium truncate max-w-full">
+                {link.label}
+              </span>
+            </Link>
+          );
+        })}
+
+        {/* More button */}
+        <div ref={moreRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setMoreOpen((v) => !v)}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-0",
+              moreOpen || moreIsActive ? "text-purple-600" : "text-neutral-400"
+            )}
+          >
+            {moreOpen ? (
+              <X className="w-5 h-5 flex-shrink-0" />
+            ) : (
+              <MoreHorizontal className="w-5 h-5 flex-shrink-0" />
+            )}
+            <span className="text-[10px] font-medium">More</span>
+          </button>
+
+          {/* Popover menu */}
+          {moreOpen && (
+            <div className="absolute bottom-full right-0 mb-2 w-56 bg-white rounded-xl border border-neutral-200 shadow-lg py-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
+              {moreLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-2.5 text-sm transition-colors",
+                      isActive(link.href)
+                        ? "text-purple-600 font-medium bg-purple-50"
+                        : "text-neutral-700 hover:bg-neutral-50"
+                    )}
+                  >
+                    <Icon className="w-4 h-4 opacity-70 flex-shrink-0" />
+                    <span className="flex-1">{link.label}</span>
+                    {link.proOnly && !isPro && (
+                      <span className="text-[9px] font-semibold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">
+                        PRO
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+              <div className="my-1 border-t border-neutral-100" />
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
+              >
+                <LogOut className="w-4 h-4 opacity-70 flex-shrink-0" />
+                Sign out
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 }

@@ -23,7 +23,7 @@ export function TrackCard({ track, priority = false }: TrackCardProps) {
   const action = getTrackAction(track);
 
   return (
-    <div className="group flex items-center gap-3 sm:gap-5 rounded-2xl border-2 border-neutral-200 bg-white px-4 py-4 shadow-sm transition-all duration-200 ease-out hover:shadow-md motion-reduce:transition-none">
+    <div className="group flex items-center gap-3 sm:gap-5 rounded-2xl border-2 border-neutral-200 bg-white px-4 py-4 shadow-sm transition-shadow duration-200 ease-out hover:shadow-md motion-reduce:transition-none">
       {/* Artwork */}
       <div className="relative flex-shrink-0">
         <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-neutral-100 border border-black/5">
