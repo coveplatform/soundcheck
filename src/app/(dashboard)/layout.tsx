@@ -1,8 +1,56 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/dashboard/sidebar";
+
+// Cache sidebar data per user for 30s to avoid re-fetching on every navigation
+const getSidebarData = unstable_cache(
+  async (userId: string) => {
+    let artistProfile: any = null;
+    try {
+      artistProfile = await prisma.artistProfile.findUnique({
+        where: { userId },
+        select: {
+          id: true,
+          artistName: true,
+          reviewCredits: true,
+          subscriptionStatus: true,
+          completedOnboarding: true,
+        },
+      });
+    } catch {
+      artistProfile = await prisma.artistProfile.findUnique({
+        where: { userId },
+        select: {
+          id: true,
+          artistName: true,
+          subscriptionStatus: true,
+          completedOnboarding: true,
+        },
+      });
+    }
+
+    if (!artistProfile) return null;
+
+    let pendingReviews = 0;
+    try {
+      pendingReviews = await prisma.review.count({
+        where: {
+          peerReviewerArtistId: artistProfile.id,
+          status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+        },
+      });
+    } catch {
+      pendingReviews = 0;
+    }
+
+    return { ...artistProfile, pendingReviews };
+  },
+  ["sidebar-data"],
+  { revalidate: 30, tags: ["sidebar"] }
+);
 
 export default async function DashboardLayout({
   children,
@@ -15,31 +63,7 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  // Fetch artist profile for sidebar
-  let artistProfile: any = null;
-  try {
-    artistProfile = await prisma.artistProfile.findUnique({
-      where: { userId: session.user.id },
-      select: {
-        id: true,
-        artistName: true,
-        reviewCredits: true,
-        subscriptionStatus: true,
-        completedOnboarding: true,
-      },
-    });
-  } catch {
-    // Fallback without reviewCredits if column doesn't exist yet
-    artistProfile = await prisma.artistProfile.findUnique({
-      where: { userId: session.user.id },
-      select: {
-        id: true,
-        artistName: true,
-        subscriptionStatus: true,
-        completedOnboarding: true,
-      },
-    });
-  }
+  const artistProfile = await getSidebarData(session.user.id);
 
   // If no artist profile OR onboarding not completed, show simple layout (for /onboarding page)
   // Note: also check artistName as fallback — existing users may have completedOnboarding=false
@@ -56,26 +80,13 @@ export default async function DashboardLayout({
   const credits: number = artistProfile.reviewCredits ?? 0;
   const isPro = artistProfile.subscriptionStatus === "active";
 
-  // Count pending peer reviews
-  let pendingReviews = 0;
-  try {
-    pendingReviews = await prisma.review.count({
-      where: {
-        peerReviewerArtistId: artistProfile.id,
-        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-      },
-    });
-  } catch {
-    pendingReviews = 0;
-  }
-
   return (
     <div className="min-h-screen bg-[#faf8f5]">
       <Sidebar
         artistName={artistName}
         credits={credits}
         isPro={isPro}
-        pendingReviews={pendingReviews}
+        pendingReviews={artistProfile.pendingReviews}
       />
 
       {/* Main content with sidebar offset */}

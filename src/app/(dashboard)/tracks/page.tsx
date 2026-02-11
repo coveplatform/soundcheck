@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Plus, Music, DollarSign, MessageSquare, CheckCircle2, Sparkles } from "lucide-react";
+import { Plus, Music, DollarSign, MessageSquare, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -352,20 +352,11 @@ function TrackCard({
   const isComplete = status === "COMPLETED";
   const isUploaded = status === "UPLOADED";
 
-  const statusLabel = isUploaded
-    ? "Uploaded"
-    : isPending
-      ? "Payment pending"
-      : isComplete
-        ? "Completed"
-        : isReviewing
-          ? "Reviewing"
-          : null;
-
   return (
     <Link href={`/artist/tracks/${id}`} className="group block">
       <Card variant="soft" interactive className="overflow-hidden">
-        <div className="relative aspect-square bg-neutral-100">
+        {/* Artwork - 4:3 ratio to leave more room for text */}
+        <div className="relative aspect-[4/3] bg-neutral-100">
           {artworkUrl ? (
             <Image
               src={artworkUrl}
@@ -376,40 +367,42 @@ function TrackCard({
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-              <Music className="h-10 w-10 text-black/20" />
+              <Music className="h-8 w-8 text-black/15" />
             </div>
           )}
 
+          {/* Status badge */}
           {isComplete ? (
-            <div className="absolute top-2 left-2 -rotate-3">
-              <div className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-purple-400 to-purple-500 border-2 border-black text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-                <div className="h-4 w-4 bg-white text-purple-600 flex items-center justify-center rounded-sm">
-                  <CheckCircle2 className="h-2.5 w-2.5" />
-                </div>
-                <span className="text-[9px] font-black tracking-wide uppercase">Done</span>
-                <Sparkles className="h-3 w-3" />
-              </div>
-            </div>
-          ) : statusLabel && (
-            <div className="absolute top-3 left-3">
-              <span
-                className={cn(
-                  "inline-flex items-center text-xs px-2.5 py-1 rounded-full border",
-                  isPending
-                    ? "bg-white/80 text-black border-black/15"
-                    : isUploaded
-                      ? "bg-purple-100 text-purple-800 border-purple-200"
-                      : "bg-white/70 text-black border-black/10"
-                )}
-              >
-                {statusLabel}
+            <div className="absolute top-2 left-2">
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-emerald-500 text-white shadow-sm">
+                <CheckCircle2 className="h-3 w-3" />
+                Complete
               </span>
             </div>
-          )}
+          ) : isReviewing ? (
+            <div className="absolute top-2 left-2">
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-purple-600 text-white shadow-sm">
+                Reviewing
+              </span>
+            </div>
+          ) : isUploaded ? (
+            <div className="absolute top-2 left-2">
+              <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/80 text-black/60 border border-black/10 backdrop-blur-sm">
+                Uploaded
+              </span>
+            </div>
+          ) : isPending ? (
+            <div className="absolute top-2 left-2">
+              <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/80 text-black/50 border border-black/10 backdrop-blur-sm">
+                Pending
+              </span>
+            </div>
+          ) : null}
 
+          {/* Review progress bar */}
           {isReviewing && hasReviews && (
-            <div className="absolute bottom-3 left-3 right-3">
-              <div className="h-1.5 bg-white/35 rounded-full overflow-hidden">
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/30 to-transparent pt-6 pb-2 px-2">
+              <div className="h-1 bg-white/30 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-white rounded-full transition-[width] duration-150 ease-out motion-reduce:transition-none"
                   style={{ width: `${reviewProgress * 100}%` }}
@@ -419,46 +412,30 @@ function TrackCard({
           )}
         </div>
 
-        <div className="p-3 sm:p-4 space-y-2">
-          <h3 className="font-medium text-sm sm:text-base truncate text-black group-hover:text-black/70 transition-colors duration-150 ease-out motion-reduce:transition-none">
+        {/* Info area */}
+        <div className="p-3 space-y-1.5">
+          <h3 className="font-semibold text-[13px] leading-snug text-black line-clamp-2 group-hover:text-black/70 transition-colors duration-150 ease-out motion-reduce:transition-none">
             {title}
           </h3>
 
-          <div className="flex flex-wrap gap-1.5">
-            {hasReviews && (
-              <span
-                className={cn(
-                  "inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full",
-                  isComplete
-                    ? "bg-emerald-50 text-emerald-700"
-                    : isReviewing
-                      ? "bg-violet-50 text-violet-700"
-                      : "bg-neutral-100 text-neutral-600"
-                )}
-              >
-                <MessageSquare className="h-3 w-3" />
-                {completedReviews}/{totalReviews}
-              </span>
-            )}
-
-            {earnings > 0 && (
-              <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
-                <DollarSign className="h-3 w-3" />
-                {earnings.toFixed(2)}
-              </span>
-            )}
-
-            {!hasReviews && earnings === 0 && !isPending && (
-              <span
-                className={cn(
-                  "text-xs",
-                  isUploaded ? "text-black/60" : "text-black/30"
-                )}
-              >
-                {isUploaded ? "Request reviews" : "No reviews yet"}
-              </span>
-            )}
-          </div>
+          {/* Review count - prominent */}
+          {hasReviews ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <MessageSquare className={cn("h-3 w-3", isComplete ? "text-emerald-600" : "text-purple-500")} />
+                <span className={cn("text-xs font-semibold", isComplete ? "text-emerald-700" : "text-purple-700")}>
+                  {completedReviews}/{totalReviews} reviews
+                </span>
+              </div>
+              {earnings > 0 && (
+                <span className="text-[10px] font-semibold text-emerald-600">${earnings.toFixed(2)}</span>
+              )}
+            </div>
+          ) : (
+            <p className={cn("text-xs", isUploaded ? "text-purple-600 font-medium" : "text-black/30")}>
+              {isUploaded ? "Request reviews →" : isPending ? "Payment pending" : "No reviews yet"}
+            </p>
+          )}
         </div>
       </Card>
     </Link>

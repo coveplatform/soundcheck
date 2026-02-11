@@ -1,15 +1,15 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Tooltip } from "@/components/ui/tooltip";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MessageCircle, Trophy, Music, Headphones } from "lucide-react";
 
-// New imports
 import {
   DashboardArtistProfile,
   MinimalArtistProfile,
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
             },
           },
           orderBy: { createdAt: "desc" },
-          take: 3,
+          take: 4,
         },
       },
     });
@@ -92,7 +92,7 @@ export default async function DashboardPage() {
             },
           },
           orderBy: { createdAt: "desc" },
-          take: 3,
+          take: 4,
         },
       },
     });
@@ -111,7 +111,13 @@ export default async function DashboardPage() {
   const isSubscribed = artistProfile.subscriptionStatus === "active";
   const tracks = artistProfile.Track ?? [];
 
-  // Fetch pending peer reviews with timestamp
+  // Detect tracks with feedback waiting
+  const tracksWithFeedback = tracks.filter((t) => {
+    const completed = t.Review.filter((r) => r.status === "COMPLETED").length;
+    return completed > 0 && (t.status === "IN_PROGRESS" || t.status === "COMPLETED");
+  });
+
+  // Fetch pending peer reviews
   let pendingPeerReviews: PendingPeerReview[] = [];
   try {
     pendingPeerReviews = await prisma.review.findMany({
@@ -142,7 +148,62 @@ export default async function DashboardPage() {
     pendingPeerReviews = [];
   }
 
-  // Calculate stats with priority ordering
+  // Fetch highest rated track of the day (community feature)
+  type TopTrack = { id: string; title: string; artworkUrl: string | null; artistName: string; avgScore: number };
+  const topRatedTrack: TopTrack | null = await (async (): Promise<TopTrack | null> => {
+    try {
+      const recentTracks = await prisma.track.findMany({
+        where: {
+          status: { in: ["IN_PROGRESS", "COMPLETED"] },
+          reviewsCompleted: { gte: 3 },
+          artistId: { not: artistProfile.id },
+        },
+        select: {
+          id: true,
+          title: true,
+          artworkUrl: true,
+          ArtistProfile: { select: { artistName: true } },
+          Review: {
+            where: { status: "COMPLETED" },
+            select: {
+              productionScore: true,
+              originalityScore: true,
+              vocalScore: true,
+            },
+          },
+        },
+        orderBy: { completedAt: "desc" },
+        take: 20,
+      });
+
+      let best: TopTrack | null = null;
+      let bestAvg = 0;
+      for (const t of recentTracks) {
+        const scores = t.Review.flatMap((r) =>
+          [r.productionScore, r.originalityScore, r.vocalScore].filter(
+            (s): s is number => s !== null && s >= 1
+          )
+        );
+        if (scores.length < 3) continue;
+        const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+        if (avg > bestAvg) {
+          bestAvg = avg;
+          best = {
+            id: t.id,
+            title: t.title,
+            artworkUrl: t.artworkUrl,
+            artistName: t.ArtistProfile.artistName,
+            avgScore: Math.round(avg * 10) / 10,
+          };
+        }
+      }
+      return best;
+    } catch {
+      return null;
+    }
+  })();
+
+  // Calculate stats
   const stats = calculateDashboardStats({
     totalPeerReviews:
       "totalPeerReviews" in artistProfile
@@ -173,111 +234,134 @@ export default async function DashboardPage() {
   const showSideRail = !hasSeenCreditGuide || !isSubscribed || whatsNext;
 
   return (
-    <div className="pt-8 pb-24 overflow-x-hidden">
+    <div className="pt-6 pb-24 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hero Section - Reduced height */}
-        <div className="mb-10">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between pb-6 border-b border-black/10">
-            <div>
-              <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40">
-                Dashboard
-              </p>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black mt-2 break-words">
-                Welcome back, {artistProfile.artistName}
-              </h1>
-              <p className="text-sm text-black/50 mt-2 max-w-xl">
-                Here's what's happening with your music right now.
-              </p>
-            </div>
-
-            {/* Credits and CTA */}
-            <div className="flex flex-wrap items-center gap-3">
-              <Tooltip
-                content={
-                  credits > 0
-                    ? "Spend on reviews"
-                    : "Earn by reviewing tracks"
-                }
+        {/* Compact Hero */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-5 mb-5 border-b border-black/10">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-black truncate">
+              Hey, {artistProfile.artistName}
+            </h1>
+          </div>
+          <div className="flex items-center gap-2.5 flex-shrink-0">
+            <Tooltip
+              content={
+                credits > 0
+                  ? "Spend on reviews"
+                  : "Earn by reviewing tracks"
+              }
+            >
+              <div className="flex items-baseline gap-1.5 rounded-lg border border-black/8 bg-white px-3 py-2">
+                <p className="text-lg font-bold text-black tabular-nums">{credits}</p>
+                <p className="text-[10px] font-medium text-black/40 uppercase tracking-wider">credits</p>
+              </div>
+            </Tooltip>
+            <Link href="/submit">
+              <Button
+                className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out motion-reduce:transition-none text-sm h-9 px-4"
               >
-                <div className="rounded-xl border-2 border-neutral-200 bg-white px-3 sm:px-4 py-2.5 sm:py-3 shadow-sm">
-                  <div className="flex items-baseline gap-2">
-                    <p className="text-2xl font-bold text-black tabular-nums">
-                      {credits}
-                    </p>
-                    <p className="text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                      Credits
-                    </p>
-                  </div>
-                  {credits === 0 && (
-                    <Link
-                      href="/review"
-                      className="text-xs text-purple-600 hover:text-purple-700 font-medium transition-colors mt-1 inline-block"
-                    >
-                      Earn more →
-                    </Link>
-                  )}
-                </div>
-              </Tooltip>
-
-              <Link href="/submit">
-                <Button
-                  size="lg"
-                  className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out motion-reduce:transition-none"
-                >
-                  Submit a track
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
+                Submit track
+                <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+              </Button>
+            </Link>
           </div>
         </div>
 
+        {/* Feedback Alert Banner */}
+        {tracksWithFeedback.length > 0 && (
+          <Link
+            href={`/artist/tracks/${tracksWithFeedback[0].id}`}
+            className="flex items-center gap-3 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 mb-5 group transition-colors duration-150 ease-out hover:bg-purple-100/80"
+          >
+            <div className="h-8 w-8 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
+              <MessageCircle className="h-4 w-4 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-purple-900">
+                You have feedback waiting
+                {tracksWithFeedback.length > 1
+                  ? ` on ${tracksWithFeedback.length} tracks`
+                  : ` on "${tracksWithFeedback[0].title}"`}
+              </p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-purple-400 group-hover:text-purple-600 transition-colors flex-shrink-0" />
+          </Link>
+        )}
+
         <div
-          className={`grid gap-8 ${
-            showSideRail ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""
+          className={`grid gap-6 ${
+            showSideRail ? "lg:grid-cols-[minmax(0,1fr)_280px]" : ""
           }`}
         >
-          <div className="space-y-10 min-w-0">
-            {/* Stats Section */}
+          <div className="space-y-6 min-w-0">
+            {/* Stats */}
             <section aria-label="Dashboard statistics">
-              <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40 mb-4">
-                Overview
-              </p>
               <StatCardGrid stats={stats} />
             </section>
+
+            {/* Highest Rated Today */}
+            {topRatedTrack && (
+              <section aria-label="Highest rated today">
+                <div className="flex items-center gap-3 rounded-2xl border border-amber-200/80 bg-gradient-to-r from-amber-50 via-white to-amber-50 px-4 py-3">
+                  <div className="h-10 w-10 rounded-lg overflow-hidden bg-neutral-100 border border-black/5 flex-shrink-0">
+                    {topRatedTrack.artworkUrl ? (
+                      <Image
+                        src={topRatedTrack.artworkUrl}
+                        alt={topRatedTrack.title}
+                        width={40}
+                        height={40}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-200 to-amber-300">
+                        <Music className="h-4 w-4 text-amber-600" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <Trophy className="h-3 w-3 text-amber-500" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600">Top Rated Today</span>
+                    </div>
+                    <p className="text-sm font-semibold text-black truncate mt-0.5">
+                      {topRatedTrack.title}
+                      <span className="font-normal text-black/40"> · {topRatedTrack.artistName}</span>
+                    </p>
+                  </div>
+                  <div className="flex items-baseline gap-0.5 flex-shrink-0">
+                    <span className="text-lg font-black text-amber-600">{topRatedTrack.avgScore}</span>
+                    <span className="text-[10px] text-amber-500/70">/5</span>
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* Your Tracks */}
             <section aria-label="Your tracks">
-              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
-                <div>
-                  <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40">
-                    Library
-                  </p>
-                  <h2 className="text-2xl sm:text-3xl font-light tracking-tight text-black mt-2">
-                    Your Tracks
-                  </h2>
-                </div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-bold text-black">Your Tracks</h2>
                 <Link
                   href="/tracks"
-                  className="inline-flex items-center gap-2 text-[11px] font-mono tracking-[0.2em] uppercase text-black/50 hover:text-black transition-colors duration-150 ease-out motion-reduce:transition-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded"
+                  className="text-[11px] font-mono tracking-[0.15em] uppercase text-black/40 hover:text-black transition-colors duration-150 ease-out"
                 >
-                  View all
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  View all →
                 </Link>
               </div>
 
               {tracks.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {tracks.map((track, index) => (
                     <TrackCard
                       key={track.id}
                       track={track}
                       priority={index === 0}
+                      compact
                     />
                   ))}
                 </div>
               ) : (
                 <Card variant="soft" className="border border-black/10 bg-white/50">
-                  <CardContent className="py-12">
+                  <CardContent className="py-8">
                     <EmptyState
                       doodle="music"
                       title="No tracks yet"
@@ -291,37 +375,36 @@ export default async function DashboardPage() {
 
             {/* Tracks to Review */}
             <section aria-label="Tracks to review">
-              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
-                <div>
-                  <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40">
-                    Queue
-                  </p>
-                  <h2 className="text-2xl sm:text-3xl font-light tracking-tight text-black mt-2">
-                    Tracks to Review
-                  </h2>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold text-black">Tracks to Review</h2>
+                  {pendingPeerReviews.length > 0 && (
+                    <span className="text-[10px] font-bold bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full">
+                      {pendingPeerReviews.length}
+                    </span>
+                  )}
                 </div>
                 <Link
                   href="/review"
-                  className="inline-flex items-center gap-2 text-[11px] font-mono tracking-[0.2em] uppercase text-black/50 hover:text-black transition-colors duration-150 ease-out motion-reduce:transition-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded"
+                  className="text-[11px] font-mono tracking-[0.15em] uppercase text-black/40 hover:text-black transition-colors duration-150 ease-out"
                 >
-                  View queue
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  View queue →
                 </Link>
               </div>
 
               {pendingPeerReviews.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {pendingPeerReviews.map((review) => (
                     <PendingReviewCard key={review.id} review={review} />
                   ))}
                 </div>
               ) : (
                 <Card variant="soft" className="border border-black/10 bg-white/50">
-                  <CardContent className="py-12">
+                  <CardContent className="py-8">
                     <EmptyState
                       doodle="headphones"
-                      title="No tracks in your queue"
-                      description="No tracks in your queue right now. Check back soon!"
+                      title="Queue empty"
+                      description="No tracks to review right now. Check back soon!"
                     />
                   </CardContent>
                 </Card>
@@ -330,49 +413,34 @@ export default async function DashboardPage() {
           </div>
 
           {showSideRail && (
-            <aside className="space-y-6 mt-6 lg:mt-0 lg:sticky lg:top-8 h-fit" aria-label="Sidebar">
-              {/* What's Next */}
+            <aside className="space-y-4 mt-2 lg:mt-0 lg:sticky lg:top-6 h-fit" aria-label="Sidebar">
               {whatsNext && <WhatsNextCard {...whatsNext} />}
-
-              {/* Credit Guide */}
               {!hasSeenCreditGuide && <CreditGuide />}
-
-              {/* Pro Upsell */}
               {!isSubscribed && (
-                <div className="border-2 border-purple-200 rounded-2xl bg-gradient-to-br from-purple-50 via-white to-purple-100 p-6 shadow-sm">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-xl bg-purple-600 flex items-center justify-center flex-shrink-0">
-                        <ArrowRight className="h-6 w-6 text-white rotate-[-45deg]" />
-                      </div>
-                      <div>
-                        <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-purple-600">
-                          Pro
-                        </p>
-                        <p className="text-lg font-bold text-black mt-1">
-                          Upgrade to Pro
-                        </p>
-                        <p className="text-sm text-neutral-600">
-                          Get 40 credits per month and enable listener revenue.
-                        </p>
-                      </div>
+                <div className="border border-purple-200 rounded-2xl bg-gradient-to-br from-purple-50 via-white to-purple-100 p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="h-9 w-9 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
+                      <ArrowRight className="h-4 w-4 text-white rotate-[-45deg]" />
                     </div>
-                    <Link href="/account">
-                      <Button
-                        className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out motion-reduce:transition-none"
-                      >
-                        Learn More
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Button>
-                    </Link>
+                    <div>
+                      <p className="text-sm font-bold text-black">Upgrade to Pro</p>
+                      <p className="text-xs text-neutral-500">40 credits/mo + listener revenue</p>
+                    </div>
                   </div>
+                  <Link href="/account">
+                    <Button
+                      className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out motion-reduce:transition-none text-sm h-9"
+                    >
+                      Learn More
+                      <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                    </Button>
+                  </Link>
                 </div>
               )}
             </aside>
           )}
         </div>
 
-        {/* Mobile Sticky CTA */}
         <MobileStickyCTA show={tracks.length === 0 || credits > 0} />
       </div>
     </div>

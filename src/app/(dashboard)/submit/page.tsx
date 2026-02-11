@@ -23,6 +23,7 @@ import {
   Coins,
   Sparkles,
   CheckCircle2,
+  ImagePlus,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -84,12 +85,15 @@ export default function SubmitTrackPage() {
   const [urlError, setUrlError] = useState("");
   const [sourceType, setSourceType] = useState<SourceType>(null);
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
+  const [artworkUrl, setArtworkUrl] = useState<string | null>(null);
 
   const [uploadedUrl, setUploadedUrl] = useState("");
   const [uploadedFileName, setUploadedFileName] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const artworkInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingArtwork, setIsUploadingArtwork] = useState(false);
 
   // ---- step 2: details state ----------------------------------------------
   const [title, setTitle] = useState("");
@@ -167,6 +171,7 @@ export default function SubmitTrackPage() {
         if (metadata?.title) {
           setTitle(metadata.title);
         }
+        setArtworkUrl(metadata?.artworkUrl ?? null);
       } catch {
         // metadata fetch is best-effort
       } finally {
@@ -267,6 +272,64 @@ export default function SubmitTrackPage() {
     }
   }, [title]);
 
+  const handleArtworkUpload = useCallback(async (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image is too large. Maximum size is 5 MB.");
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setError("Please upload an image file (JPG, PNG, WebP).");
+      return;
+    }
+
+    setError("");
+    setIsUploadingArtwork(true);
+
+    try {
+      const presignRes = await fetch("/api/uploads/artwork/presign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type,
+          contentLength: file.size,
+        }),
+      });
+
+      if (!presignRes.ok) {
+        // If cloud uploads not configured, create a local object URL as fallback
+        if (presignRes.status === 501) {
+          const objectUrl = URL.createObjectURL(file);
+          setArtworkUrl(objectUrl);
+          return;
+        }
+        const err = await presignRes.json().catch(() => null);
+        setError((err as { error?: string })?.error || "Failed to upload artwork");
+        return;
+      }
+
+      const presignData = await presignRes.json();
+
+      const putRes = await fetch(presignData.uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": presignData.contentType },
+        body: file,
+      });
+
+      if (!putRes.ok) {
+        setError("Failed to upload artwork");
+        return;
+      }
+
+      setArtworkUrl(presignData.fileUrl);
+    } catch {
+      setError("Failed to upload artwork");
+    } finally {
+      setIsUploadingArtwork(false);
+    }
+  }, []);
+
   // ---- step 2 handler ------------------------------------------------------
 
   const toggleGenre = useCallback((genreId: string) => {
@@ -301,6 +364,7 @@ export default function SubmitTrackPage() {
           sourceUrl: trackSourceUrl,
           ...(trackSourceType ? { sourceType: trackSourceType } : {}),
           title: title.trim(),
+          artworkUrl: artworkUrl || undefined,
           genreIds: selectedGenres,
           feedbackFocus: feedbackFocus.trim() || undefined,
           packageType: "STARTER",
@@ -347,6 +411,7 @@ export default function SubmitTrackPage() {
     url,
     uploadedUrl,
     title,
+    artworkUrl,
     selectedGenres,
     feedbackFocus,
     reviewCount,
@@ -369,6 +434,7 @@ export default function SubmitTrackPage() {
           sourceUrl: trackSourceUrl,
           ...(trackSourceType ? { sourceType: trackSourceType } : {}),
           title: title.trim(),
+          artworkUrl: artworkUrl || undefined,
           genreIds: selectedGenres,
           feedbackFocus: feedbackFocus.trim() || undefined,
           isPublic: false,
@@ -388,7 +454,7 @@ export default function SubmitTrackPage() {
       setError("Something went wrong. Please try again.");
       setIsSubmitting(false);
     }
-  }, [uploadMode, url, uploadedUrl, title, selectedGenres, feedbackFocus, router]);
+  }, [uploadMode, url, uploadedUrl, title, artworkUrl, selectedGenres, feedbackFocus, router]);
 
   const handleBuyCredits = useCallback(async () => {
     setIsBuyingCredits(true);
@@ -532,6 +598,7 @@ export default function SubmitTrackPage() {
                   setUploadMode("link");
                   setUploadedUrl("");
                   setUploadedFileName("");
+                  setArtworkUrl(null);
                   setError("");
                 }}
                 className={cn(
@@ -551,6 +618,7 @@ export default function SubmitTrackPage() {
                   setUrl("");
                   setUrlError("");
                   setSourceType(null);
+                  setArtworkUrl(null);
                   setError("");
                 }}
                 className={cn(
@@ -589,21 +657,30 @@ export default function SubmitTrackPage() {
                   </div>
                 )}
                 {url && !urlError && !isLoadingMetadata && title && (
-                  <div className="rounded-xl border-2 border-emerald-200 bg-emerald-50 p-4 flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                      <Music className="h-5 w-5 text-emerald-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-emerald-600" />
-                        <span className="text-sm font-medium text-emerald-700">
-                          Track detected
-                        </span>
+                  <div className="rounded-xl border-2 border-black/10 bg-white p-4 flex items-center gap-4 shadow-sm">
+                    {artworkUrl ? (
+                      <img
+                        src={artworkUrl}
+                        alt=""
+                        className="h-14 w-14 rounded-lg object-cover flex-shrink-0 border border-black/10"
+                      />
+                    ) : (
+                      <div className="h-14 w-14 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center flex-shrink-0">
+                        <Music className="h-6 w-6 text-white/70" />
                       </div>
-                      <p className="font-medium text-neutral-900 truncate mt-0.5">
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-black truncate">
                         {title}
                       </p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        <span className="text-xs font-medium text-neutral-500">
+                          {sourceType === "SOUNDCLOUD" ? "SoundCloud" : sourceType === "BANDCAMP" ? "Bandcamp" : sourceType === "YOUTUBE" ? "YouTube" : "Ready"}
+                        </span>
+                      </div>
                     </div>
+                    <Check className="h-5 w-5 text-emerald-500 flex-shrink-0" />
                   </div>
                 )}
               </div>
@@ -720,22 +797,59 @@ export default function SubmitTrackPage() {
               </button>
             </div>
 
-            {/* Title */}
-            <div>
-              <label
-                htmlFor="track-title"
-                className="block text-sm font-medium text-neutral-700 mb-2"
-              >
-                Title
-              </label>
-              <Input
-                id="track-title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="What's your track called?"
-                className="h-12 rounded-xl border-2 border-neutral-200 bg-white focus:border-purple-500"
-                autoFocus
-              />
+            {/* Title + Artwork */}
+            <div className="flex gap-4 items-start">
+              {/* Artwork thumbnail - clickable */}
+              <div className="flex-shrink-0">
+                <input
+                  ref={artworkInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void handleArtworkUpload(file);
+                  }}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => artworkInputRef.current?.click()}
+                  disabled={isUploadingArtwork}
+                  className="group relative h-[72px] w-[72px] rounded-xl border-2 border-dashed border-neutral-300 hover:border-purple-400 bg-neutral-50 hover:bg-purple-50/50 overflow-hidden transition-all duration-150 ease-out flex items-center justify-center"
+                >
+                  {isUploadingArtwork ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
+                  ) : artworkUrl ? (
+                    <>
+                      <img src={artworkUrl} alt="" className="h-full w-full object-cover" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                        <ImagePlus className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center gap-0.5">
+                      <ImagePlus className="h-5 w-5 text-neutral-400 group-hover:text-purple-500 transition-colors" />
+                      <span className="text-[10px] font-medium text-neutral-400 group-hover:text-purple-500 transition-colors">Art</span>
+                    </div>
+                  )}
+                </button>
+              </div>
+              <div className="flex-1">
+                <label
+                  htmlFor="track-title"
+                  className="block text-sm font-medium text-neutral-700 mb-2"
+                >
+                  Title
+                </label>
+                <Input
+                  id="track-title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="What's your track called?"
+                  className="h-12 rounded-xl border-2 border-neutral-200 bg-white focus:border-purple-500"
+                  autoFocus
+                />
+              </div>
             </div>
 
             {/* Genres */}
