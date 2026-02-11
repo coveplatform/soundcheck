@@ -183,8 +183,8 @@ export function CompletedReview({
               </div>
             ) : (
               <div className="text-center space-y-4">
-                <div className="w-12 h-12 bg-purple-100 border-2 border-purple-500 flex items-center justify-center mx-auto">
-                  <ShoppingCart className="h-6 w-6 text-purple-700" />
+                <div className="w-12 h-12 bg-lime-50 border border-lime-300 rounded-xl flex items-center justify-center mx-auto">
+                  <ShoppingCart className="h-6 w-6 text-lime-700" />
                 </div>
                 <div>
                   <p className="font-bold text-lg">Love this track?</p>

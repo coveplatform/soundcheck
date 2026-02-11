@@ -40,7 +40,7 @@ export function YesNoToggle({
             baseClasses,
             "rounded-xl border",
             value === true
-              ? "bg-purple-600 text-white border-purple-600"
+              ? "bg-lime-500 text-black border-lime-400"
               : "bg-white/60 text-black border-black/10 hover:bg-white"
           )}
         >
@@ -70,10 +70,10 @@ export function YesNoToggle({
         onClick={() => onChange(true)}
         className={cn(
           baseClasses,
-          "border-2 border-black",
+          "rounded-lg border border-black/10",
           value === true
-            ? "bg-purple-600 text-white"
-            : "bg-white text-black hover:bg-neutral-100"
+            ? "bg-lime-500 text-black border-lime-400"
+            : "bg-white text-black hover:bg-neutral-50"
         )}
       >
         {yesLabel}
@@ -83,10 +83,10 @@ export function YesNoToggle({
         onClick={() => onChange(false)}
         className={cn(
           baseClasses,
-          "border-2 border-black",
+          "rounded-lg border border-black/10",
           value === false
-            ? "bg-neutral-800 text-white"
-            : "bg-white text-black hover:bg-neutral-100"
+            ? "bg-neutral-800 text-white border-neutral-700"
+            : "bg-white text-black hover:bg-neutral-50"
         )}
       >
         {noLabel}

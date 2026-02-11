@@ -715,15 +715,15 @@ export function AudioPlayer({
                 className={cn(
                   "h-full transition-[width] duration-300 ease-out rounded-full motion-reduce:transition-none",
                   hasReachedMinimum
-                    ? "bg-gradient-to-r from-green-400 to-green-500"
+                    ? "bg-gradient-to-r from-lime-400 to-lime-500"
                     : "bg-gradient-to-r from-neutral-700 to-neutral-800"
                 )}
                 style={{ width: `${listenProgress}%` }}
               />
             </div>
             {hasReachedMinimum ? (
-              <p className="text-xs font-medium text-green-600 mt-2 flex items-center gap-1">
-                <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+              <p className="text-xs font-medium text-lime-600 mt-2 flex items-center gap-1">
+                <span className="inline-block w-2 h-2 rounded-full bg-lime-500" />
                 Ready to submit your review
               </p>
             ) : isPlaying ? (
@@ -953,15 +953,15 @@ export function AudioPlayer({
                 className={cn(
                   "h-full transition-[width] duration-300 ease-out rounded-full motion-reduce:transition-none",
                   hasReachedMinimum
-                    ? "bg-gradient-to-r from-green-400 to-green-500"
+                    ? "bg-gradient-to-r from-lime-400 to-lime-500"
                     : "bg-gradient-to-r from-neutral-700 to-neutral-800"
                 )}
                 style={{ width: `${listenProgress}%` }}
               />
             </div>
             {hasReachedMinimum ? (
-              <p className="text-xs font-medium text-green-600 mt-2 flex items-center gap-1">
-                <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+              <p className="text-xs font-medium text-lime-600 mt-2 flex items-center gap-1">
+                <span className="inline-block w-2 h-2 rounded-full bg-lime-500" />
                 Ready to submit your review
               </p>
             ) : (

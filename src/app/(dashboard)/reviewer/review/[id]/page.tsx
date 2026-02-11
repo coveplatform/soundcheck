@@ -1530,7 +1530,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       </Card>
 
       {/* Submit Card */}
-      <Card variant="soft" elevated className="bg-black text-white border-black">
+      <Card variant="soft" elevated className="bg-neutral-950 text-white border-neutral-900">
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div className="min-w-0">
@@ -1549,7 +1549,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <div className="text-left sm:text-right">
               <div className="flex items-center gap-2 text-sm flex-wrap">
                 {canSubmit ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-lime-500 text-black font-bold text-xs">
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-lime-500 text-black font-bold text-xs rounded-lg">
                     <Check className="h-3 w-3" /> Listening complete
                   </span>
                 ) : (
@@ -1560,7 +1560,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               </div>
               <div className="flex items-center gap-2 text-sm mt-1 flex-wrap">
                 {meetsTextMinimum ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-lime-500 text-black font-bold text-xs">
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-lime-500 text-black font-bold text-xs rounded-lg">
                     <Check className="h-3 w-3" /> Feedback complete
                   </span>
                 ) : (
@@ -1574,7 +1574,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
           {/* Validation Warnings */}
           {validationIssues.length > 0 && (
-            <div className="mb-4 p-4 bg-red-500/20 border border-red-500/40 rounded-lg">
+            <div className="mb-4 p-4 bg-red-500/20 border border-red-500/40 rounded-xl">
               <p className="text-sm font-bold text-white mb-2 flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
                 Please fix {validationIssues.length} issue{validationIssues.length === 1 ? "" : "s"} before submitting:

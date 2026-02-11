@@ -39,7 +39,7 @@ export function firstImpressionColor(score: number): string {
   if (score === 2) return "bg-orange-100 border-orange-400 text-orange-800";
   if (score === 3) return "bg-yellow-100 border-yellow-400 text-yellow-800";
   if (score === 4) return "bg-lime-100 border-lime-400 text-lime-800";
-  return "bg-green-100 border-green-400 text-green-800";
+  return "bg-lime-100 border-lime-500 text-lime-800";
 }
 
 export function firstImpressionEnumFromScore(score: number): FirstImpression {
