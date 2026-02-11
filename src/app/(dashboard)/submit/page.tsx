@@ -952,7 +952,7 @@ export default function SubmitTrackPage() {
                   {/* Upsell: upgrade to Pro */}
                   <Link href="/account">
                     <Button className="w-full border-2 border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 h-12 rounded-xl font-medium">
-                      Upgrade to Pro — 10 credits/month
+                      Upgrade to Pro — 40 credits/month
                     </Button>
                   </Link>
                 </div>

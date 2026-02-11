@@ -55,12 +55,12 @@ export function Tooltip({ content, children }: TooltipProps) {
   }, [isVisible]);
 
   return (
-    <div className="relative inline-block">
+    <div className="relative h-full">
       <div
         ref={triggerRef}
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
-        className="cursor-help"
+        className="cursor-help h-full"
       >
         {children}
       </div>

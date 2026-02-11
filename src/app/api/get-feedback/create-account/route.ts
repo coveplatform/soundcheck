@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { createHash, randomBytes } from "crypto";
-import { sendEmailVerificationEmail } from "@/lib/email";
 import { PASSWORD_REGEX } from "@/lib/password";
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
 
@@ -71,32 +69,8 @@ export async function POST(request: Request) {
         select: { id: true },
       });
 
-      const token = randomBytes(32).toString("hex");
-      const tokenHash = createHash("sha256").update(token).digest("hex");
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-      await tx.emailVerificationToken.create({
-        data: {
-          userId: user.id,
-          tokenHash,
-          expiresAt,
-        },
-      });
-
-      return { token };
+      return {};
     });
-
-    const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
-    const verifyUrl = `${baseUrl}/verify-email?token=${result.token}&email=${encodeURIComponent(normalizedEmail)}`;
-
-    try {
-      await sendEmailVerificationEmail({
-        to: normalizedEmail,
-        verifyUrl,
-      });
-    } catch (emailError) {
-      console.error("Failed to send verification email:", emailError);
-    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

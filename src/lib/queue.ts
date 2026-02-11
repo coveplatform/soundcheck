@@ -151,9 +151,6 @@ export async function getEligibleReviewers(
       createdAt: {
         lte: cutoff,
       },
-      emailVerified: {
-        not: null,
-      },
       // Exclude test accounts from this query (they're handled separately)
       email: {
         notIn: TEST_REVIEWER_EMAILS,
@@ -182,9 +179,6 @@ export async function getEligibleReviewers(
     onboardingQuizPassed: true,
     isRestricted: false,
     User: {
-      emailVerified: {
-        not: null,
-      },
       email: {
         in: TEST_REVIEWER_EMAILS,
       },
@@ -298,10 +292,7 @@ export async function getEligiblePeerReviewers(
           trackId: track.id,
         },
       },
-      // Must have a verified email
-      User: {
-        emailVerified: { not: null },
-      },
+      User: {},
     },
     include: {
       Genre_ArtistReviewGenres: true,

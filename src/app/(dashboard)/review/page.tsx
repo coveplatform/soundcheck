@@ -136,10 +136,10 @@ export default async function ReviewQueuePage({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
           {/* Main Content */}
-          <div className="lg:col-span-2">
-            <div className="border-2 border-neutral-200 rounded-2xl bg-white p-6 shadow-sm">
+          <div>
+            <div className="border border-black/8 rounded-xl bg-white/60 p-5">
               <p className="text-[11px] font-mono tracking-[0.2em] text-black/40 uppercase mb-4">
                 Tracks to Review
               </p>
@@ -156,11 +156,11 @@ export default async function ReviewQueuePage({
                   {pendingReviews.map((review) => (
                     <div
                       key={review.id}
-                      className="flex items-center justify-between gap-4 rounded-2xl border-2 border-neutral-200 bg-white px-4 py-4 shadow-sm transition-all duration-150 hover:shadow-md"
+                      className="flex items-center justify-between gap-4 rounded-xl border border-black/8 bg-white px-4 py-3.5 transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="h-12 w-12 rounded-xl bg-purple-100 border-2 border-purple-200 flex items-center justify-center flex-shrink-0">
-                          <Music className="h-5 w-5 text-purple-600" />
+                        <div className="h-9 w-9 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+                          <Music className="h-4 w-4 text-purple-600" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-base font-semibold text-black truncate">{review.Track.title}</p>
@@ -188,7 +188,7 @@ export default async function ReviewQueuePage({
                       <Link href={`/review/${review.id}`} className="flex-shrink-0">
                         <Button
                           size="sm"
-                          className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-semibold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px] transition-all duration-150 ease-out"
+                          className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-semibold transition-colors duration-150 ease-out"
                         >
                           Review
                           <ArrowRight className="h-4 w-4 ml-1" />
@@ -203,58 +203,58 @@ export default async function ReviewQueuePage({
 
           {/* Stats Sidebar */}
           <div className="space-y-4">
-            <div className="border-2 border-neutral-200 rounded-2xl bg-white p-6 shadow-sm">
-              <p className="text-[11px] font-mono tracking-[0.2em] text-black/40 uppercase mb-4">
+            <div className="border border-black/8 rounded-xl bg-white/60 p-4">
+              <p className="text-[11px] font-mono tracking-[0.2em] text-black/40 uppercase mb-3">
                 Your Stats
               </p>
-              <div className="space-y-4">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-purple-100 border-2 border-purple-200 flex items-center justify-center">
-                      <MessageSquare className="h-5 w-5 text-purple-600" />
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-7 w-7 rounded-md bg-purple-100 flex items-center justify-center">
+                      <MessageSquare className="h-3.5 w-3.5 text-purple-600" />
                     </div>
-                    <span className="text-sm font-medium text-neutral-700">Credits earned</span>
+                    <span className="text-xs text-black/50">Credits</span>
                   </div>
-                  <span className="text-xl font-bold tabular-nums">{artistProfile.reviewCredits ?? 0}</span>
+                  <span className="text-lg font-bold tabular-nums">{artistProfile.reviewCredits ?? 0}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center">
-                      <Music className="h-5 w-5 text-emerald-600" />
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-7 w-7 rounded-md bg-emerald-100 flex items-center justify-center">
+                      <Music className="h-3.5 w-3.5 text-emerald-600" />
                     </div>
-                    <span className="text-sm font-medium text-neutral-700">Reviews given</span>
+                    <span className="text-xs text-black/50">Reviews</span>
                   </div>
-                  <span className="text-xl font-bold tabular-nums">{artistProfile.totalPeerReviews ?? 0}</span>
+                  <span className="text-lg font-bold tabular-nums">{artistProfile.totalPeerReviews ?? 0}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-amber-100 border-2 border-amber-200 flex items-center justify-center">
-                      <Star className="h-5 w-5 text-amber-600" />
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-7 w-7 rounded-md bg-amber-100 flex items-center justify-center">
+                      <Star className="h-3.5 w-3.5 text-amber-600" />
                     </div>
-                    <span className="text-sm font-medium text-neutral-700">Avg rating</span>
+                    <span className="text-xs text-black/50">Avg rating</span>
                   </div>
-                  <span className="text-xl font-bold tabular-nums">{avgRating}</span>
+                  <span className="text-lg font-bold tabular-nums">{avgRating}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-purple-100 border-2 border-purple-200 flex items-center justify-center">
-                      <Gem className="h-5 w-5 text-purple-600" />
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-7 w-7 rounded-md bg-lime-100 flex items-center justify-center">
+                      <Gem className="h-3.5 w-3.5 text-lime-600" />
                     </div>
-                    <span className="text-sm font-medium text-neutral-700">Gems received</span>
+                    <span className="text-xs text-black/50">Gems</span>
                   </div>
-                  <span className="text-xl font-bold tabular-nums">{artistProfile.peerGemCount ?? 0}</span>
+                  <span className="text-lg font-bold tabular-nums">{artistProfile.peerGemCount ?? 0}</span>
                 </div>
               </div>
             </div>
 
             {/* Review Genres */}
             {artistProfile.Genre_ArtistReviewGenres && artistProfile.Genre_ArtistReviewGenres.length > 0 && (
-              <div className="border-2 border-neutral-200 rounded-2xl bg-white p-6 shadow-sm">
-                <div className="flex items-center gap-2 mb-4">
-                  <Tag className="h-4 w-4 text-purple-600" />
+              <div className="border border-black/8 rounded-xl bg-white/60 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Tag className="h-3.5 w-3.5 text-purple-600" />
                   <p className="text-[11px] font-mono tracking-[0.2em] text-black/40 uppercase">
                     Your Review Genres
                   </p>

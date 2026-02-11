@@ -104,15 +104,15 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       console.log(`Subscription activated for artist profile: ${artistProfile.id} (initial payment succeeded)`);
     }
 
-    // Grant 10 review credits for Pro subscribers (both initial and renewal)
+    // Grant 40 review credits for Pro subscribers (both initial and renewal)
     await prisma.artistProfile.update({
       where: { id: artistProfile.id },
       data: {
         reviewCredits: {
-          increment: 10,
+          increment: 40,
         },
         totalCreditsEarned: {
-          increment: 10,
+          increment: 40,
         },
       },
     });
@@ -349,15 +349,15 @@ async function handleSubscriptionCheckoutComplete(session: Stripe.Checkout.Sessi
         },
       });
 
-      // Grant 10 review credits for Pro subscription
+      // Grant 40 review credits for Pro subscription
       await tx.artistProfile.update({
         where: { id: artistProfileId },
         data: {
           reviewCredits: {
-            increment: 10,
+            increment: 40,
           },
           totalCreditsEarned: {
-            increment: 10,
+            increment: 40,
           },
         },
       });

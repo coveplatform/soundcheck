@@ -22,44 +22,32 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <header className="bg-white border-b-2 border-black sticky top-0 z-50">
+    <div className="min-h-screen bg-[#faf8f5]">
+      <header className="bg-white border-b border-neutral-200 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
               <Link href="/" className="flex items-center">
                 <Logo />
               </Link>
-              <span className="px-2 py-0.5 text-xs font-semibold bg-red-100 text-red-700 rounded-full border border-red-200">
-                Admin Dashboard
+              <span className="px-2 py-0.5 text-[10px] font-bold bg-red-50 text-red-600 rounded border border-red-200 uppercase tracking-wider">
+                Admin
               </span>
             </div>
-            <nav className="flex items-center gap-4 text-sm">
-              <Link href="/admin" className="text-neutral-600 hover:text-neutral-900">
+            <nav className="flex items-center gap-1 text-sm">
+              <Link href="/admin" className="px-3 py-1.5 rounded-md text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 font-medium transition-colors">
                 Overview
               </Link>
-              <Link href="/admin/users" className="text-neutral-600 hover:text-neutral-900">
+              <Link href="/admin/users" className="px-3 py-1.5 rounded-md text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 font-medium transition-colors">
                 Users
               </Link>
-              <Link href="/admin/tracks" className="text-neutral-600 hover:text-neutral-900">
+              <Link href="/admin/tracks" className="px-3 py-1.5 rounded-md text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 font-medium transition-colors">
                 Tracks
               </Link>
-              <Link href="/admin/reviews" className="text-neutral-600 hover:text-neutral-900">
+              <Link href="/admin/reviews" className="px-3 py-1.5 rounded-md text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 font-medium transition-colors">
                 Reviews
               </Link>
-              <Link href="/admin/reviewers" className="text-neutral-600 hover:text-neutral-900">
-                Reviewers
-              </Link>
-              <Link href="/admin/ableton-renders" className="text-neutral-600 hover:text-neutral-900">
-                Renders
-              </Link>
-              <Link href="/admin/leads" className="text-neutral-600 hover:text-neutral-900">
-                Leads
-              </Link>
-              <Link href="/admin/reengagement" className="text-neutral-600 hover:text-neutral-900">
-                Emails
-              </Link>
-              <Link href="/admin/support" className="text-neutral-600 hover:text-neutral-900">
+              <Link href="/admin/support" className="px-3 py-1.5 rounded-md text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 font-medium transition-colors">
                 Support
               </Link>
             </nav>

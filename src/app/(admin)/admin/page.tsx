@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
-import { DevToolsPreview } from "./dev-tools-preview";
 
 export const dynamic = 'force-dynamic';
 
@@ -9,72 +8,122 @@ function StatCard({
   title,
   value,
   href,
+  accent,
 }: {
   title: string;
   value: string;
   href: string;
+  accent?: boolean;
 }) {
   return (
     <Link
       href={href}
-      className="block rounded-xl border border-neutral-200 bg-white p-6 shadow-sm hover:border-neutral-300"
+      className={`block rounded-xl border bg-white p-5 hover:border-neutral-300 transition-colors ${
+        accent ? "border-purple-200" : "border-neutral-200"
+      }`}
     >
-      <div className="text-sm text-neutral-500">{title}</div>
-      <div className="mt-2 text-2xl font-bold">{value}</div>
+      <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">{title}</div>
+      <div className={`mt-2 text-2xl font-black ${accent ? "text-purple-600" : "text-neutral-950"}`}>{value}</div>
     </Link>
   );
 }
 
 export default async function AdminPage() {
-  const [users, tracks, reviews, revenueAgg] = await Promise.all([
+  const [
+    totalUsers,
+    proUsers,
+    totalTracks,
+    activeTracks,
+    totalReviews,
+    completedReviews,
+    flaggedReviews,
+    pendingQueue,
+    revenueAgg,
+    recentUsers,
+  ] = await Promise.all([
     prisma.user.count(),
+    prisma.artistProfile.count({ where: { subscriptionStatus: "active" } }),
     prisma.track.count(),
+    prisma.track.count({ where: { status: { in: ["QUEUED", "IN_PROGRESS"] } } }),
     prisma.review.count(),
+    prisma.review.count({ where: { status: "COMPLETED" } }),
+    prisma.review.count({ where: { wasFlagged: true } }),
+    prisma.reviewQueue.count(),
     prisma.payment.aggregate({
       where: { status: "COMPLETED" },
       _sum: { amount: true },
+    }),
+    prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 8,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        ArtistProfile: {
+          select: { subscriptionStatus: true },
+        },
+      },
     }),
   ]);
 
   const revenueCents = revenueAgg._sum.amount ?? 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">Admin</h1>
-        <p className="text-neutral-500">Operational overview</p>
+        <h1 className="text-2xl font-black text-neutral-950">Overview</h1>
+        <p className="text-sm text-neutral-500 mt-1">Platform health at a glance</p>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Users" value={String(users)} href="/admin/users" />
-        <StatCard title="Tracks" value={String(tracks)} href="/admin/tracks" />
-        <StatCard title="Reviews" value={String(reviews)} href="/admin/reviews" />
-        <StatCard
-          title="Revenue (gross)"
-          value={`$${(revenueCents / 100).toFixed(2)}`}
-          href="/admin/tracks"
-        />
+      {/* Primary stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard title="Total Users" value={String(totalUsers)} href="/admin/users" />
+        <StatCard title="Pro Users" value={String(proUsers)} href="/admin/users" accent />
+        <StatCard title="Total Tracks" value={String(totalTracks)} href="/admin/tracks" />
+        <StatCard title="Revenue" value={`$${(revenueCents / 100).toFixed(2)}`} href="/admin/tracks" accent />
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-        <h2 className="font-semibold">Quick links</h2>
-        <div className="mt-3 grid sm:grid-cols-2 gap-2 text-sm">
-          <Link className="text-neutral-600 hover:text-neutral-900" href="/admin/reviews">
-            Flagged reviews
-          </Link>
-          <Link className="text-neutral-600 hover:text-neutral-900" href="/admin/reviewers">
-            Reviewer restrictions
-          </Link>
-          <Link className="text-neutral-600 hover:text-neutral-900" href="/admin/support">
-            Support tickets
-          </Link>
-          <Link className="text-neutral-600 hover:text-neutral-900" href="/admin/reengagement">
-            Re-engagement emails
+      {/* Secondary stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard title="Active Tracks" value={String(activeTracks)} href="/admin/tracks" />
+        <StatCard title="Completed Reviews" value={String(completedReviews)} href="/admin/reviews" />
+        <StatCard title="Flagged Reviews" value={String(flaggedReviews)} href="/admin/reviews" accent={flaggedReviews > 0} />
+        <StatCard title="Pending Queue" value={String(pendingQueue)} href="/admin/tracks" />
+      </div>
+
+      {/* Recent signups */}
+      <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden">
+        <div className="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-neutral-950">Recent Signups</h2>
+          <Link href="/admin/users" className="text-xs font-semibold text-purple-600 hover:text-purple-700">
+            View all →
           </Link>
         </div>
+        <div className="divide-y divide-neutral-100">
+          {recentUsers.map((user) => (
+            <Link
+              key={user.id}
+              href={`/admin/users/${user.id}`}
+              className="flex items-center justify-between px-5 py-3 hover:bg-neutral-50 transition-colors"
+            >
+              <div className="min-w-0">
+                <div className="text-sm font-medium text-neutral-950 truncate">{user.email}</div>
+                <div className="text-xs text-neutral-500">{user.name || "No name"}</div>
+              </div>
+              <div className="flex items-center gap-3 flex-shrink-0">
+                {user.ArtistProfile?.subscriptionStatus === "active" && (
+                  <span className="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded border border-purple-200 uppercase">Pro</span>
+                )}
+                <span className="text-xs text-neutral-400 font-mono">
+                  {new Date(user.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
-
-      <DevToolsPreview />
     </div>
   );
 }

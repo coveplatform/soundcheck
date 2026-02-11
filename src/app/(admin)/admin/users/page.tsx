@@ -47,7 +47,6 @@ export default async function AdminUsersPage({
       id: true,
       email: true,
       name: true,
-      emailVerified: true,
       isArtist: true,
       isReviewer: true,
       createdAt: true,
@@ -138,7 +137,6 @@ export default async function AdminUsersPage({
               <tr>
                 <th className="text-left font-medium px-4 py-3">Email</th>
                 <th className="text-left font-medium px-4 py-3">Name</th>
-                <th className="text-left font-medium px-4 py-3">Verified</th>
                 <th className="text-left font-medium px-4 py-3">Roles</th>
                 <th className="text-left font-medium px-4 py-3">Reviewer Status</th>
                 <th className="text-left font-medium px-4 py-3">Created</th>
@@ -153,11 +151,6 @@ export default async function AdminUsersPage({
                     </Link>
                   </td>
                   <td className="px-4 py-3">{u.name ?? ""}</td>
-                  <td className="px-4 py-3">
-                    <span className={u.emailVerified ? "text-green-600" : "text-red-500"}>
-                      {u.emailVerified ? "Yes" : "No"}
-                    </span>
-                  </td>
                   <td className="px-4 py-3">
                     {u.isArtist && u.isReviewer
                       ? "Artist, Reviewer"
@@ -185,7 +178,7 @@ export default async function AdminUsersPage({
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-neutral-500">
+                  <td colSpan={5} className="px-4 py-8 text-center text-neutral-500">
                     No users found
                   </td>
                 </tr>

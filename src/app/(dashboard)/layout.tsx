@@ -42,7 +42,9 @@ export default async function DashboardLayout({
   }
 
   // If no artist profile OR onboarding not completed, show simple layout (for /onboarding page)
-  if (!artistProfile || !artistProfile.completedOnboarding) {
+  // Note: also check artistName as fallback — existing users may have completedOnboarding=false
+  // because the field was added after they already onboarded
+  if (!artistProfile || (!artistProfile.completedOnboarding && !artistProfile.artistName)) {
     return (
       <div className="min-h-screen bg-[#faf8f5]">
         {children}

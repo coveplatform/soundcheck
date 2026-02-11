@@ -88,17 +88,7 @@ export const authOptions: NextAuthOptions = {
     error: "/login",
   },
   callbacks: {
-    async signIn({ user, account }) {
-      try {
-        if (account?.provider && account.provider !== "credentials") {
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { emailVerified: new Date() },
-          });
-        }
-      } catch {
-      }
-
+    async signIn() {
       return true;
     },
     async jwt({ token, user }) {
@@ -122,7 +112,6 @@ export const authOptions: NextAuthOptions = {
             id: true,
             isArtist: true,
             isReviewer: true,
-            emailVerified: true,
             ArtistProfile: { select: { id: true } },
             ReviewerProfile: { select: { id: true } },
           },
@@ -131,7 +120,6 @@ export const authOptions: NextAuthOptions = {
           id: string;
           isArtist: boolean;
           isReviewer: boolean;
-          emailVerified: Date | null;
           ArtistProfile?: { id: string } | null;
           ReviewerProfile?: { id: string } | null;
         };
@@ -143,7 +131,6 @@ export const authOptions: NextAuthOptions = {
           const reviewerProfileId = db.ReviewerProfile?.id;
           token.listenerProfileId = reviewerProfileId;
           token.reviewerProfileId = reviewerProfileId;
-          token.emailVerified = db.emailVerified ? db.emailVerified.toISOString() : null;
         }
       }
       return token;
@@ -156,7 +143,6 @@ export const authOptions: NextAuthOptions = {
         session.user.artistProfileId = token.artistProfileId as string | undefined;
         session.user.listenerProfileId = token.listenerProfileId as string | undefined;
         session.user.reviewerProfileId = token.reviewerProfileId as string | undefined;
-        session.user.emailVerified = (token.emailVerified as string | null) ?? null;
       }
       return session;
     },

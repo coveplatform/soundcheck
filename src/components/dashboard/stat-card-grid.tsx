@@ -21,13 +21,12 @@ const iconMap: Record<DashboardStat["iconName"], LucideIcon> = {
 
 export function StatCardGrid({ stats }: StatCardGridProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {stats.map((stat) => {
         const IconComponent = iconMap[stat.iconName];
 
         const card = (
           <StatCard
-            key={stat.id}
             icon={IconComponent}
             iconBg={stat.iconBg}
             iconColor={stat.iconColor}
@@ -35,32 +34,32 @@ export function StatCardGrid({ stats }: StatCardGridProps) {
             label={stat.label}
             interactive={!!stat.href}
             variant="soft"
-            className={stat.href ? "cursor-pointer" : ""}
+            className="h-full"
           />
         );
 
-        // Wrap in tooltip if tooltip content exists
-        const cardWithTooltip = stat.tooltip ? (
+        // Build content: optionally wrap in tooltip
+        const content = stat.tooltip ? (
           <Tooltip content={stat.tooltip}>{card}</Tooltip>
         ) : (
           card
         );
 
-        // Wrap in link if href exists
-        if (stat.href) {
-          return (
-            <Link
-              key={stat.id}
-              href={stat.href}
-              aria-label={stat.ariaLabel}
-              className="block focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded-2xl"
-            >
-              {cardWithTooltip}
-            </Link>
-          );
-        }
-
-        return <div key={stat.id}>{cardWithTooltip}</div>;
+        // Uniform outer wrapper: Link or div, both with h-full
+        return stat.href ? (
+          <Link
+            key={stat.id}
+            href={stat.href}
+            aria-label={stat.ariaLabel}
+            className="block h-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 rounded-xl"
+          >
+            {content}
+          </Link>
+        ) : (
+          <div key={stat.id} className="h-full">
+            {content}
+          </div>
+        );
       })}
     </div>
   );

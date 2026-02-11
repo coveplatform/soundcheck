@@ -111,7 +111,7 @@ export default function OnboardingPage() {
     <div className="min-h-screen flex items-center justify-center px-6 py-12 bg-[#faf8f5]">
       <div className="w-full max-w-lg">
         {/* Step Indicator */}
-        <div className="mb-8 flex justify-center">
+        <div className="mb-8">
           <StepIndicator currentStep={step} totalSteps={3} variant="progress" labels={["Artist Name", "Genres", "Ready"]} />
         </div>
 
@@ -259,9 +259,9 @@ export default function OnboardingPage() {
                       <Gift className="h-5 w-5 text-purple-600" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-black">You have 1 free credit to start</h3>
+                      <h3 className="font-medium text-black">You have 2 free credits to start</h3>
                       <p className="text-sm text-black/50">
-                        Use it to get feedback on your track right away
+                        Use them to get feedback on your tracks right away
                       </p>
                     </div>
                   </div>

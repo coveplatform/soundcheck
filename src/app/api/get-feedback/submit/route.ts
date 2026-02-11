@@ -4,8 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { createHash, randomBytes } from "crypto";
-import { sendEmailVerificationEmail, sendAdminNewTrackNotification } from "@/lib/email";
+import { sendAdminNewTrackNotification } from "@/lib/email";
 import { PASSWORD_REGEX } from "@/lib/password";
 import { detectSource, PACKAGES, PackageType, TrackSource } from "@/lib/metadata";
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
@@ -417,37 +416,10 @@ export async function POST(request: Request) {
           },
         });
 
-        // 4. Create email verification token
-        const token = randomBytes(32).toString("hex");
-        const tokenHash = createHash("sha256").update(token).digest("hex");
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-        await tx.emailVerificationToken.create({
-          data: {
-            userId: user.id,
-            tokenHash,
-            expiresAt,
-          },
-        });
-
-        return { user, artistProfile, track, verificationToken: token };
+        return { user, artistProfile, track };
       });
 
       await markLeadConverted(normalizedEmail);
-
-      // Send verification email (outside transaction)
-      const baseUrl = process.env.NEXTAUTH_URL ?? new URL(request.url).origin;
-      const verifyUrl = `${baseUrl}/verify-email?token=${result.verificationToken}&email=${encodeURIComponent(normalizedEmail)}`;
-
-      try {
-        await sendEmailVerificationEmail({
-          to: normalizedEmail,
-          verifyUrl,
-        });
-      } catch (emailError) {
-        console.error("Failed to send verification email:", emailError);
-        // Don't fail the request if email fails - they can resend
-      }
 
       // Go to checkout
       const checkoutUrl = `/artist/submit/checkout?trackId=${result.track.id}`;

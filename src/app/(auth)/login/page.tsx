@@ -133,16 +133,29 @@ export default function LoginPage() {
   return (
     <div className="w-full">
       {/* Header */}
-      <div className="mb-10">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-950 transition-colors mb-8"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Link>
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Welcome back</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight">Welcome back</h1>
         <p className="mt-2 text-neutral-500">Sign in to your account</p>
+      </div>
+
+      {/* Google */}
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full h-12 bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-400 font-bold transition-colors duration-150 ease-out motion-reduce:transition-none"
+        onClick={() => signIn("google", { callbackUrl })}
+      >
+        <GoogleIcon className="h-5 w-5 mr-2" />
+        Continue with Google
+      </Button>
+
+      <div className="relative my-8">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-neutral-300" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-[#f7f7f5] px-4 text-neutral-500">or</span>
+        </div>
       </div>
 
       {/* Form */}
@@ -205,25 +218,6 @@ export default function LoginPage() {
           </Button>
         </div>
       </form>
-
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-neutral-300" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-[#f7f7f5] px-4 text-neutral-500">or</span>
-        </div>
-      </div>
-
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full h-12 bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-400 font-bold transition-colors duration-150 ease-out motion-reduce:transition-none"
-        onClick={() => signIn("google", { callbackUrl })}
-      >
-        <GoogleIcon className="h-5 w-5 mr-2" />
-        Continue with Google
-      </Button>
 
       <p className="text-sm text-neutral-600 text-center mt-8">
         Don&apos;t have an account?{" "}

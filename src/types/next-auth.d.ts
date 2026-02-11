@@ -5,7 +5,6 @@ declare module "next-auth" {
     user: {
       id: string;
       email: string;
-      emailVerified?: string | null;
       name?: string | null;
       image?: string | null;
       isArtist: boolean;
@@ -32,6 +31,5 @@ declare module "next-auth/jwt" {
     artistProfileId?: string;
     listenerProfileId?: string;
     reviewerProfileId?: string;
-    emailVerified?: string | null;
   }
 }

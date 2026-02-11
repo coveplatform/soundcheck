@@ -429,7 +429,7 @@ export function AccountSettingsClient({
 
               <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-sm text-purple-900 space-y-1">
                 <p className="font-bold">Your Pro benefits:</p>
-                <p>10 credits/month + sell your music + priority queue + PRO-tier reviews</p>
+                <p>40 credits/month + sell your music + priority queue + PRO-tier reviews</p>
               </div>
 
               <Button
@@ -475,7 +475,7 @@ export function AccountSettingsClient({
                   <div className="flex items-start gap-3">
                     <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-bold shrink-0">&#10003;</span>
                     <div>
-                      <p className="text-sm font-bold text-neutral-950">10 credits every month</p>
+                      <p className="text-sm font-bold text-neutral-950">40 credits every month</p>
                       <p className="text-xs text-neutral-600">Automatically added to your balance each billing cycle</p>
                     </div>
                   </div>

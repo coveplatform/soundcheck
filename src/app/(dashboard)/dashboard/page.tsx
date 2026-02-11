@@ -232,20 +232,19 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Stats Section */}
-        <section aria-label="Dashboard statistics" className="mb-10">
-          <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40 mb-4">
-            Overview
-          </p>
-          <StatCardGrid stats={stats} />
-        </section>
-
         <div
-          className={`mt-10 grid gap-8 ${
+          className={`grid gap-8 ${
             showSideRail ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""
           }`}
         >
           <div className="space-y-10">
+            {/* Stats Section */}
+            <section aria-label="Dashboard statistics">
+              <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40 mb-4">
+                Overview
+              </p>
+              <StatCardGrid stats={stats} />
+            </section>
             {/* Your Tracks */}
             <section aria-label="Your tracks">
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
@@ -354,7 +353,7 @@ export default async function DashboardPage() {
                           Upgrade to Pro
                         </p>
                         <p className="text-sm text-neutral-600">
-                          Get 10 credits per month and enable listener revenue.
+                          Get 40 credits per month and enable listener revenue.
                         </p>
                       </div>
                     </div>

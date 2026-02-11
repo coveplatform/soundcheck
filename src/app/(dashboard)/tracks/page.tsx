@@ -43,18 +43,15 @@ export default async function TracksPage() {
 
   const isPro = basicProfile.subscriptionStatus === "active";
 
-  // SECURITY: Only fetch detailed analytics data (reviews, purchases) for Pro users
+  // Fetch all track data including reviews for all users (needed for review counts/progress)
+  // Analytics UI is gated behind isPro in the rendering, not the query
   const artistProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
     include: {
       Track: {
         include: {
           Genre: true,
-          // Only include reviews and purchases if Pro (for grid view - all users see tracks)
-          Review: isPro ? {
-            where: {
-              status: "COMPLETED",
-            },
+          Review: {
             select: {
               id: true,
               status: true,
@@ -68,12 +65,12 @@ export default async function TracksPage() {
               countsTowardAnalytics: true,
               createdAt: true,
             },
-          } : false,
-          Purchase: isPro ? {
+          },
+          Purchase: {
             select: {
               amount: true,
             },
-          } : false,
+          },
         },
         orderBy: { createdAt: "desc" },
       },
@@ -288,11 +285,11 @@ export default async function TracksPage() {
                 </Link>
 
                 {tracks.map((track) => {
-                  const completedReviews = track.Review.filter(
-                    (r) => r.status === "COMPLETED"
+                  const completedReviews = (track.Review ?? []).filter(
+                    (r: any) => r.status === "COMPLETED"
                   ).length;
                   const totalPurchases =
-                    track.Purchase.reduce((sum, p) => sum + p.amount, 0) / 100;
+                    (track.Purchase ?? []).reduce((sum: number, p: any) => sum + p.amount, 0) / 100;
                   const hasReviews = track.reviewsRequested > 0;
                   const reviewProgress = hasReviews
                     ? completedReviews / track.reviewsRequested

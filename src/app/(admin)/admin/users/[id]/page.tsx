@@ -64,10 +64,6 @@ export default async function AdminUserDetailPage({
 
       <div className="grid md:grid-cols-3 gap-4">
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Email verified</div>
-          <div className="font-medium">{user.emailVerified ? "Yes" : "No"}</div>
-        </div>
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="text-sm text-neutral-500">Roles</div>
           <div className="font-medium">
             {user.isArtist && user.isReviewer

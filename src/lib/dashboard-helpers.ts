@@ -138,7 +138,7 @@ export function getWhatsNextGuidance(profile: {
     return {
       title: "Running low on credits",
       description:
-        "Upgrade to Pro for 10 credits per month or review more tracks.",
+        "Upgrade to Pro for 40 credits per month or review more tracks.",
       action: { label: "Upgrade to Pro", href: "/account" },
       priority: "medium",
     };

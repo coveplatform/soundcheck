@@ -90,8 +90,8 @@ export async function POST(request: Request) {
             subscriptionStatus: "active",
             subscriptionTier: "pro",
             subscriptionCurrentPeriodEnd: currentPeriodEnd,
-            // Grant 10 credits for Pro activation
-            reviewCredits: { increment: 10 },
+            // Grant 40 credits for Pro activation
+            reviewCredits: { increment: 40 },
           },
         });
 

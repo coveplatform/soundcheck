@@ -298,14 +298,21 @@ export function TrackReportDemo() {
                     <span className="text-xs font-semibold bg-purple-200 text-purple-900 px-2 py-1 whitespace-nowrap border border-purple-300">15 of 20</span>
                     <div>
                       <div className="font-semibold text-sm text-neutral-950">Hook hits hard at 0:45</div>
-                      <div className="text-xs text-neutral-600">Melody lands, drums feel confident</div>
+                      <div className="text-xs text-neutral-600 leading-relaxed">The main melody is catchy and well-produced — multiple reviewers said it was stuck in their head after one listen. The drum pattern underneath locks in perfectly and gives the hook real momentum.</div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="text-xs font-semibold bg-purple-100 text-purple-900 px-2 py-1 whitespace-nowrap border border-purple-200">12 of 20</span>
                     <div>
-                      <div className="font-semibold text-sm text-neutral-950">Breakdown feels fresh at 2:15</div>
-                      <div className="text-xs text-neutral-600">Nice contrast, keeps attention</div>
+                      <div className="font-semibold text-sm text-neutral-950">Breakdown at 2:15 creates real tension</div>
+                      <div className="text-xs text-neutral-600 leading-relaxed">Stripping back to just the vocal and pad was a smart arrangement choice. Reviewers noted it creates genuine anticipation before the second drop and makes the track feel dynamic rather than one-note.</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-xs font-semibold bg-purple-100 text-purple-900 px-2 py-1 whitespace-nowrap border border-purple-200">9 of 20</span>
+                    <div>
+                      <div className="font-semibold text-sm text-neutral-950">Bass and kick relationship is clean</div>
+                      <div className="text-xs text-neutral-600 leading-relaxed">The low end is well-managed — the sidechain compression gives the bass room to breathe and the kick punches through without muddiness. Several reviewers called out the mix quality specifically.</div>
                     </div>
                   </div>
                 </div>
@@ -321,15 +328,22 @@ export function TrackReportDemo() {
                   <div className="flex items-start gap-3">
                     <span className="text-xs font-semibold bg-orange-200 text-orange-900 px-2 py-1 whitespace-nowrap border border-orange-300">14 of 20</span>
                     <div>
-                      <div className="font-semibold text-sm text-neutral-950">Intro too long</div>
-                      <div className="text-xs text-neutral-600">Hook should arrive sooner</div>
+                      <div className="font-semibold text-sm text-neutral-950">Intro takes too long to reach the hook</div>
+                      <div className="text-xs text-neutral-600 leading-relaxed">Most reviewers felt the first 45 seconds could be tightened. Suggestion: trim 8-12 seconds and tease the main melody earlier to keep listeners engaged. In this genre, the hook usually lands by 0:30.</div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="text-xs font-semibold bg-orange-100 text-orange-900 px-2 py-1 whitespace-nowrap border border-orange-200">10 of 20</span>
                     <div>
-                      <div className="font-semibold text-sm text-neutral-950">Vocal too loud at 1:30</div>
-                      <div className="text-xs text-neutral-600">Clashes with the lead synth</div>
+                      <div className="font-semibold text-sm text-neutral-950">Vocal competes with lead synth around 1:30</div>
+                      <div className="text-xs text-neutral-600 leading-relaxed">The vocal and synth are fighting for the same frequency space in the midrange. Try dipping the vocal 2-3dB in that section, or carve space with a mid-side EQ cut around 2-4kHz on the synth to let the vocal sit on top.</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-xs font-semibold bg-orange-100 text-orange-900 px-2 py-1 whitespace-nowrap border border-orange-200">7 of 20</span>
+                    <div>
+                      <div className="font-semibold text-sm text-neutral-950">Outro could use more variation</div>
+                      <div className="text-xs text-neutral-600 leading-relaxed">The last 20 seconds feel like a copy of the first drop without enough change. Consider filtering the highs out gradually or introducing a new melodic element to give the ending its own identity.</div>
                     </div>
                   </div>
                 </div>
@@ -381,13 +395,13 @@ export function TrackReportDemo() {
                 <div className="bg-[#faf8f5] p-4 border border-neutral-200">
                   <div className="text-xs font-semibold text-purple-700 mb-2">WHAT WORKED</div>
                   <p className="text-neutral-700 text-sm leading-relaxed">
-                    The hook at <span className="font-mono text-neutral-950 bg-white border border-neutral-200 px-1 rounded text-xs">0:45</span> is instantly memorable — I caught myself humming it after.
+                    The hook at <span className="font-mono text-neutral-950 bg-white border border-neutral-200 px-1 rounded text-xs">0:45</span> is instantly memorable — I caught myself humming it after the first listen. The synth layering in the drop is really well done too, everything sits nicely in the mix and the sidechain on the bass gives it that professional bounce. The breakdown at <span className="font-mono text-neutral-950 bg-white border border-neutral-200 px-1 rounded text-xs">2:15</span> is a standout moment — stripping back to just the vocal and pad creates genuine tension before the second drop hits.
                   </p>
                 </div>
                 <div className="bg-[#faf8f5] p-4 border border-neutral-200">
                   <div className="text-xs font-semibold text-orange-700 mb-2">TO IMPROVE</div>
                   <p className="text-neutral-700 text-sm leading-relaxed">
-                    Intro feels too long — I&apos;d cut 8-12 seconds to get to the action faster.
+                    The intro drags a bit — you don&apos;t reach the hook until <span className="font-mono text-neutral-950 bg-white border border-neutral-200 px-1 rounded text-xs">0:45</span> which is a long wait for a track in this genre. I&apos;d trim 8-12 seconds and tease the melody earlier to keep people locked in. The vocal around <span className="font-mono text-neutral-950 bg-white border border-neutral-200 px-1 rounded text-xs">1:30</span> competes with the lead synth — try dipping the vocal 2-3dB or carving some space with a mid-side EQ cut around 2-4kHz on the synth.
                   </p>
                 </div>
               </div>

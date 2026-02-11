@@ -176,17 +176,29 @@ export default function SignupPage() {
   return (
     <div className="w-full">
       {/* Header */}
-      <div className="mb-10">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-950 transition-colors mb-8"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Link>
-        <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Get started free</h1>
-        <p className="mt-2 text-neutral-500">2 free credits • Earn more by reviewing • Upgrade to Pro anytime</p>
-        <p className="mt-1 text-sm text-neutral-400">No credit card required • Upgrade anytime</p>
+      <div className="mb-8">
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight">Create your account</h1>
+        <p className="mt-2 text-neutral-500">2 free credits to start • No credit card required</p>
+      </div>
+
+      {/* Google */}
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full h-12 bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-400 font-bold transition-colors duration-150 ease-out motion-reduce:transition-none"
+        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/onboarding" })}
+      >
+        <GoogleIcon className="h-5 w-5 mr-2" />
+        Continue with Google
+      </Button>
+
+      <div className="relative my-8">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-neutral-300" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-[#f7f7f5] px-4 text-neutral-500">or</span>
+        </div>
       </div>
 
       {/* Form */}
@@ -262,33 +274,14 @@ export default function SignupPage() {
           </Button>
         </div>
 
-        <p className="text-sm text-neutral-600 text-center pt-2">
-          Already have an account?{" "}
-          <Link href="/login" className="text-neutral-950 font-bold hover:text-purple-700 transition-colors">
-            Sign in
-          </Link>
-        </p>
       </form>
 
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-neutral-300" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-[#f7f7f5] px-4 text-neutral-500">or</span>
-        </div>
-      </div>
-
-      {/* Google */}
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full h-12 bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-400 font-bold transition-colors duration-150 ease-out motion-reduce:transition-none"
-        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/onboarding" })}
-      >
-        <GoogleIcon className="h-5 w-5 mr-2" />
-        Continue with Google
-      </Button>
+      <p className="text-sm text-neutral-600 text-center mt-8">
+        Already have an account?{" "}
+        <Link href="/login" className="text-neutral-950 font-bold hover:text-purple-700 transition-colors">
+          Sign in
+        </Link>
+      </p>
     </div>
   );
 }

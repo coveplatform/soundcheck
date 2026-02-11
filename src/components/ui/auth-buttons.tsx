@@ -54,7 +54,7 @@ export function AuthButtons({
           className={
             theme === "dark"
               ? "bg-purple-600 text-white hover:bg-purple-700 font-medium border-2 border-purple-600"
-              : "bg-black text-white hover:bg-neutral-800 font-medium"
+              : "bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out"
           }
         >
           Get Started

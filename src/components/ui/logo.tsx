@@ -7,7 +7,7 @@ export type LogoProps = React.ComponentPropsWithoutRef<"div">;
 export function Logo({ className, ...props }: LogoProps) {
   return (
     <div
-      className={cn("inline-flex items-center gap-2 text-black", className)}
+      className={cn("inline-flex items-center gap-2.5 text-black", className)}
       aria-label="MixReflect"
       {...props}
     >
@@ -19,32 +19,26 @@ export function Logo({ className, ...props }: LogoProps) {
         aria-hidden="true"
       >
         <rect
-          x="20"
-          y="20"
-          width="160"
-          height="160"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="15"
+          x="10"
+          y="10"
+          width="180"
+          height="180"
+          rx="40"
+          ry="40"
+          fill="#9333ea"
         />
 
-        <g fill="currentColor">
-          <rect x="45" y="90" width="10" height="20" />
-          <rect x="55" y="75" width="10" height="50" />
-          <rect x="65" y="60" width="10" height="80" />
-          <rect x="75" y="80" width="10" height="40" />
-          <rect x="85" y="50" width="10" height="100" />
-          <rect x="95" y="70" width="10" height="60" />
-          <rect x="105" y="40" width="10" height="120" />
-          <rect x="115" y="85" width="10" height="30" />
-          <rect x="125" y="65" width="10" height="70" />
-          <rect x="135" y="90" width="10" height="20" />
-          <rect x="145" y="80" width="10" height="40" />
+        <g fill="white">
+          <rect x="42" y="78" width="16" height="44" rx="3" />
+          <rect x="68" y="55" width="16" height="90" rx="3" />
+          <rect x="94" y="38" width="16" height="124" rx="3" />
+          <rect x="120" y="62" width="16" height="76" rx="3" />
+          <rect x="146" y="82" width="16" height="36" rx="3" />
         </g>
       </svg>
 
-      <span className="inline-block h-7 text-xl font-bold leading-7">
-        mixreflect
+      <span className="inline-block h-7 text-[20px] leading-7 tracking-tight">
+        <span className="font-extrabold">Mix</span><span className="font-normal text-neutral-500">Reflect</span>
       </span>
     </div>
   );
