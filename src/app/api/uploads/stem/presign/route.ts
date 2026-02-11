@@ -58,10 +58,10 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { artistProfile: { select: { id: true } } },
+      select: { ArtistProfile: { select: { id: true } } },
     });
 
-    if (!user?.artistProfile) {
+    if (!user?.ArtistProfile) {
       return NextResponse.json(
         { error: "Artist profile required" },
         { status: 403 }
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
       select: {
         artistId: true,
         status: true,
-        _count: { select: { stems: true } },
+        _count: { select: { TrackStem: true } },
       },
     });
 
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (track.artistId !== user.artistProfile.id) {
+    if (track.artistId !== user.ArtistProfile.id) {
       return NextResponse.json(
         { error: "You don't own this track" },
         { status: 403 }
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
     }
 
     // Check stem count limit
-    if (track._count.stems >= MAX_STEMS_PER_TRACK) {
+    if (track._count.TrackStem >= MAX_STEMS_PER_TRACK) {
       return NextResponse.json(
         { error: `Maximum ${MAX_STEMS_PER_TRACK} stems per track` },
         { status: 400 }

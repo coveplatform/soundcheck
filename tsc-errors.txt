@@ -1,0 +1,72 @@
+﻿src/__tests__/integration/queue-assignment.test.ts(248,49): error TS2304: Cannot find name 'ReviewerProfile'.
+src/__tests__/integration/queue-assignment.test.ts(253,49): error TS2304: Cannot find name 'ReviewerProfile'.
+src/__tests__/integration/review-submission.test.ts(30,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/review-submission.test.ts(32,38): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/review-submission.test.ts(77,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/review-submission.test.ts(80,42): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/review-submission.test.ts(112,21): error TS2304: Cannot find name 'ReviewerProfile'.
+src/__tests__/integration/review-submission.test.ts(115,45): error TS2304: Cannot find name 'ReviewerProfile'.
+src/__tests__/integration/review-submission.test.ts(173,24): error TS2304: Cannot find name 'ReviewerProfile'.
+src/__tests__/integration/review-submission.test.ts(198,22): error TS2304: Cannot find name 'ReviewerProfile'.
+src/__tests__/integration/review-submission.test.ts(214,25): error TS2304: Cannot find name 'ReviewerProfile'.
+src/__tests__/integration/review-submission.test.ts(215,24): error TS2304: Cannot find name 'ReviewerProfile'.
+src/__tests__/integration/review-submission.test.ts(221,22): error TS2304: Cannot find name 'ReviewerProfile'.
+src/__tests__/integration/review-submission.test.ts(240,22): error TS2304: Cannot find name 'ReviewerProfile'.
+src/__tests__/integration/signup.test.ts(32,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(33,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(44,45): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(49,37): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(66,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(68,38): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(78,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(109,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(111,37): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(130,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(132,37): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(151,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(153,37): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(186,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(188,40): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(226,16): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(238,36): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(261,16): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/signup.test.ts(263,38): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/stripe-webhook.test.ts(30,37): error TS2304: Cannot find name 'Payment'.
+src/__tests__/integration/stripe-webhook.test.ts(32,18): error TS2551: Property 'Payment' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'payment'?
+src/__tests__/integration/stripe-webhook.test.ts(34,40): error TS2551: Property 'Payment' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'payment'?
+src/__tests__/integration/stripe-webhook.test.ts(66,22): error TS2304: Cannot find name 'ArtistProfile'.
+src/__tests__/integration/stripe-webhook.test.ts(101,34): error TS2304: Cannot find name 'Payment'.
+src/__tests__/integration/stripe-webhook.test.ts(103,18): error TS2551: Property 'Payment' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'payment'?
+src/__tests__/integration/stripe-webhook.test.ts(105,40): error TS2551: Property 'Payment' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'payment'?
+src/__tests__/integration/stripe-webhook.test.ts(136,18): error TS2551: Property 'Payment' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'payment'?
+src/__tests__/integration/stripe-webhook.test.ts(138,48): error TS2551: Property 'Payment' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'payment'?
+src/__tests__/integration/stripe-webhook.test.ts(231,18): error TS2551: Property 'Payment' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'payment'?
+src/__tests__/integration/stripe-webhook.test.ts(233,40): error TS2551: Property 'Payment' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'payment'?
+src/__tests__/integration/stripe-webhook.test.ts(272,34): error TS2304: Cannot find name 'Payment'.
+src/__tests__/integration/stripe-webhook.test.ts(274,16): error TS2551: Property 'Payment' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'payment'?
+src/__tests__/integration/stripe-webhook.test.ts(276,38): error TS2551: Property 'Payment' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'payment'?
+src/__tests__/integration/track-submission.test.ts(33,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/track-submission.test.ts(35,38): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/track-submission.test.ts(45,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/track-submission.test.ts(91,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/track-submission.test.ts(95,36): error TS2304: Cannot find name 'ArtistProfile'.
+src/__tests__/integration/track-submission.test.ts(97,14): error TS2304: Cannot find name 'ArtistProfile'.
+src/__tests__/integration/track-submission.test.ts(108,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/track-submission.test.ts(112,32): error TS2304: Cannot find name 'ArtistProfile'.
+src/__tests__/integration/track-submission.test.ts(124,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/track-submission.test.ts(129,14): error TS2304: Cannot find name 'ArtistProfile'.
+src/__tests__/integration/track-submission.test.ts(140,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/track-submission.test.ts(145,14): error TS2304: Cannot find name 'ArtistProfile'.
+src/__tests__/integration/track-submission.test.ts(197,18): error TS2551: Property 'User' does not exist on type 'DeepMockProxy<PrismaClient<PrismaClientOptions, never, DefaultArgs>>'. Did you mean 'user'?
+src/__tests__/integration/track-submission.test.ts(210,19): error TS2304: Cannot find name 'ArtistProfile'.
+src/__tests__/integration/track-submission.test.ts(283,60): error TS2304: Cannot find name 'ArtistProfile'.
+src/__tests__/integration/track-submission.test.ts(294,60): error TS2304: Cannot find name 'ArtistProfile'.
+src/__tests__/integration/track-submission.test.ts(349,30): error TS2304: Cannot find name 'ArtistProfile'.
+src/__tests__/integration/track-submission.test.ts(360,26): error TS2304: Cannot find name 'ArtistProfile'.
+src/app/(dashboard)/artist/tracks/[id]/page.tsx(240,21): error TS2322: Type '{ Review: ({ ReviewerProfile: { User: { name: string | null; }; } & { id: string; userId: string; createdAt: Date; updatedAt: Date; pendingBalance: number; stripeAccountId: string | null; ... 17 more ...; affiliateEarnings: number; }; } & { ...; })[]; platformAverages: { ...; }; isFreeTier: boolean; }' is not assignable to type 'IntrinsicAttributes & StatsTabProps'.
+src/app/(dashboard)/artist/tracks/[id]/page.tsx(251,21): error TS2322: Type '{ Review: ({ ReviewerProfile: { User: { name: string | null; }; } & { id: string; userId: string; createdAt: Date; updatedAt: Date; pendingBalance: number; stripeAccountId: string | null; ... 17 more ...; affiliateEarnings: number; }; } & { ...; })[]; isFreeTier: boolean; trackId: string; }' is not assignable to type 'IntrinsicAttributes & ReviewsTabProps'.
+src/app/(dashboard)/artist/tracks/[id]/page.tsx(259,23): error TS2322: Type '{ Track: { id: string; title: string; sourceType: TrackSource; sharingEnabled: boolean; sharingMode: SharingMode | null; salePrice: number | null; trackShareId: string | null; publicPlayCount: number; }; ... 4 more ...; totalExternalEarnings: number; }' is not assignable to type 'IntrinsicAttributes & SalesTabProps'.
+src/app/(dashboard)/artist/tracks/[id]/page.tsx(279,21): error TS2322: Type '{ Track: { id: string; title: string; sourceUrl: string; sourceType: TrackSource; status: TrackStatus; linkIssueNotifiedAt: Date | null; feedbackFocus: string | null; }; Payment: { ...; } | null; canUpdateSource: boolean; }' is not assignable to type 'IntrinsicAttributes & SettingsTabProps'.
+src/app/(dashboard)/onboarding/page.tsx(201,21): error TS2322: Type '{ Genre: Genre[]; selectedIds: string[]; onToggle: (genreId: string) => void; minSelections: number; maxSelections: number; variant: "artist"; }' is not assignable to type 'IntrinsicAttributes & GenreSelectorProps'.
+src/app/(dashboard)/submit/page.tsx(753,19): error TS2322: Type '{ Genre: Genre[]; selectedIds: string[]; onToggle: (genreId: string) => void; maxSelections: number; variant: "artist"; }' is not assignable to type 'IntrinsicAttributes & GenreSelectorProps'.
+src/app/(public)/get-feedback/page.tsx(1901,21): error TS2322: Type '{ Genre: Genre[]; selectedIds: string[]; onToggle: (genreId: string) => void; maxSelections: number; variant: "artist"; theme: "dark"; }' is not assignable to type 'IntrinsicAttributes & GenreSelectorProps'.

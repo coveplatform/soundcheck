@@ -23,7 +23,7 @@ export async function POST(
     const user = await prisma.user.findUnique({
       where: { id },
       include: {
-        reviewerProfile: true,
+        ReviewerProfile: true,
       },
     });
 
@@ -32,7 +32,7 @@ export async function POST(
     }
 
     // If already a reviewer with a profile, just ensure they're marked as reviewer
-    if (user.reviewerProfile) {
+    if (user.ReviewerProfile) {
       await prisma.user.update({
         where: { id },
         data: { isReviewer: true },
@@ -40,7 +40,7 @@ export async function POST(
       return NextResponse.json({
         success: true,
         message: "User already has reviewer profile",
-        reviewerProfileId: user.reviewerProfile.id,
+        reviewerProfileId: user.ReviewerProfile.id,
       });
     }
 

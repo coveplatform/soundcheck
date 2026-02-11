@@ -67,7 +67,7 @@ export async function GET(
       where: {
         trackId_reviewerId: {
           trackId: track.id,
-          reviewerId: ReviewerProfile.id,
+          reviewerId: reviewer.id,
         },
       },
     });

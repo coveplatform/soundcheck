@@ -7,7 +7,7 @@ datasource db {
 }
 
 model Account {
-  id                String  @id
+  id                String @id @default(cuid())
   userId            String
   type              String
   provider          String
@@ -25,13 +25,13 @@ model Account {
 }
 
 model ArtistProfile {
-  id                           String        @id
+  id                           String @id @default(cuid())
   userId                       String        @unique
   artistName                   String
   totalTracks                  Int           @default(0)
   totalSpent                   Int           @default(0)
   createdAt                    DateTime      @default(now())
-  updatedAt                    DateTime
+  updatedAt                    DateTime @updatedAt
   pendingBalance               Int           @default(0)
   stripeAccountId              String?       @unique
   stripeConnectedAt            DateTime?
@@ -61,7 +61,7 @@ model ArtistProfile {
 }
 
 model EmailVerificationToken {
-  id        String    @id
+  id        String @id @default(cuid())
   userId    String
   tokenHash String    @unique
   expiresAt DateTime
@@ -73,7 +73,7 @@ model EmailVerificationToken {
 }
 
 model ExternalPurchase {
-  id                      String                 @id
+  id                      String @id @default(cuid())
   trackId                 String
   buyerEmail              String
   buyerName               String?
@@ -102,7 +102,7 @@ model ExternalPurchase {
 }
 
 model Genre {
-  id                               String            @id
+  id                               String @id @default(cuid())
   name                             String            @unique
   slug                             String            @unique
   ArtistProfile_ArtistGenres       ArtistProfile[]   @relation("ArtistGenres")
@@ -112,13 +112,13 @@ model Genre {
 }
 
 model LeadCapture {
-  id         String   @id
+  id         String @id @default(cuid())
   email      String
   source     String   @default("get-feedback")
   reminded   Boolean  @default(false)
   converted  Boolean  @default(false)
   createdAt  DateTime @default(now())
-  updatedAt  DateTime
+  updatedAt  DateTime @updatedAt
   artistName String?
 
   @@index([email])
@@ -126,7 +126,7 @@ model LeadCapture {
 }
 
 model PasswordResetToken {
-  id        String    @id
+  id        String @id @default(cuid())
   userId    String
   tokenHash String    @unique
   expiresAt DateTime
@@ -138,7 +138,7 @@ model PasswordResetToken {
 }
 
 model Payment {
-  id              String        @id
+  id              String @id @default(cuid())
   trackId         String        @unique
   amount          Int
   stripeSessionId String        @unique
@@ -150,7 +150,7 @@ model Payment {
 }
 
 model Payout {
-  id              String          @id
+  id              String @id @default(cuid())
   reviewerId      String
   amount          Int
   method          PayoutMethod
@@ -162,7 +162,7 @@ model Payout {
 }
 
 model Purchase {
-  id                                                             String           @id
+  id                                                             String @id @default(cuid())
   trackId                                                        String
   reviewerId                                                     String
   amount                                                         Int
@@ -181,17 +181,17 @@ model Purchase {
 }
 
 model RateLimit {
-  id        String   @id
+  id        String @id @default(cuid())
   count     Int      @default(0)
   resetAt   DateTime
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 
   @@index([resetAt])
 }
 
 model Review {
-  id                     String               @id
+  id                     String @id @default(cuid())
   trackId                String
   reviewerId             String
   status                 ReviewStatus         @default(ASSIGNED)
@@ -214,7 +214,7 @@ model Review {
   wasFlagged             Boolean              @default(false)
   flagReason             String?
   createdAt              DateTime             @default(now())
-  updatedAt              DateTime
+  updatedAt              DateTime @updatedAt
   isGem                  Boolean              @default(false)
   addressedArtistNote    AddressedArtistNote?
   nextActions            String?
@@ -240,7 +240,7 @@ model Review {
 }
 
 model ReviewQueue {
-  id               String          @id
+  id               String @id @default(cuid())
   trackId          String
   reviewerId       String
   priority         Int             @default(0)
@@ -257,7 +257,7 @@ model ReviewQueue {
 }
 
 model ReviewTimestamp {
-  id        String   @id
+  id        String @id @default(cuid())
   reviewId  String
   seconds   Int
   note      String
@@ -269,7 +269,7 @@ model ReviewTimestamp {
 }
 
 model ReviewerProfile {
-  id                                                      String        @id
+  id                                                      String @id @default(cuid())
   userId                                                  String        @unique
   tier                                                    ReviewerTier  @default(NORMAL)
   totalReviews                                            Int           @default(0)
@@ -285,7 +285,7 @@ model ReviewerProfile {
   reviewsToday                                            Int           @default(0)
   lastReviewDate                                          DateTime?
   createdAt                                               DateTime      @default(now())
-  updatedAt                                               DateTime
+  updatedAt                                               DateTime @updatedAt
   onboardingQuizCompletedAt                               DateTime?
   onboardingQuizPassed                                    Boolean       @default(false)
   onboardingQuizScore                                     Int           @default(0)
@@ -305,7 +305,7 @@ model ReviewerProfile {
 }
 
 model Session {
-  id           String   @id
+  id           String @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
@@ -313,7 +313,7 @@ model Session {
 }
 
 model StripeWebhookEvent {
-  id        String   @id
+  id        String @id @default(cuid())
   type      String
   expiresAt DateTime
   createdAt DateTime @default(now())
@@ -322,7 +322,7 @@ model StripeWebhookEvent {
 }
 
 model SupportMessage {
-  id            String                   @id
+  id            String @id @default(cuid())
   ticketId      String
   authorType    SupportMessageAuthorType
   authorUserId  String?
@@ -335,12 +335,12 @@ model SupportMessage {
 }
 
 model SupportTicket {
-  id             String              @id
+  id             String @id @default(cuid())
   userId         String
   subject        String
   status         SupportTicketStatus @default(OPEN)
   createdAt      DateTime            @default(now())
-  updatedAt      DateTime
+  updatedAt      DateTime @updatedAt
   SupportMessage SupportMessage[]
   User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -349,7 +349,7 @@ model SupportTicket {
 }
 
 model Track {
-  id                      String               @id
+  id                      String @id @default(cuid())
   artistId                String
   sourceUrl               String
   sourceType              TrackSource
@@ -399,7 +399,7 @@ model Track {
 }
 
 model TrackAffiliateLink {
-  id              String   @id
+  id              String @id @default(cuid())
   trackId         String
   code            String   @unique
   name            String
@@ -410,7 +410,7 @@ model TrackAffiliateLink {
   totalRevenue    Int      @default(0)
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
-  updatedAt       DateTime
+  updatedAt       DateTime @updatedAt
   User            User     @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
   Track           Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
 
@@ -420,7 +420,7 @@ model TrackAffiliateLink {
 }
 
 model TrackStem {
-  id           String   @id
+  id           String @id @default(cuid())
   trackId      String
   stemUrl      String
   stemType     StemType
@@ -429,7 +429,7 @@ model TrackStem {
   duration     Int?
   waveformData Json?
   createdAt    DateTime @default(now())
-  updatedAt    DateTime
+  updatedAt    DateTime @updatedAt
   Track        Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
 
   @@index([trackId])
@@ -437,14 +437,14 @@ model TrackStem {
 }
 
 model User {
-  id                     String                   @id
+  id                     String @id @default(cuid())
   email                  String                   @unique
   password               String?
   name                   String?
   image                  String?
   emailVerified          DateTime?
   createdAt              DateTime                 @default(now())
-  updatedAt              DateTime
+  updatedAt              DateTime @updatedAt
   isArtist               Boolean                  @default(true)
   isReviewer             Boolean                  @default(true)
   referralSource         String?

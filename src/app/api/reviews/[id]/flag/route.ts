@@ -36,7 +36,7 @@ export async function POST(
       return NextResponse.json({ error: "Review not found" }, { status: 404 });
     }
 
-    if (review.track.ArtistProfile.userId !== session.user.id) {
+    if (review.Track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -81,10 +81,10 @@ export async function POST(
         },
       });
 
-      const shouldRestrict = ReviewerProfile.flagCount > 3;
+      const shouldRestrict = reviewer.flagCount > 3;
       const reviewerAfter = shouldRestrict
         ? await tx.reviewerProfile.update({
-            where: { id: ReviewerProfile.id },
+            where: { id: reviewer.id },
             data: { isRestricted: true },
             select: { id: true, flagCount: true, isRestricted: true },
           })
@@ -174,7 +174,7 @@ export async function POST(
         wasFlagged: result.updatedReview.wasFlagged,
         flagReason: result.updatedReview.flagReason,
       },
-      ReviewerProfile: result.reviewer,
+      reviewer: result.ReviewerProfile,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

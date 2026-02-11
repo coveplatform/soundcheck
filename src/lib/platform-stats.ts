@@ -52,12 +52,12 @@ export async function getPlatformStats(): Promise<PlatformStats> {
     include: {
       _count: {
         select: {
-          tracks: true,
+          Track: true,
         },
       },
     },
     orderBy: {
-      tracks: {
+      Track: {
         _count: "desc",
       },
     },

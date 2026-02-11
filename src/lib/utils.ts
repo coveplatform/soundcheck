@@ -92,7 +92,7 @@ export function formatReviewCount(completed: number, requested: number): string 
   return `${completed}/${requested} reviews`;
 }
 
-export function getTrackAction(Track: {
+export function getTrackAction(track: {
   status: string;
   id: string;
   reviewsRequested: number;

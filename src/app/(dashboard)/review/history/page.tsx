@@ -95,10 +95,10 @@ export default async function ReviewHistoryPage() {
                       <Music className="h-5 w-5 text-purple-600" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-base font-semibold text-black truncate">{review.track.title}</p>
+                      <p className="text-base font-semibold text-black truncate">{review.Track.title}</p>
                       <p className="text-sm text-neutral-600 truncate">
-                        {review.track.Genre.map((g) => g.name).join(", ")}
-                        {review.track.artist?.artistName ? ` · ${review.track.ArtistProfile.artistName}` : ""}
+                        {review.Track.Genre.map((g) => g.name).join(", ")}
+                        {review.Track.ArtistProfile?.artistName ? ` · ${review.Track.ArtistProfile.artistName}` : ""}
                       </p>
                     </div>
                   </div>

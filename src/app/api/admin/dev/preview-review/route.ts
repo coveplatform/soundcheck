@@ -41,15 +41,18 @@ export async function POST() {
       },
     });
 
-    const artistProfile = await prisma.artistProfile.upsert({
+    let artistProfile = await prisma.artistProfile.findUnique({
       where: { userId: artistUser.id },
-      update: {},
-      create: {
-        userId: artistUser.id,
-        artistName: "Test Artist",
-        Genre: { connect: [{ id: genre.id }] },
-      },
     });
+
+    if (!artistProfile) {
+      artistProfile = await prisma.artistProfile.create({
+        data: {
+          userId: artistUser.id,
+          artistName: "Test Artist",
+        },
+      });
+    }
 
     // Enable reviewer mode on admin's account and create reviewer profile
     await prisma.user.update({

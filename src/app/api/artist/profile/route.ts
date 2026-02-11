@@ -45,13 +45,13 @@ export async function POST(request: Request) {
           artistName,
           ...(genreIds !== undefined
             ? {
-                Genre: {
+                Genre_ArtistGenres: {
                   set: genreIds.map((id) => ({ id })),
                 },
               }
             : {}),
         },
-        include: { Genre: true },
+        include: { Genre_ArtistGenres: true },
       });
 
       return NextResponse.json(profile);
@@ -66,13 +66,13 @@ export async function POST(request: Request) {
         reviewCredits: 2,
         ...(genreIds && genreIds.length > 0
           ? {
-              Genre: {
+              Genre_ArtistGenres: {
                 connect: genreIds.map((id) => ({ id })),
               },
             }
           : {}),
       },
-      include: { Genre: true },
+      include: { Genre_ArtistGenres: true },
     });
 
     // Update user to mark as artist
@@ -109,8 +109,8 @@ export async function GET() {
     const profile = await prisma.artistProfile.findUnique({
       where: { userId: session.user.id },
       include: {
-        Genre: true,
-        tracks: {
+        Genre_ArtistGenres: true,
+        Track: {
           select: { id: true },
         },
       },
@@ -123,7 +123,7 @@ export async function GET() {
     // Add track count and subscription status to response
     const response = {
       ...profile,
-      totalTracks: profile.tracks.length,
+      totalTracks: profile.Track.length,
       subscriptionStatus: profile.subscriptionStatus,
       reviewCredits: profile.reviewCredits,
     };

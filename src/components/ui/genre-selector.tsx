@@ -11,7 +11,7 @@ interface Genre {
 }
 
 interface GenreSelectorProps {
-  Genre: Genre[];
+  genres: Genre[];
   selectedIds: string[];
   onToggle: (id: string) => void;
   maxSelections?: number;
@@ -223,8 +223,8 @@ export function GenreSelector({
     },
   };
   const variantStyles = {
-    ArtistProfile: purpleStyles,
-    ReviewerProfile: purpleStyles,
+    artist: purpleStyles,
+    reviewer: purpleStyles,
   };
 
   const styles = variantStyles[variant][theme];

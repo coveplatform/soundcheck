@@ -79,7 +79,11 @@
       "Bash(npx concurrently:*)",
       "Bash(tasklist:*)",
       "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" npx prisma migrate status:*)",
-      "Bash(vercel --version:*)"
+      "Bash(vercel --version:*)",
+      "Bash(if [ -f \".next/lock\" ])",
+      "Bash(then echo \"Build still running\")",
+      "Bash(else echo \"Build completed, lock removed\")",
+      "Bash(fi)"
     ]
   }
 }

@@ -24,15 +24,15 @@ export async function GET() {
       where: {
         isArtist: true,
         trialReminderSentAt: null,
-        artistProfile: {
-          tracks: { none: {} },
+        ArtistProfile: {
+          Track: { none: {} },
         },
       },
       select: {
         id: true,
         email: true,
         createdAt: true,
-        artistProfile: {
+        ArtistProfile: {
           select: {
             artistName: true,
           },
@@ -46,8 +46,8 @@ export async function GET() {
       where: {
         isArtist: true,
         trialReminderSentAt: { not: null },
-        artistProfile: {
-          tracks: { none: {} },
+        ArtistProfile: {
+          Track: { none: {} },
         },
       },
     });
@@ -56,7 +56,7 @@ export async function GET() {
       eligible: eligibleUsers.map((u) => ({
         id: u.id,
         email: u.email,
-        artistName: u.artistProfile?.artistName ?? "Artist",
+        artistName: u.ArtistProfile?.artistName ?? "Artist",
         signedUpAt: u.createdAt,
       })),
       stats: {
@@ -93,9 +93,9 @@ export async function POST(request: Request) {
     const whereClause = {
       isArtist: true,
       trialReminderSentAt: null,
-      artistProfile: {
+      ArtistProfile: {
         reviewCredits: { gte: 1 },
-        tracks: { none: {} },
+        Track: { none: {} },
       },
       ...(userIds && userIds.length > 0 ? { id: { in: userIds } } : {}),
     };
@@ -105,7 +105,7 @@ export async function POST(request: Request) {
       select: {
         id: true,
         email: true,
-        artistProfile: {
+        ArtistProfile: {
           select: { artistName: true },
         },
       },
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
       users.map(async (user) => {
         const emailSent = await sendTrialReminderEmail({
           to: user.email,
-          artistName: user.artistProfile?.artistName ?? "there",
+          artistName: user.ArtistProfile?.artistName ?? "there",
         });
 
         if (!emailSent) {

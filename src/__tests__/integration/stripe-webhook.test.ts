@@ -27,11 +27,11 @@ describe('Stripe Webhook Integration', () => {
   describe('checkout.session.completed', () => {
     it('updates payment status to COMPLETED', async () => {
       const payment = createMockPayment({ status: 'PENDING' })
-      const completedPayment = { ...Payment, status: 'COMPLETED' as const, completedAt: new Date() }
+      const completedPayment = { ...payment, status: 'COMPLETED' as const, completedAt: new Date() }
 
-      prismaMock.Payment.update.mockResolvedValue(completedPayment)
+      prismaMock.payment.update.mockResolvedValue(completedPayment)
 
-      const updated = await prismaMock.Payment.update({
+      const updated = await prismaMock.payment.update({
         where: { stripeSessionId: payment.stripeSessionId },
         data: { status: 'COMPLETED', completedAt: new Date() },
       })
@@ -63,7 +63,7 @@ describe('Stripe Webhook Integration', () => {
       prismaMock.artistProfile.update.mockResolvedValue(updatedArtist)
 
       const updated = await prismaMock.artistProfile.update({
-        where: { id: ArtistProfile.id },
+        where: { id: artist.id },
         data: { totalSpent: { increment: payment.amount } },
       })
 
@@ -98,11 +98,11 @@ describe('Stripe Webhook Integration', () => {
   describe('checkout.session.expired', () => {
     it('updates payment status to FAILED', async () => {
       const payment = createMockPayment({ status: 'PENDING' })
-      const failedPayment = { ...Payment, status: 'FAILED' as const }
+      const failedPayment = { ...payment, status: 'FAILED' as const }
 
-      prismaMock.Payment.update.mockResolvedValue(failedPayment)
+      prismaMock.payment.update.mockResolvedValue(failedPayment)
 
-      const updated = await prismaMock.Payment.update({
+      const updated = await prismaMock.payment.update({
         where: { stripeSessionId: payment.stripeSessionId },
         data: { status: 'FAILED' },
       })
@@ -133,9 +133,9 @@ describe('Stripe Webhook Integration', () => {
     it('handles duplicate webhook events gracefully', async () => {
       const payment = createMockPayment({ status: 'COMPLETED' })
 
-      prismaMock.Payment.findUnique.mockResolvedValue(payment)
+      prismaMock.payment.findUnique.mockResolvedValue(payment)
 
-      const existingPayment = await prismaMock.Payment.findUnique({
+      const existingPayment = await prismaMock.payment.findUnique({
         where: { stripeSessionId: payment.stripeSessionId },
       })
 
@@ -228,9 +228,9 @@ describe('Checkout Session Creation', () => {
         status: 'PENDING',
       })
 
-      prismaMock.Payment.create.mockResolvedValue(payment)
+      prismaMock.payment.create.mockResolvedValue(payment)
 
-      const created = await prismaMock.Payment.create({
+      const created = await prismaMock.payment.create({
         data: {
           trackId: track.id,
           stripeSessionId,
@@ -269,11 +269,11 @@ describe('Refund Processing', () => {
 
   it('updates payment status to REFUNDED', async () => {
     const payment = createMockPayment({ status: 'COMPLETED' })
-    const refundedPayment = { ...Payment, status: 'REFUNDED' as const }
+    const refundedPayment = { ...payment, status: 'REFUNDED' as const }
 
-    prismaMock.Payment.update.mockResolvedValue(refundedPayment)
+    prismaMock.payment.update.mockResolvedValue(refundedPayment)
 
-    const updated = await prismaMock.Payment.update({
+    const updated = await prismaMock.payment.update({
       where: { id: payment.id },
       data: { status: 'REFUNDED' },
     })

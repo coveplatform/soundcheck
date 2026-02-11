@@ -110,15 +110,18 @@ export async function POST() {
     });
 
     // Create artist profile for admin
-    const artistProfile = await prisma.artistProfile.upsert({
+    let artistProfile = await prisma.artistProfile.findUnique({
       where: { userId: adminUserId },
-      update: {},
-      create: {
-        userId: adminUserId,
-        artistName: "Preview Artist",
-        Genre: { connect: [{ id: genre.id }] },
-      },
     });
+
+    if (!artistProfile) {
+      artistProfile = await prisma.artistProfile.create({
+        data: {
+          userId: adminUserId,
+          artistName: "Preview Artist",
+        },
+      });
+    }
 
     // Check for existing completed preview track
     let track = await prisma.track.findFirst({

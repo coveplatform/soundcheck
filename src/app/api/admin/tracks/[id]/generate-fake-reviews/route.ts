@@ -185,7 +185,7 @@ export async function POST(
     for (const { email, name } of reviewerData) {
       let user = await prisma.user.findUnique({
         where: { email },
-        include: { reviewerProfile: true },
+        include: { ReviewerProfile: true },
       });
 
       // Create demo user and listener profile if doesn't exist
@@ -197,25 +197,25 @@ export async function POST(
             password: passwordHash,
             emailVerified: new Date(),
             isReviewer: true,
-            reviewerProfile: {
+            ReviewerProfile: {
               create: {
                 tier: "NORMAL",
               },
             },
           },
-          include: { reviewerProfile: true },
+          include: { ReviewerProfile: true },
         });
       } else if (!user.name) {
         // Update existing user with name if missing
         user = await prisma.user.update({
           where: { email },
           data: { name },
-          include: { reviewerProfile: true },
+          include: { ReviewerProfile: true },
         });
       }
 
-      if (user.reviewerProfile) {
-        reviewers.push(user.reviewerProfile);
+      if (user.ReviewerProfile) {
+        reviewers.push(user.ReviewerProfile);
       }
     }
 
@@ -238,7 +238,7 @@ export async function POST(
       const review = await prisma.review.create({
         data: {
           trackId: track.id,
-          reviewerId: ReviewerProfile.id,
+          reviewerId: reviewer.id,
           status: "COMPLETED",
           countsTowardCompletion: true,
           countsTowardAnalytics: true, // Include in analytics for realistic data

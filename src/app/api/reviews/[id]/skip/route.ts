@@ -89,12 +89,12 @@ export async function POST(
 
     await prisma.reviewQueue.deleteMany({
       where: {
-        trackId: review.track.id,
+        trackId: review.Track.id,
         reviewerId: review.ReviewerProfile.id,
       },
     });
 
-    await assignReviewersToTrack(review.track.id);
+    await assignReviewersToTrack(review.Track.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

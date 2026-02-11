@@ -30,9 +30,9 @@ describe('Track Submission Integration', () => {
 
     it('requires verified email', async () => {
       const user = createMockUser({ emailVerified: null })
-      prismaMock.User.findUnique.mockResolvedValue(user)
+      prismaMock.user.findUnique.mockResolvedValue(user)
 
-      const found = await prismaMock.User.findUnique({
+      const found = await prismaMock.user.findUnique({
         where: { id: user.id },
         select: { emailVerified: true },
       })
@@ -42,7 +42,7 @@ describe('Track Submission Integration', () => {
 
     it('requires completed artist profile', async () => {
       const user = createMockUser()
-      prismaMock.User.findUnique.mockResolvedValue(user)
+      prismaMock.user.findUnique.mockResolvedValue(user)
       prismaMock.artistProfile.findUnique.mockResolvedValue(null)
 
       const artistProfile = await prismaMock.artistProfile.findUnique({
@@ -88,13 +88,13 @@ describe('Track Submission Integration', () => {
         subscriptionStatus: null,
       })
 
-      prismaMock.User.findUnique.mockResolvedValue(user)
+      prismaMock.user.findUnique.mockResolvedValue(user)
       prismaMock.artistProfile.findUnique.mockResolvedValue(artist)
 
       const reviewsRequested = 5
-      const expectedCreditsAfter = ArtistProfile.reviewCredits - reviewsRequested
+      const expectedCreditsAfter = artist.reviewCredits - reviewsRequested
 
-      expect(ArtistProfile.reviewCredits).toBe(10)
+      expect(artist.reviewCredits).toBe(10)
       expect(expectedCreditsAfter).toBe(5)
     })
 
@@ -105,11 +105,11 @@ describe('Track Submission Integration', () => {
         reviewCredits: 2,
       })
 
-      prismaMock.User.findUnique.mockResolvedValue(user)
+      prismaMock.user.findUnique.mockResolvedValue(user)
       prismaMock.artistProfile.findUnique.mockResolvedValue(artist)
 
       const reviewsRequested = 5
-      const hasEnoughCredits = ArtistProfile.reviewCredits >= reviewsRequested
+      const hasEnoughCredits = artist.reviewCredits >= reviewsRequested
 
       expect(hasEnoughCredits).toBe(false)
     })
@@ -121,12 +121,12 @@ describe('Track Submission Integration', () => {
         subscriptionStatus: null,
       })
 
-      prismaMock.User.findUnique.mockResolvedValue(user)
+      prismaMock.user.findUnique.mockResolvedValue(user)
       prismaMock.artistProfile.findUnique.mockResolvedValue(artist)
 
       const packageType = 'STANDARD'
       expect(packageType).toBe('STANDARD')
-      expect(ArtistProfile.subscriptionStatus).toBeNull()
+      expect(artist.subscriptionStatus).toBeNull()
     })
 
     it('creates PRO package for subscribed users', async () => {
@@ -137,12 +137,12 @@ describe('Track Submission Integration', () => {
         subscriptionTier: 'pro',
       })
 
-      prismaMock.User.findUnique.mockResolvedValue(user)
+      prismaMock.user.findUnique.mockResolvedValue(user)
       prismaMock.artistProfile.findUnique.mockResolvedValue(artist)
 
       const packageType = 'PRO'
       expect(packageType).toBe('PRO')
-      expect(ArtistProfile.subscriptionStatus).toBe('active')
+      expect(artist.subscriptionStatus).toBe('active')
     })
 
     it('sets correct review count for PRO package', async () => {
@@ -194,7 +194,7 @@ describe('Track Submission Integration', () => {
       const genre1 = createMockGenre({ name: 'Electronic' })
       const genre2 = createMockGenre({ name: 'Hip-Hop' })
 
-      prismaMock.User.findUnique.mockResolvedValue(user)
+      prismaMock.user.findUnique.mockResolvedValue(user)
       prismaMock.artistProfile.findUnique.mockResolvedValue(artist)
 
       const trackData = {
@@ -207,7 +207,7 @@ describe('Track Submission Integration', () => {
       }
 
       const track = createMockTrack({
-        artistId: ArtistProfile.id,
+        artistId: artist.id,
         title: trackData.title,
         sourceUrl: trackData.sourceUrl,
         sourceType: trackData.sourceType,
@@ -280,7 +280,7 @@ describe('Track Submission Integration', () => {
 
       const sourceType = 'UPLOAD'
       const allowPurchase = true
-      const canEnablePurchase = sourceType === 'UPLOAD' && ArtistProfile.subscriptionStatus === 'active'
+      const canEnablePurchase = sourceType === 'UPLOAD' && artist.subscriptionStatus === 'active'
 
       expect(canEnablePurchase).toBe(true)
     })
@@ -291,7 +291,7 @@ describe('Track Submission Integration', () => {
       })
 
       const sourceType = 'UPLOAD'
-      const canEnablePurchase = sourceType === 'UPLOAD' && ArtistProfile.subscriptionStatus === 'active'
+      const canEnablePurchase = sourceType === 'UPLOAD' && artist.subscriptionStatus === 'active'
 
       expect(canEnablePurchase).toBe(false)
     })
@@ -303,7 +303,7 @@ describe('Track Submission Integration', () => {
 
       const sourceType = 'SOUNDCLOUD' as const
       // @ts-expect-error - Intentional type mismatch to test that SOUNDCLOUD !== UPLOAD
-      const canEnablePurchase = sourceType === 'UPLOAD' && ArtistProfile.subscriptionStatus === 'active'
+      const canEnablePurchase = sourceType === 'UPLOAD' && artist.subscriptionStatus === 'active'
 
       expect(canEnablePurchase).toBe(false)
     })
@@ -346,7 +346,7 @@ describe('Track Submission Integration', () => {
         totalTracks: 5,
       })
 
-      const newTotalTracks = ArtistProfile.totalTracks + 1
+      const newTotalTracks = artist.totalTracks + 1
 
       expect(newTotalTracks).toBe(6)
     })
@@ -357,7 +357,7 @@ describe('Track Submission Integration', () => {
       })
 
       const creditsSpent = 5
-      const newCredits = ArtistProfile.reviewCredits - creditsSpent
+      const newCredits = artist.reviewCredits - creditsSpent
 
       expect(newCredits).toBe(5)
     })

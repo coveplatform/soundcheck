@@ -169,7 +169,7 @@ export async function getEligibleReviewers(
         trackId: track.id,
       },
     },
-    queueEntries: {
+    ReviewQueue: {
       none: {
         trackId: track.id,
       },
@@ -195,7 +195,7 @@ export async function getEligibleReviewers(
         trackId: track.id,
       },
     },
-    queueEntries: {
+    ReviewQueue: {
       none: {
         trackId: track.id,
       },
@@ -282,18 +282,18 @@ export async function getEligiblePeerReviewers(
       // Exclude the track owner
       id: { not: track.ArtistProfile.id },
       // Must have matching review genres
-      reviewGenres: {
+      Genre_ArtistReviewGenres: {
         some: {
           id: { in: genreIds },
         },
       },
       // Exclude if already assigned as peer reviewer for this track
-      peerReviews: {
+      Review: {
         none: {
           trackId: track.id,
         },
       },
-      peerQueueEntries: {
+      ReviewQueue: {
         none: {
           trackId: track.id,
         },
@@ -304,7 +304,7 @@ export async function getEligiblePeerReviewers(
       },
     },
     include: {
-      reviewGenres: true,
+      Genre_ArtistReviewGenres: true,
       User: { select: { id: true, email: true } },
     },
     orderBy: [
@@ -359,7 +359,7 @@ export async function assignReviewersToTrack(trackId: string) {
             },
           },
         },
-        queueEntries: true,
+        ReviewQueue: true,
       },
     });
 
@@ -382,7 +382,7 @@ export async function assignReviewersToTrack(trackId: string) {
 
     const countedStatuses = new Set(["ASSIGNED", "IN_PROGRESS", "COMPLETED"]);
     const existingProCount = track.Review.filter(
-      (r) => countedStatuses.has(r.status) && r.reviewer?.tier === "PRO"
+      (r) => countedStatuses.has(r.status) && r.ReviewerProfile?.tier === "PRO"
     ).length;
 
     const neededReviews =
@@ -432,7 +432,7 @@ export async function assignReviewersToTrack(trackId: string) {
         tx
       );
 
-      const existingReviewerIds = new Set(track.Review.map((r) => r.reviewerId));
+      const existingReviewerIds = new Set(track.Review.map((r: any) => r.reviewerId));
       const eligibleUnique = eligibleReviewers.filter(
         (r) => !existingReviewerIds.has(r.id)
       );
@@ -482,7 +482,7 @@ export async function assignReviewersToTrack(trackId: string) {
         await tx.reviewQueue.createMany({
           data: reviewersToAssign.map((reviewer) => ({
             trackId,
-            reviewerId: ReviewerProfile.id,
+            reviewerId: reviewer.id,
             expiresAt,
             priority,
           })),
@@ -492,7 +492,7 @@ export async function assignReviewersToTrack(trackId: string) {
         await tx.review.createMany({
           data: reviewersToAssign.map((reviewer) => ({
             trackId,
-            reviewerId: ReviewerProfile.id,
+            reviewerId: reviewer.id,
             status: "ASSIGNED",
           })),
           skipDuplicates: true,
@@ -583,7 +583,7 @@ export async function assignTracksToTestReviewer(reviewerId: string, email: stri
           reviewerId,
         },
       },
-      queueEntries: {
+      ReviewQueue: {
         none: {
           reviewerId,
         },
@@ -674,23 +674,23 @@ export async function updateReviewerTier(reviewerId: string) {
 
   if (!reviewer) return;
 
-  const gemCount = ReviewerProfile.gemCount ?? 0;
+  const gemCount = reviewer.gemCount ?? 0;
   const newTier = gemCount >= 10
     ? ("PRO" as unknown as ReviewerTier)
-    : calculateTier(ReviewerProfile.totalReviews, ReviewerProfile.averageRating);
+    : calculateTier(reviewer.totalReviews, reviewer.averageRating);
 
-  if (newTier !== ReviewerProfile.tier) {
+  if (newTier !== reviewer.tier) {
     const tierRank = (tier: ReviewerTier) => (tier === "PRO" ? 2 : 1);
-    const isUpgrade = tierRank(newTier) > tierRank(ReviewerProfile.tier);
+    const isUpgrade = tierRank(newTier) > tierRank(reviewer.tier);
 
     await prisma.reviewerProfile.update({
       where: { id: reviewerId },
       data: { tier: newTier },
     });
 
-    if (isUpgrade && ReviewerProfile.user?.email) {
+    if (isUpgrade && reviewer.User?.email) {
       await sendTierChangeEmail({
-        to: ReviewerProfile.User.email,
+        to: reviewer.User.email,
         newTier,
         newRateCents: getTierRateCents(newTier),
       });

@@ -19,7 +19,7 @@ export async function DELETE() {
       select: { id: true, totalSpent: true },
     });
 
-    if (artist && ArtistProfile.totalSpent > 0) {
+    if (artist && artist.totalSpent > 0) {
       return NextResponse.json(
         { error: "Your account has purchase history. Please contact support to delete your account." },
         { status: 400 }
@@ -32,7 +32,7 @@ export async function DELETE() {
     });
 
     if (reviewer) {
-      if (ReviewerProfile.pendingBalance > 0) {
+      if (reviewer.pendingBalance > 0) {
         return NextResponse.json(
           { error: "You have a remaining balance. Please contact support to delete your account." },
           { status: 400 }
@@ -40,7 +40,7 @@ export async function DELETE() {
       }
 
       const payoutCount = await prisma.payout.count({
-        where: { reviewerId: ReviewerProfile.id },
+        where: { reviewerId: reviewer.id },
       });
 
       if (payoutCount > 0) {

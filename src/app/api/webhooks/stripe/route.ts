@@ -187,7 +187,7 @@ export async function POST(request: Request) {
       break;
     }
 
-    case "invoice.Payment_succeeded": {
+    case "invoice.payment_succeeded": {
       const invoice = event.data.object as Stripe.Invoice;
       await handleInvoicePaymentSucceeded(invoice);
       break;
@@ -256,10 +256,10 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     }
 
     if (track.status === "CANCELLED") {
-      if (track.Payment?.status !== "REFUNDED" && session.Payment_intent) {
+      if (track.Payment?.status !== "REFUNDED" && session.payment_intent) {
         try {
           await stripe.refunds.create({
-            payment_intent: session.Payment_intent as string,
+            payment_intent: session.payment_intent as string,
           }, {
             idempotencyKey: `webhook_refund_${session.id}`,
           });
@@ -279,7 +279,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     const result = await finalizePaidCheckoutSession({
       stripeSessionId: session.id,
       trackId,
-      stripePaymentId: (session.Payment_intent as string) || null,
+      stripePaymentId: (session.payment_intent as string) || null,
       amountTotalCents:
         typeof session.amount_total === "number" ? session.amount_total : null,
       completedAt,
@@ -464,7 +464,7 @@ async function handleExternalPurchaseComplete(
 
     // Generate download URL (7 day expiry)
     const { generateDownloadUrl } = await import("@/lib/s3");
-    const downloadUrl = await generateDownloadUrl(purchase.track.sourceUrl, 7 * 24 * 60 * 60);
+    const downloadUrl = await generateDownloadUrl(purchase.Track.sourceUrl, 7 * 24 * 60 * 60);
 
     if (!downloadUrl) {
       console.error(`Failed to generate download URL for purchase: ${purchaseId}`);
@@ -477,7 +477,7 @@ async function handleExternalPurchaseComplete(
         where: { id: purchaseId },
         data: {
           status: "COMPLETED",
-          stripePaymentIntentId: (session.Payment_intent as string) || "unknown",
+          stripePaymentIntentId: (session.payment_intent as string) || "unknown",
           downloadUrl,
           completedAt,
         },
@@ -485,7 +485,7 @@ async function handleExternalPurchaseComplete(
 
       // Credit artist
       await tx.artistProfile.update({
-        where: { id: purchase.track.ArtistProfile.id },
+        where: { id: purchase.Track.ArtistProfile.id },
         data: {
           pendingBalance: { increment: purchase.artistAmount },
           totalEarnings: { increment: purchase.artistAmount },
@@ -495,29 +495,29 @@ async function handleExternalPurchaseComplete(
       // Credit affiliate commission if applicable
       if (purchase.affiliateUserId && purchase.affiliateCommission > 0) {
         // Check if user is an artist or reviewer
-        const user = await tx.User.findUnique({
+        const user = await tx.user.findUnique({
           where: { id: purchase.affiliateUserId },
           select: {
             isArtist: true,
             isReviewer: true,
-            artistProfile: { select: { id: true } },
-            reviewerProfile: { select: { id: true } },
+            ArtistProfile: { select: { id: true } },
+            ReviewerProfile: { select: { id: true } },
           },
         });
 
-        if (user?.isArtist && user.artistProfile) {
+        if (user?.isArtist && user.ArtistProfile) {
           // Credit to artist profile
           await tx.artistProfile.update({
-            where: { id: user.artistProfile.id },
+            where: { id: user.ArtistProfile.id },
             data: {
               pendingBalance: { increment: purchase.affiliateCommission },
               totalEarnings: { increment: purchase.affiliateCommission },
             },
           });
-        } else if (user?.isReviewer && user.reviewerProfile) {
+        } else if (user?.isReviewer && user.ReviewerProfile) {
           // Credit to listener profile
           await tx.reviewerProfile.update({
-            where: { id: user.reviewerProfile.id },
+            where: { id: user.ReviewerProfile.id },
             data: {
               pendingBalance: { increment: purchase.affiliateCommission },
               totalEarnings: { increment: purchase.affiliateCommission },
@@ -548,8 +548,8 @@ async function handleExternalPurchaseComplete(
     await sendPurchaseConfirmationEmail({
       buyerEmail: purchase.buyerEmail,
       buyerName: purchase.buyerName || undefined,
-      trackTitle: purchase.track.title,
-      artistName: purchase.track.ArtistProfile.artistName,
+      trackTitle: purchase.Track.title,
+      artistName: purchase.Track.ArtistProfile.artistName,
       downloadUrl: downloadUrl || undefined,
       purchaseId: purchase.id,
     }).catch((err) => {

@@ -84,7 +84,7 @@ export async function POST(request: Request) {
             userId: session.user.id,
             artistName: profileName,
             reviewCredits: 2,
-            Genre: {
+            Genre_ArtistGenres: {
               connect: data.genreIds.map((id) => ({ id })),
             },
           },
@@ -273,7 +273,7 @@ export async function POST(request: Request) {
               userId: existingUser.id,
               artistName: profileName,
               reviewCredits: 2,
-              Genre: {
+              Genre_ArtistGenres: {
                 connect: data.genreIds.map((id) => ({ id })),
               },
             },
@@ -377,7 +377,7 @@ export async function POST(request: Request) {
       // Create everything in a transaction
       const result = await prisma.$transaction(async (tx) => {
         // 1. Create user
-        const user = await tx.User.create({
+        const user = await tx.user.create({
           data: {
             email: normalizedEmail,
             password: hashedPassword,
@@ -393,7 +393,7 @@ export async function POST(request: Request) {
             userId: user.id,
             artistName: data.artistName,
             reviewCredits: 2,
-            Genre: {
+            Genre_ArtistGenres: {
               connect: data.genreIds.map((id) => ({ id })),
             },
           },

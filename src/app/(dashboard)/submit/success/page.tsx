@@ -9,7 +9,7 @@ interface SuccessPageProps {
 
 export default async function SubmitSuccessPage({ searchParams }: SuccessPageProps) {
   const params = await searchParams;
-  const reviewCount = parseInt(params.Review || "0", 10);
+  const reviewCount = parseInt(params.reviews || "0", 10);
   const hasReviews = reviewCount > 0;
 
   return (

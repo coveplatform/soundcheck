@@ -39,12 +39,12 @@ export async function GET(request: Request) {
         createdAt: true,
         updatedAt: true,
         User: { select: { email: true } },
-        messages: {
+        SupportMessage: {
           orderBy: { createdAt: "desc" },
           take: 1,
           select: { body: true, createdAt: true, authorType: true },
         },
-        _count: { select: { messages: true } },
+        _count: { select: { SupportMessage: true } },
       },
     });
 

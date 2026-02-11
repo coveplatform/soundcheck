@@ -84,7 +84,7 @@ export async function getRenderStatus(trackId: string): Promise<RenderProgress |
     select: {
       id: true,
       abletonRenderStatus: true,
-      Stem: {
+      TrackStem: {
         select: {
           stemUrl: true,
           stemType: true,
@@ -132,7 +132,7 @@ export async function getRenderStatus(trackId: string): Promise<RenderProgress |
     status: track.abletonRenderStatus as any,
     progress,
     currentStep,
-    stems: track.stems.map((s) => ({
+    stems: track.TrackStem.map((s) => ({
       stemUrl: s.stemUrl,
       stemType: s.stemType,
       label: s.label,
@@ -149,7 +149,7 @@ export async function manualRenderProject(trackId: string): Promise<void> {
   const track = await prisma.track.findUnique({
     where: { id: trackId },
     include: {
-      stems: true,
+      TrackStem: true,
     },
   });
 
@@ -386,7 +386,7 @@ export async function getPendingRenders() {
           artistName: true,
         },
       },
-      stems: true,
+      TrackStem: true,
     },
     orderBy: {
       createdAt: "asc",
@@ -410,7 +410,7 @@ export async function getCompletedRenders(limit = 20) {
           artistName: true,
         },
       },
-      stems: true,
+      TrackStem: true,
     },
     orderBy: {
       createdAt: "desc",

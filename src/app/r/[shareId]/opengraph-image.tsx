@@ -56,9 +56,9 @@ export default async function OGImage({ params }: { params: Promise<{ shareId: s
 
   // Try to fetch artwork as base64 if available
   let artworkData: string | null = null;
-  if (review.track.artworkUrl) {
+  if (review.Track.artworkUrl) {
     try {
-      const response = await fetch(review.track.artworkUrl);
+      const response = await fetch(review.Track.artworkUrl);
       if (response.ok) {
         const buffer = await response.arrayBuffer();
         const base64 = Buffer.from(buffer).toString("base64");
@@ -142,9 +142,9 @@ export default async function OGImage({ params }: { params: Promise<{ shareId: s
               marginBottom: 16,
             }}
           >
-            {review.track.title.length > 32
-              ? review.track.title.slice(0, 32) + "..."
-              : review.track.title}
+            {review.Track.title.length > 32
+              ? review.Track.title.slice(0, 32) + "..."
+              : review.Track.title}
           </div>
 
           {/* Score with stars */}

@@ -27,9 +27,9 @@ describe('Review Submission Integration', () => {
   describe('Authorization Checks', () => {
     it('rejects submission from unverified email', async () => {
       const user = createMockUser({ emailVerified: null })
-      prismaMock.User.findUnique.mockResolvedValue(user)
+      prismaMock.user.findUnique.mockResolvedValue(user)
 
-      const found = await prismaMock.User.findUnique({
+      const found = await prismaMock.user.findUnique({
         where: { id: user.id },
         select: { emailVerified: true },
       })
@@ -74,10 +74,10 @@ describe('Review Submission Integration', () => {
         isRestricted: false,
       })
 
-      prismaMock.User.findUnique.mockResolvedValue(user)
+      prismaMock.user.findUnique.mockResolvedValue(user)
       prismaMock.reviewerProfile.findUnique.mockResolvedValue(reviewer)
 
-      const foundUser = await prismaMock.User.findUnique({
+      const foundUser = await prismaMock.user.findUnique({
         where: { id: user.id },
         select: { emailVerified: true },
       })
@@ -109,10 +109,10 @@ describe('Review Submission Integration', () => {
     it('allows submission for review assigned to current reviewer', async () => {
       const reviewer = createMockReviewerProfile()
       const review = createMockReview({
-        reviewerId: ReviewerProfile.id,
+        reviewerId: reviewer.id,
       })
 
-      const isOwner = review.reviewerId === ReviewerProfile.id
+      const isOwner = review.reviewerId === reviewer.id
       expect(isOwner).toBe(true)
     })
   })
@@ -170,7 +170,7 @@ describe('Review Submission Integration', () => {
       const review = createMockReview()
       const reviewer = createMockReviewerProfile({ tier: 'NORMAL' as any })
 
-      const earnings = ReviewerProfile.tier === 'PRO' ? TIER_RATES.PRO : TIER_RATES.NORMAL
+      const earnings = reviewer.tier === 'PRO' ? TIER_RATES.PRO : TIER_RATES.NORMAL
       const completedReview = { ...review, paidAmount: earnings }
 
       prismaMock.review.update.mockResolvedValue(completedReview)
@@ -195,7 +195,7 @@ describe('Review Submission Integration', () => {
       prismaMock.reviewerProfile.update.mockResolvedValue(updatedReviewer)
 
       const updated = await prismaMock.reviewerProfile.update({
-        where: { id: ReviewerProfile.id },
+        where: { id: reviewer.id },
         data: { totalReviews: { increment: 1 } },
       })
 
@@ -211,14 +211,14 @@ describe('Review Submission Integration', () => {
 
       const updatedReviewer = {
         ...reviewer,
-        pendingBalance: ReviewerProfile.pendingBalance + earnings,
-        totalEarnings: ReviewerProfile.totalEarnings + earnings,
+        pendingBalance: reviewer.pendingBalance + earnings,
+        totalEarnings: reviewer.totalEarnings + earnings,
       }
 
       prismaMock.reviewerProfile.update.mockResolvedValue(updatedReviewer)
 
       const updated = await prismaMock.reviewerProfile.update({
-        where: { id: ReviewerProfile.id },
+        where: { id: reviewer.id },
         data: {
           pendingBalance: { increment: earnings },
           totalEarnings: { increment: earnings },
@@ -237,7 +237,7 @@ describe('Review Submission Integration', () => {
       prismaMock.reviewerProfile.update.mockResolvedValue(updatedReviewer)
 
       const updated = await prismaMock.reviewerProfile.update({
-        where: { id: ReviewerProfile.id },
+        where: { id: reviewer.id },
         data: { lastReviewDate: now },
       })
 

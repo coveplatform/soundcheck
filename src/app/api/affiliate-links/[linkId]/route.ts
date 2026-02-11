@@ -69,8 +69,8 @@ export async function PATCH(
       },
     });
 
-    const fullUrl = link.track.trackShareId
-      ? `${process.env.NEXT_PUBLIC_APP_URL}/t/${link.track.trackShareId}?ref=${updated.code}`
+    const fullUrl = link.Track.trackShareId
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/t/${link.Track.trackShareId}?ref=${updated.code}`
       : null;
 
     return NextResponse.json({

@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       data: {
         userId: session.user.id,
         subject: data.subject,
-        messages: {
+        SupportMessage: {
           create: {
             authorType: "USER",
             authorUserId: session.user.id,
@@ -89,12 +89,12 @@ export async function GET(request: Request) {
         status: true,
         createdAt: true,
         updatedAt: true,
-        messages: {
+        SupportMessage: {
           orderBy: { createdAt: "desc" },
           take: 1,
           select: { body: true, createdAt: true, authorType: true },
         },
-        _count: { select: { messages: true } },
+        _count: { select: { SupportMessage: true } },
       },
     });
 

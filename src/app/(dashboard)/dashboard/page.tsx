@@ -50,8 +50,8 @@ export default async function DashboardPage() {
         peerGemCount: true,
         hasSeenCreditGuide: true,
         subscriptionStatus: true,
-        reviewGenres: true,
-        tracks: {
+        Genre_ArtistReviewGenres: true,
+        Track: {
           select: {
             id: true,
             title: true,
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
         id: true,
         artistName: true,
         subscriptionStatus: true,
-        tracks: {
+        Track: {
           select: {
             id: true,
             title: true,
@@ -109,7 +109,7 @@ export default async function DashboardPage() {
       ? artistProfile.hasSeenCreditGuide ?? false
       : true;
   const isSubscribed = artistProfile.subscriptionStatus === "active";
-  const tracks = artistProfile.tracks ?? [];
+  const tracks = artistProfile.Track ?? [];
 
   // Fetch pending peer reviews with timestamp
   let pendingPeerReviews: PendingPeerReview[] = [];

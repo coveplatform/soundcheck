@@ -34,7 +34,7 @@ function titleCase(value: string) {
     .join(" ");
 }
 
-function calculateAverage(Review: ReviewLike[], field: keyof ReviewLike): number {
+function calculateAverage(reviews: ReviewLike[], field: keyof ReviewLike): number {
   const scores = reviews
     .map((r) => r[field])
     .filter((v): v is number => typeof v === "number" && v >= 1 && v <= 5);
@@ -253,7 +253,7 @@ function EngagementRow({
   );
 }
 
-function EngagementSection({ reviews }: { Review: ReviewLike[] }) {
+function EngagementSection({ reviews }: { reviews: ReviewLike[] }) {
   // Calculate each metric with its OWN denominator (reviews that have that field answered)
   // This handles old reviews that may not have newer fields
   const listenAgainTotal = reviews.filter(r => r.wouldListenAgain !== null).length;
@@ -362,7 +362,7 @@ export function AggregateAnalytics({
   reviews,
   platformAverages
 }: {
-  Review: ReviewLike[];
+  reviews: ReviewLike[];
   platformAverages?: PlatformAverages;
 }) {
   const completed = reviews.length;

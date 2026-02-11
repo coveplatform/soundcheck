@@ -122,7 +122,7 @@ export function AnalyticsDashboard({
       };
     }
 
-    const reviews = filteredTracks.reduce((sum, t) => sum + t.ReviewCompleted, 0);
+    const reviews = filteredTracks.reduce((sum, t) => sum + t.reviewsCompleted, 0);
     const avgScore =
       filteredTracks.reduce((sum, t) => sum + t.avgScore, 0) / filteredTracks.length;
     const earnings = filteredTracks.reduce((sum, t) => sum + t.earnings, 0);
@@ -281,7 +281,7 @@ export function AnalyticsDashboard({
           avgTimeToComplete={reviewVelocity.avgTimeToComplete}
           fastestTrack={reviewVelocity.fastestTrack}
           slowestTrack={reviewVelocity.slowestTrack}
-          reviewsPerWeek={reviewVelocity.ReviewPerWeek}
+          reviewsPerWeek={reviewVelocity.reviewsPerWeek}
           totalReviews={totalReviews}
         />
       </section>

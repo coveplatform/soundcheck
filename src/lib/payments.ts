@@ -13,7 +13,7 @@ export async function finalizePaidCheckoutSession(params: {
   trackTitle: string | null;
 }> {
   return prisma.$transaction(async (tx) => {
-    const existingPayment = await tx.Payment.findUnique({
+    const existingPayment = await tx.payment.findUnique({
       where: { stripeSessionId: params.stripeSessionId },
       select: { id: true, trackId: true, status: true },
     });
@@ -34,7 +34,7 @@ export async function finalizePaidCheckoutSession(params: {
     }
 
     if (existingPayment) {
-      await tx.Payment.update({
+      await tx.payment.update({
         where: { id: existingPayment.id },
         data: {
           status: "COMPLETED",
@@ -44,7 +44,7 @@ export async function finalizePaidCheckoutSession(params: {
       });
     } else {
       try {
-        await tx.Payment.create({
+        await tx.payment.create({
           data: {
             trackId: params.trackId,
             amount: params.amountTotalCents ?? 0,
@@ -112,7 +112,7 @@ export async function finalizePaidCheckoutSession(params: {
     return {
       trackId: track.id,
       queuedNow: firstQueue.count > 0,
-      artistEmail: track.ArtistProfile.user?.email ?? null,
+      artistEmail: track.ArtistProfile.User?.email ?? null,
       trackTitle: track.title ?? null,
     };
   });

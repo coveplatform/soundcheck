@@ -245,12 +245,12 @@ describe('Queue Assignment Integration', () => {
       prismaMock.review.createMany.mockResolvedValue({ count: 1 })
 
       const queueResult = await prismaMock.reviewQueue.createMany({
-        data: [{ trackId: track.id, reviewerId: ReviewerProfile.id, expiresAt: new Date(), priority: 5 }],
+        data: [{ trackId: track.id, reviewerId: reviewer.id, expiresAt: new Date(), priority: 5 }],
         skipDuplicates: true,
       })
 
       const reviewResult = await prismaMock.review.createMany({
-        data: [{ trackId: track.id, reviewerId: ReviewerProfile.id, status: 'ASSIGNED' }],
+        data: [{ trackId: track.id, reviewerId: reviewer.id, status: 'ASSIGNED' }],
         skipDuplicates: true,
       })
 

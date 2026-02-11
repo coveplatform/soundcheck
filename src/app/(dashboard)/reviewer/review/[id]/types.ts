@@ -27,14 +27,14 @@ export interface Review {
     allowPurchase: boolean;
     hasStems: boolean;
     abletonProjectData?: unknown | null;
-    stems?: Array<{
+    TrackStem?: Array<{
       id: string;
       stemUrl: string;
       stemType: string;
       label: string;
       order: number;
     }>;
-    artist?: {
+    ArtistProfile?: {
       artistName: string;
     };
   };

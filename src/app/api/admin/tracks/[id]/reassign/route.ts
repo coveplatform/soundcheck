@@ -37,7 +37,7 @@ export async function POST(
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
-        queueEntries: true,
+        ReviewQueue: true,
         Review: true,
       },
     });
@@ -54,7 +54,7 @@ export async function POST(
     }
 
     // Verify current reviewer is actually assigned
-    const currentQueueEntry = track.queueEntries.find(
+    const currentQueueEntry = track.ReviewQueue.find(
       (q) => q.reviewerId === currentReviewerId
     );
     const currentReview = track.Review.find(
@@ -86,7 +86,7 @@ export async function POST(
     const existingAssignment = track.Review.find(
       (r) => r.reviewerId === newReviewerId
     );
-    const existingQueueEntry = track.queueEntries.find(
+    const existingQueueEntry = track.ReviewQueue.find(
       (q) => q.reviewerId === newReviewerId
     );
 

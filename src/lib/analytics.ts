@@ -224,7 +224,7 @@ export const funnels = {
     start: () => track("artist_onboarding_started"),
     enterName: () => track("artist_onboarding_name_entered"),
     selectGenres: (Genre: string[]) =>
-      track("artist_onboarding_genres_selected", { genres, count: genres.length }),
+      track("artist_onboarding_genres_selected", { Genre, count: Genre.length }),
     complete: () => track("artist_onboarding_completed"),
   },
 
@@ -235,7 +235,7 @@ export const funnels = {
     validateUrl: (sourceType: string, success: boolean) =>
       track("track_url_validated", { sourceType, success }),
     selectGenres: (Genre: string[]) =>
-      track("track_genres_selected", { genres, count: genres.length }),
+      track("track_genres_selected", { Genre, count: Genre.length }),
     selectPackage: (pkg: string, price: number, reviewCount: number) =>
       track("track_package_selected", { package: pkg, price, reviewCount }),
     complete: () => track("track_submission_form_completed"),
@@ -255,7 +255,7 @@ export const funnels = {
   reviewerOnboarding: {
     start: () => track("reviewer_onboarding_started"),
     selectGenres: (Genre: string[]) =>
-      track("reviewer_onboarding_genres_selected", { genres, count: genres.length }),
+      track("reviewer_onboarding_genres_selected", { Genre, count: Genre.length }),
     complete: () => track("reviewer_onboarding_completed"),
   },
 

@@ -32,7 +32,7 @@ export async function GET(
         createdAt: true,
         updatedAt: true,
         User: { select: { id: true, email: true, name: true } },
-        messages: {
+        SupportMessage: {
           orderBy: { createdAt: "asc" },
           select: {
             id: true,

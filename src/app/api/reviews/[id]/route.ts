@@ -68,6 +68,9 @@ export async function GET(
                 artistName: true,
               },
             },
+            TrackStem: {
+              orderBy: { order: "asc" },
+            },
           },
         },
         ReviewerProfile: {
@@ -77,7 +80,7 @@ export async function GET(
             userId: true,
           },
         },
-        peerReviewerArtist: {
+        ArtistProfile: {
           select: {
             id: true,
             userId: true,
@@ -148,7 +151,7 @@ export async function PATCH(
       );
     }
 
-    if (review.track.ArtistProfile.userId !== session.user.id) {
+    if (review.Track.ArtistProfile.userId !== session.user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

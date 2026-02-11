@@ -482,7 +482,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
       // Track successful review completion
       funnels.review.complete(
-        review.track.id,
+        review.Track.id,
         review.id,
         data.earnings || getTierEarningsCents(review.ReviewerProfile.tier)
       );
@@ -510,7 +510,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
     setError("");
     setIsSkipping(true);
-    track("reviewer_track_skipped", { trackId: review.track.id });
+    track("reviewer_track_skipped", { trackId: review.Track.id });
 
     try {
       const response = await fetch(`/api/reviews/${review.id}/skip`, {
@@ -638,14 +638,14 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       // Get referral data from cookie if it matches this track
       const referralCookie = getReferralCookie();
       const referral =
-        referralCookie && referralCookie.trackId === review.track.id
+        referralCookie && referralCookie.trackId === review.Track.id
           ? { reviewerId: referralCookie.reviewerId, shareId: referralCookie.shareId }
           : undefined;
 
       const response = await fetch("/api/purchases", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ trackId: review.track.id, referral }),
+        body: JSON.stringify({ trackId: review.Track.id, referral }),
       });
 
       const data = await response.json();
@@ -674,7 +674,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     if (!review) return;
 
     try {
-      const response = await fetch(`/api/tracks/${review.track.id}/download`);
+      const response = await fetch(`/api/tracks/${review.Track.id}/download`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -793,15 +793,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   if (!review) return null;
 
-  const stems = Array.isArray(review.track.stems) ? review.track.stems : [];
+  const stems = Array.isArray(review.Track.TrackStem) ? review.Track.TrackStem : [];
 
   const isZipUpload =
-    review.track.sourceType === "UPLOAD" &&
-    typeof review.track.sourceUrl === "string" &&
-    review.track.sourceUrl.toLowerCase().endsWith(".zip");
+    review.Track.sourceType === "UPLOAD" &&
+    typeof review.Track.sourceUrl === "string" &&
+    review.Track.sourceUrl.toLowerCase().endsWith(".zip");
 
   const hasPlayableStems =
-    Boolean(review.track.hasStems) &&
+    Boolean(review.Track.hasStems) &&
     stems.length > 0 &&
     stems.every(
       (s) => typeof s.stemUrl === "string" && !s.stemUrl.toLowerCase().endsWith(".zip")
@@ -831,9 +831,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                 <Music className="h-6 w-6 text-black" />
               </div>
               <div>
-                <CardTitle className="text-xl">{review.track.title}</CardTitle>
+                <CardTitle className="text-xl">{review.Track.title}</CardTitle>
                 <p className="text-sm text-neutral-600">
-                  {review.track.Genre.map((g) => g.name).join(", ")}
+                  {review.Track.Genre.map((g) => g.name).join(", ")}
                 </p>
               </div>
             </div>
@@ -841,7 +841,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <CardContent className="pt-6">
             {hasPlayableStems ? (
               <StemPlayer
-                trackId={review.track.id}
+                trackId={review.Track.id}
                 stems={stems}
                 showListenTracker={false}
               />
@@ -854,10 +854,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               </div>
             ) : (
               <AudioPlayer
-                sourceUrl={review.track.sourceUrl}
-                sourceType={review.track.sourceType}
+                sourceUrl={review.Track.sourceUrl}
+                sourceType={review.Track.sourceType}
                 showListenTracker={false}
-                showWaveform={review.track.sourceType === "UPLOAD"}
+                showWaveform={review.Track.sourceType === "UPLOAD"}
               />
             )}
           </CardContent>
@@ -949,7 +949,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     weakestPartWords >= MIN_WORDS_PER_SECTION;
 
   if (success) {
-    const canPurchase = review.track.sourceType === "UPLOAD" && review.track.allowPurchase;
+    const canPurchase = review.Track.sourceType === "UPLOAD" && review.Track.allowPurchase;
 
     return (
       <div className="max-w-md mx-auto text-center py-20">
@@ -973,9 +973,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <div className="flex items-center gap-3 mb-3">
               <Music className="h-5 w-5 text-neutral-600" />
               <div>
-                <p className="font-bold text-black">{review.track.title}</p>
-                {review.track.artist?.artistName && (
-                  <p className="text-sm text-neutral-500">{review.track.ArtistProfile.artistName}</p>
+                <p className="font-bold text-black">{review.Track.title}</p>
+                {review.Track.ArtistProfile?.artistName && (
+                  <p className="text-sm text-neutral-500">{review.Track.ArtistProfile.artistName}</p>
                 )}
               </div>
             </div>
@@ -1064,16 +1064,16 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               <Music className="h-6 w-6 text-black" />
             </div>
             <div>
-              <CardTitle className="text-xl">{review.track.title}</CardTitle>
+              <CardTitle className="text-xl">{review.Track.title}</CardTitle>
               <p className="text-sm text-neutral-600">
-                {review.track.Genre.map((g) => g.name).join(", ")}
+                {review.Track.Genre.map((g) => g.name).join(", ")}
               </p>
             </div>
           </div>
-          {review.track.feedbackFocus && (
+          {review.Track.feedbackFocus && (
             <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-2xl">
               <p className="text-sm font-bold text-amber-800">
-                Artist note: <span className="font-medium">{review.track.feedbackFocus}</span>
+                Artist note: <span className="font-medium">{review.Track.feedbackFocus}</span>
               </p>
             </div>
           )}
@@ -1081,7 +1081,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         <CardContent className="pt-6 space-y-4">
           {hasPlayableStems ? (
             <StemPlayer
-              trackId={review.track.id}
+              trackId={review.Track.id}
               stems={stems}
               minListenTime={MIN_LISTEN_SECONDS}
               initialListenTime={listenTime}
@@ -1092,7 +1092,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               }}
               onMinimumReached={() => {
                 setCanSubmit(true);
-                funnels.review.minimumReached(review.track.id, MIN_LISTEN_SECONDS);
+                funnels.review.minimumReached(review.Track.id, MIN_LISTEN_SECONDS);
               }}
               showListenTracker
               onAddTimestamp={(seconds) => {
@@ -1108,9 +1108,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           ) : (
             <AudioPlayer
-              sourceUrl={review.track.sourceUrl}
-              sourceType={review.track.sourceType}
-              showWaveform={review.track.sourceType === "UPLOAD"}
+              sourceUrl={review.Track.sourceUrl}
+              sourceType={review.Track.sourceType}
+              showWaveform={review.Track.sourceType === "UPLOAD"}
               minListenTime={MIN_LISTEN_SECONDS}
               initialListenTime={listenTime}
               onTimeUpdate={(seconds) => setPlayerSeconds(seconds)}
@@ -1120,7 +1120,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               }}
               onMinimumReached={() => {
                 setCanSubmit(true);
-                funnels.review.minimumReached(review.track.id, MIN_LISTEN_SECONDS);
+                funnels.review.minimumReached(review.Track.id, MIN_LISTEN_SECONDS);
               }}
               onAddTimestamp={(seconds) => {
                 addTimestampNote(seconds);
@@ -1132,8 +1132,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       </Card>
 
       {/* Project Structure (for Ableton projects) */}
-      {Boolean(review.track.abletonProjectData) && (
-        <ProjectStructure projectData={review.track.abletonProjectData as any} />
+      {Boolean(review.Track.abletonProjectData) && (
+        <ProjectStructure projectData={review.Track.abletonProjectData as any} />
       )}
 
       <Card variant="soft" elevated>

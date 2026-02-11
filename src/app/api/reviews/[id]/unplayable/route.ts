@@ -78,7 +78,7 @@ export async function POST(
     }
 
     // Check if artist has already been notified about this track's link issue
-    const shouldNotifyArtist = !review.track.linkIssueNotifiedAt;
+    const shouldNotifyArtist = !review.Track.linkIssueNotifiedAt;
 
     await prisma.$transaction([
       prisma.review.update({
@@ -88,7 +88,7 @@ export async function POST(
       }),
       prisma.reviewQueue.deleteMany({
         where: {
-          trackId: review.track.id,
+          trackId: review.Track.id,
           reviewerId: review.ReviewerProfile.id,
         },
       }),
@@ -96,7 +96,7 @@ export async function POST(
       ...(shouldNotifyArtist
         ? [
             prisma.track.update({
-              where: { id: review.track.id },
+              where: { id: review.Track.id },
               data: { linkIssueNotifiedAt: new Date() },
             }),
           ]
@@ -106,14 +106,14 @@ export async function POST(
     // Send email to artist if this is the first report
     if (shouldNotifyArtist) {
       await sendInvalidTrackLinkEmail({
-        to: review.track.ArtistProfile.User.email,
-        trackTitle: review.track.title,
-        trackId: review.track.id,
-        sourceUrl: review.track.sourceUrl,
+        to: review.Track.ArtistProfile.User.email,
+        trackTitle: review.Track.title,
+        trackId: review.Track.id,
+        sourceUrl: review.Track.sourceUrl,
       });
     }
 
-    await assignReviewersToTrack(review.track.id);
+    await assignReviewersToTrack(review.Track.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

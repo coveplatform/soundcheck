@@ -237,7 +237,7 @@ export default async function TrackDetailPage({
                 isPro={isSubscribed}
                 statsTab={
                   <StatsTab
-                    Review={track.Review}
+                    reviews={track.Review}
                     platformAverages={{
                       production: platformStats._avg.productionScore ?? 0,
                       originality: platformStats._avg.originalityScore ?? 0,
@@ -248,7 +248,7 @@ export default async function TrackDetailPage({
                 }
                 reviewsTab={
                   <ReviewsTab
-                    Review={track.Review}
+                    reviews={track.Review}
                     isFreeTier={isFreeTier}
                     trackId={track.id}
                   />

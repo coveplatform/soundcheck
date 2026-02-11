@@ -33,12 +33,12 @@ export async function POST(
 
     if (isRestricted) {
       await prisma.reviewQueue.deleteMany({
-        where: { reviewerId: ReviewerProfile.id },
+        where: { reviewerId: reviewer.id },
       });
 
       await prisma.review.updateMany({
         where: {
-          reviewerId: ReviewerProfile.id,
+          reviewerId: reviewer.id,
           status: { in: ["ASSIGNED", "IN_PROGRESS"] },
         },
         data: { status: "EXPIRED" },

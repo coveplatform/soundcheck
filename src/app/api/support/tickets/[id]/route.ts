@@ -30,7 +30,7 @@ export async function GET(
         status: true,
         createdAt: true,
         updatedAt: true,
-        messages: {
+        SupportMessage: {
           orderBy: { createdAt: "asc" },
           select: {
             id: true,

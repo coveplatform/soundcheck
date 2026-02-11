@@ -303,7 +303,7 @@ export function ActivityFeed() {
       {/* Text underneath */}
       <div className="mt-3" style={{ width: `${layout.cardSizePx}px` }}>
         <p className={`${isCompact ? "text-[13px]" : "text-sm"} font-semibold text-neutral-950 truncate`}>{activity.title}</p>
-        <p className={`${isCompact ? "text-[12px]" : "text-[13px]"} font-semibold text-neutral-700 truncate`}>{activity.artist}</p>
+        <p className={`${isCompact ? "text-[12px]" : "text-[13px]"} font-semibold text-neutral-700 truncate`}>{activity.ArtistProfile}</p>
         <p
           className={`${isCompact ? "text-[12px]" : "text-[13px]"} font-semibold leading-tight ${
             activity.type === "sale" ? "text-purple-700" : "text-neutral-700"

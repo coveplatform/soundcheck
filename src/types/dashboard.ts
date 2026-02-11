@@ -11,8 +11,8 @@ export type DashboardArtistProfile = Prisma.ArtistProfileGetPayload<{
     peerGemCount: true;
     hasSeenCreditGuide: true;
     subscriptionStatus: true;
-    reviewGenres: true;
-    tracks: {
+    Genre_ArtistReviewGenres: true;
+    Track: {
       select: {
         id: true;
         title: true;
@@ -36,7 +36,7 @@ export type MinimalArtistProfile = Prisma.ArtistProfileGetPayload<{
     id: true;
     artistName: true;
     subscriptionStatus: true;
-    tracks: {
+    Track: {
       select: {
         id: true;
         title: true;
@@ -55,7 +55,7 @@ export type MinimalArtistProfile = Prisma.ArtistProfileGetPayload<{
 }>;
 
 // Track with review info and genres
-export type DashboardTrack = DashboardArtistProfile["tracks"][number];
+export type DashboardTrack = DashboardArtistProfile["Track"][number];
 
 // Pending peer review with timestamp
 export type PendingPeerReview = Prisma.ReviewGetPayload<{

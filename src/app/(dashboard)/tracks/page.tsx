@@ -47,7 +47,7 @@ export default async function TracksPage() {
   const artistProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
     include: {
-      tracks: {
+      Track: {
         include: {
           Genre: true,
           // Only include reviews and purchases if Pro (for grid view - all users see tracks)
@@ -69,7 +69,7 @@ export default async function TracksPage() {
               createdAt: true,
             },
           } : false,
-          purchases: isPro ? {
+          Purchase: isPro ? {
             select: {
               amount: true,
             },
@@ -84,7 +84,7 @@ export default async function TracksPage() {
     redirect("/onboarding");
   }
 
-  const tracks = artistProfile.tracks;
+  const tracks = artistProfile.Track;
   const totalEarnings = basicProfile.totalEarnings / 100;
   const pendingBalance = basicProfile.pendingBalance / 100;
 
@@ -178,7 +178,7 @@ export default async function TracksPage() {
       const shareTotal = t.Review.filter((r) => r.wouldShare !== null).length;
       const sharePercent = shareTotal > 0 ? Math.round((shareYes / shareTotal) * 100) : 0;
 
-      const trackEarnings = t.purchases.reduce((sum, p) => sum + p.amount, 0) / 100;
+      const trackEarnings = t.Purchase.reduce((sum, p) => sum + p.amount, 0) / 100;
 
       return {
         id: t.id,
@@ -292,7 +292,7 @@ export default async function TracksPage() {
                     (r) => r.status === "COMPLETED"
                   ).length;
                   const totalPurchases =
-                    track.purchases.reduce((sum, p) => sum + p.amount, 0) / 100;
+                    track.Purchase.reduce((sum, p) => sum + p.amount, 0) / 100;
                   const hasReviews = track.reviewsRequested > 0;
                   const reviewProgress = hasReviews
                     ? completedReviews / track.reviewsRequested

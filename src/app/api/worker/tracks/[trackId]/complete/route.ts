@@ -125,7 +125,7 @@ export async function POST(
       where: { id: trackId },
       data: updateData,
       include: {
-        stems: true,
+        TrackStem: true,
       },
     });
 

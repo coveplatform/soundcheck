@@ -62,7 +62,7 @@ export async function POST() {
       updated: reviewsWithoutShareId.length,
       Review: reviewsWithoutShareId.map((r) => ({
         id: r.id,
-        trackTitle: r.track.title,
+        trackTitle: r.Track.title,
       })),
     });
   } catch (error) {

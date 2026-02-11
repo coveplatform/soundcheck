@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     }
 
     // Check sufficient balance
-    if (ReviewerProfile.pendingBalance < PURCHASE_AMOUNT_CENTS) {
+    if (reviewer.pendingBalance < PURCHASE_AMOUNT_CENTS) {
       return NextResponse.json(
         { error: "Insufficient balance. You need at least $0.50 to purchase a track." },
         { status: 400 }
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
       where: {
         trackId_reviewerId: {
           trackId: track.id,
-          reviewerId: ReviewerProfile.id,
+          reviewerId: reviewer.id,
         },
       },
     });
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
     // Validate referral if provided
     let validatedReferral: { reviewerId: string; shareId: string } | null = null;
     if (referral) {
-      const isValid = await validateReferral(referral, ReviewerProfile.id, trackId);
+      const isValid = await validateReferral(referral, reviewer.id, trackId);
       if (isValid) {
         validatedReferral = referral;
       }
@@ -150,7 +150,7 @@ export async function POST(request: Request) {
       // Deduct from reviewer balance
       const updated = await tx.reviewerProfile.updateMany({
         where: {
-          id: ReviewerProfile.id,
+          id: reviewer.id,
           pendingBalance: { gte: PURCHASE_AMOUNT_CENTS },
         },
         data: { pendingBalance: { decrement: PURCHASE_AMOUNT_CENTS } },
@@ -185,7 +185,7 @@ export async function POST(request: Request) {
       return tx.purchase.create({
         data: {
           trackId: track.id,
-          reviewerId: ReviewerProfile.id,
+          reviewerId: reviewer.id,
           amount: PURCHASE_AMOUNT_CENTS,
           referredByReviewerId: validatedReferral?.reviewerId ?? null,
           referralShareId: validatedReferral?.shareId ?? null,
@@ -249,7 +249,7 @@ export async function GET() {
     }
 
     const purchases = await prisma.purchase.findMany({
-      where: { reviewerId: ReviewerProfile.id },
+      where: { reviewerId: reviewer.id },
       select: {
         id: true,
         amount: true,

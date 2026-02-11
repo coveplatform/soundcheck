@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ shareId: 
   const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
   const roundedScore = Math.round(avgScore * 10) / 10;
 
-  const title = `"${review.track.title}" scored ${roundedScore}/5 on MixReflect`;
+  const title = `"${review.Track.title}" scored ${roundedScore}/5 on MixReflect`;
 
   const parts: string[] = [];
   if (review.wouldListenAgain) {
@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: { params: Promise<{ shareId: 
           url: `/r/${shareId}/opengraph-image`,
           width: 1200,
           height: 630,
-          alt: `Review of ${review.track.title}`,
+          alt: `Review of ${review.Track.title}`,
         },
       ],
     },
@@ -118,7 +118,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
       <ReferralTracker
         reviewerId={review.ReviewerProfile.id}
         shareId={shareId}
-        trackId={review.track.id}
+        trackId={review.Track.id}
       />
 
       {/* Header */}
@@ -140,10 +140,10 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
         <div className="border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           {/* Track Header */}
           <div className="p-4 border-b-2 border-black bg-black flex items-center gap-4">
-            {review.track.artworkUrl ? (
+            {review.Track.artworkUrl ? (
               <img
-                src={review.track.artworkUrl}
-                alt={review.track.title}
+                src={review.Track.artworkUrl}
+                alt={review.Track.title}
                 className="w-16 h-16 object-cover border-2 border-neutral-700 flex-shrink-0"
               />
             ) : (
@@ -153,7 +153,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
             )}
             <div className="min-w-0 flex-1">
               <h1 className="text-lg font-bold text-white truncate">
-                {review.track.title}
+                {review.Track.title}
               </h1>
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-2xl font-black text-purple-500">{roundedScore}</span>
@@ -218,7 +218,7 @@ export default async function SharePage({ params }: { params: Promise<{ shareId:
           <div className="p-4 bg-neutral-50">
             <ShareButtons
               shareId={shareId}
-              trackTitle={review.track.title}
+              trackTitle={review.Track.title}
               score={roundedScore}
             />
           </div>

@@ -30,7 +30,7 @@ export default async function EarningsPage() {
           },
         },
       },
-      payouts: {
+      Payout: {
         orderBy: { createdAt: "desc" },
         take: 10,
       },
@@ -178,11 +178,11 @@ export default async function EarningsPage() {
             <CardContent className="pt-6">
               <p className="text-xs font-mono tracking-widest text-black/40 uppercase mb-4">payout history</p>
               
-              {reviewerProfile.payouts.length === 0 ? (
+              {reviewerProfile.Payout.length === 0 ? (
                 <p className="text-sm text-black/40">No payouts yet</p>
               ) : (
                 <div className="space-y-2">
-                  {reviewerProfile.payouts.map((payout: any) => (
+                  {reviewerProfile.Payout.map((payout: any) => (
                     <div
                       key={payout.id}
                       className="flex items-center justify-between gap-3 py-2"

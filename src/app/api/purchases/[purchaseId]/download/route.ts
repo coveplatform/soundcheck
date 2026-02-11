@@ -44,7 +44,7 @@ export async function GET(
     }
 
     // Verify track is an upload
-    if (purchase.track.sourceType !== "UPLOAD") {
+    if (purchase.Track.sourceType !== "UPLOAD") {
       return NextResponse.json(
         { error: "Only uploaded tracks can be downloaded" },
         { status: 400 }
@@ -53,7 +53,7 @@ export async function GET(
 
     // Generate fresh download URL (7 day expiry)
     const downloadUrl = await generateDownloadUrl(
-      purchase.track.sourceUrl,
+      purchase.Track.sourceUrl,
       7 * 24 * 60 * 60
     );
 
@@ -78,7 +78,7 @@ export async function GET(
     return NextResponse.json({
       success: true,
       downloadUrl,
-      trackTitle: purchase.track.title,
+      trackTitle: purchase.Track.title,
       expiresIn: "7 days",
     });
   } catch (error) {

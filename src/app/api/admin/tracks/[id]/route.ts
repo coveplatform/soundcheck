@@ -75,7 +75,7 @@ export async function POST(
       include: {
         Genre: true,
         Review: { select: { reviewerId: true, status: true } },
-        queueEntries: { select: { reviewerId: true } },
+        ReviewQueue: { select: { reviewerId: true } },
       },
     });
 
@@ -127,7 +127,7 @@ export async function POST(
       const hasExistingReview = track.Review.some(rev => rev.reviewerId === r.id);
       if (hasExistingReview) reasons.push("already has review entry for this track");
 
-      const hasQueueEntry = track.queueEntries.some(q => q.reviewerId === r.id);
+      const hasQueueEntry = track.ReviewQueue.some(q => q.reviewerId === r.id);
       if (hasQueueEntry) reasons.push("already in queue for this track");
 
       const isEligible = eligibleReviewers.some(e => e.id === r.id);
@@ -148,7 +148,7 @@ export async function POST(
       where: { id: trackId },
       include: {
         Review: { select: { reviewerId: true, status: true } },
-        queueEntries: {
+        ReviewQueue: {
           include: { ReviewerProfile: { include: { User: { select: { email: true } } } } }
         },
       },
@@ -164,7 +164,7 @@ export async function POST(
       eligibleCount: eligibleReviewers.length,
       reviewerDebug,
       afterAssignment: {
-        queueEntries: updatedTrack?.queueEntries.map(q => q.ReviewerProfile.User.email) ?? [],
+        ReviewQueue: updatedTrack?.ReviewQueue.map(q => q.ReviewerProfile.User.email) ?? [],
         Review: updatedTrack?.Review ?? [],
       },
     });

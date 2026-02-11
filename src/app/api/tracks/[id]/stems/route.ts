@@ -37,7 +37,7 @@ export async function GET(
       where: { id },
       select: {
         hasStems: true,
-        Stem: {
+        TrackStem: {
           orderBy: { order: "asc" },
         },
       },
@@ -49,7 +49,7 @@ export async function GET(
 
     return NextResponse.json({
       hasStems: track.hasStems,
-      stems: track.stems,
+      stems: track.TrackStem,
     });
   } catch (error) {
     console.error("Get stems error:", error);
@@ -74,10 +74,10 @@ export async function POST(
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { artistProfile: { select: { id: true } } },
+      select: { ArtistProfile: { select: { id: true } } },
     });
 
-    if (!user?.artistProfile) {
+    if (!user?.ArtistProfile) {
       return NextResponse.json(
         { error: "Artist profile required" },
         { status: 403 }
@@ -94,7 +94,7 @@ export async function POST(
       select: {
         artistId: true,
         status: true,
-        _count: { select: { stems: true } },
+        _count: { select: { TrackStem: true } },
       },
     });
 
@@ -102,7 +102,7 @@ export async function POST(
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
-    if (track.artistId !== user.artistProfile.id) {
+    if (track.artistId !== user.ArtistProfile.id) {
       return NextResponse.json(
         { error: "You don't own this track" },
         { status: 403 }
@@ -147,7 +147,7 @@ export async function POST(
     }
 
     // Check if adding these stems would exceed the limit
-    if (track._count.stems + data.stems.length > 10) {
+    if (track._count.TrackStem + data.stems.length > 10) {
       return NextResponse.json(
         { error: "Maximum 10 stems per track" },
         { status: 400 }
@@ -177,7 +177,7 @@ export async function POST(
         where: { id },
         data: { hasStems: true },
         include: {
-          Stem: {
+          TrackStem: {
             orderBy: { order: "asc" },
           },
         },
@@ -217,10 +217,10 @@ export async function DELETE(
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { artistProfile: { select: { id: true } } },
+      select: { ArtistProfile: { select: { id: true } } },
     });
 
-    if (!user?.artistProfile) {
+    if (!user?.ArtistProfile) {
       return NextResponse.json(
         { error: "Artist profile required" },
         { status: 403 }
@@ -239,7 +239,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
-    if (track.artistId !== user.artistProfile.id) {
+    if (track.artistId !== user.ArtistProfile.id) {
       return NextResponse.json(
         { error: "You don't own this track" },
         { status: 403 }

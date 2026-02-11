@@ -64,7 +64,7 @@ export function DiscoverMockup() {
             {/* Track Info */}
             <div className="mt-2">
               <p className="font-semibold text-neutral-950 text-sm truncate">{track.title}</p>
-              <p className="text-xs text-neutral-500 truncate">{track.artist}</p>
+              <p className="text-xs text-neutral-500 truncate">{track.ArtistProfile}</p>
               <p className="text-xs text-neutral-400 mt-0.5">{track.genre}</p>
             </div>
           </div>

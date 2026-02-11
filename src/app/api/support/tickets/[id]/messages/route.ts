@@ -52,7 +52,7 @@ export async function POST(
       where: { id },
       data: {
         status: "OPEN",
-        messages: {
+        SupportMessage: {
           create: {
             authorType: "USER",
             authorUserId: session.user.id,

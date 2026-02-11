@@ -76,7 +76,7 @@ export function DebugAssignButton({ trackId }: { trackId: string }) {
           <div>
             <div className="font-bold mb-2">Track Info</div>
             <div className="text-neutral-600">
-              Status: {result.track.status} | Genres: {result.track.Genre.join(", ")} | Reviews requested: {result.track.reviewsRequested}
+              Status: {result.Track.status} | Genres: {result.Track.Genre.join(", ")} | Reviews requested: {result.Track.reviewsRequested}
             </div>
           </div>
 

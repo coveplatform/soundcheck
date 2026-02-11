@@ -49,7 +49,7 @@ export function getTopWords(
 }
 
 // Analyze feedback patterns
-export function analyzeFeedbackPatterns(Review: Review[]) {
+export function analyzeFeedbackPatterns(reviews: Review[]) {
   const praises = reviews
     .map((r) => r.bestPart)
     .filter((text): text is string => Boolean(text));
@@ -150,7 +150,7 @@ export function calculateReviewVelocity(
   );
   const weeksSinceStart =
     (Date.now() - new Date(oldestTrack.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 7);
-  const totalReviews = tracks.reduce((sum, t) => sum + t.ReviewCompleted, 0);
+  const totalReviews = tracks.reduce((sum, t) => sum + t.reviewsCompleted, 0);
   const reviewsPerWeek = weeksSinceStart > 0 ? totalReviews / weeksSinceStart : 0;
 
   return {

@@ -18,21 +18,21 @@ export function PendingReviewCard({ review }: PendingReviewCardProps) {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-base font-semibold text-black truncate">
-            {review.track.title}
+            {review.Track.title}
           </p>
           <div className="flex items-center gap-2 flex-wrap">
             <p className="text-sm text-black/50 truncate">
-              by {review.track.artist?.artistName ?? "Unknown"}
+              by {review.Track.ArtistProfile?.artistName ?? "Unknown"}
             </p>
             <span className="text-xs text-black/30">•</span>
             <p className="text-xs text-black/40">
               {formatRelativeDate(review.createdAt)}
             </p>
           </div>
-          {review.track.Genre && review.track.Genre.length > 0 && (
+          {review.Track.Genre && review.Track.Genre.length > 0 && (
             <div className="mt-1">
               <GenreTagList
-                genres={review.track.Genre}
+                genres={review.Track.Genre}
                 variant="neutral"
                 size="sm"
                 maxDisplay={2}

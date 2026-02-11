@@ -53,26 +53,26 @@ export function CompletedReview({
               <Music className="h-6 w-6 text-black" />
             </div>
             <div>
-              <CardTitle className="text-xl">{review.track.title}</CardTitle>
+              <CardTitle className="text-xl">{review.Track.title}</CardTitle>
               <p className="text-sm text-neutral-600">
-                {review.track.Genre.map((g) => g.name).join(", ")}
+                {review.Track.Genre.map((g) => g.name).join(", ")}
               </p>
             </div>
           </div>
         </CardHeader>
         <CardContent className="pt-6">
-          {review.track.hasStems && review.track.stems && review.track.stems.length > 0 ? (
+          {review.Track.hasStems && review.Track.TrackStem && review.Track.TrackStem.length > 0 ? (
             <StemPlayer
-              trackId={review.track.id}
-              stems={review.track.stems}
+              trackId={review.Track.id}
+              stems={review.Track.TrackStem}
               showListenTracker={false}
             />
           ) : (
             <AudioPlayer
-              sourceUrl={review.track.sourceUrl}
-              sourceType={review.track.sourceType}
+              sourceUrl={review.Track.sourceUrl}
+              sourceType={review.Track.sourceType}
               showListenTracker={false}
-              showWaveform={review.track.sourceType === "UPLOAD"}
+              showWaveform={review.Track.sourceType === "UPLOAD"}
             />
           )}
         </CardContent>
@@ -171,7 +171,7 @@ export function CompletedReview({
       </Card>
 
       {/* Purchase Card */}
-      {review.track.allowPurchase && (
+      {review.Track.allowPurchase && (
         <Card variant="soft" elevated>
           <CardContent className="pt-6">
             {hasPurchased ? (

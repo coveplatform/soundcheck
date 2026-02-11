@@ -45,7 +45,7 @@ export default async function ReviewQueuePage({
       totalPeerReviews: true,
       peerReviewRating: true,
       peerGemCount: true,
-      reviewGenres: {
+      Genre_ArtistReviewGenres: {
         select: { id: true, name: true },
       },
     },
@@ -163,11 +163,11 @@ export default async function ReviewQueuePage({
                           <Music className="h-5 w-5 text-purple-600" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-base font-semibold text-black truncate">{review.track.title}</p>
-                          <p className="text-sm text-neutral-600 mb-1">by {review.track.ArtistProfile.artistName}</p>
+                          <p className="text-base font-semibold text-black truncate">{review.Track.title}</p>
+                          <p className="text-sm text-neutral-600 mb-1">by {review.Track.ArtistProfile.artistName}</p>
                           <div className="flex items-center gap-2 flex-wrap">
                             <GenreTagList
-                              genres={review.track.Genre}
+                              genres={review.Track.Genre}
                               variant="neutral"
                               size="sm"
                               maxDisplay={2}
@@ -178,9 +178,9 @@ export default async function ReviewQueuePage({
                               </span>
                             )}
                           </div>
-                          {review.track.feedbackFocus && (
+                          {review.Track.feedbackFocus && (
                             <p className="text-xs text-purple-600 font-medium mt-1">
-                              Focus: {review.track.feedbackFocus}
+                              Focus: {review.Track.feedbackFocus}
                             </p>
                           )}
                         </div>
@@ -251,7 +251,7 @@ export default async function ReviewQueuePage({
             </div>
 
             {/* Review Genres */}
-            {artistProfile.reviewGenres && artistProfile.reviewGenres.length > 0 && (
+            {artistProfile.Genre_ArtistReviewGenres && artistProfile.Genre_ArtistReviewGenres.length > 0 && (
               <div className="border-2 border-neutral-200 rounded-2xl bg-white p-6 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
                   <Tag className="h-4 w-4 text-purple-600" />
@@ -260,7 +260,7 @@ export default async function ReviewQueuePage({
                   </p>
                 </div>
                 <GenreTagList
-                  genres={artistProfile.reviewGenres}
+                  genres={artistProfile.Genre_ArtistReviewGenres}
                   variant="neutral"
                   size="sm"
                 />

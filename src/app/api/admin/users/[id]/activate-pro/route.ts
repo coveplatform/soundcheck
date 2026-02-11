@@ -26,7 +26,7 @@ export async function POST(
     const user = await prisma.user.findUnique({
       where: { id },
       include: {
-        artistProfile: {
+        ArtistProfile: {
           select: {
             id: true,
             subscriptionStatus: true,
@@ -41,7 +41,7 @@ export async function POST(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    if (!user.artistProfile) {
+    if (!user.ArtistProfile) {
       return NextResponse.json(
         { error: "User does not have an artist profile" },
         { status: 400 }
@@ -50,7 +50,7 @@ export async function POST(
 
     // Activate pro subscription
     const updatedProfile = await prisma.artistProfile.update({
-      where: { id: user.artistProfile.id },
+      where: { id: user.ArtistProfile.id },
       data: {
         subscriptionStatus: "active",
         subscriptionTier: "pro",

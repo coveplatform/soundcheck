@@ -35,11 +35,11 @@ export default async function BusinessPage() {
     ? await prisma.artistProfile.findUnique({
         where: { userId: session.user.id },
         include: {
-          tracks: {
+          Track: {
             include: {
               Purchase: {
                 include: {
-                  ReviewerProfile: {
+                  ReviewerProfile_Purchase_reviewerIdToReviewerProfile: {
                     include: {
                       User: { select: { name: true } },
                     },
@@ -59,7 +59,7 @@ export default async function BusinessPage() {
                   },
                 },
               },
-              affiliateLinks: {
+              TrackAffiliateLink: {
                 orderBy: { createdAt: "desc" },
                 take: 1,
               },
@@ -90,14 +90,14 @@ export default async function BusinessPage() {
 
   if (isPro && artistProfileWithData) {
     // Calculate internal earnings (from peer reviewers)
-    allInternalPurchases = artistProfileWithData.tracks.flatMap((track) =>
-      track.purchases.map((purchase) => ({
+    allInternalPurchases = artistProfileWithData.Track.flatMap((track) =>
+      track.Purchase.map((purchase) => ({
         id: purchase.id,
         trackTitle: track.title,
         trackId: track.id,
         amount: purchase.amount,
         createdAt: purchase.createdAt.toISOString(),
-        buyerName: purchase.ReviewerProfile.User.name || "Anonymous",
+        buyerName: purchase.ReviewerProfile_Purchase_reviewerIdToReviewerProfile.User.name || "Anonymous",
         type: "internal" as const,
       }))
     );
@@ -107,8 +107,8 @@ export default async function BusinessPage() {
     );
 
     // Calculate external earnings (from public sales)
-    allExternalPurchases = artistProfileWithData.tracks.flatMap((track) =>
-      track.externalPurchases.map((purchase) => ({
+    allExternalPurchases = artistProfileWithData.Track.flatMap((track) =>
+      track.ExternalPurchase.map((purchase) => ({
         id: purchase.id,
         trackTitle: track.title,
         trackId: track.id,
@@ -125,7 +125,7 @@ export default async function BusinessPage() {
     );
 
     // Get tracks data
-    uploadedTracks = artistProfileWithData.tracks.map((track) => ({
+    uploadedTracks = artistProfileWithData.Track.map((track) => ({
       id: track.id,
       title: track.title,
       sourceType: track.sourceType,
@@ -133,7 +133,7 @@ export default async function BusinessPage() {
       sharingMode: track.sharingMode,
       salePrice: track.salePrice,
       publicPlayCount: track.publicPlayCount,
-      externalPurchasesCount: track._count.externalPurchases,
+      externalPurchasesCount: track._count.ExternalPurchase,
     })).filter((t) => t.sourceType === "UPLOAD");
 
     tracksForSale = uploadedTracks.filter((t) => t.sharingEnabled && t.sharingMode === "SALES");
@@ -168,9 +168,9 @@ export default async function BusinessPage() {
       playCount: link.playCount,
       purchaseCount: link.purchaseCount,
       totalRevenue: link.totalRevenue,
-      trackId: link.track.id,
-      trackTitle: link.track.title,
-      trackShareId: link.track.trackShareId,
+      trackId: link.Track.id,
+      trackTitle: link.Track.title,
+      trackShareId: link.Track.trackShareId,
     }));
 
     totalEarnings = totalInternalEarnings + totalExternalEarnings;

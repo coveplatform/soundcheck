@@ -51,15 +51,18 @@ export async function POST() {
     });
 
     // Create artist profile for admin
-    const artistProfile = await prisma.artistProfile.upsert({
+    let artistProfile = await prisma.artistProfile.findUnique({
       where: { userId: adminUserId },
-      update: {},
-      create: {
-        userId: adminUserId,
-        artistName: "Preview Artist",
-        Genre: { connect: [{ id: genre.id }] },
-      },
     });
+
+    if (!artistProfile) {
+      artistProfile = await prisma.artistProfile.create({
+        data: {
+          userId: adminUserId,
+          artistName: "Preview Artist",
+        },
+      });
+    }
 
     // Check for existing single-review preview track
     let track = await prisma.track.findFirst({
@@ -75,29 +78,37 @@ export async function POST() {
       // Create test reviewer
       const passwordHash = await hash("test123456", 12);
 
-      const reviewerUser = await prisma.user.upsert({
+      let reviewerUser = await prisma.user.findUnique({
         where: { email: "preview-reviewer-single@soundcheck.com" },
-        update: {},
-        create: {
-          email: "preview-reviewer-single@soundcheck.com",
-          password: passwordHash,
-          name: "Sarah",
-          isReviewer: true,
-          emailVerified: new Date(),
-        },
       });
 
-      const reviewerProfile = await prisma.reviewerProfile.upsert({
+      if (!reviewerUser) {
+        reviewerUser = await prisma.user.create({
+          data: {
+            email: "preview-reviewer-single@soundcheck.com",
+            password: passwordHash,
+            name: "Sarah",
+            isReviewer: true,
+            emailVerified: new Date(),
+          },
+        });
+      }
+
+      let reviewerProfile = await prisma.reviewerProfile.findUnique({
         where: { userId: reviewerUser.id },
-        update: {},
-        create: {
-          userId: reviewerUser.id,
-          tier: "NORMAL",
-          completedOnboarding: true,
-          onboardingQuizPassed: true,
-          Genre: { connect: [{ id: genre.id }] },
-        },
       });
+
+      if (!reviewerProfile) {
+        reviewerProfile = await prisma.reviewerProfile.create({
+          data: {
+            userId: reviewerUser.id,
+            tier: "NORMAL",
+            completedOnboarding: true,
+            onboardingQuizPassed: true,
+            Genre: { connect: [{ id: genre.id }] },
+          },
+        });
+      }
 
       // Create track with 1 review (simulating free tier)
       track = await prisma.track.create({

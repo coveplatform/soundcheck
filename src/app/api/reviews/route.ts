@@ -194,7 +194,7 @@ export async function POST(request: Request) {
       where: { id: data.reviewId },
       include: {
         ReviewerProfile: true,
-        peerReviewerArtist: { include: { User: true } },
+        ArtistProfile: { include: { User: true } },
         Track: {
           include: {
             ArtistProfile: { include: { User: true } },
@@ -212,12 +212,12 @@ export async function POST(request: Request) {
 
     if (isPeerReview) {
       // Peer review - check if user owns the peer reviewer artist profile
-      if (!review.peerReviewerArtist || review.peerReviewerArtist.userId !== session.user.id) {
+      if (!review.ArtistProfile || review.ArtistProfile.userId !== session.user.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
     } else {
       // Legacy review - check if user owns the reviewer profile
-      if (!review.reviewer || review.ReviewerProfile.userId !== session.user.id) {
+      if (!review.ReviewerProfile || review.ReviewerProfile.userId !== session.user.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
     }
@@ -404,7 +404,7 @@ export async function POST(request: Request) {
       });
 
       const nextTrackStatus =
-        countedCompletedReviews >= review.track.reviewsRequested
+        countedCompletedReviews >= review.Track.reviewsRequested
           ? ("COMPLETED" as const)
           : ("IN_PROGRESS" as const);
 
@@ -476,19 +476,19 @@ export async function POST(request: Request) {
 
     await updateReviewerTier(review.reviewerId);
 
-    const milestoneHalf = Math.ceil(result.track.reviewsRequested / 2);
-    const milestoneFull = result.track.reviewsRequested;
+    const milestoneHalf = Math.ceil(result.Track.reviewsRequested / 2);
+    const milestoneFull = result.Track.reviewsRequested;
 
     if (
-      result.track.artistEmail &&
+      result.Track.artistEmail &&
       (result.completedReviews === milestoneHalf ||
         result.completedReviews === milestoneFull)
     ) {
       await sendReviewProgressEmail(
-        result.track.artistEmail,
-        result.track.title,
+        result.Track.artistEmail,
+        result.Track.title,
         result.completedReviews,
-        result.track.reviewsRequested
+        result.Track.reviewsRequested
       );
     }
 

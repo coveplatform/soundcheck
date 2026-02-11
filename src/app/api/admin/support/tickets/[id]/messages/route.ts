@@ -29,7 +29,7 @@ export async function POST(
     await prisma.supportTicket.update({
       where: { id },
       data: {
-        messages: {
+        SupportMessage: {
           create: {
             authorType: "ADMIN",
             authorUserId: session.user.id,

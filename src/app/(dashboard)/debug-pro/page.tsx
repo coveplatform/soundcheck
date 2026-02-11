@@ -15,11 +15,11 @@ export default async function DebugProPage() {
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
-      artistProfile: true,
+      ArtistProfile: true,
     },
   });
 
-  const isPro = user?.artistProfile?.subscriptionStatus === "active";
+  const isPro = user?.ArtistProfile?.subscriptionStatus === "active";
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
@@ -31,13 +31,13 @@ export default async function DebugProPage() {
           <p><strong>Session User ID:</strong> {session.user.id}</p>
           <p><strong>User ID from DB:</strong> {user?.id || "not found"}</p>
           <p><strong>User Email from DB:</strong> {user?.email || "not found"}</p>
-          <p><strong>Has Artist Profile:</strong> {user?.artistProfile ? "Yes" : "No"}</p>
-          {user?.artistProfile && (
+          <p><strong>Has Artist Profile:</strong> {user?.ArtistProfile ? "Yes" : "No"}</p>
+          {user?.ArtistProfile && (
             <>
-              <p><strong>Artist Profile ID:</strong> {user.artistProfile.id}</p>
-              <p><strong>Artist Name:</strong> {user.artistProfile.artistName}</p>
-              <p><strong>Subscription Status:</strong> {user.artistProfile.subscriptionStatus || "null"}</p>
-              <p><strong>Subscription Tier:</strong> {user.artistProfile.subscriptionTier || "null"}</p>
+              <p><strong>Artist Profile ID:</strong> {user.ArtistProfile.id}</p>
+              <p><strong>Artist Name:</strong> {user.ArtistProfile.artistName}</p>
+              <p><strong>Subscription Status:</strong> {user.ArtistProfile.subscriptionStatus || "null"}</p>
+              <p><strong>Subscription Tier:</strong> {user.ArtistProfile.subscriptionTier || "null"}</p>
             </>
           )}
           <p className="text-2xl font-black pt-4">
