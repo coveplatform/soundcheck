@@ -7,9 +7,30 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 import { checkRateLimit, RATE_LIMITS } from "./rate-limit";
 
+// Wrap PrismaAdapter to handle Prisma 7 relation casing (User vs user)
+function createAdapter(prismaClient: typeof prisma) {
+  const base = PrismaAdapter(prismaClient);
+  return {
+    ...base,
+    async getUserByAccount(providerAccountId: { provider: string; providerAccountId: string }) {
+      const account = await (prismaClient.account as any).findUnique({
+        where: { provider_providerAccountId: providerAccountId },
+        include: { User: true, user: true },
+      }).catch(() => null) ?? await (prismaClient.account as any).findUnique({
+        where: { provider_providerAccountId: providerAccountId },
+        include: { User: true },
+      }).catch(() => null) ?? await (prismaClient.account as any).findUnique({
+        where: { provider_providerAccountId: providerAccountId },
+        include: { user: true },
+      }).catch(() => null);
+      return (account as any)?.user ?? (account as any)?.User ?? null;
+    },
+  };
+}
+
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
-  adapter: PrismaAdapter(prisma),
+  adapter: createAdapter(prisma) as any,
   providers: [
     CredentialsProvider({
       name: "credentials",
