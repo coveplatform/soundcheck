@@ -393,11 +393,32 @@ export async function assignReviewersToTrack(trackId: string) {
       expiresAt.setHours(expiresAt.getHours() + 48);
 
       if (peersToAssign.length > 0) {
+        // Ensure each peer reviewer has a ReviewerProfile (required by FK constraints)
+        const peerData: { artistProfileId: string; reviewerProfileId: string }[] = [];
+        for (const peer of peersToAssign) {
+          let rp = await tx.reviewerProfile.findUnique({
+            where: { userId: (peer as any).User.id },
+          });
+          if (!rp) {
+            rp = await tx.reviewerProfile.create({
+              data: {
+                userId: (peer as any).User.id,
+                completedOnboarding: true,
+                onboardingQuizPassed: true,
+              },
+            });
+          }
+          peerData.push({
+            artistProfileId: peer.id,
+            reviewerProfileId: rp.id,
+          });
+        }
+
         await tx.reviewQueue.createMany({
-          data: peersToAssign.map((peer: any) => ({
+          data: peerData.map((d) => ({
             trackId,
-            reviewerId: peer.id, // placeholder - required field
-            artistReviewerId: peer.id,
+            reviewerId: d.reviewerProfileId,
+            artistReviewerId: d.artistProfileId,
             expiresAt,
             priority: 0,
           })),
@@ -405,10 +426,10 @@ export async function assignReviewersToTrack(trackId: string) {
         });
 
         await tx.review.createMany({
-          data: peersToAssign.map((peer: any) => ({
+          data: peerData.map((d) => ({
             trackId,
-            reviewerId: peer.id, // placeholder - required field
-            peerReviewerArtistId: peer.id,
+            reviewerId: d.reviewerProfileId,
+            peerReviewerArtistId: d.artistProfileId,
             isPeerReview: true,
             status: "ASSIGNED",
           })),
