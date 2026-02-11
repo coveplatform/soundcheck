@@ -40,16 +40,16 @@ export default async function ArtistReviewerProfilePage({
     },
   });
 
-  if (!reviewer || ReviewerProfile.isRestricted) {
+  if (!reviewer || reviewer.isRestricted) {
     notFound();
   }
 
-  const fullName = ReviewerProfile.User.name ?? "Reviewer";
+  const fullName = reviewer.User.name ?? "Reviewer";
   const firstName = fullName.trim().split(/\s+/g)[0] || "Reviewer";
   const initial = (fullName.trim()[0] || "?").toUpperCase();
 
-  const lastActive = ReviewerProfile.lastReviewDate
-    ? new Date(ReviewerProfile.lastReviewDate).toLocaleDateString()
+  const lastActive = reviewer.lastReviewDate
+    ? new Date(reviewer.lastReviewDate).toLocaleDateString()
     : "—";
 
   return (
@@ -75,16 +75,16 @@ export default async function ArtistReviewerProfilePage({
               <h1 className="text-xl font-black truncate">{firstName}</h1>
               <div className="mt-2 flex flex-wrap gap-2 text-sm">
                 <span className="inline-flex items-center px-2.5 py-1 border-2 border-black bg-white font-bold">
-                  Tier: {ReviewerProfile.tier}
+                  Tier: {reviewer.tier}
                 </span>
                 <span className="inline-flex items-center px-2.5 py-1 border-2 border-black bg-white font-bold">
-                  Avg rating: {ReviewerProfile.averageRating.toFixed(2)}
+                  Avg rating: {reviewer.averageRating.toFixed(2)}
                 </span>
                 <span className="inline-flex items-center px-2.5 py-1 border-2 border-black bg-white font-bold">
-                  Reviews: {ReviewerProfile._count.Review}
+                  Reviews: {reviewer._count.Review}
                 </span>
                 <span className="inline-flex items-center px-2.5 py-1 border-2 border-black bg-white font-bold">
-                  Gems: {ReviewerProfile.gemCount}
+                  Gems: {reviewer.gemCount}
                 </span>
                 <span className="inline-flex items-center px-2.5 py-1 border-2 border-black bg-white font-bold">
                   Last active: {lastActive}
@@ -95,8 +95,8 @@ export default async function ArtistReviewerProfilePage({
 
           <div>
             <h2 className="text-sm font-black mb-2">Genres</h2>
-            {ReviewerProfile.Genre.length > 0 ? (
-              <GenreTagList genres={ReviewerProfile.Genre} variant="neutral" size="sm" />
+            {reviewer.Genre.length > 0 ? (
+              <GenreTagList genres={reviewer.Genre} variant="neutral" size="sm" />
             ) : (
               <p className="text-sm text-neutral-600">No genres listed.</p>
             )}
