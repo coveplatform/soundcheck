@@ -79,7 +79,7 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
       <Icon className="w-4 h-4 opacity-70" />
       <span className="flex-1">{label}</span>
       {badge !== undefined && (
-        <span className="bg-lime-100 text-lime-700 text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+        <span className="bg-purple-100 text-purple-700 text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
           {badge}
         </span>
       )}
@@ -309,7 +309,7 @@ function MobileBottomNav({
               <div className="relative">
                 <Icon className="w-5 h-5 flex-shrink-0" />
                 {link.href === "/review" && pendingReviews > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-lime-600 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
                     {pendingReviews}
                   </span>
                 )}
