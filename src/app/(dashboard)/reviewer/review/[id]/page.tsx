@@ -1297,15 +1297,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               {/* Would add to playlist */}
               <div className="space-y-2">
                 <Label className="text-sm">Add to playlist?</Label>
-                <div className="flex gap-1">
+                <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setWouldAddToPlaylist(true)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
+                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldAddToPlaylist === true
                         ? "border-purple-400 bg-purple-600 text-white"
-                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
+                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
                     )}
                   >
                     Yes
@@ -1314,10 +1314,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldAddToPlaylist(false)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
+                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldAddToPlaylist === false
                         ? "border-neutral-700 bg-neutral-800 text-white"
-                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
+                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
                     )}
                   >
                     No
@@ -1328,15 +1328,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               {/* Would share */}
               <div className="space-y-2">
                 <Label className="text-sm">Share with a friend?</Label>
-                <div className="flex gap-1">
+                <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setWouldShare(true)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
+                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldShare === true
                         ? "border-purple-400 bg-purple-600 text-white"
-                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
+                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
                     )}
                   >
                     Yes
@@ -1345,10 +1345,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldShare(false)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
+                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldShare === false
                         ? "border-neutral-700 bg-neutral-800 text-white"
-                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
+                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
                     )}
                   >
                     No
@@ -1359,15 +1359,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               {/* Would follow */}
               <div className="space-y-2">
                 <Label className="text-sm">Follow this artist?</Label>
-                <div className="flex gap-1">
+                <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setWouldFollow(true)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
+                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldFollow === true
                         ? "border-purple-400 bg-purple-600 text-white"
-                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
+                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
                     )}
                   >
                     Yes
@@ -1376,10 +1376,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldFollow(false)}
                     className={cn(
-                      "flex-1 py-2 px-2 text-xs font-bold transition-colors duration-150 ease-out rounded-lg border",
+                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldFollow === false
                         ? "border-neutral-700 bg-neutral-800 text-white"
-                        : "border-black/10 bg-white text-black hover:bg-neutral-50"
+                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
                     )}
                   >
                     No
