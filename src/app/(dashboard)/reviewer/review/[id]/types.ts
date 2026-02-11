@@ -31,7 +31,9 @@ export interface Review {
   };
   ReviewerProfile: {
     tier: string;
-  };
+  } | null;
+  isPeerReview?: boolean;
+  peerReviewerArtistId?: string | null;
 }
 
 export type FirstImpression = "STRONG_HOOK" | "DECENT" | "LOST_INTEREST";

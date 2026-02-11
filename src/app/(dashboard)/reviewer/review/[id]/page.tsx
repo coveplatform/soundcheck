@@ -482,7 +482,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       funnels.review.complete(
         review.Track.id,
         review.id,
-        data.earnings || getTierEarningsCents(review.ReviewerProfile.tier)
+        data.earnings || (review.ReviewerProfile ? getTierEarningsCents(review.ReviewerProfile.tier) : 0)
       );
 
       try {
@@ -929,7 +929,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-lime-500 border-2 border-black mb-4 rounded-full">
           <DollarSign className="h-5 w-5 text-black" />
           <span className="font-black text-lg">
-            +{formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier))}
+            {review.ReviewerProfile
+              ? `+${formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier))}`
+              : "+1 credit"}
           </span>
         </div>
         <p className="text-neutral-600 mb-6">
@@ -1527,7 +1529,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <div className="min-w-0">
               <p className="text-neutral-400 text-sm font-medium">You&apos;ll earn</p>
               <p className="text-3xl font-black text-lime-500">
-                {formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier))}
+                {review.ReviewerProfile
+                  ? formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier))
+                  : "1 credit"}
               </p>
               {draftSavedAt ? (
                 <p className="text-neutral-400 text-xs font-mono mt-2">
@@ -1592,7 +1596,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             className="w-full"
           >
             {canSubmit && meetsTextMinimum
-              ? `Submit Review & Earn ${formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier))}`
+              ? `Submit Review & Earn ${review.ReviewerProfile ? formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier)) : "1 credit"}`
               : "Complete requirements to submit"}
           </Button>
         </CardContent>
