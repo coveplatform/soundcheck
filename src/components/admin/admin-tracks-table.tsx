@@ -22,6 +22,7 @@ export type AdminTrackRow = {
   promoCode: string | null;
   createdAt: Date;
   reviewsRequested: number;
+  creditsSpent: number;
   ArtistProfile: {
     subscriptionStatus: string | null;
     reviewCredits: number;
@@ -152,7 +153,7 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
               <th className="text-left font-medium px-4 py-3">Title</th>
               <th className="text-left font-medium px-4 py-3">Status</th>
               <th className="text-left font-medium px-4 py-3">Package</th>
-              <th className="text-left font-medium px-4 py-3">Payment</th>
+              <th className="text-left font-medium px-4 py-3">Credits</th>
               <th className="text-left font-medium px-4 py-3">Artist</th>
               <th className="text-left font-medium px-4 py-3">Created</th>
               <th className="text-left font-medium px-4 py-3">Actions</th>
@@ -207,13 +208,19 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    {!track.Payment && track.status !== "PENDING_PAYMENT" ? (
-                      <span className="px-1.5 py-0.5 text-xs font-bold bg-blue-100 text-blue-700 rounded">
-                        REVIEW CREDITS
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs font-bold">
+                        {track.creditsSpent} spent
                       </span>
-                    ) : (
-                      track.Payment?.status ?? ""
-                    )}
+                      <span className="text-xs text-neutral-400">
+                        {track.ArtistProfile.reviewCredits} remaining
+                      </span>
+                      {track.Payment?.status === "COMPLETED" && (
+                        <span className="px-1.5 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded w-fit">
+                          PAID
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col">
@@ -233,9 +240,6 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                             FREE
                           </span>
                         )}
-                        <span className="text-xs text-neutral-400">
-                          {track.ArtistProfile.reviewCredits} credits
-                        </span>
                       </span>
                     </div>
                   </td>

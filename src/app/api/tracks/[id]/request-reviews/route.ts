@@ -113,6 +113,7 @@ export async function POST(
         data: {
           packageType: hasExistingReviews ? track.packageType : packageType,
           reviewsRequested: newReviewsRequested,
+          creditsSpent: { increment: cost },
           status: newStatus,
           paidAt: track.paidAt ?? new Date(),
           completedAt: null, // Clear completion if it was completed

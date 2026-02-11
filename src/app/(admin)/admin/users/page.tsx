@@ -54,6 +54,7 @@ export default async function AdminUsersPage({
         select: {
           completedOnboarding: true,
           totalPeerReviews: true,
+          reviewCredits: true,
         },
       },
       ReviewerProfile: {
@@ -145,6 +146,7 @@ export default async function AdminUsersPage({
                 <th className="text-left font-medium px-4 py-3">Name</th>
                 <th className="text-left font-medium px-4 py-3">Roles</th>
                 <th className="text-left font-medium px-4 py-3">Reviewer Status</th>
+                <th className="text-left font-medium px-4 py-3">Credits</th>
                 <th className="text-left font-medium px-4 py-3">Created</th>
               </tr>
             </thead>
@@ -180,13 +182,20 @@ export default async function AdminUsersPage({
                     )}
                   </td>
                   <td className="px-4 py-3">
+                    {u.ArtistProfile ? (
+                      <span className="font-medium tabular-nums">{u.ArtistProfile.reviewCredits ?? 0}</span>
+                    ) : (
+                      <span className="text-neutral-400">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
                     {new Date(u.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-neutral-500">
+                  <td colSpan={6} className="px-4 py-8 text-center text-neutral-500">
                     No users found
                   </td>
                 </tr>
