@@ -91,6 +91,14 @@ export const authOptions: NextAuthOptions = {
     async signIn() {
       return true;
     },
+    async redirect({ url, baseUrl }) {
+      // If the url is relative, prefix with baseUrl
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // If the url is on the same origin, allow it
+      if (new URL(url).origin === baseUrl) return url;
+      // Default to dashboard
+      return `${baseUrl}/dashboard`;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
