@@ -425,12 +425,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     setIsSubmitting(true);
 
     try {
-      // Send a final heartbeat to sync server listenDuration before submitting
+      // Send a final heartbeat with client listen time to sync server before submitting
       try {
         await fetch(`/api/reviews/${review.id}/heartbeat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: "{}",
+          body: JSON.stringify({ clientListenTime: Math.floor(listenTime) }),
         });
       } catch {
         // Non-fatal: submission will still attempt

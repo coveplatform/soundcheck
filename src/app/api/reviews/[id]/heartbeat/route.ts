@@ -18,7 +18,8 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await request.json().catch(() => ({}));
+    const body = await request.json().catch(() => ({}));
+    const clientListenTime = typeof body?.clientListenTime === "number" ? body.clientListenTime : null;
 
     const review = await prisma.review.findUnique({
       where: { id },
@@ -54,18 +55,28 @@ export async function POST(
     }
 
     const now = new Date();
-    let deltaSeconds = 1;
+    let newListenDuration: number;
 
-    if (review.lastHeartbeat) {
-      deltaSeconds = Math.floor((now.getTime() - review.lastHeartbeat.getTime()) / 1000);
-      if (deltaSeconds < 0) deltaSeconds = 0;
-      if (deltaSeconds > 10) deltaSeconds = 10;
+    if (clientListenTime !== null && clientListenTime > review.listenDuration) {
+      // Client is providing its listen time for sync (e.g. before submission).
+      // Trust it, but cap at current + 60s to prevent abuse.
+      const maxAllowed = review.listenDuration + 60;
+      newListenDuration = Math.min(clientListenTime, maxAllowed);
+    } else {
+      // Normal heartbeat: increment by time since last heartbeat (capped at 10s)
+      let deltaSeconds = 1;
+      if (review.lastHeartbeat) {
+        deltaSeconds = Math.floor((now.getTime() - review.lastHeartbeat.getTime()) / 1000);
+        if (deltaSeconds < 0) deltaSeconds = 0;
+        if (deltaSeconds > 10) deltaSeconds = 10;
+      }
+      newListenDuration = review.listenDuration + deltaSeconds;
     }
 
     const updated = await prisma.review.update({
       where: { id },
       data: {
-        listenDuration: { increment: deltaSeconds },
+        listenDuration: newListenDuration,
         lastHeartbeat: now,
         ...(review.status === "ASSIGNED" ? { status: "IN_PROGRESS" } : {}),
       },
