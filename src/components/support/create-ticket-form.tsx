@@ -61,22 +61,22 @@ export function CreateTicketForm() {
   return (
     <div className="space-y-3">
       {error ? (
-        <div className="bg-red-50 border-2 border-red-500 text-red-600 text-sm p-3 font-medium">
+        <div className="bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm p-3 font-medium">
           {error}
         </div>
       ) : null}
 
       <div className="space-y-2">
-        <div className="text-sm text-neutral-600 font-bold">Subject</div>
+        <div className="text-xs font-mono tracking-[0.1em] uppercase text-black/40">Subject</div>
         <Input value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={120} />
       </div>
 
       <div className="space-y-2">
-        <div className="text-sm text-neutral-600 font-bold">Message</div>
+        <div className="text-xs font-mono tracking-[0.1em] uppercase text-black/40">Message</div>
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="w-full px-3 py-2 border-2 border-black text-sm min-h-[140px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+          className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[140px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
           maxLength={4000}
         />
       </div>

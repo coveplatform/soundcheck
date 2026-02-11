@@ -48,62 +48,72 @@ export default async function SupportTicketsPage() {
   });
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex items-start justify-between gap-4">
+    <div className="max-w-3xl mx-auto space-y-8">
+      <div className="flex items-start justify-between gap-4 pb-6 border-b border-black/10">
         <div>
-          <h1 className="text-2xl font-black">Support tickets</h1>
-          <p className="text-neutral-600 mt-1">Create a ticket and keep the conversation in one place.</p>
+          <h1 className="text-3xl sm:text-4xl font-light tracking-tight text-black">Support tickets</h1>
+          <p className="text-sm text-black/40 mt-2">Create a ticket and keep the conversation in one place.</p>
         </div>
-        <Link href="/support" className="text-sm font-bold text-neutral-600 hover:text-black">
-          Back to Support
+        <Link href="/support" className="text-sm font-semibold text-black/40 hover:text-black transition-colors duration-150 ease-out whitespace-nowrap">
+          ← Back
         </Link>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Create a ticket</CardTitle>
+      <Card variant="soft" elevated>
+        <CardHeader className="border-b border-black/10">
+          <CardTitle className="text-base font-bold">Create a ticket</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <CreateTicketForm />
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Your tickets</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {tickets.length === 0 ? (
-            <div className="text-sm text-neutral-600">No tickets yet.</div>
-          ) : (
-            tickets.map((t) => {
+      <div>
+        <p className="text-xs font-mono tracking-[0.15em] uppercase text-black/40 mb-4">Your tickets</p>
+        {tickets.length === 0 ? (
+          <div className="rounded-2xl border border-black/8 bg-white p-8 text-center">
+            <p className="text-sm text-black/40">No tickets yet. Create one above to get started.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {tickets.map((t) => {
               const last = t.messages[0];
+              const statusColor = t.status === "OPEN"
+                ? "bg-lime-100 text-lime-700 border-lime-200"
+                : "bg-neutral-100 text-neutral-600 border-neutral-200";
               return (
                 <Link
                   key={t.id}
                   href={`/support/tickets/${t.id}`}
-                  className="block border-2 border-black bg-white p-4 hover:bg-neutral-50"
+                  className="block rounded-xl border border-black/8 bg-white p-4 transition-colors duration-150 ease-out hover:border-black/12 hover:bg-white/80"
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="font-bold">{t.subject}</div>
-                      <div className="text-xs text-neutral-600 font-mono mt-1">
-                        {t.status} • {t._count.messages} messages • Updated {new Date(t.updatedAt).toLocaleString()}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-black truncate">{t.subject}</p>
+                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span className={`text-[10px] font-mono tracking-[0.1em] uppercase px-2 py-0.5 rounded-full border ${statusColor}`}>
+                          {t.status}
+                        </span>
+                        <span className="text-xs text-black/30 font-mono">
+                          {t._count.messages} messages
+                        </span>
+                        <span className="text-xs text-black/30 font-mono">
+                          Updated {new Date(t.updatedAt).toLocaleDateString()}
+                        </span>
                       </div>
                     </div>
-                    <div className="text-xs text-neutral-600 font-mono">{t.id}</div>
                   </div>
                   {last ? (
-                    <div className="text-sm text-neutral-700 mt-3 line-clamp-2">
-                      {last.authorType}: {last.body}
-                    </div>
+                    <p className="text-sm text-black/50 mt-3 line-clamp-2">
+                      <span className="font-medium text-black/60">{last.authorType === "ADMIN" ? "Support" : "You"}:</span> {last.body}
+                    </p>
                   ) : null}
                 </Link>
               );
-            })
-          )}
-        </CardContent>
-      </Card>
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
