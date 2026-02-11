@@ -120,7 +120,12 @@ export default async function ReviewQueuePage({
     },
     include: {
       Genre: true,
-      ArtistProfile: { select: { artistName: true } },
+      ArtistProfile: {
+        select: {
+          artistName: true,
+          User: { select: { email: true } },
+        },
+      },
       _count: {
         select: {
           Review: {
@@ -135,9 +140,15 @@ export default async function ReviewQueuePage({
   });
 
   // Filter to only tracks that still need more reviewers
-  const available = availableTracksResult.filter(
-    (t) => t._count.Review < t.reviewsRequested
-  );
+  // Sort: real user tracks first, seeded tracks last
+  const available = availableTracksResult
+    .filter((t) => t._count.Review < t.reviewsRequested)
+    .sort((a, b) => {
+      const aIsSeed = a.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
+      const bIsSeed = b.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
+      if (aIsSeed !== bIsSeed) return aIsSeed ? 1 : -1;
+      return 0; // preserve createdAt order within each group
+    });
 
   const totalQueue = claimedReviews.length + available.length;
 

@@ -151,13 +151,19 @@ export default async function DashboardPage() {
       createdAt: true,
       reviewsRequested: true,
       Genre: true,
-      ArtistProfile: { select: { artistName: true } },
+      ArtistProfile: { select: { artistName: true, User: { select: { email: true } } } },
       _count: { select: { Review: { where: { status: { in: ["ASSIGNED", "IN_PROGRESS", "COMPLETED"] } } } } },
     },
     orderBy: { createdAt: "asc" },
   });
   const availableQueueTracks = availableTracksRaw
     .filter((t) => t._count.Review < t.reviewsRequested)
+    .sort((a, b) => {
+      const aIsSeed = a.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
+      const bIsSeed = b.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
+      if (aIsSeed !== bIsSeed) return aIsSeed ? 1 : -1;
+      return 0;
+    })
     .slice(0, 3);
 
   // Fetch highest rated track of the day (community feature)
@@ -373,7 +379,7 @@ export default async function DashboardPage() {
                 <div className="flex items-center gap-2">
                   <h2 className="text-base font-bold text-black">Tracks to Review</h2>
                   {availableQueueTracks.length > 0 && (
-                    <span className="text-[10px] font-bold bg-lime-100 text-lime-700 px-1.5 py-0.5 rounded-full">
+                    <span className="text-[10px] font-bold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full">
                       {availableQueueTracks.length}
                     </span>
                   )}
@@ -414,7 +420,10 @@ export default async function DashboardPage() {
                         <p className="text-xs text-black/40 truncate">by {track.ArtistProfile.artistName}</p>
                       </div>
                       <div className="flex items-center pr-3 sm:pr-4">
-                        <span className="text-xs font-semibold text-lime-700">Review →</span>
+                        <Button size="sm" variant="primary" tabIndex={-1}>
+                          Review
+                          <ArrowRight className="h-4 w-4 ml-1" />
+                        </Button>
                       </div>
                     </Link>
                   ))}
