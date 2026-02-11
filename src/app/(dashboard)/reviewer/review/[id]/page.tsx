@@ -1160,28 +1160,26 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               validationIssues.some((i) => i.section === "firstImpression") && "bg-red-50/60 border border-red-200 rounded-xl"
             )}
           >
-            <Label className="text-base font-bold">First Impression (after 30 seconds)</Label>
+            <div>
+              <Label className="text-base font-bold">First Impression</Label>
+              <p className="text-xs text-neutral-500 mt-0.5">How did the first 30 seconds make you feel?</p>
+            </div>
             {validationIssues.some((i) => i.section === "firstImpression") && (
               <p className="text-xs font-medium text-red-600 flex items-center gap-1">
                 <AlertTriangle className="h-3 w-3" />
                 {validationIssues.find((i) => i.section === "firstImpression")?.message}
               </p>
             )}
-            <div className="space-y-3">
-              {/* Current selection display */}
-              {firstImpressionTouched ? (
-                <div className={cn("px-3 py-2 border rounded-xl text-sm font-bold transition-colors duration-150 ease-out", firstImpressionColor(firstImpressionScore))}>
-                  {firstImpressionLabel(firstImpressionScore)}
-                </div>
-              ) : (
-                <div className="px-3 py-2 border border-dashed border-neutral-200 rounded-xl text-sm text-neutral-500">
-                  Tap a point below to rate your first impression
-                </div>
-              )}
-
-              {/* Clickable scale */}
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((score) => (
+            <div className="grid grid-cols-5 gap-1.5">
+              {([
+                { score: 1, emoji: "😴", short: "Nope" },
+                { score: 2, emoji: "😐", short: "Meh" },
+                { score: 3, emoji: "🤔", short: "Decent" },
+                { score: 4, emoji: "😮", short: "Good" },
+                { score: 5, emoji: "🔥", short: "Hooked" },
+              ] as const).map(({ score, emoji, short }) => {
+                const isSelected = firstImpressionTouched && firstImpressionScore === score;
+                return (
                   <button
                     key={score}
                     type="button"
@@ -1191,21 +1189,26 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                       setFirstImpression(firstImpressionEnumFromScore(score));
                     }}
                     className={cn(
-                      "flex-1 py-3 text-xs font-bold rounded-lg border transition-colors duration-150 ease-out motion-reduce:transition-none",
-                      firstImpressionTouched && firstImpressionScore === score
+                      "flex flex-col items-center gap-1 py-3 px-1 rounded-xl border-2 cursor-pointer transition-all duration-150 ease-out motion-reduce:transition-none",
+                      isSelected
                         ? firstImpressionColor(score)
-                        : "border-black/10 bg-neutral-50 hover:border-neutral-300 hover:bg-white text-neutral-600"
+                        : "border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 text-neutral-600"
                     )}
                   >
-                    {score}
+                    <span className="text-xl leading-none">{emoji}</span>
+                    <span className="text-[11px] font-bold leading-tight">{short}</span>
                   </button>
-                ))}
-              </div>
-              <div className="flex items-center justify-between text-xs font-medium text-neutral-500">
-                <span>Lost interest</span>
-                <span>Hooked</span>
-              </div>
+                );
+              })}
             </div>
+            {firstImpressionTouched && (
+              <p className={cn(
+                "text-sm font-semibold px-3 py-2 rounded-lg transition-colors duration-150 ease-out",
+                firstImpressionColor(firstImpressionScore)
+              )}>
+                {firstImpressionLabel(firstImpressionScore)}
+              </p>
+            )}
           </div>
 
           {/* Scores */}
