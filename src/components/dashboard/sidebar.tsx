@@ -19,6 +19,7 @@ import {
   MoreHorizontal,
   X,
   Compass,
+  LifeBuoy,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -208,6 +209,19 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
 
           <div className="space-y-1">
             <Link
+              href="/support"
+              className={cn(
+                "flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium transition-colors border-l-2",
+                isActive("/support")
+                  ? "text-black border-purple-600"
+                  : "text-neutral-600 border-transparent hover:text-black hover:border-purple-300"
+              )}
+            >
+              <LifeBuoy className="w-4 h-4 opacity-70" />
+              Support
+            </Link>
+
+            <Link
               href="/account"
               className={cn(
                 "flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium transition-colors border-l-2",
@@ -283,6 +297,7 @@ function MobileBottomNav({
     { href: "/business", label: "Business", icon: DollarSign, proOnly: true },
     { href: "/reviewer/earnings", label: "Earnings", icon: Coins },
     { href: "/review/history", label: "Review History", icon: History },
+    { href: "/support", label: "Support", icon: LifeBuoy },
     { href: "/account", label: "Settings", icon: Settings },
   ];
 
