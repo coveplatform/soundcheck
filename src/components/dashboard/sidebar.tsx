@@ -94,7 +94,7 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 bg-[#faf8f5] border-r border-black/10 flex-col z-40">
+      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 bg-[#faf8f5] border-r border-black/10 flex-col z-40 overflow-hidden">
         {/* Header */}
         <div className="p-6 border-b border-black/10">
           <Link href="/dashboard" className="flex items-center gap-2.5">
@@ -151,7 +151,7 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
                 SOON
               </span>
             </div>
-            <div className="absolute left-full top-0 ml-2 w-56 p-3 bg-white rounded-xl border border-neutral-200 shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 ease-out z-50">
+            <div className="absolute bottom-full left-4 mb-2 w-52 p-3 bg-white rounded-xl border border-neutral-200 shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 ease-out z-50">
               <p className="text-xs font-semibold text-black mb-1">Discover Music</p>
               <p className="text-[11px] text-neutral-500 leading-relaxed">
                 Browse tracks from the community, listen to new music, purchase songs, and share affiliate links to earn.
