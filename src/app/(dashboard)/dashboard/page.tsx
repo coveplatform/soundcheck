@@ -9,6 +9,13 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ArrowRight, MessageCircle, Trophy, Music, Headphones } from "lucide-react";
+import {
+  SparklesDoodle,
+  SquiggleDoodle,
+  DotsDoodle,
+  MusicDoodle,
+  StarDoodle,
+} from "@/components/dashboard/doodles";
 
 import {
   DashboardArtistProfile,
@@ -245,7 +252,8 @@ export default async function DashboardPage() {
     <div className="pt-6 pb-24 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Compact Hero */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-5 mb-5 border-b border-black/10">
+        <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-5 mb-5 border-b border-black/10">
+          <SparklesDoodle className="absolute -top-1 -left-3 w-7 h-7 text-black/[0.04] pointer-events-none" />
           <div className="min-w-0">
             <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-black truncate">
               Hey, {artistProfile.artistName}
@@ -324,7 +332,8 @@ export default async function DashboardPage() {
             )}
 
             {/* Your Tracks */}
-            <section aria-label="Your tracks">
+            <section aria-label="Your tracks" className="relative">
+              <SquiggleDoodle className="absolute -top-2 -right-2 w-10 h-10 text-black/[0.04] pointer-events-none hidden sm:block" />
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-base font-bold text-black">Your Tracks</h2>
                 <Link
@@ -361,12 +370,13 @@ export default async function DashboardPage() {
             </section>
 
             {/* Tracks to Review */}
-            <section aria-label="Tracks to review">
+            <section aria-label="Tracks to review" className="relative">
+              <DotsDoodle className="absolute -top-1 -right-1 w-8 h-8 text-black/[0.04] pointer-events-none hidden sm:block" />
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <h2 className="text-base font-bold text-black">Tracks to Review</h2>
                   {pendingPeerReviews.length > 0 && (
-                    <span className="text-[10px] font-bold bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full">
+                    <span className="text-[10px] font-bold bg-lime-100 text-lime-700 px-1.5 py-0.5 rounded-full">
                       {pendingPeerReviews.length}
                     </span>
                   )}
@@ -399,7 +409,8 @@ export default async function DashboardPage() {
             </section>
           </div>
 
-          <aside className="space-y-4 mt-2 lg:mt-0 lg:sticky lg:top-6 h-fit" aria-label="Sidebar">
+          <aside className="relative space-y-4 mt-2 lg:mt-0 lg:sticky lg:top-6 h-fit" aria-label="Sidebar">
+              <MusicDoodle className="absolute -top-3 right-2 w-8 h-8 text-black/[0.04] pointer-events-none hidden lg:block" />
               {whatsNext && <WhatsNextCard {...whatsNext} />}
               {!hasSeenCreditGuide && <CreditGuide />}
 
