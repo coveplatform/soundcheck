@@ -1,8 +1,25 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 
 export function CreditGuide() {
+  const [dismissed, setDismissed] = useState(false);
+  const router = useRouter();
+
+  if (dismissed) return null;
+
+  const handleDismiss = async () => {
+    setDismissed(true);
+    try {
+      await fetch("/api/artist/welcome-seen", { method: "POST" });
+      router.refresh();
+    } catch {
+      // Already hidden client-side, no need to handle
+    }
+  };
+
   return (
     <div className="border-2 border-neutral-200 rounded-2xl bg-white p-6 shadow-sm">
       <div className="flex items-start justify-between gap-4">
@@ -30,15 +47,14 @@ export function CreditGuide() {
             </li>
           </ul>
         </div>
-        <form action="/api/artist/welcome-seen" method="POST">
-          <button
-            type="submit"
-            className="rounded-full border-2 border-neutral-300 p-2 text-neutral-400 hover:text-black hover:border-neutral-400 transition-colors duration-150 ease-out motion-reduce:transition-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-            aria-label="Dismiss credit guide"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={handleDismiss}
+          className="rounded-full border-2 border-neutral-300 p-2 text-neutral-400 hover:text-black hover:border-neutral-400 transition-colors duration-150 ease-out motion-reduce:transition-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          aria-label="Dismiss credit guide"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );
