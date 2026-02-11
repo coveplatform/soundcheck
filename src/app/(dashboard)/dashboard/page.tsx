@@ -141,6 +141,7 @@ export default async function DashboardPage() {
         Track: {
           select: {
             title: true,
+            artworkUrl: true,
             Genre: true,
             ArtistProfile: {
               select: { artistName: true },

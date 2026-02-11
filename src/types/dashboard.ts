@@ -67,6 +67,7 @@ export type PendingPeerReview = Prisma.ReviewGetPayload<{
     Track: {
       select: {
         title: true;
+        artworkUrl: true;
         Genre: true;
         ArtistProfile: {
           select: { artistName: true };

@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ interface ClaimedReview {
   Track: {
     id: string;
     title: string;
+    artworkUrl: string | null;
     feedbackFocus: string | null;
     Genre: Array<{ id: string; name: string }>;
     ArtistProfile: { artistName: string };
@@ -75,9 +77,15 @@ export default async function ReviewQueuePage({
       status: { in: ["ASSIGNED", "IN_PROGRESS"] },
       Track: { status: { not: "COMPLETED" } },
     },
-    include: {
+    select: {
+      id: true,
+      status: true,
       Track: {
-        include: {
+        select: {
+          id: true,
+          title: true,
+          artworkUrl: true,
+          feedbackFocus: true,
           Genre: true,
           ArtistProfile: { select: { artistName: true } },
         },
@@ -204,12 +212,18 @@ export default async function ReviewQueuePage({
                   {claimedReviews.map((review) => (
                     <div
                       key={review.id}
-                      className="flex items-center justify-between gap-4 rounded-xl border border-black/8 bg-white px-4 py-3.5 transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
+                      className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
                     >
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="h-9 w-9 rounded-lg bg-lime-100 flex items-center justify-center flex-shrink-0">
-                          <Music className="h-4 w-4 text-lime-600" />
-                        </div>
+                      <div className="w-16 sm:w-20 flex-shrink-0 relative">
+                        {review.Track.artworkUrl ? (
+                          <Image src={review.Track.artworkUrl} alt={review.Track.title} fill className="object-cover" sizes="80px" />
+                        ) : (
+                          <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
+                            <Music className="h-5 w-5 text-neutral-400" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between gap-4 flex-1 min-w-0 px-4 py-3.5">
                         <div className="min-w-0 flex-1">
                           <p className="text-base font-semibold text-black truncate">{review.Track.title}</p>
                           <p className="text-sm text-neutral-600 mb-1">by {review.Track.ArtistProfile.artistName}</p>
@@ -220,13 +234,13 @@ export default async function ReviewQueuePage({
                             </span>
                           </div>
                         </div>
+                        <Link href={`/reviewer/review/${review.id}`} className="flex-shrink-0">
+                          <Button size="sm" variant="primary">
+                            Continue
+                            <ArrowRight className="h-4 w-4 ml-1" />
+                          </Button>
+                        </Link>
                       </div>
-                      <Link href={`/reviewer/review/${review.id}`} className="flex-shrink-0">
-                        <Button size="sm" variant="primary">
-                          Continue
-                          <ArrowRight className="h-4 w-4 ml-1" />
-                        </Button>
-                      </Link>
                     </div>
                   ))}
                 </div>
@@ -251,12 +265,18 @@ export default async function ReviewQueuePage({
                   {available.map((track) => (
                     <div
                       key={track.id}
-                      className="flex items-center justify-between gap-4 rounded-xl border border-black/8 bg-white px-4 py-3.5 transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
+                      className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
                     >
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="h-9 w-9 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0">
-                          <Music className="h-4 w-4 text-neutral-500" />
-                        </div>
+                      <div className="w-16 sm:w-20 flex-shrink-0 relative">
+                        {track.artworkUrl ? (
+                          <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="80px" />
+                        ) : (
+                          <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
+                            <Music className="h-5 w-5 text-neutral-400" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between gap-4 flex-1 min-w-0 px-4 py-3.5">
                         <div className="min-w-0 flex-1">
                           <p className="text-base font-semibold text-black truncate">{track.title}</p>
                           <p className="text-sm text-neutral-600 mb-1">by {track.ArtistProfile.artistName}</p>
@@ -269,8 +289,8 @@ export default async function ReviewQueuePage({
                             </p>
                           )}
                         </div>
+                        <ClaimButton trackId={track.id} />
                       </div>
-                      <ClaimButton trackId={track.id} />
                     </div>
                   ))}
                 </div>

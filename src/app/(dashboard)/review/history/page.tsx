@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
+import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatRelativeDate } from "@/lib/utils";
@@ -47,6 +48,7 @@ export default async function ReviewHistoryPage() {
       Track: {
         select: {
           title: true,
+          artworkUrl: true,
           Genre: true,
           ArtistProfile: { select: { artistName: true } },
         },
@@ -70,7 +72,7 @@ export default async function ReviewHistoryPage() {
           </p>
         </div>
 
-        <div className="border-2 border-neutral-200 rounded-2xl bg-white p-6 shadow-sm">
+        <div className="border border-black/8 rounded-xl bg-white/60 p-6">
           <p className="text-[11px] font-mono tracking-[0.2em] text-black/40 uppercase mb-4">
             Past Reviews
           </p>
@@ -88,12 +90,18 @@ export default async function ReviewHistoryPage() {
                 <Link
                   key={review.id}
                   href={`/listener/review/${review.id}`}
-                  className="flex items-center justify-between gap-4 rounded-2xl border-2 border-neutral-200 bg-white px-4 py-4 shadow-sm transition-all duration-150 hover:shadow-md hover:border-neutral-300"
+                  className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-all duration-150 hover:border-black/12"
                 >
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="h-12 w-12 rounded-xl bg-purple-100 border-2 border-purple-200 flex items-center justify-center flex-shrink-0">
-                      <Music className="h-5 w-5 text-purple-600" />
-                    </div>
+                  <div className="w-16 sm:w-20 flex-shrink-0 relative">
+                    {review.Track.artworkUrl ? (
+                      <Image src={review.Track.artworkUrl} alt={review.Track.title} fill className="object-cover" sizes="80px" />
+                    ) : (
+                      <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
+                        <Music className="h-5 w-5 text-neutral-400" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between gap-4 flex-1 min-w-0 px-4 py-3">
                     <div className="min-w-0 flex-1">
                       <p className="text-base font-semibold text-black truncate">{review.Track.title}</p>
                       <p className="text-sm text-neutral-600 truncate">
@@ -101,32 +109,31 @@ export default async function ReviewHistoryPage() {
                         {review.Track.ArtistProfile?.artistName ? ` · ${review.Track.ArtistProfile.artistName}` : ""}
                       </p>
                     </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 flex-shrink-0">
-                    <div className="text-right hidden sm:block">
-                      <p className="text-sm font-bold text-emerald-600">{formatCurrency(review.paidAmount)}</p>
-                      <div className="flex items-center justify-end gap-0.5 mt-1">
-                        {review.artistRating !== null && review.artistRating !== undefined ? (
-                          [1, 2, 3, 4, 5].map((i) => (
-                            <Star
-                              key={i}
-                              className={
-                                i <= (review.artistRating ?? 0)
-                                  ? "h-3.5 w-3.5 text-amber-500 fill-amber-500"
-                                  : "h-3.5 w-3.5 text-neutral-300"
-                              }
-                            />
-                          ))
-                        ) : (
-                          <span className="text-xs text-neutral-400">No rating</span>
-                        )}
+                    <div className="flex items-center gap-4 flex-shrink-0">
+                      <div className="text-right hidden sm:block">
+                        <p className="text-sm font-bold text-lime-600">{formatCurrency(review.paidAmount)}</p>
+                        <div className="flex items-center justify-end gap-0.5 mt-1">
+                          {review.artistRating !== null && review.artistRating !== undefined ? (
+                            [1, 2, 3, 4, 5].map((i) => (
+                              <Star
+                                key={i}
+                                className={
+                                  i <= (review.artistRating ?? 0)
+                                    ? "h-3.5 w-3.5 text-amber-500 fill-amber-500"
+                                    : "h-3.5 w-3.5 text-neutral-300"
+                                }
+                              />
+                            ))
+                          ) : (
+                            <span className="text-xs text-neutral-400">No rating</span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs text-neutral-500 font-medium">
-                        {formatRelativeDate(review.createdAt)}
-                      </span>
+                      <div className="text-right">
+                        <span className="text-xs text-neutral-500 font-medium">
+                          {formatRelativeDate(review.createdAt)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </Link>
