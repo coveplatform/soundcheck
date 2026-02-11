@@ -392,9 +392,9 @@ export default async function DashboardPage() {
                     <Link
                       key={track.id}
                       href="/review"
-                      className="group flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/90 hover:border-black/12"
+                      className="group flex items-center gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/90 hover:border-black/12"
                     >
-                      <div className="w-14 sm:w-16 aspect-square flex-shrink-0 relative">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 relative">
                         {track.artworkUrl ? (
                           <Image
                             src={track.artworkUrl}

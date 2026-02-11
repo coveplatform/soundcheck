@@ -90,9 +90,9 @@ export default async function ReviewHistoryPage() {
                 <Link
                   key={review.id}
                   href={`/listener/review/${review.id}`}
-                  className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-all duration-150 hover:border-black/12"
+                  className="flex items-center gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-all duration-150 hover:border-black/12"
                 >
-                  <div className="w-16 sm:w-20 aspect-square flex-shrink-0 relative">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 relative">
                     {review.Track.artworkUrl ? (
                       <Image src={review.Track.artworkUrl} alt={review.Track.title} fill className="object-cover" sizes="80px" />
                     ) : (
