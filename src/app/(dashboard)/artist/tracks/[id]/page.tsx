@@ -316,18 +316,16 @@ export default async function TrackDetailPage({
           <div className="space-y-6">
             {/* Player Card */}
             <Card variant="soft" elevated className="overflow-hidden">
-              <CardContent className="pt-6">
-                <p className="text-xs font-mono tracking-widest uppercase text-black/40 mb-4">
+              <CardContent className="p-4">
+                <p className="text-xs font-mono tracking-widest uppercase text-black/40 mb-3">
                   Listen
                 </p>
-                {(
-                  <AudioPlayer
-                    sourceUrl={track.sourceUrl}
-                    sourceType={track.sourceType}
-                    showListenTracker={false}
-                    showWaveform={track.sourceType === "UPLOAD"}
-                  />
-                )}
+                <AudioPlayer
+                  sourceUrl={track.sourceUrl}
+                  sourceType={track.sourceType}
+                  showListenTracker={false}
+                  showWaveform={track.sourceType === "UPLOAD"}
+                />
               </CardContent>
             </Card>
 

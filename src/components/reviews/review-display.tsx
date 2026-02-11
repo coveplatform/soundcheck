@@ -81,20 +81,20 @@ export function ReviewDisplay({
   const reviewerProfileId = review.ReviewerProfile?.id ?? review.ArtistProfile?.id;
 
   return (
-    <article className="p-6">
-      {/* Clean header: Reviewer info */}
+    <article className="px-5 sm:px-6 py-5">
+      {/* Header: Reviewer + Actions */}
       <header className="mb-5">
         <div className="flex items-center gap-3">
           {/* Avatar */}
           {showControls && reviewerProfileId ? (
             <Link
               href={`/artist/reviewers/${reviewerProfileId}`}
-              className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black hover:from-neutral-200 hover:to-neutral-300 transition-colors"
+              className="h-9 w-9 min-w-[2.25rem] flex-shrink-0 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-xs font-black text-purple-700 hover:from-purple-200 hover:to-purple-300 transition-colors duration-150 ease-out motion-reduce:transition-none"
             >
               {getInitial(reviewerName)}
             </Link>
           ) : (
-            <span className="h-10 w-10 min-w-[2.5rem] aspect-square flex-shrink-0 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 border-2 border-black overflow-hidden flex items-center justify-center text-sm font-black text-black">
+            <span className="h-9 w-9 min-w-[2.25rem] flex-shrink-0 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-xs font-black text-purple-700">
               {getInitial(reviewerName)}
             </span>
           )}
@@ -116,31 +116,31 @@ export function ReviewDisplay({
               )}
               {review.firstImpression && (
                 <span
-                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
                     review.firstImpression === "STRONG_HOOK"
                       ? "bg-purple-100 text-purple-700"
                       : review.firstImpression === "DECENT"
-                      ? "bg-amber-100 text-amber-700"
-                      : "bg-neutral-100 text-neutral-600"
+                      ? "bg-amber-50 text-amber-700"
+                      : "bg-black/5 text-black/50"
                   }`}
                 >
                   {review.firstImpression === "STRONG_HOOK"
-                    ? "Strong Hook"
+                    ? "Hooked"
                     : review.firstImpression === "DECENT"
-                    ? "Decent"
+                    ? "Solid"
                     : "Lost Interest"}
                 </span>
               )}
             </div>
-            <time className="text-xs text-neutral-500">
+            <time className="text-xs text-black/40">
               {review.createdAt.toLocaleDateString()}
             </time>
           </div>
         </div>
 
-        {/* Action toolbar - separate row, mobile friendly */}
+        {/* Action toolbar */}
         {showControls && (
-          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-100">
+          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-black/5">
             <ReviewRating
               reviewId={review.id}
               initialRating={review.artistRating ?? null}
@@ -151,113 +151,108 @@ export function ReviewDisplay({
         )}
       </header>
 
-      {/* Scores - Compact inline display */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-neutral-600 mb-5">
-        {review.productionScore && (
-          <span>
-            Production{" "}
+      {/* Scores */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        {review.productionScore != null && (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
+            <span className="text-black/50">Production</span>
             <strong className="text-black">{review.productionScore}/5</strong>
           </span>
         )}
-        {review.vocalScore && (
-          <span>
-            Vocals{" "}
+        {review.vocalScore != null && (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
+            <span className="text-black/50">Vocals</span>
             <strong className="text-black">{review.vocalScore}/5</strong>
           </span>
         )}
-        {review.originalityScore && (
-          <span>
-            Originality{" "}
+        {review.originalityScore != null && (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
+            <span className="text-black/50">Originality</span>
             <strong className="text-black">{review.originalityScore}/5</strong>
           </span>
         )}
         {review.wouldListenAgain !== null && (
-          <span className="flex items-center gap-1">
+          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
+            review.wouldListenAgain
+              ? "bg-purple-50 text-purple-700"
+              : "bg-black/5 text-black/40"
+          }`}>
             {review.wouldListenAgain ? (
-              <>
-                <ThumbsUp className="h-3.5 w-3.5 text-purple-700" />
-                <strong className="text-purple-700">Would listen again</strong>
-              </>
-            ) : (
-              <>
-                <ThumbsDown className="h-3.5 w-3.5 text-neutral-400" />
-                <span className="text-neutral-500">Wouldn&apos;t replay</span>
-              </>
-            )}
+              <><ThumbsUp className="h-3 w-3" /> Replay</>            ) : (
+              <><ThumbsDown className="h-3 w-3" /> No replay</>            )}
           </span>
         )}
       </div>
 
       {/* Listener Signals */}
       {(review.wouldAddToPlaylist !== null || review.wouldShare !== null || review.wouldFollow !== null) && (
-        <div className="flex flex-wrap items-center gap-2 mb-5">
+        <div className="flex flex-wrap items-center gap-1.5 mb-5">
           {review.wouldAddToPlaylist !== null && (
-            <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 ${
+            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold ${
               review.wouldAddToPlaylist
-                ? "bg-purple-50 border-purple-600 text-purple-700"
-                : "bg-neutral-50 border-neutral-300 text-neutral-500"
+                ? "bg-purple-50 text-purple-700"
+                : "bg-black/5 text-black/35"
             }`}>
               <ListMusic className="h-3 w-3" />
-              {review.wouldAddToPlaylist ? "Would playlist" : "No playlist"}
+              {review.wouldAddToPlaylist ? "Playlist" : "No playlist"}
             </span>
           )}
           {review.wouldShare !== null && (
-            <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 ${
+            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold ${
               review.wouldShare
-                ? "bg-purple-50 border-purple-600 text-purple-700"
-                : "bg-neutral-50 border-neutral-300 text-neutral-500"
+                ? "bg-purple-50 text-purple-700"
+                : "bg-black/5 text-black/35"
             }`}>
               <Share2 className="h-3 w-3" />
-              {review.wouldShare ? "Would share" : "No share"}
+              {review.wouldShare ? "Share" : "No share"}
             </span>
           )}
           {review.wouldFollow !== null && (
-            <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold border-2 ${
+            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold ${
               review.wouldFollow
-                ? "bg-purple-50 border-purple-600 text-purple-700"
-                : "bg-neutral-50 border-neutral-300 text-neutral-500"
+                ? "bg-purple-50 text-purple-700"
+                : "bg-black/5 text-black/35"
             }`}>
               <UserPlus className="h-3 w-3" />
-              {review.wouldFollow ? "Would follow" : "No follow"}
+              {review.wouldFollow ? "Follow" : "No follow"}
             </span>
           )}
         </div>
       )}
 
-      {/* Main Feedback - The star of the show */}
+      {/* Written Feedback */}
       <div className="space-y-4 mb-5">
         {review.addressedArtistNote && (
-          <div className="text-xs text-neutral-600 font-mono">
-            Addressed your note:{" "}
-            <strong className="text-black">{review.addressedArtistNote}</strong>
-          </div>
+          <p className="text-xs text-black/40 font-mono">
+            Addressed your note: <strong className="text-black/60">{review.addressedArtistNote}</strong>
+          </p>
         )}
         {review.bestPart && (
           <div>
-            <h4 className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-1.5">
+            <h4 className="text-[11px] font-bold text-purple-600 uppercase tracking-widest mb-1.5">
               What Worked
             </h4>
-            <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-purple-600">
+            <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-purple-400">
               {review.bestPart}
             </p>
           </div>
         )}
         {review.weakestPart && (
           <div>
-            <h4 className="text-xs font-bold text-red-600 uppercase tracking-wide mb-1.5">
+            <h4 className="text-[11px] font-bold text-red-500 uppercase tracking-widest mb-1.5">
               To Improve
             </h4>
-            <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-red-400">
+            <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-red-300">
               {review.weakestPart}
             </p>
           </div>
         )}
         {review.additionalNotes && (
           <div>
-            <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wide mb-1.5">
+            <h4 className="text-[11px] font-bold text-black/40 uppercase tracking-widest mb-1.5">
               Additional Notes
             </h4>
-            <p className="text-sm text-neutral-700 leading-relaxed pl-3 border-l-4 border-neutral-300">
+            <p className="text-sm text-black/70 leading-relaxed pl-3 border-l-2 border-black/10">
               {review.additionalNotes}
             </p>
           </div>
@@ -265,10 +260,10 @@ export function ReviewDisplay({
 
         {review.nextActions && (
           <div>
-            <h4 className="text-xs font-bold text-black uppercase tracking-wide mb-1.5">
+            <h4 className="text-[11px] font-bold text-black/70 uppercase tracking-widest mb-1.5">
               Next Actions
             </h4>
-            <p className="text-sm text-neutral-800 leading-relaxed pl-3 border-l-4 border-black whitespace-pre-wrap">
+            <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-black/30 whitespace-pre-wrap">
               {review.nextActions}
             </p>
           </div>
@@ -277,21 +272,21 @@ export function ReviewDisplay({
         {Array.isArray(review.timestamps) &&
           review.timestamps.filter(isTimestampNote).length > 0 && (
             <div>
-              <h4 className="text-xs font-bold text-purple-700 uppercase tracking-wide mb-1.5">
+              <h4 className="text-[11px] font-bold text-purple-600 uppercase tracking-widest mb-1.5">
                 Timestamps
               </h4>
               <div className="space-y-2">
                 {review.timestamps.filter(isTimestampNote).map((t, i) => (
                   <div
                     key={`${t.seconds}-${i}`}
-                    className="pl-3 border-l-4 border-purple-400"
+                    className="pl-3 border-l-2 border-purple-300"
                   >
-                    <p className="text-xs font-mono text-neutral-600">
+                    <p className="text-xs font-mono text-black/40">
                       {`${Math.floor(t.seconds / 60)}:${String(
                         Math.floor(t.seconds % 60)
                       ).padStart(2, "0")}`}
                     </p>
-                    <p className="text-sm text-neutral-800 leading-relaxed">
+                    <p className="text-sm text-black/80 leading-relaxed">
                       {t.note}
                     </p>
                   </div>
@@ -301,30 +296,28 @@ export function ReviewDisplay({
           )}
       </div>
 
-      {/* Secondary info - inline text, not boxed */}
+      {/* Genre / Similar artists */}
       {(review.perceivedGenre || review.similarArtists) && (
-        <div className="text-xs text-neutral-500 mb-4">
+        <div className="text-xs text-black/40 mb-4">
           {review.perceivedGenre && (
             <span>
-              Sounds like{" "}
-              <strong className="text-neutral-700">{review.perceivedGenre}</strong>
+              Sounds like <strong className="text-black/60">{review.perceivedGenre}</strong>
             </span>
           )}
           {review.perceivedGenre && review.similarArtists && (
-            <span className="mx-2">·</span>
+            <span className="mx-1.5">·</span>
           )}
           {review.similarArtists && (
             <span>
-              Similar to{" "}
-              <strong className="text-neutral-700">{review.similarArtists}</strong>
+              Similar to <strong className="text-black/60">{review.similarArtists}</strong>
             </span>
           )}
         </div>
       )}
 
-      {/* Flag control - minimal, at the bottom */}
+      {/* Flag */}
       {showControls && (
-        <footer className="pt-4 border-t border-neutral-200">
+        <footer className="pt-3 border-t border-black/5">
           <ReviewFlag
             reviewId={review.id}
             wasFlagged={review.wasFlagged}

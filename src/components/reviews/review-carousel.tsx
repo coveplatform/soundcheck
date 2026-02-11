@@ -79,43 +79,43 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
   return (
     <div className="relative">
       {/* Header with counter and navigation */}
-      <div className="flex items-center justify-between px-6 py-4 border-b-2 border-black bg-neutral-50">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-bold text-neutral-600">Review</span>
-          <div className="flex items-center gap-1 bg-black text-white px-3 py-1 font-mono text-sm font-bold">
-            <span>{currentIndex + 1}</span>
-            <span className="text-neutral-400">/</span>
-            <span>{totalReviews}</span>
-          </div>
+      <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b border-black/10">
+        <div className="flex items-center gap-2.5">
+          <span className="text-xs font-mono tracking-widest uppercase text-black/40">Review</span>
+          <span className="text-sm font-bold tabular-nums text-black">
+            {currentIndex + 1}
+            <span className="text-black/30 mx-0.5">/</span>
+            {totalReviews}
+          </span>
         </div>
 
         {/* Navigation arrows */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={goToPrev}
             disabled={currentIndex === 0}
             className={cn(
-              "h-10 w-10 flex items-center justify-center border-2 border-black transition-colors duration-150 ease-out motion-reduce:transition-none",
+              "h-8 w-8 flex items-center justify-center rounded-full transition-colors duration-150 ease-out motion-reduce:transition-none",
               currentIndex === 0
-                ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
-                : "bg-white hover:bg-black hover:text-white"
+                ? "text-black/20 cursor-not-allowed"
+                : "text-black/60 hover:bg-black/5 active:bg-black/10"
             )}
             aria-label="Previous review"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-4 w-4" />
           </button>
           <button
             onClick={goToNext}
             disabled={currentIndex === totalReviews - 1}
             className={cn(
-              "h-10 w-10 flex items-center justify-center border-2 border-black transition-colors duration-150 ease-out motion-reduce:transition-none",
+              "h-8 w-8 flex items-center justify-center rounded-full transition-colors duration-150 ease-out motion-reduce:transition-none",
               currentIndex === totalReviews - 1
-                ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
-                : "bg-white hover:bg-black hover:text-white"
+                ? "text-black/20 cursor-not-allowed"
+                : "text-black/60 hover:bg-black/5 active:bg-black/10"
             )}
             aria-label="Next review"
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -139,40 +139,23 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
       </div>
 
       {/* Dot indicators */}
-      <div className="flex items-center justify-center gap-1.5 py-4 border-t border-neutral-200 bg-neutral-50">
-        {reviews.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToIndex(index)}
-            className={cn(
-              "h-2 rounded-full transition-[width,background-color] duration-150 ease-out motion-reduce:transition-none",
-              index === currentIndex
-                ? "w-6 bg-black"
-                : "w-2 bg-neutral-300 hover:bg-neutral-400"
-            )}
-            aria-label={`Go to review ${index + 1}`}
-          />
-        ))}
-      </div>
-
-      {/* Quick stats bar */}
-      <div className="flex items-center justify-center gap-6 py-3 px-6 bg-black text-white text-xs font-mono">
-        {currentReview.productionScore && (
-          <span>
-            Production: <strong>{currentReview.productionScore}/5</strong>
-          </span>
-        )}
-        {currentReview.originalityScore && (
-          <span>
-            Originality: <strong>{currentReview.originalityScore}/5</strong>
-          </span>
-        )}
-        {currentReview.wouldListenAgain !== null && (
-          <span className={currentReview.wouldListenAgain ? "text-purple-500" : "text-neutral-400"}>
-            {currentReview.wouldListenAgain ? "Would listen again" : "Wouldn't replay"}
-          </span>
-        )}
-      </div>
+      {totalReviews > 1 && (
+        <div className="flex items-center justify-center gap-1.5 py-3 border-t border-black/5">
+          {reviews.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToIndex(index)}
+              className={cn(
+                "h-1.5 rounded-full transition-[width,background-color] duration-150 ease-out motion-reduce:transition-none",
+                index === currentIndex
+                  ? "w-5 bg-purple-500"
+                  : "w-1.5 bg-black/15 hover:bg-black/25"
+              )}
+              aria-label={`Go to review ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

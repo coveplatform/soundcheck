@@ -18,26 +18,46 @@ export default async function ReviewHistoryPage() {
     redirect("/login");
   }
 
-  const reviewerProfile = await prisma.reviewerProfile.findUnique({
-    where: { userId: session.user.id },
-    select: { id: true, isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
-  });
+  const [reviewerProfile, artistProfile] = await Promise.all([
+    prisma.reviewerProfile.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true, isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true },
+    }),
+    prisma.artistProfile.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true, completedOnboarding: true },
+    }),
+  ]);
 
-  if (!reviewerProfile) {
+  if (!reviewerProfile && !artistProfile) {
     redirect("/onboarding");
   }
 
-  if (reviewerProfile.isRestricted) {
+  if (reviewerProfile?.isRestricted) {
     redirect("/dashboard");
   }
 
-  if (!reviewerProfile.completedOnboarding || !reviewerProfile.onboardingQuizPassed) {
+  // Allow access if either profile completed onboarding
+  const hasCompletedOnboarding =
+    artistProfile?.completedOnboarding ||
+    (reviewerProfile?.completedOnboarding && reviewerProfile?.onboardingQuizPassed);
+
+  if (!hasCompletedOnboarding) {
     redirect("/onboarding");
+  }
+
+  // Query both legacy reviews (reviewerId) and peer reviews (peerReviewerArtistId)
+  const orConditions: any[] = [];
+  if (reviewerProfile) {
+    orConditions.push({ reviewerId: reviewerProfile.id });
+  }
+  if (artistProfile) {
+    orConditions.push({ peerReviewerArtistId: artistProfile.id });
   }
 
   const reviews = await prisma.review.findMany({
     where: {
-      reviewerId: reviewerProfile.id,
+      OR: orConditions,
       status: "COMPLETED",
     },
     select: {
