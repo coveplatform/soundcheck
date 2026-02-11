@@ -214,9 +214,9 @@ export default async function ReviewQueuePage({
                       key={review.id}
                       className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
                     >
-                      <div className="aspect-square self-stretch flex-shrink-0 relative">
+                      <div className="w-20 sm:w-24 flex-shrink-0 relative bg-neutral-100">
                         {review.Track.artworkUrl ? (
-                          <Image src={review.Track.artworkUrl} alt={review.Track.title} fill className="object-cover" sizes="80px" />
+                          <Image src={review.Track.artworkUrl} alt={review.Track.title} fill className="object-cover" sizes="96px" />
                         ) : (
                           <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
                             <Music className="h-5 w-5 text-neutral-400" />
@@ -267,9 +267,9 @@ export default async function ReviewQueuePage({
                       key={track.id}
                       className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
                     >
-                      <div className="aspect-square self-stretch flex-shrink-0 relative">
+                      <div className="w-20 sm:w-24 flex-shrink-0 relative bg-neutral-100">
                         {track.artworkUrl ? (
-                          <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="80px" />
+                          <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="96px" />
                         ) : (
                           <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
                             <Music className="h-5 w-5 text-neutral-400" />
