@@ -68,7 +68,7 @@ export async function POST(request: Request) {
       line_items: [
         {
           price_data: {
-            currency: "aud",
+            currency: "usd",
             product_data: {
               name: "MixReflect Pro",
               description: "Unlimited track uploads and review requests",

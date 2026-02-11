@@ -73,7 +73,7 @@ export async function POST(request: Request) {
       ? `${appUrl}/submit?credits=canceled`
       : `${appUrl}/account?credits=canceled`;
 
-    const currency = "aud";
+    const currency = "usd";
 
     const packPricing: Record<3 | 10 | 25, { amountCents: number; credits: number }> = {
       3: { amountCents: 295, credits: 3 },

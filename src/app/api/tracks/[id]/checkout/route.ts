@@ -77,7 +77,7 @@ export async function POST(
       line_items: [
         {
           price_data: {
-            currency: "aud",
+            currency: "usd",
             product_data: {
               name: `${packageDetails.name} Package`,
               description: `${packageDetails.Review} reviews for: ${track.title}`,

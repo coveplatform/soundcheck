@@ -111,7 +111,7 @@ export const redditEvents = {
   // User initiates checkout (selected package)
   initiateCheckout: (packageType: string, amount: number) => {
     trackRedditEvent("AddToCart", {
-      currency: "AUD",
+      currency: "USD",
       value: amount / 100, // Convert cents to dollars
       itemCount: 1,
       customEventName: `Checkout_${packageType}`,
@@ -121,7 +121,7 @@ export const redditEvents = {
   // User completes purchase
   purchase: (packageType: string, amount: number, transactionId?: string) => {
     trackRedditEvent("Purchase", {
-      currency: "AUD",
+      currency: "USD",
       value: amount / 100, // Convert cents to dollars
       itemCount: 1,
       transactionId,
