@@ -62,49 +62,49 @@ export default async function ReviewQueuePage({
   const MAX_REVIEWS_PER_DAY = 5;
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
-  const reviewsTodayCount = await prisma.review.count({
-    where: {
-      peerReviewerArtistId: artistProfile.id,
-      status: "COMPLETED",
-      updatedAt: { gte: startOfToday },
-    },
-  });
-  const reviewsRemaining = isPro ? null : Math.max(0, MAX_REVIEWS_PER_DAY - reviewsTodayCount);
 
-  // Fetch reviews user has already claimed (in progress)
-  const claimedReviews: ClaimedReview[] = await prisma.review.findMany({
-    where: {
-      peerReviewerArtistId: artistProfile.id,
-      status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-      Track: { status: { not: "COMPLETED" } },
-    },
-    select: {
-      id: true,
-      status: true,
-      Track: {
-        select: {
-          id: true,
-          title: true,
-          artworkUrl: true,
-          feedbackFocus: true,
-          Genre: true,
-          ArtistProfile: { select: { artistName: true } },
+  // Run independent queries in parallel for speed
+  const [reviewsTodayCount, claimedReviews, pastReviewTrackIds] = await Promise.all([
+    prisma.review.count({
+      where: {
+        peerReviewerArtistId: artistProfile.id,
+        status: "COMPLETED",
+        updatedAt: { gte: startOfToday },
+      },
+    }),
+    prisma.review.findMany({
+      where: {
+        peerReviewerArtistId: artistProfile.id,
+        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+        Track: { status: { not: "COMPLETED" } },
+      },
+      select: {
+        id: true,
+        status: true,
+        Track: {
+          select: {
+            id: true,
+            title: true,
+            artworkUrl: true,
+            feedbackFocus: true,
+            Genre: true,
+            ArtistProfile: { select: { artistName: true } },
+          },
         },
       },
-    },
-    orderBy: { createdAt: "asc" },
-  }) as unknown as ClaimedReview[];
+      orderBy: { createdAt: "asc" },
+    }) as Promise<ClaimedReview[]>,
+    prisma.review.findMany({
+      where: {
+        peerReviewerArtistId: artistProfile.id,
+        status: { in: ["COMPLETED", "SKIPPED", "EXPIRED"] },
+      },
+      select: { trackId: true },
+    }),
+  ]);
 
+  const reviewsRemaining = isPro ? null : Math.max(0, MAX_REVIEWS_PER_DAY - reviewsTodayCount);
   const claimedTrackIds = claimedReviews.map((r) => r.Track.id);
-
-  // Fetch track IDs this user has already reviewed/skipped (any terminal status)
-  const pastReviewTrackIds = await prisma.review.findMany({
-    where: {
-      peerReviewerArtistId: artistProfile.id,
-      status: { in: ["COMPLETED", "SKIPPED", "EXPIRED"] },
-    },
-    select: { trackId: true },
-  });
   const excludeTrackIds = [
     ...claimedTrackIds,
     ...pastReviewTrackIds.map((r) => r.trackId),

@@ -131,12 +131,72 @@ export default async function DashboardPage() {
     return completedReviews.some((r) => new Date(r.createdAt).getTime() > viewedAt);
   });
 
-  // Fetch available tracks in the review queue (claim model)
-  const excludeTrackIds = await prisma.review.findMany({
-    where: { peerReviewerArtistId: artistProfile.id },
-    select: { trackId: true },
-  }).then((r: { trackId: string }[]) => r.map((x) => x.trackId)).catch(() => [] as string[]);
+  // Run independent queries in parallel for speed
+  type TopTrack = { id: string; title: string; artworkUrl: string | null; artistName: string; avgScore: number };
 
+  const [excludeTrackIds, topRatedTrack] = await Promise.all([
+    // 1. Track IDs this user already reviewed/claimed
+    prisma.review.findMany({
+      where: { peerReviewerArtistId: artistProfile.id },
+      select: { trackId: true },
+    }).then((r: { trackId: string }[]) => r.map((x) => x.trackId)).catch(() => [] as string[]),
+
+    // 2. Highest rated track of the day (community feature)
+    (async (): Promise<TopTrack | null> => {
+      try {
+        const recentTracks = await prisma.track.findMany({
+          where: {
+            status: { in: ["IN_PROGRESS", "COMPLETED"] },
+            reviewsCompleted: { gte: 3 },
+            artistId: { not: artistProfile.id },
+          },
+          select: {
+            id: true,
+            title: true,
+            artworkUrl: true,
+            ArtistProfile: { select: { artistName: true } },
+            Review: {
+              where: { status: "COMPLETED" },
+              select: {
+                productionScore: true,
+                originalityScore: true,
+                vocalScore: true,
+              },
+            },
+          },
+          orderBy: { completedAt: "desc" },
+          take: 20,
+        });
+
+        let best: TopTrack | null = null;
+        let bestAvg = 0;
+        for (const t of recentTracks) {
+          const scores = t.Review.flatMap((r) =>
+            [r.productionScore, r.originalityScore, r.vocalScore].filter(
+              (s): s is number => s !== null && s >= 1
+            )
+          );
+          if (scores.length < 3) continue;
+          const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+          if (avg > bestAvg) {
+            bestAvg = avg;
+            best = {
+              id: t.id,
+              title: t.title,
+              artworkUrl: t.artworkUrl,
+              artistName: t.ArtistProfile.artistName,
+              avgScore: Math.round(avg * 10) / 10,
+            };
+          }
+        }
+        return best;
+      } catch {
+        return null;
+      }
+    })(),
+  ]);
+
+  // Fetch available tracks (depends on excludeTrackIds from above)
   const availableTracksRaw = await prisma.track.findMany({
     where: {
       packageType: "PEER",
@@ -165,61 +225,6 @@ export default async function DashboardPage() {
       return 0;
     })
     .slice(0, 3);
-
-  // Fetch highest rated track of the day (community feature)
-  type TopTrack = { id: string; title: string; artworkUrl: string | null; artistName: string; avgScore: number };
-  const topRatedTrack: TopTrack | null = await (async (): Promise<TopTrack | null> => {
-    try {
-      const recentTracks = await prisma.track.findMany({
-        where: {
-          status: { in: ["IN_PROGRESS", "COMPLETED"] },
-          reviewsCompleted: { gte: 3 },
-          artistId: { not: artistProfile.id },
-        },
-        select: {
-          id: true,
-          title: true,
-          artworkUrl: true,
-          ArtistProfile: { select: { artistName: true } },
-          Review: {
-            where: { status: "COMPLETED" },
-            select: {
-              productionScore: true,
-              originalityScore: true,
-              vocalScore: true,
-            },
-          },
-        },
-        orderBy: { completedAt: "desc" },
-        take: 20,
-      });
-
-      let best: TopTrack | null = null;
-      let bestAvg = 0;
-      for (const t of recentTracks) {
-        const scores = t.Review.flatMap((r) =>
-          [r.productionScore, r.originalityScore, r.vocalScore].filter(
-            (s): s is number => s !== null && s >= 1
-          )
-        );
-        if (scores.length < 3) continue;
-        const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-        if (avg > bestAvg) {
-          bestAvg = avg;
-          best = {
-            id: t.id,
-            title: t.title,
-            artworkUrl: t.artworkUrl,
-            artistName: t.ArtistProfile.artistName,
-            avgScore: Math.round(avg * 10) / 10,
-          };
-        }
-      }
-      return best;
-    } catch {
-      return null;
-    }
-  })();
 
   // Calculate stats
   const stats = calculateDashboardStats({
