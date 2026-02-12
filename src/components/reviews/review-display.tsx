@@ -138,17 +138,6 @@ export function ReviewDisplay({
           </div>
         </div>
 
-        {/* Action toolbar */}
-        {showControls && (
-          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-black/5">
-            <ReviewRating
-              reviewId={review.id}
-              initialRating={review.artistRating ?? null}
-            />
-            <div className="flex-1" />
-            <ReviewGem reviewId={review.id} initialIsGem={review.isGem ?? false} compact />
-          </div>
-        )}
       </header>
 
       {/* Scores */}
@@ -315,14 +304,45 @@ export function ReviewDisplay({
         </div>
       )}
 
-      {/* Flag */}
+      {/* Rate this feedback + Gem */}
       {showControls && (
-        <footer className="pt-3 border-t border-black/5">
-          <ReviewFlag
-            reviewId={review.id}
-            wasFlagged={review.wasFlagged}
-            flagReason={review.flagReason}
-          />
+        <footer className="mt-6 pt-5 border-t border-black/10">
+          <div className="rounded-xl bg-black/[0.02] border border-black/5 p-4">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-black/40 mb-3">
+              What did you think of this feedback?
+            </p>
+
+            {/* Star rating */}
+            <div className="flex items-center gap-2 mb-4">
+              <ReviewRating
+                reviewId={review.id}
+                initialRating={review.artistRating ?? null}
+              />
+              <span className="text-xs text-black/30">Rate this review</span>
+            </div>
+
+            {/* Gem - prominent */}
+            <div className="flex items-start gap-3 rounded-lg bg-white border border-black/8 p-3">
+              <ReviewGem reviewId={review.id} initialIsGem={review.isGem ?? false} />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-black/70">
+                  Award a Gem for exceptional feedback
+                </p>
+                <p className="text-[11px] text-black/40 mt-0.5">
+                  Gems reward reviewers who go above and beyond. They&apos;ll earn recognition and priority in future reviews.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Flag - kept small */}
+          <div className="mt-3">
+            <ReviewFlag
+              reviewId={review.id}
+              wasFlagged={review.wasFlagged}
+              flagReason={review.flagReason}
+            />
+          </div>
         </footer>
       )}
     </article>

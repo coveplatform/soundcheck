@@ -68,17 +68,17 @@ export function ReviewGem({
         type="button"
         onClick={toggle}
         disabled={isSaving}
-        title={isGem ? "Remove gem" : "Mark as gem"}
+        title={isGem ? "Remove gem" : "Award a gem"}
         className={cn(
-          "inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 border-2 border-black transition-colors",
+          "inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors duration-150 ease-out motion-reduce:transition-none",
           isGem
-            ? "bg-amber-400 text-black"
-            : "bg-white text-black hover:bg-neutral-100",
+            ? "bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-200"
+            : "bg-white text-black/60 border border-black/10 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200",
           isSaving && "opacity-60 cursor-not-allowed"
         )}
       >
-        <Gem className={cn("h-3.5 w-3.5", isGem ? "text-black" : "text-neutral-600")} />
-        <span>{isGem ? "Gem" : "Gem"}</span>
+        <Gem className={cn("h-4 w-4", isGem ? "fill-amber-500 text-amber-600" : "text-black/30")} />
+        <span>{isGem ? "Gem awarded" : "Award gem"}</span>
       </button>
       {error && <span className="text-xs text-red-500">!</span>}
     </div>
