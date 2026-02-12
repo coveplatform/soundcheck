@@ -307,8 +307,8 @@ export function ReviewDisplay({
       {/* Rate this feedback + Gem */}
       {showControls && (
         <footer className="mt-6 pt-5 border-t border-black/10">
-          <div className="rounded-xl bg-black/[0.02] border border-black/5 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-black/40 mb-3">
+          <div className="rounded-xl bg-black/[0.03] border border-black/10 p-4">
+            <p className="text-xs font-bold text-black/70 mb-3">
               What did you think of this feedback?
             </p>
 
@@ -318,17 +318,17 @@ export function ReviewDisplay({
                 reviewId={review.id}
                 initialRating={review.artistRating ?? null}
               />
-              <span className="text-xs text-black/30">Rate this review</span>
+              <span className="text-xs text-black/50">Rate this review</span>
             </div>
 
             {/* Gem - prominent */}
-            <div className="flex items-start gap-3 rounded-lg bg-white border border-black/8 p-3">
+            <div className="flex items-start gap-3 rounded-lg bg-white border border-black/10 p-3">
               <ReviewGem reviewId={review.id} initialIsGem={review.isGem ?? false} />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-black/70">
+                <p className="text-xs font-semibold text-black/80">
                   Award a Gem for exceptional feedback
                 </p>
-                <p className="text-[11px] text-black/40 mt-0.5">
+                <p className="text-[11px] text-black/50 mt-0.5">
                   Gems reward reviewers who go above and beyond. They&apos;ll earn recognition and priority in future reviews.
                 </p>
               </div>
