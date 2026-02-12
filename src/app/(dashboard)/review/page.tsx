@@ -209,6 +209,9 @@ export default async function ReviewQueuePage({
               <span>{reviewsRemaining} of {MAX_REVIEWS_PER_DAY} reviews left today</span>
             )}
           </div>
+          <p className="text-xs text-black/40 mt-3">
+            Pick a track → listen for 3 min → leave honest feedback → earn a credit to get your own music reviewed.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
