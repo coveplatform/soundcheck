@@ -110,7 +110,7 @@ export default async function ReviewHistoryPage() {
                 <Link
                   key={review.id}
                   href={`/listener/review/${review.id}`}
-                  className="flex items-center gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-all duration-150 hover:border-black/12"
+                  className="flex items-center gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-all duration-150 ease-out hover:border-black/12 hover:-translate-y-[1px] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] active:translate-y-0 active:shadow-none motion-reduce:transition-none motion-reduce:transform-none"
                 >
                   <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 relative">
                     {review.Track.artworkUrl ? (

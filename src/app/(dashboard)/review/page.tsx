@@ -227,7 +227,7 @@ export default async function ReviewQueuePage({
                   {claimedReviews.map((review) => (
                     <div
                       key={review.id}
-                      className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12"
+                      className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-all duration-150 ease-out hover:border-black/12 hover:-translate-y-[1px] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] active:translate-y-0 active:shadow-none motion-reduce:transition-none motion-reduce:transform-none"
                     >
                       <div className="w-[100px] flex-shrink-0 self-stretch relative bg-neutral-100">
                         {review.Track.artworkUrl ? (
@@ -280,7 +280,7 @@ export default async function ReviewQueuePage({
                   {available.map((track) => (
                     <div
                       key={track.id}
-                      className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/80 hover:border-black/12 min-h-[100px]"
+                      className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-all duration-150 ease-out hover:border-black/12 hover:-translate-y-[1px] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] active:translate-y-0 active:shadow-none motion-reduce:transition-none motion-reduce:transform-none min-h-[100px]"
                     >
                       <div className="w-[100px] flex-shrink-0 self-stretch relative bg-neutral-100">
                         {track.artworkUrl ? (

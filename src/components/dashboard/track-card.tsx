@@ -31,7 +31,7 @@ export function TrackCard({ track, priority = false, compact = false }: TrackCar
   const hasFeedback = newFeedbackCount > 0;
 
   return (
-    <div className="group flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/90 hover:border-black/12 motion-reduce:transition-none">
+    <div className="group flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-all duration-150 ease-out hover:border-black/12 hover:-translate-y-[1px] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] active:translate-y-0 active:shadow-none motion-reduce:transition-none motion-reduce:transform-none">
       {/* Artwork */}
       <div className={`${compact ? 'w-16 sm:w-[72px]' : 'w-20 sm:w-[100px]'} flex-shrink-0 self-stretch relative bg-neutral-100`}>
         {track.artworkUrl ? (
