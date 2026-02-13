@@ -141,37 +141,15 @@ export default async function TrackDetailPage({
 
   const canUpdateSource = track.status !== "CANCELLED" && completedReviews === 0;
 
-  // Calculate estimated wait time for tracks still awaiting reviews
+  // Estimated wait time for tracks still awaiting reviews
   const needsMoreReviews = track.reviewsRequested > 0 && countedCompletedReviews < track.reviewsRequested;
   let estimatedWaitHours: number | null = null;
-  let queuePosition: number | null = null;
 
   if (needsMoreReviews && (track.status === "QUEUED" || track.status === "IN_PROGRESS")) {
-    // Count how many PEER tracks are ahead in the queue (submitted before this one)
-    const tracksAhead = await prisma.track.count({
-      where: {
-        packageType: "PEER",
-        status: { in: ["QUEUED", "IN_PROGRESS"] },
-        createdAt: { lt: track.createdAt },
-      },
-    });
-    // Pro tracks jump ahead of free tracks
-    queuePosition = isSubscribed ? 1 : tracksAhead + 1;
-
-    // Calculate average reviews completed per day over the last 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const recentReviewCount = await prisma.review.count({
-      where: {
-        status: "COMPLETED",
-        updatedAt: { gte: sevenDaysAgo },
-      },
-    });
-    const reviewsPerDay = Math.max(1, recentReviewCount / 7);
     const remainingReviews = track.reviewsRequested - countedCompletedReviews;
-    // Rough estimate: (queue position * remaining reviews) / reviews per day
-    const estimatedDays = (queuePosition * remainingReviews) / reviewsPerDay;
-    estimatedWaitHours = Math.max(1, Math.round(estimatedDays * 24));
+    // Pro: ~6-12h per review, Free: ~24-48h per review
+    const hoursPerReview = isSubscribed ? 8 : 36;
+    estimatedWaitHours = Math.max(1, remainingReviews * hoursPerReview);
   }
 
   return (
