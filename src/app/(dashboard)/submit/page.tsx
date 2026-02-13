@@ -1230,62 +1230,42 @@ export default function SubmitTrackPage() {
               </div>
             )}
 
-            {/* Enough credits -- submit */}
-            {hasEnoughCredits && (
-              <Button
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                isLoading={isSubmitting}
-                className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl"
-              >
-                Submit for Review
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            )}
+            {/* Submit button - always visible, disabled if insufficient credits */}
+            <Button
+              onClick={handleSubmit}
+              disabled={!hasEnoughCredits || isSubmitting}
+              isLoading={isSubmitting}
+              className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+            >
+              Submit for Review
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
 
-            {/* Not enough credits */}
+            {/* Options when not enough credits */}
             {!hasEnoughCredits && (
-              <div className="space-y-4">
-                <div className="rounded-xl bg-amber-50 border-2 border-amber-200 p-4">
-                  <p className="text-sm text-amber-800 font-medium mb-2">
-                    ⚠️ You need {creditDeficit} more{" "}
-                    {creditDeficit === 1 ? "credit" : "credits"} for{" "}
-                    {reviewCount} reviews.
-                  </p>
-                  {cashAddOns > 0 && (
-                    <p className="text-xs text-amber-700">
-                      Note: Add-ons (${cashAddOns.toFixed(2)}) are upgrades on top of your base credits. You still need {reviewCount} credits in your account.
-                    </p>
-                  )}
-                </div>
+              <div className="space-y-3 pt-2">
+                <p className="text-sm text-center text-amber-800 font-medium">
+                  Need {creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}? Get them below:
+                </p>
 
-                <div className="space-y-3">
-                  {/* Primary: earn credits */}
-                  <Link href="/review">
-                    <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl">
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Review tracks to earn credits
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Earn credits */}
+                  <Link href="/review" className="flex-1">
+                    <Button variant="outline" className="w-full h-11 text-sm font-semibold">
+                      <Sparkles className="h-4 w-4 mr-1.5" />
+                      Earn credits
                     </Button>
                   </Link>
 
-                  <div className="flex items-center gap-3 text-xs text-black/30">
-                    <div className="flex-1 h-px bg-black/10" />
-                    <span>or</span>
-                    <div className="flex-1 h-px bg-black/10" />
-                  </div>
-
-                  {/* Secondary: buy credits */}
+                  {/* Buy credits */}
                   <Button
                     onClick={handleBuyCredits}
                     disabled={isBuyingCredits}
                     isLoading={isBuyingCredits}
-                    className="w-full border-2 border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 h-12 rounded-xl font-semibold"
+                    variant="outline"
+                    className="w-full h-11 text-sm font-semibold"
                   >
-                    Buy {creditDeficit <= 3 ? 3 : creditDeficit <= 10 ? 10 : 25} credits — {
-                      creditDeficit <= 3 ? "$2.95" :
-                      creditDeficit <= 10 ? "$7.95" :
-                      "$14.95"
-                    }
+                    Buy {creditDeficit <= 3 ? 3 : creditDeficit <= 10 ? 10 : 25} credits
                   </Button>
                 </div>
               </div>
