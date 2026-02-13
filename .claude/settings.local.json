@@ -83,7 +83,8 @@
       "Bash(if [ -f \".next/lock\" ])",
       "Bash(then echo \"Build still running\")",
       "Bash(else echo \"Build completed, lock removed\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(vercel:*)"
     ]
   }
 }
