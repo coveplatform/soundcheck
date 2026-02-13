@@ -84,7 +84,9 @@
       "Bash(then echo \"Build still running\")",
       "Bash(else echo \"Build completed, lock removed\")",
       "Bash(fi)",
-      "Bash(vercel:*)"
+      "Bash(vercel:*)",
+      "Bash(./deploy.bat)",
+      "Bash(git config:*)"
     ]
   }
 }
