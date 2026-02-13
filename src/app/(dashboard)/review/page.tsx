@@ -5,7 +5,7 @@ import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
-import { Music, ArrowRight, Star, Gem, MessageSquare, Tag, DollarSign, TrendingUp } from "lucide-react";
+import { Music, ArrowRight, Star, Gem, MessageSquare, Tag, DollarSign, TrendingUp, Zap } from "lucide-react";
 import { isPeerReviewerPro, PRO_TIER_MIN_REVIEWS, PRO_TIER_MIN_RATING, TIER_RATES } from "@/lib/queue";
 import { GenreTagList } from "@/components/ui/genre-tag";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -124,6 +124,7 @@ export default async function ReviewQueuePage({
       ArtistProfile: {
         select: {
           artistName: true,
+          subscriptionStatus: true,
           User: { select: { email: true } },
         },
       },
@@ -141,13 +142,17 @@ export default async function ReviewQueuePage({
   });
 
   // Filter to only tracks that still need more reviewers
-  // Sort: real user tracks first, seeded tracks last
+  // Sort: Pro tracks first, then free, then seeded tracks last
   const available = availableTracksResult
     .filter((t) => t._count.Review < t.reviewsRequested)
     .sort((a, b) => {
       const aIsSeed = a.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       const bIsSeed = b.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       if (aIsSeed !== bIsSeed) return aIsSeed ? 1 : -1;
+      // Pro tracks above free tracks
+      const aIsPro = a.ArtistProfile?.subscriptionStatus === "active";
+      const bIsPro = b.ArtistProfile?.subscriptionStatus === "active";
+      if (aIsPro !== bIsPro) return aIsPro ? -1 : 1;
       return 0; // preserve createdAt order within each group
     });
 
@@ -307,7 +312,15 @@ export default async function ReviewQueuePage({
                       <div className="flex items-center justify-between gap-4 flex-1 min-w-0 px-4 py-3.5">
                         <div className="min-w-0 flex-1">
                           <p className="text-base font-semibold text-black truncate">{track.title}</p>
-                          <p className="text-sm text-neutral-600 mb-1">by {track.ArtistProfile.artistName}</p>
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <p className="text-sm text-neutral-600">by {track.ArtistProfile.artistName}</p>
+                            {track.ArtistProfile.subscriptionStatus === "active" && (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">
+                                <Zap className="h-2.5 w-2.5" />
+                                Priority
+                              </span>
+                            )}
+                          </div>
                           <div className="flex items-center gap-2 flex-wrap">
                             <GenreTagList genres={track.Genre} variant="neutral" size="sm" maxDisplay={2} />
                           </div>

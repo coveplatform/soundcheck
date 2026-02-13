@@ -22,6 +22,7 @@ import {
   XCircle,
   Clock,
   Loader2,
+  Zap,
 } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
@@ -139,6 +140,39 @@ export default async function TrackDetailPage({
   );
 
   const canUpdateSource = track.status !== "CANCELLED" && completedReviews === 0;
+
+  // Calculate estimated wait time for tracks still awaiting reviews
+  const needsMoreReviews = track.reviewsRequested > 0 && countedCompletedReviews < track.reviewsRequested;
+  let estimatedWaitHours: number | null = null;
+  let queuePosition: number | null = null;
+
+  if (needsMoreReviews && (track.status === "QUEUED" || track.status === "IN_PROGRESS")) {
+    // Count how many PEER tracks are ahead in the queue (submitted before this one)
+    const tracksAhead = await prisma.track.count({
+      where: {
+        packageType: "PEER",
+        status: { in: ["QUEUED", "IN_PROGRESS"] },
+        createdAt: { lt: track.createdAt },
+      },
+    });
+    // Pro tracks jump ahead of free tracks
+    queuePosition = isSubscribed ? 1 : tracksAhead + 1;
+
+    // Calculate average reviews completed per day over the last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const recentReviewCount = await prisma.review.count({
+      where: {
+        status: "COMPLETED",
+        updatedAt: { gte: sevenDaysAgo },
+      },
+    });
+    const reviewsPerDay = Math.max(1, recentReviewCount / 7);
+    const remainingReviews = track.reviewsRequested - countedCompletedReviews;
+    // Rough estimate: (queue position * remaining reviews) / reviews per day
+    const estimatedDays = (queuePosition * remainingReviews) / reviewsPerDay;
+    estimatedWaitHours = Math.max(1, Math.round(estimatedDays * 24));
+  }
 
   return (
     <div className="pt-8 pb-24">
@@ -370,6 +404,57 @@ export default async function TrackDetailPage({
                 </a>
               </CardContent>
             </Card>
+
+            {/* Queue Status */}
+            {needsMoreReviews && estimatedWaitHours !== null && (
+              <Card variant="soft" elevated>
+                <CardContent className="pt-6">
+                  <p className="text-xs font-mono tracking-widest uppercase text-black/40 mb-3">
+                    Queue Status
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-black/40" />
+                        <span className="text-sm text-black/60">Est. wait</span>
+                      </div>
+                      <span className="text-sm font-bold text-black">
+                        {estimatedWaitHours < 24
+                          ? `~${estimatedWaitHours}h`
+                          : estimatedWaitHours < 48
+                            ? "~1 day"
+                            : `~${Math.round(estimatedWaitHours / 24)} days`}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 text-black/40" />
+                        <span className="text-sm text-black/60">Remaining</span>
+                      </div>
+                      <span className="text-sm font-bold text-black">
+                        {track.reviewsRequested - countedCompletedReviews} review{track.reviewsRequested - countedCompletedReviews !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                    {isSubscribed ? (
+                      <div className="flex items-center gap-1.5 pt-1">
+                        <Zap className="h-3.5 w-3.5 text-amber-600" />
+                        <span className="text-xs font-bold text-amber-700">Priority queue active</span>
+                      </div>
+                    ) : (
+                      <Link
+                        href="/account"
+                        className="flex items-center gap-2 pt-2 border-t border-black/8 group"
+                      >
+                        <Zap className="h-3.5 w-3.5 text-purple-500" />
+                        <span className="text-xs font-medium text-purple-600 group-hover:text-purple-800 transition-colors">
+                          Upgrade to Pro for priority queue
+                        </span>
+                      </Link>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Artist Note */}
             {track.feedbackFocus && (
