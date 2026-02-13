@@ -401,6 +401,8 @@ export default function SubmitTrackPage() {
       // 2. Route based on whether there are cash add-ons
       if (cashAddOns > 0) {
         // Route to add-ons checkout
+        console.log('Cash add-ons detected:', cashAddOns, 'Creating checkout for track:', trackId);
+
         const res = await fetch(`/api/tracks/${trackId}/checkout-addons`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -412,18 +414,24 @@ export default function SubmitTrackPage() {
         });
 
         const data = await res.json();
+        console.log('Checkout response:', res.status, data);
 
         if (!res.ok) {
-          setError(data.error || "Failed to create checkout");
+          console.error('Checkout failed:', data);
+          setError(data.error || "Failed to create checkout. Please try again.");
           setIsSubmitting(false);
           return;
         }
 
         if (data.url) {
+          console.log('Redirecting to Stripe:', data.url);
           window.location.href = data.url; // Redirect to Stripe
+          return; // Stop execution after redirect
         } else {
-          setError("Failed to create checkout");
+          console.error('No checkout URL returned:', data);
+          setError("Checkout session created but no payment URL returned. Please contact support.");
           setIsSubmitting(false);
+          return;
         }
       } else {
         // Credits-only path (existing flow)

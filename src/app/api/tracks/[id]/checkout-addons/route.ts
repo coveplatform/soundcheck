@@ -80,7 +80,7 @@ export async function POST(
     if (track.ArtistProfile.reviewCredits < creditCost) {
       return NextResponse.json(
         {
-          error: "Insufficient credits",
+          error: "Insufficient credits. You need credits to request reviews, even when using add-ons.",
           required: creditCost,
           available: track.ArtistProfile.reviewCredits,
         },
