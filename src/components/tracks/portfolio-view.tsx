@@ -146,13 +146,13 @@ export function PortfolioView({
               <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-5">
                 <BarChart3 className="h-7 w-7 text-purple-600" />
               </div>
-              <h2 className="text-2xl font-black mb-2">Unlock Portfolio Analytics</h2>
+              <h2 className="text-2xl font-black mb-2">See what&apos;s working</h2>
               <p className="text-sm text-black/60 mb-6">
                 MixReflect Pro &middot; <span className="font-bold text-black">$9.95/month</span>
               </p>
 
               <p className="text-sm text-black/70 max-w-lg mx-auto mb-6">
-                See what&apos;s improving, what&apos;s holding you back, and which tracks are actually landing -- without digging through every review.
+                Track your growth across every track. See which areas are improving, spot patterns in your feedback, and know exactly where to focus next.
               </p>
 
               <div className="bg-white/50 rounded-2xl p-5 max-w-lg mx-auto mb-7">

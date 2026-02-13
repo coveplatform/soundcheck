@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 import { Grid3x3, BarChart3 } from "lucide-react";
 
 interface TracksViewToggleProps {
-  defaultView?: "grid" | "portfolio";
+  defaultView?: "grid" | "insights";
   isPro: boolean;
-  onViewChange?: (view: "grid" | "portfolio") => void;
+  onViewChange?: (view: "grid" | "insights") => void;
   gridView: React.ReactNode;
-  portfolioView: React.ReactNode;
+  insightsView: React.ReactNode;
 }
 
 export function TracksViewToggle({
@@ -17,11 +17,11 @@ export function TracksViewToggle({
   isPro,
   onViewChange,
   gridView,
-  portfolioView,
+  insightsView,
 }: TracksViewToggleProps) {
-  const [activeView, setActiveView] = useState<"grid" | "portfolio">(defaultView);
+  const [activeView, setActiveView] = useState<"grid" | "insights">(defaultView);
 
-  const handleViewChange = (view: "grid" | "portfolio") => {
+  const handleViewChange = (view: "grid" | "insights") => {
     setActiveView(view);
     onViewChange?.(view);
   };
@@ -45,16 +45,16 @@ export function TracksViewToggle({
           </button>
 
           <button
-            onClick={() => handleViewChange("portfolio")}
+            onClick={() => handleViewChange("insights")}
             className={cn(
               "flex items-center gap-2 px-4 py-3 font-bold text-sm whitespace-nowrap transition-all duration-150 ease-out border-b-2 -mb-0.5",
-              activeView === "portfolio"
+              activeView === "insights"
                 ? "text-purple-600 border-purple-600"
                 : "text-black/40 border-transparent hover:text-black/60 hover:border-black/20"
             )}
           >
             <BarChart3 className="h-4 w-4" />
-            Portfolio
+            Insights
             {!isPro && (
               <span className="text-[9px] font-semibold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded ml-1">
                 PRO
@@ -67,7 +67,7 @@ export function TracksViewToggle({
       {/* View Content */}
       <div>
         {activeView === "grid" && gridView}
-        {activeView === "portfolio" && portfolioView}
+        {activeView === "insights" && insightsView}
       </div>
     </div>
   );

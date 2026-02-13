@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Tooltip } from "@/components/ui/tooltip";
-import { ArrowRight, MessageCircle, Trophy, Music, Headphones } from "lucide-react";
+import { ArrowRight, MessageCircle, Trophy, Music, Headphones, BarChart3 } from "lucide-react";
 import {
   SparklesDoodle,
   SquiggleDoodle,
@@ -518,27 +518,25 @@ export default async function DashboardPage() {
                   </div>
                 )}
               </div>
-              {!isSubscribed && (
-                <div className="border border-purple-200 rounded-2xl bg-gradient-to-br from-purple-50 via-white to-purple-100 p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="h-9 w-9 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
-                      <ArrowRight className="h-4 w-4 text-white rotate-[-45deg]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-black">Go Pro</p>
-                      <p className="text-xs text-neutral-500">40 credits/mo · no reviewing required</p>
-                    </div>
+              <Link href="/tracks" className="block">
+                <div className={`border rounded-2xl p-4 transition-colors duration-150 ease-out ${isSubscribed ? 'border-purple-200 bg-gradient-to-br from-purple-50/80 via-white to-purple-50/50 hover:bg-purple-50/80' : 'border-black/10 bg-white/60 hover:bg-white/80'}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <BarChart3 className="h-3.5 w-3.5 text-purple-600" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600">Insights</span>
+                    {!isSubscribed && (
+                      <span className="text-[9px] font-semibold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded ml-auto">PRO</span>
+                    )}
                   </div>
-                  <Link href="/account">
-                    <Button
-                      className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out motion-reduce:transition-none text-sm h-9"
-                    >
-                      $9.95/month
-                      <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
-                    </Button>
-                  </Link>
+                  <p className="text-sm font-bold text-black mb-0.5">
+                    {isSubscribed ? 'See your progress' : 'See what\u2019s working'}
+                  </p>
+                  <p className="text-xs text-black/40">
+                    {isSubscribed
+                      ? 'Score trends, feedback patterns, and growth across all your tracks.'
+                      : 'Track your scores, spot patterns, and know where to focus next.'}
+                  </p>
                 </div>
-              )}
+              </Link>
             </aside>
         </div>
 

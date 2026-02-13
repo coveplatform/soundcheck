@@ -313,7 +313,7 @@ export default async function TracksPage() {
               </div>
             )
           }
-          portfolioView={
+          insightsView={
             <PortfolioView
               isPro={isPro}
               hasData={hasAnalyticsData}
