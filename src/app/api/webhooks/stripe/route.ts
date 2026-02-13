@@ -6,6 +6,7 @@ import { assignReviewersToTrack } from "@/lib/queue";
 import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email";
 import { finalizePaidCheckoutSession } from "@/lib/payments";
 import type Stripe from "stripe";
+import { AddOnType, PaymentStatus } from "@prisma/client";
 
 
 async function handleReviewCreditsTopup(session: Stripe.Checkout.Session) {
@@ -96,8 +97,8 @@ async function handleAddOnsCheckout(session: Stripe.Checkout.Session) {
         data: {
           reviewsRequested: reviewCount,
           creditsSpent: creditCost,
-          requestedProReviewers,
-          requestedExpertReviewers,
+          requestedProReviewers: requestProReviewers,
+          requestedExpertReviewers: requestExpertReviewers,
           rushDelivery,
           rushDeliveryDeadline,
           cashAddOnTotal: session.amount_total || 0,
@@ -110,10 +111,10 @@ async function handleAddOnsCheckout(session: Stripe.Checkout.Session) {
       // 3. Create AddOnPayment records for accounting
       const addOnPayments: Array<{
         trackId: string;
-        addOnType: string;
+        addOnType: AddOnType;
         amountCents: number;
         stripePaymentIntentId: string | null;
-        status: string;
+        status: PaymentStatus;
         completedAt: Date;
       }> = [];
 
