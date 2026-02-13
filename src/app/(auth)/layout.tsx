@@ -84,7 +84,7 @@ export default function AuthLayout({
         {/* Bottom tagline */}
         <div className="relative z-10 pt-6 border-t border-white/10">
           <p className="text-xs text-purple-200 font-semibold">
-            No credit card required · Upgrade to Pro anytime
+            No credit card required · Pay as you go
           </p>
         </div>
       </div>

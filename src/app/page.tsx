@@ -301,7 +301,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">Unlimited reviews per day</span> to earn credits</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">Review tracks</span> to earn credits</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />

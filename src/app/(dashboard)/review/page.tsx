@@ -208,11 +208,7 @@ export default async function ReviewQueuePage({
             <span className="text-neutral-300">•</span>
             <span>Earn 1 credit per review</span>
             <span className="text-neutral-300">•</span>
-            {isPro ? (
-              <span className="text-lime-600 font-semibold">Unlimited reviews (Pro)</span>
-            ) : (
-              <span>{reviewsRemaining} of {MAX_REVIEWS_PER_DAY} reviews left today</span>
-            )}
+            <span>{reviewsRemaining} of {MAX_REVIEWS_PER_DAY} reviews left today</span>
           </div>
           <p className="text-xs text-black/40 mt-3">
             Pick a track → listen for 3 min → leave honest feedback → earn a credit to get your own music reviewed.
@@ -277,13 +273,7 @@ export default async function ReviewQueuePage({
                 reviewsRemaining === 0 ? (
                   <div className="py-8 text-center">
                     <p className="text-base font-bold text-black mb-1">You&apos;ve hit today&apos;s limit</p>
-                    <p className="text-sm text-black/50 mb-4">Free accounts can review up to {MAX_REVIEWS_PER_DAY} tracks per day.</p>
-                    <Link href="/account">
-                      <Button className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out text-sm h-10 px-5 rounded-xl">
-                        Go Pro — unlimited reviews
-                        <ArrowRight className="h-3.5 w-3.5 ml-2" />
-                      </Button>
-                    </Link>
+                    <p className="text-sm text-black/50 mb-4">You can review up to {MAX_REVIEWS_PER_DAY} tracks per day. Check back tomorrow!</p>
                   </div>
                 ) : (
                   <EmptyState

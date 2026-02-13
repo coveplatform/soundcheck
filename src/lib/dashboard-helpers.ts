@@ -152,12 +152,12 @@ export function getWhatsNextGuidance(profile: {
     };
   }
 
-  if (!isSubscribed && credits < 3) {
+  if (credits < 3) {
     return {
       title: "Running low on credits",
       description:
-        "Upgrade to Pro for 40 credits per month or review more tracks.",
-      action: { label: "Upgrade to Pro", href: "/account" },
+        "Review more tracks to earn credits or buy a review package.",
+      action: { label: "Buy credits", href: "/submit" },
       priority: "medium",
     };
   }

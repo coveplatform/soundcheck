@@ -38,7 +38,7 @@ export function ReviewsTab({ reviews, isFreeTier = false, trackId }: ReviewsTabP
                 Unlock detailed analytics
               </h4>
               <p className="text-xs text-black/60 leading-relaxed mb-3">
-                See score trends over time, compare across tracks, and get actionable insights from your feedback with Pro analytics.
+                See score trends over time, compare across tracks, and get actionable insights from your feedback.
               </p>
               <div className="flex flex-wrap gap-3 text-[11px] text-black/40 mb-4">
                 <span className="inline-flex items-center gap-1">
@@ -48,9 +48,9 @@ export function ReviewsTab({ reviews, isFreeTier = false, trackId }: ReviewsTabP
                   <TrendingUp className="h-3 w-3" /> Trend analysis
                 </span>
               </div>
-              <Link href="/artist/submit">
+              <Link href="/tracks">
                 <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:shadow-[3px_3px_0_rgba(0,0,0,0.6)] active:shadow-[1px_1px_0_rgba(0,0,0,0.6)] active:translate-x-[1px] active:translate-y-[1px] transition-all">
-                  Go Pro
+                  View Insights
                   <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                 </Button>
               </Link>

@@ -285,14 +285,14 @@ export function TrackSharingModal({
                       {!canSell && (
                         <div className="mt-3 pt-3 border-t border-neutral-200">
                           <p className="text-xs text-neutral-600 mb-2">
-                            {eligibilityReason || "Upgrade to Pro to sell downloads and earn from your tracks"}
+                            {eligibilityReason || "Upload your track as MP3/WAV to sell downloads and earn"}
                           </p>
                           <Button
                             onClick={handleUpgrade}
                             size="sm"
                             className="w-full bg-black text-white hover:bg-neutral-800"
                           >
-                            Upgrade to Pro - $9.95/mo
+                            Upload Track
                           </Button>
                         </div>
                       )}

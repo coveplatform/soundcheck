@@ -308,7 +308,7 @@ export async function POST(request: Request) {
 
       if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
         return NextResponse.json(
-          { error: "You've reached the daily limit of 5 reviews. Upgrade to Pro for unlimited reviews!" },
+          { error: "You've reached the daily limit of 5 reviews. Come back tomorrow or buy credits to get more reviews!" },
           { status: 429 }
         );
       }

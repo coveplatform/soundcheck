@@ -89,7 +89,8 @@
       "Bash(git config:*)",
       "Bash(npx vercel:*)",
       "Bash(cmd.exe:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Bash(git diff:*)"
     ]
   }
 }

@@ -180,16 +180,13 @@ export function BusinessPageClient({
                   <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-5">
                     <ShoppingCart className="h-7 w-7 text-teal-600" />
                   </div>
-                  <h2 className="text-2xl font-black mb-2">Unlock Sales & Earnings</h2>
-                  <p className="text-sm text-black/60 mb-6">
-                    MixReflect Pro &middot; <span className="font-bold text-black">$9.95/month</span>
-                  </p>
+                  <h2 className="text-2xl font-black mb-2">Upload Tracks to Unlock Sales</h2>
                   <p className="text-sm text-black/70 max-w-lg mx-auto mb-6">
-                    Sell your tracks, track affiliate campaigns, and manage all your earnings in one place.
+                    Upload your tracks (MP3/WAV) to enable public sharing, sell downloads, track affiliate campaigns, and manage all your earnings in one place.
                   </p>
-                  <Link href="/account">
+                  <Link href="/submit">
                     <Button variant="primary" size="lg">
-                      Upgrade to Pro
+                      Upload a Track
                       <Sparkles className="h-5 w-5 ml-2" />
                     </Button>
                   </Link>

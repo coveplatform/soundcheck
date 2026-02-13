@@ -6,7 +6,6 @@ import { Grid3x3, BarChart3 } from "lucide-react";
 
 interface TracksViewToggleProps {
   defaultView?: "grid" | "insights";
-  isPro: boolean;
   onViewChange?: (view: "grid" | "insights") => void;
   gridView: React.ReactNode;
   insightsView: React.ReactNode;
@@ -14,7 +13,6 @@ interface TracksViewToggleProps {
 
 export function TracksViewToggle({
   defaultView = "grid",
-  isPro,
   onViewChange,
   gridView,
   insightsView,
@@ -55,11 +53,6 @@ export function TracksViewToggle({
           >
             <BarChart3 className="h-4 w-4" />
             Insights
-            {!isPro && (
-              <span className="text-[9px] font-semibold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded ml-1">
-                PRO
-              </span>
-            )}
           </button>
         </div>
       </div>

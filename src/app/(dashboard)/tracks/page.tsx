@@ -26,12 +26,11 @@ export default async function TracksPage() {
     redirect("/login");
   }
 
-  // First, get basic artist profile to check Pro status
+  // Get basic artist profile
   const basicProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
     select: {
       id: true,
-      subscriptionStatus: true,
       totalEarnings: true,
       pendingBalance: true,
     },
@@ -41,10 +40,7 @@ export default async function TracksPage() {
     redirect("/onboarding");
   }
 
-  const isPro = basicProfile.subscriptionStatus === "active";
-
-  // Fetch all track data including reviews for all users (needed for review counts/progress)
-  // Analytics UI is gated behind isPro in the rendering, not the query
+  // Fetch all track data including reviews for analytics
   const artistProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
     include: {
@@ -85,13 +81,13 @@ export default async function TracksPage() {
   const totalEarnings = basicProfile.totalEarnings / 100;
   const pendingBalance = basicProfile.pendingBalance / 100;
 
-  // Calculate portfolio analytics data (ONLY for Pro users)
-  const tracksWithReviews = isPro ? tracks.filter(t => t.Review && t.Review.length > 0) : [];
+  // Calculate portfolio analytics data
+  const tracksWithReviews = tracks.filter(t => t.Review && t.Review.length > 0);
   const hasAnalyticsData = tracksWithReviews.length > 0;
 
   let portfolioData = null;
 
-  if (isPro && hasAnalyticsData) {
+  if (hasAnalyticsData) {
     const totalReviews = tracks.reduce((sum, t) => sum + t.Review.length, 0);
     const totalTracks = tracksWithReviews.length;
 
@@ -258,7 +254,6 @@ export default async function TracksPage() {
 
         {/* View Toggle */}
         <TracksViewToggle
-          isPro={isPro}
           gridView={
             tracks.length === 0 ? (
               <EmptyState />
@@ -315,7 +310,6 @@ export default async function TracksPage() {
           }
           insightsView={
             <PortfolioView
-              isPro={isPro}
               hasData={hasAnalyticsData}
               {...portfolioData}
             />
