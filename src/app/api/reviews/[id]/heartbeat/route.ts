@@ -59,8 +59,8 @@ export async function POST(
 
     if (clientListenTime !== null && clientListenTime > review.listenDuration) {
       // Client is providing its listen time for sync (e.g. before submission).
-      // Trust it, but cap at current + 60s to prevent abuse.
-      const maxAllowed = review.listenDuration + 60;
+      // Trust it, but cap at current + 300s to allow catch-up from missed heartbeats.
+      const maxAllowed = review.listenDuration + 300;
       newListenDuration = Math.min(clientListenTime, maxAllowed);
     } else {
       // Normal heartbeat: increment by time since last heartbeat (capped at 10s)

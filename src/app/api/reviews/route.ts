@@ -250,8 +250,9 @@ export async function POST(request: Request) {
     }
 
     if (
-      !review.lastHeartbeat ||
-      Date.now() - review.lastHeartbeat.getTime() > 2 * 60 * 1000
+      !skipListenTimer &&
+      (!review.lastHeartbeat ||
+        Date.now() - review.lastHeartbeat.getTime() > 2 * 60 * 1000)
     ) {
       return NextResponse.json(
         { error: "Listen session expired. Please keep listening and try again." },
