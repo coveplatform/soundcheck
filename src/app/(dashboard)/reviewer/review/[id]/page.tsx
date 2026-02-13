@@ -1071,7 +1071,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   return (
     <div className="pt-8 pb-24">
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <button
@@ -1107,6 +1107,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </Button>
         </div>
       </div>
+
+      <div className="grid lg:grid-cols-[400px_minmax(0,1fr)] gap-6 mt-6">
+        {/* LEFT COLUMN: Track + Quick Reactions */}
+        <div className="space-y-4 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
 
       {/* Track Info */}
       <Card variant="soft" elevated>
@@ -1210,17 +1214,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </CardContent>
       </Card>
 
-      {/* Review Form */}
+      {/* Quick Reactions */}
       <Card variant="soft" elevated>
-        <CardHeader className="border-b border-black/10">
-          <CardTitle>Your Review</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6 pt-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm p-3 font-medium">
-              {error}
-            </div>
-          )}
+        <CardContent className="space-y-5 pt-5">
 
           {/* First Impression */}
           <div
@@ -1295,23 +1291,26 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                 {validationIssues.filter((i) => i.section === "scores").map((i) => i.message).join(", ")}
               </p>
             )}
-            <div className="grid sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <ScoreInput
-                label="Production Quality"
+                label="Production"
                 value={productionScore}
                 onChange={setProductionScore}
                 hasError={validationIssues.some((i) => i.id === "productionScore")}
+                size="sm"
               />
               <ScoreInput
-                label="Vocals (optional)"
+                label="Vocals"
                 value={vocalScore}
                 onChange={setVocalScore}
+                size="sm"
               />
               <ScoreInput
                 label="Originality"
                 value={originalityScore}
                 onChange={setOriginalityScore}
                 hasError={validationIssues.some((i) => i.id === "originalityScore")}
+                size="sm"
               />
             </div>
           </div>
@@ -1360,22 +1359,19 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Listener Signals */}
-          <div className="space-y-4 p-4 bg-neutral-50/60 border border-black/10 rounded-2xl mt-4">
-            <div>
-              <Label className="text-base font-bold">Quick Listener Signals</Label>
-              <p className="text-xs text-neutral-600 mt-1">Help the artist understand how listeners might engage with this track</p>
-            </div>
+          <div className="space-y-3 p-4 bg-neutral-50/60 border border-black/10 rounded-2xl mt-4">
+            <Label className="text-sm font-bold">Listener Signals</Label>
 
-            <div className="grid sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               {/* Would add to playlist */}
               <div className="space-y-2">
-                <Label className="text-sm">Add to playlist?</Label>
-                <div className="flex gap-2">
+                <Label className="text-xs">Playlist?</Label>
+                <div className="flex gap-1">
                   <button
                     type="button"
                     onClick={() => setWouldAddToPlaylist(true)}
                     className={cn(
-                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
+                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldAddToPlaylist === true
                         ? "border-purple-400 bg-purple-600 text-white"
                         : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
@@ -1387,7 +1383,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldAddToPlaylist(false)}
                     className={cn(
-                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
+                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldAddToPlaylist === false
                         ? "border-neutral-700 bg-neutral-800 text-white"
                         : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
@@ -1400,13 +1396,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
               {/* Would share */}
               <div className="space-y-2">
-                <Label className="text-sm">Share with a friend?</Label>
-                <div className="flex gap-2">
+                <Label className="text-xs">Share?</Label>
+                <div className="flex gap-1">
                   <button
                     type="button"
                     onClick={() => setWouldShare(true)}
                     className={cn(
-                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
+                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldShare === true
                         ? "border-purple-400 bg-purple-600 text-white"
                         : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
@@ -1418,7 +1414,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldShare(false)}
                     className={cn(
-                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
+                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldShare === false
                         ? "border-neutral-700 bg-neutral-800 text-white"
                         : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
@@ -1431,13 +1427,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
               {/* Would follow */}
               <div className="space-y-2">
-                <Label className="text-sm">Follow this artist?</Label>
-                <div className="flex gap-2">
+                <Label className="text-xs">Follow?</Label>
+                <div className="flex gap-1">
                   <button
                     type="button"
                     onClick={() => setWouldFollow(true)}
                     className={cn(
-                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
+                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldFollow === true
                         ? "border-purple-400 bg-purple-600 text-white"
                         : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
@@ -1449,7 +1445,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                     type="button"
                     onClick={() => setWouldFollow(false)}
                     className={cn(
-                      "flex-1 py-2.5 px-3 text-sm font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
+                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
                       wouldFollow === false
                         ? "border-neutral-700 bg-neutral-800 text-white"
                         : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
@@ -1463,7 +1459,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Genre & Similar Artists */}
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid gap-3">
             <div className="space-y-2">
               <Label htmlFor="genre">What genre is this? (optional)</Label>
               <Input
@@ -1483,6 +1479,24 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               />
             </div>
           </div>
+        </CardContent>
+      </Card>
+        </div>
+
+        {/* RIGHT COLUMN: Written Feedback */}
+        <div className="space-y-6">
+
+      {/* Written Feedback */}
+      <Card variant="soft" elevated>
+        <CardHeader className="border-b border-black/10">
+          <CardTitle>Your Feedback</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6 pt-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm p-3 font-medium">
+              {error}
+            </div>
+          )}
 
           {/* Best Part */}
           <div ref={bestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-lg transition-colors", validationIssues.some((i) => i.section === "bestPart") && "bg-red-50/60 border border-red-200 rounded-xl")}>
@@ -1685,6 +1699,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </Button>
         </CardContent>
       </Card>
+        </div>
+      </div>
     </div>
 
       {/* Skip Track Dialog */}
