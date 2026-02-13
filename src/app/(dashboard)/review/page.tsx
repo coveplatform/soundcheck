@@ -298,11 +298,11 @@ export default async function ReviewQueuePage({
                   {available.map((track) => (
                     <div
                       key={track.id}
-                      className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-all duration-150 ease-out hover:border-black/12 hover:-translate-y-[1px] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] active:translate-y-0 active:shadow-none motion-reduce:transition-none motion-reduce:transform-none min-h-[100px]"
+                      className="flex items-stretch gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-all duration-150 ease-out hover:border-black/12 hover:-translate-y-[1px] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] active:translate-y-0 active:shadow-none motion-reduce:transition-none motion-reduce:transform-none min-h-[80px] sm:min-h-[100px]"
                     >
-                      <div className="w-[100px] flex-shrink-0 self-stretch relative bg-neutral-100">
+                      <div className="w-[80px] sm:w-[100px] flex-shrink-0 self-stretch relative bg-neutral-100">
                         {track.artworkUrl ? (
-                          <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="100px" />
+                          <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="(max-width: 640px) 80px, 100px" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Music className="h-5 w-5 text-neutral-400" />
@@ -312,10 +312,10 @@ export default async function ReviewQueuePage({
                       <div className="flex items-center justify-between gap-4 flex-1 min-w-0 px-4 py-3.5">
                         <div className="min-w-0 flex-1">
                           <p className="text-base font-semibold text-black truncate">{track.title}</p>
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <p className="text-sm text-neutral-600">by {track.ArtistProfile.artistName}</p>
+                          <div className="flex items-center gap-1.5 mb-1 min-w-0">
+                            <p className="text-sm text-neutral-600 truncate">by {track.ArtistProfile.artistName}</p>
                             {track.ArtistProfile.subscriptionStatus === "active" && (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded flex-shrink-0">
                                 <Zap className="h-2.5 w-2.5" />
                                 Priority
                               </span>
