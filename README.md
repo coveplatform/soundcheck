@@ -19,3 +19,4 @@ npm run dev
 ```
 
 Open `http://localhost:3000`.
+// Pro subscription removed - now freemium with add-ons
