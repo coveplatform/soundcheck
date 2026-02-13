@@ -1108,65 +1108,75 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-[400px_minmax(0,1fr)] gap-6 mt-6">
-        {/* LEFT COLUMN: Track + Quick Reactions */}
-        <div className="space-y-4 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
-
-      {/* Track Info */}
-      <Card variant="soft" elevated>
+      {/* TRACK INFO + AUDIO PLAYER - Full Width */}
+      <Card variant="soft" elevated className="mt-6">
         <CardHeader className="border-b border-black/10">
           <div className="flex items-start gap-4">
-            <div className="h-12 w-12 bg-neutral-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Music className="h-6 w-6 text-neutral-400" />
+            <div className="h-14 w-14 bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl flex items-center justify-center flex-shrink-0 border border-purple-200/50">
+              <Music className="h-7 w-7 text-purple-600" />
             </div>
-            <div>
-              <CardTitle className="text-xl">{review.Track.title}</CardTitle>
-              <p className="text-sm text-neutral-500">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-2xl">{review.Track.title}</CardTitle>
+              <p className="text-sm text-neutral-600 font-medium mt-1">
                 {review.Track.Genre.map((g) => g.name).join(", ")}
               </p>
             </div>
+            {/* Quick add timestamp in header on desktop */}
+            <div className="hidden lg:flex lg:flex-col lg:gap-2 lg:items-end">
+              {timestampNotes.length > 0 && (
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-neutral-500 font-medium">Timestamps:</span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 font-bold font-mono rounded-md">
+                    {timestampNotes.filter(t => t.note.trim()).length}/{timestampNotes.length}
+                  </span>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => addTimestampNote(playerSeconds)}
+                className="px-3 py-2 text-xs font-bold border-2 border-black/10 rounded-lg bg-white hover:bg-neutral-50 hover:border-black/20 transition-all duration-150 ease-out"
+              >
+                + Timestamp {formatTimestamp(playerSeconds)}
+              </button>
+            </div>
           </div>
           {review.Track.feedbackFocus && (
-            <div className="mt-4 p-3 bg-amber-50/60 border border-amber-200/60 rounded-2xl">
-              <p className="text-sm text-amber-800">
-                <span className="font-semibold">Artist note:</span> {review.Track.feedbackFocus}
+            <div className="mt-4 p-3 bg-gradient-to-br from-amber-50 to-amber-100/50 border border-amber-300/50 rounded-xl">
+              <p className="text-sm text-amber-900">
+                <span className="font-bold">Artist note:</span> {review.Track.feedbackFocus}
               </p>
             </div>
           )}
         </CardHeader>
-        <CardContent className="pt-6 space-y-4">
-          <AudioPlayer
-              sourceUrl={review.Track.sourceUrl}
-              sourceType={review.Track.sourceType}
-              showWaveform={review.Track.sourceType === "UPLOAD"}
-              minListenTime={review.skipListenTimer ? 0 : MIN_LISTEN_SECONDS}
-              initialListenTime={listenTime}
-              onTimeUpdate={(seconds) => setPlayerSeconds(seconds)}
-              onListenProgress={(seconds) => {
-                setListenTime((prev) => Math.max(prev, seconds));
-                void maybeSendHeartbeat();
-              }}
-              onMinimumReached={() => {
-                setCanSubmit(true);
-                funnels.review.minimumReached(review.Track.id, MIN_LISTEN_SECONDS);
-              }}
-              onAddTimestamp={(seconds) => {
-                addTimestampNote(seconds);
-              }}
-              showListenTracker
-            />
-        </CardContent>
-      </Card>
-
-      <Card variant="soft" elevated>
         <CardContent className="pt-6">
-          {/* Inline timestamp controls */}
-          <div className="border-t border-black/10 pt-4">
-            <div className="flex items-center justify-between gap-3 mb-2">
+          <AudioPlayer
+            sourceUrl={review.Track.sourceUrl}
+            sourceType={review.Track.sourceType}
+            showWaveform={review.Track.sourceType === "UPLOAD"}
+            minListenTime={review.skipListenTimer ? 0 : MIN_LISTEN_SECONDS}
+            initialListenTime={listenTime}
+            onTimeUpdate={(seconds) => setPlayerSeconds(seconds)}
+            onListenProgress={(seconds) => {
+              setListenTime((prev) => Math.max(prev, seconds));
+              void maybeSendHeartbeat();
+            }}
+            onMinimumReached={() => {
+              setCanSubmit(true);
+              funnels.review.minimumReached(review.Track.id, MIN_LISTEN_SECONDS);
+            }}
+            onAddTimestamp={(seconds) => {
+              addTimestampNote(seconds);
+            }}
+            showListenTracker
+          />
+
+          {/* Timestamp quick access - visible on mobile */}
+          <div className="lg:hidden mt-4 pt-4 border-t border-black/10">
+            <div className="flex items-center justify-between gap-3 mb-3">
               <span className="text-sm font-bold text-neutral-700">
                 Timestamp Notes
                 {timestampNotes.length > 0 && (
-                  <span className="ml-2 px-2 py-0.5 text-xs bg-black text-white rounded-full">
+                  <span className="ml-2 px-2 py-0.5 text-xs bg-black text-white rounded-full font-mono">
                     {timestampNotes.length}
                   </span>
                 )}
@@ -1179,12 +1189,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                 + Add at {formatTimestamp(playerSeconds)}
               </button>
             </div>
-
-            {timestampNotes.length === 0 ? (
-              <p className="text-xs text-neutral-500">
-                Click the button above to mark moments in the track
-              </p>
-            ) : (
+            {timestampNotes.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {timestampNotes.map((t) => (
                   <button
@@ -1214,21 +1219,35 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </CardContent>
       </Card>
 
+      {/* MAIN CONTENT - 2 Balanced Columns on Desktop */}
+      <div className="grid lg:grid-cols-2 gap-6 mt-6">
+
+        {/* LEFT COLUMN: Quick Reactions & Scores */}
+        <div className="space-y-6">
+
       {/* Quick Reactions */}
-      <Card variant="soft" elevated>
+      <Card variant="soft" elevated className="border-l-4 border-l-purple-500">
+        <CardHeader className="border-b border-black/10">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-purple-500"></span>
+            Quick Reactions
+          </CardTitle>
+        </CardHeader>
         <CardContent className="space-y-5 pt-5">
 
           {/* First Impression */}
           <div
             ref={firstImpressionRef}
             className={cn(
-              "space-y-3 p-4 -m-4 rounded-lg transition-colors",
-              validationIssues.some((i) => i.section === "firstImpression") && "bg-red-50/60 border border-red-200 rounded-xl"
+              "space-y-3 p-4 -m-4 rounded-xl transition-all duration-200",
+              validationIssues.some((i) => i.section === "firstImpression")
+                ? "bg-red-50 border-2 border-red-300"
+                : "bg-gradient-to-br from-purple-50/50 to-transparent"
             )}
           >
             <div>
-              <Label className="text-base font-bold">First Impression</Label>
-              <p className="text-xs text-neutral-500 mt-0.5">How did the first 30 seconds make you feel?</p>
+              <Label className="text-base font-bold text-purple-900">First Impression</Label>
+              <p className="text-xs text-purple-700/60 mt-0.5">How did the first 30 seconds make you feel?</p>
             </div>
             {validationIssues.some((i) => i.section === "firstImpression") && (
               <p className="text-xs font-medium text-red-600 flex items-center gap-1">
@@ -1281,8 +1300,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <div
             ref={scoresRef}
             className={cn(
-              "p-4 -m-4 rounded-lg transition-colors",
-              validationIssues.some((i) => i.section === "scores") && "bg-red-50/60 border border-red-200 rounded-xl"
+              "p-4 -m-4 rounded-xl transition-all duration-200",
+              validationIssues.some((i) => i.section === "scores")
+                ? "bg-red-50 border-2 border-red-300"
+                : "bg-gradient-to-br from-blue-50/40 to-transparent"
             )}
           >
             {validationIssues.some((i) => i.section === "scores") && (
@@ -1319,11 +1340,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <div
             ref={wouldListenAgainRef}
             className={cn(
-              "space-y-3 p-4 -m-4 rounded-lg transition-colors",
-              validationIssues.some((i) => i.section === "wouldListenAgain") && "bg-red-50/60 border border-red-200 rounded-xl"
+              "space-y-3 p-4 -m-4 rounded-xl transition-all duration-200",
+              validationIssues.some((i) => i.section === "wouldListenAgain")
+                ? "bg-red-50 border-2 border-red-300"
+                : "bg-gradient-to-br from-indigo-50/40 to-transparent"
             )}
           >
-            <Label className="text-base font-bold">Would you listen to this again?</Label>
+            <Label className="text-base font-bold text-indigo-900">Would you listen to this again?</Label>
             {validationIssues.some((i) => i.section === "wouldListenAgain") && (
               <p className="text-xs font-medium text-red-600 flex items-center gap-1">
                 <AlertTriangle className="h-3 w-3" />
@@ -1359,8 +1382,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Listener Signals */}
-          <div className="space-y-3 p-4 bg-neutral-50/60 border border-black/10 rounded-2xl mt-4">
-            <Label className="text-sm font-bold">Listener Signals</Label>
+          <div className="space-y-3 p-4 bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200/50 rounded-xl mt-4">
+            <Label className="text-sm font-bold text-slate-800">Listener Signals</Label>
 
             <div className="grid grid-cols-3 gap-2">
               {/* Would add to playlist */}
@@ -1487,9 +1510,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         <div className="space-y-6">
 
       {/* Written Feedback */}
-      <Card variant="soft" elevated>
+      <Card variant="soft" elevated className="border-l-4 border-l-emerald-500">
         <CardHeader className="border-b border-black/10">
-          <CardTitle>Your Feedback</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+            Written Feedback
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
           {error && (
@@ -1499,8 +1525,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           )}
 
           {/* Best Part */}
-          <div ref={bestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-lg transition-colors", validationIssues.some((i) => i.section === "bestPart") && "bg-red-50/60 border border-red-200 rounded-xl")}>
-            <Label htmlFor="best" className="text-base font-bold">Best part of the track *</Label>
+          <div ref={bestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-xl transition-all duration-200", validationIssues.some((i) => i.section === "bestPart") ? "bg-red-50 border-2 border-red-300" : "bg-gradient-to-br from-emerald-50/50 to-transparent border border-emerald-200/30")}>
+            <Label htmlFor="best" className="text-base font-bold text-emerald-900">Best part of the track *</Label>
             {validationIssues.some((i) => i.section === "bestPart") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "bestPart")?.message}</p>)}
             <textarea
               id="best"
@@ -1525,8 +1551,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {/* Weakest Part */}
-          <div ref={weakestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-lg transition-colors", validationIssues.some((i) => i.section === "weakestPart") && "bg-red-50/60 border border-red-200 rounded-xl")}>
-            <Label htmlFor="weakest" className="text-base font-bold">Weakest part / Areas for improvement *</Label>
+          <div ref={weakestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-xl transition-all duration-200", validationIssues.some((i) => i.section === "weakestPart") ? "bg-red-50 border-2 border-red-300" : "bg-gradient-to-br from-orange-50/50 to-transparent border border-orange-200/30")}>
+            <Label htmlFor="weakest" className="text-base font-bold text-orange-900">Weakest part / Areas for improvement *</Label>
             {validationIssues.some((i) => i.section === "weakestPart") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "weakestPart")?.message}</p>)}
             <textarea
               id="weakest"
@@ -1560,68 +1586,81 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
             />
           </div>
-
-          {/* Timestamped notes - edit section */}
-          {timestampNotes.length > 0 && (
-            <div ref={timestampNotesRef} className="space-y-3 p-4 bg-neutral-50/60 border border-black/10 rounded-2xl">
-              <div className="flex items-center justify-between gap-3">
-                <Label className="text-base font-bold">
-                  Timestamp Notes
-                  <span className="ml-2 text-xs font-normal text-neutral-500">
-                    {timestampNotes.filter(t => t.note.trim()).length}/{timestampNotes.length} filled
-                  </span>
-                </Label>
-              </div>
-
-              <div className="space-y-2">
-                {timestampNotes.map((t) => (
-                  <div
-                    key={t.id}
-                    className={cn(
-                      "border p-3 bg-white rounded-xl transition-colors duration-150 ease-out",
-                      t.note.trim() ? "border-lime-300" : "border-amber-300"
-                    )}
-                  >
-                    <div className="flex items-center justify-between gap-3 mb-2">
-                      <span className={cn(
-                        "px-2 py-0.5 text-xs font-mono font-bold rounded-md",
-                        t.note.trim() ? "bg-lime-100 text-lime-800" : "bg-amber-100 text-amber-800"
-                      )}>
-                        {formatTimestamp(t.seconds)}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setTimestampNotes((prev) => prev.filter((p) => p.id !== t.id))
-                        }
-                        className="text-xs font-bold text-neutral-400 hover:text-red-600 transition-colors"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                    <Input
-                      ref={(el) => {
-                        timestampInputRefs.current[t.id] = el;
-                      }}
-                      value={t.note}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        setTimestampNotes((prev) =>
-                          prev.map((p) => (p.id === t.id ? { ...p, note: v } : p))
-                        );
-                      }}
-                      placeholder="What happens here? (e.g. drop hits hard, vocal gets buried)"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
+        </div>
+      </div>
 
-      {/* Submit Card */}
-      <Card variant="soft" elevated className="bg-neutral-950 text-white border-neutral-900">
+      {/* TIMESTAMP NOTES - Full Width */}
+      {timestampNotes.length > 0 && (
+        <Card variant="soft" elevated className="mt-6 border-l-4 border-l-blue-500">
+          <CardHeader className="border-b border-black/10">
+            <div ref={timestampNotesRef} className="flex items-center justify-between gap-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-blue-500"></span>
+                Timestamp Notes
+                <span className="ml-2 px-2 py-1 text-xs font-mono bg-blue-100 text-blue-800 rounded-lg">
+                  {timestampNotes.filter(t => t.note.trim()).length}/{timestampNotes.length} filled
+                </span>
+              </CardTitle>
+              <button
+                type="button"
+                onClick={() => addTimestampNote(playerSeconds)}
+                className="hidden lg:block px-3 py-1.5 text-xs font-semibold border-2 border-black/10 rounded-lg bg-white hover:bg-neutral-50 hover:border-black/20 transition-all duration-150 ease-out"
+              >
+                + Add at {formatTimestamp(playerSeconds)}
+              </button>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {timestampNotes.map((t) => (
+                <div
+                  key={t.id}
+                  className={cn(
+                    "border-2 p-3 bg-white rounded-xl transition-all duration-150 ease-out hover:shadow-md",
+                    t.note.trim() ? "border-lime-400/60" : "border-amber-400/60"
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <span className={cn(
+                      "px-2 py-1 text-xs font-mono font-bold rounded-lg",
+                      t.note.trim() ? "bg-lime-100 text-lime-800" : "bg-amber-100 text-amber-800"
+                    )}>
+                      {formatTimestamp(t.seconds)}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setTimestampNotes((prev) => prev.filter((p) => p.id !== t.id))
+                      }
+                      className="text-xs font-bold text-neutral-400 hover:text-red-600 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <Input
+                    ref={(el) => {
+                      timestampInputRefs.current[t.id] = el;
+                    }}
+                    value={t.note}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setTimestampNotes((prev) =>
+                        prev.map((p) => (p.id === t.id ? { ...p, note: v } : p))
+                      );
+                    }}
+                    placeholder="What happens here? (e.g. drop hits hard, vocal gets buried)"
+                  />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* SUBMIT CARD - Full Width */}
+      <Card variant="soft" elevated className="mt-6 bg-gradient-to-br from-neutral-900 to-neutral-950 text-white border-2 border-neutral-800">
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div className="min-w-0">
@@ -1699,8 +1738,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </Button>
         </CardContent>
       </Card>
-        </div>
-      </div>
     </div>
 
       {/* Skip Track Dialog */}
