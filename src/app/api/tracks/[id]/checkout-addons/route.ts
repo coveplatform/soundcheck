@@ -8,7 +8,6 @@ import { getStripe } from "@/lib/stripe";
 const requestSchema = z.object({
   reviewCount: z.number().int().min(1).max(50),
   requestProReviewers: z.boolean(),
-  requestExpertReviewers: z.boolean(),
   rushDelivery: z.boolean(),
 });
 
@@ -29,7 +28,6 @@ export async function POST(
     const {
       reviewCount,
       requestProReviewers,
-      requestExpertReviewers,
       rushDelivery,
     } = validated;
 
@@ -40,10 +38,8 @@ export async function POST(
         ArtistProfile: {
           include: {
             User: true,
-            Genre_ArtistGenres: true,
           },
         },
-        Genre: true,
       },
     });
 
@@ -61,19 +57,15 @@ export async function POST(
     let cashAddOnCents = 0;
     const addOnDescriptions: string[] = [];
 
-    if (requestExpertReviewers) {
-      // Industry experts cost $10/review (replaces Pro tier)
-      cashAddOnCents += reviewCount * 1000;
-      addOnDescriptions.push(`Industry Expert reviews (${reviewCount} × $10)`);
-    } else if (requestProReviewers) {
-      // Pro reviewers cost $2/review
+    if (requestProReviewers) {
+      // Verified reviewers cost $2/review
       cashAddOnCents += reviewCount * 200;
-      addOnDescriptions.push(`Pro Reviewer upgrades (${reviewCount} × $2)`);
+      addOnDescriptions.push(`Verified Reviewer upgrades (${reviewCount} × $2)`);
     }
 
     if (rushDelivery) {
       cashAddOnCents += 1000; // $10 flat fee
-      addOnDescriptions.push("Rush Delivery (24h guarantee)");
+      addOnDescriptions.push("Rush Delivery (30min guarantee)");
     }
 
     // If no cash add-ons, return error
@@ -94,35 +86,6 @@ export async function POST(
         },
         { status: 403 }
       );
-    }
-
-    // Check expert availability if requested
-    if (requestExpertReviewers) {
-      const genreIds = track.Genre.map((g) => g.id);
-
-      const expertCount = await prisma.reviewerProfile.count({
-        where: {
-          isIndustryExpert: true,
-          completedOnboarding: true,
-          isRestricted: false,
-          Genre: {
-            some: {
-              id: { in: genreIds },
-            },
-          },
-        },
-      });
-
-      if (expertCount === 0) {
-        return NextResponse.json(
-          {
-            error: "No industry experts available for your genres",
-            suggestion:
-              "Try Pro Reviewers instead, or contact support to request expert reviewers in your genre",
-          },
-          { status: 400 }
-        );
-      }
     }
 
     // Get or create Stripe customer
@@ -176,7 +139,6 @@ export async function POST(
         reviewCount: String(reviewCount),
         creditCost: String(creditCost),
         requestProReviewers: String(requestProReviewers),
-        requestExpertReviewers: String(requestExpertReviewers),
         rushDelivery: String(rushDelivery),
       },
     });

@@ -86,7 +86,10 @@
       "Bash(fi)",
       "Bash(vercel:*)",
       "Bash(./deploy.bat)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(npx vercel:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(tee:*)"
     ]
   }
 }

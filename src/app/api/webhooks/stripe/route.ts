@@ -48,7 +48,6 @@ async function handleAddOnsCheckout(session: Stripe.Checkout.Session) {
     const reviewCount = parseInt(metadata.reviewCount);
     const creditCost = parseInt(metadata.creditCost);
     const requestProReviewers = metadata.requestProReviewers === "true";
-    const requestExpertReviewers = metadata.requestExpertReviewers === "true";
     const rushDelivery = metadata.rushDelivery === "true";
 
     if (!trackId || !userId) {
@@ -98,7 +97,6 @@ async function handleAddOnsCheckout(session: Stripe.Checkout.Session) {
           reviewsRequested: reviewCount,
           creditsSpent: creditCost,
           requestedProReviewers: requestProReviewers,
-          requestedExpertReviewers: requestExpertReviewers,
           rushDelivery,
           rushDeliveryDeadline,
           cashAddOnTotal: session.amount_total || 0,
@@ -118,16 +116,7 @@ async function handleAddOnsCheckout(session: Stripe.Checkout.Session) {
         completedAt: Date;
       }> = [];
 
-      if (requestExpertReviewers) {
-        addOnPayments.push({
-          trackId,
-          addOnType: "EXPERT_REVIEWERS",
-          amountCents: reviewCount * 1000,
-          stripePaymentIntentId: session.payment_intent as string | null,
-          status: "COMPLETED",
-          completedAt: new Date(),
-        });
-      } else if (requestProReviewers) {
+      if (requestProReviewers) {
         addOnPayments.push({
           trackId,
           addOnType: "PRO_REVIEWERS",

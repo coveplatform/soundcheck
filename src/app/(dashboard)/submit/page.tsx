@@ -28,7 +28,6 @@ import {
   Lock,
   Zap,
   Clock,
-  Award,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -110,7 +109,6 @@ export default function SubmitTrackPage() {
   const [reviewCount, setReviewCount] = useState<number>(5);
   const [isDraggingSlider, setIsDraggingSlider] = useState(false);
   const [requestProReviewers, setRequestProReviewers] = useState(false);
-  const [requestExpertReviewers, setRequestExpertReviewers] = useState(false);
   const [rushDelivery, setRushDelivery] = useState(false);
 
   // ---- shared UI state ----------------------------------------------------
@@ -356,16 +354,14 @@ export default function SubmitTrackPage() {
   // Calculate cash add-ons
   const cashAddOns = useMemo(() => {
     let total = 0;
-    if (requestExpertReviewers) {
-      total += reviewCount * 10; // $10 per review
-    } else if (requestProReviewers) {
+    if (requestProReviewers) {
       total += reviewCount * 2; // $2 per review
     }
     if (rushDelivery) {
       total += 10; // $10 flat fee
     }
     return total;
-  }, [requestProReviewers, requestExpertReviewers, rushDelivery, reviewCount]);
+  }, [requestProReviewers, rushDelivery, reviewCount]);
 
   const handleSubmit = useCallback(async () => {
     setError("");
@@ -411,7 +407,6 @@ export default function SubmitTrackPage() {
           body: JSON.stringify({
             reviewCount,
             requestProReviewers,
-            requestExpertReviewers,
             rushDelivery,
           }),
         });
@@ -467,7 +462,6 @@ export default function SubmitTrackPage() {
     isPublic,
     reviewCount,
     requestProReviewers,
-    requestExpertReviewers,
     rushDelivery,
     cashAddOns,
     router,
@@ -1120,7 +1114,7 @@ export default function SubmitTrackPage() {
                 <span className="text-sm font-semibold text-black">Estimated turnaround</span>
               </div>
               <p className="text-sm text-black/60">
-                ~{Math.max(1, Math.round((reviewCount * 24) / 24))}&ndash;{Math.max(2, Math.round((reviewCount * 36) / 24))} days for {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
+                {rushDelivery ? '10-24 hours' : `${Math.min(10 + reviewCount * 2, 40)} hours`} for {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
               </p>
             </div>
 
@@ -1135,41 +1129,16 @@ export default function SubmitTrackPage() {
                   <input
                     type="checkbox"
                     checked={requestProReviewers}
-                    onChange={(e) => {
-                      setRequestProReviewers(e.target.checked);
-                      if (e.target.checked) setRequestExpertReviewers(false);
-                    }}
+                    onChange={(e) => setRequestProReviewers(e.target.checked)}
                     className="mt-1"
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <Star className="h-4 w-4 text-purple-600" />
-                      <span className="font-semibold text-black">Pro Reviewers</span>
+                      <span className="font-semibold text-black">Verified Reviewers</span>
                       <span className="text-sm text-purple-600 font-bold">+${(reviewCount * 2).toFixed(2)}</span>
                     </div>
                     <p className="text-sm text-neutral-600">100+ reviews completed, 4.5+ average rating</p>
-                  </div>
-                </label>
-
-                {/* Industry Experts Checkbox */}
-                <label className="flex items-start gap-3 p-4 rounded-xl border-2 hover:border-purple-300 cursor-pointer transition-all"
-                  style={{ borderColor: requestExpertReviewers ? 'rgb(147 51 234)' : 'rgb(229 231 235)' }}>
-                  <input
-                    type="checkbox"
-                    checked={requestExpertReviewers}
-                    onChange={(e) => {
-                      setRequestExpertReviewers(e.target.checked);
-                      if (e.target.checked) setRequestProReviewers(false);
-                    }}
-                    className="mt-1"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Award className="h-4 w-4 text-amber-600" />
-                      <span className="font-semibold text-black">Industry Experts</span>
-                      <span className="text-sm text-amber-600 font-bold">+${(reviewCount * 10).toFixed(2)}</span>
-                    </div>
-                    <p className="text-sm text-neutral-600">Verified producers, engineers & label professionals</p>
                   </div>
                 </label>
               </div>
@@ -1193,13 +1162,13 @@ export default function SubmitTrackPage() {
                     <span className="font-semibold text-black">Rush Delivery</span>
                     <span className="text-sm text-orange-600 font-bold">+$10.00</span>
                   </div>
-                  <p className="text-sm text-neutral-600">First review within 24 hours guaranteed</p>
+                  <p className="text-sm text-neutral-600">All reviews delivered within 30 minutes</p>
                 </div>
               </label>
             </div>
 
             {/* Pricing Summary */}
-            {(requestProReviewers || requestExpertReviewers || rushDelivery) && (
+            {(requestProReviewers || rushDelivery) && (
               <div className="rounded-xl border-2 border-purple-200 bg-purple-50 p-4">
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
@@ -1208,14 +1177,8 @@ export default function SubmitTrackPage() {
                   </div>
                   {requestProReviewers && (
                     <div className="flex justify-between">
-                      <span className="text-neutral-700">Pro reviewers</span>
+                      <span className="text-neutral-700">Verified reviewers</span>
                       <span className="font-medium">+${(reviewCount * 2).toFixed(2)}</span>
-                    </div>
-                  )}
-                  {requestExpertReviewers && (
-                    <div className="flex justify-between">
-                      <span className="text-neutral-700">Industry experts</span>
-                      <span className="font-medium">+${(reviewCount * 10).toFixed(2)}</span>
                     </div>
                   )}
                   {rushDelivery && (

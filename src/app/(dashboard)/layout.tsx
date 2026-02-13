@@ -16,7 +16,6 @@ const getSidebarData = unstable_cache(
           id: true,
           artistName: true,
           reviewCredits: true,
-          subscriptionStatus: true,
           completedOnboarding: true,
         },
       });
@@ -26,7 +25,6 @@ const getSidebarData = unstable_cache(
         select: {
           id: true,
           artistName: true,
-          subscriptionStatus: true,
           completedOnboarding: true,
         },
       });
@@ -92,14 +90,12 @@ export default async function DashboardLayout({
 
   const artistName = artistProfile.artistName || session.user.name || "Artist";
   const credits: number = artistProfile.reviewCredits ?? 0;
-  const isPro = artistProfile.subscriptionStatus === "active";
 
   return (
     <div className="min-h-screen bg-[#faf8f5]">
       <Sidebar
         artistName={artistName}
         credits={credits}
-        isPro={isPro}
         pendingReviews={artistProfile.pendingReviews}
       />
 

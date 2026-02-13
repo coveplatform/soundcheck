@@ -367,11 +367,7 @@ export default function Home() {
                   <span className="text-purple-400 font-bold">+$2/review</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-neutral-300">✓ Industry Experts (producers, engineers, label pros)</span>
-                  <span className="text-purple-400 font-bold">+$10/review</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-neutral-300">✓ Rush Delivery (first review within 24h)</span>
+                  <span className="text-neutral-300">✓ Rush Delivery (all reviews within 30 min)</span>
                   <span className="text-purple-400 font-bold">+$10</span>
                 </div>
               </div>
@@ -412,7 +408,7 @@ export default function Home() {
               },
               {
                 q: "What are premium add-ons?",
-                a: "You can optionally request Verified Reviewers (+$2/review), Industry Experts (+$10/review), or Rush Delivery (+$10 for first review within 24h). These add-ons are pay-as-you-go -- only pay for them when you need higher quality or faster turnaround on specific tracks.",
+                a: "You can optionally request Verified Reviewers (+$2/review) or Rush Delivery (+$10 for all reviews within 30 minutes). These add-ons are pay-as-you-go -- only pay for them when you need higher quality or faster turnaround on specific tracks.",
               },
               {
                 q: "Is my music safe?",

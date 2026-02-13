@@ -24,11 +24,10 @@ import {
 interface SidebarProps {
   artistName: string;
   credits: number;
-  isPro: boolean;
   pendingReviews: number;
 }
 
-export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarProps) {
+export function Sidebar({ artistName, credits, pendingReviews }: SidebarProps) {
   const pathname = usePathname();
 
   const mainLinks = [
@@ -57,13 +56,11 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
     label,
     icon: Icon,
     badge,
-    proOnly,
   }: {
     href: string;
     label: string;
     icon: React.ComponentType<{ className?: string }>;
     badge?: number;
-    proOnly?: boolean;
   }) => (
     <Link
       href={href}
@@ -79,11 +76,6 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
       {badge !== undefined && (
         <span className="bg-purple-100 text-purple-700 text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
           {badge}
-        </span>
-      )}
-      {proOnly && !isPro && (
-        <span className="text-[9px] font-semibold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">
-          PRO
         </span>
       )}
     </Link>
@@ -138,35 +130,26 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
 
         {/* Credit Balance */}
         <div className="px-4 py-3 border-t border-black/10">
-          <div className={`rounded-xl p-3 ${credits === 0 && !isPro ? 'bg-amber-50 border border-amber-200' : 'bg-purple-50'}`}>
+          <div className={`rounded-xl p-3 ${credits === 0 ? 'bg-amber-50 border border-amber-200' : 'bg-purple-50'}`}>
             <div className="flex items-center gap-2 mb-1.5">
-              <Coins className={`w-4 h-4 ${credits === 0 && !isPro ? 'text-amber-600' : 'text-purple-600'}`} />
-              <span className={`text-lg font-bold tabular-nums ${credits === 0 && !isPro ? 'text-amber-900' : 'text-purple-900'}`}>{credits}</span>
-              <span className={`text-[10px] font-medium uppercase tracking-wider ${credits === 0 && !isPro ? 'text-amber-600/60' : 'text-purple-600/60'}`}>credits</span>
+              <Coins className={`w-4 h-4 ${credits === 0 ? 'text-amber-600' : 'text-purple-600'}`} />
+              <span className={`text-lg font-bold tabular-nums ${credits === 0 ? 'text-amber-900' : 'text-purple-900'}`}>{credits}</span>
+              <span className={`text-[10px] font-medium uppercase tracking-wider ${credits === 0 ? 'text-amber-600/60' : 'text-purple-600/60'}`}>credits</span>
             </div>
             <div className="flex items-center gap-2 text-[11px]">
               <Link
                 href="/review"
-                className={`font-medium transition-colors ${credits === 0 && !isPro ? 'text-amber-700 hover:text-amber-900' : 'text-purple-600 hover:text-purple-800'}`}
+                className={`font-medium transition-colors ${credits === 0 ? 'text-amber-700 hover:text-amber-900' : 'text-purple-600 hover:text-purple-800'}`}
               >
                 {credits === 0 ? 'Earn credits' : 'Earn more'}
               </Link>
-              <span className={credits === 0 && !isPro ? 'text-amber-300' : 'text-purple-300'}>|</span>
-              {isPro ? (
-                <Link
-                  href="/account"
-                  className="text-purple-600 hover:text-purple-800 font-medium transition-colors"
-                >
-                  Manage Pro
-                </Link>
-              ) : (
-                <Link
-                  href="/account"
-                  className="text-purple-600 hover:text-purple-800 font-medium transition-colors"
-                >
-                  Go Pro
-                </Link>
-              )}
+              <span className={credits === 0 ? 'text-amber-300' : 'text-purple-300'}>|</span>
+              <Link
+                href="/review-credits/checkout"
+                className="text-purple-600 hover:text-purple-800 font-medium transition-colors"
+              >
+                Buy credits
+              </Link>
             </div>
           </div>
         </div>
@@ -176,11 +159,6 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
           <div className="px-4">
             <p className="text-xs text-neutral-500 mb-1">Signed in as</p>
             <p className="text-sm font-medium truncate">{artistName}</p>
-            {isPro && (
-              <span className="inline-block mt-1 text-[10px] font-semibold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">
-                PRO
-              </span>
-            )}
           </div>
 
           <div className="space-y-1">
@@ -226,7 +204,6 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
       <MobileBottomNav
         isActive={isActive}
         pendingReviews={pendingReviews}
-        isPro={isPro}
       />
     </>
   );
@@ -235,11 +212,9 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
 function MobileBottomNav({
   isActive,
   pendingReviews,
-  isPro,
 }: {
   isActive: (href: string) => boolean;
   pendingReviews: number;
-  isPro: boolean;
 }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
