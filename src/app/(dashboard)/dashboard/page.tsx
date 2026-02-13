@@ -267,28 +267,18 @@ export default async function DashboardPage() {
               Hey, {artistProfile.artistName}
             </h1>
           </div>
-          <div className="flex items-center gap-2.5 flex-shrink-0">
-            <Tooltip
-              content={
-                credits > 0
-                  ? "Spend on reviews"
-                  : "Earn by reviewing tracks"
-              }
-            >
-              <div className="flex items-baseline gap-1.5 rounded-lg border border-black/8 bg-white px-3 py-2">
-                <p className="text-lg font-bold text-black tabular-nums">{credits}</p>
-                <p className="text-[10px] font-medium text-black/40 uppercase tracking-wider">credits</p>
-              </div>
-            </Tooltip>
-            <Link href="/submit">
-              <Button
-                className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out motion-reduce:transition-none text-sm h-9 px-4"
-              >
-                Submit track
-                <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
+          <Tooltip
+            content={
+              credits > 0
+                ? "Spend on reviews"
+                : "Earn by reviewing tracks"
+            }
+          >
+            <div className="flex items-baseline gap-1.5 rounded-lg border border-black/8 bg-white px-3 py-2">
+              <p className="text-lg font-bold text-black tabular-nums">{credits}</p>
+              <p className="text-[10px] font-medium text-black/40 uppercase tracking-wider">credits</p>
+            </div>
+          </Tooltip>
         </div>
 
         {/* Feedback Alert Banner */}
@@ -366,12 +356,20 @@ export default async function DashboardPage() {
               <SquiggleDoodle className="absolute -top-2 -right-2 w-10 h-10 text-black/[0.04] pointer-events-none hidden sm:block" />
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-base font-bold text-black">Your Tracks</h2>
-                <Link
-                  href="/tracks"
-                  className="text-[11px] font-mono tracking-[0.15em] uppercase text-black/40 hover:text-black transition-colors duration-150 ease-out"
-                >
-                  View all →
-                </Link>
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/submit"
+                    className="text-[11px] font-mono tracking-[0.15em] uppercase text-purple-600 hover:text-purple-800 font-semibold transition-colors duration-150 ease-out"
+                  >
+                    + Submit
+                  </Link>
+                  <Link
+                    href="/tracks"
+                    className="text-[11px] font-mono tracking-[0.15em] uppercase text-black/40 hover:text-black transition-colors duration-150 ease-out"
+                  >
+                    View all →
+                  </Link>
+                </div>
               </div>
 
               {tracks.length > 0 ? (
