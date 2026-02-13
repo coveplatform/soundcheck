@@ -26,6 +26,8 @@ import {
   ImagePlus,
   Globe,
   Lock,
+  Zap,
+  Clock,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -403,7 +405,8 @@ export default function SubmitTrackPage() {
         return;
       }
 
-      router.push(`/submit/success?trackId=${trackId}&reviews=${reviewCount}`);
+      const proParam = profile?.subscriptionStatus === "active" ? "&pro=1" : "";
+      router.push(`/submit/success?trackId=${trackId}&reviews=${reviewCount}${proParam}`);
     } catch {
       setError("Something went wrong. Please try again.");
       setIsSubmitting(false);
@@ -418,6 +421,7 @@ export default function SubmitTrackPage() {
     feedbackFocus,
     reviewCount,
     router,
+    profile,
   ]);
 
   const handleUploadOnly = useCallback(async () => {
@@ -1057,6 +1061,40 @@ export default function SubmitTrackPage() {
                   Current insight level
                 </p>
               </div>
+            </div>
+
+            {/* Estimated turnaround */}
+            <div className="rounded-xl border border-black/8 bg-white/60 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="h-4 w-4 text-black/40" />
+                <span className="text-sm font-semibold text-black">Estimated turnaround</span>
+              </div>
+              {profile?.subscriptionStatus === "active" ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-black/60">
+                    ~{Math.max(1, Math.round((reviewCount * 8) / 24))} {Math.round((reviewCount * 8) / 24) <= 1 ? 'day' : 'days'} for {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <Zap className="h-3 w-3 text-amber-600" />
+                    <span className="text-xs font-bold text-amber-700">Priority queue active</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-sm text-black/60">
+                    ~{Math.max(1, Math.round((reviewCount * 36) / 24))}&ndash;{Math.max(2, Math.round((reviewCount * 48) / 24))} days for {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
+                  </p>
+                  <Link
+                    href="/account"
+                    className="flex items-center gap-1.5 group"
+                  >
+                    <Zap className="h-3 w-3 text-purple-500" />
+                    <span className="text-xs font-medium text-purple-600 group-hover:text-purple-800 transition-colors">
+                      Go Pro for priority queue &amp; faster turnaround
+                    </span>
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Enough credits -- submit */}
