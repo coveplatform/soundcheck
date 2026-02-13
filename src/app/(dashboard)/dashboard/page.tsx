@@ -16,6 +16,7 @@ import {
   MusicDoodle,
   StarDoodle,
 } from "@/components/dashboard/doodles";
+import { ClaimCard } from "@/components/dashboard/claim-card";
 
 import {
   DashboardArtistProfile,
@@ -420,37 +421,13 @@ export default async function DashboardPage() {
               {availableQueueTracks.length > 0 ? (
                 <div className="space-y-2">
                   {availableQueueTracks.map((track) => (
-                    <Link
+                    <ClaimCard
                       key={track.id}
-                      href="/review"
-                      className="group flex items-center gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/90 hover:border-black/12"
-                    >
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 relative">
-                        {track.artworkUrl ? (
-                          <Image
-                            src={track.artworkUrl}
-                            alt={track.title}
-                            fill
-                            className="object-cover"
-                            sizes="64px"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
-                            <Music className="h-5 w-5 text-neutral-400" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1 py-3 px-3 sm:px-4">
-                        <p className="text-sm font-semibold text-black truncate">{track.title}</p>
-                        <p className="text-xs text-black/40 truncate">by {track.ArtistProfile.artistName}</p>
-                      </div>
-                      <div className="flex items-center pr-3 sm:pr-4">
-                        <Button size="sm" variant="primary" tabIndex={-1}>
-                          Review
-                          <ArrowRight className="h-4 w-4 ml-1" />
-                        </Button>
-                      </div>
-                    </Link>
+                      trackId={track.id}
+                      title={track.title}
+                      artistName={track.ArtistProfile.artistName}
+                      artworkUrl={track.artworkUrl}
+                    />
                   ))}
                 </div>
               ) : (
