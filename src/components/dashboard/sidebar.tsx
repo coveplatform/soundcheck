@@ -145,7 +145,7 @@ export function Sidebar({ artistName, credits, pendingReviews }: SidebarProps) {
               </Link>
               <span className={credits === 0 ? 'text-amber-300' : 'text-purple-300'}>|</span>
               <Link
-                href="/review-credits/checkout"
+                href="/account"
                 className="text-purple-600 hover:text-purple-800 font-medium transition-colors"
               >
                 Buy credits
