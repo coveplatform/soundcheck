@@ -943,34 +943,88 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   if (success) {
     const canPurchase = review.Track.sourceType === "UPLOAD" && review.Track.allowPurchase;
+    const isPeer = review.isPeerReview || !!review.peerReviewerArtistId;
+    const totalReviews = review.ArtistProfile?.totalPeerReviews ?? 0;
+    const avgRating = review.ArtistProfile?.peerReviewRating ?? 0;
+    const isProReviewer = totalReviews >= 25 && avgRating >= 4.5;
+    const reviewsUntilPro = Math.max(0, 25 - totalReviews);
 
     return (
-      <div className="max-w-md mx-auto px-4 sm:px-6 text-center py-20">
-        <div className="w-16 h-16 bg-lime-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <Check className="h-8 w-8 text-black" />
+      <div className="max-w-md mx-auto px-4 sm:px-6 py-16">
+        {/* Success header */}
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-5 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+            <Check className="h-7 w-7 text-white" />
+          </div>
+          <h2 className="text-2xl font-black text-black mb-2">Review Submitted!</h2>
+          <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-100 border border-purple-200 rounded-full mb-3">
+            <span className="font-black text-lg text-purple-700">
+              {isPeer ? "+1 credit earned" : `+${formatCurrency(getTierEarningsCents(review.ReviewerProfile?.tier ?? "NORMAL"))}`}
+            </span>
+          </div>
+          <p className="text-sm text-black/50">
+            Your feedback helps artists improve their music.
+          </p>
         </div>
-        <h2 className="text-2xl font-black mb-2">Review Submitted!</h2>
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-lime-500 border border-lime-400 mb-4 rounded-full">
-          <DollarSign className="h-5 w-5 text-black" />
-          <span className="font-black text-lg">
-            {review.ReviewerProfile
-              ? `+${formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier))}`
-              : "+1 credit"}
-          </span>
-        </div>
-        <p className="text-neutral-600 mb-6">
-          Your feedback helps artists improve their music.
-        </p>
+
+        {/* PRO Reviewer promotion */}
+        {isPeer && !isProReviewer && (
+          <div className="rounded-xl border border-black/10 bg-[#faf8f5] p-5 mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <DollarSign className="h-4 w-4 text-amber-600" />
+              <p className="text-sm font-bold text-black">Earn $1.50 cash per review</p>
+            </div>
+            <p className="text-xs text-black/50 mb-3">
+              Become a PRO Reviewer and get paid for every review you complete:
+            </p>
+            <ul className="space-y-2 mb-4">
+              <li className="flex items-start gap-2">
+                <span className={`mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold shrink-0 ${totalReviews >= 25 ? 'bg-purple-600 text-white' : 'bg-black/10 text-black/40'}`}>
+                  {totalReviews >= 25 ? '✓' : '1'}
+                </span>
+                <span className="text-xs text-black/70">
+                  <span className="font-semibold">Complete 25 reviews</span>
+                  <span className="text-black/40"> — {reviewsUntilPro > 0 ? `${reviewsUntilPro} to go` : 'Done!'}</span>
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className={`mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold shrink-0 ${avgRating >= 4.5 ? 'bg-purple-600 text-white' : 'bg-black/10 text-black/40'}`}>
+                  {avgRating >= 4.5 ? '✓' : '2'}
+                </span>
+                <span className="text-xs text-black/70">
+                  <span className="font-semibold">Maintain a 4.5+ average rating</span>
+                  <span className="text-black/40"> — {avgRating > 0 ? `currently ${avgRating.toFixed(1)}` : 'no ratings yet'}</span>
+                </span>
+              </li>
+            </ul>
+            {totalReviews > 0 && (
+              <div className="h-1.5 bg-black/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-purple-500 transition-all duration-300 rounded-full"
+                  style={{ width: `${Math.min(100, (totalReviews / 25) * 100)}%` }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Already PRO Reviewer */}
+        {isPeer && isProReviewer && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 mb-6 text-center">
+            <p className="text-sm font-bold text-amber-800">You&apos;re a PRO Reviewer</p>
+            <p className="text-xs text-amber-700/60 mt-0.5">You earn $1.50 cash for every review</p>
+          </div>
+        )}
 
         {/* Purchase option for uploaded tracks */}
         {canPurchase && (
-          <div className="mb-6 p-4 border border-black/10 bg-white/70 rounded-3xl text-left">
+          <div className="mb-6 p-4 border border-black/10 bg-white rounded-xl text-left">
             <div className="flex items-center gap-3 mb-3">
               <Music className="h-5 w-5 text-neutral-600" />
               <div>
                 <p className="font-bold text-black">{review.Track.title}</p>
                 {review.Track.ArtistProfile?.artistName && (
-                  <p className="text-sm text-neutral-500">{review.Track.ArtistProfile.artistName}</p>
+                  <p className="text-sm text-black/50">{review.Track.ArtistProfile.artistName}</p>
                 )}
               </div>
             </div>
@@ -1000,14 +1054,16 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                 Buy Track - $0.50
               </Button>
             )}
-            <p className="text-xs text-neutral-500 mt-2 text-center">
+            <p className="text-xs text-black/40 mt-2 text-center">
               {hasPurchased ? "Thanks for supporting the artist!" : "Support the artist by purchasing their track"}
             </p>
           </div>
         )}
 
         <Link href="/review">
-          <Button variant="primary">Continue Listening</Button>
+          <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl">
+            Review another track
+          </Button>
         </Link>
       </div>
     );

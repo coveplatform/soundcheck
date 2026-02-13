@@ -42,6 +42,8 @@ export async function GET(
           select: {
             id: true,
             userId: true,
+            totalPeerReviews: true,
+            peerReviewRating: true,
           },
         },
       },
