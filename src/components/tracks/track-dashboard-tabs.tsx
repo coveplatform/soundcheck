@@ -29,7 +29,6 @@ interface TrackDashboardTabsProps {
   reviewsTab?: React.ReactNode;
   salesTab?: React.ReactNode;
   settingsTab?: React.ReactNode;
-  isPro?: boolean;
 }
 
 export function TrackDashboardTabs({
@@ -39,7 +38,6 @@ export function TrackDashboardTabs({
   reviewsTab,
   salesTab,
   settingsTab,
-  isPro = false
 }: TrackDashboardTabsProps) {
   const [activeTab, setActiveTab] = useState(defaultTab);
 
@@ -48,19 +46,12 @@ export function TrackDashboardTabs({
     onTabChange?.(tabId);
   };
 
-  // Filter tabs based on pro status
-  const visibleTabs = tabs.filter(tab => {
-    // Sales tab only for pro users
-    if (tab.id === "sales" && !isPro) return false;
-    return true;
-  });
-
   return (
     <div>
       {/* Tab Navigation */}
       <div className="border-b-2 border-neutral-200 mb-8 -mx-6 px-6 sm:-mx-8 sm:px-8">
         <div className="flex gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {visibleTabs.map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}

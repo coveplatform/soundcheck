@@ -35,7 +35,6 @@ export async function POST(
         ArtistProfile: {
           select: {
             userId: true,
-            subscriptionStatus: true,
           },
         },
       },
@@ -65,20 +64,6 @@ export async function POST(
 
     // Validate SALES mode requirements
     if (config.sharingMode === "SALES") {
-      // Check Pro subscription
-      const isPro = track.ArtistProfile.subscriptionStatus === "active";
-
-      if (!isPro) {
-        return NextResponse.json(
-          {
-            error:
-              "Sales mode requires a Pro subscription. Upgrade to enable paid downloads.",
-            requiresUpgrade: true,
-          },
-          { status: 403 }
-        );
-      }
-
       // Require sale price for SALES mode
       if (!config.salePrice) {
         return NextResponse.json(
@@ -156,7 +141,6 @@ export async function GET(
         ArtistProfile: {
           select: {
             userId: true,
-            subscriptionStatus: true,
           },
         },
       },
@@ -173,9 +157,7 @@ export async function GET(
       );
     }
 
-    const isPro = track.ArtistProfile.subscriptionStatus === "active";
     const isEligibleForSharing = track.sourceType === "UPLOAD";
-    const isEligibleForSales = isEligibleForSharing && isPro;
 
     return NextResponse.json({
       trackShareId: track.trackShareId,
@@ -188,11 +170,9 @@ export async function GET(
         : null,
       eligibility: {
         canShare: isEligibleForSharing,
-        canSell: isEligibleForSales,
+        canSell: isEligibleForSharing,
         reason: !isEligibleForSharing
           ? "Only uploaded tracks (MP3/WAV) can be shared"
-          : !isPro
-          ? "Upgrade to Pro to enable sales mode"
           : null,
       },
     });

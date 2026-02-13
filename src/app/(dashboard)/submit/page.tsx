@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -28,6 +28,7 @@ import {
   Lock,
   Zap,
   Clock,
+  Award,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -47,7 +48,6 @@ interface ArtistProfile {
   id: string;
   artistName: string;
   totalTracks: number;
-  subscriptionStatus: string | null;
   reviewCredits: number;
 }
 
@@ -109,6 +109,9 @@ export default function SubmitTrackPage() {
   // ---- step 3: reviews state ----------------------------------------------
   const [reviewCount, setReviewCount] = useState<number>(5);
   const [isDraggingSlider, setIsDraggingSlider] = useState(false);
+  const [requestProReviewers, setRequestProReviewers] = useState(false);
+  const [requestExpertReviewers, setRequestExpertReviewers] = useState(false);
+  const [rushDelivery, setRushDelivery] = useState(false);
 
   // ---- shared UI state ----------------------------------------------------
   const [error, setError] = useState("");
@@ -126,7 +129,6 @@ export default function SubmitTrackPage() {
             id: data.id,
             artistName: data.artistName,
             totalTracks: data.totalTracks ?? 0,
-            subscriptionStatus: data.subscriptionStatus ?? null,
             reviewCredits: data.reviewCredits ?? 0,
           });
         }
@@ -351,6 +353,20 @@ export default function SubmitTrackPage() {
   const hasEnoughCredits = creditBalance >= reviewCount;
   const creditDeficit = reviewCount - creditBalance;
 
+  // Calculate cash add-ons
+  const cashAddOns = useMemo(() => {
+    let total = 0;
+    if (requestExpertReviewers) {
+      total += reviewCount * 10; // $10 per review
+    } else if (requestProReviewers) {
+      total += reviewCount * 2; // $2 per review
+    }
+    if (rushDelivery) {
+      total += 10; // $10 flat fee
+    }
+    return total;
+  }, [requestProReviewers, requestExpertReviewers, rushDelivery, reviewCount]);
+
   const handleSubmit = useCallback(async () => {
     setError("");
     setIsSubmitting(true);
@@ -386,27 +402,56 @@ export default function SubmitTrackPage() {
 
       const trackId = trackData.id;
 
-      // 2. Request reviews with credits
-      const reviewRes = await fetch(`/api/tracks/${trackId}/request-reviews`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          desiredReviews: reviewCount,
-          useCredits: true,
-        }),
-      });
+      // 2. Route based on whether there are cash add-ons
+      if (cashAddOns > 0) {
+        // Route to add-ons checkout
+        const res = await fetch(`/api/tracks/${trackId}/checkout-addons`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            reviewCount,
+            requestProReviewers,
+            requestExpertReviewers,
+            rushDelivery,
+          }),
+        });
 
-      if (!reviewRes.ok) {
-        const reviewErr = await reviewRes.json().catch(() => null);
-        setError(
-          (reviewErr as { error?: string })?.error || "Failed to request reviews"
-        );
-        setIsSubmitting(false);
-        return;
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.error || "Failed to create checkout");
+          setIsSubmitting(false);
+          return;
+        }
+
+        if (data.url) {
+          window.location.href = data.url; // Redirect to Stripe
+        } else {
+          setError("Failed to create checkout");
+          setIsSubmitting(false);
+        }
+      } else {
+        // Credits-only path (existing flow)
+        const reviewRes = await fetch(`/api/tracks/${trackId}/request-reviews`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            desiredReviews: reviewCount,
+            useCredits: true,
+          }),
+        });
+
+        if (!reviewRes.ok) {
+          const reviewErr = await reviewRes.json().catch(() => null);
+          setError(
+            (reviewErr as { error?: string })?.error || "Failed to request reviews"
+          );
+          setIsSubmitting(false);
+          return;
+        }
+
+        router.push(`/submit/success?trackId=${trackId}&reviews=${reviewCount}`);
       }
-
-      const proParam = profile?.subscriptionStatus === "active" ? "&pro=1" : "";
-      router.push(`/submit/success?trackId=${trackId}&reviews=${reviewCount}${proParam}`);
     } catch {
       setError("Something went wrong. Please try again.");
       setIsSubmitting(false);
@@ -419,7 +464,12 @@ export default function SubmitTrackPage() {
     artworkUrl,
     selectedGenres,
     feedbackFocus,
+    isPublic,
     reviewCount,
+    requestProReviewers,
+    requestExpertReviewers,
+    rushDelivery,
+    cashAddOns,
     router,
     profile,
   ]);
@@ -1069,33 +1119,123 @@ export default function SubmitTrackPage() {
                 <Clock className="h-4 w-4 text-black/40" />
                 <span className="text-sm font-semibold text-black">Estimated turnaround</span>
               </div>
-              {profile?.subscriptionStatus === "active" ? (
-                <div className="space-y-2">
-                  <p className="text-sm text-black/60">
-                    ~{Math.max(1, Math.round((reviewCount * 8) / 24))} {Math.round((reviewCount * 8) / 24) <= 1 ? 'day' : 'days'} for {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
-                  </p>
-                  <div className="flex items-center gap-1.5">
-                    <Zap className="h-3 w-3 text-amber-600" />
-                    <span className="text-xs font-bold text-amber-700">Priority queue active</span>
+              <p className="text-sm text-black/60">
+                ~{Math.max(1, Math.round((reviewCount * 24) / 24))}&ndash;{Math.max(2, Math.round((reviewCount * 36) / 24))} days for {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
+              </p>
+            </div>
+
+            {/* Review Quality Card */}
+            <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-black mb-4">Review Quality</h3>
+
+              <div className="space-y-3">
+                {/* Pro Reviewers Checkbox */}
+                <label className="flex items-start gap-3 p-4 rounded-xl border-2 hover:border-purple-300 cursor-pointer transition-all"
+                  style={{ borderColor: requestProReviewers ? 'rgb(147 51 234)' : 'rgb(229 231 235)' }}>
+                  <input
+                    type="checkbox"
+                    checked={requestProReviewers}
+                    onChange={(e) => {
+                      setRequestProReviewers(e.target.checked);
+                      if (e.target.checked) setRequestExpertReviewers(false);
+                    }}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Star className="h-4 w-4 text-purple-600" />
+                      <span className="font-semibold text-black">Pro Reviewers</span>
+                      <span className="text-sm text-purple-600 font-bold">+${(reviewCount * 2).toFixed(2)}</span>
+                    </div>
+                    <p className="text-sm text-neutral-600">100+ reviews completed, 4.5+ average rating</p>
+                  </div>
+                </label>
+
+                {/* Industry Experts Checkbox */}
+                <label className="flex items-start gap-3 p-4 rounded-xl border-2 hover:border-purple-300 cursor-pointer transition-all"
+                  style={{ borderColor: requestExpertReviewers ? 'rgb(147 51 234)' : 'rgb(229 231 235)' }}>
+                  <input
+                    type="checkbox"
+                    checked={requestExpertReviewers}
+                    onChange={(e) => {
+                      setRequestExpertReviewers(e.target.checked);
+                      if (e.target.checked) setRequestProReviewers(false);
+                    }}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Award className="h-4 w-4 text-amber-600" />
+                      <span className="font-semibold text-black">Industry Experts</span>
+                      <span className="text-sm text-amber-600 font-bold">+${(reviewCount * 10).toFixed(2)}</span>
+                    </div>
+                    <p className="text-sm text-neutral-600">Verified producers, engineers & label professionals</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Delivery Speed Card */}
+            <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-black mb-4">Delivery Speed</h3>
+
+              <label className="flex items-start gap-3 p-4 rounded-xl border-2 hover:border-purple-300 cursor-pointer transition-all"
+                style={{ borderColor: rushDelivery ? 'rgb(147 51 234)' : 'rgb(229 231 235)' }}>
+                <input
+                  type="checkbox"
+                  checked={rushDelivery}
+                  onChange={(e) => setRushDelivery(e.target.checked)}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Zap className="h-4 w-4 text-orange-600" />
+                    <span className="font-semibold text-black">Rush Delivery</span>
+                    <span className="text-sm text-orange-600 font-bold">+$10.00</span>
+                  </div>
+                  <p className="text-sm text-neutral-600">First review within 24 hours guaranteed</p>
+                </div>
+              </label>
+            </div>
+
+            {/* Pricing Summary */}
+            {(requestProReviewers || requestExpertReviewers || rushDelivery) && (
+              <div className="rounded-xl border-2 border-purple-200 bg-purple-50 p-4">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-neutral-700">{reviewCount} reviews</span>
+                    <span className="font-medium">{reviewCount} credits</span>
+                  </div>
+                  {requestProReviewers && (
+                    <div className="flex justify-between">
+                      <span className="text-neutral-700">Pro reviewers</span>
+                      <span className="font-medium">+${(reviewCount * 2).toFixed(2)}</span>
+                    </div>
+                  )}
+                  {requestExpertReviewers && (
+                    <div className="flex justify-between">
+                      <span className="text-neutral-700">Industry experts</span>
+                      <span className="font-medium">+${(reviewCount * 10).toFixed(2)}</span>
+                    </div>
+                  )}
+                  {rushDelivery && (
+                    <div className="flex justify-between">
+                      <span className="text-neutral-700">Rush delivery</span>
+                      <span className="font-medium">+$10.00</span>
+                    </div>
+                  )}
+                  <div className="border-t border-purple-300 pt-2 flex justify-between font-bold text-black">
+                    <span>Total</span>
+                    <div className="text-right">
+                      <div>{reviewCount} credits</div>
+                      {cashAddOns > 0 && (
+                        <div className="text-purple-600">+ ${cashAddOns.toFixed(2)}</div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  <p className="text-sm text-black/60">
-                    ~{Math.max(1, Math.round((reviewCount * 36) / 24))}&ndash;{Math.max(2, Math.round((reviewCount * 48) / 24))} days for {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
-                  </p>
-                  <Link
-                    href="/account"
-                    className="flex items-center gap-1.5 group"
-                  >
-                    <Zap className="h-3 w-3 text-purple-500" />
-                    <span className="text-xs font-medium text-purple-600 group-hover:text-purple-800 transition-colors">
-                      Go Pro for priority queue &amp; faster turnaround
-                    </span>
-                  </Link>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Enough credits -- submit */}
             {hasEnoughCredits && (
@@ -1122,16 +1262,12 @@ export default function SubmitTrackPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {/* Primary: Go Pro */}
-                  <Link href="/account">
-                    <div className="rounded-xl border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-white p-4">
-                      <p className="text-sm font-bold text-black">Get 40 credits every month</p>
-                      <p className="text-xs text-black/50 mt-0.5">No reviewing required. Cancel anytime.</p>
-                      <Button className="w-full mt-3 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl">
-                        Go Pro — $9.95/month
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Button>
-                    </div>
+                  {/* Primary: earn credits */}
+                  <Link href="/review">
+                    <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Review tracks to earn credits
+                    </Button>
                   </Link>
 
                   <div className="flex items-center gap-3 text-xs text-black/30">
@@ -1140,20 +1276,12 @@ export default function SubmitTrackPage() {
                     <div className="flex-1 h-px bg-black/10" />
                   </div>
 
-                  {/* Secondary: earn credits */}
-                  <Link href="/review">
-                    <Button className="w-full border-2 border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 h-12 rounded-xl font-semibold">
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Review tracks to earn credits
-                    </Button>
-                  </Link>
-
-                  {/* Tertiary: buy credits */}
+                  {/* Secondary: buy credits */}
                   <Button
                     onClick={handleBuyCredits}
                     disabled={isBuyingCredits}
                     isLoading={isBuyingCredits}
-                    className="w-full border border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50 h-10 rounded-xl text-sm"
+                    className="w-full border-2 border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 h-12 rounded-xl font-semibold"
                   >
                     Buy {creditDeficit <= 3 ? 3 : creditDeficit <= 10 ? 10 : 25} credits — {
                       creditDeficit <= 3 ? "$2.95" :

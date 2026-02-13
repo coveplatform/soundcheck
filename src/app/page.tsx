@@ -148,9 +148,9 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-4 pt-6 sm:pt-8">
           <div className="grid gap-8 md:gap-10 md:grid-cols-2 lg:grid-cols-[1fr_380px] items-center">
             <AnimatedSection className="is-visible max-w-xl text-center md:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold">PRO artists sell their music</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold">Sell your music directly</h2>
               <p className="mt-3 text-neutral-300">
-                Every track gets a public page. Share it anywhere. When listeners buy through your link, you keep 85% of the sale. Upgrade to PRO to unlock selling and get your music discovered by the right people.
+                Every track gets a public page. Share it anywhere. When listeners buy through your link, you keep 85% of the sale. Get your music discovered by the right people.
               </p>
 
               <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
@@ -212,7 +212,7 @@ export default function Home() {
 
                 {/* Footer */}
                 <div className="px-4 py-2.5 bg-black/20 border-t border-white/5 text-center">
-                  <span className="text-[11px] text-neutral-400">PRO feature: Keep <span className="text-blue-400 font-semibold">85%</span> of every sale</span>
+                  <span className="text-[11px] text-neutral-400">Keep <span className="text-blue-400 font-semibold">85%</span> of every sale</span>
                 </div>
               </div>
             </AnimatedSection>
@@ -282,17 +282,16 @@ export default function Home() {
       <section id="pricing" className="py-16 bg-neutral-900 text-neutral-50">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-4">Simple Pricing</h2>
-          <p className="text-center text-neutral-400 mb-12 max-w-xl mx-auto">
-            Start free and earn feedback by reviewing. Or go PRO to skip the queue and unlock premium features.
+          <p className="text-center text-neutral-400 mb-12 max-w-2xl mx-auto">
+            Start free. Earn credits by reviewing. Buy credit packs for convenience. Add premium features only when you need them.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Free Tier */}
+          <div className="max-w-2xl mx-auto space-y-6">
+            {/* What You Get */}
             <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-8">
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-purple-400 mb-2">Free</h3>
-                <div className="text-4xl font-extrabold">$0</div>
-                <p className="text-sm text-neutral-400 mt-2">Forever free</p>
+                <h3 className="text-2xl font-bold text-purple-400 mb-2">Free Forever</h3>
+                <p className="text-sm text-neutral-400">No subscription required</p>
               </div>
 
               <div className="space-y-3 text-left">
@@ -302,27 +301,23 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Upload tracks &amp; get peer reviews</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">Unlimited reviews per day</span> to earn credits</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">5 reviews per day</span> to earn credits</span>
+                  <span className="text-sm text-neutral-50">Upload tracks &amp; get peer feedback</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Genre-matched feedback</span>
+                  <span className="text-sm text-neutral-50">Sell your tracks &amp; keep <span className="font-bold">85%</span> of sales</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Buy credit packs anytime</span>
+                  <span className="text-sm text-neutral-50">Full analytics dashboard</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Unlock <span className="font-bold">$1.50/review</span> as PRO Reviewer</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Public track pages</span>
+                  <span className="text-sm text-neutral-50">Earn <span className="font-bold">$1.50/review</span> as Verified Reviewer</span>
                 </div>
               </div>
 
@@ -330,8 +325,7 @@ export default function Home() {
                 <Link href="/signup">
                   <Button
                     size="lg"
-                    variant="outline"
-                    className="w-full bg-neutral-700 border border-neutral-600 text-neutral-50 hover:bg-neutral-600 rounded-xl"
+                    className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all rounded-xl"
                   >
                     Get started free
                   </Button>
@@ -339,51 +333,48 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Pro Tier */}
-            <div className="bg-purple-600 text-white border border-purple-500 p-8 shadow-lg relative rounded-2xl">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-black text-purple-300 text-xs font-black px-3 py-1 rounded-full">
-                MOST POPULAR
-              </div>
-
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-black mb-2">Pro</h3>
-                <div className="text-5xl font-black">
-                  $9.95<span className="text-xl font-black">/mo</span>
+            {/* Credit Packs */}
+            <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-2xl p-6">
+              <h4 className="text-lg font-bold text-neutral-50 mb-3">Buy Credits Anytime</h4>
+              <p className="text-sm text-neutral-400 mb-4">Don't want to review? Purchase credit packs whenever you need them.</p>
+              <div className="grid grid-cols-3 gap-3 text-center">
+                <div className="bg-neutral-700 rounded-xl p-4 border border-neutral-600">
+                  <div className="text-2xl font-bold text-purple-400">3</div>
+                  <div className="text-xs text-neutral-400 mb-2">credits</div>
+                  <div className="text-sm font-bold text-neutral-50">$2.95</div>
                 </div>
-                <p className="text-sm text-white/60 mt-2 font-semibold">For serious artists</p>
-              </div>
-
-              <div className="space-y-3 text-left mb-6">
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
-                  <span className="text-sm font-bold">Everything in Free, plus:</span>
+                <div className="bg-purple-600 rounded-xl p-4 border border-purple-500 relative">
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-black text-purple-300 text-[9px] font-black px-2 py-0.5 rounded-full">BEST</div>
+                  <div className="text-2xl font-bold text-white">10</div>
+                  <div className="text-xs text-white/60 mb-2">credits</div>
+                  <div className="text-sm font-bold text-white">$7.95</div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
-                  <span className="text-sm font-bold">40 credits/month (no reviewing required)</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
-                  <span className="text-sm font-bold">Unlimited reviews per day</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
-                  <span className="text-sm font-semibold">Priority queue — get reviewed faster</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
-                  <span className="text-sm font-semibold">Sell your tracks &amp; earn from downloads</span>
+                <div className="bg-neutral-700 rounded-xl p-4 border border-neutral-600">
+                  <div className="text-2xl font-bold text-purple-400">25</div>
+                  <div className="text-xs text-neutral-400 mb-2">credits</div>
+                  <div className="text-sm font-bold text-neutral-50">$14.95</div>
                 </div>
               </div>
+            </div>
 
-              <Link href="/signup">
-                <Button
-                  size="lg"
-                  className="w-full bg-white text-purple-700 hover:bg-purple-50 active:bg-purple-100 font-black rounded-xl border border-white shadow-lg transition-colors duration-150 ease-out"
-                >
-                  Get started free <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+            {/* Premium Add-ons */}
+            <div className="bg-neutral-800/50 border border-neutral-700/50 rounded-2xl p-6">
+              <h4 className="text-lg font-bold text-neutral-50 mb-3">Premium Add-ons</h4>
+              <p className="text-sm text-neutral-400 mb-4">Upgrade the quality or speed of your reviews on a per-track basis.</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-300">✓ Verified Reviewers (100+ reviews, 4.5+ rating)</span>
+                  <span className="text-purple-400 font-bold">+$2/review</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-300">✓ Industry Experts (producers, engineers, label pros)</span>
+                  <span className="text-purple-400 font-bold">+$10/review</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-300">✓ Rush Delivery (first review within 24h)</span>
+                  <span className="text-purple-400 font-bold">+$10</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -401,15 +392,15 @@ export default function Home() {
               },
               {
                 q: "How do credits work?",
-                a: "Every time you review another artist's track, you earn a credit. Spend that credit to get a review on one of your own tracks. It's a simple give-one-get-one system that keeps quality feedback flowing. PRO members get 40 credits per month included, no reviewing required.",
+                a: "Every time you review another artist's track, you earn a credit. Spend that credit to get a review on one of your own tracks. It's a simple give-one-get-one system that keeps quality feedback flowing. You can also buy credit packs anytime if you don't want to review.",
               },
               {
                 q: "Can I get paid for reviewing?",
-                a: "Yes. Complete 25 reviews with an average artist rating of 4.5 or higher and you'll unlock PRO Reviewer status. PRO Reviewers earn $1.50 cash per review on top of the usual credit. You can track your progress in the review queue sidebar.",
+                a: "Yes. Complete 25 reviews with an average artist rating of 4.5 or higher and you'll unlock Verified Reviewer status. Verified Reviewers earn $1.50 cash per review on top of the usual credit. You can track your progress in the review queue sidebar.",
               },
               {
                 q: "Is it really free?",
-                a: "Yes. Free users can upload tracks and earn credits by reviewing up to 5 tracks per day. There's no cap on how much feedback you can get -- just keep reviewing and keep earning. PRO unlocks unlimited daily reviews, 40 credits/month without reviewing, plus premium features like selling music and analytics.",
+                a: "Yes. You can upload tracks, earn unlimited credits by reviewing (no daily cap), sell your music, and access full analytics -- all for free. Just review other artists to earn credits, or buy credit packs when you need them.",
               },
               {
                 q: "Who reviews my tracks?",
@@ -420,16 +411,12 @@ export default function Home() {
                 a: "One person's feedback is just their taste. With multiple reviews, patterns emerge. If one person says your intro is too long, maybe they're wrong. If most reviewers say it, that's signal worth acting on.",
               },
               {
-                q: "What does PRO include?",
-                a: "PRO ($9.95/mo) gives you 40 credits every month without reviewing, unlimited daily reviews to earn even more, and priority queue so your tracks get feedback faster. You can also sell your music and keep 85%. Cancel anytime.",
+                q: "What are premium add-ons?",
+                a: "You can optionally request Verified Reviewers (+$2/review), Industry Experts (+$10/review), or Rush Delivery (+$10 for first review within 24h). These add-ons are pay-as-you-go -- only pay for them when you need higher quality or faster turnaround on specific tracks.",
               },
               {
                 q: "Is my music safe?",
                 a: "Yes. Your unreleased tracks are only heard by genre-matched artists reviewing your work. We never share, publish, or leak anything. You can choose to allow your music to be public and discoverable.",
-              },
-              {
-                q: "Can I cancel PRO?",
-                a: "Yes, anytime. Your tracks and any unspent credits stay on the platform. You can still earn credits by reviewing -- you just lose PRO perks like the monthly credit grant, unlimited reviews, and priority queue.",
               },
             ].map((item, i, arr) => (
               <details

@@ -228,6 +228,8 @@ model Review {
   reviewSchemaVersion    Int                  @default(1)
   isPeerReview           Boolean              @default(false)
   peerReviewerArtistId   String?
+  abTestPreference       ABTestPreference?
+  abTestComment          String?
   ArtistProfile          ArtistProfile?       @relation(fields: [peerReviewerArtistId], references: [id])
   ReviewerProfile        ReviewerProfile?     @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
   Track                  Track                @relation(fields: [trackId], references: [id], onDelete: Cascade)
@@ -295,6 +297,11 @@ model ReviewerProfile {
   country                                                 String?
   stripeConnectedAt                                       DateTime?
   affiliateEarnings                                       Int           @default(0)
+  isIndustryExpert                                        Boolean       @default(false)
+  expertVerifiedAt                                        DateTime?
+  expertVerifiedBy                                        String?
+  expertCredentials                                       String?
+  expertBio                                               String?
   Payout                                                  Payout[]
   Purchase_Purchase_referredByReviewerIdToReviewerProfile Purchase[]    @relation("Purchase_referredByReviewerIdToReviewerProfile")
   Purchase_Purchase_reviewerIdToReviewerProfile           Purchase[]    @relation("Purchase_reviewerIdToReviewerProfile")
@@ -385,6 +392,13 @@ model Track {
   showReviewsOnPublicPage Boolean              @default(true)
   trackShareId            String?              @unique
   creditsSpent            Int                  @default(0)
+  requestedProReviewers   Boolean              @default(false)
+  requestedExpertReviewers Boolean             @default(false)
+  rushDelivery            Boolean              @default(false)
+  rushDeliveryDeadline    DateTime?
+  isAbTest                Boolean              @default(false)
+  abTestPrimaryTrackId    String?              @unique
+  cashAddOnTotal          Int                  @default(0)
   ExternalPurchase        ExternalPurchase[]
   Payment                 Payment?
   Purchase                Purchase[]
@@ -394,6 +408,9 @@ model Track {
   TrackAffiliateLink      TrackAffiliateLink[]
   TrackStem               TrackStem[]
   Genre                   Genre[]              @relation("TrackGenres")
+  AddOnPayment            AddOnPayment[]
+  ABTestPrimaryTrack      Track?               @relation("ABTestPair")
+  ABTestVariantTrack      Track?               @relation("ABTestPair", fields: [abTestPrimaryTrackId], references: [id], onDelete: SetNull)
 
   @@index([abletonRenderStatus])
   @@index([artistId])
@@ -471,11 +488,39 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model AddOnPayment {
+  id                    String        @id @default(cuid())
+  trackId               String
+  addOnType             AddOnType
+  amountCents           Int
+  stripePaymentIntentId String?
+  status                PaymentStatus @default(PENDING)
+  createdAt             DateTime      @default(now())
+  completedAt           DateTime?
+  Track                 Track         @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@index([trackId])
+  @@index([status])
+}
+
 enum AbletonRenderStatus {
   PENDING
   RENDERING
   COMPLETED
   FAILED
+}
+
+enum ABTestPreference {
+  VERSION_A
+  VERSION_B
+  NO_PREFERENCE
+}
+
+enum AddOnType {
+  PRO_REVIEWERS
+  EXPERT_REVIEWERS
+  RUSH_DELIVERY
+  AB_TEST
 }
 
 enum AddressedArtistNote {

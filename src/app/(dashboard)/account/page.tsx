@@ -30,16 +30,11 @@ export default async function AccountPage() {
     select: { Genre: { select: { id: true } } },
   });
 
-  // Get artist profile for credit balance and subscription info
+  // Get artist profile for credit balance
   const artistProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
     select: {
       artistName: true,
-      subscriptionStatus: true,
-      subscriptionTier: true,
-      subscriptionCurrentPeriodEnd: true,
-      subscriptionCanceledAt: true,
-      totalTracks: true,
       reviewCredits: true,
     },
   });
@@ -59,7 +54,7 @@ export default async function AccountPage() {
             Account
           </h1>
           <p className="text-sm text-black/50 mt-2">
-            Manage your profile, subscription, and preferences
+            Manage your profile, credits, and preferences
           </p>
         </div>
 
@@ -74,17 +69,6 @@ export default async function AccountPage() {
             email={dbUser.email}
             hasPassword={Boolean(dbUser.password)}
             reviewCredits={artistProfile?.reviewCredits ?? 0}
-            subscription={
-              artistProfile
-                ? {
-                    status: artistProfile.subscriptionStatus || null,
-                    tier: artistProfile.subscriptionTier || null,
-                    currentPeriodEnd: artistProfile.subscriptionCurrentPeriodEnd || null,
-                    canceledAt: artistProfile.subscriptionCanceledAt || null,
-                    totalTracks: artistProfile.totalTracks,
-                  }
-                : null
-            }
           />
         </div>
       </div>

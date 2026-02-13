@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -14,20 +14,12 @@ export function AccountSettingsClient({
   email,
   hasPassword,
   reviewCredits: initialReviewCredits,
-  subscription,
 }: {
   initialName: string;
   artistName: string | null;
   email: string;
   hasPassword: boolean;
   reviewCredits: number;
-  subscription: {
-    status: string | null;
-    tier: string | null;
-    currentPeriodEnd: Date | null;
-    canceledAt: Date | null;
-    totalTracks: number;
-  } | null;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -46,87 +38,18 @@ export function AccountSettingsClient({
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
-  const [isStartingCheckout, setIsStartingCheckout] = useState(false);
-  const [checkoutError, setCheckoutError] = useState("");
-
   const [isBuyingCredits, setIsBuyingCredits] = useState(false);
   const [buyCreditsError, setBuyCreditsError] = useState("");
   const [selectedCreditPack, setSelectedCreditPack] = useState<3 | 10 | 25 | null>(null);
 
-  // Subscription verification state (for handling redirect from Stripe checkout)
-  const [isVerifyingSubscription, setIsVerifyingSubscription] = useState(false);
-  const [subscriptionJustActivated, setSubscriptionJustActivated] = useState(false);
-  const [verifiedSubscription, setVerifiedSubscription] = useState<{
-    status: string;
-    tier: string | null;
-    currentPeriodEnd: Date | null;
-    credits: number;
-  } | null>(null);
-
-  // Verify subscription status when redirected from checkout
-  const verifySubscription = useCallback(async () => {
-    try {
-      const res = await fetch("/api/subscriptions/verify", { method: "POST" });
-      const data = await res.json();
-
-      if (res.ok && data.status === "active") {
-        setVerifiedSubscription({
-          status: data.status,
-          tier: data.tier,
-          currentPeriodEnd: data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null,
-          credits: data.credits ?? 0,
-        });
-        setSubscriptionJustActivated(true);
-        return true;
-      }
-      return false;
-    } catch {
-      return false;
-    }
-  }, []);
-
-  // Poll for subscription activation when coming from checkout
+  // Handle credits success redirect
   useEffect(() => {
-    const checkoutSuccess = searchParams.get("subscription") === "success";
     const creditsSuccess = searchParams.get("credits") === "success";
 
-    // Show credits success message
     if (creditsSuccess) {
-      // Refresh the page data to show updated credits
       router.refresh();
     }
-
-    // Handle subscription checkout success - poll until activated
-    if (checkoutSuccess && subscription?.status !== "active") {
-      setIsVerifyingSubscription(true);
-
-      let attempts = 0;
-      const maxAttempts = 10;
-      const pollInterval = 2000; // 2 seconds
-
-      const poll = async () => {
-        attempts++;
-        const activated = await verifySubscription();
-
-        if (activated) {
-          setIsVerifyingSubscription(false);
-          // Clean up URL
-          const newUrl = new URL(window.location.href);
-          newUrl.searchParams.delete("subscription");
-          window.history.replaceState({}, "", newUrl.toString());
-          // Refresh to update server-side data
-          router.refresh();
-        } else if (attempts < maxAttempts) {
-          setTimeout(poll, pollInterval);
-        } else {
-          // Max attempts reached - subscription might still activate via webhook
-          setIsVerifyingSubscription(false);
-        }
-      };
-
-      poll();
-    }
-  }, [searchParams, subscription?.status, verifySubscription, router]);
+  }, [searchParams, router]);
 
   async function saveProfile() {
     setProfileError("");
@@ -236,39 +159,6 @@ export function AccountSettingsClient({
     }
   }
 
-  // Use verified subscription state if available (for immediate UI update after checkout)
-  const effectiveSubscription = verifiedSubscription || subscription;
-  const isSubscribed = effectiveSubscription?.status === "active";
-  const reviewCredits = verifiedSubscription?.credits ?? initialReviewCredits;
-
-  async function startCheckout() {
-    setCheckoutError("");
-    setIsStartingCheckout(true);
-
-    try {
-      const res = await fetch("/api/subscriptions/checkout", {
-        method: "POST",
-      });
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        setCheckoutError(data?.error || "Failed to start checkout");
-        return;
-      }
-
-      if (data?.url) {
-        window.location.href = data.url;
-        return;
-      }
-
-      setCheckoutError("Failed to start checkout");
-    } catch {
-      setCheckoutError("Failed to start checkout");
-    } finally {
-      setIsStartingCheckout(false);
-    }
-  }
-
   return (
     <div className="space-y-8">
       {/* Credit Balance Card */}
@@ -283,7 +173,7 @@ export function AccountSettingsClient({
               <p className="text-xs text-neutral-600 mt-0.5">Use credits to get reviews on your tracks</p>
             </div>
             <div className="text-right">
-              <p className="text-3xl font-bold text-purple-600 tabular-nums">{reviewCredits}</p>
+              <p className="text-3xl font-bold text-purple-600 tabular-nums">{initialReviewCredits}</p>
               <p className="text-xs text-neutral-500 font-medium">available</p>
             </div>
           </div>
@@ -367,152 +257,6 @@ export function AccountSettingsClient({
               </div>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* Subscription Card */}
-      <div className="bg-white border-2 border-neutral-200 rounded-2xl shadow-sm overflow-hidden">
-        <div className="border-b border-neutral-200 px-6 py-4">
-          <h3 className="text-lg font-bold text-neutral-950">Subscription</h3>
-        </div>
-        <div className="p-6 space-y-3">
-          {/* Verifying subscription after checkout */}
-          {isVerifyingSubscription ? (
-            <div className="bg-purple-50 border-2 border-purple-200 text-purple-800 text-sm p-4 font-medium rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="animate-spin h-4 w-4 border-2 border-purple-600 border-t-transparent rounded-full" />
-                <span>Activating your subscription...</span>
-              </div>
-            </div>
-          ) : null}
-
-          {/* Subscription just activated success message */}
-          {subscriptionJustActivated && !isVerifyingSubscription ? (
-            <div className="bg-emerald-50 border-2 border-emerald-200 text-emerald-800 text-sm p-4 font-medium rounded-lg">
-              <div className="flex items-center gap-2">
-                <span className="text-emerald-600 font-bold">&#10003;</span>
-                <span>Your Pro subscription is now active! You have {reviewCredits} review credits.</span>
-              </div>
-            </div>
-          ) : null}
-
-          {checkoutError ? (
-            <div className="bg-red-50 border-2 border-red-200 text-red-700 text-sm p-3 font-medium rounded-lg">
-              {checkoutError}
-            </div>
-          ) : null}
-
-          {isSubscribed ? (
-            <>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-bold text-neutral-950">SoundCheck Pro</p>
-                  <p className="text-xs text-neutral-600">$9.95/month</p>
-                </div>
-                <div className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">
-                  Active
-                </div>
-              </div>
-              <div className="text-sm text-neutral-600">
-                {subscription?.canceledAt ? (
-                  <p>
-                    Your subscription will end on{" "}
-                    {new Date(effectiveSubscription?.currentPeriodEnd ?? subscription?.currentPeriodEnd!).toLocaleDateString()}
-                  </p>
-                ) : effectiveSubscription?.currentPeriodEnd ? (
-                  <p>
-                    Next billing date:{" "}
-                    {new Date(effectiveSubscription.currentPeriodEnd).toLocaleDateString()}
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-sm text-purple-900 space-y-1">
-                <p className="font-bold">Your Pro benefits:</p>
-                <p>40 credits/month + unlimited reviews + priority queue + sell your tracks</p>
-              </div>
-
-              <Button
-                variant="outline"
-                onClick={async () => {
-                  try {
-                    const res = await fetch("/api/subscriptions/portal", {
-                      method: "POST",
-                    });
-                    const data = await res.json();
-                    if (data.url) {
-                      window.location.href = data.url;
-                    }
-                  } catch (error) {
-                    console.error("Portal error:", error);
-                  }
-                }}
-              >
-                Manage Subscription
-              </Button>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-bold text-neutral-950">Current plan</p>
-                  <p className="text-xs text-neutral-600">Free</p>
-                </div>
-                <div className="px-3 py-1 bg-neutral-100 text-neutral-700 text-xs font-bold rounded-full">
-                  Not subscribed
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 border-2 border-purple-200 rounded-2xl p-5 space-y-4">
-                <div>
-                  <p className="text-base font-bold text-neutral-950 mb-2">Upgrade to SoundCheck Pro</p>
-                  <p className="text-sm text-neutral-700">
-                    <span className="font-bold text-neutral-950">$9.95/month</span> · Cancel anytime
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-bold shrink-0">&#10003;</span>
-                    <div>
-                      <p className="text-sm font-bold text-neutral-950">40 credits every month</p>
-                      <p className="text-xs text-neutral-600">Get feedback without reviewing — credits added automatically each month</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-bold shrink-0">&#10003;</span>
-                    <div>
-                      <p className="text-sm font-bold text-neutral-950">Unlimited reviews per day</p>
-                      <p className="text-xs text-neutral-600">No daily cap — earn as many extra credits as you want</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-bold shrink-0">&#10003;</span>
-                    <div>
-                      <p className="text-sm font-bold text-neutral-950">Priority queue</p>
-                      <p className="text-xs text-neutral-600">Your tracks get reviewed faster</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-bold shrink-0">&#10003;</span>
-                    <div>
-                      <p className="text-sm font-bold text-neutral-950">Sell your tracks</p>
-                      <p className="text-xs text-neutral-600">Enable downloads, share links, and earn from your music</p>
-                    </div>
-                  </div>
-                </div>
-
-                <Button
-                  variant="primary"
-                  onClick={startCheckout}
-                  isLoading={isStartingCheckout}
-                  className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all"
-                >
-                  Upgrade to Pro — $9.95/month
-                </Button>
-              </div>
-            </>
-          )}
         </div>
       </div>
 

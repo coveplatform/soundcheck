@@ -119,10 +119,6 @@ export default async function TrackDetailPage({
     }).catch(() => {});
   }
 
-  // Check subscription status
-  const isSubscribed = track.ArtistProfile.subscriptionStatus === "active";
-  const isFreeTier = !isSubscribed;
-
   const completedReviews = track.Review.length;
   const countedCompletedReviews = track.Review.filter(
     (r) => r.countsTowardCompletion !== false
@@ -238,25 +234,6 @@ export default async function TrackDetailPage({
           </div>
         </div>
 
-        {/* Pro nudge — shown once when first review arrives for free users */}
-        {completedReviews === 1 && !isSubscribed && (
-          <Link
-            href="/account"
-            className="flex items-center gap-3 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 mb-6 group transition-colors duration-150 ease-out hover:bg-purple-100/80"
-          >
-            <div className="h-8 w-8 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
-              <ArrowRight className="h-3.5 w-3.5 text-white rotate-[-45deg]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-purple-900">
-                Your first review is in! Want more feedback, faster?
-              </p>
-              <p className="text-xs text-purple-700/60">Go Pro — 40 credits/month, no reviewing required</p>
-            </div>
-            <ArrowRight className="h-4 w-4 text-purple-400 group-hover:text-purple-600 transition-colors flex-shrink-0" />
-          </Link>
-        )}
-
         {/* Main Content - Tabs + Sidebar Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-8">
           {/* Main Content - Tabs (LEFT) */}
@@ -264,7 +241,6 @@ export default async function TrackDetailPage({
             {completedReviews > 0 ? (
               <TrackDashboardTabs
                 defaultTab="reviews"
-                isPro={isSubscribed}
                 statsTab={
                   <StatsTab
                     reviews={track.Review}
@@ -413,22 +389,6 @@ export default async function TrackDetailPage({
                         {track.reviewsRequested - countedCompletedReviews} review{track.reviewsRequested - countedCompletedReviews !== 1 ? "s" : ""}
                       </span>
                     </div>
-                    {isSubscribed ? (
-                      <div className="flex items-center gap-1.5 pt-1">
-                        <Zap className="h-3.5 w-3.5 text-amber-600" />
-                        <span className="text-xs font-bold text-amber-700">Priority queue active</span>
-                      </div>
-                    ) : (
-                      <Link
-                        href="/account"
-                        className="flex items-center gap-2 pt-2 border-t border-black/8 group"
-                      >
-                        <Zap className="h-3.5 w-3.5 text-purple-500" />
-                        <span className="text-xs font-medium text-purple-600 group-hover:text-purple-800 transition-colors">
-                          Upgrade to Pro for priority queue
-                        </span>
-                      </Link>
-                    )}
                   </div>
                 </CardContent>
               </Card>

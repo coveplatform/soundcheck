@@ -7,13 +7,6 @@ import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email
 import { finalizePaidCheckoutSession } from "@/lib/payments";
 import type Stripe from "stripe";
 
-const getUnixTimestamp = (value: unknown): number | null =>
-  typeof value === "number" && Number.isFinite(value) ? value : null;
-
-type StripeSubscriptionUnixFields = {
-  current_period_end?: number | null;
-  canceled_at?: number | null;
-};
 
 async function handleReviewCreditsTopup(session: Stripe.Checkout.Session) {
   try {
@@ -46,80 +39,149 @@ async function handleReviewCreditsTopup(session: Stripe.Checkout.Session) {
   }
 }
 
-async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
+async function handleAddOnsCheckout(session: Stripe.Checkout.Session) {
   try {
-    const subscriptionId =
-      typeof (invoice as any).subscription === "string" ? ((invoice as any).subscription as string) : null;
-    const billingReason = typeof (invoice as any).billing_reason === "string" ? (invoice as any).billing_reason : null;
-    const customerId = typeof (invoice as any).customer === "string" ? ((invoice as any).customer as string) : null;
+    const metadata = session.metadata!;
+    const trackId = metadata.trackId;
+    const userId = metadata.userId;
+    const reviewCount = parseInt(metadata.reviewCount);
+    const creditCost = parseInt(metadata.creditCost);
+    const requestProReviewers = metadata.requestProReviewers === "true";
+    const requestExpertReviewers = metadata.requestExpertReviewers === "true";
+    const rushDelivery = metadata.rushDelivery === "true";
 
-    if (!subscriptionId) {
+    if (!trackId || !userId) {
+      console.error("Missing trackId or userId in add-ons metadata");
       return;
     }
 
-    // Handle both initial subscription payment and renewal payments
-    const isInitialPayment = billingReason === "subscription_create";
-    const isRenewalPayment = billingReason === "subscription_cycle";
+    const stripe = getStripe();
 
-    if (!isInitialPayment && !isRenewalPayment) {
-      return;
-    }
+    await prisma.$transaction(async (tx) => {
+      // 1. Deduct credits with optimistic locking
+      const updated = await tx.artistProfile.updateMany({
+        where: {
+          userId: userId,
+          reviewCredits: { gte: creditCost },
+        },
+        data: {
+          reviewCredits: { decrement: creditCost },
+          totalCreditsSpent: { increment: creditCost },
+        },
+      });
 
-    // Try to find artist profile by subscriptionId first, then by customerId as fallback
-    let artistProfile = await prisma.artistProfile.findFirst({
-      where: { subscriptionId },
-      select: { id: true, subscriptionStatus: true },
+      // If credits insufficient (race condition), refund and abort
+      if (updated.count === 0) {
+        console.error("Insufficient credits after payment - refunding");
+
+        if (session.payment_intent) {
+          await stripe.refunds.create({
+            payment_intent: session.payment_intent as string,
+            reason: "requested_by_customer",
+          }, {
+            idempotencyKey: `addons_refund_${session.id}`,
+          });
+        }
+
+        throw new Error("INSUFFICIENT_CREDITS");
+      }
+
+      // 2. Update track with add-on flags and status
+      const rushDeliveryDeadline = rushDelivery
+        ? new Date(Date.now() + 24 * 60 * 60 * 1000)
+        : null;
+
+      await tx.track.update({
+        where: { id: trackId },
+        data: {
+          reviewsRequested: reviewCount,
+          creditsSpent: creditCost,
+          requestedProReviewers,
+          requestedExpertReviewers,
+          rushDelivery,
+          rushDeliveryDeadline,
+          cashAddOnTotal: session.amount_total || 0,
+          status: "QUEUED",
+          paidAt: new Date(),
+          completedAt: null, // Reset if re-requesting reviews
+        },
+      });
+
+      // 3. Create AddOnPayment records for accounting
+      const addOnPayments: Array<{
+        trackId: string;
+        addOnType: string;
+        amountCents: number;
+        stripePaymentIntentId: string | null;
+        status: string;
+        completedAt: Date;
+      }> = [];
+
+      if (requestExpertReviewers) {
+        addOnPayments.push({
+          trackId,
+          addOnType: "EXPERT_REVIEWERS",
+          amountCents: reviewCount * 1000,
+          stripePaymentIntentId: session.payment_intent as string | null,
+          status: "COMPLETED",
+          completedAt: new Date(),
+        });
+      } else if (requestProReviewers) {
+        addOnPayments.push({
+          trackId,
+          addOnType: "PRO_REVIEWERS",
+          amountCents: reviewCount * 200,
+          stripePaymentIntentId: session.payment_intent as string | null,
+          status: "COMPLETED",
+          completedAt: new Date(),
+        });
+      }
+
+      if (rushDelivery) {
+        addOnPayments.push({
+          trackId,
+          addOnType: "RUSH_DELIVERY",
+          amountCents: 1000,
+          stripePaymentIntentId: session.payment_intent as string | null,
+          status: "COMPLETED",
+          completedAt: new Date(),
+        });
+      }
+
+      if (addOnPayments.length > 0) {
+        await tx.addOnPayment.createMany({
+          data: addOnPayments,
+        });
+      }
     });
 
-    // Fallback: if not found by subscriptionId, try by stripeCustomerId (for initial payment race condition)
-    if (!artistProfile && customerId && isInitialPayment) {
-      artistProfile = await prisma.artistProfile.findFirst({
-        where: { stripeCustomerId: customerId },
-        select: { id: true, subscriptionStatus: true },
-      });
+    // 4. Trigger reviewer assignment (outside transaction)
+    await assignReviewersToTrack(trackId);
 
-      // If found by customerId, also save the subscriptionId
-      if (artistProfile) {
-        await prisma.artistProfile.update({
-          where: { id: artistProfile.id },
-          data: { subscriptionId },
-        });
-        console.log(`Saved subscriptionId for artist profile: ${artistProfile.id} (found by customerId)`);
-      }
-    }
-
-    if (!artistProfile) {
-      console.error(`Artist profile not found for subscription: ${subscriptionId}, customer: ${customerId}`);
-      return;
-    }
-
-    if (isInitialPayment) {
-      // Initial payment succeeded - activate the subscription
-      await prisma.artistProfile.update({
-        where: { id: artistProfile.id },
-        data: {
-          subscriptionStatus: "active",
-        },
-      });
-      console.log(`Subscription activated for artist profile: ${artistProfile.id} (initial payment succeeded)`);
-    }
-
-    // Grant 40 review credits for Pro subscribers (both initial and renewal)
-    await prisma.artistProfile.update({
-      where: { id: artistProfile.id },
-      data: {
-        reviewCredits: {
-          increment: 40,
-        },
-        totalCreditsEarned: {
-          increment: 40,
-        },
+    // 5. Send confirmation email
+    const track = await prisma.track.findUnique({
+      where: { id: trackId },
+      include: {
+        ArtistProfile: { include: { User: true } },
       },
     });
+
+    if (track) {
+      await sendTrackQueuedEmail(
+        track.ArtistProfile.User.email,
+        track.title
+      );
+    }
   } catch (error) {
-    console.error("Error handling invoice payment succeeded:", error);
+    if (error instanceof Error && error.message === "INSUFFICIENT_CREDITS") {
+      console.error("Refunded add-on payment due to insufficient credits");
+      // Email already sent in refund logic
+    } else {
+      console.error("Error handling add-ons checkout:", error);
+    }
   }
 }
+
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -178,36 +240,13 @@ export async function POST(request: Request) {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
-      // Handle both subscription and one-time payments
-      if (session.mode === "subscription") {
-        await handleSubscriptionCheckoutComplete(session);
-      } else {
-        await handleCheckoutComplete(session);
-      }
-      break;
-    }
-
-    case "invoice.payment_succeeded": {
-      const invoice = event.data.object as Stripe.Invoice;
-      await handleInvoicePaymentSucceeded(invoice);
+      await handleCheckoutComplete(session);
       break;
     }
 
     case "checkout.session.expired": {
       const session = event.data.object as Stripe.Checkout.Session;
       await handleCheckoutExpired(session);
-      break;
-    }
-
-    case "customer.subscription.updated": {
-      const subscription = event.data.object as Stripe.Subscription;
-      await handleSubscriptionUpdated(subscription);
-      break;
-    }
-
-    case "customer.subscription.deleted": {
-      const subscription = event.data.object as Stripe.Subscription;
-      await handleSubscriptionDeleted(subscription);
       break;
     }
 
@@ -222,6 +261,11 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   // Check if this is an external purchase (track sale) or track review payment
   if (session.metadata?.type === "review_credits_topup") {
     await handleReviewCreditsTopup(session);
+    return;
+  }
+
+  if (session.metadata?.type === "track_addons") {
+    await handleAddOnsCheckout(session);
     return;
   }
 
@@ -315,116 +359,6 @@ async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
   }
 }
 
-async function handleSubscriptionCheckoutComplete(session: Stripe.Checkout.Session) {
-  try {
-    const artistProfileId = session.metadata?.artistProfileId;
-    const subscription = session.subscription as string;
-
-    if (!artistProfileId || !subscription) {
-      console.error("Missing artistProfileId or subscription in session metadata");
-      return;
-    }
-
-    const stripe = getStripe();
-    const subscriptionResponse = await stripe.subscriptions.retrieve(subscription);
-    const subscriptionData: Stripe.Subscription =
-      (subscriptionResponse as any).data ?? (subscriptionResponse as any);
-
-    const subscriptionUnixFields =
-      subscriptionData as unknown as StripeSubscriptionUnixFields;
-    const currentPeriodEndUnix = getUnixTimestamp(
-      subscriptionUnixFields.current_period_end
-    );
-
-    await prisma.$transaction(async (tx) => {
-      await tx.artistProfile.update({
-        where: { id: artistProfileId },
-        data: {
-          subscriptionId: subscriptionData.id,
-          subscriptionStatus: subscriptionData.status,
-          subscriptionTier: "pro",
-          subscriptionCurrentPeriodEnd: currentPeriodEndUnix
-            ? new Date(currentPeriodEndUnix * 1000)
-            : null,
-        },
-      });
-
-      // Grant 40 review credits for Pro subscription
-      await tx.artistProfile.update({
-        where: { id: artistProfileId },
-        data: {
-          reviewCredits: {
-            increment: 40,
-          },
-          totalCreditsEarned: {
-            increment: 40,
-          },
-        },
-      });
-    });
-
-    console.log(`Subscription activated for artist profile: ${artistProfileId}`);
-  } catch (error) {
-    console.error("Error handling subscription checkout complete:", error);
-  }
-}
-
-async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
-  try {
-    const artistProfile = await prisma.artistProfile.findFirst({
-      where: { subscriptionId: subscription.id },
-    });
-
-    if (!artistProfile) {
-      console.error(`Artist profile not found for subscription: ${subscription.id}`);
-      return;
-    }
-
-    await prisma.artistProfile.update({
-      where: { id: artistProfile.id },
-      data: {
-        subscriptionStatus: subscription.status,
-        subscriptionCurrentPeriodEnd: (() => {
-          const unix = getUnixTimestamp((subscription as any).current_period_end);
-          return unix ? new Date(unix * 1000) : null;
-        })(),
-        subscriptionCanceledAt: (() => {
-          const unix = getUnixTimestamp((subscription as any).canceled_at);
-          return unix ? new Date(unix * 1000) : null;
-        })(),
-      },
-    });
-
-    console.log(`Subscription updated for artist profile: ${artistProfile.id}`);
-  } catch (error) {
-    console.error("Error handling subscription updated:", error);
-  }
-}
-
-async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-  try {
-    const artistProfile = await prisma.artistProfile.findFirst({
-      where: { subscriptionId: subscription.id },
-    });
-
-    if (!artistProfile) {
-      console.error(`Artist profile not found for subscription: ${subscription.id}`);
-      return;
-    }
-
-    await prisma.artistProfile.update({
-      where: { id: artistProfile.id },
-      data: {
-        subscriptionStatus: "canceled",
-        subscriptionCanceledAt: new Date(),
-      },
-    });
-
-    console.log(`Subscription deleted for artist profile: ${artistProfile.id}`);
-  } catch (error) {
-    console.error("Error handling subscription deleted:", error);
-  }
-}
 
 async function handleExternalPurchaseComplete(
   session: Stripe.Checkout.Session,

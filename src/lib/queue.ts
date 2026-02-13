@@ -396,11 +396,37 @@ export async function assignReviewersToTrack(trackId: string) {
       return;
     } else {
       // Legacy flow for STARTER/STANDARD/PRO/DEEP_DIVE packages
-      const eligibleReviewers = await getEligibleReviewers(
+      let eligibleReviewers = await getEligibleReviewers(
         trackId,
         track.packageType,
         tx
       );
+
+      // Apply tier filtering based on track's requested add-ons
+      if (track.requestedExpertReviewers) {
+        // Filter to industry experts only
+        eligibleReviewers = eligibleReviewers.filter((r) => r.isIndustryExpert);
+
+        // Fallback to Pro reviewers if no experts available
+        if (eligibleReviewers.length === 0) {
+          console.warn(
+            `No industry experts available for track ${trackId}, falling back to Pro reviewers`
+          );
+          eligibleReviewers = await getEligibleReviewers(
+            trackId,
+            track.packageType,
+            tx
+          );
+          eligibleReviewers = eligibleReviewers.filter(
+            (r) => r.totalReviews >= 100 && r.averageRating >= 4.5
+          );
+        }
+      } else if (track.requestedProReviewers) {
+        // Filter to Pro tier (100+ reviews, 4.5+ rating)
+        eligibleReviewers = eligibleReviewers.filter(
+          (r) => r.totalReviews >= 100 && r.averageRating >= 4.5
+        );
+      }
 
       const existingReviewerIds = new Set(track.Review.map((r: any) => r.reviewerId));
       const eligibleUnique = eligibleReviewers.filter(
@@ -441,12 +467,18 @@ export async function assignReviewersToTrack(trackId: string) {
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 48);
 
-      const priority =
+      // Calculate priority with Rush Delivery support
+      let priority =
         track.packageType === "PRO" || track.packageType === "DEEP_DIVE"
           ? 10
           : track.packageType === "STANDARD"
             ? 5
             : 0;
+
+      // RUSH DELIVERY: Highest priority (15)
+      if (track.rushDelivery) {
+        priority = 15;
+      }
 
       if (reviewersToAssign.length > 0) {
         await tx.reviewQueue.createMany({
