@@ -159,6 +159,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           if (data.status !== "COMPLETED") {
             funnels.review.start(data.Track.id, data.id);
           }
+          if (data.skipListenTimer) {
+            setCanSubmit(true);
+          }
           setIsLoading(false);
         } else {
           const data = await response.json().catch(() => null);
@@ -1076,7 +1079,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               sourceUrl={review.Track.sourceUrl}
               sourceType={review.Track.sourceType}
               showWaveform={review.Track.sourceType === "UPLOAD"}
-              minListenTime={MIN_LISTEN_SECONDS}
+              minListenTime={review.skipListenTimer ? 0 : MIN_LISTEN_SECONDS}
               initialListenTime={listenTime}
               onTimeUpdate={(seconds) => setPlayerSeconds(seconds)}
               onListenProgress={(seconds) => {

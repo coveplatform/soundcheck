@@ -236,7 +236,13 @@ export async function POST(request: Request) {
       );
     }
 
-    if (review.listenDuration < MIN_LISTEN_SECONDS) {
+    // Per-user listen timer bypass
+    const SKIP_LISTEN_TIMER_EMAILS = ["kris.engelhardt4@gmail.com"];
+    const skipListenTimer = SKIP_LISTEN_TIMER_EMAILS.includes(
+      (session.user.email ?? "").toLowerCase()
+    );
+
+    if (!skipListenTimer && review.listenDuration < MIN_LISTEN_SECONDS) {
       return NextResponse.json(
         { error: `Must listen for at least ${MIN_LISTEN_SECONDS} seconds` },
         { status: 400 }

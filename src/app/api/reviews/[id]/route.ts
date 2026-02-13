@@ -68,7 +68,13 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(review);
+    // Per-user listen timer bypass
+    const SKIP_LISTEN_TIMER_EMAILS = ["kris.engelhardt4@gmail.com"];
+    const skipListenTimer = SKIP_LISTEN_TIMER_EMAILS.includes(
+      (session.user.email ?? "").toLowerCase()
+    );
+
+    return NextResponse.json({ ...review, skipListenTimer });
   } catch (error) {
     console.error("Error fetching review:", error);
     return NextResponse.json(

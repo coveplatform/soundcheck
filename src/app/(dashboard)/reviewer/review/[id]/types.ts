@@ -34,6 +34,7 @@ export interface Review {
   } | null;
   isPeerReview?: boolean;
   peerReviewerArtistId?: string | null;
+  skipListenTimer?: boolean;
 }
 
 export type FirstImpression = "STRONG_HOOK" | "DECENT" | "LOST_INTEREST";
