@@ -47,9 +47,7 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
     { href: "/review/history", label: "Review History", icon: History },
   ];
 
-  const proLinks = isPro
-    ? [{ href: "/business", label: "Business", icon: DollarSign }]
-    : [];
+  const proLinks: typeof mainLinks = [];
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
@@ -272,7 +270,6 @@ function MobileBottomNav({
   ];
 
   const moreLinks = [
-    { href: "/business", label: "Business", icon: DollarSign, proOnly: true },
     { href: "/reviewer/earnings", label: "Earnings", icon: Coins },
     { href: "/review/history", label: "Review History", icon: History },
     { href: "/support", label: "Support", icon: LifeBuoy },
@@ -346,11 +343,6 @@ function MobileBottomNav({
                   >
                     <Icon className="w-4 h-4 opacity-70 flex-shrink-0" />
                     <span className="flex-1">{link.label}</span>
-                    {link.proOnly && !isPro && (
-                      <span className="text-[9px] font-semibold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">
-                        PRO
-                      </span>
-                    )}
                   </Link>
                 );
               })}
