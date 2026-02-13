@@ -143,8 +143,8 @@ export default async function TrackDetailPage({
 
   if (needsMoreReviews && (track.status === "QUEUED" || track.status === "IN_PROGRESS")) {
     const remainingReviews = track.reviewsRequested - countedCompletedReviews;
-    // Pro: ~6-12h per review, Free: ~24-48h per review
-    const hoursPerReview = isSubscribed ? 8 : 36;
+    // Standard: ~24-36h per review
+    const hoursPerReview = 30;
     estimatedWaitHours = Math.max(1, remainingReviews * hoursPerReview);
   }
 
@@ -249,36 +249,32 @@ export default async function TrackDetailPage({
                       originality: platformStats._avg.originalityScore ?? 0,
                       vocals: platformStats._avg.vocalScore ?? 0,
                     }}
-                    isFreeTier={isFreeTier}
                   />
                 }
                 reviewsTab={
                   <ReviewsTab
                     reviews={track.Review}
-                    isFreeTier={isFreeTier}
                     trackId={track.id}
                   />
                 }
                 salesTab={
-                  isSubscribed ? (
-                    <SalesTab
-                      track={{
-                        id: track.id,
-                        title: track.title,
-                        sourceType: track.sourceType,
-                        sharingEnabled: track.sharingEnabled,
-                        sharingMode: track.sharingMode,
-                        salePrice: track.salePrice,
-                        trackShareId: track.trackShareId,
-                        publicPlayCount: track.publicPlayCount,
-                      }}
-                      internalPurchases={track.Purchase}
-                      externalPurchases={track.ExternalPurchase}
-                      affiliateLinks={track.TrackAffiliateLink}
-                      totalInternalEarnings={totalInternalEarnings}
-                      totalExternalEarnings={totalExternalEarnings}
-                    />
-                  ) : undefined
+                  <SalesTab
+                    track={{
+                      id: track.id,
+                      title: track.title,
+                      sourceType: track.sourceType,
+                      sharingEnabled: track.sharingEnabled,
+                      sharingMode: track.sharingMode,
+                      salePrice: track.salePrice,
+                      trackShareId: track.trackShareId,
+                      publicPlayCount: track.publicPlayCount,
+                    }}
+                    internalPurchases={track.Purchase}
+                    externalPurchases={track.ExternalPurchase}
+                    affiliateLinks={track.TrackAffiliateLink}
+                    totalInternalEarnings={totalInternalEarnings}
+                    totalExternalEarnings={totalExternalEarnings}
+                  />
                 }
                 settingsTab={
                   <SettingsTab
