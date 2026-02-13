@@ -429,7 +429,7 @@ export function AccountSettingsClient({
 
               <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-sm text-purple-900 space-y-1">
                 <p className="font-bold">Your Pro benefits:</p>
-                <p>40 credits/month + sell your music + priority queue + PRO-tier reviews</p>
+                <p>40 credits/month + unlimited reviews + priority queue + sell your tracks</p>
               </div>
 
               <Button
@@ -476,14 +476,14 @@ export function AccountSettingsClient({
                     <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-bold shrink-0">&#10003;</span>
                     <div>
                       <p className="text-sm font-bold text-neutral-950">40 credits every month</p>
-                      <p className="text-xs text-neutral-600">Automatically added to your balance each billing cycle</p>
+                      <p className="text-xs text-neutral-600">Get feedback without reviewing — credits added automatically each month</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-bold shrink-0">&#10003;</span>
                     <div>
-                      <p className="text-sm font-bold text-neutral-950">Sell your music</p>
-                      <p className="text-xs text-neutral-600">Custom links and affiliate tracking for your tracks</p>
+                      <p className="text-sm font-bold text-neutral-950">Unlimited reviews per day</p>
+                      <p className="text-xs text-neutral-600">No daily cap — earn as many extra credits as you want</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -496,8 +496,8 @@ export function AccountSettingsClient({
                   <div className="flex items-start gap-3">
                     <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-white text-xs font-bold shrink-0">&#10003;</span>
                     <div>
-                      <p className="text-sm font-bold text-neutral-950">PRO-tier reviews</p>
-                      <p className="text-xs text-neutral-600">Detailed, high-quality feedback from experienced reviewers</p>
+                      <p className="text-sm font-bold text-neutral-950">Sell your tracks</p>
+                      <p className="text-xs text-neutral-600">Enable downloads, share links, and earn from your music</p>
                     </div>
                   </div>
                 </div>

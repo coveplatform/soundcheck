@@ -71,7 +71,7 @@ export async function POST(request: Request) {
             currency: "usd",
             product_data: {
               name: "MixReflect Pro",
-              description: "Unlimited track uploads and review requests",
+              description: "40 credits/month, unlimited reviews, priority queue",
             },
             unit_amount: 995, // $9.95 in cents
             recurring: {

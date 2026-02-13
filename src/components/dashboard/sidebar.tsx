@@ -18,7 +18,6 @@ import {
   History,
   MoreHorizontal,
   X,
-  Compass,
   LifeBuoy,
 } from "lucide-react";
 
@@ -48,9 +47,9 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
     { href: "/review/history", label: "Review History", icon: History },
   ];
 
-  const proLinks = [
-    { href: "/business", label: "Business", icon: DollarSign, proOnly: true },
-  ];
+  const proLinks = isPro
+    ? [{ href: "/business", label: "Business", icon: DollarSign }]
+    : [];
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
@@ -137,45 +136,24 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
             </>
           )}
 
-          <div className="my-4 border-t border-black/8" />
-
-          <p className="px-4 mb-2 text-[10px] font-mono tracking-widest text-black/35 uppercase">
-            Explore
-          </p>
-          <div className="group relative">
-            <div
-              className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-neutral-400 cursor-default border-l-2 border-transparent"
-            >
-              <Compass className="w-4 h-4 opacity-50" />
-              <span className="flex-1">Discover</span>
-              <span className="text-[9px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
-                SOON
-              </span>
-            </div>
-            <div className="absolute bottom-full left-4 mb-2 w-52 p-3 bg-white rounded-xl border border-neutral-200 shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 ease-out z-50">
-              <p className="text-xs font-semibold text-black mb-1">Discover Music</p>
-              <p className="text-[11px] text-neutral-500 leading-relaxed">
-                Browse tracks from the community, listen to new music, purchase songs, and share affiliate links to earn.
-              </p>
-            </div>
-          </div>
         </nav>
 
         {/* Credit Balance */}
         <div className="px-4 py-3 border-t border-black/10">
-          <div className="bg-purple-50 rounded-xl p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Coins className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-semibold text-purple-900">{credits} credits</span>
+          <div className={`rounded-xl p-3 ${credits === 0 && !isPro ? 'bg-amber-50 border border-amber-200' : 'bg-purple-50'}`}>
+            <div className="flex items-center gap-2 mb-1.5">
+              <Coins className={`w-4 h-4 ${credits === 0 && !isPro ? 'text-amber-600' : 'text-purple-600'}`} />
+              <span className={`text-lg font-bold tabular-nums ${credits === 0 && !isPro ? 'text-amber-900' : 'text-purple-900'}`}>{credits}</span>
+              <span className={`text-[10px] font-medium uppercase tracking-wider ${credits === 0 && !isPro ? 'text-amber-600/60' : 'text-purple-600/60'}`}>credits</span>
             </div>
             <div className="flex items-center gap-2 text-[11px]">
               <Link
                 href="/review"
-                className="text-purple-600 hover:text-purple-800 font-medium transition-colors"
+                className={`font-medium transition-colors ${credits === 0 && !isPro ? 'text-amber-700 hover:text-amber-900' : 'text-purple-600 hover:text-purple-800'}`}
               >
-                Earn more
+                {credits === 0 ? 'Earn credits' : 'Earn more'}
               </Link>
-              <span className="text-purple-300">|</span>
+              <span className={credits === 0 && !isPro ? 'text-amber-300' : 'text-purple-300'}>|</span>
               {isPro ? (
                 <Link
                   href="/account"
@@ -188,7 +166,7 @@ export function Sidebar({ artistName, credits, isPro, pendingReviews }: SidebarP
                   href="/account"
                   className="text-purple-600 hover:text-purple-800 font-medium transition-colors"
                 >
-                  Get Pro
+                  Go Pro
                 </Link>
               )}
             </div>
@@ -301,10 +279,6 @@ function MobileBottomNav({
     { href: "/account", label: "Settings", icon: Settings },
   ];
 
-  const comingSoonLinks = [
-    { label: "Discover", icon: Compass, description: "Browse, listen & share music" },
-  ];
-
   const moreIsActive = moreLinks.some((l) => isActive(l.href));
 
   return (
@@ -378,22 +352,6 @@ function MobileBottomNav({
                       </span>
                     )}
                   </Link>
-                );
-              })}
-              <div className="my-1 border-t border-neutral-100" />
-              {comingSoonLinks.map((link) => {
-                const Icon = link.icon;
-                return (
-                  <div
-                    key={link.label}
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-400 cursor-default"
-                  >
-                    <Icon className="w-4 h-4 opacity-50 flex-shrink-0" />
-                    <span className="flex-1">{link.label}</span>
-                    <span className="text-[9px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
-                      SOON
-                    </span>
-                  </div>
                 );
               })}
               <div className="my-1 border-t border-neutral-100" />

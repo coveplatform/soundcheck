@@ -226,6 +226,25 @@ export default async function TrackDetailPage({
           </div>
         </div>
 
+        {/* Pro nudge — shown once when first review arrives for free users */}
+        {completedReviews === 1 && !isSubscribed && (
+          <Link
+            href="/account"
+            className="flex items-center gap-3 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 mb-6 group transition-colors duration-150 ease-out hover:bg-purple-100/80"
+          >
+            <div className="h-8 w-8 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
+              <ArrowRight className="h-3.5 w-3.5 text-white rotate-[-45deg]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-purple-900">
+                Your first review is in! Want more feedback, faster?
+              </p>
+              <p className="text-xs text-purple-700/60">Go Pro — 40 credits/month, no reviewing required</p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-purple-400 group-hover:text-purple-600 transition-colors flex-shrink-0" />
+          </Link>
+        )}
+
         {/* Main Content - Tabs + Sidebar Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-8">
           {/* Main Content - Tabs (LEFT) */}

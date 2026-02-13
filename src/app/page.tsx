@@ -368,15 +368,11 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
-                  <span className="text-sm font-semibold">Sell your music &amp; keep 85%</span>
+                  <span className="text-sm font-semibold">Priority queue — get reviewed faster</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
-                  <span className="text-sm font-semibold">Portfolio analytics dashboard</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-white flex-shrink-0" />
-                  <span className="text-sm font-semibold">Business &amp; earnings dashboard</span>
+                  <span className="text-sm font-semibold">Sell your tracks &amp; earn from downloads</span>
                 </div>
               </div>
 
@@ -425,7 +421,7 @@ export default function Home() {
               },
               {
                 q: "What does PRO include?",
-                a: "PRO ($9.95/mo) gives you 40 credits every month without reviewing, the ability to sell your music and keep 85%, a portfolio analytics dashboard to track your progress across tracks, and a business dashboard to manage your earnings. You can still earn extra credits by reviewing too.",
+                a: "PRO ($9.95/mo) gives you 40 credits every month without reviewing, unlimited daily reviews to earn even more, and priority queue so your tracks get feedback faster. You can also sell your music and keep 85%. Cancel anytime.",
               },
               {
                 q: "Is my music safe?",
@@ -433,7 +429,7 @@ export default function Home() {
               },
               {
                 q: "Can I cancel PRO?",
-                a: "Yes, anytime. Your tracks and any unspent credits stay on the platform. You can still earn credits by reviewing -- you just lose PRO perks like the monthly credit grant, selling music, and analytics dashboards.",
+                a: "Yes, anytime. Your tracks and any unspent credits stay on the platform. You can still earn credits by reviewing -- you just lose PRO perks like the monthly credit grant, unlimited reviews, and priority queue.",
               },
             ].map((item, i, arr) => (
               <details

@@ -312,6 +312,28 @@ export default async function DashboardPage() {
           </Link>
         )}
 
+        {/* Zero credits banner */}
+        {credits === 0 && !isSubscribed && (
+          <div className="rounded-xl border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-white p-5 mb-5">
+            <p className="text-base font-bold text-black">You&apos;re out of credits</p>
+            <p className="text-sm text-black/50 mt-1">You need credits to get feedback on your tracks.</p>
+            <div className="flex flex-col sm:flex-row gap-2.5 mt-4">
+              <Link href="/review">
+                <Button className="w-full sm:w-auto border-2 border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 font-semibold text-sm h-10 px-5 rounded-xl">
+                  <Headphones className="h-3.5 w-3.5 mr-2" />
+                  Review a track to earn one
+                </Button>
+              </Link>
+              <Link href="/account">
+                <Button className="w-full sm:w-auto bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out text-sm h-10 px-5 rounded-xl">
+                  Go Pro — 40 credits/month
+                  <ArrowRight className="h-3.5 w-3.5 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
+
         <div
           className={`grid gap-6 ${
             showSideRail ? "lg:grid-cols-[minmax(0,1fr)_280px]" : ""
@@ -324,7 +346,7 @@ export default async function DashboardPage() {
             </section>
 
             {/* Mobile Pro Upsell - visible only on small screens */}
-            {!isSubscribed && (
+            {!isSubscribed && credits > 0 && (
               <Link href="/account" className="block lg:hidden">
                 <div className="flex items-center gap-3 rounded-xl border border-purple-200 bg-gradient-to-r from-purple-50 via-white to-purple-50 px-4 py-3 active:scale-[0.99] transition-transform duration-100 ease-out">
                   <div className="h-8 w-8 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
@@ -332,7 +354,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-black">Upgrade to Pro</p>
-                    <p className="text-[11px] text-neutral-500">40 credits/mo + listener revenue</p>
+                    <p className="text-[11px] text-neutral-500">40 credits/mo · unlimited reviews</p>
                   </div>
                   <ArrowRight className="h-4 w-4 text-purple-400 flex-shrink-0" />
                 </div>
@@ -503,15 +525,15 @@ export default async function DashboardPage() {
                       <ArrowRight className="h-4 w-4 text-white rotate-[-45deg]" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-black">Upgrade to Pro</p>
-                      <p className="text-xs text-neutral-500">40 credits/mo + listener revenue</p>
+                      <p className="text-sm font-bold text-black">Go Pro</p>
+                      <p className="text-xs text-neutral-500">40 credits/mo · no reviewing required</p>
                     </div>
                   </div>
                   <Link href="/account">
                     <Button
                       className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out motion-reduce:transition-none text-sm h-9"
                     >
-                      Learn More
+                      $9.95/month
                       <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                     </Button>
                   </Link>

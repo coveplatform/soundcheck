@@ -1084,20 +1084,38 @@ export default function SubmitTrackPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {/* Primary: earn credits */}
+                  {/* Primary: Go Pro */}
+                  <Link href="/account">
+                    <div className="rounded-xl border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-white p-4">
+                      <p className="text-sm font-bold text-black">Get 40 credits every month</p>
+                      <p className="text-xs text-black/50 mt-0.5">No reviewing required. Cancel anytime.</p>
+                      <Button className="w-full mt-3 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl">
+                        Go Pro — $9.95/month
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    </div>
+                  </Link>
+
+                  <div className="flex items-center gap-3 text-xs text-black/30">
+                    <div className="flex-1 h-px bg-black/10" />
+                    <span>or</span>
+                    <div className="flex-1 h-px bg-black/10" />
+                  </div>
+
+                  {/* Secondary: earn credits */}
                   <Link href="/review">
-                    <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl">
+                    <Button className="w-full border-2 border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 h-12 rounded-xl font-semibold">
                       <Sparkles className="h-4 w-4 mr-2" />
                       Review tracks to earn credits
                     </Button>
                   </Link>
 
-                  {/* Secondary: buy credits */}
+                  {/* Tertiary: buy credits */}
                   <Button
                     onClick={handleBuyCredits}
                     disabled={isBuyingCredits}
                     isLoading={isBuyingCredits}
-                    className="w-full border-2 border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 h-12 rounded-xl font-semibold"
+                    className="w-full border border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50 h-10 rounded-xl text-sm"
                   >
                     Buy {creditDeficit <= 3 ? 3 : creditDeficit <= 10 ? 10 : 25} credits — {
                       creditDeficit <= 3 ? "$2.95" :
@@ -1105,13 +1123,6 @@ export default function SubmitTrackPage() {
                       "$14.95"
                     }
                   </Button>
-
-                  {/* Upsell: upgrade to Pro */}
-                  <Link href="/account">
-                    <Button className="w-full border-2 border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 h-12 rounded-xl font-medium">
-                      Upgrade to Pro — 40 credits/month
-                    </Button>
-                  </Link>
                 </div>
               </div>
             )}
