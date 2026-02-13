@@ -11,7 +11,7 @@ type AdminTicketDetail = {
   createdAt: Date;
   updatedAt: Date;
   User: { id: string; email: string; name: string | null };
-  messages: Array<{
+  SupportMessage: Array<{
     id: string;
     authorType: string;
     authorEmail: string | null;
@@ -40,7 +40,7 @@ export default async function AdminSupportTicketPage({
       createdAt: true,
       updatedAt: true,
       User: { select: { id: true, email: true, name: true } },
-      messages: {
+      SupportMessage: {
         orderBy: { createdAt: "asc" },
         select: { id: true, authorType: true, authorEmail: true, body: true, createdAt: true },
       },
@@ -99,7 +99,7 @@ export default async function AdminSupportTicketPage({
       <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
         <div className="px-4 py-3 border-b border-neutral-200 font-medium">Conversation</div>
         <div className="p-4 space-y-3">
-          {ticket.messages.map((m) => (
+          {ticket.SupportMessage.map((m) => (
             <div key={m.id} className="border border-neutral-200 rounded-md p-3">
               <div className="flex items-center justify-between gap-4">
                 <div className="text-sm font-medium">
@@ -115,7 +115,7 @@ export default async function AdminSupportTicketPage({
               ) : null}
             </div>
           ))}
-          {ticket.messages.length === 0 ? (
+          {ticket.SupportMessage.length === 0 ? (
             <div className="text-sm text-neutral-500">No messages</div>
           ) : null}
         </div>

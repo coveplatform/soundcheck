@@ -9,8 +9,8 @@ type AdminTicketListItem = {
   createdAt: Date;
   updatedAt: Date;
   User: { email: string };
-  messages: Array<{ body: string; createdAt: Date; authorType: string }>;
-  _count: { messages: number };
+  SupportMessage: Array<{ body: string; createdAt: Date; authorType: string }>;
+  _count: { SupportMessage: number };
 };
 
 export const dynamic = "force-dynamic";
@@ -48,12 +48,12 @@ export default async function AdminSupportPage({
       createdAt: true,
       updatedAt: true,
       User: { select: { email: true } },
-      messages: {
+      SupportMessage: {
         orderBy: { createdAt: "desc" },
         take: 1,
         select: { body: true, createdAt: true, authorType: true },
       },
-      _count: { select: { messages: true } },
+      _count: { select: { SupportMessage: true } },
     },
   });
 
@@ -111,7 +111,7 @@ export default async function AdminSupportPage({
                   <td className="px-4 py-3">{t.status}</td>
                   <td className="px-4 py-3">{t.User.email}</td>
                   <td className="px-4 py-3">{new Date(t.updatedAt).toLocaleString()}</td>
-                  <td className="px-4 py-3">{t._count.messages}</td>
+                  <td className="px-4 py-3">{t._count.SupportMessage}</td>
                 </tr>
               ))}
               {tickets.length === 0 ? (
