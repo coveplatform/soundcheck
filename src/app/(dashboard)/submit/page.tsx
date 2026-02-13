@@ -1034,6 +1034,28 @@ export default function SubmitTrackPage() {
               </p>
             </div>
 
+            {/* Insufficient credits warning - inline */}
+            {!hasEnoughCredits && reviewCount > 0 && (
+              <div className="rounded-xl bg-amber-50 border-2 border-amber-300 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center text-white font-bold text-xs">!</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-amber-900 mb-1">
+                      Not enough credits
+                    </p>
+                    <p className="text-sm text-amber-800">
+                      You need <strong>{creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}</strong> to request {reviewCount} reviews.
+                      {cashAddOns > 0 && (
+                        <span className="block mt-1 text-xs">
+                          (Add-ons are upgrades on top of base credits)
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Review count slider */}
             <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 shadow-sm">
               {/* Large display */}
@@ -1225,11 +1247,16 @@ export default function SubmitTrackPage() {
             {!hasEnoughCredits && (
               <div className="space-y-4">
                 <div className="rounded-xl bg-amber-50 border-2 border-amber-200 p-4">
-                  <p className="text-sm text-amber-800 font-medium">
-                    You need {creditDeficit} more{" "}
+                  <p className="text-sm text-amber-800 font-medium mb-2">
+                    ⚠️ You need {creditDeficit} more{" "}
                     {creditDeficit === 1 ? "credit" : "credits"} for{" "}
                     {reviewCount} reviews.
                   </p>
+                  {cashAddOns > 0 && (
+                    <p className="text-xs text-amber-700">
+                      Note: Add-ons (${cashAddOns.toFixed(2)}) are upgrades on top of your base credits. You still need {reviewCount} credits in your account.
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-3">
