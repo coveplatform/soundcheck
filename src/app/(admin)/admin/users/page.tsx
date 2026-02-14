@@ -183,7 +183,10 @@ export default async function AdminUsersPage({
               {users.map((u) => {
                 const tracksPosted = u.ArtistProfile?.totalTracks ?? 0;
                 const reviewsRequested = u.ArtistProfile?.Track?.reduce((sum, t) => sum + t.reviewsRequested, 0) ?? 0;
-                const reviewsDone = u.ReviewerProfile?.totalReviews ?? 0;
+                // Count both peer reviews and professional reviews
+                const peerReviewsDone = u.ArtistProfile?.totalPeerReviews ?? 0;
+                const proReviewsDone = u.ReviewerProfile?.totalReviews ?? 0;
+                const reviewsDone = peerReviewsDone + proReviewsDone;
 
                 return (
                 <tr key={u.id} className="text-neutral-700 hover:bg-neutral-50">
