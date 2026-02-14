@@ -465,6 +465,7 @@ model User {
   emailVerified          DateTime?
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime @updatedAt
+  lastLoginAt            DateTime?
   isArtist               Boolean                  @default(true)
   isReviewer             Boolean                  @default(true)
   referralSource         String?

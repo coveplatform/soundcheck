@@ -5,6 +5,23 @@ export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 100;
 
+function getRelativeTime(date: Date | null): string {
+  if (!date) return '—';
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
+  return `${Math.floor(diffDays / 365)}y ago`;
+}
+
 export default async function AdminUsersPage({
   searchParams,
 }: {
@@ -50,17 +67,25 @@ export default async function AdminUsersPage({
       isArtist: true,
       isReviewer: true,
       createdAt: true,
+      lastLoginAt: true,
       ArtistProfile: {
         select: {
           completedOnboarding: true,
           totalPeerReviews: true,
           reviewCredits: true,
+          totalTracks: true,
+          Track: {
+            select: {
+              reviewsRequested: true,
+            },
+          },
         },
       },
       ReviewerProfile: {
         select: {
           completedOnboarding: true,
           onboardingQuizPassed: true,
+          totalReviews: true,
         },
       },
     },
@@ -145,16 +170,24 @@ export default async function AdminUsersPage({
                 <th className="text-left font-medium px-4 py-3">Email</th>
                 <th className="text-left font-medium px-4 py-3">Name</th>
                 <th className="text-left font-medium px-4 py-3">Roles</th>
-                <th className="text-left font-medium px-4 py-3">Reviewer Status</th>
-                <th className="text-left font-medium px-4 py-3">Credits</th>
+                <th className="text-right font-medium px-4 py-3">Tracks</th>
+                <th className="text-right font-medium px-4 py-3">Reviews Req.</th>
+                <th className="text-right font-medium px-4 py-3">Reviews Done</th>
+                <th className="text-right font-medium px-4 py-3">Credits</th>
+                <th className="text-left font-medium px-4 py-3">Last Login</th>
                 <th className="text-left font-medium px-4 py-3">Created</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
-              {users.map((u) => (
-                <tr key={u.id} className="text-neutral-700">
+              {users.map((u) => {
+                const tracksPosted = u.ArtistProfile?.totalTracks ?? 0;
+                const reviewsRequested = u.ArtistProfile?.Track?.reduce((sum, t) => sum + t.reviewsRequested, 0) ?? 0;
+                const reviewsDone = u.ReviewerProfile?.totalReviews ?? 0;
+
+                return (
+                <tr key={u.id} className="text-neutral-700 hover:bg-neutral-50">
                   <td className="px-4 py-3">
-                    <Link className="underline" href={`/admin/users/${u.id}`}>
+                    <Link className="underline hover:text-purple-600" href={`/admin/users/${u.id}`}>
                       {u.email}
                     </Link>
                   </td>
@@ -168,20 +201,32 @@ export default async function AdminUsersPage({
                       ? "Reviewer"
                       : <span className="text-neutral-400">—</span>}
                   </td>
-                  <td className="px-4 py-3">
-                    {u.isReviewer ? (
-                      // Peer reviewers complete onboarding via ArtistProfile, legacy via ReviewerProfile
-                      u.ArtistProfile?.completedOnboarding ||
-                      (u.ReviewerProfile?.completedOnboarding && u.ReviewerProfile?.onboardingQuizPassed) ? (
-                        <span className="text-green-600">Active{u.ArtistProfile?.totalPeerReviews ? ` (${u.ArtistProfile.totalPeerReviews} reviews)` : ""}</span>
-                      ) : (
-                        <span className="text-orange-500">Onboarding</span>
-                      )
+                  <td className="px-4 py-3 text-right">
+                    {tracksPosted > 0 ? (
+                      <span className={`font-medium tabular-nums ${tracksPosted >= 5 ? 'text-green-600' : tracksPosted >= 3 ? 'text-blue-600' : ''}`}>
+                        {tracksPosted}
+                      </span>
                     ) : (
                       <span className="text-neutral-400">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-right">
+                    {reviewsRequested > 0 ? (
+                      <span className="font-medium tabular-nums">{reviewsRequested}</span>
+                    ) : (
+                      <span className="text-neutral-400">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {reviewsDone > 0 ? (
+                      <span className={`font-medium tabular-nums ${reviewsDone >= 25 ? 'text-purple-600' : reviewsDone >= 5 ? 'text-blue-600' : ''}`}>
+                        {reviewsDone}
+                      </span>
+                    ) : (
+                      <span className="text-neutral-400">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-right">
                     {u.ArtistProfile ? (
                       <span className="font-medium tabular-nums">{u.ArtistProfile.reviewCredits ?? 0}</span>
                     ) : (
@@ -189,13 +234,29 @@ export default async function AdminUsersPage({
                     )}
                   </td>
                   <td className="px-4 py-3">
+                    {u.lastLoginAt ? (
+                      <span className={`text-sm ${
+                        new Date().getTime() - new Date(u.lastLoginAt).getTime() < 86400000
+                          ? 'text-green-600 font-medium'
+                          : new Date().getTime() - new Date(u.lastLoginAt).getTime() < 604800000
+                          ? 'text-blue-600'
+                          : 'text-neutral-600'
+                      }`} title={new Date(u.lastLoginAt).toLocaleString()}>
+                        {getRelativeTime(u.lastLoginAt)}
+                      </span>
+                    ) : (
+                      <span className="text-neutral-400 text-sm">Never</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
                     {new Date(u.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-neutral-500">
+                  <td colSpan={9} className="px-4 py-8 text-center text-neutral-500">
                     No users found
                   </td>
                 </tr>
