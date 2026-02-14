@@ -67,7 +67,7 @@ export default async function AdminUsersPage({
       isArtist: true,
       isReviewer: true,
       createdAt: true,
-      lastLoginAt: true,
+      lastActiveAt: true,
       ArtistProfile: {
         select: {
           completedOnboarding: true,
@@ -174,7 +174,7 @@ export default async function AdminUsersPage({
                 <th className="text-right font-medium px-4 py-3">Reviews Req.</th>
                 <th className="text-right font-medium px-4 py-3">Reviews Done</th>
                 <th className="text-right font-medium px-4 py-3">Credits</th>
-                <th className="text-left font-medium px-4 py-3">Last Login</th>
+                <th className="text-left font-medium px-4 py-3">Last Active</th>
                 <th className="text-left font-medium px-4 py-3">Created</th>
               </tr>
             </thead>
@@ -234,15 +234,15 @@ export default async function AdminUsersPage({
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    {u.lastLoginAt ? (
+                    {u.lastActiveAt ? (
                       <span className={`text-sm ${
-                        new Date().getTime() - new Date(u.lastLoginAt).getTime() < 86400000
+                        new Date().getTime() - new Date(u.lastActiveAt).getTime() < 86400000
                           ? 'text-green-600 font-medium'
-                          : new Date().getTime() - new Date(u.lastLoginAt).getTime() < 604800000
+                          : new Date().getTime() - new Date(u.lastActiveAt).getTime() < 604800000
                           ? 'text-blue-600'
                           : 'text-neutral-600'
-                      }`} title={new Date(u.lastLoginAt).toLocaleString()}>
-                        {getRelativeTime(u.lastLoginAt)}
+                      }`} title={new Date(u.lastActiveAt).toLocaleString()}>
+                        {getRelativeTime(u.lastActiveAt)}
                       </span>
                     ) : (
                       <span className="text-neutral-400 text-sm">Never</span>

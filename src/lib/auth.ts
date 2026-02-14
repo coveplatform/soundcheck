@@ -102,11 +102,6 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // Update last login timestamp on fresh login
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { lastLoginAt: new Date() },
-        });
       }
       // Fetch user roles from database
       if (token.email) {
@@ -156,6 +151,22 @@ export const authOptions: NextAuthOptions = {
         session.user.artistProfileId = token.artistProfileId as string | undefined;
         session.user.listenerProfileId = token.listenerProfileId as string | undefined;
         session.user.reviewerProfileId = token.reviewerProfileId as string | undefined;
+
+        // Update lastActiveAt - throttle to once per 5 minutes to avoid excessive DB writes
+        const lastUpdate = token.lastActiveUpdate as number | undefined;
+        const now = Date.now();
+        const fiveMinutes = 5 * 60 * 1000;
+
+        if (!lastUpdate || now - lastUpdate > fiveMinutes) {
+          token.lastActiveUpdate = now;
+          // Fire and forget - don't await to keep session creation fast
+          prisma.user.update({
+            where: { id: token.id as string },
+            data: { lastActiveAt: new Date() },
+          }).catch(() => {
+            // Silently fail - activity tracking shouldn't block the session
+          });
+        }
       }
       return session;
     },
