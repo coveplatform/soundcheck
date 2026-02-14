@@ -1219,6 +1219,37 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </CardContent>
       </Card>
 
+      {/* VALIDATION ALERT - Prominent at top */}
+      {validationIssues.length > 0 && (
+        <div className="mt-6 p-4 bg-gradient-to-br from-red-500 to-red-600 border-2 border-red-400 rounded-xl shadow-lg">
+          <div className="flex items-start gap-3">
+            <div className="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="h-5 w-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <p className="text-base font-bold text-white mb-2">
+                {validationIssues.length === 1
+                  ? "Please fix 1 issue before submitting:"
+                  : `Please fix ${validationIssues.length} issues before submitting:`}
+              </p>
+              <div className="space-y-1.5">
+                {validationIssues.map((issue) => (
+                  <button
+                    key={issue.id}
+                    type="button"
+                    onClick={() => scrollToSection(issue.section)}
+                    className="w-full text-left text-sm text-white/90 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all duration-150 ease-out flex items-center gap-2 font-medium"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-white/80 flex-shrink-0"></span>
+                    {issue.message}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MAIN CONTENT - 2 Balanced Columns on Desktop */}
       <div className="grid lg:grid-cols-2 gap-6 mt-6">
 
@@ -1702,25 +1733,33 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           </div>
 
-          {/* Validation Warnings */}
+          {/* Validation Warnings - Above Submit Button */}
           {validationIssues.length > 0 && (
-            <div className="mb-4 p-4 bg-red-500/20 border border-red-500/40 rounded-xl">
-              <p className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                Please fix {validationIssues.length} issue{validationIssues.length === 1 ? "" : "s"} before submitting:
-              </p>
-              <div className="space-y-1">
-                {validationIssues.map((issue) => (
-                  <button
-                    key={issue.id}
-                    type="button"
-                    onClick={() => scrollToSection(issue.section)}
-                    className="w-full text-left text-sm text-red-200 hover:text-white hover:bg-red-500/30 px-2 py-1 rounded transition-colors flex items-center gap-2"
-                  >
-                    <span className="text-red-400">→</span>
-                    {issue.message}
-                  </button>
-                ))}
+            <div className="mb-4 p-4 bg-gradient-to-br from-red-500 to-red-600 border-2 border-red-400 rounded-xl shadow-lg">
+              <div className="flex items-start gap-3">
+                <div className="h-7 w-7 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <AlertTriangle className="h-4 w-4 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-white mb-2">
+                    {validationIssues.length === 1
+                      ? "Fix 1 issue to submit:"
+                      : `Fix ${validationIssues.length} issues to submit:`}
+                  </p>
+                  <div className="space-y-1.5">
+                    {validationIssues.map((issue) => (
+                      <button
+                        key={issue.id}
+                        type="button"
+                        onClick={() => scrollToSection(issue.section)}
+                        className="w-full text-left text-sm text-white/90 hover:text-white hover:bg-white/10 px-2 py-1.5 rounded-lg transition-all duration-150 ease-out flex items-center gap-2 font-medium"
+                      >
+                        <span className="h-1 w-1 rounded-full bg-white/80 flex-shrink-0"></span>
+                        {issue.message}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}
