@@ -70,6 +70,7 @@ export default async function AdminUsersPage({
       lastActiveAt: true,
       ArtistProfile: {
         select: {
+          artistName: true,
           completedOnboarding: true,
           totalPeerReviews: true,
           reviewCredits: true,
@@ -168,9 +169,9 @@ export default async function AdminUsersPage({
             <thead className="bg-neutral-50 text-neutral-600">
               <tr>
                 <th className="text-left font-medium px-4 py-3">Email</th>
-                <th className="text-left font-medium px-4 py-3">Name</th>
+                <th className="text-left font-medium px-4 py-3">Artist Name</th>
                 <th className="text-left font-medium px-4 py-3">Roles</th>
-                <th className="text-right font-medium px-4 py-3">Tracks</th>
+                <th className="text-right font-medium px-4 py-3">Tracks Uploaded</th>
                 <th className="text-right font-medium px-4 py-3">Reviews Req.</th>
                 <th className="text-right font-medium px-4 py-3">Reviews Done</th>
                 <th className="text-right font-medium px-4 py-3">Credits</th>
@@ -191,7 +192,7 @@ export default async function AdminUsersPage({
                       {u.email}
                     </Link>
                   </td>
-                  <td className="px-4 py-3">{u.name ?? ""}</td>
+                  <td className="px-4 py-3">{u.ArtistProfile?.artistName ?? u.name ?? ""}</td>
                   <td className="px-4 py-3">
                     {u.isArtist && u.isReviewer
                       ? "Artist, Reviewer"
