@@ -100,5 +100,6 @@ export function TrackDashboardTabs({
         {activeTab === "settings" && settingsTab}
       </div>
     </div>
+    </>
   );
 }
