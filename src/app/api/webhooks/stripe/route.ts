@@ -7,12 +7,15 @@ import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email
 import { finalizePaidCheckoutSession } from "@/lib/payments";
 import type Stripe from "stripe";
 import { AddOnType, PaymentStatus } from "@prisma/client";
+import { rewardReferrer, markCouponUsed } from "@/lib/referral-system";
 
 
 async function handleReviewCreditsTopup(session: Stripe.Checkout.Session) {
   try {
     const artistProfileId = session.metadata?.artistProfileId;
+    const userId = session.metadata?.userId;
     const creditsToAddRaw = session.metadata?.creditsToAdd;
+    const usedReferralCoupon = session.metadata?.usedReferralCoupon;
 
     const creditsToAdd = Number.parseInt(String(creditsToAddRaw ?? ""), 10);
 
@@ -35,6 +38,25 @@ async function handleReviewCreditsTopup(session: Stripe.Checkout.Session) {
         },
       },
     });
+
+    // Handle referral rewards
+    if (userId) {
+      // Mark coupon as used if it was applied
+      if (usedReferralCoupon) {
+        await markCouponUsed(userId);
+      }
+
+      // Reward the referrer if this is the referee's first purchase
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { referredByCode: true, ArtistProfile: { select: { totalSpent: true } } },
+      });
+
+      // If they used a referral code and this is their first purchase (totalSpent was 0 before)
+      if (user?.referredByCode && user.ArtistProfile && user.ArtistProfile.totalSpent === 0) {
+        await rewardReferrer(user.referredByCode, userId);
+      }
+    }
   } catch (error) {
     console.error("Error handling review credits topup:", error);
   }

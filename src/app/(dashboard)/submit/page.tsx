@@ -11,6 +11,7 @@ import { GenreSelector } from "@/components/ui/genre-selector";
 import { SupportedPlatforms } from "@/components/ui/supported-platforms";
 import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, detectSource } from "@/lib/metadata";
+import { OutOfCreditsBanner } from "@/components/referral/out-of-credits-banner";
 import {
   ArrowRight,
   ArrowLeft,
@@ -637,6 +638,9 @@ export default function SubmitTrackPage() {
             <p className="text-sm text-red-700 font-medium">{error}</p>
           </div>
         )}
+
+        {/* Out of credits banner */}
+        {profile && profile.reviewCredits <= 3 && <OutOfCreditsBanner />}
 
         {/* ================================================================= */}
         {/* STEP 1: Upload your track                                         */}

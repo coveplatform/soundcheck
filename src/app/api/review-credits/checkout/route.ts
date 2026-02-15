@@ -5,6 +5,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
+import { applyCouponToCheckout } from "@/lib/referral-system";
 
 const bodySchema = z
   .object({
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
       select: {
         id: true,
         stripeCustomerId: true,
-        User: { select: { email: true, name: true } },
+        User: { select: { email: true, name: true, referralCouponId: true } },
       },
     });
 
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
     const creditsToAdd =
       data.kind === "pack" ? packPricing[data.pack!].credits : data.quantity!;
 
-    const checkoutSession = await stripe.checkout.sessions.create({
+    let sessionParams: any = {
       customer: customerId,
       mode: "payment",
       payment_method_types: ["card"],
@@ -126,7 +127,18 @@ export async function POST(request: Request) {
         kind: data.kind,
         creditsToAdd: String(creditsToAdd),
       },
-    });
+    };
+
+    // Auto-apply referral coupon if user has one
+    if (artistProfile.User.referralCouponId) {
+      sessionParams = await applyCouponToCheckout(
+        sessionParams,
+        artistProfile.User.referralCouponId
+      );
+      sessionParams.metadata.usedReferralCoupon = artistProfile.User.referralCouponId;
+    }
+
+    const checkoutSession = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ url: checkoutSession.url });
   } catch (error) {

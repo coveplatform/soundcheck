@@ -42,6 +42,7 @@ export default function SignupPage() {
 
   const callbackUrl = searchParams.get("callbackUrl") || "";
   const role: Role = "artist";
+  const referralCode = searchParams.get("ref") || undefined;
 
   const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
@@ -102,7 +103,7 @@ export default function SignupPage() {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, role, acceptedTerms }),
+        body: JSON.stringify({ email, password, role, acceptedTerms, referralCode }),
       });
 
       if (!response.ok) {

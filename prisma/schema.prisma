@@ -470,6 +470,11 @@ model User {
   isReviewer             Boolean                  @default(true)
   referralSource         String?
   trialReminderSentAt    DateTime?
+  referralCode           String?                  @unique
+  referredByCode         String?
+  referralCouponId       String?
+  totalReferrals         Int                      @default(0)
+  referralRewardsEarned  Int                      @default(0)
   Account                Account[]
   ArtistProfile          ArtistProfile?
   EmailVerificationToken EmailVerificationToken[]

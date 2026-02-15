@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
   BarChart3,
@@ -8,6 +8,7 @@ import {
   DollarSign,
   Settings
 } from "lucide-react";
+import { PostReviewModal } from "@/components/referral/post-review-modal";
 
 interface Tab {
   id: "stats" | "reviews" | "sales" | "settings";
@@ -29,6 +30,8 @@ interface TrackDashboardTabsProps {
   reviewsTab?: React.ReactNode;
   salesTab?: React.ReactNode;
   settingsTab?: React.ReactNode;
+  trackTitle?: string;
+  hasCompletedReviews?: boolean;
 }
 
 export function TrackDashboardTabs({
@@ -38,8 +41,20 @@ export function TrackDashboardTabs({
   reviewsTab,
   salesTab,
   settingsTab,
+  trackTitle,
+  hasCompletedReviews = false,
 }: TrackDashboardTabsProps) {
   const [activeTab, setActiveTab] = useState(defaultTab);
+  const [showReferralModal, setShowReferralModal] = useState(false);
+
+  // Show referral modal when viewing reviews tab with completed reviews
+  useEffect(() => {
+    const hasSeenModal = sessionStorage.getItem("post-review-modal-seen");
+    if (activeTab === "reviews" && hasCompletedReviews && !hasSeenModal) {
+      setShowReferralModal(true);
+      sessionStorage.setItem("post-review-modal-seen", "true");
+    }
+  }, [activeTab, hasCompletedReviews]);
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId as "stats" | "reviews" | "sales" | "settings");
@@ -47,8 +62,16 @@ export function TrackDashboardTabs({
   };
 
   return (
-    <div>
-      {/* Tab Navigation */}
+    <>
+      {showReferralModal && trackTitle && (
+        <PostReviewModal
+          trackTitle={trackTitle}
+          onClose={() => setShowReferralModal(false)}
+        />
+      )}
+
+      <div>
+        {/* Tab Navigation */}
       <div className="border-b-2 border-neutral-200 mb-8 -mx-6 px-6 sm:-mx-8 sm:px-8">
         <div className="flex gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((tab) => (

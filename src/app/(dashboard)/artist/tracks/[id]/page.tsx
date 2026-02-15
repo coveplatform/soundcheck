@@ -241,6 +241,8 @@ export default async function TrackDetailPage({
             {completedReviews > 0 ? (
               <TrackDashboardTabs
                 defaultTab="reviews"
+                trackTitle={track.title}
+                hasCompletedReviews={completedReviews > 0}
                 statsTab={
                   <StatsTab
                     reviews={track.Review}

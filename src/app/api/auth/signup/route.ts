@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE } from "@/lib/password";
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
+import { createReferralCoupon, generateReferralCode } from "@/lib/referral-system";
 
 export const runtime = "nodejs";
 
@@ -15,6 +16,7 @@ const signupSchema = z.object({
     .regex(PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE),
   acceptedTerms: z.boolean(),
   referralSource: z.string().optional(),
+  referralCode: z.string().optional(), // Referral code from ?ref= parameter
   // Note: 'role' field removed - everyone is both artist and reviewer in unified model
 });
 
@@ -39,7 +41,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { email, password, acceptedTerms, referralSource } = signupSchema.parse(body);
+    const { email, password, acceptedTerms, referralSource, referralCode } = signupSchema.parse(body);
     const normalizedEmail = email.trim().toLowerCase();
 
     if (!acceptedTerms) {
@@ -47,6 +49,19 @@ export async function POST(request: Request) {
         { error: "You must agree to the Terms and Privacy Policy" },
         { status: 400 }
       );
+    }
+
+    // Validate referral code if provided
+    let validReferralCode: string | null = null;
+    if (referralCode) {
+      const referrer = await prisma.user.findUnique({
+        where: { referralCode: referralCode.toUpperCase() },
+        select: { id: true },
+      });
+
+      if (referrer) {
+        validReferralCode = referralCode.toUpperCase();
+      }
     }
 
     // Check if user already exists
@@ -69,6 +84,9 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Generate referral code for new user
+    const newUserReferralCode = await generateReferralCode(normalizedEmail.split("@")[0], "temp");
+
     // Create user with role flags (auto-verified)
     const user = await prisma.user.create({
       data: {
@@ -78,8 +96,24 @@ export async function POST(request: Request) {
         isArtist: true,
         isReviewer: true, // All users can review via peer system
         referralSource,
+        referredByCode: validReferralCode,
+        referralCode: newUserReferralCode,
       },
     });
+
+    // Create $5 off coupon for new user if they used a referral code
+    let couponId: string | undefined;
+    if (validReferralCode) {
+      try {
+        couponId = await createReferralCoupon(user.id, normalizedEmail.split("@")[0]);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { referralCouponId: couponId },
+        });
+      } catch (error) {
+        console.error("Failed to create referral coupon:", error);
+      }
+    }
 
     return NextResponse.json(
       {
@@ -87,6 +121,7 @@ export async function POST(request: Request) {
         userId: user.id,
         isArtist: user.isArtist,
         isReviewer: user.isReviewer,
+        hasReferralDiscount: !!couponId,
       },
       { status: 201 }
     );

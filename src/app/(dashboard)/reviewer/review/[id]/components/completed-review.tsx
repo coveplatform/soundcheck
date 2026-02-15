@@ -9,6 +9,7 @@ import { ArrowLeft, Music, DollarSign, Download, ShoppingCart } from "lucide-rea
 import { formatCurrency } from "@/lib/utils";
 import { Review } from "../types";
 import { formatFirstImpression } from "../utils";
+import { PostReviewBanner } from "@/components/referral/post-review-banner";
 
 interface CompletedReviewProps {
   review: Review;
@@ -31,6 +32,8 @@ export function CompletedReview({
 }: CompletedReviewProps) {
   return (
     <div className="max-w-3xl mx-auto space-y-10">
+      <PostReviewBanner />
+
       <div className="flex items-center justify-between gap-4">
         <Link
           href="/review/history"

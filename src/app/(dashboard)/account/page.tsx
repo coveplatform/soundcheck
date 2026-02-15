@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AccountSettingsClient } from "@/components/account/account-settings-client";
 import { ReviewerGenrePreferences } from "@/components/account/reviewer-genre-preferences";
+import { ReferralCard } from "@/components/referral/referral-card";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +60,8 @@ export default async function AccountPage() {
         </div>
 
         <div className="space-y-6">
+          <ReferralCard />
+
           {isReviewer && (
             <ReviewerGenrePreferences initialGenreIds={initialGenreIds} />
           )}
