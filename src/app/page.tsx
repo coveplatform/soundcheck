@@ -13,6 +13,8 @@ import { DiscoverMockup } from "@/components/landing/discover-mockup";
 import { Sparkle, Star, Squiggle, Dots } from "@/components/landing/doodles";
 import { AnimatedSection } from "@/components/landing/animated-section";
 import { OnlineListeners } from "@/components/landing/online-listeners";
+import { HeroCTA } from "@/components/landing/hero-cta";
+import { SignupLink } from "@/components/landing/signup-link";
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
 
@@ -47,25 +49,7 @@ export default function Home() {
             Upload your track, review others in your genre, and get honest structured feedback from fellow producers. Genre-matched, artist-to-artist.
           </p>
 
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/signup">
-              <Button
-                size="lg"
-                className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-lg px-8 py-6 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] transition-all duration-150 ease-out"
-              >
-                Start for free <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link href="#examples">
-              <Button
-                variant="outline"
-                size="lg"
-                className="bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-50 font-bold text-lg px-8 py-6"
-              >
-                See examples
-              </Button>
-            </Link>
-          </div>
+          <HeroCTA />
 
           <p className="mt-6 text-sm text-neutral-500">
             Start with <span className="font-bold text-purple-600">2 free credits</span> • Earn more by reviewing • No credit card required
@@ -154,14 +138,14 @@ export default function Home() {
               </p>
 
               <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-                <Link href="/signup">
+                <SignupLink>
                   <Button
                     size="lg"
                     className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
                   >
                     Get started free <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                </Link>
+                </SignupLink>
                 <Link href="#pricing">
                   <Button variant="outline" size="lg" className="bg-white/10 text-neutral-50 border-white/20 hover:bg-white/15">
                     See pricing
@@ -322,14 +306,14 @@ export default function Home() {
               </div>
 
               <div className="mt-6">
-                <Link href="/signup">
+                <SignupLink>
                   <Button
                     size="lg"
                     className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all rounded-xl"
                   >
                     Get started free
                   </Button>
-                </Link>
+                </SignupLink>
               </div>
             </div>
 
