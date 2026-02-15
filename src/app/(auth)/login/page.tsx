@@ -36,11 +36,15 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   const authError = searchParams.get("error");
+  const ref = searchParams.get("ref");
   const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
+
+  // Preserve referral code when linking to signup
+  const signupUrl = ref ? `/signup?ref=${ref}` : "/signup";
 
   useEffect(() => {
     let cancelled = false;
@@ -221,7 +225,7 @@ export default function LoginPage() {
 
       <p className="text-sm text-neutral-600 text-center mt-8">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="text-neutral-950 font-bold hover:text-purple-700 transition-colors">
+        <Link href={signupUrl} className="text-neutral-950 font-bold hover:text-purple-700 transition-colors">
           Sign up
         </Link>
       </p>

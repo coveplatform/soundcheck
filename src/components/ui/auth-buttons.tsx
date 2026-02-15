@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export function AuthButtons({
@@ -10,6 +11,12 @@ export function AuthButtons({
   theme?: "light" | "dark";
 } = {}) {
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const ref = searchParams.get("ref");
+
+  // Preserve referral code in auth links
+  const loginUrl = ref ? `/login?ref=${ref}` : "/login";
+  const signupUrl = ref ? `/signup?ref=${ref}` : "/signup";
 
   // Show nothing while loading to avoid layout shift
   if (status === "loading") {
@@ -41,7 +48,7 @@ export function AuthButtons({
 
   return (
     <>
-      <Link href="/login">
+      <Link href={loginUrl}>
         <Button
           variant="ghost"
           className={theme === "dark" ? "font-medium text-white hover:bg-neutral-900" : "font-medium"}
@@ -49,7 +56,7 @@ export function AuthButtons({
           Sign in
         </Button>
       </Link>
-      <Link href="/signup">
+      <Link href={signupUrl}>
         <Button
           className={
             theme === "dark"
