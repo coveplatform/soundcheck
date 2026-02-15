@@ -155,9 +155,38 @@ export async function getReferralStats(userId: string) {
 
   if (!user) return null;
 
+  // Count pending referrals (signed up but haven't made first purchase yet)
+  const pendingReferrals = await prisma.user.count({
+    where: {
+      referredByCode: user.referralCode,
+      ArtistProfile: {
+        totalSpent: 0, // Haven't made a purchase yet
+      },
+    },
+  });
+
+  // Get list of pending referral emails (for debugging/display)
+  const pendingUsers = await prisma.user.findMany({
+    where: {
+      referredByCode: user.referralCode,
+      ArtistProfile: {
+        totalSpent: 0,
+      },
+    },
+    select: {
+      email: true,
+      createdAt: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
   return {
     code: user.referralCode,
-    totalReferrals: user.totalReferrals,
+    totalReferrals: user.totalReferrals, // Completed (purchased)
+    pendingReferrals, // Signed up but not purchased
+    pendingUsers, // List of pending users
     rewardsEarned: user.referralRewardsEarned,
     hasPendingCoupon: !!user.referralCouponId,
     couponId: user.referralCouponId,

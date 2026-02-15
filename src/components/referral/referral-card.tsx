@@ -6,6 +6,8 @@ import { Copy, Check, Gift } from "lucide-react";
 interface ReferralStats {
   code: string | null;
   totalReferrals: number;
+  pendingReferrals: number;
+  pendingUsers: Array<{ email: string; createdAt: string }>;
   rewardsEarned: number;
   hasPendingCoupon: boolean;
 }
@@ -114,15 +116,39 @@ export function ReferralCard() {
         <div className="flex gap-4 pt-3 border-t border-neutral-200">
           <div>
             <div className="text-2xl font-bold text-neutral-900">{stats.totalReferrals}</div>
-            <div className="text-xs text-neutral-600">Friends joined</div>
+            <div className="text-xs text-neutral-600">Converted</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-purple-600">{stats.pendingReferrals}</div>
+            <div className="text-xs text-neutral-600">Pending</div>
           </div>
           <div>
             <div className="text-2xl font-bold text-neutral-900">
               ${(stats.rewardsEarned / 100).toFixed(0)}
             </div>
-            <div className="text-xs text-neutral-600">Rewards earned</div>
+            <div className="text-xs text-neutral-600">Earned</div>
           </div>
         </div>
+
+        {stats.pendingUsers.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-neutral-200">
+            <div className="text-xs font-medium text-neutral-700 mb-2">Pending sign-ups:</div>
+            <div className="space-y-1">
+              {stats.pendingUsers.map((user) => (
+                <div key={user.email} className="text-xs text-neutral-600 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                  {user.email}
+                  <span className="text-neutral-400">
+                    (signed up {new Date(user.createdAt).toLocaleDateString()})
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-neutral-500 mt-2 italic">
+              💡 You'll earn $5 when they make their first purchase
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
