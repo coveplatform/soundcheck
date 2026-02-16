@@ -291,6 +291,7 @@ export default async function TrackDetailPage({
                     }}
                     payment={track.Payment}
                     canUpdateSource={canUpdateSource}
+                    completedReviewCount={track.Review?.length || 0}
                   />
                 }
               />

@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TrackUpdateSourceForm } from "@/components/artist/track-update-source-form";
@@ -8,7 +10,8 @@ import {
   Settings as SettingsIcon,
   ExternalLink,
   Trash2,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from "lucide-react";
 
 interface SettingsTabProps {
@@ -25,9 +28,45 @@ interface SettingsTabProps {
     status: string;
   } | null;
   canUpdateSource: boolean;
+  completedReviewCount?: number;
 }
 
-export function SettingsTab({ track, payment, canUpdateSource }: SettingsTabProps) {
+export function SettingsTab({ track, payment, canUpdateSource, completedReviewCount = 0 }: SettingsTabProps) {
+  const router = useRouter();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const handleDelete = async () => {
+    if (deleteConfirmText !== "DELETE") {
+      setDeleteError("You must type DELETE to confirm");
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      const res = await fetch(`/api/tracks/${track.id}/delete`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete track");
+      }
+
+      // Success - redirect to tracks page
+      router.push("/tracks?deleted=true");
+      router.refresh();
+    } catch (error: any) {
+      setDeleteError(error.message);
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Track Source */}
@@ -154,22 +193,98 @@ export function SettingsTab({ track, payment, canUpdateSource }: SettingsTabProp
 
             {track.status !== "QUEUED" && track.status !== "CANCELLED" && (
               <div>
-                <p className="text-sm text-black/60 mb-2">
-                  Delete this track permanently. This action cannot be undone.
-                </p>
-                <Button
-                  variant="airy"
-                  className="border-red-300 text-red-700 hover:bg-red-50"
-                  onClick={() => {
-                    if (confirm(`Are you sure you want to delete "${track.title}"? This cannot be undone.`)) {
-                      // TODO: Implement delete functionality
-                      alert("Delete functionality coming soon");
-                    }
-                  }}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Track
-                </Button>
+                {!showDeleteConfirm ? (
+                  <>
+                    <p className="text-sm text-black/60 mb-2">
+                      Delete this track permanently. This action cannot be undone.
+                    </p>
+                    {completedReviewCount > 0 && (
+                      <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-sm font-bold text-red-900 mb-1">⚠️ Warning</p>
+                        <p className="text-sm text-red-700">
+                          This track has <strong>{completedReviewCount} completed review{completedReviewCount !== 1 ? "s" : ""}</strong>.
+                          Deleting will remove all review data and affect reviewer stats.
+                        </p>
+                      </div>
+                    )}
+                    <Button
+                      variant="airy"
+                      className="border-red-300 text-red-700 hover:bg-red-50"
+                      onClick={() => setShowDeleteConfirm(true)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Track
+                    </Button>
+                  </>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="p-4 bg-red-100 border-2 border-red-300 rounded-lg">
+                      <p className="font-bold text-red-900 mb-2">⚠️ Are you absolutely sure?</p>
+                      <p className="text-sm text-red-800 mb-2">
+                        This will permanently delete:
+                      </p>
+                      <ul className="text-sm text-red-800 list-disc list-inside space-y-1 mb-3">
+                        <li>The track "{track.title}"</li>
+                        <li>All {completedReviewCount} review{completedReviewCount !== 1 ? "s" : ""} and feedback</li>
+                        <li>Payment records</li>
+                        <li>Reviewer earnings history for this track</li>
+                      </ul>
+                      <p className="text-sm font-bold text-red-900">
+                        This action cannot be undone.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-black mb-2">
+                        Type <code className="bg-red-100 px-2 py-0.5 rounded font-mono text-red-900">DELETE</code> to confirm:
+                      </label>
+                      <input
+                        type="text"
+                        value={deleteConfirmText}
+                        onChange={(e) => setDeleteConfirmText(e.target.value)}
+                        placeholder="Type DELETE"
+                        className="w-full px-3 py-2 border-2 border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        disabled={isDeleting}
+                      />
+                    </div>
+
+                    {deleteError && (
+                      <p className="text-sm text-red-600 font-semibold">{deleteError}</p>
+                    )}
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant="airy"
+                        className="border-red-300 text-red-700 hover:bg-red-50 font-bold"
+                        onClick={handleDelete}
+                        disabled={isDeleting || deleteConfirmText !== "DELETE"}
+                      >
+                        {isDeleting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Deleting...
+                          </>
+                        ) : (
+                          <>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Permanently
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        variant="airy"
+                        onClick={() => {
+                          setShowDeleteConfirm(false);
+                          setDeleteConfirmText("");
+                          setDeleteError(null);
+                        }}
+                        disabled={isDeleting}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
