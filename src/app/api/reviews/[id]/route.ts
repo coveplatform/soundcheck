@@ -71,7 +71,7 @@ export async function GET(
     }
 
     // Per-user listen timer bypass
-    const SKIP_LISTEN_TIMER_EMAILS = ["kris.engelhardt4@gmail.com"];
+    const SKIP_LISTEN_TIMER_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com"];
     const skipListenTimer = SKIP_LISTEN_TIMER_EMAILS.includes(
       (session.user.email ?? "").toLowerCase()
     );
