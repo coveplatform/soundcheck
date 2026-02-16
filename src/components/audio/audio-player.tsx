@@ -167,41 +167,44 @@ export function AudioPlayer({
     }
   }, []);
 
-  // Fetch Bandcamp embed URL via oEmbed
+  // Fetch Bandcamp embed URL via backend proxy (avoids CORS issues)
   useEffect(() => {
     if (sourceType !== "BANDCAMP") return;
 
     let cancelled = false;
-    let timeoutId: NodeJS.Timeout;
 
     const fetchBandcampEmbed = async () => {
       try {
-        // Set a 10-second timeout
-        const controller = new AbortController();
-        timeoutId = setTimeout(() => controller.abort(), 10000);
-
-        const oembedUrl = `https://bandcamp.com/oembed?url=${encodeURIComponent(sourceUrl)}&format=json`;
-        const response = await fetch(oembedUrl, { signal: controller.signal });
-
-        clearTimeout(timeoutId);
+        // Use backend proxy to avoid CORS issues - it includes a 10s timeout
+        const response = await fetch('/api/metadata', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: sourceUrl }),
+        });
 
         if (response.ok && !cancelled) {
           const data = await response.json();
-          // Extract src URL from the HTML string
-          // Format: <iframe ... src="https://bandcamp.com/EmbeddedPlayer/..." ...></iframe>
-          const srcMatch = data.html?.match(/src="([^"]+)"/);
-          if (srcMatch?.[1]) {
-            setBandcampEmbedUrl(srcMatch[1]);
+
+          if (data.embedUrl) {
+            setBandcampEmbedUrl(data.embedUrl);
             setBandcampError(false);
           } else {
-            // oEmbed succeeded but no src found
+            // API succeeded but no embed URL found
+            console.warn('Bandcamp embed URL not found in response:', { sourceUrl, data });
             if (!cancelled) setBandcampError(true);
           }
         } else {
+          // Log the error for debugging
+          const errorData = await response.json().catch(() => null);
+          console.error('Failed to fetch Bandcamp embed:', {
+            sourceUrl,
+            status: response.status,
+            error: errorData?.error,
+          });
           if (!cancelled) setBandcampError(true);
         }
       } catch (error) {
-        // Fetch failed (timeout, network error, etc.)
+        // Fetch failed (network error, timeout, etc.)
         if (!cancelled) {
           setBandcampError(true);
         }
@@ -212,7 +215,6 @@ export function AudioPlayer({
 
     return () => {
       cancelled = true;
-      clearTimeout(timeoutId);
     };
   }, [sourceType, sourceUrl]);
 
