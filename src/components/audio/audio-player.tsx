@@ -89,6 +89,7 @@ export function AudioPlayer({
   const [timestampAdded, setTimestampAdded] = useState(false);
   const [bandcampEmbedUrl, setBandcampEmbedUrl] = useState<string | null>(null);
   const [bandcampError, setBandcampError] = useState(false);
+  const [soundcloudError, setSoundcloudError] = useState(false);
   const [isEmbedInteractive, setIsEmbedInteractive] = useState(true);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -406,6 +407,11 @@ export function AudioPlayer({
       const widget = window.SC.Widget(iframe);
       scWidgetRef.current = widget;
 
+      // Check if iframe loaded successfully
+      widget.bind(window.SC.Widget.Events.ERROR, () => {
+        if (mounted) setSoundcloudError(true);
+      });
+
       widget.bind(window.SC.Widget.Events.PLAY, () => {
         if (mounted) setIsPlaying(true);
       });
@@ -586,14 +592,30 @@ export function AudioPlayer({
         {/* Embedded Player */}
         <div className="relative rounded-xl overflow-hidden bg-neutral-950 border border-black/10">
           {sourceType === "SOUNDCLOUD" ? (
-            <iframe
-              ref={scIframeRef}
-              src={getEmbedUrl()}
-              width="100%"
-              height={166}
-              allow="autoplay; encrypted-media"
-              className={cn("border-0", !isEmbedInteractive && "pointer-events-none")}
-            />
+            soundcloudError ? (
+              <div className="h-[166px] flex flex-col items-center justify-center gap-3 text-neutral-400 px-4">
+                <p className="text-sm text-center">Could not load SoundCloud player</p>
+                <p className="text-xs text-center text-neutral-500">Track may be private, deleted, or unavailable</p>
+                <a
+                  href={sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-lime-500 text-black border border-lime-400 rounded-lg font-bold text-sm hover:bg-lime-400 transition-colors"
+                >
+                  Open on SoundCloud
+                </a>
+              </div>
+            ) : (
+              <iframe
+                ref={scIframeRef}
+                src={getEmbedUrl()}
+                width="100%"
+                height={166}
+                allow="autoplay; encrypted-media"
+                className={cn("border-0", !isEmbedInteractive && "pointer-events-none")}
+                onError={() => setSoundcloudError(true)}
+              />
+            )
           ) : sourceType === "YOUTUBE" ? (
             <iframe
               id={ytContainerId}
