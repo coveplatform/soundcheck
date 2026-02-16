@@ -6,9 +6,12 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  let requestUrl: string | undefined;
+
   try {
     const body = await request.json();
     const { url } = requestSchema.parse(body);
+    requestUrl = url;
 
     // Detect source
     const hostname = new URL(url).hostname.toLowerCase();
@@ -77,7 +80,7 @@ export async function POST(request: Request) {
     console.error("Error fetching metadata:", {
       error: errorName,
       message: errorMessage,
-      url: body?.url,
+      url: requestUrl,
     });
 
     // Check if it's a timeout error
