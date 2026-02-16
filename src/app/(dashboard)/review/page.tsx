@@ -58,7 +58,12 @@ export default async function ReviewQueuePage({
     redirect("/onboarding");
   }
 
+  // Check if user bypasses limits (Pro or admin emails)
+  const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com"];
   const isPro = artistProfile.subscriptionStatus === "active";
+  const isAdmin = BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
+  const bypassLimit = isPro || isAdmin;
+
   const MAX_REVIEWS_PER_DAY = 2;
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
@@ -103,7 +108,7 @@ export default async function ReviewQueuePage({
     }),
   ]);
 
-  const reviewsRemaining = isPro ? null : Math.max(0, MAX_REVIEWS_PER_DAY - reviewsTodayCount);
+  const reviewsRemaining = bypassLimit ? null : Math.max(0, MAX_REVIEWS_PER_DAY - reviewsTodayCount);
   const claimedTrackIds = claimedReviews.map((r) => r.Track.id);
   const excludeTrackIds = [
     ...claimedTrackIds,
@@ -208,7 +213,11 @@ export default async function ReviewQueuePage({
             <span className="text-neutral-300">•</span>
             <span>Earn 1 credit per review</span>
             <span className="text-neutral-300">•</span>
-            <span>{reviewsRemaining} of {MAX_REVIEWS_PER_DAY} reviews left today</span>
+            {bypassLimit ? (
+              <span>Unlimited reviews</span>
+            ) : (
+              <span>{reviewsRemaining} of {MAX_REVIEWS_PER_DAY} reviews left today</span>
+            )}
           </div>
           <p className="text-xs text-black/40 mt-3">
             Pick a track → listen for 3 min → leave honest feedback → earn a credit to get your own music reviewed.
@@ -315,7 +324,7 @@ export default async function ReviewQueuePage({
                             <GenreTagList genres={track.Genre} variant="neutral" size="sm" maxDisplay={2} />
                           </div>
                         </div>
-                        <ClaimButton trackId={track.id} reviewsRemaining={reviewsRemaining} isPro={isPro} />
+                        <ClaimButton trackId={track.id} reviewsRemaining={reviewsRemaining} isPro={bypassLimit} />
                       </div>
                     </div>
                   ))}
