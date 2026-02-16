@@ -59,7 +59,7 @@ export default async function ReviewQueuePage({
   }
 
   const isPro = artistProfile.subscriptionStatus === "active";
-  const MAX_REVIEWS_PER_DAY = 5;
+  const MAX_REVIEWS_PER_DAY = 2;
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
 

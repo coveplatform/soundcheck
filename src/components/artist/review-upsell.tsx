@@ -89,7 +89,7 @@ export function ReviewUpsell({
         <div className="inline-flex items-baseline gap-2">
           <span className="text-neutral-500 text-sm">Starting at</span>
           <span className="text-3xl font-black text-white">$4.95</span>
-          <span className="text-neutral-500 text-sm">for 5 reviews</span>
+          <span className="text-neutral-500 text-sm">for 2 reviews</span>
         </div>
       </div>
 

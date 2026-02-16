@@ -15,7 +15,7 @@ interface Activity {
 }
 
 const ACTIVITIES: Activity[] = [
-  { id: 1, type: "review", title: "Neon Pulse", ArtistProfile: "Maya Kim", timeAgo: "just now", metric: "5 reviews", artwork: 1, color: "bg-gradient-to-br from-purple-500 to-blue-600" },
+  { id: 1, type: "review", title: "Neon Pulse", ArtistProfile: "Maya Kim", timeAgo: "just now", metric: "2 reviews", artwork: 1, color: "bg-gradient-to-br from-purple-500 to-blue-600" },
   { id: 2, type: "sale", title: "Late Night Taxi", ArtistProfile: "Marcus T.", timeAgo: "1m ago", metric: "$0.50 sale", artwork: 2, color: "bg-gradient-to-br from-orange-500 to-red-600" },
   { id: 3, type: "review", title: "Golden Hour", ArtistProfile: "James Cole", timeAgo: "2m ago", metric: "8 reviews", artwork: 3, color: "bg-gradient-to-br from-green-500 to-teal-600" },
   { id: 4, type: "review", title: "Street Lights", ArtistProfile: "DJ Nova", timeAgo: "3m ago", metric: "4 reviews", artwork: 4, color: "bg-gradient-to-br from-pink-500 to-rose-600" },

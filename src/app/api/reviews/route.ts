@@ -291,7 +291,7 @@ export async function POST(request: Request) {
     startOfToday.setHours(0, 0, 0, 0);
     const heartbeatCutoff = new Date(now.getTime() - 2 * 60 * 1000);
 
-    // Daily review cap: 5/day for free users, unlimited for pro subscribers
+    // Daily review cap: 2/day for free users, unlimited for pro subscribers
     const isProReviewer = peerReviewerProfile?.subscriptionStatus === "active";
 
     if (!isProReviewer) {

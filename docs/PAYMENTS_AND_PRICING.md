@@ -11,7 +11,7 @@
 Pricing is defined in `src/lib/metadata.ts` as cents (minor currency units).
 
 - `STARTER`
-  - **5 reviews**
+  - **2 reviews**
   - **$4.95** (`495`)
   - **Guaranteed PRO reviews:** `0`
 - `STANDARD`
