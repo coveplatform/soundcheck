@@ -407,11 +407,6 @@ export function AudioPlayer({
       const widget = window.SC.Widget(iframe);
       scWidgetRef.current = widget;
 
-      // Check if iframe loaded successfully
-      widget.bind(window.SC.Widget.Events.ERROR, () => {
-        if (mounted) setSoundcloudError(true);
-      });
-
       widget.bind(window.SC.Widget.Events.PLAY, () => {
         if (mounted) setIsPlaying(true);
       });
