@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Tooltip } from "@/components/ui/tooltip";
-import { ArrowRight, MessageCircle, Trophy, Music, Headphones, BarChart3 } from "lucide-react";
+import { ArrowRight, MessageCircle, Trophy, Music, Headphones, BarChart3, Sparkles } from "lucide-react";
 import {
   SparklesDoodle,
   SquiggleDoodle,
@@ -71,7 +71,13 @@ export default async function DashboardPage() {
             feedbackViewedAt: true,
             Genre: true,
             Review: {
-              select: { status: true, createdAt: true },
+              select: {
+                status: true,
+                createdAt: true,
+                productionScore: true,
+                vocalScore: true,
+                originalityScore: true,
+              },
             },
           },
           orderBy: { createdAt: "desc" },
@@ -98,7 +104,13 @@ export default async function DashboardPage() {
             feedbackViewedAt: true,
             Genre: true,
             Review: {
-              select: { status: true, createdAt: true },
+              select: {
+                status: true,
+                createdAt: true,
+                productionScore: true,
+                vocalScore: true,
+                originalityScore: true,
+              },
             },
           },
           orderBy: { createdAt: "desc" },
@@ -301,6 +313,55 @@ export default async function DashboardPage() {
             </div>
             <ArrowRight className="h-4 w-4 text-purple-400 group-hover:text-purple-600 transition-colors flex-shrink-0" />
           </Link>
+        )}
+
+        {/* First-time user welcome banner */}
+        {tracks.length === 0 && credits >= 2 && (
+          <div className="rounded-xl border-2 border-lime-300 bg-gradient-to-br from-lime-50 via-white to-lime-50/50 p-6 mb-5 relative overflow-hidden">
+            <StarDoodle className="absolute top-2 right-3 w-12 h-12 text-lime-600/10 pointer-events-none" />
+            <div className="relative">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="h-10 w-10 rounded-xl bg-lime-500 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-black">Welcome to MixReflect!</h3>
+                  <p className="text-sm text-black/60 mt-1">
+                    You have <span className="font-bold text-lime-700">{credits} free credits</span> to get started. Here&apos;s what to do:
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-2 mb-4 ml-13">
+                <div className="flex items-start gap-2">
+                  <span className="text-sm font-bold text-lime-700 flex-shrink-0">1.</span>
+                  <p className="text-sm text-black/80">
+                    <strong>Submit a track</strong> and spend credits to request feedback
+                  </p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-sm font-bold text-lime-700 flex-shrink-0">2.</span>
+                  <p className="text-sm text-black/80">
+                    <strong>Review other tracks</strong> to earn more credits (1 review = 1 credit)
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <Link href="/submit" className="flex-1">
+                  <Button className="w-full bg-lime-600 text-white hover:bg-lime-700 active:bg-lime-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out text-sm h-10 px-5 rounded-xl">
+                    <Music className="h-3.5 w-3.5 mr-2" />
+                    Submit Your First Track
+                    <ArrowRight className="h-3.5 w-3.5 ml-2" />
+                  </Button>
+                </Link>
+                <Link href="/review" className="flex-1">
+                  <Button className="w-full border-2 border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 font-semibold text-sm h-10 px-5 rounded-xl">
+                    <Headphones className="h-3.5 w-3.5 mr-2" />
+                    Review Tracks to Earn Credits
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Zero credits banner */}

@@ -9,6 +9,7 @@ import { isPeerReviewerPro, PRO_TIER_MIN_REVIEWS, PRO_TIER_MIN_RATING, TIER_RATE
 /**
  * Calculate dashboard stats with priority ordering
  * Stats are ordered based on urgency and relevance to the user
+ * MUSIC-FOCUSED: Shows artist's track performance, not reviewer metrics
  */
 export function calculateDashboardStats(profile: {
   totalPeerReviews?: number;
@@ -17,75 +18,110 @@ export function calculateDashboardStats(profile: {
   tracks: DashboardTrack[];
   pendingPeerReviews?: PendingPeerReview[];
 }): DashboardStat[] {
-  const totalPeerReviews = profile.totalPeerReviews ?? 0;
-  const peerReviewRating = profile.peerReviewRating ?? 0;
-  const peerGemCount = profile.peerGemCount ?? 0;
   const totalTracks = profile.tracks.length;
-  const pendingCount = profile.pendingPeerReviews?.length ?? 0;
 
-  const isProTier = isPeerReviewerPro(totalPeerReviews, peerReviewRating);
-  const reviewsToGo = Math.max(0, PRO_TIER_MIN_REVIEWS - totalPeerReviews);
-  const proRate = `$${(TIER_RATES.PRO / 100).toFixed(2)}`;
+  // Calculate reviews received (feedback on artist's tracks)
+  const totalReviewsReceived = profile.tracks.reduce((sum, track) => {
+    return sum + track.Review.filter((r) => r.status === "COMPLETED").length;
+  }, 0);
 
-  const reviewsTooltip = isProTier
-    ? `PRO Reviewer — you earn 1 credit + ${proRate} cash per review`
-    : reviewsToGo > 0
-      ? `${reviewsToGo} more review${reviewsToGo !== 1 ? "s" : ""} to unlock PRO (${proRate}/review)`
-      : `Maintain a ${PRO_TIER_MIN_RATING}+ rating to unlock PRO (${proRate}/review)`;
+  // Calculate average track score across all completed reviews
+  let avgTrackScore = 0;
+  let totalScores = 0;
+  let scoreCount = 0;
 
-  const ratingTooltip = isProTier
-    ? `PRO Reviewer — keep your rating above ${PRO_TIER_MIN_RATING} to stay PRO`
-    : peerReviewRating >= PRO_TIER_MIN_RATING
-      ? `On track for PRO! Complete ${PRO_TIER_MIN_REVIEWS} reviews to unlock ${proRate}/review`
-      : `Reach ${PRO_TIER_MIN_RATING}+ with ${PRO_TIER_MIN_REVIEWS} reviews to earn ${proRate}/review`;
+  profile.tracks.forEach((track) => {
+    track.Review.filter((r) => r.status === "COMPLETED").forEach((review) => {
+      // Assuming reviews have scores - we'll calculate average from production, vocal, originality
+      // This is a simplified calculation - adjust based on your actual Review schema
+      let reviewScore = 0;
+      let reviewScoreCount = 0;
+
+      if ((review as any).productionScore) {
+        reviewScore += (review as any).productionScore;
+        reviewScoreCount++;
+      }
+      if ((review as any).vocalScore) {
+        reviewScore += (review as any).vocalScore;
+        reviewScoreCount++;
+      }
+      if ((review as any).originalityScore) {
+        reviewScore += (review as any).originalityScore;
+        reviewScoreCount++;
+      }
+
+      if (reviewScoreCount > 0) {
+        totalScores += reviewScore / reviewScoreCount;
+        scoreCount++;
+      }
+    });
+  });
+
+  if (scoreCount > 0) {
+    avgTrackScore = totalScores / scoreCount;
+  }
+
+  // Tracks with completed reviews
+  const tracksWithFeedback = profile.tracks.filter(
+    (t) => t.Review.some((r) => r.status === "COMPLETED")
+  ).length;
 
   const stats: DashboardStat[] = [
     {
-      id: "tracks",
+      id: "tracks-uploaded",
       iconName: "music",
-      iconBg: "bg-neutral-100",
-      iconColor: "text-neutral-600",
+      iconBg: "bg-purple-100",
+      iconColor: "text-purple-700",
       value: totalTracks,
-      label: "Tracks",
+      label: "Tracks Uploaded",
       href: "/tracks",
       ariaLabel: "View all your tracks",
-      priority: totalTracks === 0 ? 10 : 5,
+      tooltip: totalTracks === 0
+        ? "Upload your first track to get started"
+        : `You have ${totalTracks} track${totalTracks === 1 ? "" : "s"} on MixReflect`,
+      priority: 1,
     },
     {
-      id: "reviews-given",
+      id: "reviews-received",
       iconName: "headphones",
-      iconBg: isProTier ? "bg-purple-100" : "bg-emerald-100",
-      iconColor: isProTier ? "text-purple-700" : "text-emerald-700",
-      value: totalPeerReviews,
-      label: isProTier ? "Reviews (PRO)" : "Reviews Given",
-      href: "/review/history",
-      tooltip: reviewsTooltip,
-      ariaLabel: "View your review history",
-      priority: pendingCount > 0 ? 1 : 3,
+      iconBg: "bg-emerald-100",
+      iconColor: "text-emerald-700",
+      value: totalReviewsReceived,
+      label: "Reviews Received",
+      href: "/tracks",
+      tooltip: totalReviewsReceived === 0
+        ? "Submit a track to get feedback from peers"
+        : `You've received ${totalReviewsReceived} review${totalReviewsReceived === 1 ? "" : "s"} on your music`,
+      ariaLabel: `You have received ${totalReviewsReceived} reviews`,
+      priority: 2,
     },
     {
-      id: "rating",
+      id: "avg-track-score",
       iconName: "star",
       iconBg: "bg-amber-100",
       iconColor: "text-amber-700",
-      value: peerReviewRating > 0 ? peerReviewRating.toFixed(1) : "—",
-      label: "Avg Rating",
-      tooltip: ratingTooltip,
-      ariaLabel: `Your average review rating is ${
-        peerReviewRating > 0 ? peerReviewRating.toFixed(1) : "not available"
+      value: avgTrackScore > 0 ? avgTrackScore.toFixed(1) : "—",
+      label: "Avg Track Score",
+      tooltip: avgTrackScore > 0
+        ? `Your tracks score an average of ${avgTrackScore.toFixed(1)}/5 across all reviews`
+        : "Submit tracks and get reviews to see your average score",
+      ariaLabel: `Your average track score is ${
+        avgTrackScore > 0 ? avgTrackScore.toFixed(1) : "not available"
       }`,
-      priority: 4,
+      priority: 3,
     },
     {
-      id: "gems",
+      id: "tracks-reviewed",
       iconName: "sparkles",
       iconBg: "bg-lime-100",
       iconColor: "text-lime-700",
-      value: peerGemCount,
-      label: "Gems",
-      tooltip: "Gems received for outstanding reviews",
-      ariaLabel: `You have earned ${peerGemCount} gems`,
-      priority: 6,
+      value: tracksWithFeedback,
+      label: "Tracks Reviewed",
+      tooltip: tracksWithFeedback === 0
+        ? "Tracks that have received at least one review"
+        : `${tracksWithFeedback} of your ${totalTracks} track${totalTracks === 1 ? " has" : "s have"} received feedback`,
+      ariaLabel: `${tracksWithFeedback} of your tracks have received reviews`,
+      priority: 4,
     },
   ];
 
