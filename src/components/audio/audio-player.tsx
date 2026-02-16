@@ -88,6 +88,7 @@ export function AudioPlayer({
   const [isWaveformLoading, setIsWaveformLoading] = useState(false);
   const [timestampAdded, setTimestampAdded] = useState(false);
   const [bandcampEmbedUrl, setBandcampEmbedUrl] = useState<string | null>(null);
+  const [bandcampError, setBandcampError] = useState(false);
   const [isEmbedInteractive, setIsEmbedInteractive] = useState(true);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -171,11 +172,19 @@ export function AudioPlayer({
     if (sourceType !== "BANDCAMP") return;
 
     let cancelled = false;
+    let timeoutId: NodeJS.Timeout;
 
     const fetchBandcampEmbed = async () => {
       try {
+        // Set a 10-second timeout
+        const controller = new AbortController();
+        timeoutId = setTimeout(() => controller.abort(), 10000);
+
         const oembedUrl = `https://bandcamp.com/oembed?url=${encodeURIComponent(sourceUrl)}&format=json`;
-        const response = await fetch(oembedUrl);
+        const response = await fetch(oembedUrl, { signal: controller.signal });
+
+        clearTimeout(timeoutId);
+
         if (response.ok && !cancelled) {
           const data = await response.json();
           // Extract src URL from the HTML string
@@ -183,10 +192,19 @@ export function AudioPlayer({
           const srcMatch = data.html?.match(/src="([^"]+)"/);
           if (srcMatch?.[1]) {
             setBandcampEmbedUrl(srcMatch[1]);
+            setBandcampError(false);
+          } else {
+            // oEmbed succeeded but no src found
+            if (!cancelled) setBandcampError(true);
           }
+        } else {
+          if (!cancelled) setBandcampError(true);
         }
-      } catch {
-        // Bandcamp embed fetch failed, will show loading state
+      } catch (error) {
+        // Fetch failed (timeout, network error, etc.)
+        if (!cancelled) {
+          setBandcampError(true);
+        }
       }
     };
 
@@ -194,6 +212,7 @@ export function AudioPlayer({
 
     return () => {
       cancelled = true;
+      clearTimeout(timeoutId);
     };
   }, [sourceType, sourceUrl]);
 
@@ -583,7 +602,19 @@ export function AudioPlayer({
               className={cn("border-0", !isEmbedInteractive && "pointer-events-none")}
             />
           ) : sourceType === "BANDCAMP" ? (
-            bandcampEmbedUrl ? (
+            bandcampError ? (
+              <div className="h-[120px] flex flex-col items-center justify-center gap-3 text-neutral-400 px-4">
+                <p className="text-sm text-center">Could not load Bandcamp player</p>
+                <a
+                  href={sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-lime-500 text-black border border-lime-400 rounded-lg font-bold text-sm hover:bg-lime-400 transition-colors"
+                >
+                  Open on Bandcamp
+                </a>
+              </div>
+            ) : bandcampEmbedUrl ? (
               <iframe
                 ref={bcIframeRef}
                 src={bandcampEmbedUrl}
@@ -592,6 +623,7 @@ export function AudioPlayer({
                 allow="autoplay; encrypted-media"
                 className={cn("border-0", !isEmbedInteractive && "pointer-events-none")}
                 style={{ border: 0 }}
+                seamless
               />
             ) : (
               <div className="h-[120px] flex items-center justify-center text-neutral-400">
@@ -616,17 +648,71 @@ export function AudioPlayer({
         </div>
 
         {/* Manual tracking toggle for Bandcamp (no JS API available) */}
-        {sourceType === "BANDCAMP" && showListenTracker && (
-          <div className="bg-white border border-black/10 rounded-2xl p-3 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-neutral-600">
-                <span className="font-medium">Tracking listen time</span>
+        {sourceType === "BANDCAMP" && showListenTracker && !bandcampError && (
+          <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="h-8 w-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Play className="h-4 w-4 text-amber-600" />
               </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-amber-900 mb-1">Manual Tracking Required</p>
+                <p className="text-xs text-amber-700">
+                  Bandcamp doesn&apos;t support automatic tracking. Follow these steps:
+                </p>
+                <ol className="text-xs text-amber-700 mt-2 space-y-1 list-decimal list-inside">
+                  <li>Press <strong>play</strong> on the Bandcamp player above</li>
+                  <li>Click <strong>&quot;Start Tracking&quot;</strong> below while listening</li>
+                  <li>When you pause the player, click <strong>&quot;Pause Tracking&quot;</strong></li>
+                </ol>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsPlaying(!isPlaying)}
+              className={cn(
+                "w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold rounded-lg border-2 transition-all duration-150 ease-out motion-reduce:transition-none",
+                isPlaying
+                  ? "bg-black text-white border-black hover:bg-neutral-800"
+                  : "bg-lime-500 text-black border-lime-400 hover:bg-lime-400 shadow-md hover:shadow-lg"
+              )}
+            >
+              {isPlaying ? (
+                <>
+                  <Pause className="h-5 w-5" />
+                  Pause Tracking
+                </>
+              ) : (
+                <>
+                  <Play className="h-5 w-5" />
+                  Start Tracking
+                </>
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Helper for Bandcamp errors with listen tracking */}
+        {sourceType === "BANDCAMP" && bandcampError && showListenTracker && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+            <p className="text-sm font-bold text-red-900 mb-2">Player could not load</p>
+            <p className="text-xs text-red-700 mb-3">
+              The Bandcamp embed failed to load. Please open the track in Bandcamp and listen there.
+              You can still manually track your listen time here to unlock submission.
+            </p>
+            <div className="flex gap-2">
+              <a
+                href={sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 text-center px-4 py-2 bg-white text-black border-2 border-black rounded-lg font-bold text-sm hover:bg-neutral-50 transition-colors"
+              >
+                Open on Bandcamp
+              </a>
               <button
                 type="button"
                 onClick={() => setIsPlaying(!isPlaying)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg border transition-colors duration-150 ease-out motion-reduce:transition-none",
+                  "flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold rounded-lg border-2 transition-colors duration-150 ease-out",
                   isPlaying
                     ? "bg-black text-white border-black"
                     : "bg-lime-500 text-black border-lime-400 hover:bg-lime-400"
@@ -635,19 +721,16 @@ export function AudioPlayer({
                 {isPlaying ? (
                   <>
                     <Pause className="h-4 w-4" />
-                    Pause Tracking
+                    Pause
                   </>
                 ) : (
                   <>
                     <Play className="h-4 w-4" />
-                    Start Tracking
+                    Start
                   </>
                 )}
               </button>
             </div>
-            <p className="text-xs text-neutral-400 mt-2">
-              Press play above, then click &quot;Start Tracking&quot; while you listen
-            </p>
           </div>
         )}
 

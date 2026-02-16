@@ -295,7 +295,7 @@ export async function POST(request: Request) {
     const isProReviewer = peerReviewerProfile?.subscriptionStatus === "active";
 
     if (!isProReviewer) {
-      const MAX_REVIEWS_PER_DAY = 5;
+      const MAX_REVIEWS_PER_DAY = 2;
       const reviewsTodayCount = await prisma.review.count({
         where: {
           status: "COMPLETED",
@@ -308,7 +308,7 @@ export async function POST(request: Request) {
 
       if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
         return NextResponse.json(
-          { error: "You've reached the daily limit of 5 reviews. Come back tomorrow or buy credits to get more reviews!" },
+          { error: "You've reached the daily limit of 2 reviews. Come back tomorrow or buy credits to get more reviews!" },
           { status: 429 }
         );
       }
@@ -327,8 +327,8 @@ export async function POST(request: Request) {
                 ? { peerReviewerArtistId: review.peerReviewerArtistId }
                 : { reviewerId: review.reviewerId }),
               status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-              listenDuration: { gte: MIN_LISTEN_SECONDS },
-              lastHeartbeat: { gte: heartbeatCutoff },
+              ...(skipListenTimer ? {} : { listenDuration: { gte: MIN_LISTEN_SECONDS } }),
+              ...(skipListenTimer ? {} : { lastHeartbeat: { gte: heartbeatCutoff } }),
             },
             data: {
               status: "COMPLETED",
@@ -390,11 +390,11 @@ export async function POST(request: Request) {
           return { updated: false as const, reason: "NOT_ACTIVE" as const };
         }
 
-        if (!current.lastHeartbeat || current.lastHeartbeat.getTime() < heartbeatCutoff.getTime()) {
+        if (!skipListenTimer && (!current.lastHeartbeat || current.lastHeartbeat.getTime() < heartbeatCutoff.getTime())) {
           return { updated: false as const, reason: "HEARTBEAT_EXPIRED" as const };
         }
 
-        if (current.listenDuration < MIN_LISTEN_SECONDS) {
+        if (!skipListenTimer && current.listenDuration < MIN_LISTEN_SECONDS) {
           return { updated: false as const, reason: "INSUFFICIENT_LISTEN" as const };
         }
 

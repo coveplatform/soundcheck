@@ -724,7 +724,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       const res = await fetch(`/api/reviews/${review.id}/heartbeat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: "{}",
+        body: JSON.stringify({ clientListenTime: Math.floor(listenTime) }),
       });
 
       if (!res.ok) {
