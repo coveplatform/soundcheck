@@ -59,7 +59,7 @@ export default async function ReviewQueuePage({
   }
 
   // Check if user bypasses limits (Pro or admin emails)
-  const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com"];
+  const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
   const isPro = artistProfile.subscriptionStatus === "active";
   const isAdmin = BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
   const bypassLimit = isPro || isAdmin;

@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   }
 
   // Daily review limit check (bypass for pro subscribers and admin emails)
-  const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com"];
+  const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
   const bypassLimit =
     artistProfile.subscriptionStatus === "active" ||
     BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());

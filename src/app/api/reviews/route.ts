@@ -237,7 +237,7 @@ export async function POST(request: Request) {
     }
 
     // Per-user listen timer bypass
-    const SKIP_LISTEN_TIMER_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com"];
+    const SKIP_LISTEN_TIMER_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
     const skipListenTimer = SKIP_LISTEN_TIMER_EMAILS.includes(
       (session.user.email ?? "").toLowerCase()
     );
@@ -292,7 +292,7 @@ export async function POST(request: Request) {
     const heartbeatCutoff = new Date(now.getTime() - 2 * 60 * 1000);
 
     // Daily review cap: 2/day for free users, unlimited for pro subscribers and admin emails
-    const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com"];
+    const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
     const bypassLimit =
       peerReviewerProfile?.subscriptionStatus === "active" ||
       BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
