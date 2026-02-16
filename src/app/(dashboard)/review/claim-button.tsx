@@ -2,13 +2,22 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Lock } from "lucide-react";
 
-export function ClaimButton({ trackId }: { trackId: string }) {
+interface ClaimButtonProps {
+  trackId: string;
+  reviewsRemaining: number | null;
+  isPro: boolean;
+}
+
+export function ClaimButton({ trackId, reviewsRemaining, isPro }: ClaimButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const hasReachedLimit = !isPro && reviewsRemaining !== null && reviewsRemaining <= 0;
 
   const handleClaim = async () => {
     setLoading(true);
@@ -36,6 +45,28 @@ export function ClaimButton({ trackId }: { trackId: string }) {
       setLoading(false);
     }
   };
+
+  if (hasReachedLimit) {
+    return (
+      <div className="flex-shrink-0 text-right">
+        <Button
+          size="sm"
+          variant="outline"
+          disabled
+          className="opacity-50 cursor-not-allowed"
+        >
+          <Lock className="h-3 w-3 mr-1" />
+          Limit Reached
+        </Button>
+        <Link
+          href="/submit"
+          className="block text-xs text-purple-600 hover:text-purple-700 font-semibold mt-1 hover:underline"
+        >
+          Get Pro
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-shrink-0">

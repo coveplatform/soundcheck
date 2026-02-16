@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
   const artistProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
-    select: { id: true, completedOnboarding: true, peerFlagCount: true },
+    select: { id: true, completedOnboarding: true, peerFlagCount: true, subscriptionStatus: true },
   });
 
   if (!artistProfile) {
@@ -32,6 +32,33 @@ export async function POST(request: Request) {
 
   if (!artistProfile.completedOnboarding) {
     return NextResponse.json({ error: "Complete onboarding first" }, { status: 403 });
+  }
+
+  // Daily review limit check (bypass for pro subscribers and admin emails)
+  const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com"];
+  const bypassLimit =
+    artistProfile.subscriptionStatus === "active" ||
+    BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
+
+  if (!bypassLimit) {
+    const MAX_REVIEWS_PER_DAY = 2;
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const reviewsTodayCount = await prisma.review.count({
+      where: {
+        peerReviewerArtistId: artistProfile.id,
+        status: "COMPLETED",
+        updatedAt: { gte: startOfToday },
+      },
+    });
+
+    if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
+      return NextResponse.json(
+        { error: "You've reached your daily limit of 2 reviews. Upgrade to Pro for unlimited reviews or check back tomorrow!" },
+        { status: 429 }
+      );
+    }
   }
 
   try {

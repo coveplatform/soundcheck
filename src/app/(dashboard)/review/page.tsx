@@ -315,7 +315,7 @@ export default async function ReviewQueuePage({
                             <GenreTagList genres={track.Genre} variant="neutral" size="sm" maxDisplay={2} />
                           </div>
                         </div>
-                        <ClaimButton trackId={track.id} />
+                        <ClaimButton trackId={track.id} reviewsRemaining={reviewsRemaining} isPro={isPro} />
                       </div>
                     </div>
                   ))}

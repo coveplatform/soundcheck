@@ -291,10 +291,13 @@ export async function POST(request: Request) {
     startOfToday.setHours(0, 0, 0, 0);
     const heartbeatCutoff = new Date(now.getTime() - 2 * 60 * 1000);
 
-    // Daily review cap: 2/day for free users, unlimited for pro subscribers
-    const isProReviewer = peerReviewerProfile?.subscriptionStatus === "active";
+    // Daily review cap: 2/day for free users, unlimited for pro subscribers and admin emails
+    const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com"];
+    const bypassLimit =
+      peerReviewerProfile?.subscriptionStatus === "active" ||
+      BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
 
-    if (!isProReviewer) {
+    if (!bypassLimit) {
       const MAX_REVIEWS_PER_DAY = 2;
       const reviewsTodayCount = await prisma.review.count({
         where: {
@@ -308,7 +311,7 @@ export async function POST(request: Request) {
 
       if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
         return NextResponse.json(
-          { error: "You've reached the daily limit of 2 reviews. Come back tomorrow or buy credits to get more reviews!" },
+          { error: "You've reached the daily limit of 2 reviews. Upgrade to Pro for unlimited reviews or check back tomorrow!" },
           { status: 429 }
         );
       }
