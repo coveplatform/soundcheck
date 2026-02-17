@@ -94,7 +94,8 @@
       "Bash(export:*)",
       "Bash(npx dotenv:*)",
       "Bash(node --env-file=.env.local -e:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(node add-reviews-simple.js:*)"
     ]
   }
 }

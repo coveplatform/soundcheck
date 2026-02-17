@@ -20,7 +20,10 @@ function isUniqueConstraintError(error: unknown): boolean {
 function generateShareId(): string {
   return randomBytes(6).toString("base64url").slice(0, 8);
 }
-const MIN_WORDS_PER_SECTION = 30;
+// Streamlined form word requirements
+const MIN_WORDS_BEST_MOMENT = 15;
+const MIN_WORDS_BIGGEST_ISSUE = 15;
+const MIN_WORDS_QUICK_WIN = 10;
 
 function extractWords(text: string): string[] {
   return text.toLowerCase().match(/[a-z0-9']+/g) ?? [];
@@ -81,11 +84,11 @@ function countActionLines(text: string): number {
   return lines.length;
 }
 
-function validateReviewText(fieldLabel: string, text: string): string | null {
+function validateReviewText(fieldLabel: string, text: string, minWords: number): string | null {
   const words = extractWords(text);
 
-  if (words.length < MIN_WORDS_PER_SECTION) {
-    return `${fieldLabel} must be at least ${MIN_WORDS_PER_SECTION} words`;
+  if (words.length < minWords) {
+    return `${fieldLabel} must be at least ${minWords} words`;
   }
 
   const unique = new Set(words);
@@ -282,14 +285,22 @@ export async function POST(request: Request) {
       );
     }
 
-    const bestPartError = validateReviewText("Best part", data.bestPart);
+    const bestPartError = validateReviewText("Best moment", data.bestPart, MIN_WORDS_BEST_MOMENT);
     if (bestPartError) {
       return NextResponse.json({ error: bestPartError }, { status: 400 });
     }
 
-    const weakestPartError = validateReviewText("Weakest part", data.weakestPart);
+    const weakestPartError = validateReviewText("Biggest issue", data.weakestPart, MIN_WORDS_BIGGEST_ISSUE);
     if (weakestPartError) {
       return NextResponse.json({ error: weakestPartError }, { status: 400 });
+    }
+
+    // Validate Quick Win if present (new streamlined field)
+    if (data.quickWin) {
+      const quickWinError = validateReviewText("Quick win", data.quickWin, MIN_WORDS_QUICK_WIN);
+      if (quickWinError) {
+        return NextResponse.json({ error: quickWinError }, { status: 400 });
+      }
     }
 
     // Fetch peer reviewer stats for tier check and daily cap
