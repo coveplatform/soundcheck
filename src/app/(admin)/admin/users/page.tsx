@@ -38,6 +38,7 @@ export default async function AdminUsersPage({
     "@seed.mixreflect.com",
     "@mixreflect.com",
     "@example.com",
+    "@soundcheck.com",
   ];
   const DEMO_EMAIL_EXACT = [
     "testlink@gmail.com",
@@ -51,6 +52,33 @@ export default async function AdminUsersPage({
     "bogushogus@gmail.com",
     "hot23@gmail.com",
     "bigbadbozo@gmail.com",
+    // Additional test / friends / family accounts
+    "daniel.basshead@gmail.com",
+    "alexkimbeats@gmail.com",
+    "poopdogwe@google.com",
+    "poopdogger@poop.com",
+    "soord@fksss.com",
+    "soord@fk.com",
+    "kris@kris.com",
+    "poop@poop.com",
+    "steve2@steve.com",
+    "stevejob@job.com",
+    "cove.platform@proton.me",
+    "test@test.com",
+    "tether.platform@proton.me",
+    "jones@jones.com",
+    "steveo23@gmail.com",
+    "james.producer.uk@outlook.com",
+    "sean@spdafy.com",
+    // Family / friends
+    "qairulothman@gmail.com",
+    "imogengravina@gmail.com",
+    "bjorn@bjornengelhardt.com",
+    "a.engelhardt101@gmail.com",
+    "simlimsd3@gmail.com",
+    "kris.engelhardt4@gmail.com",
+    "millersport98@gmail.com",
+    "illy81095@gmail.com",
   ];
 
   // Build where clause
