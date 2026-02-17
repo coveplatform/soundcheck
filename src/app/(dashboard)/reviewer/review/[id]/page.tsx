@@ -36,6 +36,11 @@ import {
   firstImpressionColor,
   firstImpressionEnumFromScore,
 } from "./utils";
+import { TechnicalFeedbackSection } from "./components/technical-feedback-section";
+import { ArrangementFeedbackSection } from "./components/arrangement-feedback-section";
+import { EmotionalImpactSection } from "./components/emotional-impact-section";
+import { ActionableFeedbackSection } from "./components/actionable-feedback-section";
+import { ContextNextStepsSection } from "./components/context-next-steps-section";
 
 // Types and utilities imported from ./types and ./utils
 
@@ -92,6 +97,28 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [playerSeconds, setPlayerSeconds] = useState(0);
   const [pendingTimestampFocusId, setPendingTimestampFocusId] = useState<string | null>(null);
   const [validationIssues, setValidationIssues] = useState<Array<{ id: string; message: string; section: string }>>([]);
+
+  // V2 Enhanced Feedback State
+  const [lowEndClarity, setLowEndClarity] = useState<string | null>(null);
+  const [vocalClarity, setVocalClarity] = useState<string | null>(null);
+  const [highEndQuality, setHighEndQuality] = useState<string | null>(null);
+  const [stereoWidth, setStereoWidth] = useState<string | null>(null);
+  const [dynamics, setDynamics] = useState<string | null>(null);
+  const [energyCurve, setEnergyCurve] = useState<string | null>(null);
+  const [tooRepetitive, setTooRepetitive] = useState<boolean>(false);
+  const [repetitiveNote, setRepetitiveNote] = useState<string>("");
+  const [lostInterestAt, setLostInterestAt] = useState<number | null>(null);
+  const [lostInterestReason, setLostInterestReason] = useState<string>("");
+  const [trackLength, setTrackLength] = useState<string | null>(null);
+  const [emotionalImpact, setEmotionalImpact] = useState<string[]>([]);
+  const [memorableMoment, setMemorableMoment] = useState<string>("");
+  const [playlistAction, setPlaylistAction] = useState<string | null>(null);
+  const [biggestWeaknessSpecific, setBiggestWeaknessSpecific] = useState<string>("");
+  const [quickWin, setQuickWin] = useState<string>("");
+  const [targetAudience, setTargetAudience] = useState<string[]>([]);
+  const [nextFocus, setNextFocus] = useState<string | null>(null);
+  const [expectedPlacement, setExpectedPlacement] = useState<string | null>(null);
+  const [qualityLevel, setQualityLevel] = useState<string | null>(null);
 
   // Section refs for scroll-to functionality
   const firstImpressionRef = useRef<HTMLDivElement>(null);
@@ -214,7 +241,28 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     bestPart.trim().length > 0 ||
     weakestPart.trim().length > 0 ||
     additionalNotes.trim().length > 0 ||
-    timestampNotes.some((t) => t.note.trim().length > 0);
+    timestampNotes.some((t) => t.note.trim().length > 0) ||
+    // V2 fields
+    lowEndClarity !== null ||
+    vocalClarity !== null ||
+    highEndQuality !== null ||
+    stereoWidth !== null ||
+    dynamics !== null ||
+    energyCurve !== null ||
+    tooRepetitive ||
+    repetitiveNote.trim().length > 0 ||
+    lostInterestAt !== null ||
+    lostInterestReason.trim().length > 0 ||
+    trackLength !== null ||
+    emotionalImpact.length > 0 ||
+    memorableMoment.trim().length > 0 ||
+    playlistAction !== null ||
+    biggestWeaknessSpecific.trim().length > 0 ||
+    quickWin.trim().length > 0 ||
+    targetAudience.length > 0 ||
+    nextFocus !== null ||
+    expectedPlacement !== null ||
+    qualityLevel !== null;
 
   const confirmLeave = () => {
     if (!isDirty) return true;
@@ -300,6 +348,29 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           normalized.sort((a, b) => (a.seconds - b.seconds) || a.id.localeCompare(b.id));
           setTimestampNotes(normalized);
           setDraftSavedAt(typeof parsed.savedAt === "number" ? parsed.savedAt : null);
+
+          // Restore v2 fields
+          setLowEndClarity(typeof parsed.lowEndClarity === "string" ? parsed.lowEndClarity : null);
+          setVocalClarity(typeof parsed.vocalClarity === "string" ? parsed.vocalClarity : null);
+          setHighEndQuality(typeof parsed.highEndQuality === "string" ? parsed.highEndQuality : null);
+          setStereoWidth(typeof parsed.stereoWidth === "string" ? parsed.stereoWidth : null);
+          setDynamics(typeof parsed.dynamics === "string" ? parsed.dynamics : null);
+          setEnergyCurve(typeof parsed.energyCurve === "string" ? parsed.energyCurve : null);
+          setTooRepetitive(typeof parsed.tooRepetitive === "boolean" ? parsed.tooRepetitive : false);
+          setRepetitiveNote(typeof parsed.repetitiveNote === "string" ? parsed.repetitiveNote : "");
+          setLostInterestAt(typeof parsed.lostInterestAt === "number" ? parsed.lostInterestAt : null);
+          setLostInterestReason(typeof parsed.lostInterestReason === "string" ? parsed.lostInterestReason : "");
+          setTrackLength(typeof parsed.trackLength === "string" ? parsed.trackLength : null);
+          setEmotionalImpact(Array.isArray(parsed.emotionalImpact) ? parsed.emotionalImpact : []);
+          setMemorableMoment(typeof parsed.memorableMoment === "string" ? parsed.memorableMoment : "");
+          setPlaylistAction(typeof parsed.playlistAction === "string" ? parsed.playlistAction : null);
+          setBiggestWeaknessSpecific(typeof parsed.biggestWeaknessSpecific === "string" ? parsed.biggestWeaknessSpecific : "");
+          setQuickWin(typeof parsed.quickWin === "string" ? parsed.quickWin : "");
+          setTargetAudience(Array.isArray(parsed.targetAudience) ? parsed.targetAudience : []);
+          setNextFocus(typeof parsed.nextFocus === "string" ? parsed.nextFocus : null);
+          setExpectedPlacement(typeof parsed.expectedPlacement === "string" ? parsed.expectedPlacement : null);
+          setQualityLevel(typeof parsed.qualityLevel === "string" ? parsed.qualityLevel : null);
+
           setDraftReady(true);
           return;
         }
@@ -357,6 +428,27 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         additionalNotes,
         nextActions,
         timestampNotes,
+        // V2 fields
+        lowEndClarity,
+        vocalClarity,
+        highEndQuality,
+        stereoWidth,
+        dynamics,
+        energyCurve,
+        tooRepetitive,
+        repetitiveNote,
+        lostInterestAt,
+        lostInterestReason,
+        trackLength,
+        emotionalImpact,
+        memorableMoment,
+        playlistAction,
+        biggestWeaknessSpecific,
+        quickWin,
+        targetAudience,
+        nextFocus,
+        expectedPlacement,
+        qualityLevel,
       };
 
       try {
@@ -388,6 +480,27 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     additionalNotes,
     nextActions,
     timestampNotes,
+    // V2 fields
+    lowEndClarity,
+    vocalClarity,
+    highEndQuality,
+    stereoWidth,
+    dynamics,
+    energyCurve,
+    tooRepetitive,
+    repetitiveNote,
+    lostInterestAt,
+    lostInterestReason,
+    trackLength,
+    emotionalImpact,
+    memorableMoment,
+    playlistAction,
+    biggestWeaknessSpecific,
+    quickWin,
+    targetAudience,
+    nextFocus,
+    expectedPlacement,
+    qualityLevel,
   ]);
 
   const handleSubmit = async () => {
@@ -466,6 +579,27 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                   .map((t) => ({ seconds: t.seconds, note: t.note.trim() }))
                   .filter((t) => t.note.length > 0)
               : undefined,
+          // V2 enhanced feedback
+          lowEndClarity,
+          vocalClarity,
+          highEndQuality,
+          stereoWidth,
+          dynamics,
+          energyCurve,
+          tooRepetitive,
+          repetitiveNote: repetitiveNote || undefined,
+          lostInterestAt,
+          lostInterestReason: lostInterestReason || undefined,
+          trackLength,
+          emotionalImpact: emotionalImpact.length > 0 ? emotionalImpact : undefined,
+          memorableMoment: memorableMoment || undefined,
+          playlistAction,
+          biggestWeaknessSpecific: biggestWeaknessSpecific || undefined,
+          quickWin: quickWin || undefined,
+          targetAudience: targetAudience.length > 0 ? targetAudience : undefined,
+          nextFocus,
+          expectedPlacement,
+          qualityLevel,
         }),
       });
 
@@ -937,9 +1071,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   const bestPartWords = countWords(bestPart);
   const weakestPartWords = countWords(weakestPart);
+  const weaknessWords = countWords(biggestWeaknessSpecific);
+  const quickWinWords = countWords(quickWin);
   const meetsTextMinimum =
     bestPartWords >= MIN_WORDS_PER_SECTION &&
     weakestPartWords >= MIN_WORDS_PER_SECTION;
+  const meetsV2TextMinimum =
+    bestPartWords >= 15 &&
+    weaknessWords >= 15 &&
+    quickWinWords >= 10;
 
   if (success) {
     const canPurchase = review.Track.sourceType === "UPLOAD" && review.Track.allowPurchase;
@@ -1620,6 +1760,80 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </CardContent>
       </Card>
         </div>
+      </div>
+
+      {/* V2 ENHANCED FEEDBACK SECTIONS - Full Width */}
+      <div className="mt-6 space-y-6">
+        {/* Technical Feedback */}
+        <TechnicalFeedbackSection
+          lowEndClarity={lowEndClarity}
+          setLowEndClarity={setLowEndClarity}
+          vocalClarity={vocalClarity}
+          setVocalClarity={setVocalClarity}
+          highEndQuality={highEndQuality}
+          setHighEndQuality={setHighEndQuality}
+          stereoWidth={stereoWidth}
+          setStereoWidth={setStereoWidth}
+          dynamics={dynamics}
+          setDynamics={setDynamics}
+        />
+
+        {/* Arrangement Feedback */}
+        <ArrangementFeedbackSection
+          energyCurve={energyCurve}
+          setEnergyCurve={setEnergyCurve}
+          tooRepetitive={tooRepetitive}
+          setTooRepetitive={setTooRepetitive}
+          repetitiveNote={repetitiveNote}
+          setRepetitiveNote={setRepetitiveNote}
+          lostInterestAt={lostInterestAt}
+          setLostInterestAt={setLostInterestAt}
+          lostInterestReason={lostInterestReason}
+          setLostInterestReason={setLostInterestReason}
+          trackLength={trackLength}
+          setTrackLength={setTrackLength}
+          playerSeconds={playerSeconds}
+          addTimestampNote={addTimestampNote}
+        />
+
+        {/* Emotional Impact */}
+        <EmotionalImpactSection
+          emotionalImpact={emotionalImpact}
+          setEmotionalImpact={setEmotionalImpact}
+          memorableMoment={memorableMoment}
+          setMemorableMoment={setMemorableMoment}
+          originalityScore={originalityScore}
+          setOriginalityScore={setOriginalityScore}
+          playlistAction={playlistAction}
+          setPlaylistAction={setPlaylistAction}
+        />
+
+        {/* Actionable Feedback */}
+        <ActionableFeedbackSection
+          bestPart={bestPart}
+          setBestPart={setBestPart}
+          biggestWeaknessSpecific={biggestWeaknessSpecific}
+          setBiggestWeaknessSpecific={setBiggestWeaknessSpecific}
+          quickWin={quickWin}
+          setQuickWin={setQuickWin}
+          bestPartWords={bestPartWords}
+          weaknessWords={weaknessWords}
+          quickWinWords={quickWinWords}
+          addTimestampNote={addTimestampNote}
+          playerSeconds={playerSeconds}
+        />
+
+        {/* Context & Next Steps */}
+        <ContextNextStepsSection
+          targetAudience={targetAudience}
+          setTargetAudience={setTargetAudience}
+          nextFocus={nextFocus}
+          setNextFocus={setNextFocus}
+          expectedPlacement={expectedPlacement}
+          setExpectedPlacement={setExpectedPlacement}
+          qualityLevel={qualityLevel}
+          setQualityLevel={setQualityLevel}
+        />
       </div>
 
       {/* TIMESTAMP NOTES - Full Width */}
