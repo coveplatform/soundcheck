@@ -15,6 +15,11 @@ import {
   analyzeFeedbackPatterns,
   calculateReviewVelocity,
   generateEarningsData,
+  analyzeQualityLevels,
+  analyzeTechnicalIssues,
+  analyzeNextFocus,
+  analyzePlaylistActions,
+  getTopQuickWins,
 } from "@/lib/analytics-helpers";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +65,21 @@ export default async function TracksPage() {
               wouldFollow: true,
               countsTowardAnalytics: true,
               createdAt: true,
+              // V2 enhanced feedback
+              lowEndClarity: true,
+              vocalClarity: true,
+              highEndQuality: true,
+              stereoWidth: true,
+              dynamics: true,
+              energyCurve: true,
+              trackLength: true,
+              emotionalImpact: true,
+              playlistAction: true,
+              qualityLevel: true,
+              nextFocus: true,
+              expectedPlacement: true,
+              quickWin: true,
+              biggestWeaknessSpecific: true,
             },
           },
           Purchase: {
@@ -213,6 +233,13 @@ export default async function TracksPage() {
     // Analyze feedback patterns
     const feedbackPatterns = analyzeFeedbackPatterns(allReviews);
 
+    // V2 Analytics
+    const qualityLevels = analyzeQualityLevels(allReviews);
+    const technicalIssues = analyzeTechnicalIssues(allReviews);
+    const nextFocusData = analyzeNextFocus(allReviews);
+    const playlistActionsData = analyzePlaylistActions(allReviews);
+    const topQuickWins = getTopQuickWins(allReviews, 3);
+
     portfolioData = {
       trackData,
       totalReviews,
@@ -227,6 +254,12 @@ export default async function TracksPage() {
       earningsData,
       reviewVelocity,
       feedbackPatterns,
+      // V2 analytics
+      qualityLevels,
+      technicalIssues,
+      nextFocusData,
+      playlistActionsData,
+      topQuickWins,
     };
   }
 

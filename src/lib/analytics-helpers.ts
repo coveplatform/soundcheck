@@ -7,6 +7,17 @@ interface Review {
   vocalScore?: number | null;
   originalityScore?: number | null;
   createdAt: Date;
+  // V2 fields
+  qualityLevel?: string | null;
+  nextFocus?: string | null;
+  lowEndClarity?: string | null;
+  vocalClarity?: string | null;
+  highEndQuality?: string | null;
+  dynamics?: string | null;
+  trackLength?: string | null;
+  playlistAction?: string | null;
+  quickWin?: string | null;
+  biggestWeaknessSpecific?: string | null;
 }
 
 // Stop words to filter out
@@ -201,4 +212,155 @@ export function generateEarningsData(
         trackCount: data.trackCount,
       };
     });
+}
+
+// V2 Analytics: Analyze quality level distribution
+export function analyzeQualityLevels(reviews: Review[]) {
+  const reviewsWithQuality = reviews.filter((r) => r.qualityLevel);
+
+  if (reviewsWithQuality.length === 0) {
+    return null;
+  }
+
+  const counts: Record<string, number> = {};
+  reviewsWithQuality.forEach((r) => {
+    const level = r.qualityLevel!;
+    counts[level] = (counts[level] || 0) + 1;
+  });
+
+  const total = reviewsWithQuality.length;
+  const distribution = Object.entries(counts).map(([level, count]) => ({
+    level,
+    count,
+    percentage: Math.round((count / total) * 100),
+  }));
+
+  // Order by quality (best to worst)
+  const order = ["PROFESSIONAL", "RELEASE_READY", "ALMOST_THERE", "DEMO_STAGE", "NOT_READY"];
+  distribution.sort((a, b) => order.indexOf(a.level) - order.indexOf(b.level));
+
+  return {
+    distribution,
+    mostCommon: distribution.reduce((max, item) => item.count > max.count ? item : max),
+    releaseReady: counts["PROFESSIONAL"] || 0 + counts["RELEASE_READY"] || 0,
+  };
+}
+
+// V2 Analytics: Analyze common technical issues
+export function analyzeTechnicalIssues(reviews: Review[]) {
+  const issues: Record<string, number> = {};
+
+  reviews.forEach((r) => {
+    if (r.lowEndClarity && r.lowEndClarity !== "PERFECT") {
+      issues["Low End"] = (issues["Low End"] || 0) + 1;
+    }
+    if (r.vocalClarity && !["CRYSTAL_CLEAR", "NOT_APPLICABLE"].includes(r.vocalClarity)) {
+      issues["Vocals"] = (issues["Vocals"] || 0) + 1;
+    }
+    if (r.highEndQuality && r.highEndQuality !== "PERFECT") {
+      issues["High End"] = (issues["High End"] || 0) + 1;
+    }
+    if (r.dynamics && r.dynamics === "TOO_COMPRESSED") {
+      issues["Dynamics/Compression"] = (issues["Dynamics/Compression"] || 0) + 1;
+    }
+    if (r.trackLength && ["TOO_SHORT", "WAY_TOO_LONG"].includes(r.trackLength)) {
+      issues["Track Length"] = (issues["Track Length"] || 0) + 1;
+    }
+  });
+
+  return Object.entries(issues)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([issue, count]) => ({
+      issue,
+      count,
+      percentage: Math.round((count / reviews.length) * 100),
+    }));
+}
+
+// V2 Analytics: Analyze next focus recommendations
+export function analyzeNextFocus(reviews: Review[]) {
+  const reviewsWithFocus = reviews.filter((r) => r.nextFocus);
+
+  if (reviewsWithFocus.length === 0) {
+    return null;
+  }
+
+  const counts: Record<string, number> = {};
+  reviewsWithFocus.forEach((r) => {
+    const focus = r.nextFocus!;
+    counts[focus] = (counts[focus] || 0) + 1;
+  });
+
+  const recommendations = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([focus, count]) => ({
+      focus,
+      count,
+      percentage: Math.round((count / reviewsWithFocus.length) * 100),
+    }));
+
+  return {
+    recommendations,
+    topRecommendation: recommendations[0],
+    readyToRelease: counts["READY_TO_RELEASE"] || 0,
+  };
+}
+
+// V2 Analytics: Analyze playlist actions
+export function analyzePlaylistActions(reviews: Review[]) {
+  const reviewsWithAction = reviews.filter((r) => r.playlistAction);
+
+  if (reviewsWithAction.length === 0) {
+    return null;
+  }
+
+  const counts: Record<string, number> = {};
+  reviewsWithAction.forEach((r) => {
+    const action = r.playlistAction!;
+    counts[action] = (counts[action] || 0) + 1;
+  });
+
+  const total = reviewsWithAction.length;
+
+  return {
+    addToLibrary: Math.round(((counts["ADD_TO_LIBRARY"] || 0) / total) * 100),
+    letPlay: Math.round(((counts["LET_PLAY"] || 0) / total) * 100),
+    skip: Math.round(((counts["SKIP"] || 0) / total) * 100),
+    dislike: Math.round(((counts["DISLIKE"] || 0) / total) * 100),
+    positiveRate: Math.round((((counts["ADD_TO_LIBRARY"] || 0) + (counts["LET_PLAY"] || 0)) / total) * 100),
+  };
+}
+
+// V2 Analytics: Get most valuable quick wins
+export function getTopQuickWins(reviews: Review[], limit: number = 3) {
+  const quickWins = reviews
+    .filter((r) => r.quickWin && r.quickWin.trim().length > 0)
+    .map((r) => r.quickWin!);
+
+  if (quickWins.length === 0) {
+    return [];
+  }
+
+  // Get common words/phrases from quick wins to identify patterns
+  const patterns = getTopWords(quickWins, limit * 2);
+
+  // Return a subset of actual quick wins that contain these common patterns
+  const topQuickWins: string[] = [];
+  const usedPatterns = new Set<string>();
+
+  patterns.forEach(({ word }) => {
+    if (topQuickWins.length >= limit) return;
+
+    const matchingWin = quickWins.find(
+      (win) => win.toLowerCase().includes(word) && !usedPatterns.has(win)
+    );
+
+    if (matchingWin) {
+      topQuickWins.push(matchingWin);
+      usedPatterns.add(matchingWin);
+    }
+  });
+
+  return topQuickWins;
 }

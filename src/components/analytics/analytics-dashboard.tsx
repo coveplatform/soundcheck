@@ -76,6 +76,12 @@ interface AnalyticsDashboardProps {
     improvingAreas: string[];
     consistentStrengths: string[];
   };
+  // V2 analytics
+  qualityLevels?: any;
+  technicalIssues?: any[];
+  nextFocusData?: any;
+  playlistActionsData?: any;
+  topQuickWins?: string[];
 }
 
 export function AnalyticsDashboard({
@@ -92,6 +98,11 @@ export function AnalyticsDashboard({
   earningsData,
   reviewVelocity,
   feedbackPatterns,
+  qualityLevels,
+  technicalIssues = [],
+  nextFocusData,
+  playlistActionsData,
+  topQuickWins = [],
 }: AnalyticsDashboardProps) {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("all");
 
@@ -299,6 +310,184 @@ export function AnalyticsDashboard({
             improvingAreas={feedbackPatterns.improvingAreas}
             consistentStrengths={feedbackPatterns.consistentStrengths}
           />
+        </section>
+      )}
+
+      {/* V2 QUALITY LEVELS */}
+      {qualityLevels && (
+        <section>
+          <div className="flex items-center gap-3 mb-6">
+            <Award className="w-6 h-6 text-lime-600" />
+            <h3 className="text-xl font-black">Track Quality Assessment</h3>
+          </div>
+          <Card variant="soft" elevated className="rounded-3xl overflow-hidden">
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                {qualityLevels.distribution.map((item: any) => (
+                  <div key={item.level}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-bold">
+                        {item.level.split('_').map((w: string) => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}
+                      </span>
+                      <span className="text-sm font-bold text-black/60">{item.percentage}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-black/5 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-lime-500 to-lime-600 rounded-full transition-all duration-500"
+                        style={{ width: `${item.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {qualityLevels.releaseReady > 0 && (
+                <div className="mt-6 p-4 bg-lime-50 border border-lime-200 rounded-xl">
+                  <p className="text-sm font-bold text-lime-900">
+                    🎉 {qualityLevels.releaseReady} track{qualityLevels.releaseReady === 1 ? '' : 's'} rated as release-ready or professional!
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      {/* V2 TECHNICAL ISSUES */}
+      {technicalIssues.length > 0 && (
+        <section>
+          <div className="flex items-center gap-3 mb-6">
+            <Zap className="w-6 h-6 text-orange-600" />
+            <h3 className="text-xl font-black">Common Technical Issues</h3>
+          </div>
+          <Card variant="soft" elevated className="rounded-3xl overflow-hidden">
+            <CardContent className="pt-6">
+              <p className="text-sm text-black/60 mb-4">Areas mentioned most often for improvement:</p>
+              <div className="space-y-3">
+                {technicalIssues.map((issue: any, index: number) => (
+                  <div key={issue.issue} className="flex items-center gap-4">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                      <span className="text-xs font-bold text-orange-700">{index + 1}</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold">{issue.issue}</span>
+                        <span className="text-xs font-mono text-black/40">{issue.percentage}% of reviews</span>
+                      </div>
+                      <div className="mt-1 h-1.5 w-full bg-black/5 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-orange-500 rounded-full"
+                          style={{ width: `${issue.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      {/* V2 NEXT FOCUS */}
+      {nextFocusData && (
+        <section>
+          <div className="flex items-center gap-3 mb-6">
+            <TrendingUp className="w-6 h-6 text-blue-600" />
+            <h3 className="text-xl font-black">What Reviewers Suggest You Focus On</h3>
+          </div>
+          <Card variant="soft" elevated className="rounded-3xl overflow-hidden">
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {nextFocusData.recommendations.slice(0, 4).map((rec: any) => (
+                  <div key={rec.focus} className="p-4 bg-white/60 border border-black/10 rounded-xl">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-bold">
+                        {rec.focus.split('_').map((w: string) => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}
+                      </span>
+                      <span className="text-xs font-mono text-black/40">{rec.percentage}%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-black/5 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-blue-500 rounded-full"
+                        style={{ width: `${rec.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {nextFocusData.readyToRelease > 0 && (
+                <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-xl">
+                  <p className="text-sm font-bold text-purple-900">
+                    🚀 {nextFocusData.readyToRelease} review{nextFocusData.readyToRelease === 1 ? '' : 's'} said you're ready to release!
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      {/* V2 QUICK WINS */}
+      {topQuickWins.length > 0 && (
+        <section>
+          <div className="flex items-center gap-3 mb-6">
+            <Sparkles className="w-6 h-6 text-amber-600" />
+            <h3 className="text-xl font-black">Top Quick Wins from Reviewers</h3>
+          </div>
+          <Card variant="soft" elevated className="rounded-3xl overflow-hidden">
+            <CardContent className="pt-6">
+              <p className="text-sm text-black/60 mb-4">Easy improvements reviewers suggest:</p>
+              <div className="space-y-3">
+                {topQuickWins.map((win: string, index: number) => (
+                  <div key={index} className="p-4 bg-lime-50 border-2 border-lime-300 rounded-xl">
+                    <div className="flex gap-3">
+                      <span className="flex-shrink-0 text-lg">🎯</span>
+                      <p className="text-sm font-medium text-lime-900">{win}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      {/* V2 PLAYLIST ACTIONS */}
+      {playlistActionsData && (
+        <section>
+          <div className="flex items-center gap-3 mb-6">
+            <Music className="w-6 h-6 text-purple-600" />
+            <h3 className="text-xl font-black">Playlist Behavior</h3>
+          </div>
+          <Card variant="soft" elevated className="rounded-3xl overflow-hidden">
+            <CardContent className="pt-6">
+              <p className="text-sm text-black/60 mb-4">If reviewers heard your tracks on a playlist:</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-lime-50 border border-lime-200 rounded-xl text-center">
+                  <p className="text-3xl font-black text-lime-700">{playlistActionsData.addToLibrary}%</p>
+                  <p className="text-xs text-lime-800 mt-1 font-semibold">Add to Library</p>
+                </div>
+                <div className="p-4 bg-purple-50 border border-purple-200 rounded-xl text-center">
+                  <p className="text-3xl font-black text-purple-700">{playlistActionsData.letPlay}%</p>
+                  <p className="text-xs text-purple-800 mt-1 font-semibold">Let it Play</p>
+                </div>
+                <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl text-center">
+                  <p className="text-3xl font-black text-orange-700">{playlistActionsData.skip}%</p>
+                  <p className="text-xs text-orange-800 mt-1 font-semibold">Skip</p>
+                </div>
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-center">
+                  <p className="text-3xl font-black text-red-700">{playlistActionsData.dislike}%</p>
+                  <p className="text-xs text-red-800 mt-1 font-semibold">Dislike</p>
+                </div>
+              </div>
+              <div className="mt-4 p-4 bg-white/60 border border-black/10 rounded-xl">
+                <p className="text-sm font-bold text-center">
+                  <span className="text-2xl text-purple-600">{playlistActionsData.positiveRate}%</span>
+                  <span className="text-black/60 ml-2">positive engagement rate</span>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </section>
       )}
 

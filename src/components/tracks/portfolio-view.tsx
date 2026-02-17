@@ -19,6 +19,12 @@ interface PortfolioViewProps {
   earningsData?: any[];
   reviewVelocity?: any;
   feedbackPatterns?: any;
+  // V2 analytics
+  qualityLevels?: any;
+  technicalIssues?: any[];
+  nextFocusData?: any;
+  playlistActionsData?: any;
+  topQuickWins?: string[];
 }
 
 const MIN_REVIEWS_FOR_INSIGHTS = 10;
@@ -38,6 +44,11 @@ export function PortfolioView({
   earningsData = [],
   reviewVelocity,
   feedbackPatterns,
+  qualityLevels,
+  technicalIssues,
+  nextFocusData,
+  playlistActionsData,
+  topQuickWins,
 }: PortfolioViewProps) {
   // Empty state - no tracks submitted yet
   if (!hasData) {
@@ -146,6 +157,11 @@ export function PortfolioView({
       earningsData={earningsData}
       reviewVelocity={reviewVelocity}
       feedbackPatterns={feedbackPatterns}
+      qualityLevels={qualityLevels}
+      technicalIssues={technicalIssues}
+      nextFocusData={nextFocusData}
+      playlistActionsData={playlistActionsData}
+      topQuickWins={topQuickWins}
     />
   );
 }

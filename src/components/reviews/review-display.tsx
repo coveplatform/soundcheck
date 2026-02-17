@@ -28,6 +28,13 @@ function getInitial(name: string) {
   return (name.trim()[0] || "?").toUpperCase();
 }
 
+function formatEnum(value: string): string {
+  return value
+    .split('_')
+    .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
 export type ReviewData = {
   id: string;
   shareId: string | null;
@@ -52,6 +59,21 @@ export type ReviewData = {
   isGem: boolean;
   wasFlagged: boolean;
   flagReason: string | null;
+  // V2 fields
+  lowEndClarity?: string | null;
+  vocalClarity?: string | null;
+  highEndQuality?: string | null;
+  stereoWidth?: string | null;
+  dynamics?: string | null;
+  energyCurve?: string | null;
+  trackLength?: string | null;
+  emotionalImpact?: Prisma.JsonValue;
+  playlistAction?: string | null;
+  qualityLevel?: string | null;
+  nextFocus?: string | null;
+  expectedPlacement?: string | null;
+  quickWin?: string | null;
+  biggestWeaknessSpecific?: string | null;
   ReviewerProfile: {
     id: string;
     User: {
@@ -209,6 +231,90 @@ export function ReviewDisplay({
         </div>
       )}
 
+      {/* V2 Quick Win - Prominently displayed */}
+      {review.quickWin && (
+        <div className="mb-5 p-4 bg-lime-50 border-2 border-lime-300 rounded-xl">
+          <h4 className="text-xs font-bold text-lime-900 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+            <span className="text-base">🎯</span>
+            Quick Win
+          </h4>
+          <p className="text-sm text-lime-900 font-medium leading-relaxed">
+            {review.quickWin}
+          </p>
+        </div>
+      )}
+
+      {/* V2 Technical Feedback */}
+      {(review.lowEndClarity || review.vocalClarity || review.highEndQuality || review.stereoWidth || review.dynamics) && (
+        <div className="mb-5 p-4 bg-purple-50 border border-purple-200 rounded-xl">
+          <h4 className="text-xs font-bold text-purple-900 uppercase tracking-widest mb-3">
+            Technical Feedback
+          </h4>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            {review.lowEndClarity && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-purple-600/60">Low End:</span>
+                <span className="font-semibold text-purple-900">{formatEnum(review.lowEndClarity)}</span>
+              </div>
+            )}
+            {review.vocalClarity && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-purple-600/60">Vocals:</span>
+                <span className="font-semibold text-purple-900">{formatEnum(review.vocalClarity)}</span>
+              </div>
+            )}
+            {review.highEndQuality && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-purple-600/60">High End:</span>
+                <span className="font-semibold text-purple-900">{formatEnum(review.highEndQuality)}</span>
+              </div>
+            )}
+            {review.stereoWidth && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-purple-600/60">Stereo:</span>
+                <span className="font-semibold text-purple-900">{formatEnum(review.stereoWidth)}</span>
+              </div>
+            )}
+            {review.dynamics && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-purple-600/60">Dynamics:</span>
+                <span className="font-semibold text-purple-900">{formatEnum(review.dynamics)}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* V2 Quality & Next Steps */}
+      {(review.qualityLevel || review.nextFocus || review.expectedPlacement) && (
+        <div className="mb-5 flex flex-wrap gap-2 items-center">
+          {review.qualityLevel && (
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
+              review.qualityLevel === "PROFESSIONAL" || review.qualityLevel === "RELEASE_READY"
+                ? "bg-lime-100 text-lime-800"
+                : review.qualityLevel === "ALMOST_THERE"
+                ? "bg-amber-100 text-amber-800"
+                : "bg-orange-100 text-orange-800"
+            }`}>
+              <span className="text-sm">⭐</span>
+              {formatEnum(review.qualityLevel)}
+            </span>
+          )}
+          {review.nextFocus && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+              <span className="text-sm">📋</span>
+              Focus: {formatEnum(review.nextFocus)}
+            </span>
+          )}
+          {review.expectedPlacement && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
+              <span className="text-sm">📍</span>
+              {formatEnum(review.expectedPlacement)}
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Written Feedback */}
       <div className="space-y-4 mb-5">
         {review.addressedArtistNote && (
@@ -233,6 +339,16 @@ export function ReviewDisplay({
             </h4>
             <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-red-300">
               {review.weakestPart}
+            </p>
+          </div>
+        )}
+        {review.biggestWeaknessSpecific && (
+          <div>
+            <h4 className="text-[11px] font-bold text-orange-600 uppercase tracking-widest mb-1.5">
+              Biggest Weakness
+            </h4>
+            <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-orange-400">
+              {review.biggestWeaknessSpecific}
             </p>
           </div>
         )}
