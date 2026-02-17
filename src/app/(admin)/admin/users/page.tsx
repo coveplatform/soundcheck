@@ -79,6 +79,13 @@ export default async function AdminUsersPage({
     "kris.engelhardt4@gmail.com",
     "millersport98@gmail.com",
     "illy81095@gmail.com",
+    "poop1@poop.com",
+    "testthedog23@pooper.com",
+    "testman1@testman1.com",
+    "bigman1@poop.com",
+    "bigdog1@gmail.com",
+    "pash.tzaikos@gmail.com",
+    "steve@steve.com",
   ];
 
   // Build where clause
