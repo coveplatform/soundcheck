@@ -92,20 +92,28 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   // Section refs for scroll-to functionality
   const firstImpressionRef = useRef<HTMLDivElement>(null);
-  const scoresRef = useRef<HTMLDivElement>(null);
   const wouldListenAgainRef = useRef<HTMLDivElement>(null);
+  const playlistActionRef = useRef<HTMLDivElement>(null);
+  const technicalIssuesRef = useRef<HTMLDivElement>(null);
   const bestPartRef = useRef<HTMLDivElement>(null);
-  const weakestPartRef = useRef<HTMLDivElement>(null);
+  const biggestIssueRef = useRef<HTMLDivElement>(null);
+  const quickWinRef = useRef<HTMLDivElement>(null);
+  const qualityLevelRef = useRef<HTMLDivElement>(null);
+  const nextFocusRef = useRef<HTMLDivElement>(null);
   const timestampNotesRef = useRef<HTMLDivElement>(null);
   const timestampInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const scrollToSection = useCallback((sectionId: string) => {
     const refs: Record<string, React.RefObject<HTMLDivElement | null>> = {
       firstImpression: firstImpressionRef,
-      scores: scoresRef,
       wouldListenAgain: wouldListenAgainRef,
+      playlistAction: playlistActionRef,
+      technicalIssues: technicalIssuesRef,
       bestPart: bestPartRef,
-      weakestPart: weakestPartRef,
+      biggestIssue: biggestIssueRef,
+      quickWin: quickWinRef,
+      qualityLevel: qualityLevelRef,
+      nextFocus: nextFocusRef,
       timestamps: timestampNotesRef,
     };
     const ref = refs[sectionId];
@@ -258,27 +266,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             setFirstImpressionTouched(true);
             setFirstImpressionScore(parsed.firstImpression === "STRONG_HOOK" ? 5 : parsed.firstImpression === "DECENT" ? 3 : 1);
           }
-          setProductionScore(typeof parsed.productionScore === "number" ? parsed.productionScore : 0);
-          setVocalScore(typeof parsed.vocalScore === "number" ? parsed.vocalScore : 0);
-          setOriginalityScore(typeof parsed.originalityScore === "number" ? parsed.originalityScore : 0);
           setWouldListenAgain(
             typeof parsed.wouldListenAgain === "boolean" ? parsed.wouldListenAgain : null
           );
-          setWouldAddToPlaylist(
-            typeof parsed.wouldAddToPlaylist === "boolean" ? parsed.wouldAddToPlaylist : null
-          );
-          setWouldShare(
-            typeof parsed.wouldShare === "boolean" ? parsed.wouldShare : null
-          );
-          setWouldFollow(
-            typeof parsed.wouldFollow === "boolean" ? parsed.wouldFollow : null
-          );
-          setPerceivedGenre(typeof parsed.perceivedGenre === "string" ? parsed.perceivedGenre : "");
-          setSimilarArtists(typeof parsed.similarArtists === "string" ? parsed.similarArtists : "");
           setBestPart(typeof parsed.bestPart === "string" ? parsed.bestPart : "");
-          setWeakestPart(typeof parsed.weakestPart === "string" ? parsed.weakestPart : "");
-          setAdditionalNotes(typeof parsed.additionalNotes === "string" ? parsed.additionalNotes : "");
-          setNextActions(typeof parsed.nextActions === "string" ? parsed.nextActions : "");
           const restoredTimestamps = Array.isArray(parsed.timestampNotes) ? parsed.timestampNotes : [];
           const normalized = restoredTimestamps
             .map((t: unknown) => {
@@ -372,6 +363,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     success,
     listenTime,
     firstImpression,
+    firstImpressionScore,
     wouldListenAgain,
     bestPart,
     timestampNotes,
@@ -964,8 +956,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     );
   }
 
-  const bestPartWords = countWords(bestPart);
-  const weakestPartWords = countWords(weakestPart);
   const bestMomentWords = countWords(bestPart); // Reusing bestPart for "Best Moment"
   const biggestIssueWords = countWords(biggestWeaknessSpecific);
   const quickWinWords = countWords(quickWin);
@@ -1361,46 +1351,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             )}
           </div>
 
-          {/* Scores */}
-          <div
-            ref={scoresRef}
-            className={cn(
-              "p-4 -m-4 rounded-xl transition-all duration-200",
-              validationIssues.some((i) => i.section === "scores")
-                ? "bg-red-50 border-2 border-red-300"
-                : "bg-gradient-to-br from-blue-50/40 to-transparent"
-            )}
-          >
-            {validationIssues.some((i) => i.section === "scores") && (
-              <p className="text-xs font-medium text-red-600 flex items-center gap-1 mb-3">
-                <AlertTriangle className="h-3 w-3" />
-                {validationIssues.filter((i) => i.section === "scores").map((i) => i.message).join(", ")}
-              </p>
-            )}
-            <div className="grid grid-cols-3 gap-3">
-              <ScoreInput
-                label="Production"
-                value={productionScore}
-                onChange={setProductionScore}
-                hasError={validationIssues.some((i) => i.id === "productionScore")}
-                size="sm"
-              />
-              <ScoreInput
-                label="Vocals"
-                value={vocalScore}
-                onChange={setVocalScore}
-                size="sm"
-              />
-              <ScoreInput
-                label="Originality"
-                value={originalityScore}
-                onChange={setOriginalityScore}
-                hasError={validationIssues.some((i) => i.id === "originalityScore")}
-                size="sm"
-              />
-            </div>
-          </div>
-
           {/* Would Listen Again */}
           <div
             ref={wouldListenAgainRef}
@@ -1446,125 +1396,86 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           </div>
 
-          {/* Listener Signals */}
-          <div className="space-y-3 p-4 bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200/50 rounded-xl mt-4">
-            <Label className="text-sm font-bold text-slate-800">Listener Signals</Label>
-
-            <div className="grid grid-cols-3 gap-2">
-              {/* Would add to playlist */}
-              <div className="space-y-2">
-                <Label className="text-xs">Playlist?</Label>
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setWouldAddToPlaylist(true)}
-                    className={cn(
-                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
-                      wouldAddToPlaylist === true
-                        ? "border-purple-400 bg-purple-600 text-white"
-                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
-                    )}
-                  >
-                    Yes
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setWouldAddToPlaylist(false)}
-                    className={cn(
-                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
-                      wouldAddToPlaylist === false
-                        ? "border-neutral-700 bg-neutral-800 text-white"
-                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
-                    )}
-                  >
-                    No
-                  </button>
-                </div>
-              </div>
-
-              {/* Would share */}
-              <div className="space-y-2">
-                <Label className="text-xs">Share?</Label>
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setWouldShare(true)}
-                    className={cn(
-                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
-                      wouldShare === true
-                        ? "border-purple-400 bg-purple-600 text-white"
-                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
-                    )}
-                  >
-                    Yes
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setWouldShare(false)}
-                    className={cn(
-                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
-                      wouldShare === false
-                        ? "border-neutral-700 bg-neutral-800 text-white"
-                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
-                    )}
-                  >
-                    No
-                  </button>
-                </div>
-              </div>
-
-              {/* Would follow */}
-              <div className="space-y-2">
-                <Label className="text-xs">Follow?</Label>
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setWouldFollow(true)}
-                    className={cn(
-                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
-                      wouldFollow === true
-                        ? "border-purple-400 bg-purple-600 text-white"
-                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
-                    )}
-                  >
-                    Yes
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setWouldFollow(false)}
-                    className={cn(
-                      "flex-1 py-1.5 px-1 text-xs font-bold cursor-pointer transition-colors duration-150 ease-out rounded-lg border-2",
-                      wouldFollow === false
-                        ? "border-neutral-700 bg-neutral-800 text-white"
-                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
-                    )}
-                  >
-                    No
-                  </button>
-                </div>
-              </div>
+          {/* Technical Issues */}
+          <div
+            ref={technicalIssuesRef}
+            className="space-y-3 p-4 -m-4 rounded-xl transition-all duration-200 bg-gradient-to-br from-orange-50/40 to-transparent"
+          >
+            <Label className="text-base font-bold text-orange-900">Technical Issues (optional)</Label>
+            <p className="text-xs text-orange-700/60">Select any technical problems you noticed</p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: "vocals-buried", label: "Vocals buried" },
+                { id: "muddy-low", label: "Muddy low end" },
+                { id: "compressed", label: "Over-compressed" },
+                { id: "harsh-highs", label: "Harsh highs" },
+                { id: "narrow-stereo", label: "Narrow stereo" },
+                { id: "repetitive", label: "Too repetitive" },
+                { id: "too-long", label: "Too long" },
+              ].map((issue) => (
+                <button
+                  key={issue.id}
+                  type="button"
+                  onClick={() => {
+                    setTechnicalIssues((prev) =>
+                      prev.includes(issue.id)
+                        ? prev.filter((i) => i !== issue.id)
+                        : [...prev, issue.id]
+                    );
+                  }}
+                  className={cn(
+                    "py-2 px-3 text-sm font-bold transition-colors duration-150 ease-out rounded-lg border-2",
+                    technicalIssues.includes(issue.id)
+                      ? "border-orange-400 bg-orange-500 text-white"
+                      : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
+                  )}
+                >
+                  {issue.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Genre & Similar Artists */}
-          <div className="grid gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="genre">What genre is this? (optional)</Label>
-              <Input
-                id="genre"
-                placeholder="e.g., Lo-fi Hip-Hop"
-                value={perceivedGenre}
-                onChange={(e) => setPerceivedGenre(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="similar">Similar artists (optional)</Label>
-              <Input
-                id="similar"
-                placeholder="e.g., Nujabes, J Dilla"
-                value={similarArtists}
-                onChange={(e) => setSimilarArtists(e.target.value)}
-              />
+          {/* Playlist Action */}
+          <div
+            ref={playlistActionRef}
+            className={cn(
+              "space-y-3 p-4 -m-4 rounded-xl transition-all duration-200",
+              validationIssues.some((i) => i.section === "playlistAction")
+                ? "bg-red-50 border-2 border-red-300"
+                : "bg-gradient-to-br from-purple-50/50 to-transparent"
+            )}
+          >
+            <Label className="text-base font-bold text-purple-900">Playlist Action *</Label>
+            <p className="text-xs text-purple-700/60">What would you do if you heard this?</p>
+            {validationIssues.some((i) => i.section === "playlistAction") && (
+              <p className="text-xs font-medium text-red-600 flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" />
+                {validationIssues.find((i) => i.section === "playlistAction")?.message}
+              </p>
+            )}
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: "ADD_TO_LIBRARY", label: "Add to library", icon: Download },
+                { id: "LET_PLAY", label: "Let it play", icon: Music },
+                { id: "SKIP", label: "Skip", icon: SkipForward },
+                { id: "DISLIKE", label: "Dislike", icon: VolumeX },
+              ].map((action) => (
+                <button
+                  key={action.id}
+                  type="button"
+                  onClick={() => setPlaylistAction(action.id)}
+                  className={cn(
+                    "flex items-center justify-center gap-2 py-3 px-3 text-sm font-bold transition-colors duration-150 ease-out rounded-lg border-2",
+                    playlistAction === action.id
+                      ? "border-purple-400 bg-purple-600 text-white"
+                      : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
+                  )}
+                >
+                  <action.icon className="h-4 w-4" />
+                  {action.label}
+                </button>
+              ))}
             </div>
           </div>
         </CardContent>
@@ -1574,12 +1485,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         {/* RIGHT COLUMN: Written Feedback */}
         <div className="space-y-6">
 
-      {/* Written Feedback */}
+      {/* Actionable Feedback */}
       <Card variant="soft" elevated className="border-l-4 border-l-emerald-500">
         <CardHeader className="border-b border-black/10">
           <CardTitle className="text-lg flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
-            Written Feedback
+            Actionable Feedback
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
@@ -1589,13 +1500,68 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           )}
 
-          {/* Best Part */}
+          {/* Quick Win */}
+          <div ref={quickWinRef} className={cn("space-y-3 p-4 -m-4 rounded-xl transition-all duration-200", validationIssues.some((i) => i.section === "quickWin") ? "bg-red-50 border-2 border-red-300" : "bg-gradient-to-br from-lime-50/50 to-transparent border border-lime-200/30")}>
+            <Label htmlFor="quickwin" className="text-base font-bold text-lime-900">Quick Win *</Label>
+            <p className="text-xs text-lime-700/60">One small, easy fix that would improve the track right away</p>
+            {validationIssues.some((i) => i.section === "quickWin") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "quickWin")?.message}</p>)}
+            <textarea
+              id="quickwin"
+              placeholder="E.g., 'Turn up the lead vocal by 2dB in the chorus' or 'Cut the intro from 16 to 8 bars'"
+              value={quickWin}
+              onChange={(e) => setQuickWin(e.target.value)}
+              className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[80px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
+            />
+            <div className="flex items-center justify-between">
+              <p className={cn(
+                "text-xs font-mono",
+                quickWinWords >= 10 ? "text-lime-600" : "text-neutral-500"
+              )}>
+                {quickWinWords}/10 words
+              </p>
+              {quickWinWords >= 10 && (
+                <span className="text-xs font-bold text-lime-600 flex items-center gap-1">
+                  <Check className="h-3 w-3" /> Complete
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Biggest Issue */}
+          <div ref={biggestIssueRef} className={cn("space-y-3 p-4 -m-4 rounded-xl transition-all duration-200", validationIssues.some((i) => i.section === "biggestIssue") ? "bg-red-50 border-2 border-red-300" : "bg-gradient-to-br from-orange-50/50 to-transparent border border-orange-200/30")}>
+            <Label htmlFor="biggestissue" className="text-base font-bold text-orange-900">Biggest Issue *</Label>
+            <p className="text-xs text-orange-700/60">The one thing holding this track back the most</p>
+            {validationIssues.some((i) => i.section === "biggestIssue") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "biggestIssue")?.message}</p>)}
+            <textarea
+              id="biggestissue"
+              placeholder="E.g., 'The kick and bass clash in the 100-200Hz range' or 'The verse melody is too repetitive'"
+              value={biggestWeaknessSpecific}
+              onChange={(e) => setBiggestWeaknessSpecific(e.target.value)}
+              className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
+            />
+            <div className="flex items-center justify-between">
+              <p className={cn(
+                "text-xs font-mono",
+                biggestIssueWords >= 15 ? "text-lime-600" : "text-neutral-500"
+              )}>
+                {biggestIssueWords}/15 words
+              </p>
+              {biggestIssueWords >= 15 && (
+                <span className="text-xs font-bold text-lime-600 flex items-center gap-1">
+                  <Check className="h-3 w-3" /> Complete
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Best Moment */}
           <div ref={bestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-xl transition-all duration-200", validationIssues.some((i) => i.section === "bestPart") ? "bg-red-50 border-2 border-red-300" : "bg-gradient-to-br from-emerald-50/50 to-transparent border border-emerald-200/30")}>
-            <Label htmlFor="best" className="text-base font-bold text-emerald-900">Best part of the track *</Label>
+            <Label htmlFor="bestmoment" className="text-base font-bold text-emerald-900">Best Moment *</Label>
+            <p className="text-xs text-emerald-700/60">What stood out? What should they keep doing?</p>
             {validationIssues.some((i) => i.section === "bestPart") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "bestPart")?.message}</p>)}
             <textarea
-              id="best"
-              placeholder="What stood out to you? What worked well?"
+              id="bestmoment"
+              placeholder="E.g., 'The vocal ad-libs at 2:15 add energy and personality' or 'The synth texture in the breakdown is unique'"
               value={bestPart}
               onChange={(e) => setBestPart(e.target.value)}
               className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
@@ -1603,131 +1569,143 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <div className="flex items-center justify-between">
               <p className={cn(
                 "text-xs font-mono",
-                bestPartWords >= MIN_WORDS_PER_SECTION ? "text-lime-600" : "text-neutral-500"
+                bestMomentWords >= 15 ? "text-lime-600" : "text-neutral-500"
               )}>
-                {bestPartWords}/{MIN_WORDS_PER_SECTION} words
+                {bestMomentWords}/15 words
               </p>
-              {bestPartWords >= MIN_WORDS_PER_SECTION && (
+              {bestMomentWords >= 15 && (
                 <span className="text-xs font-bold text-lime-600 flex items-center gap-1">
                   <Check className="h-3 w-3" /> Complete
                 </span>
               )}
             </div>
-          </div>
-
-          {/* Weakest Part */}
-          <div ref={weakestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-xl transition-all duration-200", validationIssues.some((i) => i.section === "weakestPart") ? "bg-red-50 border-2 border-red-300" : "bg-gradient-to-br from-orange-50/50 to-transparent border border-orange-200/30")}>
-            <Label htmlFor="weakest" className="text-base font-bold text-orange-900">Weakest part / Areas for improvement *</Label>
-            {validationIssues.some((i) => i.section === "weakestPart") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "weakestPart")?.message}</p>)}
-            <textarea
-              id="weakest"
-              placeholder="What could be better? Be constructive."
-              value={weakestPart}
-              onChange={(e) => setWeakestPart(e.target.value)}
-              className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
-            />
-            <div className="flex items-center justify-between">
-              <p className={cn(
-                "text-xs font-mono",
-                weakestPartWords >= MIN_WORDS_PER_SECTION ? "text-lime-600" : "text-neutral-500"
-              )}>
-                {weakestPartWords}/{MIN_WORDS_PER_SECTION} words
-              </p>
-              {weakestPartWords >= MIN_WORDS_PER_SECTION && (
-                <span className="text-xs font-bold text-lime-600 flex items-center gap-1">
-                  <Check className="h-3 w-3" /> Complete
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <Label htmlFor="notes" className="text-base font-bold">Additional notes (optional)</Label>
-            <textarea
-              id="notes"
-              placeholder="Any other thoughts..."
-              value={additionalNotes}
-              onChange={(e) => setAdditionalNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
-            />
           </div>
         </CardContent>
       </Card>
         </div>
       </div>
 
-      {/* V2 ENHANCED FEEDBACK SECTIONS - Full Width */}
-      <div className="mt-6 space-y-6">
-        {/* Technical Feedback */}
-        <TechnicalFeedbackSection
-          lowEndClarity={lowEndClarity}
-          setLowEndClarity={setLowEndClarity}
-          vocalClarity={vocalClarity}
-          setVocalClarity={setVocalClarity}
-          highEndQuality={highEndQuality}
-          setHighEndQuality={setHighEndQuality}
-          stereoWidth={stereoWidth}
-          setStereoWidth={setStereoWidth}
-          dynamics={dynamics}
-          setDynamics={setDynamics}
-        />
+      {/* Quality Assessment & Next Steps - Full Width */}
+      <div className="mt-6 grid lg:grid-cols-2 gap-6">
 
-        {/* Arrangement Feedback */}
-        <ArrangementFeedbackSection
-          energyCurve={energyCurve}
-          setEnergyCurve={setEnergyCurve}
-          tooRepetitive={tooRepetitive}
-          setTooRepetitive={setTooRepetitive}
-          repetitiveNote={repetitiveNote}
-          setRepetitiveNote={setRepetitiveNote}
-          lostInterestAt={lostInterestAt}
-          setLostInterestAt={setLostInterestAt}
-          lostInterestReason={lostInterestReason}
-          setLostInterestReason={setLostInterestReason}
-          trackLength={trackLength}
-          setTrackLength={setTrackLength}
-          playerSeconds={playerSeconds}
-          addTimestampNote={addTimestampNote}
-        />
+        {/* Quality Level */}
+        <Card variant="soft" elevated className="border-l-4 border-l-purple-500">
+          <CardHeader className="border-b border-black/10">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-purple-500"></span>
+              Quality Level
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-5">
+            <div
+              ref={qualityLevelRef}
+              className={cn(
+                "space-y-3 p-4 -m-4 rounded-xl transition-all duration-200",
+                validationIssues.some((i) => i.section === "qualityLevel")
+                  ? "bg-red-50 border-2 border-red-300"
+                  : "bg-gradient-to-br from-purple-50/50 to-transparent"
+              )}
+            >
+              <Label className="text-base font-bold text-purple-900">Overall quality *</Label>
+              <p className="text-xs text-purple-700/60">Where is this track at?</p>
+              {validationIssues.some((i) => i.section === "qualityLevel") && (
+                <p className="text-xs font-medium text-red-600 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  {validationIssues.find((i) => i.section === "qualityLevel")?.message}
+                </p>
+              )}
+              <div className="grid gap-2">
+                {[
+                  { id: "PROFESSIONAL", label: "Professional", desc: "Ready for commercial release" },
+                  { id: "RELEASE_READY", label: "Release ready", desc: "Could be released with minor tweaks" },
+                  { id: "ALMOST_THERE", label: "Almost there", desc: "Needs some work but on the right track" },
+                  { id: "DEMO_STAGE", label: "Demo stage", desc: "Good ideas, needs more refinement" },
+                  { id: "NOT_READY", label: "Not ready", desc: "Needs significant work" },
+                ].map((level) => (
+                  <button
+                    key={level.id}
+                    type="button"
+                    onClick={() => setQualityLevel(level.id)}
+                    className={cn(
+                      "text-left py-3 px-4 transition-colors duration-150 ease-out rounded-lg border-2",
+                      qualityLevel === level.id
+                        ? "border-purple-400 bg-purple-600 text-white"
+                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
+                    )}
+                  >
+                    <div className="font-bold text-sm">{level.label}</div>
+                    <div className={cn(
+                      "text-xs mt-0.5",
+                      qualityLevel === level.id ? "text-purple-100" : "text-neutral-500"
+                    )}>
+                      {level.desc}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Emotional Impact */}
-        <EmotionalImpactSection
-          emotionalImpact={emotionalImpact}
-          setEmotionalImpact={setEmotionalImpact}
-          memorableMoment={memorableMoment}
-          setMemorableMoment={setMemorableMoment}
-          originalityScore={originalityScore}
-          setOriginalityScore={setOriginalityScore}
-          playlistAction={playlistAction}
-          setPlaylistAction={setPlaylistAction}
-        />
-
-        {/* Actionable Feedback */}
-        <ActionableFeedbackSection
-          bestPart={bestPart}
-          setBestPart={setBestPart}
-          biggestWeaknessSpecific={biggestWeaknessSpecific}
-          setBiggestWeaknessSpecific={setBiggestWeaknessSpecific}
-          quickWin={quickWin}
-          setQuickWin={setQuickWin}
-          bestPartWords={bestPartWords}
-          weaknessWords={weaknessWords}
-          quickWinWords={quickWinWords}
-          addTimestampNote={addTimestampNote}
-          playerSeconds={playerSeconds}
-        />
-
-        {/* Context & Next Steps */}
-        <ContextNextStepsSection
-          targetAudience={targetAudience}
-          setTargetAudience={setTargetAudience}
-          nextFocus={nextFocus}
-          setNextFocus={setNextFocus}
-          expectedPlacement={expectedPlacement}
-          setExpectedPlacement={setExpectedPlacement}
-          qualityLevel={qualityLevel}
-          setQualityLevel={setQualityLevel}
-        />
+        {/* Next Focus */}
+        <Card variant="soft" elevated className="border-l-4 border-l-blue-500">
+          <CardHeader className="border-b border-black/10">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-blue-500"></span>
+              Next Focus
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-5">
+            <div
+              ref={nextFocusRef}
+              className={cn(
+                "space-y-3 p-4 -m-4 rounded-xl transition-all duration-200",
+                validationIssues.some((i) => i.section === "nextFocus")
+                  ? "bg-red-50 border-2 border-red-300"
+                  : "bg-gradient-to-br from-blue-50/50 to-transparent"
+              )}
+            >
+              <Label className="text-base font-bold text-blue-900">What should they focus on next? *</Label>
+              <p className="text-xs text-blue-700/60">The one area that would improve this track most</p>
+              {validationIssues.some((i) => i.section === "nextFocus") && (
+                <p className="text-xs font-medium text-red-600 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  {validationIssues.find((i) => i.section === "nextFocus")?.message}
+                </p>
+              )}
+              <div className="grid gap-2">
+                {[
+                  { id: "MIXING", label: "Mixing", desc: "Balance, EQ, compression, clarity" },
+                  { id: "ARRANGEMENT", label: "Arrangement", desc: "Structure, transitions, dynamics" },
+                  { id: "SOUND_DESIGN", label: "Sound design", desc: "Sounds, textures, production choices" },
+                  { id: "SONGWRITING", label: "Songwriting", desc: "Melody, harmony, lyrics" },
+                  { id: "PERFORMANCE", label: "Performance", desc: "Vocals, playing, delivery" },
+                  { id: "READY_TO_RELEASE", label: "Ready to release!", desc: "This is good to go" },
+                ].map((focus) => (
+                  <button
+                    key={focus.id}
+                    type="button"
+                    onClick={() => setNextFocus(focus.id)}
+                    className={cn(
+                      "text-left py-3 px-4 transition-colors duration-150 ease-out rounded-lg border-2",
+                      nextFocus === focus.id
+                        ? "border-blue-400 bg-blue-600 text-white"
+                        : "border-neutral-200 bg-white text-black hover:bg-neutral-50 hover:border-neutral-300"
+                    )}
+                  >
+                    <div className="font-bold text-sm">{focus.label}</div>
+                    <div className={cn(
+                      "text-xs mt-0.5",
+                      nextFocus === focus.id ? "text-blue-100" : "text-neutral-500"
+                    )}>
+                      {focus.desc}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* TIMESTAMP NOTES - Full Width */}
