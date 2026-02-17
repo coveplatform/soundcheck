@@ -9,8 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ScoreInput } from "@/components/ui/score-input";
-import { YesNoToggle } from "@/components/ui/yes-no-toggle";
+// Removed unused imports
 import { WordCounter, countWords } from "@/components/ui/word-counter";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, Download, ShoppingCart, SkipForward, VolumeX } from "lucide-react";
@@ -36,11 +35,7 @@ import {
   firstImpressionColor,
   firstImpressionEnumFromScore,
 } from "./utils";
-import { TechnicalFeedbackSection } from "./components/technical-feedback-section";
-import { ArrangementFeedbackSection } from "./components/arrangement-feedback-section";
-import { EmotionalImpactSection } from "./components/emotional-impact-section";
-import { ActionableFeedbackSection } from "./components/actionable-feedback-section";
-import { ContextNextStepsSection } from "./components/context-next-steps-section";
+// V2 components removed - using streamlined inline form instead
 
 // Types and utilities imported from ./types and ./utils
 
@@ -72,25 +67,14 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [draftReady, setDraftReady] = useState(false);
   const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
 
-  // Form state
+  // Form state - streamlined for fast reviews
   const [listenTime, setListenTime] = useState(0);
   const [canSubmit, setCanSubmit] = useState(false);
   const [firstImpression, setFirstImpression] = useState<FirstImpression | null>(null);
   const [firstImpressionScore, setFirstImpressionScore] = useState<number>(3);
   const [firstImpressionTouched, setFirstImpressionTouched] = useState(false);
-  const [productionScore, setProductionScore] = useState<number>(0);
-  const [vocalScore, setVocalScore] = useState<number>(0);
-  const [originalityScore, setOriginalityScore] = useState<number>(0);
   const [wouldListenAgain, setWouldListenAgain] = useState<boolean | null>(null);
-  const [wouldAddToPlaylist, setWouldAddToPlaylist] = useState<boolean | null>(null);
-  const [wouldShare, setWouldShare] = useState<boolean | null>(null);
-  const [wouldFollow, setWouldFollow] = useState<boolean | null>(null);
-  const [perceivedGenre, setPerceivedGenre] = useState("");
-  const [similarArtists, setSimilarArtists] = useState("");
-  const [bestPart, setBestPart] = useState("");
-  const [weakestPart, setWeakestPart] = useState("");
-  const [additionalNotes, setAdditionalNotes] = useState("");
-  const [nextActions, setNextActions] = useState("");
+  const [bestPart, setBestPart] = useState(""); // Reused as "Best Moment"
   const [timestampNotes, setTimestampNotes] = useState<
     Array<{ id: string; seconds: number; note: string }>
   >([]);
@@ -98,26 +82,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [pendingTimestampFocusId, setPendingTimestampFocusId] = useState<string | null>(null);
   const [validationIssues, setValidationIssues] = useState<Array<{ id: string; message: string; section: string }>>([]);
 
-  // V2 Enhanced Feedback State
-  const [lowEndClarity, setLowEndClarity] = useState<string | null>(null);
-  const [vocalClarity, setVocalClarity] = useState<string | null>(null);
-  const [highEndQuality, setHighEndQuality] = useState<string | null>(null);
-  const [stereoWidth, setStereoWidth] = useState<string | null>(null);
-  const [dynamics, setDynamics] = useState<string | null>(null);
-  const [energyCurve, setEnergyCurve] = useState<string | null>(null);
-  const [tooRepetitive, setTooRepetitive] = useState<boolean>(false);
-  const [repetitiveNote, setRepetitiveNote] = useState<string>("");
-  const [lostInterestAt, setLostInterestAt] = useState<number | null>(null);
-  const [lostInterestReason, setLostInterestReason] = useState<string>("");
-  const [trackLength, setTrackLength] = useState<string | null>(null);
-  const [emotionalImpact, setEmotionalImpact] = useState<string[]>([]);
-  const [memorableMoment, setMemorableMoment] = useState<string>("");
+  // V2 Streamlined State
+  const [technicalIssues, setTechnicalIssues] = useState<string[]>([]);
   const [playlistAction, setPlaylistAction] = useState<string | null>(null);
   const [biggestWeaknessSpecific, setBiggestWeaknessSpecific] = useState<string>("");
   const [quickWin, setQuickWin] = useState<string>("");
-  const [targetAudience, setTargetAudience] = useState<string[]>([]);
   const [nextFocus, setNextFocus] = useState<string | null>(null);
-  const [expectedPlacement, setExpectedPlacement] = useState<string | null>(null);
   const [qualityLevel, setQualityLevel] = useState<string | null>(null);
 
   // Section refs for scroll-to functionality
@@ -229,40 +199,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   const isDirty =
     Boolean(firstImpression) ||
-    productionScore > 0 ||
-    vocalScore > 0 ||
-    originalityScore > 0 ||
     wouldListenAgain !== null ||
-    wouldAddToPlaylist !== null ||
-    wouldShare !== null ||
-    wouldFollow !== null ||
-    perceivedGenre.trim().length > 0 ||
-    similarArtists.trim().length > 0 ||
-    bestPart.trim().length > 0 ||
-    weakestPart.trim().length > 0 ||
-    additionalNotes.trim().length > 0 ||
-    timestampNotes.some((t) => t.note.trim().length > 0) ||
-    // V2 fields
-    lowEndClarity !== null ||
-    vocalClarity !== null ||
-    highEndQuality !== null ||
-    stereoWidth !== null ||
-    dynamics !== null ||
-    energyCurve !== null ||
-    tooRepetitive ||
-    repetitiveNote.trim().length > 0 ||
-    lostInterestAt !== null ||
-    lostInterestReason.trim().length > 0 ||
-    trackLength !== null ||
-    emotionalImpact.length > 0 ||
-    memorableMoment.trim().length > 0 ||
+    technicalIssues.length > 0 ||
     playlistAction !== null ||
+    bestPart.trim().length > 0 ||
     biggestWeaknessSpecific.trim().length > 0 ||
     quickWin.trim().length > 0 ||
-    targetAudience.length > 0 ||
     nextFocus !== null ||
-    expectedPlacement !== null ||
-    qualityLevel !== null;
+    qualityLevel !== null ||
+    timestampNotes.some((t) => t.note.trim().length > 0);
 
   const confirmLeave = () => {
     if (!isDirty) return true;
@@ -349,26 +294,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           setTimestampNotes(normalized);
           setDraftSavedAt(typeof parsed.savedAt === "number" ? parsed.savedAt : null);
 
-          // Restore v2 fields
-          setLowEndClarity(typeof parsed.lowEndClarity === "string" ? parsed.lowEndClarity : null);
-          setVocalClarity(typeof parsed.vocalClarity === "string" ? parsed.vocalClarity : null);
-          setHighEndQuality(typeof parsed.highEndQuality === "string" ? parsed.highEndQuality : null);
-          setStereoWidth(typeof parsed.stereoWidth === "string" ? parsed.stereoWidth : null);
-          setDynamics(typeof parsed.dynamics === "string" ? parsed.dynamics : null);
-          setEnergyCurve(typeof parsed.energyCurve === "string" ? parsed.energyCurve : null);
-          setTooRepetitive(typeof parsed.tooRepetitive === "boolean" ? parsed.tooRepetitive : false);
-          setRepetitiveNote(typeof parsed.repetitiveNote === "string" ? parsed.repetitiveNote : "");
-          setLostInterestAt(typeof parsed.lostInterestAt === "number" ? parsed.lostInterestAt : null);
-          setLostInterestReason(typeof parsed.lostInterestReason === "string" ? parsed.lostInterestReason : "");
-          setTrackLength(typeof parsed.trackLength === "string" ? parsed.trackLength : null);
-          setEmotionalImpact(Array.isArray(parsed.emotionalImpact) ? parsed.emotionalImpact : []);
-          setMemorableMoment(typeof parsed.memorableMoment === "string" ? parsed.memorableMoment : "");
+          // Restore streamlined v2 fields
+          setTechnicalIssues(Array.isArray(parsed.technicalIssues) ? parsed.technicalIssues : []);
           setPlaylistAction(typeof parsed.playlistAction === "string" ? parsed.playlistAction : null);
           setBiggestWeaknessSpecific(typeof parsed.biggestWeaknessSpecific === "string" ? parsed.biggestWeaknessSpecific : "");
           setQuickWin(typeof parsed.quickWin === "string" ? parsed.quickWin : "");
-          setTargetAudience(Array.isArray(parsed.targetAudience) ? parsed.targetAudience : []);
           setNextFocus(typeof parsed.nextFocus === "string" ? parsed.nextFocus : null);
-          setExpectedPlacement(typeof parsed.expectedPlacement === "string" ? parsed.expectedPlacement : null);
           setQualityLevel(typeof parsed.qualityLevel === "string" ? parsed.qualityLevel : null);
 
           setDraftReady(true);
@@ -414,40 +345,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         listenTime,
         firstImpression,
         firstImpressionScore,
-        productionScore,
-        vocalScore,
-        originalityScore,
         wouldListenAgain,
-        wouldAddToPlaylist,
-        wouldShare,
-        wouldFollow,
-        perceivedGenre,
-        similarArtists,
         bestPart,
-        weakestPart,
-        additionalNotes,
-        nextActions,
         timestampNotes,
-        // V2 fields
-        lowEndClarity,
-        vocalClarity,
-        highEndQuality,
-        stereoWidth,
-        dynamics,
-        energyCurve,
-        tooRepetitive,
-        repetitiveNote,
-        lostInterestAt,
-        lostInterestReason,
-        trackLength,
-        emotionalImpact,
-        memorableMoment,
+        // Streamlined V2 fields
+        technicalIssues,
         playlistAction,
         biggestWeaknessSpecific,
         quickWin,
-        targetAudience,
         nextFocus,
-        expectedPlacement,
         qualityLevel,
       };
 
@@ -466,40 +372,15 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     success,
     listenTime,
     firstImpression,
-    productionScore,
-    vocalScore,
-    originalityScore,
     wouldListenAgain,
-    wouldAddToPlaylist,
-    wouldShare,
-    wouldFollow,
-    perceivedGenre,
-    similarArtists,
     bestPart,
-    weakestPart,
-    additionalNotes,
-    nextActions,
     timestampNotes,
-    // V2 fields
-    lowEndClarity,
-    vocalClarity,
-    highEndQuality,
-    stereoWidth,
-    dynamics,
-    energyCurve,
-    tooRepetitive,
-    repetitiveNote,
-    lostInterestAt,
-    lostInterestReason,
-    trackLength,
-    emotionalImpact,
-    memorableMoment,
+    // Streamlined V2 fields
+    technicalIssues,
     playlistAction,
     biggestWeaknessSpecific,
     quickWin,
-    targetAudience,
     nextFocus,
-    expectedPlacement,
     qualityLevel,
   ]);
 
@@ -512,20 +393,26 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     if (!firstImpression || !firstImpressionTouched) {
       issues.push({ id: "firstImpression", message: "Select your first impression", section: "firstImpression" });
     }
-    if (productionScore === 0) {
-      issues.push({ id: "productionScore", message: "Rate the production quality", section: "scores" });
-    }
-    if (originalityScore === 0) {
-      issues.push({ id: "originalityScore", message: "Rate the originality", section: "scores" });
-    }
     if (wouldListenAgain === null) {
       issues.push({ id: "wouldListenAgain", message: "Indicate if you would listen again", section: "wouldListenAgain" });
     }
-    if (countWords(bestPart) < MIN_WORDS_PER_SECTION) {
-      issues.push({ id: "bestPart", message: `Best part needs ${MIN_WORDS_PER_SECTION - countWords(bestPart)} more words`, section: "bestPart" });
+    if (!playlistAction) {
+      issues.push({ id: "playlistAction", message: "Select playlist action", section: "playlistAction" });
     }
-    if (countWords(weakestPart) < MIN_WORDS_PER_SECTION) {
-      issues.push({ id: "weakestPart", message: `Weakest part needs ${MIN_WORDS_PER_SECTION - countWords(weakestPart)} more words`, section: "weakestPart" });
+    if (!qualityLevel) {
+      issues.push({ id: "qualityLevel", message: "Select quality level", section: "qualityLevel" });
+    }
+    if (!nextFocus) {
+      issues.push({ id: "nextFocus", message: "Select what to focus on next", section: "nextFocus" });
+    }
+    if (countWords(bestPart) < 15) {
+      issues.push({ id: "bestPart", message: `Best moment needs ${15 - countWords(bestPart)} more words`, section: "bestPart" });
+    }
+    if (countWords(biggestWeaknessSpecific) < 15) {
+      issues.push({ id: "biggestIssue", message: `Biggest issue needs ${15 - countWords(biggestWeaknessSpecific)} more words`, section: "biggestIssue" });
+    }
+    if (countWords(quickWin) < 10) {
+      issues.push({ id: "quickWin", message: `Quick win needs ${10 - countWords(quickWin)} more words`, section: "quickWin" });
     }
 
     if (issues.length > 0) {
@@ -552,25 +439,41 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         // Non-fatal: submission will still attempt
       }
 
+      // Map streamlined inputs to full schema for analytics
+      const qualityToScore = (level: string | null): number => {
+        if (!level) return 3;
+        const mapping: Record<string, number> = {
+          PROFESSIONAL: 5,
+          RELEASE_READY: 4,
+          ALMOST_THERE: 3,
+          DEMO_STAGE: 2,
+          NOT_READY: 1,
+        };
+        return mapping[level] || 3;
+      };
+
+      // Map technical checkboxes to enum fields
+      const hasVocalIssue = technicalIssues.includes("vocals-buried");
+      const lowEndIssue = technicalIssues.includes("muddy-low");
+      const compressionIssue = technicalIssues.includes("compressed");
+      const harshHighs = technicalIssues.includes("harsh-highs");
+      const narrowStereo = technicalIssues.includes("narrow-stereo");
+      const tooRepetitive = technicalIssues.includes("repetitive");
+      const tooLong = technicalIssues.includes("too-long");
+
       const response = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           reviewId: review.id,
           firstImpression,
-          productionScore,
-          vocalScore: vocalScore || null,
-          originalityScore,
+          // Derived scores for analytics
+          productionScore: qualityToScore(qualityLevel),
+          vocalScore: hasVocalIssue ? 2 : 4,
+          originalityScore: firstImpressionScore,
           wouldListenAgain,
-          wouldAddToPlaylist,
-          wouldShare,
-          wouldFollow,
-          perceivedGenre: perceivedGenre || undefined,
-          similarArtists: similarArtists || undefined,
           bestPart,
-          weakestPart,
-          additionalNotes: additionalNotes || undefined,
-          nextActions,
+          weakestPart: biggestWeaknessSpecific, // Map biggest issue to weakest part
           timestamps:
             timestampNotes
               .map((t) => ({ seconds: t.seconds, note: t.note.trim() }))
@@ -579,26 +482,18 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                   .map((t) => ({ seconds: t.seconds, note: t.note.trim() }))
                   .filter((t) => t.note.length > 0)
               : undefined,
-          // V2 enhanced feedback
-          lowEndClarity,
-          vocalClarity,
-          highEndQuality,
-          stereoWidth,
-          dynamics,
-          energyCurve,
+          // V2 mapped from checkboxes
+          lowEndClarity: lowEndIssue ? "BOTH_MUDDY" : "PERFECT",
+          vocalClarity: hasVocalIssue ? "BURIED" : "CRYSTAL_CLEAR",
+          highEndQuality: harshHighs ? "TOO_HARSH" : "PERFECT",
+          stereoWidth: narrowStereo ? "TOO_NARROW" : "GOOD_BALANCE",
+          dynamics: compressionIssue ? "TOO_COMPRESSED" : "GREAT_DYNAMICS",
           tooRepetitive,
-          repetitiveNote: repetitiveNote || undefined,
-          lostInterestAt,
-          lostInterestReason: lostInterestReason || undefined,
-          trackLength,
-          emotionalImpact: emotionalImpact.length > 0 ? emotionalImpact : undefined,
-          memorableMoment: memorableMoment || undefined,
+          trackLength: tooLong ? "WAY_TOO_LONG" : "PERFECT",
           playlistAction,
-          biggestWeaknessSpecific: biggestWeaknessSpecific || undefined,
-          quickWin: quickWin || undefined,
-          targetAudience: targetAudience.length > 0 ? targetAudience : undefined,
+          biggestWeaknessSpecific,
+          quickWin,
           nextFocus,
-          expectedPlacement,
           qualityLevel,
         }),
       });
@@ -1071,14 +966,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
   const bestPartWords = countWords(bestPart);
   const weakestPartWords = countWords(weakestPart);
-  const weaknessWords = countWords(biggestWeaknessSpecific);
+  const bestMomentWords = countWords(bestPart); // Reusing bestPart for "Best Moment"
+  const biggestIssueWords = countWords(biggestWeaknessSpecific);
   const quickWinWords = countWords(quickWin);
+
   const meetsTextMinimum =
-    bestPartWords >= MIN_WORDS_PER_SECTION &&
-    weakestPartWords >= MIN_WORDS_PER_SECTION;
-  const meetsV2TextMinimum =
-    bestPartWords >= 15 &&
-    weaknessWords >= 15 &&
+    bestMomentWords >= 15 &&
+    biggestIssueWords >= 15 &&
     quickWinWords >= 10;
 
   if (success) {
