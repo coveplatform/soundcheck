@@ -111,6 +111,11 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-12 bg-[#faf8f5]">
       <div className="w-full max-w-lg">
+        {/* Logo - always visible */}
+        <div className="flex justify-center mb-8">
+          <Logo className="scale-110" />
+        </div>
+
         {/* Step Indicator */}
         <div className="mb-8">
           <StepIndicator currentStep={step} totalSteps={3} variant="progress" labels={["Artist Name", "Genres", "Ready"]} />
@@ -244,9 +249,6 @@ export default function OnboardingPage() {
         {step === 3 && (
           <>
             <div className="mb-8 text-center">
-              <div className="flex justify-center mb-4">
-                <Logo className="scale-125" />
-              </div>
               <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
                 You&apos;re all set!
               </h1>

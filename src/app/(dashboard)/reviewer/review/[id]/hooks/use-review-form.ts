@@ -38,6 +38,28 @@ export function useReviewForm({ reviewId, onDraftSave }: UseReviewFormOptions) {
   const [draftReady, setDraftReady] = useState(false);
   const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
 
+  // Enhanced feedback fields (v2)
+  const [lowEndClarity, setLowEndClarity] = useState<string | null>(null);
+  const [vocalClarity, setVocalClarity] = useState<string | null>(null);
+  const [highEndQuality, setHighEndQuality] = useState<string | null>(null);
+  const [stereoWidth, setStereoWidth] = useState<string | null>(null);
+  const [dynamics, setDynamics] = useState<string | null>(null);
+  const [energyCurve, setEnergyCurve] = useState<string | null>(null);
+  const [tooRepetitive, setTooRepetitive] = useState<boolean | null>(null);
+  const [repetitiveNote, setRepetitiveNote] = useState("");
+  const [lostInterestAt, setLostInterestAt] = useState<number | null>(null);
+  const [lostInterestReason, setLostInterestReason] = useState("");
+  const [trackLength, setTrackLength] = useState<string | null>(null);
+  const [emotionalImpact, setEmotionalImpact] = useState<string[]>([]);
+  const [memorableMoment, setMemorableMoment] = useState("");
+  const [playlistAction, setPlaylistAction] = useState<string | null>(null);
+  const [biggestWeaknessSpecific, setBiggestWeaknessSpecific] = useState("");
+  const [quickWin, setQuickWin] = useState("");
+  const [targetAudience, setTargetAudience] = useState<string[]>([]);
+  const [nextFocus, setNextFocus] = useState<string | null>(null);
+  const [expectedPlacement, setExpectedPlacement] = useState<string | null>(null);
+  const [qualityLevel, setQualityLevel] = useState<string | null>(null);
+
   // Section refs for scroll-to functionality
   const firstImpressionRef = useRef<HTMLDivElement>(null);
   const scoresRef = useRef<HTMLDivElement>(null);
@@ -50,7 +72,10 @@ export function useReviewForm({ reviewId, onDraftSave }: UseReviewFormOptions) {
   // Computed values
   const bestPartWords = countWords(bestPart);
   const weakestPartWords = countWords(weakestPart);
+  const weaknessWords = countWords(biggestWeaknessSpecific);
+  const quickWinWords = countWords(quickWin);
   const meetsTextMinimum = bestPartWords >= MIN_WORDS_PER_SECTION && weakestPartWords >= MIN_WORDS_PER_SECTION;
+  const meetsV2TextMinimum = bestPartWords >= 15 && weaknessWords >= 15 && quickWinWords >= 10;
 
   const isDirty =
     Boolean(firstImpression) ||
@@ -167,6 +192,47 @@ export function useReviewForm({ reviewId, onDraftSave }: UseReviewFormOptions) {
       });
     }
 
+    // V2 validations (enhanced feedback)
+    if (!lowEndClarity) {
+      issues.push({
+        id: "lowEndClarity",
+        message: "Please rate the low end (kick/bass balance)",
+        section: "technical",
+      });
+    }
+
+    if (!vocalClarity) {
+      issues.push({
+        id: "vocalClarity",
+        message: "Please rate vocal clarity",
+        section: "technical",
+      });
+    }
+
+    if (weaknessWords < 15) {
+      issues.push({
+        id: "biggestWeaknessSpecific",
+        message: `Biggest weakness needs ${15 - weaknessWords} more words - be specific!`,
+        section: "actionable",
+      });
+    }
+
+    if (quickWinWords < 10) {
+      issues.push({
+        id: "quickWin",
+        message: `Quick win needs ${10 - quickWinWords} more words`,
+        section: "actionable",
+      });
+    }
+
+    if (!qualityLevel) {
+      issues.push({
+        id: "qualityLevel",
+        message: "Please rate the overall quality level",
+        section: "context",
+      });
+    }
+
     setValidationIssues(issues);
     return issues;
   }, [firstImpressionTouched, productionScore, originalityScore, wouldListenAgain, bestPartWords, weakestPartWords]);
@@ -191,6 +257,27 @@ export function useReviewForm({ reviewId, onDraftSave }: UseReviewFormOptions) {
       timestamps: timestampNotes
         .filter((t) => t.note.trim())
         .map((t) => ({ seconds: t.seconds, note: t.note.trim() })),
+      // Enhanced feedback (v2)
+      lowEndClarity,
+      vocalClarity,
+      highEndQuality,
+      stereoWidth,
+      dynamics,
+      energyCurve,
+      tooRepetitive,
+      repetitiveNote: repetitiveNote.trim() || null,
+      lostInterestAt,
+      lostInterestReason: lostInterestReason.trim() || null,
+      trackLength,
+      emotionalImpact: emotionalImpact.length > 0 ? emotionalImpact : null,
+      memorableMoment: memorableMoment.trim() || null,
+      playlistAction,
+      biggestWeaknessSpecific: biggestWeaknessSpecific.trim(),
+      quickWin: quickWin.trim(),
+      targetAudience: targetAudience.length > 0 ? targetAudience : null,
+      nextFocus,
+      expectedPlacement,
+      qualityLevel,
     };
   }, [
     firstImpression,
@@ -208,6 +295,26 @@ export function useReviewForm({ reviewId, onDraftSave }: UseReviewFormOptions) {
     additionalNotes,
     nextActions,
     timestampNotes,
+    lowEndClarity,
+    vocalClarity,
+    highEndQuality,
+    stereoWidth,
+    dynamics,
+    energyCurve,
+    tooRepetitive,
+    repetitiveNote,
+    lostInterestAt,
+    lostInterestReason,
+    trackLength,
+    emotionalImpact,
+    memorableMoment,
+    playlistAction,
+    biggestWeaknessSpecific,
+    quickWin,
+    targetAudience,
+    nextFocus,
+    expectedPlacement,
+    qualityLevel,
   ]);
 
   // Load draft from localStorage

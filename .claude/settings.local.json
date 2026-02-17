@@ -91,7 +91,8 @@
       "Bash(cmd.exe:*)",
       "Bash(tee:*)",
       "Bash(git diff:*)",
-      "Bash(export:*)"
+      "Bash(export:*)",
+      "Bash(npx dotenv:*)"
     ]
   }
 }

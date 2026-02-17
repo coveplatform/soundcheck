@@ -52,6 +52,7 @@ model ArtistProfile {
   totalCreditsEarned           Int           @default(0)
   totalCreditsSpent            Int           @default(0)
   totalPeerReviews             Int           @default(0)
+  reviewerExpertise            ReviewerExpertise?
   User                         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   Review                       Review[]
   ReviewQueue                  ReviewQueue[]
@@ -230,6 +231,30 @@ model Review {
   peerReviewerArtistId   String?
   abTestPreference       ABTestPreference?
   abTestComment          String?
+
+  // Enhanced feedback fields (v2)
+  lowEndClarity          LowEndClarity?
+  vocalClarity           VocalClarity?
+  highEndQuality         HighEndQuality?
+  stereoWidth            StereoWidth?
+  dynamics               DynamicsQuality?
+  energyCurve            EnergyCurve?
+  tooRepetitive          Boolean?
+  repetitiveNote         String?
+  lostInterestAt         Int?
+  lostInterestReason     String?
+  trackLength            TrackLength?
+  emotionalImpact        Json?
+  memorableMoment        String?
+  playlistAction         PlaylistAction?
+  biggestWeaknessSpecific String?
+  quickWin               String?
+  targetAudience         Json?
+  nextFocus              NextFocus?
+  expectedPlacement      ExpectedPlacement?
+  qualityLevel           QualityLevel?
+  reviewerExpertise      ReviewerExpertise?
+
   ArtistProfile          ArtistProfile?       @relation(fields: [peerReviewerArtistId], references: [id])
   ReviewerProfile        ReviewerProfile?     @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
   Track                  Track                @relation(fields: [trackId], references: [id], onDelete: Cascade)
@@ -546,6 +571,97 @@ enum FirstImpression {
   STRONG_HOOK
   DECENT
   LOST_INTEREST
+}
+
+enum LowEndClarity {
+  PERFECT
+  KICK_TOO_LOUD
+  BASS_TOO_LOUD
+  BOTH_MUDDY
+  BARELY_AUDIBLE
+}
+
+enum VocalClarity {
+  CRYSTAL_CLEAR
+  SLIGHTLY_BURIED
+  BURIED
+  TOO_LOUD
+  NOT_APPLICABLE
+}
+
+enum HighEndQuality {
+  PERFECT
+  TOO_DULL
+  TOO_HARSH
+  ACCEPTABLE
+}
+
+enum StereoWidth {
+  TOO_NARROW
+  GOOD_BALANCE
+  TOO_WIDE
+}
+
+enum DynamicsQuality {
+  GREAT_DYNAMICS
+  ACCEPTABLE
+  TOO_COMPRESSED
+  TOO_QUIET
+}
+
+enum EnergyCurve {
+  BUILDS_PERFECTLY
+  STAYS_FLAT
+  BUILDS_NO_PAYOFF
+  ALL_OVER_PLACE
+}
+
+enum TrackLength {
+  TOO_SHORT
+  PERFECT
+  BIT_LONG
+  WAY_TOO_LONG
+}
+
+enum PlaylistAction {
+  ADD_TO_LIBRARY
+  LET_PLAY
+  SKIP
+  DISLIKE
+}
+
+enum NextFocus {
+  MIXING
+  ARRANGEMENT
+  SOUND_DESIGN
+  SONGWRITING
+  PERFORMANCE
+  READY_TO_RELEASE
+}
+
+enum ExpectedPlacement {
+  EDITORIAL
+  SOUNDCLOUD_TRENDING
+  CLUB
+  COFFEE_SHOP
+  VIDEO_GAME
+  AD
+  NOWHERE
+}
+
+enum QualityLevel {
+  NOT_READY
+  DEMO_STAGE
+  ALMOST_THERE
+  RELEASE_READY
+  PROFESSIONAL
+}
+
+enum ReviewerExpertise {
+  PRO_PRODUCER
+  INTERMEDIATE
+  BEGINNER
+  LISTENER_ONLY
 }
 
 enum PackageType {
