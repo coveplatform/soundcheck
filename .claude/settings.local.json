@@ -93,7 +93,8 @@
       "Bash(git diff:*)",
       "Bash(export:*)",
       "Bash(npx dotenv:*)",
-      "Bash(node --env-file=.env.local -e:*)"
+      "Bash(node --env-file=.env.local -e:*)",
+      "Bash(git rm:*)"
     ]
   }
 }
