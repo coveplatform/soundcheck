@@ -200,7 +200,7 @@ export default async function AdminUsersPage({
               showDemo ? "bg-amber-100 text-amber-700 hover:bg-amber-200" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
             }`}
           >
-            {showDemo ? "Hiding Demo" : "Show Demo"}
+            {showDemo ? "Demo" : "Demo"}
           </Link>
         </div>
       </div>
