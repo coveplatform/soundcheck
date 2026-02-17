@@ -79,4 +79,3 @@ export interface ReviewFormState {
 }
 
 export const MIN_LISTEN_SECONDS = 180;
-export const MIN_WORDS_PER_SECTION = 30;

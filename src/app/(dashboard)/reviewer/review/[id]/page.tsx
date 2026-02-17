@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
 import { funnels, track } from "@/lib/analytics";
 import { getReferralCookie, clearReferralCookie } from "@/lib/referral";
-import { Review, FirstImpression, MIN_LISTEN_SECONDS, MIN_WORDS_PER_SECTION } from "./types";
+import { Review, FirstImpression, MIN_LISTEN_SECONDS } from "./types";
 import {
   formatTimestamp,
   getTierEarningsCents,
@@ -1812,7 +1812,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                   </span>
                 ) : (
                   <span className="text-neutral-400 font-mono">
-                    {MIN_WORDS_PER_SECTION} words min per section
+                    Complete all required sections
                   </span>
                 )}
               </div>
