@@ -130,6 +130,28 @@ const submitReviewSchema = z.object({
     )
     .max(30)
     .optional(),
+
+  // V2 enhanced feedback fields
+  lowEndClarity: z.enum(["PERFECT", "KICK_TOO_LOUD", "BASS_TOO_LOUD", "BOTH_MUDDY", "BARELY_AUDIBLE"]).optional().nullable(),
+  vocalClarity: z.enum(["CRYSTAL_CLEAR", "SLIGHTLY_BURIED", "BURIED", "TOO_LOUD", "NOT_APPLICABLE"]).optional().nullable(),
+  highEndQuality: z.enum(["PERFECT", "TOO_DULL", "TOO_HARSH", "ACCEPTABLE"]).optional().nullable(),
+  stereoWidth: z.enum(["TOO_NARROW", "GOOD_BALANCE", "TOO_WIDE"]).optional().nullable(),
+  dynamics: z.enum(["GREAT_DYNAMICS", "ACCEPTABLE", "TOO_COMPRESSED", "TOO_QUIET"]).optional().nullable(),
+  energyCurve: z.enum(["BUILDS_PERFECTLY", "STAYS_FLAT", "BUILDS_NO_PAYOFF", "ALL_OVER_PLACE"]).optional().nullable(),
+  tooRepetitive: z.boolean().optional().nullable(),
+  repetitiveNote: z.string().optional().nullable(),
+  lostInterestAt: z.number().optional().nullable(),
+  lostInterestReason: z.string().optional().nullable(),
+  trackLength: z.enum(["TOO_SHORT", "PERFECT", "BIT_LONG", "WAY_TOO_LONG"]).optional().nullable(),
+  emotionalImpact: z.array(z.string()).optional().nullable(),
+  memorableMoment: z.string().optional().nullable(),
+  playlistAction: z.enum(["ADD_TO_LIBRARY", "LET_PLAY", "SKIP", "DISLIKE"]).optional().nullable(),
+  biggestWeaknessSpecific: z.string().optional().nullable(),
+  quickWin: z.string().optional().nullable(),
+  targetAudience: z.array(z.string()).optional().nullable(),
+  nextFocus: z.enum(["MIXING", "ARRANGEMENT", "SOUND_DESIGN", "SONGWRITING", "PERFORMANCE", "READY_TO_RELEASE"]).optional().nullable(),
+  expectedPlacement: z.enum(["EDITORIAL", "SOUNDCLOUD_TRENDING", "CLUB", "COFFEE_SHOP", "VIDEO_GAME", "AD", "NOWHERE"]).optional().nullable(),
+  qualityLevel: z.enum(["NOT_READY", "DEMO_STAGE", "ALMOST_THERE", "RELEASE_READY", "PROFESSIONAL"]).optional().nullable(),
 });
 
 export async function POST(request: Request) {
@@ -358,6 +380,28 @@ export async function POST(request: Request) {
               timestamps: data.timestamps,
               paidAmount: earnings,
               shareId: generateShareId(),
+
+              // V2 enhanced feedback fields
+              lowEndClarity: data.lowEndClarity,
+              vocalClarity: data.vocalClarity,
+              highEndQuality: data.highEndQuality,
+              stereoWidth: data.stereoWidth,
+              dynamics: data.dynamics,
+              energyCurve: data.energyCurve,
+              tooRepetitive: data.tooRepetitive,
+              repetitiveNote: data.repetitiveNote,
+              lostInterestAt: data.lostInterestAt,
+              lostInterestReason: data.lostInterestReason,
+              trackLength: data.trackLength,
+              emotionalImpact: data.emotionalImpact ? JSON.stringify(data.emotionalImpact) : null,
+              memorableMoment: data.memorableMoment,
+              playlistAction: data.playlistAction,
+              biggestWeaknessSpecific: data.biggestWeaknessSpecific,
+              quickWin: data.quickWin,
+              targetAudience: data.targetAudience ? JSON.stringify(data.targetAudience) : null,
+              nextFocus: data.nextFocus,
+              expectedPlacement: data.expectedPlacement,
+              qualityLevel: data.qualityLevel,
             },
           });
           updatedCount = updated.count;

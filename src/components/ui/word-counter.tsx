@@ -8,14 +8,14 @@ function countWords(text: string): number {
 }
 
 interface WordCounterProps {
-  text: string;
-  minWords: number;
+  current: number;
+  target: number;
+  label?: string;
   className?: string;
 }
 
-export function WordCounter({ text, minWords, className }: WordCounterProps) {
-  const wordCount = countWords(text);
-  const isComplete = wordCount >= minWords;
+export function WordCounter({ current, target, label = "words", className }: WordCounterProps) {
+  const isComplete = current >= target;
 
   return (
     <div className={cn("flex items-center justify-between", className)}>
@@ -23,7 +23,7 @@ export function WordCounter({ text, minWords, className }: WordCounterProps) {
         "text-xs font-mono",
         isComplete ? "text-purple-600" : "text-neutral-500"
       )}>
-        {wordCount}/{minWords} words
+        {current}/{target} {label}
       </p>
       {isComplete && (
         <span className="text-xs font-bold text-purple-600 flex items-center gap-1">
