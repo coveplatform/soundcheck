@@ -25,12 +25,33 @@ function getRelativeTime(date: Date | null): string {
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string; role?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; role?: string; demo?: string }>;
 }) {
-  const { q: query, page: pageParam, role: roleParam } = await searchParams;
+  const { q: query, page: pageParam, role: roleParam, demo: demoParam } = await searchParams;
   const q = typeof query === "string" ? query.trim() : "";
   const page = Math.max(1, parseInt(pageParam || "1", 10) || 1);
   const role = roleParam || "";
+  const showDemo = demoParam === "show";
+
+  // Patterns for seed/demo/test/internal accounts
+  const DEMO_EMAIL_PATTERNS = [
+    "@seed.mixreflect.com",
+    "@mixreflect.com",
+    "@example.com",
+  ];
+  const DEMO_EMAIL_EXACT = [
+    "testlink@gmail.com",
+    "testlink2@gmail.com",
+    "testyjoe@gmail.com",
+    "steveking1@gmail.com",
+    "bobthewizard1@gmail.com",
+    "bigdog1@bigdogco.com",
+    "bigdogman2@gmail.com",
+    "gogo45@gmail.com",
+    "bogushogus@gmail.com",
+    "hot23@gmail.com",
+    "bigbadbozo@gmail.com",
+  ];
 
   // Build where clause
   const whereClause: any = {};
@@ -49,6 +70,15 @@ export default async function AdminUsersPage({
   } else if (role === "none") {
     whereClause.isArtist = false;
     whereClause.isReviewer = false;
+  }
+
+  if (!showDemo) {
+    whereClause.AND = [
+      ...DEMO_EMAIL_PATTERNS.map((pattern) => ({
+        email: { not: { contains: pattern } },
+      })),
+      { email: { notIn: DEMO_EMAIL_EXACT } },
+    ];
   }
 
   // Get total count
@@ -93,11 +123,13 @@ export default async function AdminUsersPage({
   });
 
   // Build URL helper
-  const buildUrl = (params: { page?: number; q?: string; role?: string }) => {
+  const buildUrl = (params: { page?: number; q?: string; role?: string; demo?: string }) => {
     const url = new URLSearchParams();
     if (params.q ?? q) url.set("q", params.q ?? q);
     if (params.role ?? role) url.set("role", params.role ?? role);
     if ((params.page ?? page) > 1) url.set("page", String(params.page ?? page));
+    const demoVal = params.demo ?? (showDemo ? "show" : "");
+    if (demoVal === "show") url.set("demo", "show");
     return `/admin/users${url.toString() ? `?${url.toString()}` : ""}`;
   };
 
@@ -119,6 +151,7 @@ export default async function AdminUsersPage({
             className="flex-1 h-9 px-3 border border-neutral-200 rounded-md text-sm"
           />
           {role && <input type="hidden" name="role" value={role} />}
+          {showDemo && <input type="hidden" name="demo" value="show" />}
           <button
             type="submit"
             className="h-9 px-3 rounded-md text-sm font-medium bg-neutral-900 text-white"
@@ -159,6 +192,15 @@ export default async function AdminUsersPage({
             }`}
           >
             No Role
+          </Link>
+          <span className="w-px h-6 bg-neutral-200 mx-1" />
+          <Link
+            href={buildUrl({ demo: showDemo ? "" : "show", page: 1 })}
+            className={`h-9 px-3 rounded-md text-sm font-medium flex items-center ${
+              showDemo ? "bg-amber-100 text-amber-700 hover:bg-amber-200" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+            }`}
+          >
+            {showDemo ? "Hiding Demo" : "Show Demo"}
           </Link>
         </div>
       </div>

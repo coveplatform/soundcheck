@@ -54,6 +54,19 @@ export default async function AdminPage() {
       _sum: { amount: true },
     }),
     prisma.user.findMany({
+      where: {
+        AND: [
+          { email: { not: { contains: "@seed.mixreflect.com" } } },
+          { email: { not: { contains: "@mixreflect.com" } } },
+          { email: { not: { contains: "@example.com" } } },
+          { email: { notIn: [
+            "testlink@gmail.com", "testlink2@gmail.com", "testyjoe@gmail.com",
+            "steveking1@gmail.com", "bobthewizard1@gmail.com", "bigdog1@bigdogco.com",
+            "bigdogman2@gmail.com", "gogo45@gmail.com", "bogushogus@gmail.com",
+            "hot23@gmail.com", "bigbadbozo@gmail.com",
+          ] } },
+        ],
+      },
       orderBy: { createdAt: "desc" },
       take: 8,
       select: {
