@@ -111,7 +111,6 @@ export default function SubmitTrackPage() {
 
   // ---- step 3: product selection state ------------------------------------
   const [selectedProduct, setSelectedProduct] = useState<"RELEASE_DECISION" | "PEER">("RELEASE_DECISION");
-  const [rdPaymentMethod, setRdPaymentMethod] = useState<"cash" | "credits">("cash");
 
   // ---- step 3: general feedback state (for PEER product) -----------------
   const [reviewCount, setReviewCount] = useState<number>(5);
@@ -407,12 +406,12 @@ export default function SubmitTrackPage() {
 
       const trackId = trackData.id;
 
-      // 2. Route to Release Decision checkout
+      // 2. Route to Release Decision checkout (cash only)
       const res = await fetch(`/api/tracks/${trackId}/checkout-release-decision`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          paymentMethod: rdPaymentMethod,
+          paymentMethod: "cash",
         }),
       });
 
@@ -424,13 +423,12 @@ export default function SubmitTrackPage() {
         return;
       }
 
-      if (rdPaymentMethod === "cash" && data.url) {
+      if (data.url) {
         // Redirect to Stripe checkout
         window.location.href = data.url;
-        return;
       } else {
-        // Credits payment successful
-        router.push(`/submit/success?trackId=${trackId}&releaseDecision=true`);
+        setError("Checkout session created but no payment URL returned.");
+        setIsSubmitting(false);
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -445,7 +443,6 @@ export default function SubmitTrackPage() {
     selectedGenres,
     feedbackFocus,
     isPublic,
-    rdPaymentMethod,
     router,
   ]);
 
@@ -1154,11 +1151,11 @@ export default function SubmitTrackPage() {
                     <div className="space-y-1.5 mb-4">
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>Go/No-Go verdict from experts</span>
+                        <span>Clear Go/No-Go verdict from expert panel</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>Top 3 fixes ranked by impact</span>
+                        <span><strong>AI-powered technical analysis report</strong></span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
@@ -1166,17 +1163,24 @@ export default function SubmitTrackPage() {
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>10-12 expert reviewers only</span>
+                        <span>Top 3 fixes ranked by impact & time estimate</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>48-hour delivery guarantee</span>
+                        <span>Competitive genre benchmarking</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                        <span>10-12 expert reviewers (100+ reviews, 4.5+ rating)</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                        <span>Compiled report delivered to email within 48 hours</span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl font-bold text-purple-600">$39</span>
-                      <span className="text-sm text-neutral-500">or 15 credits</span>
+                      <span className="text-2xl font-bold text-purple-600">$9.95</span>
                     </div>
                   </div>
                 </div>
@@ -1245,90 +1249,14 @@ export default function SubmitTrackPage() {
             {/* Conditional Content - Release Decision */}
             {selectedProduct === "RELEASE_DECISION" && (
               <div className="space-y-4">
-                {/* Payment Method Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-3">
-                    Payment method
-                  </label>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setRdPaymentMethod("cash")}
-                      className={cn(
-                        "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all",
-                        rdPaymentMethod === "cash"
-                          ? "border-purple-600 bg-purple-50/60"
-                          : "border-neutral-200 bg-white hover:border-neutral-300"
-                      )}
-                    >
-                      <CreditCard
-                        className={cn(
-                          "h-5 w-5",
-                          rdPaymentMethod === "cash" ? "text-purple-600" : "text-neutral-400"
-                        )}
-                      />
-                      <span
-                        className={cn(
-                          "text-sm font-semibold",
-                          rdPaymentMethod === "cash" ? "text-purple-700" : "text-neutral-600"
-                        )}
-                      >
-                        Pay $39
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setRdPaymentMethod("credits")}
-                      disabled={creditBalance < 15}
-                      className={cn(
-                        "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all",
-                        rdPaymentMethod === "credits"
-                          ? "border-purple-600 bg-purple-50/60"
-                          : "border-neutral-200 bg-white hover:border-neutral-300",
-                        creditBalance < 15 && "opacity-50 cursor-not-allowed"
-                      )}
-                    >
-                      <Coins
-                        className={cn(
-                          "h-5 w-5",
-                          rdPaymentMethod === "credits" ? "text-purple-600" : "text-neutral-400"
-                        )}
-                      />
-                      <span
-                        className={cn(
-                          "text-sm font-semibold",
-                          rdPaymentMethod === "credits" ? "text-purple-700" : "text-neutral-600"
-                        )}
-                      >
-                        Use 15 Credits
-                      </span>
-                      {creditBalance < 15 && (
-                        <span className="text-xs text-red-600">Need {15 - creditBalance} more</span>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Credit Balance Display */}
-                <div className="flex items-center gap-3 rounded-xl bg-purple-50 border-2 border-purple-200 px-4 py-3">
-                  <Coins className="h-5 w-5 text-purple-600 flex-shrink-0" />
-                  <p className="text-sm font-medium text-purple-900">
-                    You have{" "}
-                    <span className="text-lg font-bold text-purple-600">{creditBalance}</span>{" "}
-                    {creditBalance === 1 ? "credit" : "credits"}
-                  </p>
-                </div>
-
                 {/* Submit Button */}
                 <Button
                   onClick={handleReleaseDecisionSubmit}
-                  disabled={isSubmitting || (rdPaymentMethod === "credits" && creditBalance < 15)}
+                  disabled={isSubmitting}
                   isLoading={isSubmitting}
                   className="w-full bg-purple-600 text-white hover:bg-purple-700 h-12 rounded-xl font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
                 >
-                  {rdPaymentMethod === "cash" ? "Pay $39" : "Use 15 Credits"}
+                  Pay $9.95
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
 
@@ -1336,8 +1264,9 @@ export default function SubmitTrackPage() {
                 <div className="rounded-xl bg-purple-50 border border-purple-200 p-4">
                   <p className="text-sm text-purple-900">
                     <strong>What happens next:</strong> Your track will be assigned to 10-12
-                    expert reviewers (100+ reviews, 4.5+ rating). You'll receive your compiled
-                    Release Decision Report within 48 hours.
+                    expert reviewers (100+ reviews, 4.5+ rating). Their feedback will be analyzed by AI
+                    to generate a comprehensive technical report with actionable insights. You'll receive
+                    your complete Release Decision Report via email within 48 hours.
                   </p>
                 </div>
               </div>

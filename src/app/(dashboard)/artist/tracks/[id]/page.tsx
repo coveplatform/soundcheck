@@ -23,6 +23,7 @@ import {
   Clock,
   Loader2,
   Zap,
+  Target,
 } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
@@ -357,6 +358,62 @@ export default async function TrackDetailPage({
                 </a>
               </CardContent>
             </Card>
+
+            {/* Release Decision Upsell */}
+            {track.packageType !== "RELEASE_DECISION" &&
+             (track.status === "COMPLETED" || track.status === "IN_PROGRESS") && (
+              <Card variant="soft" elevated className="overflow-hidden border-2 border-purple-200">
+                <CardContent className="pt-6 relative">
+                  <div className="absolute top-0 right-0 bg-purple-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg tracking-wider">
+                    UPGRADE
+                  </div>
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center flex-shrink-0 shadow-md">
+                      <Target className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-bold text-black mb-1">
+                        Get Release Decision
+                      </h3>
+                      <p className="text-xs text-neutral-600 leading-snug mb-2">
+                        Should you release this track? Get expert panel verdict + AI analysis
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 mb-3 pl-13">
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <CheckCircle2 className="h-3 w-3 text-purple-600 flex-shrink-0" />
+                      <span className="text-neutral-700">Clear Go/No-Go verdict</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <CheckCircle2 className="h-3 w-3 text-purple-600 flex-shrink-0" />
+                      <span className="text-neutral-700">AI-powered technical report</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <CheckCircle2 className="h-3 w-3 text-purple-600 flex-shrink-0" />
+                      <span className="text-neutral-700">Top 3 actionable fixes</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <CheckCircle2 className="h-3 w-3 text-purple-600 flex-shrink-0" />
+                      <span className="text-neutral-700">10-12 expert reviewers</span>
+                    </div>
+                  </div>
+                  <div className="flex items-baseline gap-2 mb-3 pl-13">
+                    <span className="text-2xl font-bold text-purple-600">$9.95</span>
+                    <span className="text-xs text-neutral-500">• 48hr delivery</span>
+                  </div>
+                  <form action={`/api/tracks/${track.id}/upgrade-to-release-decision`} method="POST">
+                    <Button
+                      type="submit"
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:shadow-[3px_3px_0_rgba(0,0,0,0.6)] active:shadow-[1px_1px_0_rgba(0,0,0,0.6)] active:translate-x-[1px] active:translate-y-[1px] transition-all"
+                    >
+                      <Zap className="h-4 w-4 mr-2" />
+                      Upgrade to Release Decision
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Queue Status */}
             {needsMoreReviews && estimatedWaitHours !== null && (

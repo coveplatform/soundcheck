@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Tooltip } from "@/components/ui/tooltip";
-import { ArrowRight, MessageCircle, Trophy, Music, Headphones, BarChart3, Sparkles } from "lucide-react";
+import { ArrowRight, MessageCircle, Trophy, Music, Headphones, BarChart3, Sparkles, Target, Zap } from "lucide-react";
 import {
   SparklesDoodle,
   SquiggleDoodle,
@@ -293,6 +293,33 @@ export default async function DashboardPage() {
             </div>
           </Tooltip>
         </div>
+
+        {/* NEW: Release Decision Announcement Banner */}
+        <Link
+          href="/submit"
+          className="flex items-start sm:items-center gap-4 rounded-2xl border-2 border-purple-400 bg-gradient-to-br from-purple-50 via-white to-purple-50/70 px-5 py-4 mb-5 group transition-all duration-200 hover:border-purple-500 hover:shadow-lg relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider">
+            NEW
+          </div>
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center flex-shrink-0 shadow-md">
+            <Target className="h-6 w-6 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-lg font-bold text-black">Release Decision</h3>
+              <Zap className="h-4 w-4 text-purple-600" />
+            </div>
+            <p className="text-sm text-neutral-700 leading-snug">
+              <strong>Should you release your track?</strong> Get expert panel verdict + AI analysis for just <strong className="text-purple-700">$9.95</strong>.
+              <span className="hidden sm:inline"> Clear Go/No-Go decision with top 3 actionable fixes delivered in 48 hours.</span>
+            </p>
+          </div>
+          <div className="hidden sm:flex items-center gap-2 flex-shrink-0 text-purple-600 group-hover:text-purple-700 font-semibold transition-colors">
+            <span className="text-sm">Learn More</span>
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </Link>
 
         {/* Feedback Alert Banner */}
         {tracksWithFeedback.length > 0 && (

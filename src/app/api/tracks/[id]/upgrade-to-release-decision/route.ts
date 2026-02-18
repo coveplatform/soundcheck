@@ -1,14 +1,9 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { PACKAGES } from "@/lib/metadata";
-
-const requestSchema = z.object({
-  paymentMethod: z.literal("cash"), // Cash only - Release Decision is premium
-});
 
 export async function POST(
   request: Request,
@@ -21,14 +16,17 @@ export async function POST(
     }
 
     const { id: trackId } = await params;
-    const body = await request.json();
-    requestSchema.parse(body); // Validate cash-only
 
     const track = await prisma.track.findUnique({
       where: { id: trackId },
       include: {
         ArtistProfile: {
-          include: { User: true },
+          select: {
+            id: true,
+            userId: true,
+            stripeCustomerId: true,
+            User: { select: { email: true, name: true } },
+          },
         },
       },
     });
@@ -41,65 +39,74 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Prevent upgrading if already Release Decision
+    if (track.packageType === "RELEASE_DECISION") {
+      return NextResponse.json(
+        { error: "Track is already a Release Decision package" },
+        { status: 400 }
+      );
+    }
+
+    const stripe = getStripe();
     const rdPackage = PACKAGES.RELEASE_DECISION;
 
-    // Cash payment via Stripe (only option)
-    const stripe = getStripe();
-    let stripeCustomerId = track.ArtistProfile.stripeCustomerId;
-
-    if (!stripeCustomerId) {
+    // Create or get customer
+    let customerId = track.ArtistProfile.stripeCustomerId;
+    if (!customerId) {
       const customer = await stripe.customers.create({
         email: track.ArtistProfile.User.email,
+        name: track.ArtistProfile.User.name || undefined,
         metadata: {
           userId: session.user.id,
           artistProfileId: track.ArtistProfile.id,
         },
       });
-      stripeCustomerId = customer.id;
+      customerId = customer.id;
       await prisma.artistProfile.update({
         where: { id: track.ArtistProfile.id },
-        data: { stripeCustomerId },
+        data: { stripeCustomerId: customerId },
       });
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const appUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.NEXTAUTH_URL ||
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      "http://localhost:3000";
+
+    // Create checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
-      customer: stripeCustomerId,
+      customer: customerId,
       mode: "payment",
+      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `Release Decision for "${track.title}"`,
+              name: `Release Decision: "${track.title}"`,
               description: rdPackage.description,
             },
-            unit_amount: rdPackage.price, // 995 cents = $9.95
+            unit_amount: rdPackage.price,
           },
           quantity: 1,
         },
       ],
-      success_url: `${appUrl}/submit/success?trackId=${trackId}&releaseDecision=true`,
-      cancel_url: `${appUrl}/submit?error=canceled`,
+      success_url: `${appUrl}/artist/tracks/${trackId}?upgraded=true`,
+      cancel_url: `${appUrl}/artist/tracks/${trackId}?canceled=true`,
       metadata: {
         type: "release_decision",
-        trackId,
+        trackId: track.id,
         userId: session.user.id,
         reviewCount: String(rdPackage.reviews),
+        isUpgrade: "true",
       },
     });
 
-    return NextResponse.json({ url: checkoutSession.url });
+    // Redirect to Stripe checkout
+    return NextResponse.redirect(checkoutSession.url!);
   } catch (error) {
-    console.error("Error creating Release Decision checkout:", error);
-
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Invalid request", details: error.issues },
-        { status: 400 }
-      );
-    }
-
+    console.error("Release Decision upgrade error:", error);
     return NextResponse.json(
       { error: "Failed to create checkout session" },
       { status: 500 }

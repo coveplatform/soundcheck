@@ -22,6 +22,7 @@ export interface Review {
     title: string;
     sourceUrl: string;
     sourceType: string;
+    packageType: string;
     feedbackFocus: string | null;
     Genre: { id: string; name: string }[];
     allowPurchase: boolean;

@@ -133,17 +133,19 @@ export const PACKAGES = {
     name: "Release Decision",
     reviews: 10, // 10-12 expert reviews
     minProReviews: 10, // All must be PRO tier
-    price: 3900, // $39
-    creditsRequired: 15, // OR pay with credits
-    description: "Professional verdict on release readiness with actionable fixes",
+    price: 995, // $9.95 cash only - premium service
+    creditsRequired: 0, // Cash only - no credit option
+    description: "Expert panel + AI analysis: Should you release this track? Get a clear verdict with actionable fixes",
     mix: "10-12 expert reviewers (100+ reviews, 4.5+ rating)",
     features: [
-      "Go/No-Go verdict from experts",
+      "Clear Go/No-Go verdict from expert panel",
+      "AI-powered technical analysis report",
       "Release readiness score (0-100)",
-      "Top 3 fixes ranked by impact",
-      "Competitive benchmarking",
-      "48-hour delivery",
-      "Compiled actionable report",
+      "Top 3 fixes ranked by impact & time estimate",
+      "Competitive genre benchmarking",
+      "Strongest elements & biggest risks identified",
+      "Compiled actionable report delivered to email",
+      "48-hour delivery guarantee",
     ],
   },
   PEER: {
