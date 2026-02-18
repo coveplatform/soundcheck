@@ -18,15 +18,25 @@ export function getAppUrl(): string {
   );
 }
 
-// Brand colors - exported for preview
+// Brand colors - match current MixReflect UI
 export const COLORS = {
-  black: "#000000",
+  black: "#0a0a0a",
   white: "#ffffff",
-  lime: "#84cc16",
+  purple: "#9333ea",
+  purpleDark: "#7c3aed",
+  purpleLight: "#f3e8ff",
   gray: "#525252",
-  lightGray: "#f5f5f5",
+  grayLight: "#a3a3a3",
+  bg: "#faf8f5",
+  cardBg: "#ffffff",
   border: "#e5e5e5",
+  green: "#10b981",
+  amber: "#f59e0b",
+  red: "#ef4444",
 };
+
+// Inline SVG logo for emails (purple rounded rect with white audio bars)
+const EMAIL_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="32" height="32" style="display:block;width:32px;height:32px;"><rect x="10" y="10" width="180" height="180" rx="40" ry="40" fill="#9333ea"/><g fill="white"><rect x="42" y="78" width="16" height="44" rx="3"/><rect x="68" y="55" width="16" height="90" rx="3"/><rect x="94" y="38" width="16" height="124" rx="3"/><rect x="120" y="62" width="16" height="76" rx="3"/><rect x="146" y="82" width="16" height="36" rx="3"/></g></svg>`;
 
 // Base email wrapper template - exported for preview
 export function emailWrapper(content: string): string {
@@ -38,59 +48,47 @@ export function emailWrapper(content: string): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MixReflect</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: ${COLORS.lightGray}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: ${COLORS.lightGray};">
+<body style="margin: 0; padding: 0; background-color: ${COLORS.bg}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: ${COLORS.bg};">
     <tr>
       <td align="center" style="padding: 40px 20px;">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 520px; background-color: ${COLORS.white}; border: 2px solid ${COLORS.black}; box-shadow: 4px 4px 0px 0px ${COLORS.black};">
-          <!-- Header with Logo -->
+        <!-- Logo -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 520px;">
           <tr>
-            <td style="padding: 32px 40px 24px; border-bottom: 2px solid ${COLORS.black};">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            <td align="center" style="padding: 0 0 24px;">
+              <table role="presentation" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td align="center">
-                    <table role="presentation" cellspacing="0" cellpadding="0">
-                      <tr>
-                        <td style="vertical-align: middle;">
-                          <img src="https://mixreflect.com/email-logo.png" alt="MixReflect" width="36" height="36" style="display:block;width:36px;height:36px;" />
-                        </td>
-                        <td style="vertical-align: middle; padding-left: 12px;">
-                          <span style="font-size: 22px; font-weight: 700; color: ${COLORS.black}; letter-spacing: -0.5px;">mixreflect</span>
-                        </td>
-                      </tr>
-                    </table>
+                  <td style="vertical-align: middle;">
+                    ${EMAIL_LOGO_SVG}
+                  </td>
+                  <td style="vertical-align: middle; padding-left: 10px;">
+                    <span style="font-size: 20px; letter-spacing: -0.5px; color: ${COLORS.black};"><strong style="font-weight: 800;">Mix</strong><span style="font-weight: 400; color: ${COLORS.grayLight};">Reflect</span></span>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
+        </table>
 
+        <!-- Main card -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 520px; background-color: ${COLORS.white}; border-radius: 16px; overflow: hidden;">
           <!-- Content -->
           <tr>
-            <td style="padding: 32px 40px;">
+            <td style="padding: 36px 36px 32px;">
               ${content}
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="padding: 24px 40px; background-color: ${COLORS.lightGray}; border-top: 2px solid ${COLORS.black};">
-              <p style="margin: 0 0 8px; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-                This email was sent by MixReflect
-              </p>
-              <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-                <a href="https://mixreflect.com" style="color: ${COLORS.black}; text-decoration: none; font-weight: 600;">mixreflect.com</a>
-              </p>
             </td>
           </tr>
         </table>
 
-        <!-- Sub-footer -->
+        <!-- Footer -->
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 520px;">
           <tr>
-            <td style="padding: 20px 0; text-align: center;">
-              <p style="margin: 0; font-size: 12px; color: ${COLORS.gray};">
-                Questions? Reply to this email or contact <a href="mailto:support@mixreflect.com" style="color: ${COLORS.black};">support@mixreflect.com</a>
+            <td style="padding: 24px 0 8px; text-align: center;">
+              <p style="margin: 0 0 6px; font-size: 12px; color: ${COLORS.grayLight};">
+                Sent by <a href="${getAppUrl()}" style="color: ${COLORS.gray}; text-decoration: none; font-weight: 600;">MixReflect</a>
+              </p>
+              <p style="margin: 0; font-size: 12px; color: ${COLORS.grayLight};">
+                Questions? <a href="mailto:support@mixreflect.com" style="color: ${COLORS.gray}; text-decoration: none;">support@mixreflect.com</a>
               </p>
             </td>
           </tr>
@@ -112,7 +110,7 @@ export function emailButton(text: string, url: string, variant: "primary" | "sec
         <td align="center">
           <table role="presentation" cellspacing="0" cellpadding="0">
             <tr>
-              <td style="background-color: ${isPrimary ? COLORS.black : COLORS.white}; border: 2px solid ${COLORS.black}; padding: 14px 28px;">
+              <td style="background-color: ${isPrimary ? COLORS.purple : COLORS.white}; border-radius: 10px; padding: 14px 32px;${!isPrimary ? ` border: 1px solid ${COLORS.border};` : ''}">
                 <a href="${url}" style="color: ${isPrimary ? COLORS.white : COLORS.black}; text-decoration: none; font-weight: 700; font-size: 14px; display: inline-block;">${text}</a>
               </td>
             </tr>
@@ -120,6 +118,26 @@ export function emailButton(text: string, url: string, variant: "primary" | "sec
         </td>
       </tr>
     </table>
+  `;
+}
+
+// Reusable badge/tag component
+function emailBadge(text: string, color: string = COLORS.purple): string {
+  return `
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="display: inline-block; background-color: ${color}; padding: 6px 14px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
+        ${text}
+      </div>
+    </div>
+  `;
+}
+
+// Reusable info card
+function emailCard(content: string): string {
+  return `
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+      ${content}
+    </div>
   `;
 }
 
@@ -182,7 +200,7 @@ export async function sendTierChangeEmail(params: {
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+      <div style="display: inline-block; background-color: ${COLORS.purple}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
         Level Up!
       </div>
     </div>
@@ -192,9 +210,9 @@ export async function sendTierChangeEmail(params: {
     <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Congratulations! Your consistent high-quality reviews have earned you a tier upgrade.
     </p>
-    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; text-align: center; margin-bottom: 24px;">
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
       <p style="margin: 0 0 4px; font-size: 14px; color: ${COLORS.gray};">New earning rate</p>
-      <p style="margin: 0; font-size: 32px; font-weight: 700; color: ${COLORS.black};">$${(params.newRateCents / 100).toFixed(2)}</p>
+      <p style="margin: 0; font-size: 32px; font-weight: 700; color: ${COLORS.purple};">$${(params.newRateCents / 100).toFixed(2)}</p>
       <p style="margin: 4px 0 0; font-size: 14px; color: ${COLORS.gray};">per review</p>
     </div>
     <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
@@ -249,7 +267,7 @@ export async function sendFinishLaterEmail(params: {
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+      <div style="display: inline-block; background-color: ${COLORS.purple}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
         Finish later
       </div>
     </div>
@@ -279,15 +297,15 @@ export async function sendTrackQueuedEmail(artistEmail: string, trackTitle: stri
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+      <div style="display: inline-block; background-color: ${COLORS.purple}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
         Track Submitted
       </div>
     </div>
     <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
       Your track is in the queue
     </h1>
-    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
-      <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+      <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
       <p style="margin: 0; font-size: 18px; font-weight: 700; color: ${COLORS.black};">${trackTitle}</p>
     </div>
     <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray};">
@@ -318,23 +336,23 @@ export async function sendReviewProgressEmail(
   const isComplete = reviewCount >= totalReviews;
 
   const progressBar = `
-    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 4px; margin-bottom: 24px;">
-      <div style="background-color: ${isComplete ? COLORS.lime : COLORS.black}; height: 24px; width: ${pct}%; transition: width 0.3s;"></div>
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 4px; margin-bottom: 24px;">
+      <div style="background-color: ${isComplete ? COLORS.green : COLORS.purple}; height: 20px; width: ${pct}%; border-radius: 10px;"></div>
     </div>
   `;
 
   const content = isComplete
     ? `
       <div style="text-align: center; margin-bottom: 24px;">
-        <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+        <div style="display: inline-block; background-color: ${COLORS.green}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
           Complete!
         </div>
       </div>
       <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
         All reviews are in!
       </h1>
-      <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
-        <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
+      <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+        <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
         <p style="margin: 0; font-size: 18px; font-weight: 700; color: ${COLORS.black};">${trackTitle}</p>
       </div>
       ${progressBar}
@@ -350,8 +368,8 @@ export async function sendReviewProgressEmail(
       <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
         Review progress update
       </h1>
-      <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
-        <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
+      <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+        <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
         <p style="margin: 0; font-size: 18px; font-weight: 700; color: ${COLORS.black};">${trackTitle}</p>
       </div>
       ${progressBar}
@@ -385,18 +403,18 @@ export async function sendAdminNewTrackNotification(params: {
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: ${isPromo ? "#a855f7" : COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: ${isPromo ? "#ffffff" : COLORS.black};">
+      <div style="display: inline-block; background-color: ${isPromo ? "#a855f7" : COLORS.purple}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
         ${isPromo ? `Promo: ${promoCode}` : "New Submission"}
       </div>
     </div>
     <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
       New track submitted
     </h1>
-    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
         <tr>
           <td style="padding: 8px 0; border-bottom: 1px solid ${COLORS.border};">
-            <span style="font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase;">Track</span><br>
+            <span style="font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase;">Track</span><br>
             <span style="font-size: 16px; font-weight: 700; color: ${COLORS.black};">${trackTitle}</span>
           </td>
         </tr>
@@ -442,17 +460,17 @@ export async function sendInvalidTrackLinkEmail(params: {
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: #ef4444; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff;">
+      <div style="display: inline-block; background-color: #ef4444; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
         Action Required
       </div>
     </div>
     <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
       Your track link needs attention
     </h1>
-    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
-      <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+      <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
       <p style="margin: 0 0 16px; font-size: 18px; font-weight: 700; color: ${COLORS.black};">${params.trackTitle}</p>
-      <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase; letter-spacing: 0.5px;">Current Link</p>
+      <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase; letter-spacing: 0.5px;">Current Link</p>
       <p style="margin: 0; font-size: 14px; color: #ef4444; word-break: break-all;">${params.sourceUrl}</p>
     </div>
     <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray};">
@@ -485,7 +503,7 @@ export async function sendTrialReminderEmail(params: {
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+      <div style="display: inline-block; background-color: ${COLORS.purple}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
         Ready to get feedback?
       </div>
     </div>
@@ -495,7 +513,7 @@ export async function sendTrialReminderEmail(params: {
     <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Hey ${params.artistName}, you signed up for MixReflect but haven't submitted your track yet. We'd love to help you get real feedback on your music.
     </p>
-    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
       <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
         <strong style="color: ${COLORS.black};">Here's what you'll get:</strong>
       </p>
@@ -505,15 +523,7 @@ export async function sendTrialReminderEmail(params: {
         <li>Actionable suggestions to improve your track</li>
       </ul>
     </div>
-    <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
-      Submit any track — SoundCloud, Bandcamp, or YouTube link — and get real feedback within 24 hours.
-    </p>
     ${emailButton("Submit Your Track", `${getAppUrl()}/submit`)}
-    <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
-      <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-        Honest feedback on your music from real listeners.
-      </p>
-    </div>
   `;
 
   return sendEmail({
@@ -533,7 +543,7 @@ export async function sendLeadReminderEmail(params: {
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+      <div style="display: inline-block; background-color: ${COLORS.purple}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
         Still interested?
       </div>
     </div>
@@ -543,7 +553,7 @@ export async function sendLeadReminderEmail(params: {
     <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       ${greeting}, you started signing up for MixReflect but didn't finish. We'd love to help you get real feedback on your tracks.
     </p>
-    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
       <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
         <strong style="color: ${COLORS.black};">MixReflect connects you with real listeners who:</strong>
       </p>
@@ -553,15 +563,7 @@ export async function sendLeadReminderEmail(params: {
         <li>Help you understand what's working (and what's not)</li>
       </ul>
     </div>
-    <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
-      Sign up takes 30 seconds. Get real feedback from genre-matched listeners.
-    </p>
     ${emailButton("Finish Signing Up", `${getAppUrl()}/signup`)}
-    <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
-      <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-        Create an account and submit a track to get started.
-      </p>
-    </div>
   `;
 
   return sendEmail({
@@ -575,7 +577,7 @@ export async function sendLeadReminderEmail(params: {
 export function previewTrialReminderEmail(artistName: string): string {
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+      <div style="display: inline-block; background-color: ${COLORS.purple}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
         Ready to get feedback?
       </div>
     </div>
@@ -585,7 +587,7 @@ export function previewTrialReminderEmail(artistName: string): string {
     <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Hey ${artistName}, you signed up for MixReflect but haven't submitted your track yet. We'd love to help you get real feedback on your music.
     </p>
-    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
       <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
         <strong style="color: ${COLORS.black};">Here's what you'll get:</strong>
       </p>
@@ -595,15 +597,7 @@ export function previewTrialReminderEmail(artistName: string): string {
         <li>Actionable suggestions to improve your track</li>
       </ul>
     </div>
-    <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
-      Submit any track — SoundCloud, Bandcamp, or YouTube link — and get real feedback within 24 hours.
-    </p>
     ${emailButton("Submit Your Track", `${getAppUrl()}/submit`)}
-    <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
-      <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-        Honest feedback on your music from real listeners.
-      </p>
-    </div>
   `;
 
   return emailWrapper(content);
@@ -614,7 +608,7 @@ export function previewLeadReminderEmail(artistName?: string): string {
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+      <div style="display: inline-block; background-color: ${COLORS.purple}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
         Still interested?
       </div>
     </div>
@@ -624,7 +618,7 @@ export function previewLeadReminderEmail(artistName?: string): string {
     <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       ${greeting}, you started signing up for MixReflect but didn't finish. We'd love to help you get real feedback on your tracks.
     </p>
-    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
       <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
         <strong style="color: ${COLORS.black};">MixReflect connects you with real listeners who:</strong>
       </p>
@@ -634,15 +628,7 @@ export function previewLeadReminderEmail(artistName?: string): string {
         <li>Help you understand what's working (and what's not)</li>
       </ul>
     </div>
-    <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
-      Sign up takes 30 seconds. Get real feedback from genre-matched listeners.
-    </p>
     ${emailButton("Finish Signing Up", `${getAppUrl()}/signup`)}
-    <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
-      <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-        Create an account and submit a track to get started.
-      </p>
-    </div>
   `;
 
   return emailWrapper(content);
@@ -662,7 +648,7 @@ export async function sendPurchaseConfirmationEmail(params: {
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+      <div style="display: inline-block; background-color: ${COLORS.purple}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
         Purchase Complete
       </div>
     </div>
@@ -672,11 +658,11 @@ export async function sendPurchaseConfirmationEmail(params: {
     <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       ${greeting}, thank you for supporting ${params.artistName} by purchasing "<strong>${params.trackTitle}</strong>".
     </p>
-    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 24px; margin-bottom: 24px;">
-      <p style="margin: 0 0 8px; font-size: 14px; color: ${COLORS.gray}; text-align: center;">
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+      <p style="margin: 0 0 8px; font-size: 12px; color: ${COLORS.grayLight}; text-align: center; text-transform: uppercase; letter-spacing: 0.5px;">
         Track
       </p>
-      <p style="margin: 0 0 16px; font-size: 20px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
+      <p style="margin: 0 0 12px; font-size: 20px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
         ${params.trackTitle}
       </p>
       <p style="margin: 0; font-size: 14px; color: ${COLORS.gray}; text-align: center;">
@@ -732,7 +718,7 @@ export async function sendReleaseDecisionReport(params: {
       🔧 Top Fixes (Prioritized)
     </h3>
     ${topFixes.slice(0, 3).map((fix: any, i: number) => `
-      <div style="background-color: ${COLORS.lightGray}; border-left: 4px solid ${fix.avgImpact === 'HIGH' ? '#ef4444' : fix.avgImpact === 'MEDIUM' ? '#f59e0b' : '#10b981'}; padding: 16px; margin-bottom: 12px;">
+      <div style="background-color: ${COLORS.bg}; border-left: 4px solid ${fix.avgImpact === 'HIGH' ? '#ef4444' : fix.avgImpact === 'MEDIUM' ? '#f59e0b' : '#10b981'}; padding: 16px; margin-bottom: 12px; border-radius: 0 10px 10px 0;">
         <p style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: ${COLORS.black};">
           ${i + 1}. ${fix.issue}
         </p>
@@ -748,7 +734,7 @@ export async function sendReleaseDecisionReport(params: {
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
-      <div style="display: inline-block; background-color: #7c3aed; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: white;">
+      <div style="display: inline-block; background-color: #7c3aed; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
         Release Decision Report
       </div>
     </div>
@@ -759,7 +745,7 @@ export async function sendReleaseDecisionReport(params: {
       ${params.report.reviewCount} expert reviewers have spoken
     </p>
 
-    <div style="background-color: ${verdictColor}; padding: 20px; margin-bottom: 24px; text-align: center; border: 2px solid ${COLORS.black};">
+    <div style="background-color: ${verdictColor}; padding: 20px; margin-bottom: 24px; text-align: center; border-radius: 12px;">
       <h2 style="margin: 0; font-size: 28px; font-weight: 900; color: white;">
         ${verdictText}
       </h2>
@@ -768,7 +754,7 @@ export async function sendReleaseDecisionReport(params: {
       </p>
     </div>
 
-    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 24px; margin-bottom: 24px; text-align: center;">
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 24px; margin-bottom: 24px; text-align: center;">
       <p style="margin: 0 0 8px; font-size: 14px; color: ${COLORS.gray}; text-transform: uppercase;">
         READINESS SCORE
       </p>
@@ -779,7 +765,7 @@ export async function sendReleaseDecisionReport(params: {
 
     ${fixesHtml}
 
-    <div style="background-color: #faf5ff; border: 2px solid #e9d5ff; padding: 20px; margin: 24px 0;">
+    <div style="background-color: #faf5ff; border-radius: 12px; padding: 20px; margin: 24px 0;">
       <h3 style="margin: 0 0 12px; font-size: 16px; font-weight: 700; color: #7c3aed;">
         📊 Summary
       </h3>

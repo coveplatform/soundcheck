@@ -35,6 +35,15 @@ const mockReviews = [
   { id: "r10", releaseVerdict: "FIX_FIRST" as const, releaseReadinessScore: 71, topFixRank1: "Vocal too loud - rebalance -2dB", topFixRank1Impact: "HIGH" as const, topFixRank1TimeMin: 10, topFixRank2: "Chorus build needs more energy", topFixRank2Impact: "MEDIUM" as const, topFixRank2TimeMin: 20, topFixRank3: "Master too quiet for genre", topFixRank3Impact: "LOW" as const, topFixRank3TimeMin: 10, strongestElement: "Strong commercial potential", biggestRisk: "Sounds unpolished vs competitors", competitiveBenchmark: "Taylor Swift - Anti-Hero", ReviewerProfile: { id: "rev-10" } },
 ];
 
+// Badge helper for previews
+function badge(text: string, color: string = COLORS.purple): string {
+  return `<div style="text-align: center; margin-bottom: 20px;"><div style="display: inline-block; background-color: ${color}; padding: 6px 14px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">${text}</div></div>`;
+}
+// Card helper for previews
+function card(inner: string): string {
+  return `<div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 20px;">${inner}</div>`;
+}
+
 // Build preview HTML for each email type
 function buildPreviewHtml(type: string): string {
   const appUrl = getAppUrl();
@@ -42,17 +51,15 @@ function buildPreviewHtml(type: string): string {
   switch (type) {
     case "tier-change": {
       const content = `
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Level Up!</div>
-        </div>
+        ${badge("Level Up!")}
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">You're now PRO</h1>
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Congratulations! Your consistent high-quality reviews have earned you a tier upgrade.</p>
-        <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; text-align: center; margin-bottom: 24px;">
-          <p style="margin: 0 0 4px; font-size: 14px; color: ${COLORS.gray};">New earning rate</p>
-          <p style="margin: 0; font-size: 32px; font-weight: 700; color: ${COLORS.black};">$0.50</p>
-          <p style="margin: 4px 0 0; font-size: 14px; color: ${COLORS.gray};">per review</p>
-        </div>
-        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Keep submitting thoughtful, detailed feedback to maintain your status and continue earning more.</p>
+        ${card(`
+          <p style="margin: 0 0 4px; font-size: 14px; color: ${COLORS.gray}; text-align: center;">New earning rate</p>
+          <p style="margin: 0; font-size: 32px; font-weight: 700; color: ${COLORS.purple}; text-align: center;">$0.50</p>
+          <p style="margin: 4px 0 0; font-size: 14px; color: ${COLORS.gray}; text-align: center;">per review</p>
+        `)}
+        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Keep submitting thoughtful, detailed feedback to maintain your status.</p>
       `;
       return emailWrapper(content);
     }
@@ -61,18 +68,13 @@ function buildPreviewHtml(type: string): string {
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black};">Reset your password</h1>
         <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray};">We received a request to reset your password. Click the button below to choose a new one.</p>
         ${emailButton("Reset Password", `${appUrl}/reset-password?token=test-token-123`)}
-        <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">This link will expire in <strong>1 hour</strong> for security reasons.</p>
-        <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
-          <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">If you didn't request a password reset, you can safely ignore this email.</p>
-        </div>
+        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">This link will expire in <strong>1 hour</strong> for security reasons.</p>
       `;
       return emailWrapper(content);
     }
     case "finish-later": {
       const content = `
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Finish later</div>
-        </div>
+        ${badge("Finish later")}
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Pick this up when you're back at your computer</h1>
         <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Here's a link back to MixReflect so you can submit your track and get feedback.</p>
         ${emailButton("Continue on MixReflect", `${appUrl}/submit`)}
@@ -81,27 +83,25 @@ function buildPreviewHtml(type: string): string {
     }
     case "track-queued": {
       const content = `
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Track Submitted</div>
-        </div>
+        ${badge("Track Submitted")}
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Your track is in the queue</h1>
-        <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
-          <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
+        ${card(`
+          <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
           <p style="margin: 0; font-size: 18px; font-weight: 700; color: ${COLORS.black};">Summer Nights (Demo)</p>
-        </div>
-        <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray};">Great news! Your track has been queued and is now being matched with reviewers based on genre preferences.</p>
-        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};"><strong>What happens next:</strong><br>We'll email you updates at 50% and 100% completion. Most tracks receive all reviews within 24 hours.</p>
+        `)}
+        <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray};">Your track is now being matched with reviewers based on genre preferences.</p>
+        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};"><strong>What happens next:</strong><br>We'll email you updates at 50% and 100% completion.</p>
       `;
       return emailWrapper(content);
     }
     case "review-progress": {
-      const progressBar = `<div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 4px; margin-bottom: 24px;"><div style="background-color: ${COLORS.black}; height: 24px; width: 50%;"></div></div>`;
+      const progressBar = `<div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 4px; margin-bottom: 24px;"><div style="background-color: ${COLORS.purple}; height: 20px; width: 50%; border-radius: 10px;"></div></div>`;
       const content = `
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Review progress update</h1>
-        <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
-          <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase;">Track</p>
+        ${card(`
+          <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase;">Track</p>
           <p style="margin: 0; font-size: 18px; font-weight: 700; color: ${COLORS.black};">Summer Nights (Demo)</p>
-        </div>
+        `)}
         ${progressBar}
         <p style="margin: 0 0 24px; font-size: 18px; line-height: 1.6; color: ${COLORS.black}; text-align: center; font-weight: 700;">50% complete — 5 of 10 reviews</p>
         <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Reviews are coming in! You can already view completed reviews in your dashboard.</p>
@@ -110,16 +110,14 @@ function buildPreviewHtml(type: string): string {
       return emailWrapper(content);
     }
     case "reviews-complete": {
-      const progressBar = `<div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 4px; margin-bottom: 24px;"><div style="background-color: ${COLORS.lime}; height: 24px; width: 100%;"></div></div>`;
+      const progressBar = `<div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 4px; margin-bottom: 24px;"><div style="background-color: ${COLORS.green}; height: 20px; width: 100%; border-radius: 10px;"></div></div>`;
       const content = `
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Complete!</div>
-        </div>
+        ${badge("Complete!", COLORS.green)}
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">All reviews are in!</h1>
-        <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
-          <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase;">Track</p>
+        ${card(`
+          <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase;">Track</p>
           <p style="margin: 0; font-size: 18px; font-weight: 700; color: ${COLORS.black};">Summer Nights (Demo)</p>
-        </div>
+        `)}
         ${progressBar}
         <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;"><strong>10 of 10</strong> reviews completed</p>
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Your feedback is ready! Log in to read all reviews and rate them.</p>
@@ -129,45 +127,39 @@ function buildPreviewHtml(type: string): string {
     }
     case "invalid-track": {
       const content = `
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="display: inline-block; background-color: #ef4444; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff;">Action Required</div>
-        </div>
+        ${badge("Action Required", COLORS.red)}
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Your track link needs attention</h1>
-        <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
-          <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase;">Track</p>
+        ${card(`
+          <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase;">Track</p>
           <p style="margin: 0 0 16px; font-size: 18px; font-weight: 700; color: ${COLORS.black};">Summer Nights (Demo)</p>
-          <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase;">Current Link</p>
-          <p style="margin: 0; font-size: 14px; color: #ef4444;">https://soundcloud.com/broken-link</p>
-        </div>
-        <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray};">We've noticed that your track link appears to be broken, private, or unavailable.</p>
+          <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase;">Current Link</p>
+          <p style="margin: 0; font-size: 14px; color: ${COLORS.red};">https://soundcloud.com/broken-link</p>
+        `)}
+        <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray};">Your track link appears to be broken, private, or unavailable.</p>
         ${emailButton("Update Track Link", `${appUrl}/tracks/test-id`)}
       `;
       return emailWrapper(content);
     }
     case "trial-reminder": {
       const content = `
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Ready to get feedback?</div>
-        </div>
+        ${badge("Ready to get feedback?")}
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Submit your first track</h1>
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Hey Test User, you signed up for MixReflect but haven't submitted your track yet.</p>
-        <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
+        ${card(`
           <p style="margin: 0 0 16px; font-size: 14px; color: ${COLORS.gray};"><strong style="color: ${COLORS.black};">Here's what you'll get:</strong></p>
           <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: ${COLORS.gray};">
             <li>Detailed feedback from genre-matched listeners</li>
             <li>Honest first impressions and production notes</li>
             <li>Actionable suggestions to improve your track</li>
           </ul>
-        </div>
+        `)}
         ${emailButton("Submit Your Track", `${appUrl}/submit`)}
       `;
       return emailWrapper(content);
     }
     case "lead-reminder": {
       const content = `
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Still interested?</div>
-        </div>
+        ${badge("Still interested?")}
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Get feedback on your music</h1>
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Hey there, you started signing up for MixReflect but didn't finish.</p>
         ${emailButton("Finish Signing Up", `${appUrl}/signup`)}
@@ -176,80 +168,68 @@ function buildPreviewHtml(type: string): string {
     }
     case "purchase-confirmation": {
       const content = `
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Purchase Complete</div>
-        </div>
+        ${badge("Purchase Complete")}
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Your download is ready!</h1>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Hi Test User, thank you for supporting Demo Artist by purchasing "<strong>Summer Nights</strong>".</p>
-        <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 24px; margin-bottom: 24px;">
-          <p style="margin: 0 0 8px; font-size: 14px; color: ${COLORS.gray}; text-align: center;">Track</p>
-          <p style="margin: 0 0 16px; font-size: 20px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Summer Nights</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Hi Test User, thank you for supporting Demo Artist.</p>
+        ${card(`
+          <p style="margin: 0 0 8px; font-size: 12px; color: ${COLORS.grayLight}; text-align: center; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
+          <p style="margin: 0 0 12px; font-size: 20px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Summer Nights</p>
           <p style="margin: 0; font-size: 14px; color: ${COLORS.gray}; text-align: center;">by <strong style="color: ${COLORS.black};">Demo Artist</strong></p>
-        </div>
+        `)}
         ${emailButton("Download Track", `${appUrl}/downloads/test`)}
       `;
       return emailWrapper(content);
     }
     case "admin-new-track": {
       const content = `
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="display: inline-block; background-color: ${COLORS.lime}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">New Submission</div>
-        </div>
+        ${badge("New Submission")}
         <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">New track submitted</h1>
-        <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 20px; margin-bottom: 24px;">
+        ${card(`
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid ${COLORS.border};"><span style="font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase;">Track</span><br><span style="font-size: 16px; font-weight: 700; color: ${COLORS.black};">Summer Nights (Demo)</span></td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid ${COLORS.border};"><span style="font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase;">Artist</span><br><span style="font-size: 14px; color: ${COLORS.black};">test@example.com</span></td></tr>
-            <tr><td style="padding: 8px 0;"><span style="font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase;">Package</span><br><span style="font-size: 14px; font-weight: 600; color: ${COLORS.black};">PEER</span></td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid ${COLORS.border};"><span style="font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase;">Track</span><br><span style="font-size: 16px; font-weight: 700; color: ${COLORS.black};">Summer Nights (Demo)</span></td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid ${COLORS.border};"><span style="font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase;">Artist</span><br><span style="font-size: 14px; color: ${COLORS.black};">test@example.com</span></td></tr>
+            <tr><td style="padding: 8px 0;"><span style="font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase;">Package</span><br><span style="font-size: 14px; font-weight: 600; color: ${COLORS.black};">PEER</span></td></tr>
           </table>
-        </div>
+        `)}
         ${emailButton("View in Admin", `${appUrl}/admin/tracks`)}
       `;
       return emailWrapper(content);
     }
     case "release-decision-report": {
-      // Build inline - same as sendReleaseDecisionReport
-      const verdict = { consensus: "FIX_FIRST", breakdown: { RELEASE_NOW: 3, FIX_FIRST: 7, NEEDS_WORK: 0 }, confidence: "HIGH" };
-      const readinessScore = { average: 73 };
+      const verdict = { breakdown: { RELEASE_NOW: 3, FIX_FIRST: 7, NEEDS_WORK: 0 } };
       const topFixes = [
         { issue: "Vocal sits too loud in the mix - needs to be pulled back 2-3dB", avgImpact: "HIGH", avgTimeEstimate: 15, mentionedBy: 7 },
         { issue: "Low end is muddy around 80-120Hz - kick and bass fighting", avgImpact: "HIGH", avgTimeEstimate: 25, mentionedBy: 5 },
         { issue: "De-essing needed - sibilance is distracting", avgImpact: "MEDIUM", avgTimeEstimate: 10, mentionedBy: 4 },
       ];
-      const aiAnalysis = { summary: "7 of 10 expert reviewers recommend fixing before release. The track shows strong commercial potential but has mix balance issues.", estimatedWorkRequired: "Approximately 50 minutes based on identified fixes" };
-
-      const verdictColor = "#f59e0b";
       const trackUrl = `${appUrl}/artist/tracks/demo-track-id`;
       const fixesHtml = topFixes.map((fix: any, i: number) => `
-        <div style="background-color: ${COLORS.lightGray}; border-left: 4px solid ${fix.avgImpact === 'HIGH' ? '#ef4444' : '#f59e0b'}; padding: 16px; margin-bottom: 12px;">
+        <div style="background-color: ${COLORS.bg}; border-left: 4px solid ${fix.avgImpact === 'HIGH' ? '#ef4444' : '#f59e0b'}; padding: 16px; margin-bottom: 12px; border-radius: 0 10px 10px 0;">
           <p style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: ${COLORS.black};">${i + 1}. ${fix.issue}</p>
           <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">${fix.mentionedBy}/10 reviewers • <span style="color: ${fix.avgImpact === 'HIGH' ? '#ef4444' : '#f59e0b'}; font-weight: 600;">${fix.avgImpact} IMPACT</span> • ~${fix.avgTimeEstimate} min</p>
         </div>
       `).join("");
 
       const content = `
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="display: inline-block; background-color: #7c3aed; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: white;">Release Decision Report</div>
-        </div>
+        ${badge("Release Decision Report", "#7c3aed")}
         <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Summer Nights (Demo)</h1>
         <p style="margin: 0 0 24px; font-size: 14px; color: ${COLORS.gray}; text-align: center;">10 expert reviewers have spoken</p>
-        <div style="background-color: ${verdictColor}; padding: 20px; margin-bottom: 24px; text-align: center; border: 2px solid ${COLORS.black};">
+        <div style="background-color: ${COLORS.amber}; padding: 20px; margin-bottom: 24px; text-align: center; border-radius: 12px;">
           <h2 style="margin: 0; font-size: 28px; font-weight: 900; color: white;">⚠️ FIX FIRST</h2>
           <p style="margin: 8px 0 0; font-size: 13px; color: rgba(255,255,255,0.9);">${verdict.breakdown.RELEASE_NOW} Release • ${verdict.breakdown.FIX_FIRST} Fix First • ${verdict.breakdown.NEEDS_WORK} Needs Work</p>
         </div>
-        <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 24px; margin-bottom: 24px; text-align: center;">
+        <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 24px; margin-bottom: 24px; text-align: center;">
           <p style="margin: 0 0 8px; font-size: 14px; color: ${COLORS.gray}; text-transform: uppercase;">READINESS SCORE</p>
-          <p style="margin: 0; font-size: 56px; font-weight: 900; color: #7c3aed; line-height: 1;">${readinessScore.average}/100</p>
+          <p style="margin: 0; font-size: 56px; font-weight: 900; color: #7c3aed; line-height: 1;">73/100</p>
         </div>
         <h3 style="margin: 24px 0 16px; font-size: 18px; font-weight: 700; color: ${COLORS.black};">🔧 Top Fixes (Prioritized)</h3>
         ${fixesHtml}
-        <div style="background-color: #faf5ff; border: 2px solid #e9d5ff; padding: 20px; margin: 24px 0;">
+        <div style="background-color: #faf5ff; border-radius: 12px; padding: 20px; margin: 24px 0;">
           <h3 style="margin: 0 0 12px; font-size: 16px; font-weight: 700; color: #7c3aed;">📊 Summary</h3>
-          <p style="margin: 0 0 12px; font-size: 14px; color: #374151; line-height: 1.6;">${aiAnalysis.summary}</p>
-          <p style="margin: 0; font-size: 13px; color: #6b7280;"><strong>Work Required:</strong> ${aiAnalysis.estimatedWorkRequired}</p>
+          <p style="margin: 0 0 12px; font-size: 14px; color: #374151; line-height: 1.6;">7 of 10 expert reviewers recommend fixing before release. Strong commercial potential but mix balance issues.</p>
+          <p style="margin: 0; font-size: 13px; color: #6b7280;"><strong>Work Required:</strong> ~50 minutes</p>
         </div>
         ${emailButton("View Full Report", trackUrl)}
-        <p style="margin: 24px 0 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">Generated from 10 expert reviewers</p>
       `;
       return emailWrapper(content);
     }
