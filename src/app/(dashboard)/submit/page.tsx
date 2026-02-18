@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -77,7 +77,11 @@ const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
 
 export default function SubmitTrackPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
+
+  // Detect if user arrived via Release Decision CTA
+  const isReleaseDecisionFlow = searchParams.get("package") === "release-decision";
 
   // ---- step state ----------------------------------------------------------
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -111,6 +115,13 @@ export default function SubmitTrackPage() {
 
   // ---- step 3: product selection state ------------------------------------
   const [selectedProduct, setSelectedProduct] = useState<"RELEASE_DECISION" | "PEER">("RELEASE_DECISION");
+
+  // Force Release Decision when in dedicated flow
+  useEffect(() => {
+    if (isReleaseDecisionFlow) {
+      setSelectedProduct("RELEASE_DECISION");
+    }
+  }, [isReleaseDecisionFlow]);
 
   // ---- step 3: general feedback state (for PEER product) -----------------
   const [reviewCount, setReviewCount] = useState<number>(5);
@@ -668,11 +679,16 @@ export default function SubmitTrackPage() {
         {/* Header with step indicator */}
         <div className="mb-8 pb-6 border-b border-black/10">
           <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40">
-            Submit
+            {isReleaseDecisionFlow ? "Release Decision" : "Submit"}
           </p>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black mt-2">
-            Submit Track
+            {isReleaseDecisionFlow ? "Submit for Release Decision" : "Submit Track"}
           </h1>
+          {isReleaseDecisionFlow && (
+            <p className="text-sm text-neutral-500 mt-2">
+              Expert panel verdict • $9.95 • Delivered in 24 hours
+            </p>
+          )}
 
           {/* Step indicator */}
           <div className="flex items-center gap-2 mt-6">
@@ -1096,8 +1112,12 @@ export default function SubmitTrackPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-black mb-1">What do you need?</h2>
-                <p className="text-sm text-neutral-600">Choose the type of feedback</p>
+                <h2 className="text-xl font-semibold text-black mb-1">
+                  {isReleaseDecisionFlow ? "Confirm & Pay" : "What do you need?"}
+                </h2>
+                <p className="text-sm text-neutral-600">
+                  {isReleaseDecisionFlow ? "Review your Release Decision order" : "Choose the type of feedback"}
+                </p>
               </div>
               <button
                 onClick={goBack}
@@ -1108,7 +1128,8 @@ export default function SubmitTrackPage() {
               </button>
             </div>
 
-            {/* Product Selection Cards */}
+            {/* Product Selection Cards - hidden when in dedicated RD flow */}
+            {!isReleaseDecisionFlow && (
             <div className="space-y-4">
               {/* Release Decision Card */}
               <button
@@ -1167,7 +1188,7 @@ export default function SubmitTrackPage() {
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>AI-powered technical analysis report</span>
+                        <span>Compiled technical analysis report</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
@@ -1245,6 +1266,7 @@ export default function SubmitTrackPage() {
                 </div>
               </button>
             </div>
+            )}
 
             {/* Conditional Content - Release Decision */}
             {selectedProduct === "RELEASE_DECISION" && (
@@ -1264,8 +1286,8 @@ export default function SubmitTrackPage() {
                 <div className="rounded-xl bg-purple-50 border border-purple-200 p-4">
                   <p className="text-sm text-purple-900">
                     <strong>What happens next:</strong> Your track will be assigned to 10-12
-                    expert reviewers (100+ reviews, 4.5+ rating). Their feedback will be analyzed by AI
-                    to generate a comprehensive technical report with actionable insights. You'll receive
+                    expert reviewers (100+ reviews, 4.5+ rating). Their feedback is compiled into
+                    a comprehensive technical report with actionable insights. You&apos;ll receive
                     your complete Release Decision Report via email within 24 hours.
                   </p>
                 </div>

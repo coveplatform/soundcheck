@@ -8,7 +8,7 @@ export function ReleaseDecisionBanner() {
   return (
     <section className="pb-6 pt-6 bg-neutral-900 text-neutral-50 overflow-hidden rounded-2xl mb-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-black">
       {/* Main content */}
-      <Link href="/submit" className="block group">
+      <Link href="/submit?package=release-decision" className="block group">
         <div className="px-6 py-6">
           <div className="grid gap-6 md:grid-cols-[1fr_auto] items-center">
             {/* Left content */}
