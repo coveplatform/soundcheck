@@ -150,11 +150,19 @@ export default async function AdminPage() {
         </Link>
         <Link
           href="/admin/emails"
-          className="block rounded-xl border border-neutral-200 bg-white p-5 hover:border-purple-300 transition-colors col-span-2"
+          className="block rounded-xl border border-neutral-200 bg-white p-5 hover:border-purple-300 transition-colors"
         >
           <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Tool</div>
           <div className="mt-2 text-base font-bold text-neutral-950">Email Templates</div>
-          <div className="text-xs text-neutral-400 mt-1">Preview and test-send all 12 email templates</div>
+          <div className="text-xs text-neutral-400 mt-1">Preview and test-send all email templates</div>
+        </Link>
+        <Link
+          href="/admin/announcement"
+          className="block rounded-xl border border-purple-200 bg-purple-50 p-5 hover:border-purple-400 transition-colors"
+        >
+          <div className="text-xs font-semibold text-purple-600 uppercase tracking-wider">Blast</div>
+          <div className="mt-2 text-base font-bold text-neutral-950">Send Announcement</div>
+          <div className="text-xs text-neutral-400 mt-1">Preview &amp; send feature update to all users</div>
         </Link>
       </div>
 

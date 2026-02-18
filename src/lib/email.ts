@@ -790,3 +790,105 @@ export async function sendReleaseDecisionReport(params: {
     html: emailWrapper(content),
   });
 }
+
+// ── Announcement / Blast Email ──────────────────────────────────────────────
+export function buildAnnouncementEmail(params: { userName?: string }): { subject: string; html: string } {
+  const greeting = params.userName ? `Hey ${params.userName}` : "Hey there";
+  const appUrl = getAppUrl();
+
+  // Repeating "new" ticker — mimics the landing page Caveat font banner
+  const tickerWords = Array.from({ length: 30 }).map(() => "new").join("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+  const ticker = `
+    <div style="background-color: rgba(168,85,247,0.1); padding: 10px 0; margin: 0 0 24px; overflow: hidden; text-align: center;">
+      <div style="font-family: 'Georgia', serif; font-size: 22px; font-weight: 700; color: ${COLORS.purpleDark}; white-space: nowrap; letter-spacing: 2px; opacity: 0.7;">
+        ${tickerWords}
+      </div>
+    </div>
+  `;
+
+  const content = `
+    ${ticker}
+
+    <h1 style="margin: 0 0 8px; font-size: 26px; font-weight: 800; color: ${COLORS.black}; text-align: center; letter-spacing: -0.5px;">
+      Big updates on MixReflect
+    </h1>
+    <p style="margin: 0 0 28px; font-size: 15px; color: ${COLORS.gray}; text-align: center;">
+      ${greeting}, we've been shipping. Here's what's new.
+    </p>
+
+    <!-- Feature 1: Sell Your Music -->
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+      <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 700; color: ${COLORS.black};">
+        🎵 Sell your music directly
+      </h3>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
+        Every track now gets its own public page. Share it anywhere — when someone buys through your link, you keep <strong style="color: ${COLORS.black};">85% of the sale</strong>. No middlemen.
+      </p>
+    </div>
+
+    <!-- Feature 2: Release Decision -->
+    <div style="background-color: #0a0a0a; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+      <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 700; color: #ffffff;">
+        🎯 Release Decision Reports
+      </h3>
+      <p style="margin: 0 0 12px; font-size: 14px; line-height: 1.6; color: #a3a3a3;">
+        Should you release this track? Get a clear <strong style="color: #ffffff;">Go/No-Go verdict</strong> from 10-12 expert reviewers, a readiness score out of 100, and your top 3 fixes ranked by impact — all for $9.95.
+      </p>
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="background-color: rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; text-align: center; width: 33%;">
+            <div style="font-size: 11px; color: #737373; text-transform: uppercase;">Verdict</div>
+            <div style="font-size: 14px; font-weight: 800; color: #34d399;">RELEASE</div>
+          </td>
+          <td width="8"></td>
+          <td style="background-color: rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; text-align: center; width: 33%;">
+            <div style="font-size: 11px; color: #737373; text-transform: uppercase;">Score</div>
+            <div style="font-size: 14px; font-weight: 800; color: ${COLORS.purpleDark};">0–100</div>
+          </td>
+          <td width="8"></td>
+          <td style="background-color: rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; text-align: center; width: 33%;">
+            <div style="font-size: 11px; color: #737373; text-transform: uppercase;">Fixes</div>
+            <div style="font-size: 14px; font-weight: 800; color: ${COLORS.amber};">Top 3</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Feature 3: Discover & Public Pages -->
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+      <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 700; color: ${COLORS.black};">
+        🌍 Discover page & public track pages
+      </h3>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
+        Your music is now discoverable. Listeners can browse by genre, play tracks, and buy directly. Every track you upload gets its own shareable page.
+      </p>
+    </div>
+
+    <!-- Feature 4: Earn Money Reviewing -->
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+      <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 700; color: ${COLORS.black};">
+        💰 Earn money reviewing
+      </h3>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
+        Hit Verified Reviewer status (25+ reviews, 4.5+ rating) and earn <strong style="color: ${COLORS.black};">$1.50 per review</strong>. Cash out anytime via Stripe.
+      </p>
+    </div>
+
+    ${emailButton("Check it out", appUrl)}
+
+    <p style="margin: 24px 0 0; font-size: 13px; color: ${COLORS.grayLight}; text-align: center;">
+      Thanks for being an early user. We're building this for artists like you.
+    </p>
+  `;
+
+  return {
+    subject: "What's new on MixReflect — sell tracks, release decisions & more",
+    html: emailWrapper(content),
+  };
+}
+
+export async function sendAnnouncementEmail(params: { to: string; userName?: string }): Promise<boolean> {
+  if (!params.to) return false;
+  const { subject, html } = buildAnnouncementEmail({ userName: params.userName });
+  return sendEmail({ to: params.to, subject, html });
+}
