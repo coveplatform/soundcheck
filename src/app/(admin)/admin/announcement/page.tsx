@@ -10,7 +10,7 @@ export default function AnnouncementPage() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [sendingAll, setSendingAll] = useState(false);
-  const [result, setResult] = useState<{ sent: number; failed: number; total: number } | null>(null);
+  const [result, setResult] = useState<{ sent: number; failed: number; total: number; failedEmails?: string[] } | null>(null);
   const [testResult, setTestResult] = useState<string | null>(null);
   const [confirmSendAll, setConfirmSendAll] = useState(false);
 
@@ -53,7 +53,7 @@ export default function AnnouncementPage() {
         body: JSON.stringify({ testOnly: false }),
       });
       const data = await res.json();
-      setResult({ sent: data.sent, failed: data.failed, total: data.total });
+      setResult({ sent: data.sent, failed: data.failed, total: data.total, failedEmails: data.failedEmails || [] });
     } catch {
       setResult({ sent: 0, failed: 1, total: 0 });
     } finally {
@@ -145,11 +145,53 @@ export default function AnnouncementPage() {
         )}
 
         {result && (
-          <div className={`flex items-center gap-2 p-3 rounded-lg mb-4 text-sm font-medium ${
-            result.failed === 0 ? "bg-green-50 text-green-800 border border-green-200" : "bg-amber-50 text-amber-800 border border-amber-200"
-          }`}>
-            <CheckCircle2 className="h-4 w-4" />
-            Sent {result.sent} of {result.total} emails{result.failed > 0 ? ` (${result.failed} failed)` : ""}
+          <div className="mb-4 space-y-2">
+            <div className={`flex items-center gap-2 p-3 rounded-lg text-sm font-medium ${
+              result.failed === 0 ? "bg-green-50 text-green-800 border border-green-200" : "bg-amber-50 text-amber-800 border border-amber-200"
+            }`}>
+              <CheckCircle2 className="h-4 w-4" />
+              Sent {result.sent} of {result.total} emails{result.failed > 0 ? ` (${result.failed} failed)` : ""}
+            </div>
+            {result.failedEmails && result.failedEmails.length > 0 && (
+              <div className="border border-red-200 rounded-lg bg-red-50 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-semibold text-red-700 uppercase tracking-wider">Failed emails ({result.failedEmails.length})</p>
+                  <button
+                    onClick={async () => {
+                      setSendingAll(true);
+                      try {
+                        const res = await fetch("/api/admin/send-announcement", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ retryEmails: result.failedEmails }),
+                        });
+                        const data = await res.json();
+                        setResult({
+                          sent: result.sent + data.sent,
+                          failed: data.failed,
+                          total: result.total,
+                          failedEmails: data.failedEmails || [],
+                        });
+                      } catch {
+                        // keep current result
+                      } finally {
+                        setSendingAll(false);
+                      }
+                    }}
+                    disabled={sendingAll}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-700 hover:text-red-900 bg-white border border-red-200 px-3 py-1.5 rounded-md hover:bg-red-50 disabled:opacity-50"
+                  >
+                    {sendingAll ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+                    Retry Failed
+                  </button>
+                </div>
+                <div className="max-h-48 overflow-y-auto space-y-1">
+                  {result.failedEmails.map((email, i) => (
+                    <div key={i} className="text-sm text-red-800 font-mono bg-white/60 px-2 py-1 rounded">{email}</div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

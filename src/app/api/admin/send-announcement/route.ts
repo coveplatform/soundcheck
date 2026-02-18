@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { testOnly } = body; // if true, only send to the admin's own email
+    const { testOnly, retryEmails } = body; // testOnly: send to admin; retryEmails: re-send to specific addresses
 
     if (testOnly) {
       const success = await sendAnnouncementEmail({
@@ -70,25 +70,36 @@ export async function POST(request: Request) {
       return NextResponse.json({ success, sent: 1, total: 1 });
     }
 
-    // Fetch all real users
-    const users = await prisma.user.findMany({
-      where: {
-        email: { not: undefined },
-        AND: [
-          ...DEMO_EMAIL_PATTERNS.map((pattern) => ({
-            email: { not: { contains: pattern } },
-          })),
-          { email: { notIn: DEMO_EMAIL_EXACT } },
-        ],
-      },
-      select: { email: true, name: true },
-    });
+    // If retryEmails is provided, only send to those specific addresses
+    let users: { email: string | null; name: string | null }[];
+    if (Array.isArray(retryEmails) && retryEmails.length > 0) {
+      users = await prisma.user.findMany({
+        where: { email: { in: retryEmails } },
+        select: { email: true, name: true },
+      });
+    } else {
+      // Fetch all real users
+      users = await prisma.user.findMany({
+        where: {
+          email: { not: undefined },
+          AND: [
+            ...DEMO_EMAIL_PATTERNS.map((pattern) => ({
+              email: { not: { contains: pattern } },
+            })),
+            { email: { notIn: DEMO_EMAIL_EXACT } },
+          ],
+        },
+        select: { email: true, name: true },
+      });
+    }
 
     let sent = 0;
     let failed = 0;
+    const failedEmails: string[] = [];
 
-    // Send in batches of 5 with small delays to avoid rate limits
-    const BATCH_SIZE = 5;
+    // Send in batches of 2 with 1s delay to stay under Resend rate limits
+    const BATCH_SIZE = 2;
+    const BATCH_DELAY_MS = 1000;
     for (let i = 0; i < users.length; i += BATCH_SIZE) {
       const batch = users.slice(i, i + BATCH_SIZE);
       const results = await Promise.allSettled(
@@ -99,20 +110,21 @@ export async function POST(request: Request) {
           })
         )
       );
-      for (const result of results) {
+      for (let j = 0; j < results.length; j++) {
+        const result = results[j];
         if (result.status === "fulfilled" && result.value) {
           sent++;
         } else {
           failed++;
+          failedEmails.push(batch[j].email || "unknown");
         }
       }
-      // Small delay between batches
       if (i + BATCH_SIZE < users.length) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY_MS));
       }
     }
 
-    return NextResponse.json({ success: true, sent, failed, total: users.length });
+    return NextResponse.json({ success: true, sent, failed, total: users.length, failedEmails });
   } catch (error) {
     console.error("Announcement send error:", error);
     return NextResponse.json(
