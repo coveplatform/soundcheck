@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, Target, TrendingUp, CheckCircle2, AlertTriangle, Sparkles, Clock, Users } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
 import { generateReleaseDecisionReport } from "@/lib/release-decision-report";
+import { ReleaseDecisionReportView } from "@/components/tracks/release-decision-report-view";
 
 export const dynamic = "force-dynamic";
 
@@ -193,23 +193,9 @@ export default async function ReleaseDecisionReportDemoPage() {
   // Generate the report using real logic with mock data
   const report = await generateReleaseDecisionReport("demo-track-id", mockReviews);
 
-  const verdictColor =
-    report.verdict.consensus === "RELEASE_NOW"
-      ? "bg-green-500"
-      : report.verdict.consensus === "FIX_FIRST"
-        ? "bg-orange-500"
-        : "bg-red-500";
-
-  const verdictText =
-    report.verdict.consensus === "RELEASE_NOW"
-      ? "✅ RELEASE NOW"
-      : report.verdict.consensus === "FIX_FIRST"
-        ? "⚠️ FIX FIRST"
-        : "🔧 NEEDS WORK";
-
   return (
     <div className="pt-8 pb-24">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Link */}
         <Link
           href="/admin"
@@ -219,241 +205,22 @@ export default async function ReleaseDecisionReportDemoPage() {
           Back to Admin
         </Link>
 
-        {/* Header */}
-        <div className="mb-8 pb-6 border-b border-black/10">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center shadow-lg">
-              <Target className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-black">Release Decision Report</h1>
-              <p className="text-sm text-neutral-600">Demo report with generated feedback</p>
-            </div>
-          </div>
+        <div className="mb-6">
+          <p className="text-xs font-mono text-neutral-400 uppercase tracking-wider mb-1">Admin Preview</p>
+          <h1 className="text-2xl font-bold text-black">Report Demo — &ldquo;Summer Nights&rdquo;</h1>
         </div>
 
-        {/* Artist View - What they receive */}
-        <div className="space-y-6">
-          {/* Hero Section - Verdict */}
-          <Card variant="soft" elevated className="border-2 border-purple-200">
-            <CardContent className="pt-8 pb-8">
-              <div className="text-center mb-8">
-                <p className="text-sm font-semibold text-neutral-600 mb-3 uppercase tracking-wider">
-                  Your Release Decision for "Summer Nights"
-                </p>
-                <div className={`inline-flex items-center justify-center px-8 py-4 rounded-2xl ${verdictColor} shadow-lg mb-4`}>
-                  <span className="text-3xl font-black text-white tracking-tight">
-                    {verdictText}
-                  </span>
-                </div>
-                <div className="flex items-center justify-center gap-6 text-sm text-neutral-600 flex-wrap">
-                  <span className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    {report.reviewCount} expert reviewers
-                  </span>
-                  <span>•</span>
-                  <span>
-                    {report.verdict.breakdown.RELEASE_NOW} Release Now • {report.verdict.breakdown.FIX_FIRST} Fix First • {report.verdict.breakdown.NEEDS_WORK} Needs Work
-                  </span>
-                  <span>•</span>
-                  <span className="font-semibold">
-                    {report.verdict.confidence} Confidence
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Readiness Score */}
-          <Card variant="soft" elevated>
-            <CardContent className="pt-6">
-              <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-purple-600" />
-                Release Readiness Score
-              </h2>
-              <div className="bg-neutral-100 rounded-2xl p-8 text-center">
-                <div className="text-6xl font-black text-purple-600 mb-2">
-                  {report.readinessScore.average}/100
-                </div>
-                <p className="text-sm text-neutral-600 mb-4">Average Score</p>
-                <div className="flex items-center justify-center gap-4 text-sm text-neutral-600">
-                  <span>Range: {report.readinessScore.range[0]}-{report.readinessScore.range[1]}</span>
-                  <span>•</span>
-                  <span>Median: {report.readinessScore.median}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Top Fixes */}
-          {report.topFixes.length > 0 && (
-            <Card variant="soft" elevated>
-              <CardContent className="pt-6">
-                <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-orange-600" />
-                  Top Fixes (Prioritized)
-                </h2>
-                <div className="space-y-4">
-                  {report.topFixes.map((fix, i) => (
-                    <div key={i} className="flex gap-4 p-4 bg-white rounded-xl border-2 border-neutral-200">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-lg">
-                        {i + 1}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-black mb-2">{fix.issue}</p>
-                        <div className="flex items-center gap-4 text-sm text-neutral-600">
-                          <span className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
-                            {fix.mentionedBy}/{report.reviewCount} reviewers
-                          </span>
-                          <span>•</span>
-                          <span className={`font-semibold ${
-                            fix.avgImpact === "HIGH" ? "text-red-600" :
-                            fix.avgImpact === "MEDIUM" ? "text-orange-600" :
-                            "text-green-600"
-                          }`}>
-                            {fix.avgImpact} IMPACT
-                          </span>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            ~{fix.avgTimeEstimate} min
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* AI Analysis */}
-          <Card variant="soft" elevated className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200">
-            <CardContent className="pt-6">
-              <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-purple-600" />
-                AI-Powered Analysis
-              </h2>
-
-              <div className="space-y-6">
-                {/* Summary */}
-                <div>
-                  <h3 className="text-sm font-bold text-purple-900 uppercase tracking-wider mb-2">
-                    Summary
-                  </h3>
-                  <p className="text-base text-neutral-800 leading-relaxed">
-                    {report.aiAnalysis.summary}
-                  </p>
-                </div>
-
-                {/* Technical Insights */}
-                {report.aiAnalysis.technicalInsights && (
-                  <div>
-                    <h3 className="text-sm font-bold text-purple-900 uppercase tracking-wider mb-2">
-                      Technical Insights
-                    </h3>
-                    <p className="text-base text-neutral-800 leading-relaxed">
-                      {report.aiAnalysis.technicalInsights}
-                    </p>
-                  </div>
-                )}
-
-                {/* Market Recommendation */}
-                {report.aiAnalysis.marketRecommendation && (
-                  <div>
-                    <h3 className="text-sm font-bold text-purple-900 uppercase tracking-wider mb-2">
-                      Market Recommendation
-                    </h3>
-                    <p className="text-base text-neutral-800 leading-relaxed">
-                      {report.aiAnalysis.marketRecommendation}
-                    </p>
-                  </div>
-                )}
-
-                {/* Estimated Work */}
-                <div>
-                  <h3 className="text-sm font-bold text-purple-900 uppercase tracking-wider mb-2">
-                    Estimated Work Required
-                  </h3>
-                  <p className="text-base text-neutral-800 leading-relaxed font-semibold">
-                    {report.aiAnalysis.estimatedWorkRequired}
-                  </p>
-                </div>
-
-                {/* Action Plan */}
-                {report.aiAnalysis.prioritizedActionPlan.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-bold text-purple-900 uppercase tracking-wider mb-3">
-                      Prioritized Action Plan
-                    </h3>
-                    <div className="space-y-2">
-                      {report.aiAnalysis.prioritizedActionPlan.map((action, i) => (
-                        <div key={i} className="flex items-start gap-3 bg-white/60 rounded-lg p-3">
-                          <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold">
-                            {i + 1}
-                          </span>
-                          <p className="text-sm text-neutral-800 pt-0.5">{action}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Strengths */}
-          {report.strengths.length > 0 && (
-            <Card variant="soft" elevated>
-              <CardContent className="pt-6">
-                <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  What's Working
-                </h2>
-                <div className="space-y-3">
-                  {report.strengths.slice(0, 5).map((strength, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                      <p className="text-neutral-700">{strength}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Risks */}
-          {report.risks.length > 0 && (
-            <Card variant="soft" elevated>
-              <CardContent className="pt-6">
-                <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-orange-600" />
-                  Potential Risks
-                </h2>
-                <div className="space-y-3">
-                  {report.risks.slice(0, 5).map((risk, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <AlertTriangle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-                      <p className="text-neutral-700">{risk}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Footer */}
-          <Card variant="soft">
-            <CardContent className="pt-6 text-center">
-              <p className="text-sm text-neutral-600">
-                This report was generated from <strong>{report.reviewCount} expert reviewers</strong> with 100+ reviews each and 4.5+ ratings.
-              </p>
-              <p className="text-xs text-neutral-500 mt-2">
-                MixReflect • Release Decision Report • Generated on {new Date(report.generatedAt).toLocaleDateString()}
-              </p>
-            </CardContent>
-          </Card>
+        {/* Render the actual report component */}
+        <div className="rounded-2xl overflow-hidden shadow-xl border border-neutral-200">
+          <ReleaseDecisionReportView
+            report={{
+              ...report,
+              generatedAt: report.generatedAt instanceof Date
+                ? report.generatedAt.toISOString()
+                : String(report.generatedAt),
+            }}
+            trackTitle="Summer Nights"
+          />
         </div>
       </div>
     </div>
