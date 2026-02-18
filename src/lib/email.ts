@@ -8,6 +8,16 @@ type SendEmailParams = {
 // Admin notification email
 const ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || "kris.engelhardt4@gmail.com";
 
+// Resolve app URL with fallback chain (NEXT_PUBLIC_APP_URL is undefined on server)
+export function getAppUrl(): string {
+  return (
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXTAUTH_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://www.mixreflect.com"
+  );
+}
+
 // Brand colors - exported for preview
 export const COLORS = {
   black: "#000000",
@@ -334,7 +344,7 @@ export async function sendReviewProgressEmail(
       <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
         Your feedback is ready! Log in to read all reviews and rate them.
       </p>
-      ${emailButton("View Your Reviews", "https://mixreflect.com/dashboard")}
+      ${emailButton("View Your Reviews", `${getAppUrl()}/dashboard`)}
     `
     : `
       <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
@@ -351,7 +361,7 @@ export async function sendReviewProgressEmail(
       <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
         Reviews are coming in! You can already view completed reviews in your dashboard.
       </p>
-      ${emailButton("View Progress", "https://mixreflect.com/dashboard", "secondary")}
+      ${emailButton("View Progress", `${getAppUrl()}/dashboard`, "secondary")}
     `;
 
   await sendEmail({
@@ -410,7 +420,7 @@ export async function sendAdminNewTrackNotification(params: {
         </tr>
       </table>
     </div>
-    ${emailButton("View in Admin", "https://mixreflect.com/admin/tracks")}
+    ${emailButton("View in Admin", `${getAppUrl()}/admin/tracks`)}
   `;
 
   await sendEmail({
@@ -428,7 +438,7 @@ export async function sendInvalidTrackLinkEmail(params: {
 }) {
   if (!params.to) return;
 
-  const trackPageUrl = `https://mixreflect.com/tracks/${params.trackId}`;
+  const trackPageUrl = `${getAppUrl()}/tracks/${params.trackId}`;
 
   const content = `
     <div style="text-align: center; margin-bottom: 24px;">
@@ -498,7 +508,7 @@ export async function sendTrialReminderEmail(params: {
     <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Submit any track — SoundCloud, Bandcamp, or YouTube link — and get real feedback within 24 hours.
     </p>
-    ${emailButton("Submit Your Track", "https://mixreflect.com/submit")}
+    ${emailButton("Submit Your Track", `${getAppUrl()}/submit`)}
     <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
       <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
         Honest feedback on your music from real listeners.
@@ -546,7 +556,7 @@ export async function sendLeadReminderEmail(params: {
     <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Sign up takes 30 seconds. Get real feedback from genre-matched listeners.
     </p>
-    ${emailButton("Finish Signing Up", "https://mixreflect.com/signup")}
+    ${emailButton("Finish Signing Up", `${getAppUrl()}/signup`)}
     <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
       <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
         Create an account and submit a track to get started.
@@ -588,7 +598,7 @@ export function previewTrialReminderEmail(artistName: string): string {
     <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Submit any track — SoundCloud, Bandcamp, or YouTube link — and get real feedback within 24 hours.
     </p>
-    ${emailButton("Submit Your Track", "https://mixreflect.com/submit")}
+    ${emailButton("Submit Your Track", `${getAppUrl()}/submit`)}
     <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
       <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
         Honest feedback on your music from real listeners.
@@ -627,7 +637,7 @@ export function previewLeadReminderEmail(artistName?: string): string {
     <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
       Sign up takes 30 seconds. Get real feedback from genre-matched listeners.
     </p>
-    ${emailButton("Finish Signing Up", "https://mixreflect.com/signup")}
+    ${emailButton("Finish Signing Up", `${getAppUrl()}/signup`)}
     <div style="border-top: 1px solid ${COLORS.border}; padding-top: 16px; margin-top: 8px;">
       <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
         Create an account and submit a track to get started.
@@ -684,7 +694,7 @@ export async function sendPurchaseConfirmationEmail(params: {
         <strong style="color: ${COLORS.black};">Download link valid for 7 days</strong>
       </p>
       <p style="margin: 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-        You can re-download anytime by visiting: <a href="${process.env.NEXT_PUBLIC_APP_URL}/purchases/${params.purchaseId}/download" style="color: ${COLORS.black};">your download page</a>
+        You can re-download anytime by visiting: <a href="${getAppUrl()}/purchases/${params.purchaseId}/download" style="color: ${COLORS.black};">your download page</a>
       </p>
     </div>
   `;
@@ -715,7 +725,7 @@ export async function sendReleaseDecisionReport(params: {
     verdict.consensus === "RELEASE_NOW" ? "✅ RELEASE NOW" :
     verdict.consensus === "FIX_FIRST" ? "⚠️ FIX FIRST" : "🔧 NEEDS WORK";
 
-  const trackUrl = `${process.env.NEXT_PUBLIC_APP_URL}/artist/tracks/${params.trackId}`;
+  const trackUrl = `${getAppUrl()}/artist/tracks/${params.trackId}`;
 
   const fixesHtml = topFixes && topFixes.length > 0 ? `
     <h3 style="margin: 24px 0 16px; font-size: 18px; font-weight: 700; color: ${COLORS.black};">

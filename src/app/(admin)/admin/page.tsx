@@ -148,6 +148,14 @@ export default async function AdminPage() {
           <div className="mt-2 text-base font-bold text-neutral-950">Report Design Demo</div>
           <div className="text-xs text-neutral-400 mt-1">View the report layout with mock data</div>
         </Link>
+        <Link
+          href="/admin/emails"
+          className="block rounded-xl border border-neutral-200 bg-white p-5 hover:border-purple-300 transition-colors col-span-2"
+        >
+          <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Tool</div>
+          <div className="mt-2 text-base font-bold text-neutral-950">Email Templates</div>
+          <div className="text-xs text-neutral-400 mt-1">Preview and test-send all 12 email templates</div>
+        </Link>
       </div>
 
       {/* Primary stats */}
