@@ -124,7 +124,15 @@ export default async function ReviewQueuePage({
       artistId: { not: artistProfile.id },
       id: { notIn: excludeTrackIds },
     },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      artworkUrl: true,
+      feedbackFocus: true,
+      packageType: true,
+      reviewsRequested: true,
+      rushDelivery: true,
+      createdAt: true,
       Genre: true,
       ArtistProfile: {
         select: {
@@ -143,21 +151,28 @@ export default async function ReviewQueuePage({
         },
       },
     },
-    orderBy: { createdAt: "asc" },
   });
 
   // Filter to only tracks that still need more reviewers
-  // Sort: Pro tracks first, then free, then seeded tracks last
+  // Sort: Rush delivery first, then Pro tracks, then free, then seeded tracks last
   const available = availableTracksResult
     .filter((t) => t._count.Review < t.reviewsRequested)
     .sort((a, b) => {
+      // Rush delivery tracks at the very top (highest priority)
+      const aIsRush = a.rushDelivery ?? false;
+      const bIsRush = b.rushDelivery ?? false;
+      if (aIsRush !== bIsRush) return aIsRush ? -1 : 1;
+
+      // Seed tracks at the bottom
       const aIsSeed = a.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       const bIsSeed = b.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       if (aIsSeed !== bIsSeed) return aIsSeed ? 1 : -1;
+
       // Pro tracks above free tracks
       const aIsPro = a.ArtistProfile?.subscriptionStatus === "active";
       const bIsPro = b.ArtistProfile?.subscriptionStatus === "active";
       if (aIsPro !== bIsPro) return aIsPro ? -1 : 1;
+
       return 0; // preserve createdAt order within each group
     });
 
