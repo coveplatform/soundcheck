@@ -58,11 +58,9 @@ export default async function ReviewQueuePage({
     redirect("/onboarding");
   }
 
-  // Check if user bypasses limits (Pro or admin emails)
+  // Check if user bypasses limits (admin emails only)
   const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
-  const isPro = artistProfile.subscriptionStatus === "active";
-  const isAdmin = BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
-  const bypassLimit = isPro || isAdmin;
+  const bypassLimit = BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
 
   const MAX_REVIEWS_PER_DAY = 2;
   const startOfToday = new Date();
@@ -154,7 +152,7 @@ export default async function ReviewQueuePage({
   });
 
   // Filter to only tracks that still need more reviewers
-  // Sort: Rush delivery first, then Pro tracks, then free, then seeded tracks last
+  // Sort: Rush delivery first, then seeded tracks last
   const available = availableTracksResult
     .filter((t) => t._count.Review < t.reviewsRequested)
     .sort((a, b) => {
@@ -167,11 +165,6 @@ export default async function ReviewQueuePage({
       const aIsSeed = a.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       const bIsSeed = b.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       if (aIsSeed !== bIsSeed) return aIsSeed ? 1 : -1;
-
-      // Pro tracks above free tracks
-      const aIsPro = a.ArtistProfile?.subscriptionStatus === "active";
-      const bIsPro = b.ArtistProfile?.subscriptionStatus === "active";
-      if (aIsPro !== bIsPro) return aIsPro ? -1 : 1;
 
       return 0; // preserve createdAt order within each group
     });
@@ -328,12 +321,6 @@ export default async function ReviewQueuePage({
                           <p className="text-base font-semibold text-black truncate">{track.title}</p>
                           <div className="flex items-center gap-1.5 mb-1 min-w-0">
                             <p className="text-sm text-neutral-600 truncate">by {track.ArtistProfile.artistName}</p>
-                            {track.ArtistProfile.subscriptionStatus === "active" && (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded flex-shrink-0">
-                                <Zap className="h-2.5 w-2.5" />
-                                Priority
-                              </span>
-                            )}
                           </div>
                           <div className="flex items-center gap-2 flex-wrap">
                             <GenreTagList genres={track.Genre} variant="neutral" size="sm" maxDisplay={2} />

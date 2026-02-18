@@ -340,11 +340,9 @@ export async function POST(request: Request) {
     startOfToday.setHours(0, 0, 0, 0);
     const heartbeatCutoff = new Date(now.getTime() - 2 * 60 * 1000);
 
-    // Daily review cap: 2/day for free users, unlimited for pro subscribers and admin emails
+    // Daily review cap: 2/day for all users (bypass for admin emails only)
     const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
-    const bypassLimit =
-      peerReviewerProfile?.subscriptionStatus === "active" ||
-      BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
+    const bypassLimit = BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
 
     if (!bypassLimit) {
       const MAX_REVIEWS_PER_DAY = 2;
@@ -360,7 +358,7 @@ export async function POST(request: Request) {
 
       if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
         return NextResponse.json(
-          { error: "You've reached the daily limit of 2 reviews. Upgrade to Pro for unlimited reviews or check back tomorrow!" },
+          { error: "You've reached the daily limit of 2 reviews. Check back tomorrow!" },
           { status: 429 }
         );
       }

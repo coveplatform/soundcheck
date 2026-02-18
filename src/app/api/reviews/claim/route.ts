@@ -34,11 +34,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Complete onboarding first" }, { status: 403 });
   }
 
-  // Daily review limit check (bypass for pro subscribers and admin emails)
+  // Daily review limit check (bypass for admin emails only)
   const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
-  const bypassLimit =
-    artistProfile.subscriptionStatus === "active" ||
-    BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
+  const bypassLimit = BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
 
   if (!bypassLimit) {
     const MAX_REVIEWS_PER_DAY = 2;
@@ -55,7 +53,7 @@ export async function POST(request: Request) {
 
     if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
       return NextResponse.json(
-        { error: "You've reached your daily limit of 2 reviews. Upgrade to Pro for unlimited reviews or check back tomorrow!" },
+        { error: "You've reached your daily limit of 2 reviews. Check back tomorrow!" },
         { status: 429 }
       );
     }

@@ -131,7 +131,6 @@ export default async function DashboardPage() {
     "hasSeenCreditGuide" in artistProfile
       ? artistProfile.hasSeenCreditGuide ?? false
       : true;
-  const isSubscribed = artistProfile.subscriptionStatus === "active";
   const tracks = artistProfile.Track ?? [];
 
   // Detect tracks with NEW feedback (completed reviews since last viewed)
@@ -369,7 +368,7 @@ export default async function DashboardPage() {
         )}
 
         {/* Zero credits banner */}
-        {credits === 0 && !isSubscribed && (
+        {credits === 0 && (
           <div className="rounded-xl border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-white p-5 mb-5">
             <p className="text-base font-bold text-black">You&apos;re out of credits</p>
             <p className="text-sm text-black/50 mt-1">You need credits to get feedback on your tracks.</p>
