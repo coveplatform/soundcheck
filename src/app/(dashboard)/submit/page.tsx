@@ -780,46 +780,45 @@ export default function SubmitTrackPage() {
                     <div className="bg-white/[0.06] rounded-xl p-3">
                       <div className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1">Verdict</div>
                       <div className="text-sm font-extrabold text-emerald-400">RELEASE</div>
-                      <div className="text-[10px] text-neutral-500 mt-0.5">or Fix First / Needs Work</div>
+                      <div className="text-[10px] text-neutral-500 mt-0.5 hidden sm:block">or Fix First / Needs Work</div>
+                      <div className="text-[10px] text-neutral-500 mt-0.5 sm:hidden">or Fix First</div>
                     </div>
                     <div className="bg-white/[0.06] rounded-xl p-3">
                       <div className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1">Score</div>
                       <div className="text-sm font-extrabold text-purple-400">0–100</div>
-                      <div className="text-[10px] text-neutral-500 mt-0.5">release readiness</div>
+                      <div className="text-[10px] text-neutral-500 mt-0.5">readiness</div>
                     </div>
                     <div className="bg-white/[0.06] rounded-xl p-3">
                       <div className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1">Fixes</div>
                       <div className="text-sm font-extrabold text-amber-400">Top 3</div>
-                      <div className="text-[10px] text-neutral-500 mt-0.5">ranked by impact</div>
+                      <div className="text-[10px] text-neutral-500 mt-0.5">by impact</div>
                     </div>
                   </div>
 
                   {/* Additional details */}
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4 pl-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 sm:gap-y-2 mb-4 pl-1">
                     <div className="flex items-center gap-2">
                       <Check className="h-3 w-3 text-purple-400 flex-shrink-0" />
-                      <span className="text-[12px] text-neutral-400">Strongest elements identified</span>
+                      <span className="text-[11px] sm:text-[12px] text-neutral-400">Strongest elements identified</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Check className="h-3 w-3 text-purple-400 flex-shrink-0" />
-                      <span className="text-[12px] text-neutral-400">Biggest risks flagged</span>
+                      <span className="text-[11px] sm:text-[12px] text-neutral-400">Biggest risks flagged</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Check className="h-3 w-3 text-purple-400 flex-shrink-0" />
-                      <span className="text-[12px] text-neutral-400">Genre benchmarking</span>
+                      <span className="text-[11px] sm:text-[12px] text-neutral-400">Genre benchmarking</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Check className="h-3 w-3 text-purple-400 flex-shrink-0" />
-                      <span className="text-[12px] text-neutral-400">Time estimates per fix</span>
+                      <span className="text-[11px] sm:text-[12px] text-neutral-400">Time estimates per fix</span>
                     </div>
                   </div>
 
                   {/* Bottom details */}
-                  <div className="flex items-center justify-between pt-3 border-t border-white/[0.08]">
-                    <div className="flex items-center gap-4 text-[11px] text-neutral-400">
-                      <span className="flex items-center gap-1"><MessageSquare className="h-3 w-3" /> 10–12 expert reviewers</span>
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> Delivered in 24 hours</span>
-                    </div>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 pt-3 border-t border-white/[0.08]">
+                    <span className="flex items-center gap-1 text-[11px] text-neutral-400"><MessageSquare className="h-3 w-3" /> 10–12 expert reviewers</span>
+                    <span className="flex items-center gap-1 text-[11px] text-neutral-400"><Clock className="h-3 w-3" /> Delivered in 24 hours</span>
                   </div>
                 </div>
               </div>

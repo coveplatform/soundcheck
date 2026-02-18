@@ -797,138 +797,110 @@ export function buildAnnouncementEmail(params: { userName?: string }): { subject
   const appUrl = getAppUrl();
   const rdUrl = `${appUrl}/submit?package=release-decision`;
 
+  // Personal, text-forward email — reads like a founder update so Gmail
+  // treats it as a conversation rather than a promotion.
   const content = `
-    <!-- Hero -->
-    <div style="text-align: center; padding: 8px 0 28px;">
-      <div style="display: inline-block; background-color: ${COLORS.purple}; color: #ffffff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 5px 14px; border-radius: 20px; margin-bottom: 16px;">
-        New on MixReflect
-      </div>
-      <h1 style="margin: 0 0 10px; font-size: 28px; font-weight: 800; color: ${COLORS.black}; letter-spacing: -0.5px; line-height: 1.2;">
-        Know exactly what to fix<span style="color: ${COLORS.purple};">.</span>
-      </h1>
-      <p style="margin: 0; font-size: 15px; color: ${COLORS.gray}; line-height: 1.5;">
-        ${name ? `${name}, we` : "We"} just launched <strong style="color: ${COLORS.black};">Release Decision</strong> — a new way to find out if your track is ready to release, and exactly what to fix if it isn't.
-      </p>
-    </div>
+    <p style="margin: 0 0 16px; font-size: 15px; color: ${COLORS.black}; line-height: 1.7;">
+      ${name ? `Hey ${name},` : "Hey,"}
+    </p>
 
-    <!-- The problem -->
-    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-      <h3 style="margin: 0 0 10px; font-size: 15px; font-weight: 700; color: ${COLORS.black};">
-        The problem
-      </h3>
-      <p style="margin: 0; font-size: 14px; line-height: 1.7; color: ${COLORS.gray};">
-        You've finished a track. You think it's good — but is it <em>ready</em>? Asking friends doesn't help. Posting on forums gets generic advice. You need honest, expert-level feedback from people who actually know what they're listening for.
-      </p>
-    </div>
+    <p style="margin: 0 0 16px; font-size: 15px; color: ${COLORS.gray}; line-height: 1.7;">
+      Quick update — we just shipped something I think you'll find useful.
+    </p>
 
-    <!-- The solution — dark card -->
-    <div style="background-color: #0a0a0a; border-radius: 14px; padding: 24px; margin-bottom: 16px;">
-      <div style="margin-bottom: 16px;">
-        <div style="display: inline-block; background-color: ${COLORS.purple}; color: #ffffff; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 10px; border-radius: 6px;">
-          Release Decision
-        </div>
-      </div>
-      <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">
-        A panel of 10–12 experts reviews your track and gives you a clear answer.
-      </h3>
-      <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: #a3a3a3;">
-        Upload your track, and within 24 hours you'll receive a detailed report.
+    <p style="margin: 0 0 16px; font-size: 15px; color: ${COLORS.gray}; line-height: 1.7;">
+      It's called <strong style="color: ${COLORS.black};">Release Decision</strong>. The idea is simple: you upload a track, and a panel of 10–12 expert reviewers listens to it and tells you whether it's ready to release — and if not, exactly what to fix first.
+    </p>
+
+    <p style="margin: 0 0 24px; font-size: 15px; color: ${COLORS.gray}; line-height: 1.7;">
+      We built it because we kept seeing the same problem. Artists finish a track, think it sounds good, but don't have anyone they trust to give them a straight answer. Friends say it's great. Forums give vague advice. So we made a way to get a real, structured verdict from people who know what they're listening for.
+    </p>
+
+    <!-- What you get — dark card, mobile-friendly stacked layout -->
+    <div style="background-color: #0a0a0a; border-radius: 14px; padding: 24px; margin-bottom: 24px;">
+      <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: ${COLORS.purple};">
+        What you get back
+      </p>
+      <p style="margin: 0 0 20px; font-size: 16px; font-weight: 700; color: #ffffff; line-height: 1.4;">
+        A full report delivered to your inbox within 24 hours:
       </p>
 
-      <!-- Report preview cards -->
+      <!-- Row 1: Verdict -->
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 8px;">
+        <tr>
+          <td style="background-color: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+              <tr>
+                <td style="width: 50px; vertical-align: middle;">
+                  <div style="font-size: 18px; font-weight: 800; color: #34d399;">GO</div>
+                </td>
+                <td style="vertical-align: middle;">
+                  <div style="font-size: 14px; font-weight: 700; color: #ffffff;">Clear verdict</div>
+                  <div style="font-size: 12px; color: #737373; margin-top: 2px;">Release, Fix First, or Needs Work</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Row 2: Score -->
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 8px;">
+        <tr>
+          <td style="background-color: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+              <tr>
+                <td style="width: 50px; vertical-align: middle;">
+                  <div style="font-size: 18px; font-weight: 800; color: ${COLORS.purple};">82</div>
+                </td>
+                <td style="vertical-align: middle;">
+                  <div style="font-size: 14px; font-weight: 700; color: #ffffff;">Readiness score</div>
+                  <div style="font-size: 12px; color: #737373; margin-top: 2px;">0–100 based on expert consensus</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Row 3: Fixes -->
       <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 16px;">
         <tr>
-          <td style="background-color: rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 10px; text-align: center; width: 33%;">
-            <div style="font-size: 10px; font-weight: 600; color: #737373; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Verdict</div>
-            <div style="font-size: 16px; font-weight: 800; color: #34d399;">RELEASE</div>
-            <div style="font-size: 10px; color: #525252; margin-top: 2px;">or Fix First</div>
-          </td>
-          <td width="8"></td>
-          <td style="background-color: rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 10px; text-align: center; width: 33%;">
-            <div style="font-size: 10px; font-weight: 600; color: #737373; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Score</div>
-            <div style="font-size: 16px; font-weight: 800; color: ${COLORS.purple};">0–100</div>
-            <div style="font-size: 10px; color: #525252; margin-top: 2px;">readiness</div>
-          </td>
-          <td width="8"></td>
-          <td style="background-color: rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 10px; text-align: center; width: 33%;">
-            <div style="font-size: 10px; font-weight: 600; color: #737373; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Fixes</div>
-            <div style="font-size: 16px; font-weight: 800; color: ${COLORS.amber};">Top 3</div>
-            <div style="font-size: 10px; color: #525252; margin-top: 2px;">by impact</div>
+          <td style="background-color: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+              <tr>
+                <td style="width: 50px; vertical-align: middle;">
+                  <div style="font-size: 18px; font-weight: 800; color: ${COLORS.amber};">3</div>
+                </td>
+                <td style="vertical-align: middle;">
+                  <div style="font-size: 14px; font-weight: 700; color: #ffffff;">Top fixes ranked by impact</div>
+                  <div style="font-size: 12px; color: #737373; margin-top: 2px;">With time estimates so you know what to tackle first</div>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
       </table>
 
-      <!-- Checklist -->
-      <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
-        <tr>
-          <td style="padding: 4px 0; font-size: 13px; color: #a3a3a3; width: 50%;">
-            <span style="color: ${COLORS.purple}; margin-right: 6px;">✓</span> Strongest elements
-          </td>
-          <td style="padding: 4px 0; font-size: 13px; color: #a3a3a3; width: 50%;">
-            <span style="color: ${COLORS.purple}; margin-right: 6px;">✓</span> Biggest risks
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 4px 0; font-size: 13px; color: #a3a3a3;">
-            <span style="color: ${COLORS.purple}; margin-right: 6px;">✓</span> Genre benchmarking
-          </td>
-          <td style="padding: 4px 0; font-size: 13px; color: #a3a3a3;">
-            <span style="color: ${COLORS.purple}; margin-right: 6px;">✓</span> Time estimates per fix
-          </td>
-        </tr>
-      </table>
-
-      <!-- Price + CTA -->
-      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08);">
-        <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
-          <tr>
-            <td>
-              <span style="font-size: 22px; font-weight: 800; color: #ffffff;">$9.95</span>
-              <span style="font-size: 13px; color: #737373; margin-left: 6px;">one-time</span>
-            </td>
-            <td style="text-align: right;">
-              <a href="${rdUrl}" style="display: inline-block; background-color: ${COLORS.purple}; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 10px 24px; border-radius: 10px;">Get your report</a>
-            </td>
-          </tr>
-        </table>
+      <!-- Also includes -->
+      <div style="font-size: 13px; color: #a3a3a3; line-height: 1.8;">
+        Also includes: strongest elements, biggest risks, and genre benchmarking.
       </div>
     </div>
 
-    <!-- How it works -->
-    <div style="padding: 16px 0 8px;">
-      <h3 style="margin: 0 0 16px; font-size: 15px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
-        How it works
-      </h3>
-      <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
-        <tr>
-          <td style="text-align: center; width: 33%; vertical-align: top; padding: 0 4px;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${COLORS.purpleLight}; color: ${COLORS.purple}; font-size: 14px; font-weight: 800; line-height: 32px; text-align: center; margin: 0 auto 8px;">1</div>
-            <div style="font-size: 13px; font-weight: 600; color: ${COLORS.black};">Upload</div>
-            <div style="font-size: 11px; color: ${COLORS.grayLight}; margin-top: 2px;">SoundCloud, file, or link</div>
-          </td>
-          <td style="text-align: center; width: 33%; vertical-align: top; padding: 0 4px;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${COLORS.purpleLight}; color: ${COLORS.purple}; font-size: 14px; font-weight: 800; line-height: 32px; text-align: center; margin: 0 auto 8px;">2</div>
-            <div style="font-size: 13px; font-weight: 600; color: ${COLORS.black};">Experts review</div>
-            <div style="font-size: 11px; color: ${COLORS.grayLight}; margin-top: 2px;">10–12 vetted reviewers</div>
-          </td>
-          <td style="text-align: center; width: 33%; vertical-align: top; padding: 0 4px;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${COLORS.purpleLight}; color: ${COLORS.purple}; font-size: 14px; font-weight: 800; line-height: 32px; text-align: center; margin: 0 auto 8px;">3</div>
-            <div style="font-size: 13px; font-weight: 600; color: ${COLORS.black};">Get your report</div>
-            <div style="font-size: 11px; color: ${COLORS.grayLight}; margin-top: 2px;">Delivered in 24 hours</div>
-          </td>
-        </tr>
-      </table>
-    </div>
+    <p style="margin: 0 0 6px; font-size: 15px; color: ${COLORS.gray}; line-height: 1.7;">
+      If you've got a track you're sitting on and you're not sure if it's ready — this is what it's for.
+    </p>
 
-    ${emailButton("Try Release Decision", rdUrl)}
+    ${emailButton("Try it out", rdUrl)}
 
-    <p style="margin: 20px 0 0; font-size: 13px; color: ${COLORS.grayLight}; text-align: center; line-height: 1.5;">
-      Thanks for being part of MixReflect. We built this because we needed it ourselves.
+    <p style="margin: 24px 0 0; font-size: 14px; color: ${COLORS.gray}; line-height: 1.7;">
+      — The MixReflect team
     </p>
   `;
 
   return {
-    subject: "New: Know exactly what to fix before you release",
+    subject: "We just shipped something new",
     html: emailWrapper(content),
   };
 }
