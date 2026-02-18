@@ -129,55 +129,86 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
 
 // Package configuration
 export const PACKAGES = {
-  STARTER: {
-    name: "Listener Pulse",
-    Review: 5,
-    minProReviews: 0,
-    price: 495, // cents
-    description: "Get a feel for how listeners react",
-    mix: "5 genre-matched reviewers",
-    features: ["5 detailed reviews", "24-hour turnaround", "Written feedback"],
+  RELEASE_DECISION: {
+    name: "Release Decision",
+    reviews: 10, // 10-12 expert reviews
+    minProReviews: 10, // All must be PRO tier
+    price: 3900, // $39
+    creditsRequired: 15, // OR pay with credits
+    description: "Professional verdict on release readiness with actionable fixes",
+    mix: "10-12 expert reviewers (100+ reviews, 4.5+ rating)",
+    features: [
+      "Go/No-Go verdict from experts",
+      "Release readiness score (0-100)",
+      "Top 3 fixes ranked by impact",
+      "Competitive benchmarking",
+      "48-hour delivery",
+      "Compiled actionable report",
+    ],
   },
-  STANDARD: {
-    name: "Release Ready",
-    Review: 20,
-    minProReviews: 2,
-    price: 1495,
-    description: "Maximum clarity with pattern insights",
-    mix: "20 genre-matched reviewers",
-    features: ["20 detailed reviews", "24-hour turnaround", "Written feedback", "Consensus highlights", "Pattern analysis"],
-  },
-  // Peer review package - credit-based, no cash cost
   PEER: {
-    name: "Peer Review",
-    Review: 0, // dynamic - set by credits spent
+    name: "General Feedback",
+    reviews: 0, // dynamic - set by user
     minProReviews: 0,
     price: 0, // free - uses credits
-    description: "Get feedback from fellow artists using credits",
-    mix: "Genre-matched peer artists",
-    features: ["Peer artist reviews", "Genre matching", "Earn credits by reviewing others"],
+    creditsRequired: 0, // 1 credit per review
+    description: "Get listener opinions using credits",
+    mix: "Genre-matched community reviewers",
+    features: [
+      "Community reviews",
+      "Genre matching",
+      "Earn credits by reviewing others",
+      "Flexible review count (1-50)",
+      "Optional add-ons (Verified Reviewers, Rush Delivery)",
+    ],
   },
-  // Legacy packages - kept for existing tracks, not shown in UI
+  // DEPRECATED - Legacy packages kept for backwards compatibility only
+  STARTER: {
+    name: "Listener Pulse (Deprecated)",
+    reviews: 5,
+    minProReviews: 0,
+    price: 495,
+    creditsRequired: 0,
+    description: "Legacy package",
+    mix: "5 genre-matched reviewers",
+    features: ["5 detailed reviews"],
+    deprecated: true,
+  },
+  STANDARD: {
+    name: "Release Ready (Deprecated)",
+    reviews: 20,
+    minProReviews: 2,
+    price: 1495,
+    creditsRequired: 0,
+    description: "Legacy package",
+    mix: "20 genre-matched reviewers",
+    features: ["20 detailed reviews"],
+    deprecated: true,
+  },
   PRO: {
-    name: "Maximum Signal",
-    Review: 20,
+    name: "Maximum Signal (Deprecated)",
+    reviews: 20,
     minProReviews: 5,
     price: 2995,
-    description: "Highest confidence before you release",
+    creditsRequired: 0,
+    description: "Legacy package",
     mix: "20 reviewers",
-    features: ["20 detailed reviews", "24-hour turnaround", "Written feedback"],
+    features: ["20 detailed reviews"],
+    deprecated: true,
   },
   DEEP_DIVE: {
-    name: "Deep Dive",
-    Review: 20,
+    name: "Deep Dive (Deprecated)",
+    reviews: 20,
     minProReviews: 5,
     price: 2995,
-    description: "Maximum signal from multiple perspectives",
+    creditsRequired: 0,
+    description: "Legacy package",
     mix: "20 reviewers",
-    features: ["20 detailed reviews", "24-hour turnaround", "Written feedback"],
+    features: ["20 detailed reviews"],
+    deprecated: true,
   },
 } as const;
 
-export const ACTIVE_PACKAGE_TYPES = ["PEER"] as const;
+export const ACTIVE_PACKAGE_TYPES = ["RELEASE_DECISION", "PEER"] as const;
 
 export type PackageType = keyof typeof PACKAGES;

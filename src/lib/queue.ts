@@ -507,6 +507,116 @@ export async function assignReviewersToTrack(trackId: string) {
   });
 }
 
+/**
+ * Assigns expert reviewers to a Release Decision track
+ * Only assigns PRO tier reviewers with 100+ reviews and 4.5+ rating
+ */
+export async function assignExpertReviewersToTrack(trackId: string) {
+  await prisma.$transaction(async (tx) => {
+    // Prevent concurrent assignments
+    await tx.$executeRaw`
+      SELECT pg_advisory_xact_lock(hashtext(${trackId}), hashtext(${trackId} || ':assign'))
+    `;
+
+    const track = await tx.track.findUnique({
+      where: { id: trackId },
+      include: {
+        Genre: true,
+        Review: {
+          select: {
+            reviewerId: true,
+            status: true,
+          },
+        },
+        ReviewQueue: true,
+      },
+    });
+
+    if (!track || track.packageType !== "RELEASE_DECISION") {
+      console.error(`Track ${trackId} is not a Release Decision track`);
+      return;
+    }
+
+    // Count existing reviews
+    const [completedReviews, activeAssignments] = await Promise.all([
+      tx.review.count({
+        where: {
+          trackId,
+          status: "COMPLETED",
+          countsTowardCompletion: true,
+        },
+      }),
+      tx.review.count({
+        where: { trackId, status: { in: ["ASSIGNED", "IN_PROGRESS"] } },
+      }),
+    ]);
+
+    const neededReviews = track.reviewsRequested - completedReviews - activeAssignments;
+
+    if (neededReviews <= 0) {
+      console.log(`Track ${trackId} already has enough reviews assigned`);
+      return;
+    }
+
+    // Get genre IDs for matching
+    const genreIds = track.Genre.map((g) => g.id);
+
+    // Get all assigned reviewer IDs to exclude them
+    const assignedReviewerIds = [
+      ...track.Review.map((r) => r.reviewerId).filter(Boolean),
+      ...track.ReviewQueue.map((q) => q.reviewerId).filter(Boolean),
+    ] as string[];
+
+    // Find eligible PRO tier reviewers
+    const eligibleReviewers = await tx.reviewerProfile.findMany({
+      where: {
+        tier: "PRO", // CRITICAL: Only PRO reviewers
+        isRestricted: false,
+        totalReviews: { gte: 100 }, // 100+ reviews completed
+        averageRating: { gte: 4.5 }, // 4.5+ rating
+        id: { notIn: assignedReviewerIds }, // Not already assigned
+        Genre: {
+          some: {
+            id: { in: genreIds }, // Genre match
+          },
+        },
+      },
+      include: {
+        ReviewQueue: {
+          where: { expiresAt: { gt: new Date() } },
+        },
+      },
+    });
+
+    if (eligibleReviewers.length === 0) {
+      console.error(`No eligible expert reviewers found for track ${trackId}`);
+      return;
+    }
+
+    // Sort by workload (fewer active reviews = higher priority)
+    const sorted = eligibleReviewers.sort(
+      (a, b) => a.ReviewQueue.length - b.ReviewQueue.length
+    );
+
+    const toAssign = sorted.slice(0, neededReviews);
+
+    // Create review queue entries with high priority and 48h expiration
+    const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 hours
+
+    await tx.reviewQueue.createMany({
+      data: toAssign.map((reviewer) => ({
+        trackId: track.id,
+        reviewerId: reviewer.id,
+        priority: 10, // High priority for Release Decision
+        expiresAt,
+      })),
+      skipDuplicates: true,
+    });
+
+    console.log(`Assigned ${toAssign.length} expert reviewers to track ${trackId}`);
+  });
+}
+
 export async function expireAndReassignExpiredQueueEntries(): Promise<{
   expiredCount: number;
   affectedTrackCount: number;

@@ -15,8 +15,8 @@ const createTrackSchema = z.object({
   bpm: z.number().int().min(1).max(999).optional(),
   genreIds: z.array(z.string()).min(1, "Select at least one genre").max(3),
   feedbackFocus: z.string().max(1000).optional(),
-  packageType: z.enum(["STARTER", "STANDARD", "PRO", "DEEP_DIVE", "PEER"]).optional(),
-  reviewsRequested: z.number().int().min(1).max(10).optional(),
+  packageType: z.enum(["PEER", "RELEASE_DECISION"]).optional(),
+  reviewsRequested: z.number().int().min(1).max(50).optional(),
   allowPurchase: z.boolean().optional(),
   isPublic: z.boolean().optional(),
 });

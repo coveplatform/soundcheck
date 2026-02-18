@@ -80,7 +80,7 @@ export async function POST(
             currency: "usd",
             product_data: {
               name: `${packageDetails.name} Package`,
-              description: `${packageDetails.Review} reviews for: ${track.title}`,
+              description: `${packageDetails.reviews} reviews for: ${track.title}`,
             },
             unit_amount: packageDetails.price,
           },

@@ -29,6 +29,9 @@ import {
   Lock,
   Zap,
   Clock,
+  Target,
+  MessageSquare,
+  CreditCard,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -106,7 +109,11 @@ export default function SubmitTrackPage() {
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [isPublic, setIsPublic] = useState(false);
 
-  // ---- step 3: reviews state ----------------------------------------------
+  // ---- step 3: product selection state ------------------------------------
+  const [selectedProduct, setSelectedProduct] = useState<"RELEASE_DECISION" | "PEER">("RELEASE_DECISION");
+  const [rdPaymentMethod, setRdPaymentMethod] = useState<"cash" | "credits">("cash");
+
+  // ---- step 3: general feedback state (for PEER product) -----------------
   const [reviewCount, setReviewCount] = useState<number>(5);
   const [isDraggingSlider, setIsDraggingSlider] = useState(false);
   const [requestProReviewers, setRequestProReviewers] = useState(false);
@@ -363,6 +370,84 @@ export default function SubmitTrackPage() {
     }
     return total;
   }, [requestProReviewers, rushDelivery, reviewCount]);
+
+  // Release Decision submit handler
+  const handleReleaseDecisionSubmit = useCallback(async () => {
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      const isLink = uploadMode === "link";
+      const trackSourceUrl = isLink ? url : uploadedUrl;
+      const trackSourceType = isLink ? undefined : "UPLOAD";
+
+      // 1. Create the track
+      const createRes = await fetch("/api/tracks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sourceUrl: trackSourceUrl,
+          ...(trackSourceType ? { sourceType: trackSourceType } : {}),
+          title: title.trim(),
+          artworkUrl: artworkUrl || undefined,
+          genreIds: selectedGenres,
+          feedbackFocus: feedbackFocus.trim() || undefined,
+          isPublic,
+          packageType: "RELEASE_DECISION",
+        }),
+      });
+
+      const trackData = await createRes.json();
+
+      if (!createRes.ok) {
+        setError(trackData.error || "Failed to create track");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const trackId = trackData.id;
+
+      // 2. Route to Release Decision checkout
+      const res = await fetch(`/api/tracks/${trackId}/checkout-release-decision`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          paymentMethod: rdPaymentMethod,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to process Release Decision request");
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (rdPaymentMethod === "cash" && data.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
+        return;
+      } else {
+        // Credits payment successful
+        router.push(`/submit/success?trackId=${trackId}&releaseDecision=true`);
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setIsSubmitting(false);
+    }
+  }, [
+    uploadMode,
+    url,
+    uploadedUrl,
+    title,
+    artworkUrl,
+    selectedGenres,
+    feedbackFocus,
+    isPublic,
+    rdPaymentMethod,
+    router,
+  ]);
 
   const handleSubmit = useCallback(async () => {
     setError("");
@@ -1008,14 +1093,14 @@ export default function SubmitTrackPage() {
         )}
 
         {/* ================================================================= */}
-        {/* STEP 3: Request reviews (credit-based)                            */}
+        {/* STEP 3: Choose product                                            */}
         {/* ================================================================= */}
         {step === 3 && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-black mb-1">Request reviews</h2>
-                <p className="text-sm text-neutral-600">How many reviews do you want?</p>
+                <h2 className="text-xl font-semibold text-black mb-1">What do you need?</h2>
+                <p className="text-sm text-neutral-600">Choose the type of feedback</p>
               </div>
               <button
                 onClick={goBack}
@@ -1026,20 +1111,253 @@ export default function SubmitTrackPage() {
               </button>
             </div>
 
-            {/* Credit balance */}
-            <div className="flex items-center gap-3 rounded-xl bg-purple-50 border-2 border-purple-200 px-4 py-3">
-              <Coins className="h-5 w-5 text-purple-600 flex-shrink-0" />
-              <p className="text-sm font-medium text-purple-900">
-                You have{" "}
-                <span className="text-lg font-bold text-purple-600">
-                  {creditBalance}
-                </span>{" "}
-                {creditBalance === 1 ? "credit" : "credits"}
-              </p>
+            {/* Product Selection Cards */}
+            <div className="space-y-4">
+              {/* Release Decision Card */}
+              <button
+                type="button"
+                onClick={() => setSelectedProduct("RELEASE_DECISION")}
+                className={cn(
+                  "w-full text-left rounded-2xl border-2 p-6 transition-all",
+                  selectedProduct === "RELEASE_DECISION"
+                    ? "border-purple-600 bg-purple-50/60 shadow-lg"
+                    : "border-neutral-200 bg-white hover:border-purple-300"
+                )}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className={cn(
+                      "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center",
+                      selectedProduct === "RELEASE_DECISION" ? "bg-purple-600" : "bg-purple-100"
+                    )}
+                  >
+                    <Target
+                      className={cn(
+                        "h-5 w-5",
+                        selectedProduct === "RELEASE_DECISION" ? "text-white" : "text-purple-600"
+                      )}
+                    />
+                  </div>
+
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-lg font-bold text-black">Release Decision</h3>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white">
+                        RECOMMENDED
+                      </span>
+                    </div>
+
+                    <p className="text-sm text-neutral-600 mb-3">
+                      Should I release this track? Get a professional verdict with actionable fixes.
+                    </p>
+
+                    <div className="space-y-1.5 mb-4">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                        <span>Go/No-Go verdict from experts</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                        <span>Top 3 fixes ranked by impact</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                        <span>Release readiness score (0-100)</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                        <span>10-12 expert reviewers only</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                        <span>48-hour delivery guarantee</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl font-bold text-purple-600">$39</span>
+                      <span className="text-sm text-neutral-500">or 15 credits</span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              {/* General Feedback Card */}
+              <button
+                type="button"
+                onClick={() => setSelectedProduct("PEER")}
+                className={cn(
+                  "w-full text-left rounded-2xl border-2 p-6 transition-all",
+                  selectedProduct === "PEER"
+                    ? "border-purple-600 bg-purple-50/60 shadow-lg"
+                    : "border-neutral-200 bg-white hover:border-purple-300"
+                )}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className={cn(
+                      "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center",
+                      selectedProduct === "PEER" ? "bg-purple-600" : "bg-neutral-100"
+                    )}
+                  >
+                    <MessageSquare
+                      className={cn(
+                        "h-5 w-5",
+                        selectedProduct === "PEER" ? "text-white" : "text-neutral-600"
+                      )}
+                    />
+                  </div>
+
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-black mb-1">General Feedback</h3>
+
+                    <p className="text-sm text-neutral-600 mb-3">
+                      Get listener opinions and reactions using your credits.
+                    </p>
+
+                    <div className="space-y-1.5 mb-4">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-neutral-500 flex-shrink-0" />
+                        <span>Choose review count (1-50)</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-neutral-500 flex-shrink-0" />
+                        <span>Genre-matched reviewers</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-neutral-500 flex-shrink-0" />
+                        <span>Individual review cards</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-neutral-500 flex-shrink-0" />
+                        <span>Optional add-ons available</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl font-bold text-neutral-700">1 credit/review</span>
+                    </div>
+                  </div>
+                </div>
+              </button>
             </div>
 
-            {/* Insufficient credits warning - inline */}
-            {!hasEnoughCredits && reviewCount > 0 && (
+            {/* Conditional Content - Release Decision */}
+            {selectedProduct === "RELEASE_DECISION" && (
+              <div className="space-y-4">
+                {/* Payment Method Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-3">
+                    Payment method
+                  </label>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setRdPaymentMethod("cash")}
+                      className={cn(
+                        "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all",
+                        rdPaymentMethod === "cash"
+                          ? "border-purple-600 bg-purple-50/60"
+                          : "border-neutral-200 bg-white hover:border-neutral-300"
+                      )}
+                    >
+                      <CreditCard
+                        className={cn(
+                          "h-5 w-5",
+                          rdPaymentMethod === "cash" ? "text-purple-600" : "text-neutral-400"
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          "text-sm font-semibold",
+                          rdPaymentMethod === "cash" ? "text-purple-700" : "text-neutral-600"
+                        )}
+                      >
+                        Pay $39
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setRdPaymentMethod("credits")}
+                      disabled={creditBalance < 15}
+                      className={cn(
+                        "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all",
+                        rdPaymentMethod === "credits"
+                          ? "border-purple-600 bg-purple-50/60"
+                          : "border-neutral-200 bg-white hover:border-neutral-300",
+                        creditBalance < 15 && "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      <Coins
+                        className={cn(
+                          "h-5 w-5",
+                          rdPaymentMethod === "credits" ? "text-purple-600" : "text-neutral-400"
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          "text-sm font-semibold",
+                          rdPaymentMethod === "credits" ? "text-purple-700" : "text-neutral-600"
+                        )}
+                      >
+                        Use 15 Credits
+                      </span>
+                      {creditBalance < 15 && (
+                        <span className="text-xs text-red-600">Need {15 - creditBalance} more</span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Credit Balance Display */}
+                <div className="flex items-center gap-3 rounded-xl bg-purple-50 border-2 border-purple-200 px-4 py-3">
+                  <Coins className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                  <p className="text-sm font-medium text-purple-900">
+                    You have{" "}
+                    <span className="text-lg font-bold text-purple-600">{creditBalance}</span>{" "}
+                    {creditBalance === 1 ? "credit" : "credits"}
+                  </p>
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  onClick={handleReleaseDecisionSubmit}
+                  disabled={isSubmitting || (rdPaymentMethod === "credits" && creditBalance < 15)}
+                  isLoading={isSubmitting}
+                  className="w-full bg-purple-600 text-white hover:bg-purple-700 h-12 rounded-xl font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+                >
+                  {rdPaymentMethod === "cash" ? "Pay $39" : "Use 15 Credits"}
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+
+                {/* Info Box */}
+                <div className="rounded-xl bg-purple-50 border border-purple-200 p-4">
+                  <p className="text-sm text-purple-900">
+                    <strong>What happens next:</strong> Your track will be assigned to 10-12
+                    expert reviewers (100+ reviews, 4.5+ rating). You'll receive your compiled
+                    Release Decision Report within 48 hours.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Conditional Content - General Feedback (PEER) */}
+            {selectedProduct === "PEER" && (
+              <div className="space-y-6">
+                {/* Credit Balance Display */}
+                <div className="flex items-center gap-3 rounded-xl bg-purple-50 border-2 border-purple-200 px-4 py-3">
+                  <Coins className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                  <p className="text-sm font-medium text-purple-900">
+                    You have{" "}
+                    <span className="text-lg font-bold text-purple-600">{creditBalance}</span>{" "}
+                    {creditBalance === 1 ? "credit" : "credits"}
+                  </p>
+                </div>
+
+                {/* Insufficient credits warning */}
+                {!hasEnoughCredits && reviewCount > 0 && (
               <div className="rounded-xl bg-amber-50 border-2 border-amber-300 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center text-white font-bold text-xs">!</div>
@@ -1275,16 +1593,18 @@ export default function SubmitTrackPage() {
               </div>
             )}
 
-            {/* Upload without reviews */}
-            <div className="text-center pt-2">
-              <button
-                onClick={handleUploadOnly}
-                disabled={isSubmitting}
-                className="text-sm text-neutral-500 hover:text-purple-600 underline underline-offset-2 transition-colors"
-              >
-                Upload without reviews
-              </button>
-            </div>
+                {/* Upload without reviews */}
+                <div className="text-center pt-2">
+                  <button
+                    onClick={handleUploadOnly}
+                    disabled={isSubmitting}
+                    className="text-sm text-neutral-500 hover:text-purple-600 underline underline-offset-2 transition-colors"
+                  >
+                    Upload without reviews
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

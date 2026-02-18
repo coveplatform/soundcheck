@@ -255,6 +255,22 @@ model Review {
   qualityLevel           QualityLevel?
   reviewerExpertise      ReviewerExpertise?
 
+  // Release Decision fields (v3)
+  releaseVerdict         ReleaseVerdict?      // Overall verdict
+  releaseReadinessScore  Int?                 // 0-100 score
+  topFixRank1            String?              // #1 priority fix
+  topFixRank1Impact      FixImpact?           // Impact level
+  topFixRank1TimeMin     Int?                 // Estimated minutes
+  topFixRank2            String?              // #2 priority fix
+  topFixRank2Impact      FixImpact?
+  topFixRank2TimeMin     Int?
+  topFixRank3            String?              // #3 priority fix
+  topFixRank3Impact      FixImpact?
+  topFixRank3TimeMin     Int?
+  strongestElement       String?              // What's working best
+  biggestRisk            String?              // Main release concern
+  competitiveBenchmark   String?              // Where it stands vs competition
+
   ArtistProfile          ArtistProfile?       @relation(fields: [peerReviewerArtistId], references: [id])
   ReviewerProfile        ReviewerProfile?     @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
   Track                  Track                @relation(fields: [trackId], references: [id], onDelete: Cascade)
@@ -424,6 +440,8 @@ model Track {
   isAbTest                Boolean              @default(false)
   abTestPrimaryTrackId    String?              @unique
   cashAddOnTotal          Int                  @default(0)
+  releaseDecisionReport   Json?                // Compiled Release Decision report
+  releaseDecisionGeneratedAt DateTime?         // When report was generated
   ExternalPurchase        ExternalPurchase[]
   Payment                 Payment?
   Purchase                Purchase[]
@@ -665,11 +683,12 @@ enum ReviewerExpertise {
 }
 
 enum PackageType {
-  STARTER
-  STANDARD
-  PRO
-  DEEP_DIVE
-  PEER
+  STARTER         // DEPRECATED - kept for existing data only
+  STANDARD        // DEPRECATED - kept for existing data only
+  PRO             // DEPRECATED - kept for existing data only
+  DEEP_DIVE       // DEPRECATED - kept for existing data only
+  PEER            // Active: Credit-based community reviews
+  RELEASE_DECISION // Active: Premium expert review service
 }
 
 enum PaymentStatus {
@@ -747,4 +766,16 @@ enum TrackStatus {
   COMPLETED
   CANCELLED
   UPLOADED
+}
+
+enum ReleaseVerdict {
+  RELEASE_NOW    // Track is ready to release
+  FIX_FIRST      // Close, but needs specific fixes
+  NEEDS_WORK     // Not ready, requires significant work
+}
+
+enum FixImpact {
+  HIGH           // Critical issue affecting listenability
+  MEDIUM         // Noticeable but not fatal
+  LOW            // Nice to have improvement
 }
