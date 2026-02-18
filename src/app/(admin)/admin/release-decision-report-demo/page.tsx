@@ -444,7 +444,7 @@ export default async function ReleaseDecisionReportDemoPage() {
           )}
 
           {/* Footer */}
-          <Card variant="outline">
+          <Card variant="soft">
             <CardContent className="pt-6 text-center">
               <p className="text-sm text-neutral-600">
                 This report was generated from <strong>{report.reviewCount} expert reviewers</strong> with 100+ reviews each and 4.5+ ratings.
