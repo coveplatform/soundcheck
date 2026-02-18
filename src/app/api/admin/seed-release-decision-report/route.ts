@@ -228,9 +228,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "User has no artist profile" }, { status: 404 });
     }
 
-    const track = user.ArtistProfile.Track[0];
+    let track = user.ArtistProfile.Track[0];
     if (!track) {
-      return NextResponse.json({ error: "User has no tracks" }, { status: 404 });
+      // Create a placeholder track for seeding
+      track = await prisma.track.create({
+        data: {
+          title: "Demo Track — Release Decision Test",
+          sourceUrl: "https://soundcloud.com/demo/placeholder",
+          sourceType: "SOUNDCLOUD",
+          packageType: "RELEASE_DECISION",
+          status: "COMPLETED",
+          reviewsRequested: 10,
+          reviewsCompleted: 10,
+          artistProfileId: user.ArtistProfile.id,
+        },
+      });
     }
 
     // Generate report from mock data
