@@ -121,6 +121,37 @@ export default async function TrackDetailPage({
     }).catch(() => {});
   }
 
+  // Auto-fetch missing artwork from oEmbed and persist it
+  if (!track.artworkUrl && track.sourceType !== "UPLOAD" && track.sourceUrl) {
+    try {
+      const hostname = new URL(track.sourceUrl).hostname.toLowerCase();
+      let oembedUrl: string | null = null;
+      if (hostname.includes("soundcloud.com")) {
+        oembedUrl = `https://soundcloud.com/oembed?url=${encodeURIComponent(track.sourceUrl)}&format=json`;
+      } else if (hostname.includes("bandcamp.com")) {
+        oembedUrl = `https://bandcamp.com/oembed?url=${encodeURIComponent(track.sourceUrl)}&format=json`;
+      } else if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) {
+        oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(track.sourceUrl)}&format=json`;
+      }
+      if (oembedUrl) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        const res = await fetch(oembedUrl, { signal: controller.signal });
+        clearTimeout(timeout);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.thumbnail_url) {
+            track.artworkUrl = data.thumbnail_url;
+            prisma.track.update({
+              where: { id },
+              data: { artworkUrl: data.thumbnail_url },
+            }).catch(() => {});
+          }
+        }
+      }
+    } catch { /* best-effort */ }
+  }
+
   const completedReviews = track.Review.length;
   const countedCompletedReviews = track.Review.filter(
     (r) => r.countsTowardCompletion !== false
