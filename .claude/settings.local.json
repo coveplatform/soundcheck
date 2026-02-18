@@ -97,7 +97,8 @@
       "Bash(git rm:*)",
       "Bash(node add-reviews-simple.js:*)",
       "Bash(node:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(test:*)"
     ]
   }
 }
