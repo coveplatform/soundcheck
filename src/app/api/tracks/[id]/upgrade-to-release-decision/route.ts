@@ -103,8 +103,8 @@ export async function POST(
       },
     });
 
-    // Redirect to Stripe checkout
-    return NextResponse.redirect(checkoutSession.url!);
+    // Redirect to Stripe checkout (303 forces GET after POST)
+    return NextResponse.redirect(checkoutSession.url!, 303);
   } catch (error) {
     console.error("Release Decision upgrade error:", error);
     return NextResponse.json(
