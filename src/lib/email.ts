@@ -793,96 +793,142 @@ export async function sendReleaseDecisionReport(params: {
 
 // ── Announcement / Blast Email ──────────────────────────────────────────────
 export function buildAnnouncementEmail(params: { userName?: string }): { subject: string; html: string } {
-  const greeting = params.userName ? `Hey ${params.userName}` : "Hey there";
+  const name = params.userName ? params.userName.split(" ")[0] : null;
   const appUrl = getAppUrl();
-
-  // Repeating "new" ticker — mimics the landing page Caveat font banner
-  const tickerWords = Array.from({ length: 30 }).map(() => "new").join("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-  const ticker = `
-    <div style="background-color: rgba(168,85,247,0.1); padding: 10px 0; margin: 0 0 24px; overflow: hidden; text-align: center;">
-      <div style="font-family: 'Georgia', serif; font-size: 22px; font-weight: 700; color: ${COLORS.purpleDark}; white-space: nowrap; letter-spacing: 2px; opacity: 0.7;">
-        ${tickerWords}
-      </div>
-    </div>
-  `;
+  const rdUrl = `${appUrl}/submit?package=release-decision`;
 
   const content = `
-    ${ticker}
-
-    <h1 style="margin: 0 0 8px; font-size: 26px; font-weight: 800; color: ${COLORS.black}; text-align: center; letter-spacing: -0.5px;">
-      Big updates on MixReflect
-    </h1>
-    <p style="margin: 0 0 28px; font-size: 15px; color: ${COLORS.gray}; text-align: center;">
-      ${greeting}, we've been shipping. Here's what's new.
-    </p>
-
-    <!-- Feature 1: Sell Your Music -->
-    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-      <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 700; color: ${COLORS.black};">
-        🎵 Sell your music directly
-      </h3>
-      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
-        Every track now gets its own public page. Share it anywhere — when someone buys through your link, you keep <strong style="color: ${COLORS.black};">85% of the sale</strong>. No middlemen.
+    <!-- Hero -->
+    <div style="text-align: center; padding: 8px 0 28px;">
+      <div style="display: inline-block; background-color: ${COLORS.purple}; color: #ffffff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 5px 14px; border-radius: 20px; margin-bottom: 16px;">
+        New on MixReflect
+      </div>
+      <h1 style="margin: 0 0 10px; font-size: 28px; font-weight: 800; color: ${COLORS.black}; letter-spacing: -0.5px; line-height: 1.2;">
+        Know exactly what to fix<span style="color: ${COLORS.purple};">.</span>
+      </h1>
+      <p style="margin: 0; font-size: 15px; color: ${COLORS.gray}; line-height: 1.5;">
+        ${name ? `${name}, we` : "We"} just launched <strong style="color: ${COLORS.black};">Release Decision</strong> — a new way to find out if your track is ready to release, and exactly what to fix if it isn't.
       </p>
     </div>
 
-    <!-- Feature 2: Release Decision -->
-    <div style="background-color: #0a0a0a; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-      <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 700; color: #ffffff;">
-        🎯 Release Decision Reports
+    <!-- The problem -->
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+      <h3 style="margin: 0 0 10px; font-size: 15px; font-weight: 700; color: ${COLORS.black};">
+        The problem
       </h3>
-      <p style="margin: 0 0 12px; font-size: 14px; line-height: 1.6; color: #a3a3a3;">
-        Should you release this track? Get a clear <strong style="color: #ffffff;">Go/No-Go verdict</strong> from 10-12 expert reviewers, a readiness score out of 100, and your top 3 fixes ranked by impact — all for $9.95.
+      <p style="margin: 0; font-size: 14px; line-height: 1.7; color: ${COLORS.gray};">
+        You've finished a track. You think it's good — but is it <em>ready</em>? Asking friends doesn't help. Posting on forums gets generic advice. You need honest, expert-level feedback from people who actually know what they're listening for.
       </p>
+    </div>
+
+    <!-- The solution — dark card -->
+    <div style="background-color: #0a0a0a; border-radius: 14px; padding: 24px; margin-bottom: 16px;">
+      <div style="margin-bottom: 16px;">
+        <div style="display: inline-block; background-color: ${COLORS.purple}; color: #ffffff; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 10px; border-radius: 6px;">
+          Release Decision
+        </div>
+      </div>
+      <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">
+        A panel of 10–12 experts reviews your track and gives you a clear answer.
+      </h3>
+      <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: #a3a3a3;">
+        Upload your track, and within 24 hours you'll receive a detailed report.
+      </p>
+
+      <!-- Report preview cards -->
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 16px;">
+        <tr>
+          <td style="background-color: rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 10px; text-align: center; width: 33%;">
+            <div style="font-size: 10px; font-weight: 600; color: #737373; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Verdict</div>
+            <div style="font-size: 16px; font-weight: 800; color: #34d399;">RELEASE</div>
+            <div style="font-size: 10px; color: #525252; margin-top: 2px;">or Fix First</div>
+          </td>
+          <td width="8"></td>
+          <td style="background-color: rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 10px; text-align: center; width: 33%;">
+            <div style="font-size: 10px; font-weight: 600; color: #737373; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Score</div>
+            <div style="font-size: 16px; font-weight: 800; color: ${COLORS.purple};">0–100</div>
+            <div style="font-size: 10px; color: #525252; margin-top: 2px;">readiness</div>
+          </td>
+          <td width="8"></td>
+          <td style="background-color: rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 10px; text-align: center; width: 33%;">
+            <div style="font-size: 10px; font-weight: 600; color: #737373; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Fixes</div>
+            <div style="font-size: 16px; font-weight: 800; color: ${COLORS.amber};">Top 3</div>
+            <div style="font-size: 10px; color: #525252; margin-top: 2px;">by impact</div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Checklist -->
       <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
         <tr>
-          <td style="background-color: rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; text-align: center; width: 33%;">
-            <div style="font-size: 11px; color: #737373; text-transform: uppercase;">Verdict</div>
-            <div style="font-size: 14px; font-weight: 800; color: #34d399;">RELEASE</div>
+          <td style="padding: 4px 0; font-size: 13px; color: #a3a3a3; width: 50%;">
+            <span style="color: ${COLORS.purple}; margin-right: 6px;">✓</span> Strongest elements
           </td>
-          <td width="8"></td>
-          <td style="background-color: rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; text-align: center; width: 33%;">
-            <div style="font-size: 11px; color: #737373; text-transform: uppercase;">Score</div>
-            <div style="font-size: 14px; font-weight: 800; color: ${COLORS.purpleDark};">0–100</div>
+          <td style="padding: 4px 0; font-size: 13px; color: #a3a3a3; width: 50%;">
+            <span style="color: ${COLORS.purple}; margin-right: 6px;">✓</span> Biggest risks
           </td>
-          <td width="8"></td>
-          <td style="background-color: rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; text-align: center; width: 33%;">
-            <div style="font-size: 11px; color: #737373; text-transform: uppercase;">Fixes</div>
-            <div style="font-size: 14px; font-weight: 800; color: ${COLORS.amber};">Top 3</div>
+        </tr>
+        <tr>
+          <td style="padding: 4px 0; font-size: 13px; color: #a3a3a3;">
+            <span style="color: ${COLORS.purple}; margin-right: 6px;">✓</span> Genre benchmarking
+          </td>
+          <td style="padding: 4px 0; font-size: 13px; color: #a3a3a3;">
+            <span style="color: ${COLORS.purple}; margin-right: 6px;">✓</span> Time estimates per fix
+          </td>
+        </tr>
+      </table>
+
+      <!-- Price + CTA -->
+      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08);">
+        <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+          <tr>
+            <td>
+              <span style="font-size: 22px; font-weight: 800; color: #ffffff;">$9.95</span>
+              <span style="font-size: 13px; color: #737373; margin-left: 6px;">one-time</span>
+            </td>
+            <td style="text-align: right;">
+              <a href="${rdUrl}" style="display: inline-block; background-color: ${COLORS.purple}; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 10px 24px; border-radius: 10px;">Get your report</a>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div style="padding: 16px 0 8px;">
+      <h3 style="margin: 0 0 16px; font-size: 15px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
+        How it works
+      </h3>
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="text-align: center; width: 33%; vertical-align: top; padding: 0 4px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${COLORS.purpleLight}; color: ${COLORS.purple}; font-size: 14px; font-weight: 800; line-height: 32px; text-align: center; margin: 0 auto 8px;">1</div>
+            <div style="font-size: 13px; font-weight: 600; color: ${COLORS.black};">Upload</div>
+            <div style="font-size: 11px; color: ${COLORS.grayLight}; margin-top: 2px;">SoundCloud, file, or link</div>
+          </td>
+          <td style="text-align: center; width: 33%; vertical-align: top; padding: 0 4px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${COLORS.purpleLight}; color: ${COLORS.purple}; font-size: 14px; font-weight: 800; line-height: 32px; text-align: center; margin: 0 auto 8px;">2</div>
+            <div style="font-size: 13px; font-weight: 600; color: ${COLORS.black};">Experts review</div>
+            <div style="font-size: 11px; color: ${COLORS.grayLight}; margin-top: 2px;">10–12 vetted reviewers</div>
+          </td>
+          <td style="text-align: center; width: 33%; vertical-align: top; padding: 0 4px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${COLORS.purpleLight}; color: ${COLORS.purple}; font-size: 14px; font-weight: 800; line-height: 32px; text-align: center; margin: 0 auto 8px;">3</div>
+            <div style="font-size: 13px; font-weight: 600; color: ${COLORS.black};">Get your report</div>
+            <div style="font-size: 11px; color: ${COLORS.grayLight}; margin-top: 2px;">Delivered in 24 hours</div>
           </td>
         </tr>
       </table>
     </div>
 
-    <!-- Feature 3: Discover & Public Pages -->
-    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-      <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 700; color: ${COLORS.black};">
-        🌍 Discover page & public track pages
-      </h3>
-      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
-        Your music is now discoverable. Listeners can browse by genre, play tracks, and buy directly. Every track you upload gets its own shareable page.
-      </p>
-    </div>
+    ${emailButton("Try Release Decision", rdUrl)}
 
-    <!-- Feature 4: Earn Money Reviewing -->
-    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-      <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 700; color: ${COLORS.black};">
-        💰 Earn money reviewing
-      </h3>
-      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">
-        Hit Verified Reviewer status (25+ reviews, 4.5+ rating) and earn <strong style="color: ${COLORS.black};">$1.50 per review</strong>. Cash out anytime via Stripe.
-      </p>
-    </div>
-
-    ${emailButton("Check it out", appUrl)}
-
-    <p style="margin: 24px 0 0; font-size: 13px; color: ${COLORS.grayLight}; text-align: center;">
-      Thanks for being an early user. We're building this for artists like you.
+    <p style="margin: 20px 0 0; font-size: 13px; color: ${COLORS.grayLight}; text-align: center; line-height: 1.5;">
+      Thanks for being part of MixReflect. We built this because we needed it ourselves.
     </p>
   `;
 
   return {
-    subject: "What's new on MixReflect — sell tracks, release decisions & more",
+    subject: "New: Know exactly what to fix before you release",
     html: emailWrapper(content),
   };
 }
