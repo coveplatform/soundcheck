@@ -95,7 +95,9 @@
       "Bash(npx dotenv:*)",
       "Bash(node --env-file=.env.local -e:*)",
       "Bash(git rm:*)",
-      "Bash(node add-reviews-simple.js:*)"
+      "Bash(node add-reviews-simple.js:*)",
+      "Bash(node:*)",
+      "Bash(git reset:*)"
     ]
   }
 }

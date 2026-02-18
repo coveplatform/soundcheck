@@ -1,7 +1,4 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
 import { ArrowLeft, Target, Zap, CheckCircle2, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,11 +7,7 @@ import { ReleaseDecisionForm } from "@/app/(dashboard)/reviewer/review/[id]/comp
 export const dynamic = "force-dynamic";
 
 export default async function ReleaseDecisionDemoPage() {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.isAdmin) {
-    redirect("/dashboard");
-  }
+  // Auth handled by admin layout
 
   // Mock data for demo
   const mockFormData = {

@@ -2,11 +2,23 @@
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env.local') });
 
-// Now we can load Prisma
+// Now we can load Prisma with the pg adapter (this is what the project uses!)
 const { PrismaClient } = require('@prisma/client');
+const { PrismaPg } = require('@prisma/adapter-pg');
 const bcrypt = require('bcryptjs');
 
-const prisma = new PrismaClient();
+const databaseUrl = process.env.DATABASE_URL ||
+  process.env.POSTGRES_PRISMA_URL ||
+  process.env.POSTGRES_URL_NON_POOLING ||
+  process.env.POSTGRES_URL;
+
+if (!databaseUrl) {
+  throw new Error('No database URL found in environment');
+}
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: databaseUrl })
+});
 
 async function main() {
   console.log('🎵 Adding reviews for BooBooBeaar...\n');
