@@ -1,36 +1,12 @@
 import Link from "next/link";
 import { ArrowLeft, Target, Zap, CheckCircle2, Sparkles } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ReleaseDecisionForm } from "@/app/(dashboard)/reviewer/review/[id]/components/release-decision-form";
+import { DemoFormWrapper } from "./demo-form-wrapper";
 
 export const dynamic = "force-dynamic";
 
 export default async function ReleaseDecisionDemoPage() {
   // Auth handled by admin layout
-
-  // Mock data for demo
-  const mockFormData = {
-    releaseVerdict: null,
-    releaseReadinessScore: 75,
-    qualityLevel: null,
-    topFixRank1: "",
-    topFixRank1Impact: null,
-    topFixRank1TimeMin: 30,
-    topFixRank2: "",
-    topFixRank2Impact: null,
-    topFixRank2TimeMin: 60,
-    topFixRank3: "",
-    topFixRank3Impact: null,
-    topFixRank3TimeMin: 15,
-    strongestElement: "",
-    biggestRisk: "",
-    competitiveBenchmark: "",
-  };
-
-  const handleDemoSubmit = async (data: any) => {
-    console.log("Demo submission:", data);
-  };
 
   return (
     <div className="pt-8 pb-24">
@@ -202,33 +178,7 @@ export default async function ReleaseDecisionDemoPage() {
           </div>
 
           {/* RIGHT: Reviewer Form */}
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-black mb-1 flex items-center gap-2">
-                <Target className="h-5 w-5 text-purple-600" />
-                Reviewer Experience
-              </h2>
-              <p className="text-sm text-neutral-600 mb-4">The form PRO reviewers fill out (scrollable demo)</p>
-            </div>
-
-            <Card variant="soft" elevated className="sticky top-6">
-              <CardContent className="pt-6">
-                <div className="mb-4 p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
-                  <p className="text-sm font-semibold text-purple-900">
-                    <strong>Note:</strong> This is a preview. Form submissions won't be saved.
-                  </p>
-                </div>
-
-                <div className="max-h-[calc(100vh-16rem)] overflow-y-auto pr-2 -mr-2">
-                  <ReleaseDecisionForm
-                    onSubmit={handleDemoSubmit}
-                    listenTime={200}
-                    minListenTime={180}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <DemoFormWrapper />
         </div>
       </div>
     </div>
