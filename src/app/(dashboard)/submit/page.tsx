@@ -682,11 +682,13 @@ export default function SubmitTrackPage() {
             {isReleaseDecisionFlow ? "Premium" : "Submit"}
           </p>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black mt-2">
-            {isReleaseDecisionFlow ? "Get Your Release Decision" : "Submit Track"}
+            {isReleaseDecisionFlow ? (
+              <>Know exactly what to fix<span className="text-purple-600">.</span></>
+            ) : "Submit Track"}
           </h1>
           {isReleaseDecisionFlow && (
             <p className="text-sm text-neutral-500 mt-2">
-              An expert panel reviews your track and tells you if it&apos;s ready to release
+              Get a clear go/no-go verdict, a readiness score, and your top fixes — from 10+ experts
             </p>
           )}
 
