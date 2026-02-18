@@ -155,6 +155,22 @@ const submitReviewSchema = z.object({
   nextFocus: z.enum(["MIXING", "ARRANGEMENT", "SOUND_DESIGN", "SONGWRITING", "PERFORMANCE", "READY_TO_RELEASE"]).optional().nullable(),
   expectedPlacement: z.enum(["EDITORIAL", "SOUNDCLOUD_TRENDING", "CLUB", "COFFEE_SHOP", "VIDEO_GAME", "AD", "NOWHERE"]).optional().nullable(),
   qualityLevel: z.enum(["NOT_READY", "DEMO_STAGE", "ALMOST_THERE", "RELEASE_READY", "PROFESSIONAL"]).optional().nullable(),
+
+  // Release Decision fields
+  releaseVerdict: z.enum(["RELEASE_NOW", "FIX_FIRST", "NEEDS_WORK"]).optional().nullable(),
+  releaseReadinessScore: z.number().min(0).max(100).optional().nullable(),
+  topFixRank1: z.string().optional().nullable(),
+  topFixRank1Impact: z.enum(["HIGH", "MEDIUM", "LOW"]).optional().nullable(),
+  topFixRank1TimeMin: z.number().optional().nullable(),
+  topFixRank2: z.string().optional().nullable(),
+  topFixRank2Impact: z.enum(["HIGH", "MEDIUM", "LOW"]).optional().nullable(),
+  topFixRank2TimeMin: z.number().optional().nullable(),
+  topFixRank3: z.string().optional().nullable(),
+  topFixRank3Impact: z.enum(["HIGH", "MEDIUM", "LOW"]).optional().nullable(),
+  topFixRank3TimeMin: z.number().optional().nullable(),
+  strongestElement: z.string().optional().nullable(),
+  biggestRisk: z.string().optional().nullable(),
+  competitiveBenchmark: z.string().optional().nullable(),
 });
 
 export async function POST(request: Request) {
@@ -413,6 +429,22 @@ export async function POST(request: Request) {
               nextFocus: data.nextFocus,
               expectedPlacement: data.expectedPlacement,
               qualityLevel: data.qualityLevel,
+
+              // Release Decision fields
+              releaseVerdict: data.releaseVerdict,
+              releaseReadinessScore: data.releaseReadinessScore,
+              topFixRank1: data.topFixRank1,
+              topFixRank1Impact: data.topFixRank1Impact,
+              topFixRank1TimeMin: data.topFixRank1TimeMin,
+              topFixRank2: data.topFixRank2,
+              topFixRank2Impact: data.topFixRank2Impact,
+              topFixRank2TimeMin: data.topFixRank2TimeMin,
+              topFixRank3: data.topFixRank3,
+              topFixRank3Impact: data.topFixRank3Impact,
+              topFixRank3TimeMin: data.topFixRank3TimeMin,
+              strongestElement: data.strongestElement,
+              biggestRisk: data.biggestRisk,
+              competitiveBenchmark: data.competitiveBenchmark,
             },
           });
           updatedCount = updated.count;
@@ -584,6 +616,30 @@ export async function POST(request: Request) {
     }
 
     await updateReviewerTier(review.reviewerId);
+
+    // Auto-trigger Release Decision report generation if all reviews are complete
+    if (review.Track.packageType === "RELEASE_DECISION" && result.updatedReview) {
+      // Count completed Release Decision reviews with verdict and score
+      const completedReleaseDecisionReviews = await prisma.review.count({
+        where: {
+          trackId: review.trackId,
+          status: "COMPLETED",
+          releaseVerdict: { not: null },
+          releaseReadinessScore: { not: null },
+        },
+      });
+
+      // If we have 8+ reviews (threshold) and report hasn't been generated yet
+      if (completedReleaseDecisionReviews >= 8 && !review.Track.releaseDecisionGeneratedAt) {
+        console.log(`[Release Decision] ${completedReleaseDecisionReviews}/10 reviews complete for track ${review.trackId}. Triggering report generation...`);
+
+        // Trigger report generation (fire-and-forget to avoid blocking review submission)
+        const reportUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/tracks/${review.trackId}/generate-release-decision-report`;
+        fetch(reportUrl, { method: 'POST' })
+          .then(() => console.log(`[Release Decision] Report generation triggered for track ${review.trackId}`))
+          .catch(err => console.error(`[Release Decision] Failed to trigger report for track ${review.trackId}:`, err));
+      }
+    }
 
     const milestoneHalf = Math.ceil(result.Track.reviewsRequested / 2);
     const milestoneFull = result.Track.reviewsRequested;

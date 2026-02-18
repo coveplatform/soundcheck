@@ -28,7 +28,7 @@ export default async function ReleaseDecisionDemoPage() {
     competitiveBenchmark: "",
   };
 
-  const handleDemoSubmit = (data: any) => {
+  const handleDemoSubmit = async (data: any) => {
     console.log("Demo submission:", data);
   };
 

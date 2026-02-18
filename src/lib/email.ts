@@ -695,3 +695,102 @@ export async function sendPurchaseConfirmationEmail(params: {
     html: emailWrapper(content),
   });
 }
+
+export async function sendReleaseDecisionReport(params: {
+  artistEmail: string;
+  artistName: string;
+  trackTitle: string;
+  trackId: string;
+  report: any;
+}) {
+  if (!params.artistEmail) return;
+
+  const { verdict, readinessScore, topFixes, aiAnalysis } = params.report;
+
+  const verdictColor =
+    verdict.consensus === "RELEASE_NOW" ? "#10b981" :
+    verdict.consensus === "FIX_FIRST" ? "#f59e0b" : "#ef4444";
+
+  const verdictText =
+    verdict.consensus === "RELEASE_NOW" ? "✅ RELEASE NOW" :
+    verdict.consensus === "FIX_FIRST" ? "⚠️ FIX FIRST" : "🔧 NEEDS WORK";
+
+  const trackUrl = `${process.env.NEXT_PUBLIC_APP_URL}/artist/tracks/${params.trackId}`;
+
+  const fixesHtml = topFixes && topFixes.length > 0 ? `
+    <h3 style="margin: 24px 0 16px; font-size: 18px; font-weight: 700; color: ${COLORS.black};">
+      🔧 Top Fixes (Prioritized)
+    </h3>
+    ${topFixes.slice(0, 3).map((fix: any, i: number) => `
+      <div style="background-color: ${COLORS.lightGray}; border-left: 4px solid ${fix.avgImpact === 'HIGH' ? '#ef4444' : fix.avgImpact === 'MEDIUM' ? '#f59e0b' : '#10b981'}; padding: 16px; margin-bottom: 12px;">
+        <p style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: ${COLORS.black};">
+          ${i + 1}. ${fix.issue}
+        </p>
+        <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">
+          ${fix.mentionedBy}/${params.report.reviewCount} reviewers •
+          <span style="color: ${fix.avgImpact === 'HIGH' ? '#ef4444' : fix.avgImpact === 'MEDIUM' ? '#f59e0b' : '#10b981'}; font-weight: 600;">
+            ${fix.avgImpact} IMPACT
+          </span> • ~${fix.avgTimeEstimate} min
+        </p>
+      </div>
+    `).join('')}
+  ` : '';
+
+  const content = `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-block; background-color: #7c3aed; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: white;">
+        Release Decision Report
+      </div>
+    </div>
+    <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
+      ${params.trackTitle}
+    </h1>
+    <p style="margin: 0 0 24px; font-size: 14px; color: ${COLORS.gray}; text-align: center;">
+      ${params.report.reviewCount} expert reviewers have spoken
+    </p>
+
+    <div style="background-color: ${verdictColor}; padding: 20px; margin-bottom: 24px; text-align: center; border: 2px solid ${COLORS.black};">
+      <h2 style="margin: 0; font-size: 28px; font-weight: 900; color: white;">
+        ${verdictText}
+      </h2>
+      <p style="margin: 8px 0 0; font-size: 13px; color: rgba(255,255,255,0.9);">
+        ${verdict.breakdown.RELEASE_NOW} Release • ${verdict.breakdown.FIX_FIRST} Fix First • ${verdict.breakdown.NEEDS_WORK} Needs Work
+      </p>
+    </div>
+
+    <div style="background-color: ${COLORS.lightGray}; border: 2px solid ${COLORS.black}; padding: 24px; margin-bottom: 24px; text-align: center;">
+      <p style="margin: 0 0 8px; font-size: 14px; color: ${COLORS.gray}; text-transform: uppercase;">
+        READINESS SCORE
+      </p>
+      <p style="margin: 0; font-size: 56px; font-weight: 900; color: #7c3aed; line-height: 1;">
+        ${readinessScore.average}/100
+      </p>
+    </div>
+
+    ${fixesHtml}
+
+    <div style="background-color: #faf5ff; border: 2px solid #e9d5ff; padding: 20px; margin: 24px 0;">
+      <h3 style="margin: 0 0 12px; font-size: 16px; font-weight: 700; color: #7c3aed;">
+        🤖 AI Analysis
+      </h3>
+      <p style="margin: 0 0 12px; font-size: 14px; color: #374151; line-height: 1.6;">
+        ${aiAnalysis.summary}
+      </p>
+      <p style="margin: 0; font-size: 13px; color: #6b7280;">
+        <strong>Work Required:</strong> ${aiAnalysis.estimatedWorkRequired}
+      </p>
+    </div>
+
+    ${emailButton("View Full Report", trackUrl)}
+
+    <p style="margin: 24px 0 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
+      Generated from ${params.report.reviewCount} expert reviewers + AI analysis
+    </p>
+  `;
+
+  await sendEmail({
+    to: params.artistEmail,
+    subject: `Release Decision: "${params.trackTitle}" - ${verdictText}`,
+    html: emailWrapper(content),
+  });
+}
