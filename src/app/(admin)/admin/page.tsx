@@ -104,6 +104,32 @@ export default async function AdminPage() {
         <p className="text-sm text-neutral-500 mt-1">Platform health at a glance</p>
       </div>
 
+      {/* Release Decision Demo Banner */}
+      <Link
+        href="/admin/release-decision-demo"
+        className="block rounded-xl border-2 border-purple-600 bg-gradient-to-br from-purple-500 to-purple-600 p-6 hover:shadow-lg transition-all relative overflow-hidden group"
+      >
+        <div className="absolute top-0 right-0 bg-yellow-300 text-purple-900 text-[10px] font-black px-3 py-1.5 rounded-bl-xl tracking-wider">
+          ✨ NEW FEATURE
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center flex-shrink-0">
+            <svg className="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-black text-white mb-1">Release Decision Demo</h3>
+            <p className="text-sm text-white/90 font-medium">Preview the complete artist & reviewer experience</p>
+          </div>
+          <div className="hidden sm:block text-white group-hover:translate-x-1 transition-transform">
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </div>
+        </div>
+      </Link>
+
       {/* Primary stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Total Users" value={String(totalUsers)} href="/admin/users" />

@@ -1155,10 +1155,6 @@ export default function SubmitTrackPage() {
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span><strong>AI-powered technical analysis report</strong></span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
                         <span>Release readiness score (0-100)</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
@@ -1171,11 +1167,15 @@ export default function SubmitTrackPage() {
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                        <span>AI-powered technical analysis report</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
                         <span>10-12 expert reviewers (100+ reviews, 4.5+ rating)</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>Compiled report delivered to email within 48 hours</span>
+                        <span>Compiled report delivered to email within 24 hours</span>
                       </div>
                     </div>
 
@@ -1266,7 +1266,7 @@ export default function SubmitTrackPage() {
                     <strong>What happens next:</strong> Your track will be assigned to 10-12
                     expert reviewers (100+ reviews, 4.5+ rating). Their feedback will be analyzed by AI
                     to generate a comprehensive technical report with actionable insights. You'll receive
-                    your complete Release Decision Report via email within 48 hours.
+                    your complete Release Decision Report via email within 24 hours.
                   </p>
                 </div>
               </div>

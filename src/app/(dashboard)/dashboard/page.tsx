@@ -297,27 +297,43 @@ export default async function DashboardPage() {
         {/* NEW: Release Decision Announcement Banner */}
         <Link
           href="/submit"
-          className="flex items-start sm:items-center gap-4 rounded-2xl border-2 border-purple-400 bg-gradient-to-br from-purple-50 via-white to-purple-50/70 px-5 py-4 mb-5 group transition-all duration-200 hover:border-purple-500 hover:shadow-lg relative overflow-hidden"
+          className="relative block mb-5 group overflow-visible"
         >
-          <div className="absolute top-0 right-0 bg-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider">
-            NEW
-          </div>
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center flex-shrink-0 shadow-md">
-            <Target className="h-6 w-6 text-white" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-lg font-bold text-black">Release Decision</h3>
-              <Zap className="h-4 w-4 text-purple-600" />
+          <div className="rounded-2xl border-2 border-black bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 px-6 py-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-150 ease-out active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px]">
+
+            {/* Animated NEW badge */}
+            <div className="absolute -top-2 -right-2 bg-black border-2 border-white text-white text-[10px] font-black px-3 py-1.5 rounded-lg shadow-lg animate-pulse">
+              NEW ✨
             </div>
-            <p className="text-sm text-neutral-700 leading-snug">
-              <strong>Should you release your track?</strong> Get expert panel verdict + AI analysis for just <strong className="text-purple-700">$9.95</strong>.
-              <span className="hidden sm:inline"> Clear Go/No-Go decision with top 3 actionable fixes delivered in 48 hours.</span>
-            </p>
-          </div>
-          <div className="hidden sm:flex items-center gap-2 flex-shrink-0 text-purple-600 group-hover:text-purple-700 font-semibold transition-colors">
-            <span className="text-sm">Learn More</span>
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+
+            {/* Decorative elements */}
+            <div className="absolute -top-4 -left-4 w-8 h-8 bg-yellow-300 rounded-full blur-xl opacity-60 animate-pulse"></div>
+            <div className="absolute -bottom-3 -right-3 w-12 h-12 bg-pink-300 rounded-full blur-xl opacity-50"></div>
+
+            <div className="flex items-start sm:items-center gap-4 relative z-10">
+              {/* Icon */}
+              <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-150">
+                <Target className="h-7 w-7 text-white drop-shadow-md" />
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <h3 className="text-xl font-black text-white drop-shadow-md tracking-tight">Release Decision</h3>
+                  <Zap className="h-5 w-5 text-yellow-300 drop-shadow-md animate-pulse" />
+                </div>
+                <p className="text-sm text-white/95 leading-snug font-medium drop-shadow">
+                  <strong className="text-white font-bold">Should you release this track?</strong> Get expert panel + AI analysis for just <span className="inline-flex items-center px-2 py-0.5 bg-white/20 rounded-md font-black text-yellow-300 border border-white/30">$9.95</span>
+                  <span className="hidden sm:inline text-white/90"> • Clear Go/No-Go verdict with actionable fixes in 24 hours</span>
+                </p>
+              </div>
+
+              {/* CTA Arrow */}
+              <div className="hidden sm:flex items-center gap-2 flex-shrink-0 text-white font-bold bg-white/20 px-4 py-2 rounded-lg border-2 border-white/30 backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                <span className="text-sm">Learn More</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
           </div>
         </Link>
 

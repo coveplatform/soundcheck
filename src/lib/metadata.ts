@@ -139,13 +139,13 @@ export const PACKAGES = {
     mix: "10-12 expert reviewers (100+ reviews, 4.5+ rating)",
     features: [
       "Clear Go/No-Go verdict from expert panel",
-      "AI-powered technical analysis report",
       "Release readiness score (0-100)",
       "Top 3 fixes ranked by impact & time estimate",
       "Competitive genre benchmarking",
       "Strongest elements & biggest risks identified",
+      "AI-powered technical analysis report",
       "Compiled actionable report delivered to email",
-      "48-hour delivery guarantee",
+      "24-hour delivery guarantee",
     ],
   },
   PEER: {

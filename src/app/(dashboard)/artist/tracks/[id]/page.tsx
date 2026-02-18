@@ -362,57 +362,80 @@ export default async function TrackDetailPage({
             {/* Release Decision Upsell */}
             {track.packageType !== "RELEASE_DECISION" &&
              (track.status === "COMPLETED" || track.status === "IN_PROGRESS") && (
-              <Card variant="soft" elevated className="overflow-hidden border-2 border-purple-200">
-                <CardContent className="pt-6 relative">
-                  <div className="absolute top-0 right-0 bg-purple-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg tracking-wider">
-                    UPGRADE
+              <div className="relative overflow-visible group">
+                {/* Animated glow effects */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
+
+                <div className="relative rounded-2xl border-2 border-black bg-gradient-to-br from-purple-500 to-purple-600 p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                  {/* Background decoration */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                  <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-pink-400/20 rounded-full blur-2xl"></div>
+
+                  {/* UPGRADE badge */}
+                  <div className="absolute top-0 right-0 bg-black border-l-2 border-b-2 border-white text-white text-[9px] font-black px-3 py-1.5 rounded-bl-xl tracking-widest shadow-lg">
+                    ⚡ UPGRADE
                   </div>
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center flex-shrink-0 shadow-md">
-                      <Target className="h-5 w-5 text-white" />
+
+                  <div className="relative z-10">
+                    {/* Header */}
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <Target className="h-6 w-6 text-white drop-shadow-md" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-black text-white drop-shadow-md mb-1 tracking-tight">
+                          Release Decision
+                        </h3>
+                        <p className="text-xs text-white/95 leading-snug font-medium drop-shadow">
+                          Should you release this? Expert verdict + AI analysis
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-base font-bold text-black mb-1">
-                        Get Release Decision
-                      </h3>
-                      <p className="text-xs text-neutral-600 leading-snug mb-2">
-                        Should you release this track? Get expert panel verdict + AI analysis
-                      </p>
+
+                    {/* Features */}
+                    <div className="space-y-2 mb-4 bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                      <div className="flex items-center gap-2 text-xs text-white">
+                        <div className="h-1.5 w-1.5 rounded-full bg-yellow-300 shadow-lg"></div>
+                        <span className="font-semibold drop-shadow">Clear Go/No-Go verdict</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-white">
+                        <div className="h-1.5 w-1.5 rounded-full bg-yellow-300 shadow-lg"></div>
+                        <span className="font-semibold drop-shadow">AI-powered technical report</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-white">
+                        <div className="h-1.5 w-1.5 rounded-full bg-yellow-300 shadow-lg"></div>
+                        <span className="font-semibold drop-shadow">Top 3 actionable fixes ranked</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-white">
+                        <div className="h-1.5 w-1.5 rounded-full bg-yellow-300 shadow-lg"></div>
+                        <span className="font-semibold drop-shadow">10-12 expert reviewers only</span>
+                      </div>
                     </div>
+
+                    {/* Price */}
+                    <div className="flex items-center justify-between mb-4 bg-black/20 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-yellow-300 drop-shadow-md tracking-tight">$9.95</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[10px] font-bold text-white/80 uppercase tracking-wider">Delivery</div>
+                        <div className="text-sm font-black text-white drop-shadow">24 hours</div>
+                      </div>
+                    </div>
+
+                    {/* CTA Button */}
+                    <form action={`/api/tracks/${track.id}/upgrade-to-release-decision`} method="POST">
+                      <Button
+                        type="submit"
+                        className="w-full bg-white text-purple-600 hover:bg-yellow-300 hover:text-purple-700 font-black border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] transition-all duration-150 text-sm h-11"
+                      >
+                        <Zap className="h-4 w-4 mr-2" />
+                        Upgrade to Release Decision
+                      </Button>
+                    </form>
                   </div>
-                  <div className="space-y-1.5 mb-3 pl-13">
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <CheckCircle2 className="h-3 w-3 text-purple-600 flex-shrink-0" />
-                      <span className="text-neutral-700">Clear Go/No-Go verdict</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <CheckCircle2 className="h-3 w-3 text-purple-600 flex-shrink-0" />
-                      <span className="text-neutral-700">AI-powered technical report</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <CheckCircle2 className="h-3 w-3 text-purple-600 flex-shrink-0" />
-                      <span className="text-neutral-700">Top 3 actionable fixes</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <CheckCircle2 className="h-3 w-3 text-purple-600 flex-shrink-0" />
-                      <span className="text-neutral-700">10-12 expert reviewers</span>
-                    </div>
-                  </div>
-                  <div className="flex items-baseline gap-2 mb-3 pl-13">
-                    <span className="text-2xl font-bold text-purple-600">$9.95</span>
-                    <span className="text-xs text-neutral-500">• 48hr delivery</span>
-                  </div>
-                  <form action={`/api/tracks/${track.id}/upgrade-to-release-decision`} method="POST">
-                    <Button
-                      type="submit"
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:shadow-[3px_3px_0_rgba(0,0,0,0.6)] active:shadow-[1px_1px_0_rgba(0,0,0,0.6)] active:translate-x-[1px] active:translate-y-[1px] transition-all"
-                    >
-                      <Zap className="h-4 w-4 mr-2" />
-                      Upgrade to Release Decision
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
 
             {/* Queue Status */}
