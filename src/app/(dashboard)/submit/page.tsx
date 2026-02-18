@@ -745,6 +745,47 @@ export default function SubmitTrackPage() {
         {/* ================================================================= */}
         {step === 1 && (
           <div className="space-y-6">
+            {/* Release Decision overview when in dedicated flow */}
+            {isReleaseDecisionFlow && (
+              <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-9 w-9 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
+                    <Target className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-black">What you&apos;re getting</h3>
+                    <p className="text-xs text-neutral-500">Release Decision Package &bull; $9.95</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-purple-600 flex-shrink-0" />
+                    <span className="text-neutral-700">Go/No-Go expert verdict</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-purple-600 flex-shrink-0" />
+                    <span className="text-neutral-700">Readiness score (0-100)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-purple-600 flex-shrink-0" />
+                    <span className="text-neutral-700">Top 3 prioritized fixes</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-purple-600 flex-shrink-0" />
+                    <span className="text-neutral-700">Genre benchmarking</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-purple-600 flex-shrink-0" />
+                    <span className="text-neutral-700">10-12 expert reviewers</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-purple-600 flex-shrink-0" />
+                    <span className="text-neutral-700">Report in 24 hours</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div>
               <h2 className="text-xl font-semibold text-black mb-1">Upload your track</h2>
               <p className="text-sm text-neutral-600">Choose how you want to add your music</p>
@@ -943,6 +984,16 @@ export default function SubmitTrackPage() {
         {/* ================================================================= */}
         {step === 2 && (
           <div className="space-y-6">
+            {/* Compact RD reminder on step 2 */}
+            {isReleaseDecisionFlow && (
+              <div className="flex items-center gap-3 rounded-xl bg-purple-50 border border-purple-200 px-4 py-3">
+                <Target className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                <p className="text-sm font-medium text-purple-900">
+                  Release Decision &bull; 10-12 expert reviewers &bull; Report in 24h &bull; <strong>$9.95</strong>
+                </p>
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-black mb-1">Track details</h2>
