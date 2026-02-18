@@ -240,7 +240,7 @@ export async function POST(request: Request) {
           status: "COMPLETED",
           reviewsRequested: 10,
           reviewsCompleted: 10,
-          artistProfileId: user.ArtistProfile.id,
+          ArtistProfile: { connect: { id: user.ArtistProfile.id } },
         },
       });
     }
