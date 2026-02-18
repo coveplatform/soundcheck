@@ -130,6 +130,26 @@ export default async function AdminPage() {
         </div>
       </Link>
 
+      {/* Quick Admin Tools */}
+      <div className="grid grid-cols-2 gap-4">
+        <Link
+          href="/admin/seed-report"
+          className="block rounded-xl border border-neutral-200 bg-white p-5 hover:border-purple-300 transition-colors"
+        >
+          <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Tool</div>
+          <div className="mt-2 text-base font-bold text-neutral-950">Seed Release Decision Report</div>
+          <div className="text-xs text-neutral-400 mt-1">Attach mock report to any user&apos;s track</div>
+        </Link>
+        <Link
+          href="/admin/release-decision-report-demo"
+          className="block rounded-xl border border-neutral-200 bg-white p-5 hover:border-purple-300 transition-colors"
+        >
+          <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Preview</div>
+          <div className="mt-2 text-base font-bold text-neutral-950">Report Design Demo</div>
+          <div className="text-xs text-neutral-400 mt-1">View the report layout with mock data</div>
+        </Link>
+      </div>
+
       {/* Primary stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Total Users" value={String(totalUsers)} href="/admin/users" />
