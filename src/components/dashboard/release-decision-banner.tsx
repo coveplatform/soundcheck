@@ -1,31 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Caveat } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import { Target, ArrowRight } from "lucide-react";
 
-const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
-
 export function ReleaseDecisionBanner() {
   return (
-    <section className="pb-6 pt-0 bg-neutral-900 text-neutral-50 overflow-hidden rounded-2xl mb-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-black">
-      {/* Scrolling "new" marquee */}
-      <div className="w-full overflow-hidden bg-purple-400/10 border-b-2 border-purple-400/20">
-        <div className="h-10 flex items-center">
-          <div
-            className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-purple-300 text-2xl font-bold leading-none`}
-            style={{
-              animation: 'marquee 20s linear infinite',
-            }}
-          >
-            {Array.from({ length: 40 }).map((_, i) => (
-              <span key={i}>new</span>
-            ))}
-          </div>
-        </div>
-      </div>
-
+    <section className="pb-6 pt-6 bg-neutral-900 text-neutral-50 overflow-hidden rounded-2xl mb-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-black">
       {/* Main content */}
       <Link href="/submit" className="block group">
         <div className="px-6 py-6">
@@ -65,17 +46,6 @@ export function ReleaseDecisionBanner() {
           </div>
         </div>
       </Link>
-
-      <style jsx>{`
-        @keyframes marquee {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-      `}</style>
     </section>
   );
 }

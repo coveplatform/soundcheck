@@ -19,6 +19,7 @@ import {
   MoreHorizontal,
   X,
   LifeBuoy,
+  Target,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -34,6 +35,10 @@ export function Sidebar({ artistName, credits, pendingReviews }: SidebarProps) {
     { href: "/dashboard", label: "Dashboard", icon: Home },
     { href: "/tracks", label: "My Tracks", icon: Music },
     { href: "/submit", label: "Submit Track", icon: Upload },
+  ];
+
+  const featureLinks = [
+    { href: "/admin/release-decision-report-demo", label: "Release Decision", icon: Target },
   ];
 
   const reviewLinks = [
@@ -96,6 +101,17 @@ export function Sidebar({ artistName, credits, pendingReviews }: SidebarProps) {
         <nav className="flex-1 p-4 overflow-y-auto">
           <div className="space-y-1">
             {mainLinks.map((link) => (
+              <NavLink key={link.href} {...link} />
+            ))}
+          </div>
+
+          <div className="my-4 border-t border-black/8" />
+
+          <p className="px-4 mb-2 text-[10px] font-mono tracking-widest text-black/35 uppercase">
+            Features
+          </p>
+          <div className="space-y-1">
+            {featureLinks.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
           </div>
