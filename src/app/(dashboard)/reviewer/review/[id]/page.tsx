@@ -26,6 +26,7 @@ import { formatCurrency } from "@/lib/utils";
 import { funnels, track } from "@/lib/analytics";
 import { getReferralCookie, clearReferralCookie } from "@/lib/referral";
 import { Review, FirstImpression, MIN_LISTEN_SECONDS } from "./types";
+import { ReleaseDecisionForm, type ReleaseDecisionFormData } from "./components/release-decision-form";
 import {
   formatTimestamp,
   getTierEarningsCents,
@@ -731,6 +732,110 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     }
   };
 
+  const isReleaseDecision = review?.Track?.packageType === "RELEASE_DECISION";
+
+  const handleReleaseDecisionSubmit = async (data: ReleaseDecisionFormData) => {
+    if (!review) return;
+
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      // Send a final heartbeat with client listen time
+      try {
+        await fetch(`/api/reviews/${review.id}/heartbeat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ clientListenTime: Math.floor(listenTime) }),
+        });
+      } catch {
+        // Non-fatal
+      }
+
+      // Map RD fields to required base fields
+      const verdictToImpression: Record<string, string> = {
+        RELEASE_NOW: "STRONG_HOOK",
+        FIX_FIRST: "DECENT",
+        NEEDS_WORK: "LOST_INTEREST",
+      };
+      const qualityToScore = (level: string): number => {
+        const mapping: Record<string, number> = {
+          PROFESSIONAL: 5, RELEASE_READY: 4, ALMOST_THERE: 3, DEMO_STAGE: 2, NOT_READY: 1,
+        };
+        return mapping[level] || 3;
+      };
+
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reviewId: review.id,
+          // Required base fields (derived from RD data)
+          firstImpression: verdictToImpression[data.releaseVerdict] || "DECENT",
+          productionScore: qualityToScore(data.qualityLevel),
+          originalityScore: Math.max(1, Math.min(5, Math.round(data.releaseReadinessScore / 20))),
+          wouldListenAgain: data.releaseVerdict === "RELEASE_NOW",
+          bestPart: data.strongestElement,
+          weakestPart: data.biggestRisk,
+          qualityLevel: data.qualityLevel,
+          // Release Decision specific fields
+          releaseVerdict: data.releaseVerdict,
+          releaseReadinessScore: data.releaseReadinessScore,
+          topFixRank1: data.topFixRank1,
+          topFixRank1Impact: data.topFixRank1Impact,
+          topFixRank1TimeMin: data.topFixRank1TimeMin,
+          topFixRank2: data.topFixRank2,
+          topFixRank2Impact: data.topFixRank2Impact,
+          topFixRank2TimeMin: data.topFixRank2TimeMin,
+          topFixRank3: data.topFixRank3,
+          topFixRank3Impact: data.topFixRank3Impact,
+          topFixRank3TimeMin: data.topFixRank3TimeMin,
+          strongestElement: data.strongestElement,
+          biggestRisk: data.biggestRisk,
+          competitiveBenchmark: data.competitiveBenchmark,
+        }),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        const message = responseData?.error || "Failed to submit review";
+        if (response.status === 401) {
+          router.push("/login");
+          router.refresh();
+          return;
+        }
+        if (response.status === 403) {
+          if (typeof message === "string" && message.toLowerCase().includes("onboarding")) {
+            router.push("/onboarding");
+            router.refresh();
+            return;
+          }
+          if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
+            router.push("/dashboard");
+            router.refresh();
+            return;
+          }
+        }
+        setError(message);
+        setIsSubmitting(false);
+        return;
+      }
+
+      funnels.review.complete(
+        review.Track.id,
+        review.id,
+        responseData.earnings || (review.ReviewerProfile ? getTierEarningsCents(review.ReviewerProfile.tier) : 0)
+      );
+
+      try { localStorage.removeItem(draftKey); } catch {}
+      setSuccess(true);
+    } catch {
+      setError("Something went wrong");
+      setIsSubmitting(false);
+    }
+  };
+
   const maybeSendHeartbeat = async () => {
     if (!review) return;
     if (heartbeatInFlight.current) return;
@@ -1243,6 +1348,25 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         </CardContent>
       </Card>
 
+      {/* RELEASE DECISION FORM or STANDARD FORM */}
+      {isReleaseDecision ? (
+        <div className="mt-6">
+          {error && (
+            <div className="mb-6 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm p-3 font-medium">
+              {error}
+            </div>
+          )}
+          <ReleaseDecisionForm
+            trackId={review.Track.id}
+            trackTitle={review.Track.title}
+            listenTime={listenTime}
+            minListenTime={review.skipListenTimer ? 0 : MIN_LISTEN_SECONDS}
+            onSubmit={handleReleaseDecisionSubmit}
+            isSubmitting={isSubmitting}
+          />
+        </div>
+      ) : (
+      <>
       {/* VALIDATION ALERT - Prominent at top */}
       {validationIssues.length > 0 && (
         <div className="mt-6 p-4 bg-gradient-to-br from-red-500 to-red-600 border-2 border-red-400 rounded-xl shadow-lg">
@@ -1863,6 +1987,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           </Button>
         </CardContent>
       </Card>
+      </>
+      )}
     </div>
 
       {/* Skip Track Dialog */}

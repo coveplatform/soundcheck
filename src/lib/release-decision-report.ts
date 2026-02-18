@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+// AI analysis removed for now - using static analysis
 
 // Report structure
 export interface ReleaseDecisionReport {
@@ -214,17 +214,14 @@ export async function generateReleaseDecisionReport(
     .map((r) => r.competitiveBenchmark)
     .filter((b): b is string => !!b && b.length > 10);
 
-  // 5. AI Analysis
-  const aiAnalysis = await generateAIAnalysis({
-    verdictBreakdown,
-    consensus,
-    averageScore: average,
-    topFixes,
-    strengths,
-    risks,
-    competitiveBenchmarks,
-    reviewCount: completeReviews.length,
-  });
+  // 5. Static Analysis (AI removed for now)
+  const aiAnalysis = {
+    summary: `${completeReviews.length} expert reviewers reached a ${consensus.replace("_", " ").toLowerCase()} consensus with a ${average}/100 readiness score.`,
+    technicalInsights: topFixes.length > 0 ? `The most critical issue, mentioned by ${topFixes[0].mentionedBy} reviewers, is: ${topFixes[0].issue}` : "No specific technical patterns identified.",
+    marketRecommendation: "Consider the competitive benchmarks and risks identified by reviewers when planning your release strategy.",
+    estimatedWorkRequired: topFixes.length > 0 ? `Approximately ${topFixes.reduce((sum, f) => sum + f.avgTimeEstimate, 0)} minutes based on identified fixes` : "Minimal work required",
+    prioritizedActionPlan: topFixes.slice(0, 3).map((f) => f.issue),
+  };
 
   // 6. Compile individual reviews
   const compiledReviews = completeReviews.map((r) => ({
@@ -266,97 +263,4 @@ export async function generateReleaseDecisionReport(
     reviewCount: completeReviews.length,
     reviews: compiledReviews,
   };
-}
-
-// Generate AI analysis using Claude
-async function generateAIAnalysis(data: {
-  verdictBreakdown: { RELEASE_NOW: number; FIX_FIRST: number; NEEDS_WORK: number };
-  consensus: "RELEASE_NOW" | "FIX_FIRST" | "NEEDS_WORK";
-  averageScore: number;
-  topFixes: Array<{ issue: string; mentionedBy: number; avgImpact: string }>;
-  strengths: string[];
-  risks: string[];
-  competitiveBenchmarks: string[];
-  reviewCount: number;
-}) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.warn("ANTHROPIC_API_KEY not set, skipping AI analysis");
-    return {
-      summary: "AI analysis unavailable - API key not configured.",
-      technicalInsights: "",
-      marketRecommendation: "",
-      estimatedWorkRequired: "Unable to estimate",
-      prioritizedActionPlan: [],
-    };
-  }
-
-  const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY,
-  });
-
-  const prompt = `You are analyzing feedback from ${data.reviewCount} expert music reviewers for a Release Decision report.
-
-VERDICT BREAKDOWN:
-- Release Now: ${data.verdictBreakdown.RELEASE_NOW} reviewers
-- Fix First: ${data.verdictBreakdown.FIX_FIRST} reviewers
-- Needs Work: ${data.verdictBreakdown.NEEDS_WORK} reviewers
-- Consensus: ${data.consensus}
-- Average Readiness Score: ${data.averageScore}/100
-
-TOP FIXES IDENTIFIED:
-${data.topFixes.map((f, i) => `${i + 1}. ${f.issue} (mentioned by ${f.mentionedBy}/${data.reviewCount} reviewers, impact: ${f.avgImpact})`).join("\n")}
-
-STRENGTHS MENTIONED:
-${data.strengths.slice(0, 5).join("\n- ")}
-
-RISKS IDENTIFIED:
-${data.risks.slice(0, 5).join("\n- ")}
-
-COMPETITIVE BENCHMARKS:
-${data.competitiveBenchmarks.slice(0, 3).join("\n- ")}
-
-Please provide a concise, actionable analysis in JSON format:
-
-{
-  "summary": "2-3 sentence executive summary of the consensus and key takeaway",
-  "technicalInsights": "Detailed analysis of the technical issues mentioned. What patterns emerge? What's the root cause?",
-  "marketRecommendation": "Based on the benchmarks and risks, what's your market positioning advice?",
-  "estimatedWorkRequired": "Realistic time estimate to address the top fixes (e.g., '4-8 hours of mixing work')",
-  "prioritizedActionPlan": ["Action 1 (highest priority)", "Action 2", "Action 3"]
-}
-
-Be direct, specific, and actionable. Focus on what the artist should DO next.`;
-
-  try {
-    const message = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
-      max_tokens: 1024,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    });
-
-    const responseText = message.content[0].type === "text" ? message.content[0].text : "";
-
-    // Extract JSON from response (it might be wrapped in markdown)
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const analysis = JSON.parse(jsonMatch[0]);
-      return analysis;
-    }
-
-    throw new Error("No valid JSON in AI response");
-  } catch (error) {
-    console.error("AI analysis error:", error);
-    return {
-      summary: `${data.reviewCount} expert reviewers reached a ${data.consensus.replace("_", " ").toLowerCase()} consensus with a ${data.averageScore}/100 readiness score.`,
-      technicalInsights: data.topFixes.length > 0 ? `The most critical issue, mentioned by ${data.topFixes[0].mentionedBy} reviewers, is: ${data.topFixes[0].issue}` : "No specific technical patterns identified.",
-      marketRecommendation: "Consider the competitive benchmarks and risks identified by reviewers when planning your release strategy.",
-      estimatedWorkRequired: data.topFixes.length > 0 ? "Approximately 2-6 hours based on identified fixes" : "Minimal work required",
-      prioritizedActionPlan: data.topFixes.slice(0, 3).map((f) => f.issue),
-    };
-  }
 }

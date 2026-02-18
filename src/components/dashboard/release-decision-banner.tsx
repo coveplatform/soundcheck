@@ -20,7 +20,7 @@ export function ReleaseDecisionBanner() {
                 <h2 className="text-2xl sm:text-3xl font-bold text-white">Release Decision</h2>
               </div>
               <p className="text-neutral-300 leading-relaxed">
-                <strong className="text-white">Should you release this track?</strong> Get an expert panel verdict + AI-powered analysis. Clear Go/No-Go decision with top 3 actionable fixes delivered in 24 hours.
+                <strong className="text-white">Should you release this track?</strong> Get an expert panel verdict with a clear Go/No-Go decision and top 3 actionable fixes delivered in 24 hours.
               </p>
 
               <div className="mt-5 flex flex-col sm:flex-row gap-3">
@@ -39,7 +39,7 @@ export function ReleaseDecisionBanner() {
                 <div className="text-center">
                   <div className="text-sm font-bold text-neutral-400 uppercase tracking-wider mb-2">Delivered in</div>
                   <div className="text-4xl font-black text-purple-400">24hrs</div>
-                  <div className="text-xs text-neutral-500 mt-2">Expert panel + AI analysis</div>
+                  <div className="text-xs text-neutral-500 mt-2">Expert panel analysis</div>
                 </div>
               </div>
             </div>

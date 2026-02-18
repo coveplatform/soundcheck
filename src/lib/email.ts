@@ -771,7 +771,7 @@ export async function sendReleaseDecisionReport(params: {
 
     <div style="background-color: #faf5ff; border: 2px solid #e9d5ff; padding: 20px; margin: 24px 0;">
       <h3 style="margin: 0 0 12px; font-size: 16px; font-weight: 700; color: #7c3aed;">
-        🤖 AI Analysis
+        📊 Summary
       </h3>
       <p style="margin: 0 0 12px; font-size: 14px; color: #374151; line-height: 1.6;">
         ${aiAnalysis.summary}
@@ -784,7 +784,7 @@ export async function sendReleaseDecisionReport(params: {
     ${emailButton("View Full Report", trackUrl)}
 
     <p style="margin: 24px 0 0; font-size: 13px; color: ${COLORS.gray}; text-align: center;">
-      Generated from ${params.report.reviewCount} expert reviewers + AI analysis
+      Generated from ${params.report.reviewCount} expert reviewers
     </p>
   `;
 

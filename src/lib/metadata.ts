@@ -135,7 +135,7 @@ export const PACKAGES = {
     minProReviews: 10, // All must be PRO tier
     price: 995, // $9.95 cash only - premium service
     creditsRequired: 0, // Cash only - no credit option
-    description: "Expert panel + AI analysis: Should you release this track? Get a clear verdict with actionable fixes",
+    description: "Expert panel verdict: Should you release this track? Get a clear Go/No-Go with actionable fixes",
     mix: "10-12 expert reviewers (100+ reviews, 4.5+ rating)",
     features: [
       "Clear Go/No-Go verdict from expert panel",
@@ -143,7 +143,7 @@ export const PACKAGES = {
       "Top 3 fixes ranked by impact & time estimate",
       "Competitive genre benchmarking",
       "Strongest elements & biggest risks identified",
-      "AI-powered technical analysis report",
+      "Compiled technical analysis report",
       "Compiled actionable report delivered to email",
       "24-hour delivery guarantee",
     ],

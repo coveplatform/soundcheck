@@ -12,6 +12,7 @@ import { StatsTab } from "@/components/tracks/stats-tab";
 import { ReviewsTab } from "@/components/tracks/reviews-tab";
 import { SalesTab } from "@/components/tracks/sales-tab";
 import { SettingsTab } from "@/components/tracks/settings-tab";
+import { ReleaseDecisionReportView } from "@/components/tracks/release-decision-report-view";
 import {
   ArrowLeft,
   ArrowRight,
@@ -239,6 +240,16 @@ export default async function TrackDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-8">
           {/* Main Content - Tabs (LEFT) */}
           <div className="min-w-0 overflow-hidden">
+            {/* Release Decision Report - shown above tabs when available */}
+            {track.releaseDecisionReport && (
+              <div className="mb-8">
+                <ReleaseDecisionReportView
+                  report={track.releaseDecisionReport as any}
+                  trackTitle={track.title}
+                />
+              </div>
+            )}
+
             {completedReviews > 0 ? (
               <TrackDashboardTabs
                 defaultTab="reviews"
@@ -387,7 +398,7 @@ export default async function TrackDetailPage({
                           Release Decision
                         </h3>
                         <p className="text-xs text-white/95 leading-snug font-medium drop-shadow">
-                          Should you release this? Expert verdict + AI analysis
+                          Should you release this? Expert verdict + actionable report
                         </p>
                       </div>
                     </div>
@@ -400,7 +411,7 @@ export default async function TrackDetailPage({
                       </div>
                       <div className="flex items-center gap-2 text-xs text-white">
                         <div className="h-1.5 w-1.5 rounded-full bg-yellow-300 shadow-lg"></div>
-                        <span className="font-semibold drop-shadow">AI-powered technical report</span>
+                        <span className="font-semibold drop-shadow">Compiled technical report</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-white">
                         <div className="h-1.5 w-1.5 rounded-full bg-yellow-300 shadow-lg"></div>
