@@ -17,7 +17,7 @@ interface Tab {
 }
 
 const tabs: Tab[] = [
-  { id: "stats", label: "Stats", icon: <BarChart3 className="h-4 w-4" /> },
+  { id: "stats", label: "Track Stats", icon: <BarChart3 className="h-4 w-4" /> },
   { id: "reviews", label: "Reviews", icon: <MessageSquare className="h-4 w-4" /> },
   { id: "settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
 ];

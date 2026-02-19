@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Grid3x3, BarChart3 } from "lucide-react";
 
@@ -17,7 +18,10 @@ export function TracksViewToggle({
   gridView,
   insightsView,
 }: TracksViewToggleProps) {
-  const [activeView, setActiveView] = useState<"grid" | "insights">(defaultView);
+  const searchParams = useSearchParams();
+  const viewParam = searchParams.get("view");
+  const initialView: "grid" | "insights" = viewParam === "insights" ? "insights" : defaultView;
+  const [activeView, setActiveView] = useState<"grid" | "insights">(initialView);
 
   const handleViewChange = (view: "grid" | "insights") => {
     setActiveView(view);

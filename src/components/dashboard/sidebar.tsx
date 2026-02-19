@@ -19,6 +19,7 @@ import {
   MoreHorizontal,
   X,
   LifeBuoy,
+  BarChart3,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -33,6 +34,7 @@ export function Sidebar({ artistName, credits, pendingReviews }: SidebarProps) {
   const mainLinks = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
     { href: "/tracks", label: "My Tracks", icon: Music },
+    { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
     { href: "/submit", label: "Submit Track", icon: Upload },
   ];
 
@@ -245,6 +247,7 @@ function MobileBottomNav({
   ];
 
   const moreLinks = [
+    { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
     { href: "/reviewer/earnings", label: "Earnings", icon: Coins },
     { href: "/review/history", label: "Review History", icon: History },
     { href: "/support", label: "Support", icon: LifeBuoy },
