@@ -99,7 +99,8 @@
       "Bash(node:*)",
       "Bash(git reset:*)",
       "Bash(test:*)",
-      "Bash(powershell.exe -Command:*)"
+      "Bash(powershell.exe -Command:*)",
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" npx tsx:*)"
     ]
   }
 }
