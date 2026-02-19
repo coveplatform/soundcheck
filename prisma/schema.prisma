@@ -46,7 +46,7 @@ model ArtistProfile {
   peerFlagCount                Int           @default(0)
   peerGemCount                 Int           @default(0)
   peerReviewRating             Float         @default(0)
-  reviewCredits                Int           @default(1)
+  reviewCredits                Int           @default(3)
   totalCreditsEarned           Int           @default(0)
   totalCreditsSpent            Int           @default(0)
   totalPeerReviews             Int           @default(0)
