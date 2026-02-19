@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { updateReviewerTier, getTierRateCents, updateReviewerAverageRating, isPeerReviewerPro, TIER_RATES } from "@/lib/queue";
-import { sendReviewProgressEmail } from "@/lib/email";
+import { sendReviewProgressEmail, sendListenerIntentEmail } from "@/lib/email";
 import { randomBytes } from "crypto";
 
 const MIN_LISTEN_SECONDS = 180;
@@ -577,6 +577,7 @@ export async function POST(request: Request) {
         updated: true as const,
         updatedReview,
         completedReviews: countedCompletedReviews,
+        trackId: review.trackId,
         Track: {
           title: updatedTrack.title,
           reviewsRequested: updatedTrack.reviewsRequested,
@@ -639,12 +640,41 @@ export async function POST(request: Request) {
       }
     }
 
+    const LISTENER_INTENT_THRESHOLD = 3;
     const milestoneHalf = Math.ceil(result.Track.reviewsRequested / 2);
     const milestoneFull = result.Track.reviewsRequested;
     const prevCompleted = result.completedReviews - 1;
 
+    const crossedIntentThreshold = prevCompleted < LISTENER_INTENT_THRESHOLD && result.completedReviews >= LISTENER_INTENT_THRESHOLD;
     const crossedHalf = prevCompleted < milestoneHalf && result.completedReviews >= milestoneHalf;
     const crossedFull = prevCompleted < milestoneFull && result.completedReviews >= milestoneFull;
+
+    // Listener intent email — fires exactly once when 3rd review comes in
+    if (result.Track.artistEmail && crossedIntentThreshold) {
+      try {
+        const intentReviews = await prisma.review.findMany({
+          where: { trackId: result.trackId, status: "COMPLETED", countsTowardAnalytics: true },
+          select: { wouldAddToPlaylist: true, wouldShare: true, wouldFollow: true, wouldListenAgain: true },
+        });
+        const pct = (field: "wouldAddToPlaylist" | "wouldShare" | "wouldFollow" | "wouldListenAgain") => {
+          const vals = intentReviews.filter((r) => r[field] !== null);
+          if (vals.length === 0) return null;
+          return Math.round((vals.filter((r) => r[field] === true).length / vals.length) * 100);
+        };
+        await sendListenerIntentEmail({
+          artistEmail: result.Track.artistEmail,
+          trackTitle: result.Track.title,
+          trackId: result.trackId,
+          reviewCount: result.completedReviews,
+          playlistPct: pct("wouldAddToPlaylist"),
+          sharePct: pct("wouldShare"),
+          followPct: pct("wouldFollow"),
+          listenAgainPct: pct("wouldListenAgain"),
+        });
+      } catch (err) {
+        console.error("Failed to send listener intent email", err);
+      }
+    }
 
     if (
       result.Track.artistEmail &&

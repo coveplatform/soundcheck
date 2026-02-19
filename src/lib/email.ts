@@ -259,6 +259,80 @@ export async function sendPasswordResetEmail(params: {
   });
 }
 
+export async function sendListenerIntentEmail(params: {
+  artistEmail: string;
+  trackTitle: string;
+  trackId: string;
+  reviewCount: number;
+  playlistPct: number | null;
+  sharePct: number | null;
+  followPct: number | null;
+  listenAgainPct: number | null;
+}) {
+  if (!params.artistEmail) return;
+
+  const { trackTitle, trackId, reviewCount, playlistPct, sharePct, followPct, listenAgainPct } = params;
+  const trackUrl = `${getAppUrl()}/artist/tracks/${trackId}?tab=stats`;
+
+  function intentStat(label: string, pct: number | null): string {
+    if (pct === null) return "";
+    const isPositive = pct >= 50;
+    const color = isPositive ? COLORS.purple : COLORS.grayLight;
+    return `
+      <td style="width: 25%; padding: 0 6px; text-align: center; vertical-align: top;">
+        <div style="background-color: ${isPositive ? "#f3e8ff" : COLORS.bg}; border-radius: 12px; padding: 16px 8px;">
+          <p style="margin: 0 0 4px; font-size: 28px; font-weight: 800; color: ${color}; line-height: 1;">${pct}%</p>
+          <p style="margin: 0; font-size: 11px; color: ${COLORS.grayLight}; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">${label}</p>
+        </div>
+      </td>
+    `;
+  }
+
+  const statsRow = `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 24px;">
+      <tr>
+        ${intentStat("Playlist", playlistPct)}
+        ${intentStat("Share", sharePct)}
+        ${intentStat("Follow", followPct)}
+        ${intentStat("Replay", listenAgainPct)}
+      </tr>
+    </table>
+  `;
+
+  // Pick the most compelling stat for the subject line
+  const topStat = [
+    { label: "would add to a playlist", pct: playlistPct },
+    { label: "would share it", pct: sharePct },
+    { label: "would follow you", pct: followPct },
+    { label: "would listen again", pct: listenAgainPct },
+  ]
+    .filter((s) => s.pct !== null)
+    .sort((a, b) => (b.pct ?? 0) - (a.pct ?? 0))[0];
+
+  const subjectStat = topStat ? ` — ${topStat.pct}% ${topStat.label}` : "";
+
+  const content = `
+    ${emailBadge("Listener Intent Unlocked", COLORS.purple)}
+    <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 800; color: ${COLORS.black}; text-align: center; line-height: 1.2;">
+      Your listener data is ready
+    </h1>
+    <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
+      <strong>${reviewCount} producers</strong> have reviewed <em>${trackTitle}</em>.<br>Here's how they'd actually act on it:
+    </p>
+    ${statsRow}
+    <p style="margin: 0 0 8px; font-size: 13px; line-height: 1.6; color: ${COLORS.grayLight}; text-align: center;">
+      More reviews = more reliable signal. Keep the momentum going.
+    </p>
+    ${emailButton("See Full Breakdown", trackUrl)}
+  `;
+
+  await sendEmail({
+    to: params.artistEmail,
+    subject: `🎧 ${reviewCount} producers reviewed "${trackTitle}"${subjectStat}`,
+    html: emailWrapper(content),
+  });
+}
+
 export async function sendTrackQueuedEmail(artistEmail: string, trackTitle: string) {
   if (!artistEmail) return;
 
