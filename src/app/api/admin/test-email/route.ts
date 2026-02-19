@@ -8,12 +8,9 @@ import {
   COLORS,
   sendTierChangeEmail,
   sendPasswordResetEmail,
-  sendFinishLaterEmail,
   sendTrackQueuedEmail,
   sendReviewProgressEmail,
   sendInvalidTrackLinkEmail,
-  sendTrialReminderEmail,
-  sendLeadReminderEmail,
   sendPurchaseConfirmationEmail,
   sendReleaseDecisionReport,
 } from "@/lib/email";
@@ -69,15 +66,6 @@ function buildPreviewHtml(type: string): string {
         <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray};">We received a request to reset your password. Click the button below to choose a new one.</p>
         ${emailButton("Reset Password", `${appUrl}/reset-password?token=test-token-123`)}
         <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray};">This link will expire in <strong>1 hour</strong> for security reasons.</p>
-      `;
-      return emailWrapper(content);
-    }
-    case "finish-later": {
-      const content = `
-        ${badge("Finish later")}
-        <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Pick this up when you're back at your computer</h1>
-        <p style="margin: 0 0 8px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Here's a link back to MixReflect so you can submit your track and get feedback.</p>
-        ${emailButton("Continue on MixReflect", `${appUrl}/submit`)}
       `;
       return emailWrapper(content);
     }
@@ -137,32 +125,6 @@ function buildPreviewHtml(type: string): string {
         `)}
         <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray};">Your track link appears to be broken, private, or unavailable.</p>
         ${emailButton("Update Track Link", `${appUrl}/tracks/test-id`)}
-      `;
-      return emailWrapper(content);
-    }
-    case "trial-reminder": {
-      const content = `
-        ${badge("Ready to get feedback?")}
-        <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Submit your first track</h1>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Hey Test User, you signed up for MixReflect but haven't submitted your track yet.</p>
-        ${card(`
-          <p style="margin: 0 0 16px; font-size: 14px; color: ${COLORS.gray};"><strong style="color: ${COLORS.black};">Here's what you'll get:</strong></p>
-          <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: ${COLORS.gray};">
-            <li>Detailed feedback from genre-matched listeners</li>
-            <li>Honest first impressions and production notes</li>
-            <li>Actionable suggestions to improve your track</li>
-          </ul>
-        `)}
-        ${emailButton("Submit Your Track", `${appUrl}/submit`)}
-      `;
-      return emailWrapper(content);
-    }
-    case "lead-reminder": {
-      const content = `
-        ${badge("Still interested?")}
-        <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">Get feedback on your music</h1>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">Hey there, you started signing up for MixReflect but didn't finish.</p>
-        ${emailButton("Finish Signing Up", `${appUrl}/signup`)}
       `;
       return emailWrapper(content);
     }
@@ -272,9 +234,6 @@ export async function POST(request: Request) {
       case "password-reset":
         await sendPasswordResetEmail({ to: recipientEmail, resetUrl: `${getAppUrl()}/reset-password?token=test-token-123` });
         break;
-      case "finish-later":
-        await sendFinishLaterEmail({ to: recipientEmail, resumeUrl: `${getAppUrl()}/submit` });
-        break;
       case "track-queued":
         await sendTrackQueuedEmail(recipientEmail, "Summer Nights (Test)");
         break;
@@ -286,12 +245,6 @@ export async function POST(request: Request) {
         break;
       case "invalid-track":
         await sendInvalidTrackLinkEmail({ to: recipientEmail, trackTitle: "Summer Nights (Test)", trackId: "test-id", sourceUrl: "https://soundcloud.com/broken" });
-        break;
-      case "trial-reminder":
-        await sendTrialReminderEmail({ to: recipientEmail, artistName: "Test User" });
-        break;
-      case "lead-reminder":
-        await sendLeadReminderEmail({ to: recipientEmail, artistName: "Test User" });
         break;
       case "purchase-confirmation":
         await sendPurchaseConfirmationEmail({ buyerEmail: recipientEmail, buyerName: "Test User", trackTitle: "Summer Nights", artistName: "Demo Artist", downloadUrl: `${getAppUrl()}/downloads/test`, purchaseId: "test-purchase" });

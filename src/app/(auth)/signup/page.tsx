@@ -6,7 +6,6 @@ import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
-import { funnels, track } from "@/lib/analytics";
 import { redditEvents, trackTikTokEvent } from "@/components/providers";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import { validatePassword } from "@/lib/password";
@@ -74,11 +73,6 @@ export default function SignupPage() {
     };
   }, [router]);
 
-  // Track page view
-  useEffect(() => {
-    if (isCheckingSession) return;
-    funnels.artistSignup.start();
-  }, [isCheckingSession]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +91,6 @@ export default function SignupPage() {
 
     setError("");
     setIsLoading(true);
-    funnels.artistSignup.submit(role);
 
     try {
       const response = await fetch("/api/auth/signup", {
@@ -121,13 +114,9 @@ export default function SignupPage() {
           }
         }
         setError(errorMsg);
-        track("signup_failed", { error: errorMsg });
         setIsLoading(false);
         return;
       }
-
-      const data = await response.json().catch(() => ({}));
-      funnels.artistSignup.complete(data.userId || "unknown", role);
 
       // Reddit conversion tracking
       redditEvents.signUp();
@@ -161,7 +150,6 @@ export default function SignupPage() {
       } else {
         setError("Failed to create account. Please try again.");
       }
-      track("signup_failed", { error: "network_error" });
       setIsLoading(false);
     }
   };

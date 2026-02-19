@@ -5,7 +5,6 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TrackFeedbackViewTracker } from "@/components/artist/track-feedback-view-tracker";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { TrackDashboardTabs } from "@/components/tracks/track-dashboard-tabs";
 import { StatsTab } from "@/components/tracks/stats-tab";
@@ -183,8 +182,6 @@ export default async function TrackDetailPage({
 
   return (
     <div className="pt-8 pb-24">
-      <TrackFeedbackViewTracker trackId={track.id} reviewCount={completedReviews} />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Link */}
         <Link

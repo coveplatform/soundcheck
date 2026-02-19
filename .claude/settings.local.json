@@ -98,7 +98,8 @@
       "Bash(node add-reviews-simple.js:*)",
       "Bash(node:*)",
       "Bash(git reset:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(powershell.exe -Command:*)"
     ]
   }
 }

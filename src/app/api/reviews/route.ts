@@ -641,11 +641,14 @@ export async function POST(request: Request) {
 
     const milestoneHalf = Math.ceil(result.Track.reviewsRequested / 2);
     const milestoneFull = result.Track.reviewsRequested;
+    const prevCompleted = result.completedReviews - 1;
+
+    const crossedHalf = prevCompleted < milestoneHalf && result.completedReviews >= milestoneHalf;
+    const crossedFull = prevCompleted < milestoneFull && result.completedReviews >= milestoneFull;
 
     if (
       result.Track.artistEmail &&
-      (result.completedReviews === milestoneHalf ||
-        result.completedReviews === milestoneFull)
+      (crossedHalf || crossedFull)
     ) {
       await sendReviewProgressEmail(
         result.Track.artistEmail,

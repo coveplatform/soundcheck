@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowRight, Loader2, Music } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface ClaimCardProps {
   trackId: string;
@@ -51,38 +50,39 @@ export function ClaimCard({ trackId, title, artistName, artworkUrl }: ClaimCardP
         type="button"
         onClick={handleClaim}
         disabled={loading}
-        className="w-full group flex items-center gap-0 rounded-xl border border-black/8 bg-white overflow-hidden transition-colors duration-150 ease-out hover:bg-white/90 hover:border-black/12 disabled:opacity-70 text-left"
+        className="w-full group rounded-xl border border-black/8 bg-white overflow-hidden transition-all duration-150 ease-out hover:border-black/12 hover:-translate-y-[1px] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] active:translate-y-0 active:shadow-none disabled:opacity-70 text-left motion-reduce:transition-none motion-reduce:transform-none"
       >
-        <div className="w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 relative">
+        {/* Square artwork */}
+        <div className="relative aspect-square bg-neutral-100">
           {artworkUrl ? (
             <Image
               src={artworkUrl}
               alt={title}
               fill
               className="object-cover"
-              sizes="64px"
+              sizes="(max-width: 640px) 50vw, 33vw"
             />
           ) : (
-            <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
-              <Music className="h-5 w-5 text-neutral-400" />
+            <div className="w-full h-full flex items-center justify-center">
+              <Music className="h-8 w-8 text-neutral-400" />
             </div>
           )}
         </div>
-        <div className="min-w-0 flex-1 py-3 px-3 sm:px-4">
-          <p className="text-sm font-semibold text-black truncate">{title}</p>
-          <p className="text-xs text-black/40 truncate">by {artistName}</p>
-        </div>
-        <div className="flex items-center pr-3 sm:pr-4 flex-shrink-0">
-          <span className="inline-flex items-center justify-center rounded-lg bg-purple-600 text-white text-sm font-bold px-3 h-8 pointer-events-none">
+
+        {/* Info */}
+        <div className="p-2.5">
+          <p className="text-xs font-semibold text-black truncate leading-tight">{title}</p>
+          <p className="text-[11px] text-black/40 truncate mb-2">by {artistName}</p>
+          <span className="inline-flex items-center justify-center w-full rounded-lg bg-purple-600 text-white text-xs font-bold h-7 pointer-events-none">
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
                 Claiming...
               </>
             ) : (
               <>
                 Review
-                <ArrowRight className="h-4 w-4 ml-1" />
+                <ArrowRight className="h-3.5 w-3.5 ml-1" />
               </>
             )}
           </span>

@@ -37,8 +37,6 @@ model ArtistProfile {
   stripeConnectedAt            DateTime?
   totalEarnings                Int           @default(0)
   stripeCustomerId             String?
-  subscriptionCanceledAt       DateTime?
-  subscriptionCurrentPeriodEnd DateTime?
   subscriptionId               String?
   subscriptionStatus           String?
   subscriptionTier             String?
@@ -110,20 +108,6 @@ model Genre {
   ArtistProfile_ArtistReviewGenres ArtistProfile[]   @relation("ArtistReviewGenres")
   ReviewerProfile                  ReviewerProfile[] @relation("ReviewerGenres")
   Track                            Track[]           @relation("TrackGenres")
-}
-
-model LeadCapture {
-  id         String @id @default(cuid())
-  email      String
-  source     String   @default("get-feedback")
-  reminded   Boolean  @default(false)
-  converted  Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  artistName String?
-
-  @@index([email])
-  @@index([reminded, createdAt])
 }
 
 model PasswordResetToken {
@@ -229,9 +213,6 @@ model Review {
   reviewSchemaVersion    Int                  @default(1)
   isPeerReview           Boolean              @default(false)
   peerReviewerArtistId   String?
-  abTestPreference       ABTestPreference?
-  abTestComment          String?
-
   // Enhanced feedback fields (v2)
   lowEndClarity          LowEndClarity?
   vocalClarity           VocalClarity?
@@ -321,8 +302,6 @@ model ReviewerProfile {
   averageRating                                           Float         @default(0)
   totalEarnings                                           Int           @default(0)
   pendingBalance                                          Int           @default(0)
-  spotifyId                                               String?
-  lastfmUsername                                          String?
   stripeAccountId                                         String?       @unique
   flagCount                                               Int           @default(0)
   isRestricted                                            Boolean       @default(false)
@@ -338,11 +317,6 @@ model ReviewerProfile {
   country                                                 String?
   stripeConnectedAt                                       DateTime?
   affiliateEarnings                                       Int           @default(0)
-  isIndustryExpert                                        Boolean       @default(false)
-  expertVerifiedAt                                        DateTime?
-  expertVerifiedBy                                        String?
-  expertCredentials                                       String?
-  expertBio                                               String?
   Payout                                                  Payout[]
   Purchase_Purchase_referredByReviewerIdToReviewerProfile Purchase[]    @relation("Purchase_referredByReviewerIdToReviewerProfile")
   Purchase_Purchase_reviewerIdToReviewerProfile           Purchase[]    @relation("Purchase_reviewerIdToReviewerProfile")
@@ -419,10 +393,6 @@ model Track {
   linkIssueNotifiedAt     DateTime?
   allowPurchase           Boolean              @default(false)
   isPublic                Boolean              @default(false)
-  hasStems                Boolean              @default(false)
-  abletonProjectUrl       String?
-  abletonProjectData      Json?
-  abletonRenderStatus     AbletonRenderStatus?
   feedbackViewedAt        DateTime?
   lastViewedAt            DateTime?
   viewCount               Int                  @default(0)
@@ -434,11 +404,8 @@ model Track {
   trackShareId            String?              @unique
   creditsSpent            Int                  @default(0)
   requestedProReviewers   Boolean              @default(false)
-  requestedExpertReviewers Boolean             @default(false)
   rushDelivery            Boolean              @default(false)
   rushDeliveryDeadline    DateTime?
-  isAbTest                Boolean              @default(false)
-  abTestPrimaryTrackId    String?              @unique
   cashAddOnTotal          Int                  @default(0)
   releaseDecisionReport   Json?                // Compiled Release Decision report
   releaseDecisionGeneratedAt DateTime?         // When report was generated
@@ -449,13 +416,9 @@ model Track {
   ReviewQueue             ReviewQueue[]
   ArtistProfile           ArtistProfile        @relation(fields: [artistId], references: [id], onDelete: Cascade)
   TrackAffiliateLink      TrackAffiliateLink[]
-  TrackStem               TrackStem[]
   Genre                   Genre[]              @relation("TrackGenres")
   AddOnPayment            AddOnPayment[]
-  ABTestPrimaryTrack      Track?               @relation("ABTestPair")
-  ABTestVariantTrack      Track?               @relation("ABTestPair", fields: [abTestPrimaryTrackId], references: [id], onDelete: SetNull)
 
-  @@index([abletonRenderStatus])
   @@index([artistId])
   @@index([paidAt])
   @@index([status, createdAt])
@@ -480,23 +443,6 @@ model TrackAffiliateLink {
   @@index([code])
   @@index([createdByUserId])
   @@index([trackId])
-}
-
-model TrackStem {
-  id           String @id @default(cuid())
-  trackId      String
-  stemUrl      String
-  stemType     StemType
-  label        String
-  order        Int
-  duration     Int?
-  waveformData Json?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  Track        Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
-
-  @@index([trackId])
-  @@index([trackId, order])
 }
 
 model User {
@@ -552,24 +498,10 @@ model AddOnPayment {
   @@index([status])
 }
 
-enum AbletonRenderStatus {
-  PENDING
-  RENDERING
-  COMPLETED
-  FAILED
-}
-
-enum ABTestPreference {
-  VERSION_A
-  VERSION_B
-  NO_PREFERENCE
-}
-
 enum AddOnType {
   PRO_REVIEWERS
   EXPERT_REVIEWERS
   RUSH_DELIVERY
-  AB_TEST
 }
 
 enum AddressedArtistNote {
@@ -727,17 +659,6 @@ enum ReviewerTier {
 enum SharingMode {
   EXPOSURE
   SALES
-}
-
-enum StemType {
-  MASTER
-  DRUMS
-  BASS
-  SYNTHS
-  VOCALS
-  MELODY
-  FX
-  OTHER
 }
 
 enum SupportMessageAuthorType {

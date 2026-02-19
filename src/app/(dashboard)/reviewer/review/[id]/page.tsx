@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
-import { funnels, track } from "@/lib/analytics";
 import { getReferralCookie, clearReferralCookie } from "@/lib/referral";
 import { Review, FirstImpression, MIN_LISTEN_SECONDS } from "./types";
 import { ReleaseDecisionForm, type ReleaseDecisionFormData } from "./components/release-decision-form";
@@ -163,7 +162,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             return;
           }
           if (data.status !== "COMPLETED") {
-            funnels.review.start(data.Track.id, data.id);
           }
           if (data.skipListenTimer) {
             setCanSubmit(true);
@@ -519,17 +517,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         }
 
         setError(message);
-        track("review_form_validation_failed", { field: "api", error: message });
         setIsSubmitting(false);
         return;
       }
-
-      // Track successful review completion
-      funnels.review.complete(
-        review.Track.id,
-        review.id,
-        data.earnings || (review.ReviewerProfile ? getTierEarningsCents(review.ReviewerProfile.tier) : 0)
-      );
 
       try {
         localStorage.removeItem(draftKey);
@@ -540,7 +530,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       setSuccess(true);
     } catch {
       setError("Something went wrong");
-      track("review_form_validation_failed", { field: "api", error: "network_error" });
       setIsSubmitting(false);
     }
   };
@@ -551,7 +540,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     setShowSkipDialog(false);
     setError("");
     setIsSkipping(true);
-    track("reviewer_track_skipped", { trackId: review.Track.id });
 
     try {
       const response = await fetch(`/api/reviews/${review.id}/skip`, {
@@ -821,12 +809,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         setIsSubmitting(false);
         return;
       }
-
-      funnels.review.complete(
-        review.Track.id,
-        review.id,
-        responseData.earnings || (review.ReviewerProfile ? getTierEarningsCents(review.ReviewerProfile.tier) : 0)
-      );
 
       try { localStorage.removeItem(draftKey); } catch {}
       setSuccess(true);
@@ -1291,7 +1273,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             }}
             onMinimumReached={() => {
               setCanSubmit(true);
-              funnels.review.minimumReached(review.Track.id, MIN_LISTEN_SECONDS);
             }}
             onAddTimestamp={(seconds) => {
               addTimestampNote(seconds);

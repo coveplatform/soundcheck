@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Flag, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { track } from "@/lib/analytics";
 
 export function ReviewFlag({
   reviewId,
@@ -44,7 +43,6 @@ export function ReviewFlag({
         return;
       }
 
-      track("artist_review_flagged", { reviewId, reason });
       setFlagged(true);
       setIsOpen(false);
     } catch {

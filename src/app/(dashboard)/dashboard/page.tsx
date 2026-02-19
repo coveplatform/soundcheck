@@ -423,13 +423,12 @@ export default async function DashboardPage() {
               </div>
 
               {tracks.length > 0 ? (
-                <div className="space-y-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {tracks.map((track, index) => (
                     <TrackCard
                       key={track.id}
                       track={track}
                       priority={index === 0}
-                      compact
                     />
                   ))}
                 </div>
@@ -468,7 +467,7 @@ export default async function DashboardPage() {
               </div>
 
               {availableQueueTracks.length > 0 ? (
-                <div className="space-y-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {availableQueueTracks.map((track) => (
                     <ClaimCard
                       key={track.id}

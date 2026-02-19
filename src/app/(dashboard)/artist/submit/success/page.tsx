@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Clock, ArrowRight } from "lucide-react";
-import { track } from "@/lib/analytics";
 import { trackTikTokEvent, redditEvents } from "@/components/providers";
 
 type CheckoutStatusResponse = {
@@ -63,12 +62,6 @@ export default function SuccessPage() {
 
           if (!trackedCompletion.current) {
             trackedCompletion.current = true;
-            track("checkout_completed", {
-              package: payload.packageType || "unknown",
-              price: payload.amount || 0,
-              trackId: payload.trackId,
-              bypassed: isBypass,
-            });
             // Conversion tracking (only for paid purchases, not free credits)
             if (payload.amount && payload.amount > 0) {
               // TikTok

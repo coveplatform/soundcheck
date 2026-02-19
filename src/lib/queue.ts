@@ -403,25 +403,7 @@ export async function assignReviewersToTrack(trackId: string) {
       );
 
       // Apply tier filtering based on track's requested add-ons
-      if (track.requestedExpertReviewers) {
-        // Filter to industry experts only
-        eligibleReviewers = eligibleReviewers.filter((r) => r.isIndustryExpert);
-
-        // Fallback to Pro reviewers if no experts available
-        if (eligibleReviewers.length === 0) {
-          console.warn(
-            `No industry experts available for track ${trackId}, falling back to Pro reviewers`
-          );
-          eligibleReviewers = await getEligibleReviewers(
-            trackId,
-            track.packageType,
-            tx
-          );
-          eligibleReviewers = eligibleReviewers.filter(
-            (r) => r.totalReviews >= 100 && r.averageRating >= 4.5
-          );
-        }
-      } else if (track.requestedProReviewers) {
+      if (track.requestedProReviewers) {
         // Filter to Pro tier (100+ reviews, 4.5+ rating)
         eligibleReviewers = eligibleReviewers.filter(
           (r) => r.totalReviews >= 100 && r.averageRating >= 4.5
