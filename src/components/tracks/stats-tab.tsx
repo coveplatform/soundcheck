@@ -139,10 +139,10 @@ export function StatsTab({ reviews, platformAverages }: StatsTabProps) {
                 </p>
               </div>
               <Link
-                href="/submit"
+                href="/review"
                 className="flex items-center gap-1 text-xs font-bold text-amber-700 hover:text-purple-600 transition-colors whitespace-nowrap ml-3"
               >
-                Get more <ArrowRight className="h-3 w-3" />
+                Review to earn <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
           )}
