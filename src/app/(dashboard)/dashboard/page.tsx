@@ -17,6 +17,7 @@ import {
   StarDoodle,
 } from "@/components/dashboard/doodles";
 import { ClaimCard } from "@/components/dashboard/claim-card";
+import { ReferralCard } from "@/components/referral/referral-card";
 
 import {
   DashboardArtistProfile,
@@ -236,7 +237,7 @@ export default async function DashboardPage() {
       if (aIsSeed !== bIsSeed) return aIsSeed ? 1 : -1;
       return 0;
     })
-    .slice(0, 3);
+    .slice(0, 4);
 
   // Calculate stats
   const stats = calculateDashboardStats({
@@ -552,6 +553,8 @@ export default async function DashboardPage() {
                   </p>
                 </div>
               </Link>
+
+              <ReferralCard />
             </aside>
         </div>
 

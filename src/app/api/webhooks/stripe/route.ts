@@ -53,6 +53,7 @@ async function handleReviewCreditsTopup(session: Stripe.Checkout.Session) {
       });
 
       // If they used a referral code and this is their first purchase (totalSpent was 0 before)
+      // rewardReferrer now grants credits directly to the referrer's artist profile
       if (user?.referredByCode && user.ArtistProfile && user.ArtistProfile.totalSpent === 0) {
         await rewardReferrer(user.referredByCode, userId);
       }

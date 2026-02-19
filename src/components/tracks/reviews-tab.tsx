@@ -6,12 +6,11 @@ import { ArrowRight, BarChart3, TrendingUp, Sparkles } from "lucide-react";
 
 interface ReviewsTabProps {
   reviews: any[];
-  isFreeTier?: boolean;
   trackId: string;
 }
 
-export function ReviewsTab({ reviews, isFreeTier = false, trackId }: ReviewsTabProps) {
-  const displayedReviews = isFreeTier ? reviews.slice(0, 1) : reviews;
+export function ReviewsTab({ reviews, trackId }: ReviewsTabProps) {
+  const displayedReviews = reviews;
   const totalReviews = reviews.length;
 
   return (
@@ -22,7 +21,7 @@ export function ReviewsTab({ reviews, isFreeTier = false, trackId }: ReviewsTabP
           <CardTitle>Reviews ({totalReviews})</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <ReviewCarousel reviews={displayedReviews} showControls={!isFreeTier} />
+          <ReviewCarousel reviews={displayedReviews} showControls={true} />
         </CardContent>
       </Card>
 
@@ -59,27 +58,6 @@ export function ReviewsTab({ reviews, isFreeTier = false, trackId }: ReviewsTabP
         </div>
       )}
 
-      {/* Free tier upgrade prompt */}
-      {isFreeTier && totalReviews > 1 && (
-        <Card variant="soft" elevated className="border border-purple-200">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <h3 className="text-xl font-bold text-black mb-2">
-                {totalReviews - 1} more {totalReviews - 1 === 1 ? 'review' : 'reviews'} waiting
-              </h3>
-              <p className="text-sm text-black/60 mb-4">
-                You have {totalReviews} total reviews. Upgrade to see all feedback and unlock full analytics.
-              </p>
-              <Link href="/artist/submit">
-                <Button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all">
-                  Upgrade Now
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

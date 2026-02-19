@@ -80,7 +80,7 @@ export async function POST(request: Request) {
         data: {
           userId: user.id,
           artistName: normalizedArtistName,
-          reviewCredits: 2,
+          reviewCredits: 1,
         },
         select: { id: true },
       });

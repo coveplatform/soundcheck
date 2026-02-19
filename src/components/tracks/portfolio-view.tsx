@@ -27,7 +27,7 @@ interface PortfolioViewProps {
   topQuickWins?: string[];
 }
 
-const MIN_REVIEWS_FOR_INSIGHTS = 10;
+const MIN_REVIEWS_FOR_INSIGHTS = 3;
 
 export function PortfolioView({
   hasData,

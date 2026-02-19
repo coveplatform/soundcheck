@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       data: {
         userId: session.user.id,
         artistName,
-        reviewCredits: 2,
+        reviewCredits: 1,
         ...(completedOnboarding ? { completedOnboarding: true } : {}),
         ...(genreIds && genreIds.length > 0
           ? {

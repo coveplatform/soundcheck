@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { SupportedPlatforms } from "@/components/ui/supported-platforms";
 import { cn } from "@/lib/utils";
@@ -29,9 +28,6 @@ import {
   Lock,
   Zap,
   Clock,
-  Target,
-  MessageSquare,
-  CreditCard,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -77,11 +73,7 @@ const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
 
 export default function SubmitTrackPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { data: session } = useSession();
-
-  // Detect if user arrived via Release Decision CTA
-  const isReleaseDecisionFlow = searchParams.get("package") === "release-decision";
 
   // ---- step state ----------------------------------------------------------
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -113,17 +105,7 @@ export default function SubmitTrackPage() {
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [isPublic, setIsPublic] = useState(false);
 
-  // ---- step 3: product selection state ------------------------------------
-  const [selectedProduct, setSelectedProduct] = useState<"RELEASE_DECISION" | "PEER">("RELEASE_DECISION");
-
-  // Force Release Decision when in dedicated flow
-  useEffect(() => {
-    if (isReleaseDecisionFlow) {
-      setSelectedProduct("RELEASE_DECISION");
-    }
-  }, [isReleaseDecisionFlow]);
-
-  // ---- step 3: general feedback state (for PEER product) -----------------
+  // ---- step 3: general feedback state ------------------------------------
   const [reviewCount, setReviewCount] = useState<number>(5);
   const [isDraggingSlider, setIsDraggingSlider] = useState(false);
   const [requestProReviewers, setRequestProReviewers] = useState(false);
@@ -381,82 +363,6 @@ export default function SubmitTrackPage() {
     return total;
   }, [requestProReviewers, rushDelivery, reviewCount]);
 
-  // Release Decision submit handler
-  const handleReleaseDecisionSubmit = useCallback(async () => {
-    setError("");
-    setIsSubmitting(true);
-
-    try {
-      const isLink = uploadMode === "link";
-      const trackSourceUrl = isLink ? url : uploadedUrl;
-      const trackSourceType = isLink ? undefined : "UPLOAD";
-
-      // 1. Create the track
-      const createRes = await fetch("/api/tracks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sourceUrl: trackSourceUrl,
-          ...(trackSourceType ? { sourceType: trackSourceType } : {}),
-          title: title.trim(),
-          artworkUrl: artworkUrl || undefined,
-          genreIds: selectedGenres,
-          feedbackFocus: feedbackFocus.trim() || undefined,
-          isPublic,
-          packageType: "RELEASE_DECISION",
-        }),
-      });
-
-      const trackData = await createRes.json();
-
-      if (!createRes.ok) {
-        setError(trackData.error || "Failed to create track");
-        setIsSubmitting(false);
-        return;
-      }
-
-      const trackId = trackData.id;
-
-      // 2. Route to Release Decision checkout (cash only)
-      const res = await fetch(`/api/tracks/${trackId}/checkout-release-decision`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          paymentMethod: "cash",
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Failed to process Release Decision request");
-        setIsSubmitting(false);
-        return;
-      }
-
-      if (data.url) {
-        // Redirect to Stripe checkout
-        window.location.href = data.url;
-      } else {
-        setError("Checkout session created but no payment URL returned.");
-        setIsSubmitting(false);
-      }
-    } catch {
-      setError("Something went wrong. Please try again.");
-      setIsSubmitting(false);
-    }
-  }, [
-    uploadMode,
-    url,
-    uploadedUrl,
-    title,
-    artworkUrl,
-    selectedGenres,
-    feedbackFocus,
-    isPublic,
-    router,
-  ]);
-
   const handleSubmit = useCallback(async () => {
     setError("");
     setIsSubmitting(true);
@@ -608,15 +514,9 @@ export default function SubmitTrackPage() {
     }
   }, [uploadMode, url, uploadedUrl, title, artworkUrl, selectedGenres, feedbackFocus, router]);
 
-  const handleBuyCredits = useCallback(async () => {
+  const handleBuyCredits = useCallback(async (pack: 3 | 10 | 25) => {
     setIsBuyingCredits(true);
     try {
-      // Calculate the best pack size based on deficit
-      let pack: 3 | 10 | 25;
-      if (creditDeficit <= 3) pack = 3;
-      else if (creditDeficit <= 10) pack = 10;
-      else pack = 25;
-
       const res = await fetch("/api/review-credits/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -679,18 +579,11 @@ export default function SubmitTrackPage() {
         {/* Header with step indicator */}
         <div className="mb-8 pb-6 border-b border-black/10">
           <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40">
-            {isReleaseDecisionFlow ? "Premium" : "Submit"}
+            Submit
           </p>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black mt-2">
-            {isReleaseDecisionFlow ? (
-              <>Know exactly what to fix<span className="text-purple-600">.</span></>
-            ) : "Submit Track"}
+            Submit Track
           </h1>
-          {isReleaseDecisionFlow && (
-            <p className="text-sm text-neutral-500 mt-2">
-              Get a clear go/no-go verdict, a readiness score, and your top fixes — from 10+ experts
-            </p>
-          )}
 
           {/* Step indicator */}
           <div className="flex items-center gap-2 mt-6">
@@ -747,83 +640,6 @@ export default function SubmitTrackPage() {
         {/* ================================================================= */}
         {step === 1 && (
           <div className="space-y-6">
-            {/* Release Decision overview when in dedicated flow */}
-            {isReleaseDecisionFlow && (
-              <div className="rounded-2xl bg-neutral-950 text-white p-5 sm:p-6 overflow-hidden relative">
-                {/* Subtle gradient glow */}
-                <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-600/20 rounded-full blur-3xl" />
-                <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl" />
-
-                <div className="relative">
-                  {/* Header */}
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="h-8 w-8 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
-                        <Target className="h-4 w-4 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-purple-400">Release Decision</p>
-                        <p className="text-sm font-semibold text-white">Should you release this track?</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-extrabold text-white">$9.95</p>
-                      <p className="text-[10px] text-neutral-400">one-time</p>
-                    </div>
-                  </div>
-
-                  {/* Your report includes */}
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-3">Your report includes</p>
-
-                  {/* Mini report preview */}
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="bg-white/[0.06] rounded-xl p-3">
-                      <div className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1">Verdict</div>
-                      <div className="text-sm font-extrabold text-emerald-400">RELEASE</div>
-                      <div className="text-[10px] text-neutral-500 mt-0.5 hidden sm:block">or Fix First / Needs Work</div>
-                      <div className="text-[10px] text-neutral-500 mt-0.5 sm:hidden">or Fix First</div>
-                    </div>
-                    <div className="bg-white/[0.06] rounded-xl p-3">
-                      <div className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1">Score</div>
-                      <div className="text-sm font-extrabold text-purple-400">0–100</div>
-                      <div className="text-[10px] text-neutral-500 mt-0.5">readiness</div>
-                    </div>
-                    <div className="bg-white/[0.06] rounded-xl p-3">
-                      <div className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1">Fixes</div>
-                      <div className="text-sm font-extrabold text-amber-400">Top 3</div>
-                      <div className="text-[10px] text-neutral-500 mt-0.5">by impact</div>
-                    </div>
-                  </div>
-
-                  {/* Additional details */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 sm:gap-y-2 mb-4 pl-1">
-                    <div className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-purple-400 flex-shrink-0" />
-                      <span className="text-[11px] sm:text-[12px] text-neutral-400">Strongest elements identified</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-purple-400 flex-shrink-0" />
-                      <span className="text-[11px] sm:text-[12px] text-neutral-400">Biggest risks flagged</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-purple-400 flex-shrink-0" />
-                      <span className="text-[11px] sm:text-[12px] text-neutral-400">Genre benchmarking</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-purple-400 flex-shrink-0" />
-                      <span className="text-[11px] sm:text-[12px] text-neutral-400">Time estimates per fix</span>
-                    </div>
-                  </div>
-
-                  {/* Bottom details */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 pt-3 border-t border-white/[0.08]">
-                    <span className="flex items-center gap-1 text-[11px] text-neutral-400"><MessageSquare className="h-3 w-3" /> 10–12 expert reviewers</span>
-                    <span className="flex items-center gap-1 text-[11px] text-neutral-400"><Clock className="h-3 w-3" /> Delivered in 24 hours</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div>
               <h2 className="text-xl font-semibold text-black mb-1">Upload your track</h2>
               <p className="text-sm text-neutral-600">Choose how you want to add your music</p>
@@ -1022,18 +838,6 @@ export default function SubmitTrackPage() {
         {/* ================================================================= */}
         {step === 2 && (
           <div className="space-y-6">
-            {/* Compact RD reminder on step 2 */}
-            {isReleaseDecisionFlow && (
-              <div className="flex items-center gap-3 rounded-xl bg-neutral-950 px-4 py-3">
-                <div className="h-6 w-6 rounded-md bg-purple-600 flex items-center justify-center flex-shrink-0">
-                  <Target className="h-3 w-3 text-white" />
-                </div>
-                <p className="text-sm font-medium text-neutral-300">
-                  <span className="text-white font-semibold">Release Decision</span> &middot; 10–12 experts &middot; 24h &middot; <span className="text-white font-bold">$9.95</span>
-                </p>
-              </div>
-            )}
-
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-black mb-1">Track details</h2>
@@ -1204,10 +1008,10 @@ export default function SubmitTrackPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-black mb-1">
-                  {isReleaseDecisionFlow ? "Confirm & Pay" : "What do you need?"}
+                  How many reviews?
                 </h2>
                 <p className="text-sm text-neutral-600">
-                  {isReleaseDecisionFlow ? "Review your Release Decision order" : "Choose the type of feedback"}
+                  Each review costs 1 credit
                 </p>
               </div>
               <button
@@ -1219,201 +1023,25 @@ export default function SubmitTrackPage() {
               </button>
             </div>
 
-            {/* Product Selection Cards - hidden when in dedicated RD flow */}
-            {!isReleaseDecisionFlow && (
-            <div className="space-y-4">
-              {/* Release Decision Card */}
-              <button
-                type="button"
-                onClick={() => setSelectedProduct("RELEASE_DECISION")}
-                className={cn(
-                  "w-full text-left rounded-2xl border-2 p-6 transition-all",
-                  selectedProduct === "RELEASE_DECISION"
-                    ? "border-purple-600 bg-purple-50/60 shadow-lg"
-                    : "border-neutral-200 bg-white hover:border-purple-300"
-                )}
-              >
-                <div className="flex items-start gap-4">
-                  <div
-                    className={cn(
-                      "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center",
-                      selectedProduct === "RELEASE_DECISION" ? "bg-purple-600" : "bg-purple-100"
-                    )}
-                  >
-                    <Target
-                      className={cn(
-                        "h-5 w-5",
-                        selectedProduct === "RELEASE_DECISION" ? "text-white" : "text-purple-600"
-                      )}
-                    />
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-bold text-black">Release Decision</h3>
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white">
-                        RECOMMENDED
-                      </span>
-                    </div>
-
-                    <p className="text-sm text-neutral-600 mb-3">
-                      Should I release this track? Get a professional verdict with actionable fixes.
-                    </p>
-
-                    <div className="space-y-1.5 mb-4">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>Clear Go/No-Go verdict from expert panel</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>Release readiness score (0-100)</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>Top 3 fixes ranked by impact & time estimate</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>Competitive genre benchmarking</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>Compiled technical analysis report</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>10-12 expert reviewers (100+ reviews, 4.5+ rating)</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                        <span>Compiled report delivered to email within 24 hours</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl font-bold text-purple-600">$9.95</span>
-                    </div>
-                  </div>
-                </div>
-              </button>
-
-              {/* General Feedback Card */}
-              <button
-                type="button"
-                onClick={() => setSelectedProduct("PEER")}
-                className={cn(
-                  "w-full text-left rounded-2xl border-2 p-6 transition-all",
-                  selectedProduct === "PEER"
-                    ? "border-purple-600 bg-purple-50/60 shadow-lg"
-                    : "border-neutral-200 bg-white hover:border-purple-300"
-                )}
-              >
-                <div className="flex items-start gap-4">
-                  <div
-                    className={cn(
-                      "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center",
-                      selectedProduct === "PEER" ? "bg-purple-600" : "bg-neutral-100"
-                    )}
-                  >
-                    <MessageSquare
-                      className={cn(
-                        "h-5 w-5",
-                        selectedProduct === "PEER" ? "text-white" : "text-neutral-600"
-                      )}
-                    />
-                  </div>
-
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-black mb-1">General Feedback</h3>
-
-                    <p className="text-sm text-neutral-600 mb-3">
-                      Get listener opinions and reactions using your credits.
-                    </p>
-
-                    <div className="space-y-1.5 mb-4">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-neutral-500 flex-shrink-0" />
-                        <span>Choose review count (1-50)</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-neutral-500 flex-shrink-0" />
-                        <span>Genre-matched reviewers</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-neutral-500 flex-shrink-0" />
-                        <span>Individual review cards</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-neutral-500 flex-shrink-0" />
-                        <span>Optional add-ons available</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl font-bold text-neutral-700">1 credit/review</span>
-                    </div>
-                  </div>
-                </div>
-              </button>
+            {/* Credit Balance Display */}
+            <div className="flex items-center gap-3 rounded-xl bg-purple-50 border-2 border-purple-200 px-4 py-3">
+              <Coins className="h-5 w-5 text-purple-600 flex-shrink-0" />
+              <p className="text-sm font-medium text-purple-900">
+                You have{" "}
+                <span className="text-lg font-bold text-purple-600">{creditBalance}</span>{" "}
+                {creditBalance === 1 ? "credit" : "credits"}
+              </p>
             </div>
-            )}
 
-            {/* Conditional Content - Release Decision */}
-            {selectedProduct === "RELEASE_DECISION" && (
-              <div className="space-y-4">
-                {/* Submit Button */}
-                <Button
-                  onClick={handleReleaseDecisionSubmit}
-                  disabled={isSubmitting}
-                  isLoading={isSubmitting}
-                  className="w-full bg-purple-600 text-white hover:bg-purple-700 h-12 rounded-xl font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
-                >
-                  Pay $9.95
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-
-                {/* Info Box */}
-                <div className="rounded-xl bg-purple-50 border border-purple-200 p-4">
-                  <p className="text-sm text-purple-900">
-                    <strong>What happens next:</strong> Your track will be assigned to 10-12
-                    expert reviewers (100+ reviews, 4.5+ rating). Their feedback is compiled into
-                    a comprehensive technical report with actionable insights. You&apos;ll receive
-                    your complete Release Decision Report via email within 24 hours.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Conditional Content - General Feedback (PEER) */}
-            {selectedProduct === "PEER" && (
-              <div className="space-y-6">
-                {/* Credit Balance Display */}
-                <div className="flex items-center gap-3 rounded-xl bg-purple-50 border-2 border-purple-200 px-4 py-3">
-                  <Coins className="h-5 w-5 text-purple-600 flex-shrink-0" />
-                  <p className="text-sm font-medium text-purple-900">
-                    You have{" "}
-                    <span className="text-lg font-bold text-purple-600">{creditBalance}</span>{" "}
-                    {creditBalance === 1 ? "credit" : "credits"}
-                  </p>
-                </div>
-
-                {/* Insufficient credits warning */}
-                {!hasEnoughCredits && reviewCount > 0 && (
+            {/* Insufficient credits warning */}
+            {!hasEnoughCredits && reviewCount > 0 && (
               <div className="rounded-xl bg-amber-50 border-2 border-amber-300 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center text-white font-bold text-xs">!</div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-amber-900 mb-1">
-                      Not enough credits
-                    </p>
+                    <p className="text-sm font-bold text-amber-900 mb-1">Not enough credits</p>
                     <p className="text-sm text-amber-800">
                       You need <strong>{creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}</strong> to request {reviewCount} reviews.
-                      {cashAddOns > 0 && (
-                        <span className="block mt-1 text-xs">
-                          (Add-ons are upgrades on top of base credits)
-                        </span>
-                      )}
                     </p>
                   </div>
                 </div>
@@ -1607,46 +1235,63 @@ export default function SubmitTrackPage() {
 
             {/* Options when not enough credits */}
             {!hasEnoughCredits && (
-              <div className="space-y-3 pt-2">
-                <p className="text-sm text-center text-amber-800 font-medium">
-                  Need {creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}? Get them below:
-                </p>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Earn credits */}
-                  <Link href="/review" className="flex-1">
-                    <Button variant="outline" className="w-full h-11 text-sm font-semibold">
-                      <Sparkles className="h-4 w-4 mr-1.5" />
-                      Earn credits
-                    </Button>
-                  </Link>
-
-                  {/* Buy credits */}
-                  <Button
-                    onClick={handleBuyCredits}
-                    disabled={isBuyingCredits}
-                    isLoading={isBuyingCredits}
-                    variant="outline"
-                    className="w-full h-11 text-sm font-semibold"
-                  >
-                    Buy {creditDeficit <= 3 ? 3 : creditDeficit <= 10 ? 10 : 25} credits
-                  </Button>
+              <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-5 space-y-4">
+                <div>
+                  <p className="text-sm font-bold text-amber-900">
+                    You need {creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}
+                  </p>
+                  <p className="text-xs text-amber-700 mt-0.5">Top up below, or earn free credits by reviewing others.</p>
                 </div>
+
+                {/* Credit packs */}
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { pack: 3 as const, price: "$2.95", perCredit: "$0.98" },
+                    { pack: 10 as const, price: "$7.95", perCredit: "$0.80" },
+                    { pack: 25 as const, price: "$14.95", perCredit: "$0.60", best: true },
+                  ]).map(({ pack, price, perCredit, best }) => (
+                    <button
+                      key={pack}
+                      type="button"
+                      onClick={() => handleBuyCredits(pack)}
+                      disabled={isBuyingCredits}
+                      className={cn(
+                        "relative flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all text-center",
+                        best
+                          ? "border-purple-600 bg-purple-50"
+                          : "border-neutral-200 bg-white hover:border-purple-300"
+                      )}
+                    >
+                      {best && (
+                        <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white whitespace-nowrap">
+                          BEST VALUE
+                        </span>
+                      )}
+                      <span className="text-lg font-extrabold text-black">{pack}</span>
+                      <span className="text-[10px] text-neutral-500">credits</span>
+                      <span className="text-sm font-bold text-purple-600">{price}</span>
+                      <span className="text-[10px] text-neutral-400">{perCredit}/credit</span>
+                    </button>
+                  ))}
+                </div>
+
+                <Link href="/review" className="flex items-center justify-center gap-1.5 text-sm text-amber-800 hover:text-purple-600 font-medium transition-colors">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Or earn free credits by reviewing others
+                </Link>
               </div>
             )}
 
-                {/* Upload without reviews */}
-                <div className="text-center pt-2">
-                  <button
-                    onClick={handleUploadOnly}
-                    disabled={isSubmitting}
-                    className="text-sm text-neutral-500 hover:text-purple-600 underline underline-offset-2 transition-colors"
-                  >
-                    Upload without reviews
-                  </button>
-                </div>
-              </div>
-            )}
+            {/* Upload without reviews */}
+            <div className="text-center pt-2">
+              <button
+                onClick={handleUploadOnly}
+                disabled={isSubmitting}
+                className="text-sm text-neutral-500 hover:text-purple-600 underline underline-offset-2 transition-colors"
+              >
+                Upload without reviews
+              </button>
+            </div>
           </div>
         )}
       </div>
