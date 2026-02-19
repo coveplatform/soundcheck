@@ -8,8 +8,6 @@ const nextConfig: NextConfig = {
     viewTransition: true,
   },
   images: {
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: "https",
@@ -39,10 +37,6 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "d1gm7q4p33g3v8.cloudfront.net",
-      },
-      {
-        protocol: "https",
-        hostname: "api.dicebear.com",
       },
     ],
   },
