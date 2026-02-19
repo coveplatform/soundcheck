@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -152,6 +153,7 @@ export async function POST(request: Request) {
       return review.id;
     });
 
+    revalidateTag("sidebar", { expire: 0 });
     return NextResponse.json({ reviewId });
   } catch (err: any) {
     const message = err?.message || "Failed to claim track";

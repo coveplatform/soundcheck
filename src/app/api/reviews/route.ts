@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidateTag } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
@@ -688,6 +689,7 @@ export async function POST(request: Request) {
       );
     }
 
+    revalidateTag("sidebar", { expire: 0 });
     return NextResponse.json({
       success: true,
       earnings,
