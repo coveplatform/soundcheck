@@ -192,8 +192,8 @@ export function getWhatsNextGuidance(profile: {
     return {
       title: "Running low on credits",
       description:
-        "Review more tracks to earn credits or buy a review package.",
-      action: { label: "Buy credits", href: "/submit" },
+        "Review other artists' tracks to earn free credits.",
+      action: { label: "Review to earn credits", href: "/review" },
       priority: "medium",
     };
   }

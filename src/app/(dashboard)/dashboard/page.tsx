@@ -539,7 +539,7 @@ export default async function DashboardPage() {
                   </div>
                 )}
               </div>
-              <Link href="/tracks" className="block">
+              <Link href="/tracks?view=insights" className="block">
                 <div className="border rounded-2xl p-4 transition-colors duration-150 ease-out border-black/10 bg-white/60 hover:bg-white/80">
                   <div className="flex items-center gap-2 mb-2">
                     <BarChart3 className="h-3.5 w-3.5 text-purple-600" />
