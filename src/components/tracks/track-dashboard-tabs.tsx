@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   BarChart3,
@@ -44,7 +45,11 @@ export function TrackDashboardTabs({
   trackTitle,
   hasCompletedReviews = false,
 }: TrackDashboardTabsProps) {
-  const [activeTab, setActiveTab] = useState(defaultTab);
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab") as "stats" | "reviews" | "sales" | "settings" | null;
+  const validTabs: Array<"stats" | "reviews" | "sales" | "settings"> = ["stats", "reviews", "sales", "settings"];
+  const initialTab = tabParam && validTabs.includes(tabParam) ? tabParam : defaultTab;
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [showReferralModal, setShowReferralModal] = useState(false);
 
   // Show referral modal when viewing reviews tab with completed reviews
