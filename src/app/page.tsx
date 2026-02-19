@@ -52,7 +52,7 @@ export default function Home() {
           <HeroCTA />
 
           <p className="mt-6 text-sm text-neutral-500">
-            Start with <span className="font-bold text-purple-600">2 free credits</span> • Earn more by reviewing • No credit card required
+            Start with <span className="font-bold text-purple-600">3 free credits</span> • Earn more by reviewing • No credit card required
           </p>
 
         </div>
@@ -281,7 +281,7 @@ export default function Home() {
               <div className="space-y-3 text-left">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">2 free credits</span> to start</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">3 free credits</span> to start</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
@@ -380,7 +380,7 @@ export default function Home() {
               },
               {
                 q: "Is it really free?",
-                a: "Yes. You can upload tracks, earn unlimited credits by reviewing (no daily cap), sell your music, and access full analytics -- all for free. Just review other artists to earn credits, or buy credit packs when you need them.",
+                a: "Yes. You can upload tracks, earn credits by reviewing (up to 2 reviews per day), sell your music, and access full analytics -- all for free. Just review other artists to earn credits, or buy credit packs when you need them.",
               },
               {
                 q: "Who reviews my tracks?",

@@ -265,7 +265,7 @@ export default function OnboardingPage() {
                       <Gift className="h-5 w-5 text-lime-600" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-black">You have 2 free credits to start</h3>
+                      <h3 className="font-medium text-black">You have 3 free credits to start</h3>
                       <p className="text-sm text-black/50">
                         Use them to get feedback on your tracks right away
                       </p>

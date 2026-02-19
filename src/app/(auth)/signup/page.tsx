@@ -167,7 +167,7 @@ export default function SignupPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl sm:text-4xl font-black tracking-tight">Create your account</h1>
-        <p className="mt-2 text-neutral-500">2 free credits to start • No credit card required</p>
+        <p className="mt-2 text-neutral-500">3 free credits to start • No credit card required</p>
       </div>
 
       {/* Google */}
