@@ -123,7 +123,7 @@ export async function POST(
     });
 
     await assignReviewersToTrack(track.id);
-    revalidateTag("sidebar");
+    revalidateTag("sidebar", { expire: 0 });
 
     return NextResponse.json({ success: true });
   } catch (error) {
