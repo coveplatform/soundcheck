@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
+import { revalidateTag } from "next/cache";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -122,6 +123,7 @@ export async function POST(
     });
 
     await assignReviewersToTrack(track.id);
+    revalidateTag("sidebar");
 
     return NextResponse.json({ success: true });
   } catch (error) {
