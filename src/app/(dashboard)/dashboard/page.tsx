@@ -294,9 +294,6 @@ export default async function DashboardPage() {
           </Tooltip>
         </div>
 
-        {/* NEW: Release Decision Announcement Banner */}
-        <ReleaseDecisionBanner />
-
         {/* Feedback Alert Banner */}
         {tracksWithFeedback.length > 0 && (
           <Link
@@ -490,6 +487,9 @@ export default async function DashboardPage() {
                 </Card>
               )}
             </section>
+
+            {/* Release Decision strip */}
+            <ReleaseDecisionBanner />
           </div>
 
           <aside className="relative space-y-4 mt-2 lg:mt-0 lg:sticky lg:top-6 h-fit" aria-label="Sidebar">
