@@ -9,7 +9,6 @@ import { AudioPlayer } from "@/components/audio/audio-player";
 import { TrackDashboardTabs } from "@/components/tracks/track-dashboard-tabs";
 import { StatsTab } from "@/components/tracks/stats-tab";
 import { ReviewsTab } from "@/components/tracks/reviews-tab";
-import { SalesTab } from "@/components/tracks/sales-tab";
 import { SettingsTab } from "@/components/tracks/settings-tab";
 import { ReleaseDecisionReportView } from "@/components/tracks/release-decision-report-view";
 import {
@@ -293,25 +292,6 @@ export default async function TrackDetailPage({
                   <ReviewsTab
                     reviews={track.Review}
                     trackId={track.id}
-                  />
-                }
-                salesTab={
-                  <SalesTab
-                    track={{
-                      id: track.id,
-                      title: track.title,
-                      sourceType: track.sourceType,
-                      sharingEnabled: track.sharingEnabled,
-                      sharingMode: track.sharingMode,
-                      salePrice: track.salePrice,
-                      trackShareId: track.trackShareId,
-                      publicPlayCount: track.publicPlayCount,
-                    }}
-                    internalPurchases={track.Purchase}
-                    externalPurchases={track.ExternalPurchase}
-                    affiliateLinks={track.TrackAffiliateLink}
-                    totalInternalEarnings={totalInternalEarnings}
-                    totalExternalEarnings={totalExternalEarnings}
                   />
                 }
                 settingsTab={

@@ -6,13 +6,12 @@ import { cn } from "@/lib/utils";
 import {
   BarChart3,
   MessageSquare,
-  DollarSign,
   Settings
 } from "lucide-react";
 import { PostReviewModal } from "@/components/referral/post-review-modal";
 
 interface Tab {
-  id: "stats" | "reviews" | "sales" | "settings";
+  id: "stats" | "reviews" | "settings";
   label: string;
   icon: React.ReactNode;
 }
@@ -20,16 +19,14 @@ interface Tab {
 const tabs: Tab[] = [
   { id: "stats", label: "Stats", icon: <BarChart3 className="h-4 w-4" /> },
   { id: "reviews", label: "Reviews", icon: <MessageSquare className="h-4 w-4" /> },
-  { id: "sales", label: "Sales & Earnings", icon: <DollarSign className="h-4 w-4" /> },
   { id: "settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
 ];
 
 interface TrackDashboardTabsProps {
-  defaultTab?: "stats" | "reviews" | "sales" | "settings";
+  defaultTab?: "stats" | "reviews" | "settings";
   onTabChange?: (tab: string) => void;
   statsTab?: React.ReactNode;
   reviewsTab?: React.ReactNode;
-  salesTab?: React.ReactNode;
   settingsTab?: React.ReactNode;
   trackTitle?: string;
   hasCompletedReviews?: boolean;
@@ -40,14 +37,13 @@ export function TrackDashboardTabs({
   onTabChange,
   statsTab,
   reviewsTab,
-  salesTab,
   settingsTab,
   trackTitle,
   hasCompletedReviews = false,
 }: TrackDashboardTabsProps) {
   const searchParams = useSearchParams();
-  const tabParam = searchParams.get("tab") as "stats" | "reviews" | "sales" | "settings" | null;
-  const validTabs: Array<"stats" | "reviews" | "sales" | "settings"> = ["stats", "reviews", "sales", "settings"];
+  const tabParam = searchParams.get("tab") as "stats" | "reviews" | "settings" | null;
+  const validTabs: Array<"stats" | "reviews" | "settings"> = ["stats", "reviews", "settings"];
   const initialTab = tabParam && validTabs.includes(tabParam) ? tabParam : defaultTab;
   const [activeTab, setActiveTab] = useState(initialTab);
   const [showReferralModal, setShowReferralModal] = useState(false);
@@ -62,7 +58,7 @@ export function TrackDashboardTabs({
   }, [activeTab, hasCompletedReviews]);
 
   const handleTabChange = (tabId: string) => {
-    setActiveTab(tabId as "stats" | "reviews" | "sales" | "settings");
+    setActiveTab(tabId as "stats" | "reviews" | "settings");
     onTabChange?.(tabId);
   };
 
@@ -101,7 +97,6 @@ export function TrackDashboardTabs({
       <div>
         {activeTab === "stats" && statsTab}
         {activeTab === "reviews" && reviewsTab}
-        {activeTab === "sales" && salesTab}
         {activeTab === "settings" && settingsTab}
       </div>
     </div>
