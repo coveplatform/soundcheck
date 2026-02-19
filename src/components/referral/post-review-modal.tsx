@@ -59,10 +59,10 @@ export function PostReviewModal({ trackTitle, onClose }: PostReviewModalProps) {
             <PartyPopper className="w-8 h-8 text-purple-600" />
           </div>
           <h2 className="text-2xl font-bold text-neutral-900 mb-2">
-            Love the feedback?
+            Know another producer?
           </h2>
           <p className="text-neutral-600">
-            Share MixReflect with your music friends and you'll both get <span className="font-bold text-purple-600">$5 off</span> your next purchase!
+            Invite them to MixReflect and you&apos;ll both get <span className="font-bold text-purple-600">2 free reviews</span> — no purchase needed.
           </p>
         </div>
 

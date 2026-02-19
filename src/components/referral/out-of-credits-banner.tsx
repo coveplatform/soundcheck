@@ -44,9 +44,9 @@ export function OutOfCreditsBanner() {
           <Gift className="w-5 h-5" />
         </div>
         <div className="flex-1">
-          <h3 className="font-bold mb-1">Need more credits?</h3>
+          <h3 className="font-bold mb-1">Know another producer?</h3>
           <p className="text-sm text-white/90 mb-3">
-            Invite a friend and you'll both get <strong>$5 off</strong> your next purchase!
+            Invite them and you&apos;ll both get <strong>2 free reviews</strong> instantly.
           </p>
           <button
             onClick={copyReferralLink}
