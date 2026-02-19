@@ -16,6 +16,12 @@ interface ReviewVelocityProps {
   totalReviews: number;
 }
 
+function formatDays(days: number): string {
+  const clamped = Math.max(0, days);
+  if (clamped < 1) return "< 1";
+  return clamped.toFixed(1);
+}
+
 export function ReviewVelocity({
   avgTimeToComplete,
   fastestTrack,
@@ -23,6 +29,8 @@ export function ReviewVelocity({
   reviewsPerWeek,
   totalReviews,
 }: ReviewVelocityProps) {
+  const safeAvg = Math.max(0, avgTimeToComplete);
+  const safeFastest = fastestTrack && fastestTrack.days >= 0.01 ? fastestTrack : null;
   return (
     <div className="space-y-4">
       {/* Main metric */}
@@ -36,7 +44,7 @@ export function ReviewVelocity({
               Avg Review Time
             </p>
             <div className="flex items-baseline gap-2">
-              <p className="text-4xl font-black">{avgTimeToComplete.toFixed(1)}</p>
+              <p className="text-4xl font-black">{formatDays(safeAvg)}</p>
               <p className="text-lg text-black/60">days</p>
             </div>
             <p className="text-sm text-black/60 mt-1">
@@ -53,10 +61,10 @@ export function ReviewVelocity({
             <Clock className="w-4 h-4 text-black/40" />
             <p className="text-xs font-mono text-black/40 uppercase">Fastest Track</p>
           </div>
-          {fastestTrack ? (
+          {safeFastest ? (
             <>
-              <p className="text-2xl font-black mb-1">{fastestTrack.days} days</p>
-              <p className="text-xs text-black/60 truncate">{fastestTrack.title}</p>
+              <p className="text-2xl font-black mb-1">{formatDays(safeFastest.days)} days</p>
+              <p className="text-xs text-black/60 truncate">{safeFastest.title}</p>
             </>
           ) : (
             <p className="text-sm text-black/40">No data yet</p>
@@ -86,7 +94,7 @@ export function ReviewVelocity({
       <div className="bg-white rounded-xl p-4 border-2 border-black/5">
         <p className="text-xs font-mono text-black/40 uppercase mb-3">Quick Insights</p>
         <div className="space-y-2">
-          {avgTimeToComplete < 3 && (
+          {safeAvg > 0 && safeAvg < 3 && (
             <div className="flex items-start gap-2">
               <span className="text-lime-600 font-black">•</span>
               <p className="text-sm text-black/70">
@@ -94,7 +102,7 @@ export function ReviewVelocity({
               </p>
             </div>
           )}
-          {avgTimeToComplete >= 3 && avgTimeToComplete <= 7 && (
+          {safeAvg >= 3 && safeAvg <= 7 && (
             <div className="flex items-start gap-2">
               <span className="text-blue-600 font-black">•</span>
               <p className="text-sm text-black/70">
@@ -110,11 +118,11 @@ export function ReviewVelocity({
               </p>
             </div>
           )}
-          {fastestTrack && fastestTrack.days <= 2 && (
+          {safeFastest && safeFastest.days <= 2 && (
             <div className="flex items-start gap-2">
               <span className="text-amber-600 font-black">•</span>
               <p className="text-sm text-black/70">
-                "{fastestTrack.title}" got reviews in just {fastestTrack.days} days - your fastest yet!
+                &ldquo;{safeFastest.title}&rdquo; got reviews in just {formatDays(safeFastest.days)} days - your fastest yet!
               </p>
             </div>
           )}

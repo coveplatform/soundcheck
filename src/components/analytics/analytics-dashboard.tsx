@@ -176,7 +176,7 @@ export function AnalyticsDashboard({
                 {displayStats.totalReviews}
               </div>
               <p className="text-lg sm:text-xl font-bold text-black/80 mt-3">
-                Professional Review{displayStats.totalReviews === 1 ? "" : "s"}
+                Review{displayStats.totalReviews === 1 ? "" : "s"} received
               </p>
             </div>
 
@@ -189,11 +189,6 @@ export function AnalyticsDashboard({
               <div>
                 <p className="text-3xl sm:text-4xl font-black">{filteredTracks.length}</p>
                 <p className="text-sm text-black/60 mt-1">Track{filteredTracks.length === 1 ? "" : "s"}</p>
-              </div>
-              <div className="w-px h-12 bg-black/10" />
-              <div>
-                <p className="text-3xl sm:text-4xl font-black">${displayStats.totalEarnings.toFixed(0)}</p>
-                <p className="text-sm text-black/60 mt-1">Earned</p>
               </div>
             </div>
 
