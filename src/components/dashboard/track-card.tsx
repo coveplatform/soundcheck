@@ -56,13 +56,13 @@ export function TrackCard({ track, priority = false }: TrackCardProps) {
         </div>
 
         {/* Info */}
-        <div className="p-2.5">
-          <p className="text-xs font-semibold text-black truncate leading-tight mb-1.5">
+        <div className="p-2">
+          <p className="text-[11px] font-semibold text-black truncate leading-tight mb-1">
             {track.title}
           </p>
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1 flex-wrap">
             <span
-              className={`text-[9px] font-mono tracking-[0.12em] uppercase px-1.5 py-0.5 rounded-full border flex-shrink-0 ${badge.className}`}
+              className={`text-[9px] font-mono tracking-[0.1em] uppercase px-1 py-0.5 rounded-full border flex-shrink-0 ${badge.className}`}
             >
               {badge.label}
             </span>

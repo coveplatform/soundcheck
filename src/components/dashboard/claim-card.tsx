@@ -70,10 +70,10 @@ export function ClaimCard({ trackId, title, artistName, artworkUrl }: ClaimCardP
         </div>
 
         {/* Info */}
-        <div className="p-2.5">
-          <p className="text-xs font-semibold text-black truncate leading-tight">{title}</p>
-          <p className="text-[11px] text-black/40 truncate mb-2">by {artistName}</p>
-          <span className="inline-flex items-center justify-center w-full rounded-lg bg-purple-600 text-white text-xs font-bold h-7 pointer-events-none">
+        <div className="p-2">
+          <p className="text-[11px] font-semibold text-black truncate leading-tight">{title}</p>
+          <p className="text-[10px] text-black/40 truncate mb-1.5">by {artistName}</p>
+          <span className="inline-flex items-center justify-center w-full rounded-md bg-purple-600 text-white text-[11px] font-bold h-6 pointer-events-none">
             {loading ? (
               <>
                 <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />

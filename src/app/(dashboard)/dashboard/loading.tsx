@@ -35,11 +35,11 @@ export default function DashboardLoading() {
                   <div className="h-5 w-24 bg-black/5 rounded"></div>
                   <div className="h-3 w-16 bg-black/5 rounded"></div>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {[1, 2, 3].map((i) => (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="rounded-xl border border-black/8 bg-white overflow-hidden">
                       <div className="aspect-square bg-black/5"></div>
-                      <div className="p-2.5 space-y-1.5">
+                      <div className="p-2 space-y-1">
                         <div className="h-3 w-3/4 bg-black/5 rounded"></div>
                         <div className="h-2.5 w-1/2 bg-black/5 rounded"></div>
                       </div>

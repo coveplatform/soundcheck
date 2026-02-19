@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ArrowRight, MessageCircle, Trophy, Music, Headphones, BarChart3, Sparkles } from "lucide-react";
-import { ReleaseDecisionBanner } from "@/components/dashboard/release-decision-banner";
 import {
   SparklesDoodle,
   SquiggleDoodle,
@@ -420,7 +419,7 @@ export default async function DashboardPage() {
               </div>
 
               {tracks.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                   {tracks.map((track, index) => (
                     <TrackCard
                       key={track.id}
@@ -464,7 +463,7 @@ export default async function DashboardPage() {
               </div>
 
               {availableQueueTracks.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                   {availableQueueTracks.map((track) => (
                     <ClaimCard
                       key={track.id}
@@ -488,8 +487,6 @@ export default async function DashboardPage() {
               )}
             </section>
 
-            {/* Release Decision strip */}
-            <ReleaseDecisionBanner />
           </div>
 
           <aside className="relative space-y-4 mt-2 lg:mt-0 lg:sticky lg:top-6 h-fit" aria-label="Sidebar">
