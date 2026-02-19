@@ -58,7 +58,7 @@ export function PostReviewBanner() {
         <div className="flex-1">
           <h3 className="font-bold text-neutral-900 mb-1">Nice review!</h3>
           <p className="text-sm text-neutral-700 mb-3">
-            Know another producer? Invite them and you&apos;ll both get <strong>2 free reviews</strong>.
+            Know another producer? Invite them and you&apos;ll both get <strong>10 free credits</strong>.
           </p>
           <button
             onClick={copyReferralLink}

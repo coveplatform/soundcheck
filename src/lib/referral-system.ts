@@ -4,7 +4,7 @@ import { prisma } from "./prisma";
 import Stripe from "stripe";
 
 export const REFERRAL_DISCOUNT_AMOUNT = 500; // $5.00 in cents — kept for backwards compat with existing Stripe coupons
-export const REFERRAL_CREDITS = 2; // Credits granted to both referrer and referee
+export const REFERRAL_CREDITS = 10; // Credits granted to both referrer and referee
 export const REFERRAL_COOKIE_NAME = "mr_signup_ref";
 export const REFERRAL_COOKIE_EXPIRY_DAYS = 30;
 

@@ -24,12 +24,19 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default async function TracksPage() {
+export default async function TracksPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>;
+}) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     redirect("/login");
   }
+
+  const { view } = await searchParams;
+  const isInsightsView = view === "insights";
 
   // Get basic artist profile
   const basicProfile = await prisma.artistProfile.findUnique({
@@ -45,7 +52,8 @@ export default async function TracksPage() {
     redirect("/onboarding");
   }
 
-  // Fetch all track data including reviews for analytics
+  // Grid view: lightweight query — only what the track cards need
+  // Insights view: full analytics query with all review fields
   const artistProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
     include: {
@@ -60,26 +68,27 @@ export default async function TracksPage() {
               originalityScore: true,
               vocalScore: true,
               wouldListenAgain: true,
-              wouldAddToPlaylist: true,
-              wouldShare: true,
-              wouldFollow: true,
-              countsTowardAnalytics: true,
-              createdAt: true,
-              // V2 enhanced feedback
-              lowEndClarity: true,
-              vocalClarity: true,
-              highEndQuality: true,
-              stereoWidth: true,
-              dynamics: true,
-              energyCurve: true,
-              trackLength: true,
-              emotionalImpact: true,
-              playlistAction: true,
-              qualityLevel: true,
-              nextFocus: true,
-              expectedPlacement: true,
-              quickWin: true,
-              biggestWeaknessSpecific: true,
+              ...(isInsightsView ? {
+                wouldAddToPlaylist: true,
+                wouldShare: true,
+                wouldFollow: true,
+                countsTowardAnalytics: true,
+                createdAt: true,
+                lowEndClarity: true,
+                vocalClarity: true,
+                highEndQuality: true,
+                stereoWidth: true,
+                dynamics: true,
+                energyCurve: true,
+                trackLength: true,
+                emotionalImpact: true,
+                playlistAction: true,
+                qualityLevel: true,
+                nextFocus: true,
+                expectedPlacement: true,
+                quickWin: true,
+                biggestWeaknessSpecific: true,
+              } : {}),
             },
           },
           Purchase: {

@@ -99,23 +99,27 @@ export const authOptions: NextAuthOptions = {
       // Default to dashboard
       return `${baseUrl}/dashboard`;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
+      // On initial sign-in, `user` is populated — fetch roles and cache in token.
+      // On subsequent requests, roles are already in the token — no DB hit needed.
       if (user) {
         token.id = user.id;
       }
-      // Fetch user roles from database
-      if (token.email) {
+
+      const needsRoleFetch =
+        // First sign-in
+        !!user ||
+        // Token doesn't yet have roles cached (e.g. after schema change)
+        token.isArtist === undefined ||
+        // Explicit session update triggered (e.g. after onboarding)
+        trigger === "update";
+
+      if (needsRoleFetch && token.email) {
         const normalizedEmail =
           typeof token.email === "string" ? token.email.trim().toLowerCase() : "";
-        const where = {
-          email: {
-            equals: normalizedEmail,
-            mode: "insensitive" as const,
-          },
-        };
 
         const dbUser = await prisma.user.findFirst({
-          where,
+          where: { email: { equals: normalizedEmail, mode: "insensitive" as const } },
           select: {
             id: true,
             isArtist: true,
@@ -124,23 +128,18 @@ export const authOptions: NextAuthOptions = {
             ReviewerProfile: { select: { id: true } },
           },
         });
-        const db = dbUser as null | {
-          id: string;
-          isArtist: boolean;
-          isReviewer: boolean;
-          ArtistProfile?: { id: string } | null;
-          ReviewerProfile?: { id: string } | null;
-        };
-        if (db) {
-          token.id = db.id;
-          token.isArtist = db.isArtist;
-          token.isReviewer = db.isReviewer;
-          token.artistProfileId = db.ArtistProfile?.id;
-          const reviewerProfileId = db.ReviewerProfile?.id;
+
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.isArtist = dbUser.isArtist;
+          token.isReviewer = dbUser.isReviewer;
+          token.artistProfileId = dbUser.ArtistProfile?.id;
+          const reviewerProfileId = dbUser.ReviewerProfile?.id;
           token.listenerProfileId = reviewerProfileId;
           token.reviewerProfileId = reviewerProfileId;
         }
       }
+
       return token;
     },
     async session({ session, token }) {

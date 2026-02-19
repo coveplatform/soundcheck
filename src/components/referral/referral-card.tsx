@@ -54,7 +54,7 @@ export function ReferralCard() {
   if (!stats?.code) return null;
 
   const referralLink = `${typeof window !== "undefined" ? window.location.origin : ""}/?ref=${stats.code}`;
-  const creditsEarned = stats.totalReferrals * 2;
+  const creditsEarned = stats.totalReferrals * 10;
 
   return (
     <div className="rounded-2xl border border-purple-200/60 bg-gradient-to-br from-purple-50/80 to-white p-4">
@@ -64,9 +64,9 @@ export function ReferralCard() {
           <Coins className="w-4 h-4 text-purple-600" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-bold text-black">Invite a producer, get 2 free reviews</h3>
+          <h3 className="text-sm font-bold text-black">Invite a producer, get 10 free credits</h3>
           <p className="text-xs text-black/50 mt-0.5">
-            They get 2 free reviews too. Both of you, instantly.
+            They get 10 free credits too. No purchase needed.
           </p>
         </div>
       </div>

@@ -63,24 +63,6 @@ export default async function TrackDetailPage({
           },
           orderBy: { createdAt: "asc" },
         },
-        Purchase: {
-          include: {
-            ReviewerProfile_Purchase_reviewerIdToReviewerProfile: {
-              include: {
-                User: { select: { name: true } },
-              },
-            },
-          },
-          orderBy: { createdAt: "desc" },
-        },
-        ExternalPurchase: {
-          where: { status: "COMPLETED" },
-          orderBy: { completedAt: "desc" },
-        },
-        TrackAffiliateLink: {
-          where: { isActive: true },
-          orderBy: { createdAt: "desc" },
-        },
       },
     }),
     prisma.review.aggregate({
@@ -154,13 +136,6 @@ export default async function TrackDetailPage({
     track.reviewsRequested > 0
       ? Math.round((countedCompletedReviews / track.reviewsRequested) * 100)
       : 0;
-
-  // Calculate earnings
-  const totalInternalEarnings = track.Purchase.reduce((sum, p) => sum + p.amount, 0);
-  const totalExternalEarnings = track.ExternalPurchase.reduce(
-    (sum, p) => sum + p.artistAmount,
-    0
-  );
 
   const canUpdateSource = track.status !== "CANCELLED" && completedReviews === 0;
 
@@ -405,6 +380,31 @@ export default async function TrackDetailPage({
                       </span>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Share Card */}
+            {track.trackShareId && completedReviews > 0 && (
+              <Card variant="soft" elevated>
+                <CardContent className="pt-6">
+                  <p className="text-xs font-mono tracking-widest uppercase text-black/40 mb-3">
+                    Share Results
+                  </p>
+                  <p className="text-sm text-black/60 mb-3">
+                    Share your listener feedback publicly — great for socials or press kits.
+                  </p>
+                  <a
+                    href={`/t/${track.trackShareId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <Button variant="airy" className="w-full">
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View share page
+                    </Button>
+                  </a>
                 </CardContent>
               </Card>
             )}

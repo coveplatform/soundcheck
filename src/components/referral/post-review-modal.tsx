@@ -62,7 +62,7 @@ export function PostReviewModal({ trackTitle, onClose }: PostReviewModalProps) {
             Know another producer?
           </h2>
           <p className="text-neutral-600">
-            Invite them to MixReflect and you&apos;ll both get <span className="font-bold text-purple-600">2 free reviews</span> — no purchase needed.
+            Invite them to MixReflect and you&apos;ll both get <span className="font-bold text-purple-600">10 free credits</span> — no purchase needed.
           </p>
         </div>
 
