@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TrackStatus } from "@prisma/client";
 import { z } from "zod";
-import { detectSource, PackageType } from "@/lib/metadata";
+import { detectSource, resolveShortUrl, PackageType } from "@/lib/metadata";
 
 const createTrackSchema = z.object({
   sourceUrl: z.string().min(1, "Track source is required"),
@@ -45,6 +45,9 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const data = createTrackSchema.parse(body);
+
+    // Resolve short SoundCloud links (on.soundcloud.com) to their full URL
+    data.sourceUrl = await resolveShortUrl(data.sourceUrl);
 
     console.log("Track creation - sourceUrl:", data.sourceUrl);
     console.log("Track creation - sourceType:", data.sourceType);

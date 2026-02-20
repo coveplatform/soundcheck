@@ -10,6 +10,27 @@ export interface TrackMetadata {
   duration?: number; // seconds
 }
 
+// Resolves short SoundCloud URLs (on.soundcloud.com) to their full URL by following redirects.
+// Falls back to the original URL if resolution fails or times out.
+export async function resolveShortUrl(url: string): Promise<string> {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    if (hostname !== "on.soundcloud.com") return url;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(url, {
+      method: "HEAD",
+      redirect: "follow",
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    return response.url || url;
+  } catch {
+    return url;
+  }
+}
+
 export function detectSource(url: string): TrackSource | null {
   try {
     const parsed = new URL(url);

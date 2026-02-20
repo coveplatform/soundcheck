@@ -5,7 +5,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { assignReviewersToTrack } from "@/lib/queue";
-import { detectSource } from "@/lib/metadata";
+import { detectSource, resolveShortUrl } from "@/lib/metadata";
 
 const requestSchema = z.object({
   sourceUrl: z.string().min(1, "Track URL is required"),
@@ -25,6 +25,9 @@ export async function POST(
     const { id } = await params;
     const body = await request.json();
     const data = requestSchema.parse(body);
+
+    // Resolve short SoundCloud links (on.soundcloud.com) to their full URL
+    data.sourceUrl = await resolveShortUrl(data.sourceUrl);
 
     const track = await prisma.track.findUnique({
       where: { id },
