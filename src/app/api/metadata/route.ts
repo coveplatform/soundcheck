@@ -50,7 +50,7 @@ async function fetchBandcampEmbedFromPage(
     const artworkUrl = artMatch?.[1];
 
     const embedUrl = trackId
-      ? `https://bandcamp.com/EmbeddedPlayer/track=${trackId}/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/transparent=true/`
+      ? `https://bandcamp.com/EmbeddedPlayer/track=${trackId}/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/transparent=true/`
       : undefined;
 
     return { title, artworkUrl, embedUrl };
