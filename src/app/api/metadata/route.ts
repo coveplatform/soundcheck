@@ -18,12 +18,28 @@ async function fetchBandcampEmbedFromPage(
 
     const html = await res.text();
 
-    // Extract track ID — present in multiple places in Bandcamp HTML
-    const idMatch =
-      html.match(/data-item-id="(\d+)"/) ||
-      html.match(/"item_id"\s*:\s*(\d+)/) ||
-      html.match(/\/EmbeddedPlayer\/track=(\d+)/);
-    const trackId = idMatch?.[1];
+    // Extract track ID — try several patterns Bandcamp uses
+    let trackId: string | undefined;
+
+    // 1. data-tralbum attribute (HTML-entity-encoded JSON) — most reliable
+    const tralbumMatch = html.match(/data-tralbum="([^"]+)"/);
+    if (tralbumMatch) {
+      try {
+        const decoded = tralbumMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, "&");
+        const obj = JSON.parse(decoded) as { id?: number; current?: { id?: number } };
+        const id = obj.id ?? obj.current?.id;
+        if (id) trackId = String(id);
+      } catch { /* ignore */ }
+    }
+
+    // 2. Fallback inline patterns
+    if (!trackId) {
+      const idMatch =
+        html.match(/data-item-id="(\d+)"/) ||
+        html.match(/"item_id"\s*:\s*(\d+)/) ||
+        html.match(/\/EmbeddedPlayer\/track=(\d+)/);
+      trackId = idMatch?.[1];
+    }
 
     // Extract title from og:title meta tag
     const titleMatch = html.match(/<meta property="og:title" content="([^"]+)"/);
