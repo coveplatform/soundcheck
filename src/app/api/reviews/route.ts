@@ -23,8 +23,7 @@ function generateShareId(): string {
 }
 // Streamlined form word requirements
 const MIN_WORDS_BEST_MOMENT = 15;
-const MIN_WORDS_BIGGEST_ISSUE = 15;
-const MIN_WORDS_QUICK_WIN = 10;
+const MIN_WORDS_BIGGEST_ISSUE = 20;
 
 function extractWords(text: string): string[] {
   return text.toLowerCase().match(/[a-z0-9']+/g) ?? [];
@@ -312,11 +311,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: weakestPartError }, { status: 400 });
     }
 
-    // Validate Quick Win if present (new streamlined field)
-    if (data.quickWin) {
-      const quickWinError = validateReviewText("Quick win", data.quickWin, MIN_WORDS_QUICK_WIN);
-      if (quickWinError) {
-        return NextResponse.json({ error: quickWinError }, { status: 400 });
+    // Validate Main Feedback (biggestWeaknessSpecific) if present
+    if (data.biggestWeaknessSpecific) {
+      const mainFeedbackError = validateReviewText("Main feedback", data.biggestWeaknessSpecific, MIN_WORDS_BIGGEST_ISSUE);
+      if (mainFeedbackError) {
+        return NextResponse.json({ error: mainFeedbackError }, { status: 400 });
       }
     }
 
@@ -423,7 +422,6 @@ export async function POST(request: Request) {
               memorableMoment: data.memorableMoment,
               playlistAction: data.playlistAction,
               biggestWeaknessSpecific: data.biggestWeaknessSpecific,
-              quickWin: data.quickWin,
               targetAudience: data.targetAudience ? JSON.stringify(data.targetAudience) : undefined,
               nextFocus: data.nextFocus,
               expectedPlacement: data.expectedPlacement,

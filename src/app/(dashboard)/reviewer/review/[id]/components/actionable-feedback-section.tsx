@@ -11,18 +11,14 @@ interface ActionableFeedbackProps {
   setBestPart: (value: string) => void;
   biggestWeaknessSpecific: string;
   setBiggestWeaknessSpecific: (value: string) => void;
-  quickWin: string;
-  setQuickWin: (value: string) => void;
   bestPartWords: number;
   weaknessWords: number;
-  quickWinWords: number;
   addTimestampNote: (seconds: number) => void;
   playerSeconds: number;
 }
 
 const MIN_WORDS_BEST = 15;
-const MIN_WORDS_WEAKNESS = 15;
-const MIN_WORDS_QUICKWIN = 10;
+const MIN_WORDS_WEAKNESS = 20;
 
 export function ActionableFeedbackSection(props: ActionableFeedbackProps) {
   return (
@@ -61,23 +57,23 @@ export function ActionableFeedbackSection(props: ActionableFeedbackProps) {
           </div>
         </div>
 
-        {/* Biggest Weakness */}
+        {/* Main Feedback */}
         <div className="space-y-3">
           <div>
             <Label className="text-sm font-semibold text-black">
-              ⚠️ BIGGEST WEAKNESS - What's the #1 thing holding this track back?
+              ⚠️ MAIN FEEDBACK - What's holding this track back?
             </Label>
             <p className="text-xs text-black/50 mt-1">
-              Be <strong>specific</strong>. Instead of "mixing needs work", say <strong>"vocals buried under synths at chorus (1:15-1:45)"</strong>
+              Describe the main issue and what you'd do to fix it. One focused, honest response is more useful than two overlapping ones.
             </p>
           </div>
           <div className="space-y-2">
             <Textarea
-              placeholder={`Example: "The vocals are completely buried under the synths during the chorus (1:15-1:45). They need to be 3-4dB louder and maybe a cut around 200-300Hz to reduce muddiness. Right now I can barely understand the lyrics during the most important part of the song."`}
+              placeholder={`Example: "The low-mids are building up around 200-300Hz which makes the mix feel heavy on a proper system. A few surgical cuts there and some more air above 10kHz would open it up significantly."`}
               value={props.biggestWeaknessSpecific}
               onChange={(e) => props.setBiggestWeaknessSpecific(e.target.value)}
               className={cn(
-                "min-h-[100px]",
+                "min-h-[120px]",
                 props.weaknessWords >= MIN_WORDS_WEAKNESS && "border-lime-600"
               )}
             />
@@ -90,39 +86,6 @@ export function ActionableFeedbackSection(props: ActionableFeedbackProps) {
           <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
             <p className="text-xs text-orange-900 font-medium">
               💡 <strong>Tip:</strong> Include timestamps, specific elements, and numeric suggestions when possible (dB, Hz, seconds)
-            </p>
-          </div>
-        </div>
-
-        {/* Quick Win */}
-        <div className="space-y-3">
-          <div>
-            <Label className="text-sm font-semibold text-black">
-              🎯 QUICK WIN - What's ONE small change that would make a big difference?
-            </Label>
-            <p className="text-xs text-black/50 mt-1">
-              Give the artist an <strong>easy first step</strong>. Examples: "Turn vocals up 3dB", "Cut the intro by 8 bars", "Remove the crash at 2:45"
-            </p>
-          </div>
-          <div className="space-y-2">
-            <Textarea
-              placeholder={`Example: "Just turn the vocals up 3dB across the whole track. That alone would make this 10x better and it'll take 2 minutes to re-export."`}
-              value={props.quickWin}
-              onChange={(e) => props.setQuickWin(e.target.value)}
-              className={cn(
-                "min-h-[80px]",
-                props.quickWinWords >= MIN_WORDS_QUICKWIN && "border-lime-600"
-              )}
-            />
-            <WordCounter
-              current={props.quickWinWords}
-              target={MIN_WORDS_QUICKWIN}
-              label="words"
-            />
-          </div>
-          <div className="p-3 bg-lime-50 border border-lime-200 rounded-lg">
-            <p className="text-xs text-lime-900 font-medium">
-              ⭐ <strong>This is the most valuable feedback!</strong> One actionable change the artist can make right now.
             </p>
           </div>
         </div>
@@ -140,7 +103,7 @@ export function ActionableFeedbackSection(props: ActionableFeedbackProps) {
             </div>
             <div className="p-3 bg-lime-50 border border-lime-200 rounded-lg">
               <p className="font-semibold text-lime-900 mb-1">✅ SPECIFIC (Actionable)</p>
-              <p className="text-lime-800">"Vocals are buried 3-4dB under the synths during chorus (1:15-1:45). Boost vocals, cut 200-300Hz mud, and add 3-5kHz presence. Quick win: Just +3dB vocals and re-export."</p>
+              <p className="text-lime-800">"Vocals are buried 3-4dB under the synths during the chorus (1:15-1:45). Boost vocals, cut 200-300Hz mud, and add 3-5kHz presence. Just +3dB on the vocals and a re-export would be the fastest win."</p>
             </div>
           </div>
         </details>

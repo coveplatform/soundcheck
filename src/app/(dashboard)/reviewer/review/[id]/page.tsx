@@ -86,7 +86,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [technicalIssues, setTechnicalIssues] = useState<string[]>([]);
   const [playlistAction, setPlaylistAction] = useState<string | null>(null);
   const [biggestWeaknessSpecific, setBiggestWeaknessSpecific] = useState<string>("");
-  const [quickWin, setQuickWin] = useState<string>("");
   const [nextFocus, setNextFocus] = useState<string | null>(null);
   const [qualityLevel, setQualityLevel] = useState<string | null>(null);
 
@@ -97,7 +96,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const technicalIssuesRef = useRef<HTMLDivElement>(null);
   const bestPartRef = useRef<HTMLDivElement>(null);
   const biggestIssueRef = useRef<HTMLDivElement>(null);
-  const quickWinRef = useRef<HTMLDivElement>(null);
   const qualityLevelRef = useRef<HTMLDivElement>(null);
   const nextFocusRef = useRef<HTMLDivElement>(null);
   const timestampNotesRef = useRef<HTMLDivElement>(null);
@@ -111,7 +109,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
       technicalIssues: technicalIssuesRef,
       bestPart: bestPartRef,
       biggestIssue: biggestIssueRef,
-      quickWin: quickWinRef,
       qualityLevel: qualityLevelRef,
       nextFocus: nextFocusRef,
       timestamps: timestampNotesRef,
@@ -211,7 +208,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     playlistAction !== null ||
     bestPart.trim().length > 0 ||
     biggestWeaknessSpecific.trim().length > 0 ||
-    quickWin.trim().length > 0 ||
     nextFocus !== null ||
     qualityLevel !== null ||
     timestampNotes.some((t) => t.note.trim().length > 0);
@@ -288,7 +284,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           setTechnicalIssues(Array.isArray(parsed.technicalIssues) ? parsed.technicalIssues : []);
           setPlaylistAction(typeof parsed.playlistAction === "string" ? parsed.playlistAction : null);
           setBiggestWeaknessSpecific(typeof parsed.biggestWeaknessSpecific === "string" ? parsed.biggestWeaknessSpecific : "");
-          setQuickWin(typeof parsed.quickWin === "string" ? parsed.quickWin : "");
           setNextFocus(typeof parsed.nextFocus === "string" ? parsed.nextFocus : null);
           setQualityLevel(typeof parsed.qualityLevel === "string" ? parsed.qualityLevel : null);
 
@@ -342,7 +337,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
         technicalIssues,
         playlistAction,
         biggestWeaknessSpecific,
-        quickWin,
         nextFocus,
         qualityLevel,
       };
@@ -370,7 +364,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     technicalIssues,
     playlistAction,
     biggestWeaknessSpecific,
-    quickWin,
     nextFocus,
     qualityLevel,
   ]);
@@ -399,11 +392,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     if (countWords(bestPart) < 15) {
       issues.push({ id: "bestPart", message: `Best moment needs ${15 - countWords(bestPart)} more words`, section: "bestPart" });
     }
-    if (countWords(biggestWeaknessSpecific) < 15) {
-      issues.push({ id: "biggestIssue", message: `Biggest issue needs ${15 - countWords(biggestWeaknessSpecific)} more words`, section: "biggestIssue" });
-    }
-    if (countWords(quickWin) < 10) {
-      issues.push({ id: "quickWin", message: `Quick win needs ${10 - countWords(quickWin)} more words`, section: "quickWin" });
+    if (countWords(biggestWeaknessSpecific) < 20) {
+      issues.push({ id: "biggestIssue", message: `Main feedback needs ${20 - countWords(biggestWeaknessSpecific)} more words`, section: "biggestIssue" });
     }
 
     if (issues.length > 0) {
@@ -483,7 +473,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           trackLength: tooLong ? "WAY_TOO_LONG" : "PERFECT",
           playlistAction,
           biggestWeaknessSpecific,
-          quickWin,
           nextFocus,
           qualityLevel,
         }),
@@ -1043,14 +1032,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     );
   }
 
-  const bestMomentWords = countWords(bestPart); // Reusing bestPart for "Best Moment"
+  const bestMomentWords = countWords(bestPart);
   const biggestIssueWords = countWords(biggestWeaknessSpecific);
-  const quickWinWords = countWords(quickWin);
 
   const meetsTextMinimum =
     bestMomentWords >= 15 &&
-    biggestIssueWords >= 15 &&
-    quickWinWords >= 10;
+    biggestIssueWords >= 20;
 
   if (success) {
     const canPurchase = review.Track.sourceType === "UPLOAD" && review.Track.allowPurchase;
@@ -1605,53 +1592,26 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           )}
 
-          {/* Quick Win */}
-          <div ref={quickWinRef} className={cn("space-y-3 p-4 -m-4 rounded-xl transition-all duration-200", validationIssues.some((i) => i.section === "quickWin") ? "bg-red-50 border-2 border-red-300" : "bg-gradient-to-br from-lime-50/50 to-transparent border border-lime-200/30")}>
-            <Label htmlFor="quickwin" className="text-base font-bold text-lime-900">Quick Win *</Label>
-            <p className="text-xs text-lime-700/60">One small, easy fix that would improve the track right away</p>
-            {validationIssues.some((i) => i.section === "quickWin") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "quickWin")?.message}</p>)}
-            <textarea
-              id="quickwin"
-              placeholder="E.g., 'Turn up the lead vocal by 2dB in the chorus' or 'Cut the intro from 16 to 8 bars'"
-              value={quickWin}
-              onChange={(e) => setQuickWin(e.target.value)}
-              className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[80px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
-            />
-            <div className="flex items-center justify-between">
-              <p className={cn(
-                "text-xs font-mono",
-                quickWinWords >= 10 ? "text-lime-600" : "text-neutral-500"
-              )}>
-                {quickWinWords}/10 words
-              </p>
-              {quickWinWords >= 10 && (
-                <span className="text-xs font-bold text-lime-600 flex items-center gap-1">
-                  <Check className="h-3 w-3" /> Complete
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Biggest Issue */}
+          {/* Main Feedback */}
           <div ref={biggestIssueRef} className={cn("space-y-3 p-4 -m-4 rounded-xl transition-all duration-200", validationIssues.some((i) => i.section === "biggestIssue") ? "bg-red-50 border-2 border-red-300" : "bg-gradient-to-br from-orange-50/50 to-transparent border border-orange-200/30")}>
-            <Label htmlFor="biggestissue" className="text-base font-bold text-orange-900">Biggest Issue *</Label>
-            <p className="text-xs text-orange-700/60">The one thing holding this track back the most</p>
+            <Label htmlFor="mainfeedback" className="text-base font-bold text-orange-900">Main Feedback *</Label>
+            <p className="text-xs text-orange-700/60">What's holding the track back, and what would you change? Be specific — mention elements, timestamps, or frequency ranges if relevant.</p>
             {validationIssues.some((i) => i.section === "biggestIssue") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "biggestIssue")?.message}</p>)}
             <textarea
-              id="biggestissue"
-              placeholder="E.g., 'The kick and bass clash in the 100-200Hz range' or 'The verse melody is too repetitive'"
+              id="mainfeedback"
+              placeholder="E.g., 'The low-mids are building up around 200-300Hz which makes the mix feel heavy on a proper system. A few surgical cuts there and some more air above 10kHz would open it up significantly.'"
               value={biggestWeaknessSpecific}
               onChange={(e) => setBiggestWeaknessSpecific(e.target.value)}
-              className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
+              className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[120px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
             />
             <div className="flex items-center justify-between">
               <p className={cn(
                 "text-xs font-mono",
-                biggestIssueWords >= 15 ? "text-lime-600" : "text-neutral-500"
+                biggestIssueWords >= 20 ? "text-lime-600" : "text-neutral-500"
               )}>
-                {biggestIssueWords}/15 words
+                {biggestIssueWords}/20 words
               </p>
-              {biggestIssueWords >= 15 && (
+              {biggestIssueWords >= 20 && (
                 <span className="text-xs font-bold text-lime-600 flex items-center gap-1">
                   <Check className="h-3 w-3" /> Complete
                 </span>

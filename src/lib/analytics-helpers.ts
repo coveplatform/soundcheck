@@ -332,11 +332,11 @@ export function analyzePlaylistActions(reviews: Review[]) {
   };
 }
 
-// V2 Analytics: Get most valuable quick wins
+// V2 Analytics: Get most valuable feedback (quickWin for legacy reviews, biggestWeaknessSpecific for new)
 export function getTopQuickWins(reviews: Review[], limit: number = 3) {
   const quickWins = reviews
-    .filter((r) => r.quickWin && r.quickWin.trim().length > 0)
-    .map((r) => r.quickWin!);
+    .map((r) => r.quickWin?.trim() || r.biggestWeaknessSpecific?.trim() || "")
+    .filter((text) => text.length > 0);
 
   if (quickWins.length === 0) {
     return [];

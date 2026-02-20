@@ -231,7 +231,7 @@ export function ReviewDisplay({
         </div>
       )}
 
-      {/* V2 Quick Win - Prominently displayed */}
+      {/* V2 Quick Win - Legacy reviews only (both fields populated) */}
       {review.quickWin && (
         <div className="mb-5 p-4 bg-lime-50 border-2 border-lime-300 rounded-xl">
           <h4 className="text-xs font-bold text-lime-900 uppercase tracking-widest mb-2 flex items-center gap-1.5">
@@ -342,10 +342,22 @@ export function ReviewDisplay({
             </p>
           </div>
         )}
-        {review.biggestWeaknessSpecific && (
+        {review.biggestWeaknessSpecific && review.quickWin && (
+          // Legacy review — both fields exist, label as "Biggest Weakness"
           <div>
             <h4 className="text-[11px] font-bold text-orange-600 uppercase tracking-widest mb-1.5">
               Biggest Weakness
+            </h4>
+            <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-orange-400">
+              {review.biggestWeaknessSpecific}
+            </p>
+          </div>
+        )}
+        {review.biggestWeaknessSpecific && !review.quickWin && (
+          // New review — single merged field, label as "Main Feedback"
+          <div>
+            <h4 className="text-[11px] font-bold text-orange-600 uppercase tracking-widest mb-1.5">
+              Main Feedback
             </h4>
             <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-orange-400">
               {review.biggestWeaknessSpecific}
