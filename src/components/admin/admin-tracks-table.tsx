@@ -23,6 +23,7 @@ export type AdminTrackRow = {
   createdAt: Date;
   reviewsRequested: number;
   creditsSpent: number;
+  isPublic: boolean;
   ArtistProfile: {
     subscriptionStatus: string | null;
     reviewCredits: number;
@@ -187,7 +188,20 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3">{track.status}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-1">
+                      <span>{track.status}</span>
+                      {track.isPublic ? (
+                        <span className="px-1.5 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded w-fit">
+                          PUBLIC
+                        </span>
+                      ) : (
+                        <span className="px-1.5 py-0.5 text-xs font-bold bg-neutral-100 text-neutral-500 rounded w-fit">
+                          PRIVATE
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-3">
                     {track.promoCode ? (
                       <span className="inline-flex items-center gap-1">
