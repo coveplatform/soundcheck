@@ -82,6 +82,13 @@ export async function POST(request: Request) {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
+      // For Bandcamp, oEmbed failures are common — fall back to page scraping
+      if (hostname.includes("bandcamp.com")) {
+        const fallback = await fetchBandcampEmbedFromPage(url);
+        if (fallback) {
+          return NextResponse.json(fallback);
+        }
+      }
       console.error(`oEmbed fetch failed for ${hostname}:`, {
         url,
         status: response.status,
