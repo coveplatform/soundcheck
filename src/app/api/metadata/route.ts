@@ -1,6 +1,48 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+// Fallback for when Bandcamp oEmbed returns HTML instead of JSON.
+// Fetches the track page and extracts the embed track ID from the HTML.
+async function fetchBandcampEmbedFromPage(
+  url: string
+): Promise<{ title: string; artworkUrl?: string; embedUrl?: string } | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; bot)" },
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+
+    const html = await res.text();
+
+    // Extract track ID — present in multiple places in Bandcamp HTML
+    const idMatch =
+      html.match(/data-item-id="(\d+)"/) ||
+      html.match(/"item_id"\s*:\s*(\d+)/) ||
+      html.match(/\/EmbeddedPlayer\/track=(\d+)/);
+    const trackId = idMatch?.[1];
+
+    // Extract title from og:title meta tag
+    const titleMatch = html.match(/<meta property="og:title" content="([^"]+)"/);
+    const title = titleMatch ? titleMatch[1] : "Untitled Track";
+
+    // Extract artwork from og:image
+    const artMatch = html.match(/<meta property="og:image" content="([^"]+)"/);
+    const artworkUrl = artMatch?.[1];
+
+    const embedUrl = trackId
+      ? `https://bandcamp.com/EmbeddedPlayer/track=${trackId}/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/transparent=true/`
+      : undefined;
+
+    return { title, artworkUrl, embedUrl };
+  } catch {
+    return null;
+  }
+}
+
 const requestSchema = z.object({
   url: z.string().url(),
 });
@@ -51,12 +93,28 @@ export async function POST(request: Request) {
       );
     }
 
-    const data = await response.json();
+    let data: Record<string, unknown>;
+    try {
+      data = await response.json();
+    } catch {
+      // oEmbed returned non-JSON (Bandcamp sometimes returns HTML instead).
+      // Fall back to scraping the track page for the embed track ID.
+      if (hostname.includes("bandcamp.com")) {
+        const fallback = await fetchBandcampEmbedFromPage(url);
+        if (fallback) {
+          return NextResponse.json(fallback);
+        }
+      }
+      return NextResponse.json(
+        { error: "Failed to parse track metadata" },
+        { status: 502 }
+      );
+    }
 
     // For Bandcamp, extract the iframe src from the HTML
     let embedUrl: string | undefined;
     if (hostname.includes("bandcamp.com") && data.html) {
-      const srcMatch = data.html.match(/src="([^"]+)"/);
+      const srcMatch = (data.html as string).match(/src="([^"]+)"/);
       embedUrl = srcMatch?.[1] || undefined;
     }
 
