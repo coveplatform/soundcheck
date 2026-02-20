@@ -29,7 +29,6 @@ export default async function AdminTracksPage({
         : {}),
     },
     orderBy: { createdAt: "desc" },
-    take: 50,
     select: {
       id: true,
       title: true,
@@ -54,7 +53,7 @@ export default async function AdminTracksPage({
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Tracks</h1>
-        <p className="text-neutral-500">Most recent tracks (up to 50)</p>
+        <p className="text-neutral-500">All tracks</p>
       </div>
 
       <form className="flex flex-col sm:flex-row gap-2" action="/admin/tracks" method="GET">

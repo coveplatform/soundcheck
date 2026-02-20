@@ -82,7 +82,6 @@ export default async function DashboardPage() {
             },
           },
           orderBy: { createdAt: "desc" },
-          take: 4,
         },
       },
     });
@@ -115,7 +114,6 @@ export default async function DashboardPage() {
             },
           },
           orderBy: { createdAt: "desc" },
-          take: 4,
         },
       },
     });
@@ -132,6 +130,8 @@ export default async function DashboardPage() {
       ? artistProfile.hasSeenCreditGuide ?? false
       : true;
   const tracks = artistProfile.Track ?? [];
+  // Limit to 4 for the dashboard grid display, but use all tracks for stats
+  const displayTracks = tracks.slice(0, 4);
 
   // Detect tracks with NEW feedback (completed reviews since last viewed)
   const tracksWithFeedback = tracks.filter((t) => {
@@ -421,7 +421,7 @@ export default async function DashboardPage() {
 
               {tracks.length > 0 ? (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                  {tracks.map((track, index) => (
+                  {displayTracks.map((track, index) => (
                     <TrackCard
                       key={track.id}
                       track={track}

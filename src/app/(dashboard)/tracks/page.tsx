@@ -117,7 +117,10 @@ export default async function TracksPage({
   let portfolioData = null;
 
   if (hasAnalyticsData) {
-    const totalReviews = tracks.reduce((sum, t) => sum + t.Review.length, 0);
+    const totalReviews = tracks.reduce(
+      (sum, t) => sum + t.Review.filter((r: any) => r.status === "COMPLETED").length,
+      0
+    );
     const totalTracks = tracksWithReviews.length;
 
     // Calculate overall averages
