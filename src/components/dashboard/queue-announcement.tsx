@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { X, Zap, Crown, ArrowRight, Headphones, Music } from "lucide-react";
+import { X, ArrowRight, Headphones, RefreshCw, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SparklesDoodle, StarDoodle } from "@/components/dashboard/doodles";
 
 const STORAGE_KEY = "mixreflect_queue_announcement_dismissed";
 
 export function QueueAnnouncement() {
-  const [dismissed, setDismissed] = useState(true); // default hidden to avoid flash
+  const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
     const val = localStorage.getItem(STORAGE_KEY);
@@ -23,86 +24,79 @@ export function QueueAnnouncement() {
   if (dismissed) return null;
 
   return (
-    <div className="relative rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-white to-indigo-50/50 p-5 sm:p-6 mb-5 overflow-hidden">
+    <div className="relative rounded-xl border-2 border-lime-300 bg-gradient-to-br from-lime-50 via-white to-lime-50/30 p-5 sm:p-6 mb-5 overflow-hidden">
+      {/* Brand doodles */}
+      <SparklesDoodle className="absolute -top-1 -right-1 w-10 h-10 text-lime-600/[0.07] pointer-events-none" />
+      <StarDoodle className="absolute bottom-2 right-8 w-8 h-8 text-lime-600/[0.06] pointer-events-none" />
+
       {/* Dismiss */}
       <button
         onClick={handleDismiss}
-        className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-black/5 text-black/30 hover:text-black/60 transition-colors"
+        className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-black/5 text-black/20 hover:text-black/50 transition-colors z-10"
         aria-label="Dismiss"
       >
         <X className="h-4 w-4" />
       </button>
 
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-3">
-        <div className="h-8 w-8 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">
-          <Zap className="h-4 w-4 text-white" />
-        </div>
-        <h3 className="text-base font-bold text-black">MixReflect has a new system</h3>
-      </div>
-
-      <p className="text-sm text-black/60 mb-4 max-w-xl leading-relaxed">
-        We&apos;ve simplified how everything works. No more buying credits — earn them by reviewing. Here&apos;s the new flow:
-      </p>
-
-      {/* Steps */}
-      <div className="grid sm:grid-cols-3 gap-3 mb-5">
-        <div className="flex items-start gap-3 p-3 rounded-xl bg-white/70 border border-black/5">
-          <div className="h-7 w-7 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Headphones className="h-3.5 w-3.5 text-purple-600" />
+      <div className="relative">
+        {/* Header */}
+        <div className="flex items-start gap-3 mb-4">
+          <div className="h-10 w-10 rounded-xl bg-lime-500 flex items-center justify-center flex-shrink-0">
+            <RefreshCw className="h-5 w-5 text-white" />
           </div>
           <div>
-            <p className="text-xs font-bold text-black mb-0.5">1. Review tracks</p>
-            <p className="text-[11px] text-black/50 leading-snug">Listen to tracks in your genre and give feedback. Each review earns 1 credit.</p>
+            <h3 className="text-lg font-bold text-black">We simplified everything</h3>
+            <p className="text-sm text-black/50 mt-0.5">
+              No more buying credits. Now you <span className="font-semibold text-lime-700">earn them by reviewing</span>.
+            </p>
           </div>
         </div>
-        <div className="flex items-start gap-3 p-3 rounded-xl bg-white/70 border border-black/5">
-          <div className="h-7 w-7 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Music className="h-3.5 w-3.5 text-purple-600" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-black mb-0.5">2. Submit your track</p>
-            <p className="text-[11px] text-black/50 leading-snug">Spend credits to get reviews on your own music. Your track goes into a review queue slot.</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-3 p-3 rounded-xl bg-white/70 border border-black/5">
-          <div className="h-7 w-7 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Crown className="h-3.5 w-3.5 text-purple-600" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-black mb-0.5">3. Want more?</p>
-            <p className="text-[11px] text-black/50 leading-snug">Free users have 1 queue slot. Pro ($9.99/mo) gives you 3 slots + priority reviews.</p>
-          </div>
-        </div>
-      </div>
 
-      {/* Quick info */}
-      <div className="flex items-center gap-2 p-3 rounded-xl bg-purple-50 border border-purple-100 mb-4">
-        <p className="text-xs text-purple-800 font-medium">
-          <span className="font-bold">Queue slots</span> — Free: 1 track in queue at a time. Pro: 3 tracks at once + priority placement.
-          Your existing queued tracks are grandfathered in.
-        </p>
-      </div>
+        {/* The loop — simple and punchy */}
+        <div className="flex items-center gap-2 sm:gap-3 mb-4 ml-[52px] flex-wrap">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border-2 border-black/10 text-xs font-bold text-black">
+            <Headphones className="h-3 w-3 text-lime-600" />
+            Review a track
+          </span>
+          <ArrowRight className="h-3 w-3 text-lime-500 flex-shrink-0" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-lime-100 border-2 border-lime-200 text-xs font-bold text-lime-800">
+            +1 credit
+          </span>
+          <ArrowRight className="h-3 w-3 text-lime-500 flex-shrink-0" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border-2 border-black/10 text-xs font-bold text-black">
+            Spend on your track
+          </span>
+        </div>
 
-      {/* Actions */}
-      <div className="flex flex-wrap items-center gap-3">
-        <Link href="/review">
-          <Button variant="airyPrimary" className="text-sm h-9 px-4">
-            <Headphones className="h-3.5 w-3.5 mr-1.5" />
-            Earn credits
-          </Button>
-        </Link>
-        <Link href="/pro" className="inline-flex items-center gap-1.5 text-sm text-purple-600 hover:text-purple-700 font-medium">
-          <Crown className="h-3.5 w-3.5" />
-          Learn about Pro
-          <ArrowRight className="h-3 w-3" />
-        </Link>
-        <button
-          onClick={handleDismiss}
-          className="ml-auto text-xs text-black/30 hover:text-black/50 transition-colors"
-        >
-          Got it, dismiss
-        </button>
+        {/* Queue slot callout */}
+        <div className="rounded-lg bg-white/60 border border-black/5 px-4 py-3 mb-4 ml-[52px]">
+          <p className="text-[13px] text-black/70">
+            Your track sits in a <span className="font-bold text-black">queue slot</span> while it gets reviews.
+            Free = 1 slot. <Link href="/pro" className="font-bold text-purple-600 hover:underline">Pro</Link> = 3 slots + priority.
+            {" "}Any tracks already in your queue are safe.
+          </p>
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-wrap items-center gap-2.5 ml-[52px]">
+          <Link href="/review">
+            <Button className="bg-lime-600 text-white hover:bg-lime-700 active:bg-lime-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out text-sm h-9 px-4 rounded-xl">
+              <Headphones className="h-3.5 w-3.5 mr-1.5" />
+              Start reviewing
+              <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+            </Button>
+          </Link>
+          <Link href="/pro" className="inline-flex items-center gap-1 text-sm text-purple-600 hover:text-purple-700 font-semibold">
+            <Crown className="h-3.5 w-3.5" />
+            What&apos;s Pro?
+          </Link>
+          <button
+            onClick={handleDismiss}
+            className="ml-auto text-xs text-black/25 hover:text-black/50 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
       </div>
     </div>
   );
