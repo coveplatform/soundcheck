@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
 import { TracksViewToggle } from "@/components/tracks/tracks-view-toggle";
 import { PortfolioView } from "@/components/tracks/portfolio-view";
+import { DequeueButton } from "@/components/tracks/dequeue-button";
 import {
   analyzeFeedbackPatterns,
   calculateReviewVelocity,
@@ -322,52 +323,55 @@ export default async function TracksPage({
                     return (
                       <div key={track.id}>
                         <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/30 mb-2">Slot {slotNum}</p>
-                        <Link href={`/tracks/${track.id}`} className="group block">
+                        <div className="group relative">
                           <Card variant="soft" interactive className="overflow-hidden">
-                            <div className="relative aspect-[4/3] bg-neutral-100">
-                              {track.artworkUrl ? (
-                                <Image
-                                  src={track.artworkUrl}
-                                  alt={track.title}
-                                  fill
-                                  className="object-cover transition-transform duration-150 ease-out group-hover:scale-[1.02]"
-                                  sizes="(max-width: 640px) 50vw, 33vw"
-                                />
-                              ) : (
-                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-                                  <Music className="h-8 w-8 text-black/15" />
-                                </div>
-                              )}
-                              <div className="absolute top-2 left-2">
-                                {isPending ? (
-                                  <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/80 text-black/60 border border-black/10 backdrop-blur-sm">Pending</span>
-                                ) : isQueued ? (
-                                  <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-purple-600 text-white shadow-sm">Queued</span>
-                                ) : isInProgress ? (
-                                  <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-purple-600 text-white shadow-sm">Reviewing</span>
-                                ) : null}
-                              </div>
-                              {hasReviews && (
-                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/30 to-transparent pt-6 pb-2 px-2">
-                                  <div className="h-1 bg-white/30 rounded-full overflow-hidden">
-                                    <div className="h-full bg-white rounded-full transition-[width] duration-150 ease-out" style={{ width: `${reviewProgress * 100}%` }} />
+                            <Link href={`/tracks/${track.id}`} className="block">
+                              <div className="relative aspect-[4/3] bg-neutral-100">
+                                {track.artworkUrl ? (
+                                  <Image
+                                    src={track.artworkUrl}
+                                    alt={track.title}
+                                    fill
+                                    className="object-cover transition-transform duration-150 ease-out group-hover:scale-[1.02]"
+                                    sizes="(max-width: 640px) 50vw, 33vw"
+                                  />
+                                ) : (
+                                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
+                                    <Music className="h-8 w-8 text-black/15" />
                                   </div>
+                                )}
+                                <div className="absolute top-2 left-2">
+                                  {isPending ? (
+                                    <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/80 text-black/60 border border-black/10 backdrop-blur-sm">Pending</span>
+                                  ) : isQueued ? (
+                                    <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-purple-600 text-white shadow-sm">Queued</span>
+                                  ) : isInProgress ? (
+                                    <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-purple-600 text-white shadow-sm">Reviewing</span>
+                                  ) : null}
                                 </div>
-                              )}
-                            </div>
-                            <div className="p-3 space-y-1.5">
-                              <h3 className="font-semibold text-[13px] leading-snug text-black line-clamp-2 group-hover:text-black/70 transition-colors duration-150 ease-out">{track.title}</h3>
-                              {hasReviews ? (
-                                <div className="flex items-center gap-1.5">
-                                  <MessageSquare className="h-3 w-3 text-purple-500" />
-                                  <span className="text-xs font-semibold text-purple-700">{completedReviews}/{track.reviewsRequested} reviews</span>
-                                </div>
-                              ) : (
-                                <p className="text-xs text-black/30">Awaiting reviews</p>
-                              )}
-                            </div>
+                                <DequeueButton trackId={track.id} trackTitle={track.title} />
+                                {hasReviews && (
+                                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/30 to-transparent pt-6 pb-2 px-2">
+                                    <div className="h-1 bg-white/30 rounded-full overflow-hidden">
+                                      <div className="h-full bg-white rounded-full transition-[width] duration-150 ease-out" style={{ width: `${reviewProgress * 100}%` }} />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="p-3 space-y-1.5">
+                                <h3 className="font-semibold text-[13px] leading-snug text-black line-clamp-2 group-hover:text-black/70 transition-colors duration-150 ease-out">{track.title}</h3>
+                                {hasReviews ? (
+                                  <div className="flex items-center gap-1.5">
+                                    <MessageSquare className="h-3 w-3 text-purple-500" />
+                                    <span className="text-xs font-semibold text-purple-700">{completedReviews}/{track.reviewsRequested} reviews</span>
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-black/30">Awaiting reviews</p>
+                                )}
+                              </div>
+                            </Link>
                           </Card>
-                        </Link>
+                        </div>
                       </div>
                     );
                   }
