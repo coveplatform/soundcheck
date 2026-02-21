@@ -115,8 +115,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Artist Earnings */}
-      <section className="pb-12 sm:pb-16 pt-0 bg-neutral-900 text-neutral-50 overflow-visible font-sans">
+      {/* How It Works */}
+      <section className="pb-16 sm:pb-24 pt-0 bg-neutral-900 text-neutral-50 overflow-visible font-sans">
         <div className="w-full overflow-hidden bg-purple-400/10">
           <div className="h-12 flex items-center">
             <div
@@ -129,78 +129,140 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto px-4 pt-6 sm:pt-8">
-          <div className="grid gap-8 md:gap-10 md:grid-cols-2 lg:grid-cols-[1fr_380px] items-center">
-            <AnimatedSection className="is-visible max-w-xl text-center md:text-left">
-              <h2 className="text-2xl sm:text-3xl font-bold">Sell your music directly</h2>
-              <p className="mt-3 text-neutral-300">
-                Every track gets a public page. Share it anywhere. When listeners buy through your link, you keep 85% of the sale. Get your music discovered by the right people.
-              </p>
+        <div className="max-w-5xl mx-auto px-4 pt-10 sm:pt-14">
+          <AnimatedSection className="text-center mb-12 sm:mb-16">
+            <p className="text-xs font-mono tracking-[0.25em] uppercase text-purple-400 mb-3">How it works</p>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.1]">
+              Give feedback. Get feedback.
+            </h2>
+            <p className="mt-5 text-neutral-400 text-lg max-w-2xl mx-auto">
+              A simple credit system keeps the community fair. No buying reviews — everyone earns them the same way.
+            </p>
+          </AnimatedSection>
 
-              <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-                <SignupLink>
-                  <Button
-                    size="lg"
-                    className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
-                  >
-                    Get started free <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </SignupLink>
-                <Link href="#pricing">
-                  <Button variant="outline" size="lg" className="bg-white/10 text-neutral-50 border-white/20 hover:bg-white/15">
-                    See pricing
-                  </Button>
-                </Link>
-              </div>
-            </AnimatedSection>
-
-            <AnimatedSection className="is-visible w-full max-w-sm mx-auto md:mx-0 md:max-w-none">
-              <div className="bg-neutral-800 border-2 border-neutral-700 rounded-2xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)]">
-                {/* Header with balance */}
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 px-3 py-2 border-b-2 border-black/20">
-                  <div className="text-[9px] font-bold text-white/80 uppercase tracking-wider">Your Balance</div>
-                  <div className="text-lg font-extrabold text-white">$12.50</div>
-                </div>
-
-                {/* Recent sales list */}
-                <div className="p-3 space-y-1.5">
-                  <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider px-1 mb-2">Recent Sales</div>
-
-                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
-                    <img src="/activity-artwork/1.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] font-semibold text-white truncate">Neon Pulse</div>
-                      <div className="text-[11px] text-neutral-500">2 min ago</div>
-                    </div>
-                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
+          {/* 3 Steps */}
+          <AnimatedSection>
+            <div className="grid md:grid-cols-3 gap-6 sm:gap-8 mb-14">
+              {/* Step 1 */}
+              <div className="relative group">
+                <div className="bg-neutral-800 border border-neutral-700/60 rounded-2xl p-6 sm:p-8 h-full transition-colors hover:border-purple-500/30">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="h-10 w-10 rounded-xl bg-purple-600 flex items-center justify-center text-lg font-black text-white shadow-lg shadow-purple-600/20">1</div>
+                    <div className="h-px flex-1 bg-gradient-to-r from-purple-500/40 to-transparent" />
                   </div>
-
-                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
-                    <img src="/activity-artwork/5.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] font-semibold text-white truncate">Late Night Taxi</div>
-                      <div className="text-[11px] text-neutral-500">via @lofi_curator · 8 min ago</div>
-                    </div>
-                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
+                  <h3 className="text-xl font-bold mb-2">Review a track</h3>
+                  <p className="text-sm text-neutral-400 leading-relaxed">
+                    Listen to a track in your genre for at least 3 minutes. Give honest, structured feedback. Takes about 5 minutes.
+                  </p>
+                  <div className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                    <span className="text-xs font-bold text-purple-400">+1 credit earned</span>
                   </div>
-
-                  <div className="flex items-center gap-2.5 bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors duration-150">
-                    <img src="/activity-artwork/9.jpg" alt="" className="h-8 w-8 rounded-md object-cover shadow" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] font-semibold text-white truncate">Golden Hour</div>
-                      <div className="text-[11px] text-neutral-500">15 min ago</div>
-                    </div>
-                    <div className="text-[13px] font-bold text-blue-400">+$0.50</div>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="px-4 py-2.5 bg-black/20 border-t border-white/5 text-center">
-                  <span className="text-[11px] text-neutral-400">Keep <span className="text-blue-400 font-semibold">85%</span> of every sale</span>
                 </div>
               </div>
-            </AnimatedSection>
-          </div>
+
+              {/* Step 2 */}
+              <div className="relative group">
+                <div className="bg-neutral-800 border border-neutral-700/60 rounded-2xl p-6 sm:p-8 h-full transition-colors hover:border-purple-500/30">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="h-10 w-10 rounded-xl bg-purple-600 flex items-center justify-center text-lg font-black text-white shadow-lg shadow-purple-600/20">2</div>
+                    <div className="h-px flex-1 bg-gradient-to-r from-purple-500/40 to-transparent" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Submit your track</h3>
+                  <p className="text-sm text-neutral-400 leading-relaxed">
+                    Upload or link your track and choose how many reviews you want. Each review costs 1 credit. Your track enters a <span className="text-white font-medium">review queue slot</span>.
+                  </p>
+                  <div className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-700/50 border border-neutral-600/30">
+                    <span className="text-xs font-bold text-neutral-300">1 credit per review</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="relative group">
+                <div className="bg-neutral-800 border border-neutral-700/60 rounded-2xl p-6 sm:p-8 h-full transition-colors hover:border-purple-500/30">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="h-10 w-10 rounded-xl bg-purple-600 flex items-center justify-center text-lg font-black text-white shadow-lg shadow-purple-600/20">3</div>
+                    <div className="h-px flex-1 bg-gradient-to-r from-purple-500/40 to-transparent" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Get matched feedback</h3>
+                  <p className="text-sm text-neutral-400 leading-relaxed">
+                    Artists in your genre review your track. Most reviews arrive within 24–48 hours. See patterns across multiple reviews in your analytics dashboard.
+                  </p>
+                  <div className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-700/50 border border-neutral-600/30">
+                    <span className="text-xs font-bold text-neutral-300">~24hr turnaround</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </AnimatedSection>
+
+          {/* Queue Slots visual */}
+          <AnimatedSection>
+            <div className="bg-neutral-800/60 border border-neutral-700/40 rounded-2xl p-6 sm:p-10">
+              <div className="grid md:grid-cols-[1fr_auto_1fr] gap-8 items-center">
+                {/* Free */}
+                <div className="text-center">
+                  <p className="text-xs font-mono tracking-[0.2em] uppercase text-neutral-500 mb-4">Free</p>
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <div className="h-14 w-14 rounded-xl bg-purple-600/20 border-2 border-purple-500/40 flex items-center justify-center">
+                      <span className="text-lg font-black text-purple-400">1</span>
+                    </div>
+                    <div className="h-14 w-14 rounded-xl bg-neutral-700/30 border-2 border-dashed border-neutral-600/30 flex items-center justify-center">
+                      <Lock className="h-4 w-4 text-neutral-600" />
+                    </div>
+                    <div className="h-14 w-14 rounded-xl bg-neutral-700/30 border-2 border-dashed border-neutral-600/30 flex items-center justify-center">
+                      <Lock className="h-4 w-4 text-neutral-600" />
+                    </div>
+                  </div>
+                  <p className="text-sm text-neutral-400">1 track in queue at a time</p>
+                </div>
+
+                {/* Divider */}
+                <div className="hidden md:flex flex-col items-center gap-2">
+                  <div className="h-px w-12 bg-neutral-700" />
+                  <span className="text-xs font-bold text-neutral-500">vs</span>
+                  <div className="h-px w-12 bg-neutral-700" />
+                </div>
+
+                {/* Pro */}
+                <div className="text-center">
+                  <p className="text-xs font-mono tracking-[0.2em] uppercase text-purple-400 mb-4">Pro · $9.99/mo</p>
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <div className="h-14 w-14 rounded-xl bg-purple-600/20 border-2 border-purple-500/60 flex items-center justify-center">
+                      <span className="text-lg font-black text-purple-400">1</span>
+                    </div>
+                    <div className="h-14 w-14 rounded-xl bg-purple-600/20 border-2 border-purple-500/60 flex items-center justify-center">
+                      <span className="text-lg font-black text-purple-400">2</span>
+                    </div>
+                    <div className="h-14 w-14 rounded-xl bg-purple-600/20 border-2 border-purple-500/60 flex items-center justify-center">
+                      <span className="text-lg font-black text-purple-400">3</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-neutral-300">3 tracks at once + priority reviews</p>
+                </div>
+              </div>
+            </div>
+          </AnimatedSection>
+
+          {/* CTA */}
+          <AnimatedSection className="mt-10 text-center">
+            <p className="text-neutral-400 mb-5">Start with <span className="font-bold text-purple-400">3 free credits</span> — no credit card needed</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <SignupLink>
+                <Button
+                  size="lg"
+                  className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all"
+                >
+                  Get started free <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </SignupLink>
+              <Link href="#pricing">
+                <Button variant="outline" size="lg" className="bg-white/10 text-neutral-50 border-white/20 hover:bg-white/15">
+                  See pricing
+                </Button>
+              </Link>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
@@ -395,7 +457,7 @@ export default function Home() {
               },
               {
                 q: "Is it really free?",
-                a: "Yes. You can upload tracks, earn credits by reviewing, sell your music, and access full analytics — all for free. Pro is for artists who want to move faster with more concurrent slots.",
+                a: "Yes. You can upload tracks, earn credits by reviewing, and access full analytics — all for free, forever. Pro is for artists who want to move faster with more concurrent queue slots.",
               },
               {
                 q: "Who reviews my tracks?",
