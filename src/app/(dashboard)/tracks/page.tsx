@@ -70,23 +70,21 @@ export default async function TracksPage({
               originalityScore: true,
               vocalScore: true,
               wouldListenAgain: true,
-              ...((isStatsView || isInsightsView) ? {
-                bestPart: true,
-                weakestPart: true,
-                additionalNotes: true,
-                firstImpression: true,
-                createdAt: true,
-                ReviewerProfile: {
-                  select: {
-                    User: { select: { name: true } },
-                  },
+              bestPart: true,
+              weakestPart: true,
+              additionalNotes: true,
+              firstImpression: true,
+              createdAt: true,
+              ReviewerProfile: {
+                select: {
+                  User: { select: { name: true } },
                 },
-                ArtistProfile: {
-                  select: {
-                    User: { select: { name: true } },
-                  },
+              },
+              ArtistProfile: {
+                select: {
+                  User: { select: { name: true } },
                 },
-              } : {}),
+              },
               ...(isInsightsView ? {
                 wouldAddToPlaylist: true,
                 wouldShare: true,

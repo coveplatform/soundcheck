@@ -86,16 +86,16 @@ export function QueueTrackPicker({ tracks, credits, open, onClose, initialTrackI
   // Success state
   if (success) {
     return (
-      <div className="mt-6 rounded-xl border-2 border-lime-300 bg-lime-50 p-6 text-center animate-in fade-in duration-200">
+      <div className="p-8 text-center">
         <CheckCircle2 className="h-8 w-8 text-lime-600 mx-auto mb-2" />
-        <p className="text-sm font-bold text-lime-800">Queued!</p>
-        <p className="text-xs text-lime-600 mt-1">Your track is now in the review queue.</p>
+        <p className="text-sm font-bold text-black">Queued!</p>
+        <p className="text-xs text-black/40 mt-1">Your track is now in the review queue.</p>
       </div>
     );
   }
 
   return (
-    <div className="mt-6 rounded-xl border border-black/10 bg-white overflow-hidden animate-in slide-in-from-top-2 fade-in duration-200">
+    <div className="overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-black/5 bg-neutral-50/50">
         <h3 className="text-sm font-bold text-black">
@@ -236,7 +236,7 @@ export function QueueTrackPicker({ tracks, credits, open, onClose, initialTrackI
           <Button
             onClick={handleSubmit}
             disabled={!canAfford || loading}
-            className="w-full bg-black text-white hover:bg-black/80 active:bg-black/70 font-bold text-sm h-10 rounded-xl disabled:opacity-40"
+            className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold text-sm h-10 rounded-xl disabled:opacity-40"
           >
             {loading ? (
               <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Queuing…</>

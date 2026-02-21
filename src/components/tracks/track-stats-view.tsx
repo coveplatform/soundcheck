@@ -286,11 +286,11 @@ export function TrackStatsView({ tracks }: TrackStatsViewProps) {
                               {review.wouldListenAgain !== null && (
                                 review.wouldListenAgain ? (
                                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
-                                    <ThumbsUp className="h-3 w-3" /> Yes
+                                    <ThumbsUp className="h-3 w-3" /> Would listen again
                                   </span>
                                 ) : (
                                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-500">
-                                    <ThumbsDown className="h-3 w-3" /> No
+                                    <ThumbsDown className="h-3 w-3" /> Wouldn&apos;t listen again
                                   </span>
                                 )
                               )}

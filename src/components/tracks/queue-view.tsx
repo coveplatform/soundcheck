@@ -84,6 +84,11 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
         </div>
       </div>
 
+      {/* Permanent explainer */}
+      <p className="text-xs text-black/35 mb-8 max-w-2xl mx-auto">
+        Submit a track → it sits in a slot while artists review it → slot frees up when done.
+      </p>
+
       {/* Slot grid */}
       <div className="grid grid-cols-3 gap-3 sm:gap-5 max-w-2xl mx-auto">
         {Array.from({ length: 3 }, (_, slotIndex) => {
