@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { X, ArrowRight, Headphones, RefreshCw, Crown } from "lucide-react";
+import { X, ArrowRight, RefreshCw, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SparklesDoodle, StarDoodle } from "@/components/dashboard/doodles";
 
@@ -45,44 +45,30 @@ export function QueueAnnouncement() {
             <RefreshCw className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-black">We simplified everything</h3>
+            <h3 className="text-lg font-bold text-black">New: review queue slots</h3>
             <p className="text-sm text-black/50 mt-0.5">
-              No more buying credits. Now you <span className="font-semibold text-lime-700">earn them by reviewing</span>.
+              Your tracks now sit in <span className="font-semibold text-lime-700">queue slots</span> while they get reviewed.
             </p>
           </div>
         </div>
 
-        {/* The loop — simple and punchy */}
-        <div className="flex items-center gap-2 sm:gap-3 mb-4 ml-[52px] flex-wrap">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border-2 border-black/10 text-xs font-bold text-black">
-            <Headphones className="h-3 w-3 text-lime-600" />
-            Review a track
-          </span>
-          <ArrowRight className="h-3 w-3 text-lime-500 flex-shrink-0" />
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-lime-100 border-2 border-lime-200 text-xs font-bold text-lime-800">
-            +1 credit
-          </span>
-          <ArrowRight className="h-3 w-3 text-lime-500 flex-shrink-0" />
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border-2 border-black/10 text-xs font-bold text-black">
-            Spend on your track
-          </span>
-        </div>
-
-        {/* Queue slot callout */}
-        <div className="rounded-lg bg-white/60 border border-black/5 px-4 py-3 mb-4 ml-[52px]">
+        {/* How the queue works */}
+        <div className="rounded-lg bg-white/60 border border-black/5 px-4 py-3 mb-4 ml-[52px] space-y-1.5">
           <p className="text-[13px] text-black/70">
-            Your track sits in a <span className="font-bold text-black">queue slot</span> while it gets reviews.
-            Free = 1 slot. <Link href="/pro" className="font-bold text-purple-600 hover:underline">Pro</Link> = 3 slots + priority.
-            {" "}Any tracks already in your queue are safe.
+            <span className="font-bold text-black">How it works:</span> submit a track → it takes a slot → artists review it → slot frees up for your next track.
+          </p>
+          <p className="text-[13px] text-black/70">
+            Free accounts get <span className="font-bold text-black">1 slot</span>.{" "}
+            <Link href="/pro" className="font-bold text-purple-600 hover:underline">Pro</Link> gets <span className="font-bold text-black">3 slots</span> + priority placement.
+            Any tracks already queued are safe.
           </p>
         </div>
 
         {/* Actions */}
         <div className="flex flex-wrap items-center gap-2.5 ml-[52px]">
-          <Link href="/review">
+          <Link href="/tracks">
             <Button className="bg-lime-600 text-white hover:bg-lime-700 active:bg-lime-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out text-sm h-9 px-4 rounded-xl">
-              <Headphones className="h-3.5 w-3.5 mr-1.5" />
-              Start reviewing
+              See your queue
               <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
             </Button>
           </Link>
