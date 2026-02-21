@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
 import { TracksViewToggle } from "@/components/tracks/tracks-view-toggle";
 import { PortfolioView } from "@/components/tracks/portfolio-view";
-import { DequeueButton } from "@/components/tracks/dequeue-button";
 import { TrackStatsView } from "@/components/tracks/track-stats-view";
+import { QueueView } from "@/components/tracks/queue-view";
 import {
   analyzeFeedbackPatterns,
   calculateReviewVelocity,
@@ -314,250 +314,34 @@ export default async function TracksPage({
           </div>
         </div>
 
-        {/* ===== TABS: Queue / My Tracks / Insights ===== */}
+        {/* ===== TABS: Queue / My Tracks / Stats / Insights ===== */}
         <TracksViewToggle
           queueView={
-            <div>
-              {/* Queue header */}
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
-                <p className="text-sm text-black/40">
-                  Submit a track → it fills a slot → artists review it → slot frees up.
-                  {!isPro && <>{" "}<Link href="/pro" className="text-purple-600 hover:text-purple-700 font-medium">Upgrade to Pro for 3 slots →</Link></>}
-                </p>
-                {activeTracks.length < maxSlots && (
-                  <Link href="/submit">
-                    <Button variant="airyPrimary" className="text-sm h-9 px-4">
-                      <Plus className="h-3.5 w-3.5 mr-1.5" />
-                      Submit track
-                    </Button>
-                  </Link>
-                )}
-              </div>
-
-              {/* Slot grid — always show all 3 slots */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
-                {Array.from({ length: 3 }, (_, slotIndex) => {
-                  const track = activeTracks[slotIndex];
-                  const isLocked = !isPro && slotIndex >= maxSlots;
-                  const slotNum = slotIndex + 1;
-
-                  if (track) {
-                    const completedReviews = (track.Review ?? []).filter(
-                      (r: any) => r.status === "COMPLETED"
-                    ).length;
-                    const hasReviews = track.reviewsRequested > 0;
-                    const reviewProgress = hasReviews
-                      ? completedReviews / track.reviewsRequested
-                      : 0;
-                    const isQueued = track.status === "QUEUED";
-                    const isInProgress = track.status === "IN_PROGRESS";
-                    const isPending = track.status === "PENDING_PAYMENT";
-
-                    return (
-                      <div key={track.id}>
-                        <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/30 mb-2">Slot {slotNum}</p>
-                        <div className="group relative">
-                          <Card variant="soft" interactive className="overflow-hidden">
-                            <Link href={`/tracks/${track.id}`} className="block">
-                              <div className="relative aspect-[4/3] bg-neutral-100">
-                                {track.artworkUrl ? (
-                                  <Image
-                                    src={track.artworkUrl}
-                                    alt={track.title}
-                                    fill
-                                    className="object-cover transition-transform duration-150 ease-out group-hover:scale-[1.02]"
-                                    sizes="(max-width: 640px) 50vw, 33vw"
-                                  />
-                                ) : (
-                                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-                                    <Music className="h-8 w-8 text-black/15" />
-                                  </div>
-                                )}
-                                <div className="absolute top-2 left-2">
-                                  {isPending ? (
-                                    <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/80 text-black/60 border border-black/10 backdrop-blur-sm">Pending</span>
-                                  ) : isQueued ? (
-                                    <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-purple-600 text-white shadow-sm">Queued</span>
-                                  ) : isInProgress ? (
-                                    <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-purple-600 text-white shadow-sm">Reviewing</span>
-                                  ) : null}
-                                </div>
-                                <DequeueButton trackId={track.id} trackTitle={track.title} />
-                                {hasReviews && (
-                                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/30 to-transparent pt-6 pb-2 px-2">
-                                    <div className="h-1 bg-white/30 rounded-full overflow-hidden">
-                                      <div className="h-full bg-white rounded-full transition-[width] duration-150 ease-out" style={{ width: `${reviewProgress * 100}%` }} />
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                              <div className="p-3 space-y-1.5">
-                                <h3 className="font-semibold text-[13px] leading-snug text-black line-clamp-2 group-hover:text-black/70 transition-colors duration-150 ease-out">{track.title}</h3>
-                                {hasReviews ? (
-                                  <div className="flex items-center gap-1.5">
-                                    <MessageSquare className="h-3 w-3 text-purple-500" />
-                                    <span className="text-xs font-semibold text-purple-700">{completedReviews}/{track.reviewsRequested} reviews</span>
-                                  </div>
-                                ) : (
-                                  <p className="text-xs text-black/30">Awaiting reviews</p>
-                                )}
-                              </div>
-                            </Link>
-                          </Card>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  if (isLocked) {
-                    return (
-                      <div key={`locked-${slotIndex}`}>
-                        <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/20 mb-2">Slot {slotNum}</p>
-                        <Link href="/pro" className="group block">
-                          <Card variant="soft" interactive className="border-2 border-dashed border-black/5 bg-neutral-50/50 hover:bg-purple-50/50 hover:border-purple-200">
-                            <div className="aspect-[4/3] flex flex-col items-center justify-center gap-2">
-                              <Lock className="h-6 w-6 text-black/10 group-hover:text-purple-400 transition-colors" />
-                            </div>
-                            <div className="p-3 text-center">
-                              <p className="text-xs font-semibold text-black/20 group-hover:text-purple-600 transition-colors">Unlock with Pro</p>
-                            </div>
-                          </Card>
-                        </Link>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div key={`empty-${slotIndex}`}>
-                      <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/30 mb-2">Slot {slotNum} — open</p>
-                      <Card variant="soft" className="border-2 border-dashed border-black/10 bg-white/40 overflow-hidden">
-                        <div className="aspect-[4/3] flex flex-col items-center justify-center gap-3 p-4">
-                          <div className="h-10 w-10 rounded-full bg-black/5 flex items-center justify-center">
-                            <Plus className="h-4 w-4 text-black/30" />
-                          </div>
-                          <p className="text-xs font-semibold text-black/40">Add to queue</p>
-                        </div>
-                        <div className="border-t border-black/5">
-                          <Link href="/submit" className="flex items-center gap-2 px-3 py-2.5 hover:bg-black/[0.03] transition-colors group">
-                            <Plus className="h-3 w-3 text-black/30 group-hover:text-black/60" />
-                            <span className="text-xs font-medium text-black/50 group-hover:text-black/80 transition-colors">Upload new track</span>
-                          </Link>
-                          {eligibleForQueue.length > 0 && (
-                            <Link href={`/tracks/${eligibleForQueue[0].id}`} className="flex items-center gap-2 px-3 py-2.5 hover:bg-purple-50/50 transition-colors group border-t border-black/5">
-                              <Music className="h-3 w-3 text-purple-400 group-hover:text-purple-600" />
-                              <span className="text-xs font-medium text-purple-500 group-hover:text-purple-700 transition-colors">Queue existing track</span>
-                            </Link>
-                          )}
-                        </div>
-                      </Card>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Grandfathered tracks beyond slot limit */}
-              {activeTracks.length > 3 && (
-                <div className="mt-6">
-                  <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-amber-600 mb-2">Grandfathered</p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {activeTracks.slice(3).map((track) => {
-                      const completedReviews = (track.Review ?? []).filter((r: any) => r.status === "COMPLETED").length;
-                      const hasReviews = track.reviewsRequested > 0;
-                      const reviewProgress = hasReviews ? completedReviews / track.reviewsRequested : 0;
-                      return (
-                        <Link key={track.id} href={`/tracks/${track.id}`} className="group block">
-                          <Card variant="soft" interactive className="overflow-hidden ring-2 ring-amber-300">
-                            <div className="relative aspect-[4/3] bg-neutral-100">
-                              {track.artworkUrl ? (
-                                <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="33vw" />
-                              ) : (
-                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-                                  <Music className="h-8 w-8 text-black/15" />
-                                </div>
-                              )}
-                              {hasReviews && (
-                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/30 to-transparent pt-6 pb-2 px-2">
-                                  <div className="h-1 bg-white/30 rounded-full overflow-hidden">
-                                    <div className="h-full bg-white rounded-full" style={{ width: `${reviewProgress * 100}%` }} />
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                            <div className="p-3 space-y-1.5">
-                              <h3 className="font-semibold text-[13px] text-black line-clamp-2">{track.title}</h3>
-                              {hasReviews && (
-                                <div className="flex items-center gap-1.5">
-                                  <MessageSquare className="h-3 w-3 text-purple-500" />
-                                  <span className="text-xs font-semibold text-purple-700">{completedReviews}/{track.reviewsRequested}</span>
-                                </div>
-                              )}
-                            </div>
-                          </Card>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Ready to queue — eligible tracks that can be added to a slot */}
-              {eligibleForQueue.length > 0 && (
-                <div className="mt-10">
-                  <div className="flex items-center gap-3 mb-4">
-                    <h3 className="text-sm font-bold text-black">Ready to queue</h3>
-                    <div className="h-px flex-1 bg-black/5" />
-                    {hasOpenSlots ? (
-                      <span className="text-xs text-lime-700 font-medium">{maxSlots - activeTracks.length} {maxSlots - activeTracks.length === 1 ? "slot" : "slots"} open</span>
-                    ) : (
-                      <span className="text-xs text-black/30">All slots full</span>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {eligibleForQueue.map((track) => {
-                      const completedReviews = (track.Review ?? []).filter((r: any) => r.status === "COMPLETED").length;
-                      const hasReviews = track.reviewsRequested > 0;
-                      const isCompleted = track.status === "COMPLETED";
-                      return (
-                        <Link key={track.id} href={`/tracks/${track.id}`} className="group block">
-                          <Card variant="soft" interactive className={cn("overflow-hidden", !hasOpenSlots && "opacity-50")}>
-                            <div className="relative aspect-[4/3] bg-neutral-100">
-                              {track.artworkUrl ? (
-                                <Image src={track.artworkUrl} alt={track.title} fill className="object-cover transition-transform duration-150 ease-out group-hover:scale-[1.02]" sizes="33vw" />
-                              ) : (
-                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-                                  <Music className="h-8 w-8 text-black/15" />
-                                </div>
-                              )}
-                              <div className="absolute top-2 left-2">
-                                <span className={cn(
-                                  "inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md backdrop-blur-sm",
-                                  isCompleted
-                                    ? "bg-lime-100 text-lime-800 border border-lime-300"
-                                    : "bg-white/80 text-black/50 border border-black/10"
-                                )}>
-                                  {isCompleted ? "Completed" : "Uploaded"}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="p-3 space-y-1.5">
-                              <h3 className="font-semibold text-[13px] leading-snug text-black line-clamp-2 group-hover:text-black/70 transition-colors">{track.title}</h3>
-                              {hasReviews ? (
-                                <p className="text-xs text-black/40">{completedReviews}/{track.reviewsRequested} reviews done</p>
-                              ) : (
-                                <p className="text-xs text-black/30">No reviews yet</p>
-                              )}
-                              {hasOpenSlots && (
-                                <p className="text-xs font-semibold text-purple-600 group-hover:text-purple-700">Request reviews →</p>
-                              )}
-                            </div>
-                          </Card>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
+            <QueueView
+              activeTracks={activeTracks.map((t) => ({
+                id: t.id,
+                title: t.title,
+                artworkUrl: t.artworkUrl,
+                status: t.status,
+                reviewsRequested: t.reviewsRequested ?? 0,
+                reviews: (t.Review ?? []).map((r: any) => ({ id: r.id, status: r.status })),
+              }))}
+              eligibleTracks={eligibleForQueue.map((t) => {
+                const completed = (t.Review ?? []).filter((r: any) => r.status === "COMPLETED").length;
+                return {
+                  id: t.id,
+                  title: t.title,
+                  artworkUrl: t.artworkUrl,
+                  status: t.status,
+                  genreName: (t as any).Genre?.[0]?.name ?? null,
+                  reviewsCompleted: completed,
+                  reviewsRequested: t.reviewsRequested ?? 0,
+                };
+              })}
+              maxSlots={maxSlots}
+              isPro={isPro}
+              credits={artistProfile.reviewCredits ?? 0}
+            />
           }
           gridView={
             tracks.length === 0 ? (
