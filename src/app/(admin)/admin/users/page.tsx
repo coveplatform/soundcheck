@@ -25,12 +25,12 @@ function getRelativeTime(date: Date | null): string {
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string; role?: string; demo?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; filter?: string; demo?: string }>;
 }) {
-  const { q: query, page: pageParam, role: roleParam, demo: demoParam } = await searchParams;
+  const { q: query, page: pageParam, filter: filterParam, demo: demoParam } = await searchParams;
   const q = typeof query === "string" ? query.trim() : "";
   const page = Math.max(1, parseInt(pageParam || "1", 10) || 1);
-  const role = roleParam || "";
+  const filter = filterParam || "";
   const showDemo = demoParam === "show";
 
   // Patterns for seed/demo/test/internal accounts
@@ -98,11 +98,11 @@ export default async function AdminUsersPage({
     ];
   }
 
-  if (role === "artist") {
+  if (filter === "tracks") {
     whereClause.isArtist = true;
-  } else if (role === "reviewer") {
+  } else if (filter === "reviews") {
     whereClause.isReviewer = true;
-  } else if (role === "none") {
+  } else if (filter === "inactive") {
     whereClause.isArtist = false;
     whereClause.isReviewer = false;
   }
@@ -158,10 +158,10 @@ export default async function AdminUsersPage({
   });
 
   // Build URL helper
-  const buildUrl = (params: { page?: number; q?: string; role?: string; demo?: string }) => {
+  const buildUrl = (params: { page?: number; q?: string; filter?: string; demo?: string }) => {
     const url = new URLSearchParams();
     if (params.q ?? q) url.set("q", params.q ?? q);
-    if (params.role ?? role) url.set("role", params.role ?? role);
+    if (params.filter ?? filter) url.set("filter", params.filter ?? filter);
     if ((params.page ?? page) > 1) url.set("page", String(params.page ?? page));
     const demoVal = params.demo ?? (showDemo ? "show" : "");
     if (demoVal === "show") url.set("demo", "show");
@@ -185,7 +185,7 @@ export default async function AdminUsersPage({
             placeholder="Search email or name"
             className="flex-1 h-9 px-3 border border-neutral-200 rounded-md text-sm"
           />
-          {role && <input type="hidden" name="role" value={role} />}
+          {filter && <input type="hidden" name="filter" value={filter} />}
           {showDemo && <input type="hidden" name="demo" value="show" />}
           <button
             type="submit"
@@ -197,36 +197,36 @@ export default async function AdminUsersPage({
 
         <div className="flex gap-1">
           <Link
-            href={buildUrl({ role: "", page: 1 })}
+            href={buildUrl({ filter: "", page: 1 })}
             className={`h-9 px-3 rounded-md text-sm font-medium flex items-center ${
-              !role ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+              !filter ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
             }`}
           >
             All
           </Link>
           <Link
-            href={buildUrl({ role: "artist", page: 1 })}
+            href={buildUrl({ filter: "tracks", page: 1 })}
             className={`h-9 px-3 rounded-md text-sm font-medium flex items-center ${
-              role === "artist" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+              filter === "tracks" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
             }`}
           >
-            Artists
+            Has Tracks
           </Link>
           <Link
-            href={buildUrl({ role: "reviewer", page: 1 })}
+            href={buildUrl({ filter: "reviews", page: 1 })}
             className={`h-9 px-3 rounded-md text-sm font-medium flex items-center ${
-              role === "reviewer" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+              filter === "reviews" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
             }`}
           >
-            Reviewers
+            Has Reviews
           </Link>
           <Link
-            href={buildUrl({ role: "none", page: 1 })}
+            href={buildUrl({ filter: "inactive", page: 1 })}
             className={`h-9 px-3 rounded-md text-sm font-medium flex items-center ${
-              role === "none" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+              filter === "inactive" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
             }`}
           >
-            No Role
+            Inactive
           </Link>
           <span className="w-px h-6 bg-neutral-200 mx-1" />
           <Link
@@ -247,7 +247,7 @@ export default async function AdminUsersPage({
               <tr>
                 <th className="text-left font-medium px-4 py-3">Email</th>
                 <th className="text-left font-medium px-4 py-3">Artist Name</th>
-                <th className="text-left font-medium px-4 py-3">Roles</th>
+                <th className="text-left font-medium px-4 py-3">Activity</th>
                 <th className="text-right font-medium px-4 py-3">Tracks Uploaded</th>
                 <th className="text-right font-medium px-4 py-3">Reviews Req.</th>
                 <th className="text-right font-medium px-4 py-3">Reviews Done</th>
@@ -274,13 +274,17 @@ export default async function AdminUsersPage({
                   </td>
                   <td className="px-4 py-3">{u.ArtistProfile?.artistName ?? u.name ?? ""}</td>
                   <td className="px-4 py-3">
-                    {u.isArtist && u.isReviewer
-                      ? "Artist, Reviewer"
-                      : u.isArtist
-                      ? "Artist"
-                      : u.isReviewer
-                      ? "Reviewer"
-                      : <span className="text-neutral-400">—</span>}
+                    <div className="flex gap-1 flex-wrap">
+                      {u.isArtist && (
+                        <span className="inline-flex items-center text-[11px] font-medium px-1.5 py-0.5 rounded bg-purple-50 text-purple-700">Tracks</span>
+                      )}
+                      {u.isReviewer && (
+                        <span className="inline-flex items-center text-[11px] font-medium px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">Reviews</span>
+                      )}
+                      {!u.isArtist && !u.isReviewer && (
+                        <span className="text-neutral-400">—</span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-right">
                     {tracksPosted > 0 ? (

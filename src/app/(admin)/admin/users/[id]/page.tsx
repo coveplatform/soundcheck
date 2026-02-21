@@ -64,15 +64,17 @@ export default async function AdminUserDetailPage({
 
       <div className="grid md:grid-cols-3 gap-4">
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Roles</div>
-          <div className="font-medium">
-            {user.isArtist && user.isReviewer
-              ? "Artist, Reviewer"
-              : user.isArtist
-              ? "Artist"
-              : user.isReviewer
-              ? "Reviewer"
-              : ""}
+          <div className="text-sm text-neutral-500">Activity</div>
+          <div className="flex gap-1.5 mt-1">
+            {user.isArtist && (
+              <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded bg-purple-50 text-purple-700">Submits tracks</span>
+            )}
+            {user.isReviewer && (
+              <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded bg-blue-50 text-blue-700">Reviews tracks</span>
+            )}
+            {!user.isArtist && !user.isReviewer && (
+              <span className="text-neutral-400 text-sm">No activity yet</span>
+            )}
           </div>
         </div>
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
@@ -83,7 +85,7 @@ export default async function AdminUserDetailPage({
 
       {user.ArtistProfile ? (
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="font-medium">Artist profile</div>
+          <div className="font-medium">Track submissions</div>
           <div className="mt-3 grid md:grid-cols-3 gap-3 text-sm">
             <div>
               <div className="text-neutral-500">Name</div>
@@ -121,7 +123,7 @@ export default async function AdminUserDetailPage({
       {user.ReviewerProfile ? (
         <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
           <div className="flex items-center justify-between gap-4">
-            <div className="font-medium">Reviewer profile</div>
+            <div className="font-medium">Review activity</div>
             <ReviewerRestrictionToggle
               reviewerId={user.ReviewerProfile.id}
               isRestricted={user.ReviewerProfile.isRestricted}
