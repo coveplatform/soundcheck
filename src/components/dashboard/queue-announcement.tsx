@@ -40,8 +40,8 @@ export function QueueAnnouncement() {
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         {/* Left: title */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-bold text-black mb-1">New: queue slots</h3>
-          <p className="text-[13px] text-black/50">Your tracks wait in slots while they get reviewed.</p>
+          <h3 className="text-base font-bold text-black mb-1">How your queue works</h3>
+          <p className="text-[13px] text-black/50">Drop a track in a slot. Artists review it. Slot frees up. Done.</p>
         </div>
 
         {/* Right: visual slot squares */}

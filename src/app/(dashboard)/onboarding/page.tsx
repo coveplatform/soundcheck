@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { StepIndicator } from "@/components/ui/step-indicator";
 import { GenreSelector } from "@/components/ui/genre-selector";
-import { ArrowRight, ArrowLeft, Music, RefreshCw, Gift, Loader2, Headphones, Crown, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, Music, Gift, Loader2, Headphones, Crown, Lock } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 
 interface Genre {
@@ -250,97 +250,105 @@ export default function OnboardingPage() {
           <>
             <div className="mb-8 text-center">
               <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
-                How MixReflect works
+                Here&apos;s the deal.
               </h1>
               <p className="mt-2 text-sm text-black/40">
-                Artists helping artists — give feedback, get feedback
+                It takes 3 minutes to review. Everyone does it. That&apos;s why it works.
               </p>
             </div>
 
             <div className="space-y-4">
-              {/* The Loop */}
+              {/* Visual loop cards */}
               <Card variant="soft" elevated>
                 <CardContent className="pt-6 space-y-4">
                   <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-black/30">The Loop</p>
-
-                  <div className="relative space-y-0">
-                    {/* Step 1 */}
-                    <div className="flex items-start gap-4 pb-4">
-                      <div className="relative flex flex-col items-center">
-                        <div className="h-10 w-10 rounded-xl bg-lime-100 flex items-center justify-center flex-shrink-0 z-10">
-                          <Headphones className="h-5 w-5 text-lime-600" />
-                        </div>
-                        <div className="w-px h-full bg-black/10 absolute top-10 left-1/2 -translate-x-1/2" />
+                  <div className="flex items-stretch gap-2">
+                    {/* Review card */}
+                    <div className="flex-1 rounded-xl bg-white border border-black/5 p-3 text-center">
+                      <div className="h-10 w-10 rounded-xl bg-lime-100 flex items-center justify-center mx-auto mb-2">
+                        <Headphones className="h-5 w-5 text-lime-600" />
                       </div>
-                      <div className="pt-1.5">
-                        <h3 className="text-sm font-bold text-black">Review a track in your genre</h3>
-                        <p className="text-xs text-black/50 mt-0.5">Listen for at least 3 minutes and give structured feedback. Takes ~5 min.</p>
-                      </div>
+                      <p className="text-xs font-bold text-black">Review</p>
+                      <p className="text-[11px] text-black/40 mt-0.5">Listen ~3 min</p>
                     </div>
 
-                    {/* Step 2 */}
-                    <div className="flex items-start gap-4 pb-4">
-                      <div className="relative flex flex-col items-center">
-                        <div className="h-10 w-10 rounded-xl bg-lime-100 flex items-center justify-center flex-shrink-0 z-10">
-                          <Gift className="h-5 w-5 text-lime-600" />
-                        </div>
-                        <div className="w-px h-full bg-black/10 absolute top-10 left-1/2 -translate-x-1/2" />
+                    {/* Arrow */}
+                    <div className="flex items-center text-black/20 font-bold text-lg">→</div>
+
+                    {/* Credit card */}
+                    <div className="flex-1 rounded-xl bg-white border border-black/5 p-3 text-center">
+                      <div className="h-10 w-10 rounded-xl bg-lime-100 flex items-center justify-center mx-auto mb-2">
+                        <Gift className="h-5 w-5 text-lime-600" />
                       </div>
-                      <div className="pt-1.5">
-                        <h3 className="text-sm font-bold text-black">Earn a credit</h3>
-                        <p className="text-xs text-black/50 mt-0.5">Every review you submit earns 1 credit. You start with 3 free credits.</p>
-                      </div>
+                      <p className="text-xs font-bold text-black">Credit</p>
+                      <p className="text-[11px] text-black/40 mt-0.5">Earn 1 credit</p>
                     </div>
 
-                    {/* Step 3 */}
-                    <div className="flex items-start gap-4">
-                      <div className="h-10 w-10 rounded-xl bg-lime-100 flex items-center justify-center flex-shrink-0">
+                    {/* Arrow */}
+                    <div className="flex items-center text-black/20 font-bold text-lg">→</div>
+
+                    {/* Get reviewed card */}
+                    <div className="flex-1 rounded-xl bg-white border border-black/5 p-3 text-center">
+                      <div className="h-10 w-10 rounded-xl bg-lime-100 flex items-center justify-center mx-auto mb-2">
                         <Music className="h-5 w-5 text-lime-600" />
                       </div>
-                      <div className="pt-1.5">
-                        <h3 className="text-sm font-bold text-black">Submit your track &amp; spend credits</h3>
-                        <p className="text-xs text-black/50 mt-0.5">Your track enters a review queue slot. Other artists in your genre will review it.</p>
-                      </div>
+                      <p className="text-xs font-bold text-black">Feedback</p>
+                      <p className="text-[11px] text-black/40 mt-0.5">Real artists</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Queue Slots */}
+              {/* Queue Slots visual */}
               <Card variant="soft" elevated>
-                <CardContent className="pt-6 space-y-3">
-                  <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-black/30">Review Queue</p>
+                <CardContent className="pt-6 space-y-4">
+                  <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-black/30">Your Slots</p>
                   <p className="text-sm text-black/60 leading-relaxed">
-                    Your track sits in a <span className="font-semibold text-black">queue slot</span> while it waits for reviews.
-                    Each slot holds one track at a time.
+                    Think of slots like studio booking times. One at a time on free, or run 3 at once on Pro.
                   </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 rounded-xl bg-white/70 border border-black/5 text-center">
-                      <p className="text-2xl font-bold text-black">1</p>
-                      <p className="text-[11px] text-black/40 font-medium">Free slot</p>
-                    </div>
-                    <div className="p-3 rounded-xl bg-purple-50 border border-purple-100 text-center">
-                      <div className="flex items-center justify-center gap-1 mb-0.5">
-                        <p className="text-2xl font-bold text-purple-700">3</p>
-                        <Crown className="h-4 w-4 text-purple-500" />
+
+                  {/* Free tier */}
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/30">Free</p>
+                    <div className="flex gap-2">
+                      <div className="flex-1 h-10 rounded-lg bg-lime-500 border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <Music className="h-4 w-4 text-white" />
                       </div>
-                      <p className="text-[11px] text-purple-600 font-medium">Pro slots</p>
+                      <div className="flex-1 h-10 rounded-lg border-2 border-dashed border-black/10 bg-white/50 flex items-center justify-center">
+                        <Lock className="h-3.5 w-3.5 text-black/15" />
+                      </div>
+                      <div className="flex-1 h-10 rounded-lg border-2 border-dashed border-black/10 bg-white/50 flex items-center justify-center">
+                        <Lock className="h-3.5 w-3.5 text-black/15" />
+                      </div>
                     </div>
                   </div>
-                  <p className="text-xs text-black/40">
-                    Once a track finishes reviews, the slot frees up for your next track.
-                  </p>
+
+                  {/* Pro tier */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-purple-500">Pro</p>
+                      <Crown className="h-3 w-3 text-purple-400" />
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="flex-1 h-10 rounded-lg bg-purple-500 border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <Music className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="flex-1 h-10 rounded-lg bg-purple-500 border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <Music className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="flex-1 h-10 rounded-lg bg-purple-500 border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <Music className="h-4 w-4 text-white" />
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
-              {/* What you get */}
+              {/* Starting credits */}
               <div className="p-4 rounded-xl bg-lime-50 border border-lime-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle2 className="h-4 w-4 text-lime-600 flex-shrink-0" />
-                  <p className="text-sm text-lime-900 font-bold">You&apos;re starting with 3 free credits</p>
-                </div>
-                <p className="text-xs text-lime-800/70 ml-6">
-                  Enough to get feedback on your first track right away. Earn more anytime by reviewing others.
+                <p className="text-sm font-bold text-lime-900 mb-1">🎁 You&apos;re starting with 3 free credits.</p>
+                <p className="text-xs text-lime-800/70">
+                  That&apos;s enough to get your first track reviewed right away. Earn more anytime just by reviewing others.
                 </p>
               </div>
 

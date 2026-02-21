@@ -40,7 +40,7 @@ export function TracksViewToggle({
 
   const tabs: { id: ViewType; label: string; icon: React.ReactNode }[] = [
     ...(queueView ? [{ id: "queue" as ViewType, label: "Queue", icon: <Layers className="h-4 w-4" /> }] : []),
-    { id: "grid", label: "My Tracks", icon: <Grid3x3 className="h-4 w-4" /> },
+    { id: "grid", label: "Library", icon: <Grid3x3 className="h-4 w-4" /> },
     ...(statsView ? [{ id: "stats" as ViewType, label: "Stats", icon: <TableProperties className="h-4 w-4" /> }] : []),
     { id: "insights", label: "Insights", icon: <BarChart3 className="h-4 w-4" /> },
   ];

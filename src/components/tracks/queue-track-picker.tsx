@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,14 +24,23 @@ interface QueueTrackPickerProps {
   credits: number;
   open: boolean;
   onClose: () => void;
+  initialTrackId?: string | null;
 }
 
-export function QueueTrackPicker({ tracks, credits, open, onClose }: QueueTrackPickerProps) {
+export function QueueTrackPicker({ tracks, credits, open, onClose, initialTrackId }: QueueTrackPickerProps) {
   const router = useRouter();
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
   const [reviewCount, setReviewCount] = useState(1);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setSelectedTrackId(initialTrackId ?? null);
+      setReviewCount(1);
+      setSuccess(false);
+    }
+  }, [open, initialTrackId]);
 
   if (!open) return null;
 

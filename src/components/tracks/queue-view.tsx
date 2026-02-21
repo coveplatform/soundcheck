@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Music, MessageSquare, Lock, Crown, Coins } from "lucide-react";
+import { Plus, Music, MessageSquare, Lock, Crown, Coins, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DequeueButton } from "@/components/tracks/dequeue-button";
 import { QueueTrackPicker } from "@/components/tracks/queue-track-picker";
 
@@ -38,7 +39,13 @@ interface QueueViewProps {
 
 export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credits }: QueueViewProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [initialTrackId, setInitialTrackId] = useState<string | null>(null);
   const usedSlots = Math.min(activeTracks.length, maxSlots);
+
+  const openPickerFor = (trackId?: string) => {
+    setInitialTrackId(trackId ?? null);
+    setPickerOpen(true);
+  };
 
   return (
     <div>
@@ -170,7 +177,7 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
             <div key={`empty-${slotIndex}`} className="flex flex-col items-center">
               <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/25 mb-1.5 text-center">{slotNum}</p>
               <button
-                onClick={() => setPickerOpen(true)}
+                onClick={() => openPickerFor()}
                 className="w-full group"
               >
                 <div className="aspect-square rounded-xl border-2 border-dashed border-black/10 bg-white/50 hover:bg-purple-50/40 hover:border-purple-300 flex flex-col items-center justify-center gap-2 transition-all">
@@ -230,15 +237,65 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
         </div>
       )}
 
-      {/* Track picker panel */}
-      <div className="max-w-2xl mx-auto">
-        <QueueTrackPicker
-          tracks={eligibleTracks}
-          credits={credits}
-          open={pickerOpen}
-          onClose={() => setPickerOpen(false)}
-        />
-      </div>
+      {/* Your Library section */}
+      {eligibleTracks.length > 0 && (
+        <div className="mt-10 max-w-2xl mx-auto">
+          <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/30 mb-4">Your Library</p>
+          <div className="space-y-2">
+            {eligibleTracks.map((track) => (
+              <div
+                key={track.id}
+                className="flex items-center gap-3 p-3 rounded-xl border border-black/5 bg-white/60 hover:bg-white/90 transition-colors"
+              >
+                <div className="w-10 h-10 rounded-lg bg-neutral-100 flex-shrink-0 overflow-hidden relative">
+                  {track.artworkUrl ? (
+                    <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="40px" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Music className="h-4 w-4 text-black/15" />
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-black truncate">{track.title}</p>
+                  <div className="flex items-center gap-2">
+                    {track.genreName && <span className="text-[11px] text-black/30">{track.genreName}</span>}
+                    <span className={cn(
+                      "text-[10px] font-bold uppercase",
+                      track.status === "COMPLETED" ? "text-emerald-600" : "text-black/25"
+                    )}>
+                      {track.status === "COMPLETED" ? `Completed · ${track.reviewsCompleted} reviews` : "Uploaded"}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => openPickerFor(track.id)}
+                  className="flex items-center gap-1 text-xs font-semibold text-purple-600 hover:text-purple-700 transition-colors flex-shrink-0"
+                >
+                  Queue it
+                  <ArrowRight className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Track picker modal */}
+      <Dialog open={pickerOpen} onOpenChange={(o) => !o && setPickerOpen(false)}>
+        <DialogContent className="p-0 max-w-md gap-0 overflow-hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Add track to queue</DialogTitle>
+          </DialogHeader>
+          <QueueTrackPicker
+            tracks={eligibleTracks}
+            credits={credits}
+            open={pickerOpen}
+            onClose={() => setPickerOpen(false)}
+            initialTrackId={initialTrackId}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

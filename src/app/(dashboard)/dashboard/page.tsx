@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Tooltip } from "@/components/ui/tooltip";
-import { ArrowRight, MessageCircle, Trophy, Music, Headphones, BarChart3, Sparkles } from "lucide-react";
+import { ArrowRight, MessageCircle, Trophy, Music, Headphones, BarChart3, Lock, Crown, Plus } from "lucide-react";
 import {
   SparklesDoodle,
   SquiggleDoodle,
@@ -25,16 +25,15 @@ import {
   PendingPeerReview,
 } from "@/types/dashboard";
 import { StatCardGrid } from "@/components/dashboard/stat-card-grid";
-import { TrackCard } from "@/components/dashboard/track-card";
 import { PendingReviewCard } from "@/components/dashboard/pending-review-card";
 import { WhatsNextCard } from "@/components/dashboard/whats-next-card";
 import { CreditGuide } from "@/components/dashboard/credit-guide";
 import { MobileStickyCTA } from "@/components/dashboard/mobile-sticky-cta";
-import { QueueAnnouncement } from "@/components/dashboard/queue-announcement";
 import {
   calculateDashboardStats,
   getWhatsNextGuidance,
 } from "@/lib/dashboard-helpers";
+import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
 
 export const dynamic = "force-dynamic";
 
@@ -131,8 +130,11 @@ export default async function DashboardPage() {
       ? artistProfile.hasSeenCreditGuide ?? false
       : true;
   const tracks = artistProfile.Track ?? [];
-  // Limit to 4 for the dashboard grid display, but use all tracks for stats
-  const displayTracks = tracks.slice(0, 4);
+
+  // Slot computation
+  const isPro = artistProfile.subscriptionStatus === "active";
+  const maxSlots = getMaxSlots(isPro);
+  const activeTracks = tracks.filter((t) => (ACTIVE_TRACK_STATUSES as readonly string[]).includes(t.status));
 
   // Detect tracks with NEW feedback (completed reviews since last viewed)
   const tracksWithFeedback = tracks.filter((t) => {
@@ -300,9 +302,6 @@ export default async function DashboardPage() {
           </Tooltip>
         </div>
 
-        {/* Queue system announcement for existing users */}
-        {tracks.length > 0 && <QueueAnnouncement />}
-
         {/* Feedback Alert Banner */}
         {tracksWithFeedback.length > 0 && (
           <Link
@@ -329,31 +328,10 @@ export default async function DashboardPage() {
           <div className="rounded-xl border-2 border-lime-300 bg-gradient-to-br from-lime-50 via-white to-lime-50/50 p-6 mb-5 relative overflow-hidden">
             <StarDoodle className="absolute top-2 right-3 w-12 h-12 text-lime-600/10 pointer-events-none" />
             <div className="relative">
-              <div className="flex items-start gap-3 mb-4">
-                <div className="h-10 w-10 rounded-xl bg-lime-500 flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-black">Welcome to MixReflect!</h3>
-                  <p className="text-sm text-black/60 mt-1">
-                    You have <span className="font-bold text-lime-700">{credits} free credits</span> to get started. Here&apos;s what to do:
-                  </p>
-                </div>
-              </div>
-              <div className="space-y-2 mb-4 ml-13">
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-bold text-lime-700 flex-shrink-0">1.</span>
-                  <p className="text-sm text-black/80">
-                    <strong>Submit a track</strong> and spend credits to request feedback
-                  </p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-sm font-bold text-lime-700 flex-shrink-0">2.</span>
-                  <p className="text-sm text-black/80">
-                    <strong>Review other tracks</strong> to earn more credits (1 review = 1 credit)
-                  </p>
-                </div>
-              </div>
+              <p className="text-xl font-bold text-black mb-1">Your queue is empty.</p>
+              <p className="text-sm text-black/60 mb-5">
+                You&apos;ve got <span className="font-bold text-lime-700">{credits} credits</span> to spend. That&apos;s enough to get your first track reviewed by real artists. Drop it in your slot.
+              </p>
               <div className="flex flex-col sm:flex-row gap-2.5">
                 <Link href="/submit" className="flex-1">
                   <Button className="w-full bg-lime-600 text-white hover:bg-lime-700 active:bg-lime-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out text-sm h-10 px-5 rounded-xl">
@@ -365,7 +343,7 @@ export default async function DashboardPage() {
                 <Link href="/review" className="flex-1">
                   <Button className="w-full border-2 border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 font-semibold text-sm h-10 px-5 rounded-xl">
                     <Headphones className="h-3.5 w-3.5 mr-2" />
-                    Review Tracks to Earn Credits
+                    Review Others First →
                   </Button>
                 </Link>
               </div>
@@ -402,49 +380,112 @@ export default async function DashboardPage() {
             </section>
 
 
-            {/* Your Tracks */}
-            <section aria-label="Your tracks" className="relative">
+            {/* Your Queue */}
+            <section aria-label="Your queue" className="relative">
               <SquiggleDoodle className="absolute -top-2 -right-2 w-10 h-10 text-black/[0.04] pointer-events-none hidden sm:block" />
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-base font-bold text-black">Your Tracks</h2>
-                <div className="flex items-center gap-3">
-                  <Link
-                    href="/submit"
-                    className="text-[11px] font-mono tracking-[0.15em] uppercase text-purple-600 hover:text-purple-800 font-semibold transition-colors duration-150 ease-out"
-                  >
-                    + Submit
-                  </Link>
-                  <Link
-                    href="/tracks"
-                    className="text-[11px] font-mono tracking-[0.15em] uppercase text-black/40 hover:text-black transition-colors duration-150 ease-out"
-                  >
-                    View all →
-                  </Link>
-                </div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-bold text-black">Your Queue</h2>
+                <Link
+                  href="/tracks"
+                  className="text-[11px] font-mono tracking-[0.15em] uppercase text-black/40 hover:text-black transition-colors duration-150 ease-out"
+                >
+                  Manage queue →
+                </Link>
               </div>
 
-              {tracks.length > 0 ? (
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                  {displayTracks.map((track, index) => (
-                    <TrackCard
-                      key={track.id}
-                      track={track}
-                      priority={index === 0}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <Card variant="soft" className="border border-black/10 bg-white/50">
-                  <CardContent className="py-8">
-                    <EmptyState
-                      doodle="music"
-                      title="No tracks yet"
-                      description="Upload your first track and request feedback from peers."
-                      action={{ label: "Submit a track", href: "/submit" }}
-                    />
-                  </CardContent>
-                </Card>
-              )}
+              {/* Slot grid */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                {Array.from({ length: 3 }, (_, slotIndex) => {
+                  const track = activeTracks[slotIndex];
+                  const isLocked = !isPro && slotIndex >= maxSlots;
+
+                  // Filled slot
+                  if (track) {
+                    const completedReviews = track.Review.filter((r) => r.status === "COMPLETED").length;
+                    const hasReviews = track.reviewsRequested > 0;
+                    const reviewProgress = hasReviews ? completedReviews / track.reviewsRequested : 0;
+                    const isQueued = track.status === "QUEUED";
+                    const isInProgress = track.status === "IN_PROGRESS";
+
+                    return (
+                      <Link key={track.id} href={`/tracks/${track.id}`} className="group block">
+                        <Card variant="soft" interactive className="overflow-hidden">
+                          <div className="relative aspect-square bg-neutral-100">
+                            {track.artworkUrl ? (
+                              <Image
+                                src={track.artworkUrl}
+                                alt={track.title}
+                                fill
+                                className="object-cover transition-transform duration-150 ease-out group-hover:scale-[1.02]"
+                                sizes="(max-width: 640px) 33vw, 200px"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
+                                <Music className="h-5 w-5 text-black/15" />
+                              </div>
+                            )}
+                            <div className="absolute top-1.5 left-1.5">
+                              {isQueued ? (
+                                <span className="inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-600 text-white shadow-sm">Queued</span>
+                              ) : isInProgress ? (
+                                <span className="inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-600 text-white shadow-sm">Reviewing</span>
+                              ) : null}
+                            </div>
+                            {hasReviews && (
+                              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/40 to-transparent pt-4 pb-1.5 px-1.5">
+                                <div className="h-1 bg-white/30 rounded-full overflow-hidden">
+                                  <div className="h-full bg-white rounded-full" style={{ width: `${reviewProgress * 100}%` }} />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </Card>
+                        <div className="mt-1.5 px-0.5">
+                          <p className="text-xs font-semibold text-black truncate">{track.title}</p>
+                          {hasReviews && (
+                            <p className="text-[11px] text-purple-700 font-semibold">{completedReviews}/{track.reviewsRequested} reviews</p>
+                          )}
+                        </div>
+                      </Link>
+                    );
+                  }
+
+                  // Locked slot
+                  if (isLocked) {
+                    return (
+                      <Link key={`locked-${slotIndex}`} href="/pro" className="group block">
+                        <div className="aspect-square rounded-xl border-2 border-dashed border-black/[0.06] bg-neutral-50/50 hover:bg-purple-50/30 hover:border-purple-200 flex flex-col items-center justify-center gap-1.5 transition-colors">
+                          <Lock className="h-4 w-4 text-black/[0.08] group-hover:text-purple-400 transition-colors" />
+                          <Crown className="h-3 w-3 text-purple-300 group-hover:text-purple-500 transition-colors" />
+                        </div>
+                        <p className="text-[11px] text-center mt-1.5 font-medium text-black/20 group-hover:text-purple-600 transition-colors">Go Pro</p>
+                      </Link>
+                    );
+                  }
+
+                  // Empty slot
+                  return (
+                    <Link key={`empty-${slotIndex}`} href="/tracks" className="group block">
+                      <div className="aspect-square rounded-xl border-2 border-dashed border-black/10 bg-white/50 hover:bg-purple-50/40 hover:border-purple-300 flex flex-col items-center justify-center gap-1.5 transition-all">
+                        <div className="h-8 w-8 rounded-full bg-black/[0.04] group-hover:bg-purple-100 flex items-center justify-center transition-colors">
+                          <Plus className="h-3.5 w-3.5 text-black/25 group-hover:text-purple-600 transition-colors" />
+                        </div>
+                        <span className="text-[10px] font-medium text-black/30 group-hover:text-purple-600 transition-colors">Add a track</span>
+                      </div>
+                      <p className="text-[11px] text-center mt-1.5 text-black/20">Open</p>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Credits + manage link */}
+              <div className="mt-3 flex items-center gap-2 text-xs text-black/40">
+                <span>Credits: <span className="font-bold text-black">{credits}</span></span>
+                <span>·</span>
+                <Link href="/tracks" className="text-purple-600 hover:text-purple-700 font-medium">
+                  Manage queue →
+                </Link>
+              </div>
             </section>
 
             {/* Tracks to Review */}
