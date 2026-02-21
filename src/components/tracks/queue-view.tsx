@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Plus, Music, MessageSquare, Lock, Crown, Coins, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DequeueButton } from "@/components/tracks/dequeue-button";
 import { QueueTrackPicker } from "@/components/tracks/queue-track-picker";
 
@@ -289,9 +289,7 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
       {/* Track picker modal */}
       <Dialog open={pickerOpen} onOpenChange={(o) => !o && setPickerOpen(false)}>
         <DialogContent className="p-0 max-w-md gap-0 overflow-hidden">
-          <DialogHeader className="sr-only">
-            <DialogTitle>Add track to queue</DialogTitle>
-          </DialogHeader>
+          <DialogTitle className="sr-only">Add track to queue</DialogTitle>
           <QueueTrackPicker
             tracks={eligibleTracks}
             credits={credits}

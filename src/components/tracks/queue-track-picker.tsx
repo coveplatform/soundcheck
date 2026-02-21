@@ -97,13 +97,10 @@ export function QueueTrackPicker({ tracks, credits, open, onClose, initialTrackI
   return (
     <div className="overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-black/5 bg-neutral-50/50">
+      <div className="px-4 py-3 pr-10 border-b border-black/5 bg-neutral-50/50">
         <h3 className="text-sm font-bold text-black">
           {selectedTrack ? "Request reviews" : "Choose a track"}
         </h3>
-        <button onClick={handleClose} className="text-xs text-black/30 hover:text-black/60 transition-colors">
-          Cancel
-        </button>
       </div>
 
       {!selectedTrack ? (
