@@ -129,7 +129,6 @@ export default async function ReviewQueuePage({
       feedbackFocus: true,
       packageType: true,
       reviewsRequested: true,
-      rushDelivery: true,
       createdAt: true,
       Genre: true,
       ArtistProfile: {
@@ -152,14 +151,14 @@ export default async function ReviewQueuePage({
   });
 
   // Filter to only tracks that still need more reviewers
-  // Sort: Rush delivery first, then seeded tracks last
+  // Sort: Pro tracks first, seed tracks last
   const available = availableTracksResult
     .filter((t) => t._count.Review < t.reviewsRequested)
     .sort((a, b) => {
-      // Rush delivery tracks at the very top (highest priority)
-      const aIsRush = a.rushDelivery ?? false;
-      const bIsRush = b.rushDelivery ?? false;
-      if (aIsRush !== bIsRush) return aIsRush ? -1 : 1;
+      // Pro subscribers get priority placement
+      const aIsPro = a.ArtistProfile?.subscriptionStatus === "active";
+      const bIsPro = b.ArtistProfile?.subscriptionStatus === "active";
+      if (aIsPro !== bIsPro) return aIsPro ? -1 : 1;
 
       // Seed tracks at the bottom
       const aIsSeed = a.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;

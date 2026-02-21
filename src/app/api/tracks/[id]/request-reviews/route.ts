@@ -5,8 +5,8 @@ import { revalidateTag } from "next/cache";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { PACKAGES, PackageType } from "@/lib/metadata";
 import { assignReviewersToTrack } from "@/lib/queue";
+import { hasAvailableSlot, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
 
 const requestSchema = z.object({
   desiredReviews: z.number().int().min(1).max(10),
@@ -65,6 +65,23 @@ export async function POST(
       );
     }
 
+    // Slot enforcement: if this track isn't already active, it will occupy a new slot
+    const isAlreadyActive = (ACTIVE_TRACK_STATUSES as readonly string[]).includes(track.status);
+    if (!isAlreadyActive) {
+      const isPro = track.ArtistProfile.subscriptionStatus === "active";
+      const slotCheck = await hasAvailableSlot(track.artistId, isPro);
+      if (!slotCheck.available) {
+        return NextResponse.json(
+          {
+            error: "All your review slots are in use. Wait for current reviews to complete, or upgrade to Pro for more slots.",
+            activeCount: slotCheck.activeCount,
+            maxSlots: slotCheck.maxSlots,
+          },
+          { status: 409 }
+        );
+      }
+    }
+
     const desired = data.desiredReviews;
     const cost = desired;
 
@@ -74,8 +91,6 @@ export async function POST(
         { status: 403 }
       );
     }
-
-    const packageType: PackageType = "PEER";
 
     await prisma.$transaction(async (tx) => {
       const updatedCredits = await tx.artistProfile.updateMany({
@@ -112,7 +127,7 @@ export async function POST(
       await tx.track.update({
         where: { id: track.id },
         data: {
-          packageType: hasExistingReviews ? track.packageType : packageType,
+          packageType: hasExistingReviews ? track.packageType : "PEER",
           reviewsRequested: newReviewsRequested,
           creditsSpent: { increment: cost },
           status: newStatus,

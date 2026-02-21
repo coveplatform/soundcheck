@@ -5,10 +5,11 @@ import Image from "next/image";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Plus, Music, MessageSquare, CheckCircle2 } from "lucide-react";
+import { Plus, Music, MessageSquare, CheckCircle2, Lock, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
 import { TracksViewToggle } from "@/components/tracks/tracks-view-toggle";
 import { PortfolioView } from "@/components/tracks/portfolio-view";
 import {
@@ -37,11 +38,12 @@ export default async function TracksPage({
   const { view } = await searchParams;
   const isInsightsView = view === "insights";
 
-  // Get basic artist profile
+  // Get basic artist profile with subscription info for slots
   const basicProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
     select: {
       id: true,
+      subscriptionStatus: true,
     },
   });
 
@@ -99,6 +101,14 @@ export default async function TracksPage({
   }
 
   const tracks = artistProfile.Track;
+
+  // Slot computation
+  const isPro = basicProfile.subscriptionStatus === "active";
+  const maxSlots = getMaxSlots(isPro);
+  const activeStatuses = ACTIVE_TRACK_STATUSES as readonly string[];
+  const activeTracks = tracks.filter((t) => activeStatuses.includes(t.status));
+  const completedTracks = tracks.filter((t) => !activeStatuses.includes(t.status));
+
   // Calculate portfolio analytics data
   const tracksWithReviews = tracks.filter(t => t.Review && t.Review.length > 0);
   const hasAnalyticsData = tracksWithReviews.length > 0;
@@ -267,6 +277,113 @@ export default async function TracksPage({
             <span className="text-black/60">{tracks.length} {tracks.length === 1 ? "track" : "tracks"}</span>
           </div>
         </div>
+
+        {/* ===== YOUR QUEUE — Slot visualization ===== */}
+        <div className="mb-10">
+          <h2 className="text-lg font-semibold text-black mb-4">Your Queue</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Render slot boxes */}
+            {Array.from({ length: Math.max(maxSlots, activeTracks.length) }, (_, i) => {
+              const track = activeTracks[i];
+
+              if (track) {
+                // Occupied slot
+                const completedReviews = (track.Review ?? []).filter(
+                  (r: any) => r.status === "COMPLETED"
+                ).length;
+                const progress = track.reviewsRequested > 0
+                  ? completedReviews / track.reviewsRequested
+                  : 0;
+                const isGrandfathered = i >= maxSlots;
+
+                return (
+                  <Link
+                    key={track.id}
+                    href={`/tracks/${track.id}`}
+                    className="group block"
+                  >
+                    <div className={cn(
+                      "rounded-xl border-2 p-4 transition-all hover:shadow-md",
+                      isGrandfathered
+                        ? "border-amber-300 bg-amber-50/50"
+                        : "border-purple-200 bg-purple-50/50 hover:border-purple-400"
+                    )}>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 overflow-hidden">
+                          {track.artworkUrl ? (
+                            <Image
+                              src={track.artworkUrl}
+                              alt={track.title}
+                              width={40}
+                              height={40}
+                              className="object-cover w-full h-full"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Music className="h-4 w-4 text-purple-400" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-black truncate">
+                            {track.title}
+                          </p>
+                          <p className="text-xs text-black/50">
+                            Slot {i + 1} · {completedReviews}/{track.reviewsRequested} reviews
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Progress bar */}
+                      <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-purple-500 rounded-full transition-[width] duration-300"
+                          style={{ width: `${Math.max(progress * 100, 2)}%` }}
+                        />
+                      </div>
+                    </div>
+                  </Link>
+                );
+              }
+
+              // Empty slot (within limit)
+              if (i < maxSlots) {
+                return (
+                  <Link key={`empty-${i}`} href="/submit" className="group block">
+                    <div className="rounded-xl border-2 border-dashed border-black/10 bg-white/40 hover:bg-white/60 hover:border-purple-300 p-4 transition-all h-full flex flex-col items-center justify-center gap-2 min-h-[88px]">
+                      <div className="h-8 w-8 rounded-full bg-black/5 group-hover:bg-purple-100 flex items-center justify-center transition-colors">
+                        <Plus className="h-4 w-4 text-black/30 group-hover:text-purple-600 transition-colors" />
+                      </div>
+                      <span className="text-xs text-black/40 group-hover:text-purple-600 transition-colors">
+                        Submit a track
+                      </span>
+                    </div>
+                  </Link>
+                );
+              }
+
+              return null;
+            })}
+
+            {/* Locked slots (Pro upsell) */}
+            {!isPro && activeTracks.length <= maxSlots && Array.from({ length: 3 - maxSlots }, (_, i) => (
+              <Link
+                key={`locked-${i}`}
+                href="/pro"
+                className="group block"
+              >
+                <div className="rounded-xl border-2 border-dashed border-black/5 bg-neutral-50/50 hover:bg-purple-50/50 hover:border-purple-200 p-4 flex flex-col items-center justify-center gap-2 min-h-[88px] transition-all">
+                  <Lock className="h-4 w-4 text-black/15 group-hover:text-purple-400 transition-colors" />
+                  <span className="text-xs text-black/25 text-center group-hover:text-purple-600 transition-colors">
+                    Unlock with Pro
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== COMPLETED + ALL TRACKS ===== */}
 
         {/* View Toggle */}
         <TracksViewToggle

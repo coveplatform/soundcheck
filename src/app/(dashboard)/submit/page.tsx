@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -19,15 +19,13 @@ import {
   Loader2,
   Check,
   Music,
-  Star,
   Coins,
   Sparkles,
   CheckCircle2,
   ImagePlus,
   Globe,
   Lock,
-  Zap,
-  Clock,
+  AlertTriangle,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -105,16 +103,13 @@ export default function SubmitTrackPage() {
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [isPublic, setIsPublic] = useState(false);
 
-  // ---- step 3: general feedback state ------------------------------------
+  // ---- step 3: review count state ----------------------------------------
   const [reviewCount, setReviewCount] = useState<number>(5);
-  const [isDraggingSlider, setIsDraggingSlider] = useState(false);
-  const [requestProReviewers, setRequestProReviewers] = useState(false);
-  const [rushDelivery, setRushDelivery] = useState(false);
+  const [slotInfo, setSlotInfo] = useState<{ maxSlots: number; activeCount: number; isPro: boolean } | null>(null);
 
   // ---- shared UI state ----------------------------------------------------
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isBuyingCredits, setIsBuyingCredits] = useState(false);
 
   // ---- data fetching -------------------------------------------------------
   useEffect(() => {
@@ -152,6 +147,22 @@ export default function SubmitTrackPage() {
       }
     }
     loadGenres();
+  }, []);
+
+  // Fetch slot info
+  useEffect(() => {
+    async function loadSlots() {
+      try {
+        const res = await fetch("/api/slots");
+        if (res.ok) {
+          const data = await res.json();
+          setSlotInfo({ maxSlots: data.maxSlots, activeCount: data.activeCount, isPro: data.isPro });
+        }
+      } catch (err) {
+        console.error("Failed to load slots:", err);
+      }
+    }
+    loadSlots();
   }, []);
 
   // ---- step 1 handlers -----------------------------------------------------
@@ -350,18 +361,7 @@ export default function SubmitTrackPage() {
   const creditBalance = profile?.reviewCredits ?? 0;
   const hasEnoughCredits = creditBalance >= reviewCount;
   const creditDeficit = reviewCount - creditBalance;
-
-  // Calculate cash add-ons
-  const cashAddOns = useMemo(() => {
-    let total = 0;
-    if (requestProReviewers) {
-      total += reviewCount * 2; // $2 per review
-    }
-    if (rushDelivery) {
-      total += 10; // $10 flat fee
-    }
-    return total;
-  }, [requestProReviewers, rushDelivery, reviewCount]);
+  const slotAvailable = !slotInfo || slotInfo.activeCount < slotInfo.maxSlots;
 
   const handleSubmit = useCallback(async () => {
     setError("");
@@ -398,63 +398,25 @@ export default function SubmitTrackPage() {
 
       const trackId = trackData.id;
 
-      // 2. Route based on whether there are cash add-ons
-      if (cashAddOns > 0) {
-        // Route to add-ons checkout
-        console.log('Cash add-ons detected:', cashAddOns, 'Creating checkout for track:', trackId);
+      // 2. Request reviews using credits
+      const reviewRes = await fetch(`/api/tracks/${trackId}/request-reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          desiredReviews: reviewCount,
+        }),
+      });
 
-        const res = await fetch(`/api/tracks/${trackId}/checkout-addons`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            reviewCount,
-            requestProReviewers,
-            rushDelivery,
-          }),
-        });
-
-        const data = await res.json();
-        console.log('Checkout response:', res.status, data);
-
-        if (!res.ok) {
-          console.error('Checkout failed:', data);
-          setError(data.error || "Failed to create checkout. Please try again.");
-          setIsSubmitting(false);
-          return;
-        }
-
-        if (data.url) {
-          console.log('Redirecting to Stripe:', data.url);
-          window.location.href = data.url; // Redirect to Stripe
-          return; // Stop execution after redirect
-        } else {
-          console.error('No checkout URL returned:', data);
-          setError("Checkout session created but no payment URL returned. Please contact support.");
-          setIsSubmitting(false);
-          return;
-        }
-      } else {
-        // Credits-only path (existing flow)
-        const reviewRes = await fetch(`/api/tracks/${trackId}/request-reviews`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            desiredReviews: reviewCount,
-            useCredits: true,
-          }),
-        });
-
-        if (!reviewRes.ok) {
-          const reviewErr = await reviewRes.json().catch(() => null);
-          setError(
-            (reviewErr as { error?: string })?.error || "Failed to request reviews"
-          );
-          setIsSubmitting(false);
-          return;
-        }
-
-        router.push(`/submit/success?trackId=${trackId}&reviews=${reviewCount}`);
+      if (!reviewRes.ok) {
+        const reviewErr = await reviewRes.json().catch(() => null);
+        setError(
+          (reviewErr as { error?: string })?.error || "Failed to request reviews"
+        );
+        setIsSubmitting(false);
+        return;
       }
+
+      router.push(`/submit/success?trackId=${trackId}&reviews=${reviewCount}`);
     } catch {
       setError("Something went wrong. Please try again.");
       setIsSubmitting(false);
@@ -469,11 +431,7 @@ export default function SubmitTrackPage() {
     feedbackFocus,
     isPublic,
     reviewCount,
-    requestProReviewers,
-    rushDelivery,
-    cashAddOns,
     router,
-    profile,
   ]);
 
   const handleUploadOnly = useCallback(async () => {
@@ -514,26 +472,7 @@ export default function SubmitTrackPage() {
     }
   }, [uploadMode, url, uploadedUrl, title, artworkUrl, selectedGenres, feedbackFocus, router]);
 
-  const handleBuyCredits = useCallback(async (pack: 3 | 10 | 25) => {
-    setIsBuyingCredits(true);
-    try {
-      const res = await fetch("/api/review-credits/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "pack", pack }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setError("Failed to start checkout");
-      }
-    } catch {
-      setError("Failed to start checkout");
-    } finally {
-      setIsBuyingCredits(false);
-    }
-  }, [creditDeficit]);
+
 
   // ---- derived values -------------------------------------------------------
 
@@ -1001,7 +940,7 @@ export default function SubmitTrackPage() {
         )}
 
         {/* ================================================================= */}
-        {/* STEP 3: Choose product                                            */}
+        {/* STEP 3: Review count                                              */}
         {/* ================================================================= */}
         {step === 3 && (
           <div className="space-y-6">
@@ -1022,6 +961,26 @@ export default function SubmitTrackPage() {
                 Back
               </button>
             </div>
+
+            {/* Slot status */}
+            {!slotAvailable && (
+              <div className="rounded-xl bg-amber-50 border-2 border-amber-300 p-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-bold text-amber-900 mb-1">Your review slot is full</p>
+                    <p className="text-sm text-amber-800">
+                      You can have {slotInfo?.maxSlots ?? 1} track{(slotInfo?.maxSlots ?? 1) > 1 ? "s" : ""} in the review queue at a time.
+                      Wait for current reviews to complete, or{" "}
+                      <Link href="/pro" className="font-bold text-purple-700 underline underline-offset-2 hover:text-purple-900">
+                        upgrade to Pro
+                      </Link>{" "}
+                      for 3 slots.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Credit Balance Display */}
             <div className="flex items-center gap-3 rounded-xl bg-purple-50 border-2 border-purple-200 px-4 py-3">
@@ -1071,22 +1030,18 @@ export default function SubmitTrackPage() {
                   <input
                     type="range"
                     min="1"
-                    max="50"
+                    max="10"
                     value={reviewCount}
                     onChange={(e) => setReviewCount(parseInt(e.target.value))}
-                    onMouseDown={() => setIsDraggingSlider(true)}
-                    onMouseUp={() => setIsDraggingSlider(false)}
-                    onTouchStart={() => setIsDraggingSlider(true)}
-                    onTouchEnd={() => setIsDraggingSlider(false)}
                     className="w-full h-3 bg-neutral-200 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-600 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-purple-600 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:transition-transform [&::-moz-range-thumb]:hover:scale-110"
                     style={{
-                      background: `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${((reviewCount - 1) / 49) * 100}%, rgb(229 231 235) ${((reviewCount - 1) / 49) * 100}%, rgb(229 231 235) 100%)`
+                      background: `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${((reviewCount - 1) / 9) * 100}%, rgb(229 231 235) ${((reviewCount - 1) / 9) * 100}%, rgb(229 231 235) 100%)`
                     }}
                   />
 
                   {/* Quick select markers */}
                   <div className="flex justify-between mt-2 px-1">
-                    {[1, 5, 10, 20, 30, 50].map((mark) => (
+                    {[1, 3, 5, 7, 10].map((mark) => (
                       <button
                         key={mark}
                         type="button"
@@ -1108,7 +1063,7 @@ export default function SubmitTrackPage() {
               {/* Unlocked benefits - show current level */}
               <div className="text-center py-4 border-t border-neutral-200">
                 <div className="flex items-center justify-center gap-1.5 mb-3">
-                  {REVIEW_BENEFITS.map((benefit) => (
+                  {REVIEW_BENEFITS.filter((b) => b.minReviews <= 10).map((benefit) => (
                     <div
                       key={benefit.label}
                       className={cn(
@@ -1129,103 +1084,10 @@ export default function SubmitTrackPage() {
               </div>
             </div>
 
-            {/* Estimated turnaround */}
-            <div className="rounded-xl border border-black/8 bg-white/60 p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-4 w-4 text-black/40" />
-                <span className="text-sm font-semibold text-black">Estimated turnaround</span>
-              </div>
-              <p className="text-sm text-black/60">
-                {rushDelivery ? '10-24 hours' : `${Math.min(10 + reviewCount * 2, 40)} hours`} for {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
-              </p>
-            </div>
-
-            {/* Review Quality Card */}
-            <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-black mb-4">Review Quality</h3>
-
-              <div className="space-y-3">
-                {/* Pro Reviewers Checkbox */}
-                <label className="flex items-start gap-3 p-4 rounded-xl border-2 hover:border-purple-300 cursor-pointer transition-all"
-                  style={{ borderColor: requestProReviewers ? 'rgb(147 51 234)' : 'rgb(229 231 235)' }}>
-                  <input
-                    type="checkbox"
-                    checked={requestProReviewers}
-                    onChange={(e) => setRequestProReviewers(e.target.checked)}
-                    className="mt-1"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Star className="h-4 w-4 text-purple-600" />
-                      <span className="font-semibold text-black">Verified Reviewers</span>
-                      <span className="text-sm text-purple-600 font-bold">+${(reviewCount * 2).toFixed(2)}</span>
-                    </div>
-                    <p className="text-sm text-neutral-600">100+ reviews completed, 4.5+ average rating</p>
-                  </div>
-                </label>
-              </div>
-            </div>
-
-            {/* Delivery Speed Card */}
-            <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-black mb-4">Delivery Speed</h3>
-
-              <label className="flex items-start gap-3 p-4 rounded-xl border-2 hover:border-purple-300 cursor-pointer transition-all"
-                style={{ borderColor: rushDelivery ? 'rgb(147 51 234)' : 'rgb(229 231 235)' }}>
-                <input
-                  type="checkbox"
-                  checked={rushDelivery}
-                  onChange={(e) => setRushDelivery(e.target.checked)}
-                  className="mt-1"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Zap className="h-4 w-4 text-orange-600" />
-                    <span className="font-semibold text-black">Rush Delivery</span>
-                    <span className="text-sm text-orange-600 font-bold">+$10.00</span>
-                  </div>
-                  <p className="text-sm text-neutral-600">All reviews delivered within 30 minutes</p>
-                </div>
-              </label>
-            </div>
-
-            {/* Pricing Summary */}
-            {(requestProReviewers || rushDelivery) && (
-              <div className="rounded-xl border-2 border-purple-200 bg-purple-50 p-4">
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-neutral-700">{reviewCount} reviews</span>
-                    <span className="font-medium">{reviewCount} credits</span>
-                  </div>
-                  {requestProReviewers && (
-                    <div className="flex justify-between">
-                      <span className="text-neutral-700">Verified reviewers</span>
-                      <span className="font-medium">+${(reviewCount * 2).toFixed(2)}</span>
-                    </div>
-                  )}
-                  {rushDelivery && (
-                    <div className="flex justify-between">
-                      <span className="text-neutral-700">Rush delivery</span>
-                      <span className="font-medium">+$10.00</span>
-                    </div>
-                  )}
-                  <div className="border-t border-purple-300 pt-2 flex justify-between font-bold text-black">
-                    <span>Total</span>
-                    <div className="text-right">
-                      <div>{reviewCount} credits</div>
-                      {cashAddOns > 0 && (
-                        <div className="text-purple-600">+ ${cashAddOns.toFixed(2)}</div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Submit button - always visible, disabled if insufficient credits */}
+            {/* Submit button */}
             <Button
               onClick={handleSubmit}
-              disabled={!hasEnoughCredits || isSubmitting}
+              disabled={!hasEnoughCredits || !slotAvailable || isSubmitting}
               isLoading={isSubmitting}
               className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
             >
@@ -1233,51 +1095,21 @@ export default function SubmitTrackPage() {
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
 
-            {/* Options when not enough credits */}
+            {/* Not enough credits — earn more */}
             {!hasEnoughCredits && (
-              <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-5 space-y-4">
-                <div>
-                  <p className="text-sm font-bold text-amber-900">
-                    You need {creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}
-                  </p>
-                  <p className="text-xs text-amber-700 mt-0.5">Top up below, or earn free credits by reviewing others.</p>
-                </div>
-
-                {/* Credit packs */}
-                <div className="grid grid-cols-3 gap-2">
-                  {([
-                    { pack: 3 as const, price: "$2.95", perCredit: "$0.98" },
-                    { pack: 10 as const, price: "$7.95", perCredit: "$0.80" },
-                    { pack: 25 as const, price: "$14.95", perCredit: "$0.60", best: true },
-                  ]).map(({ pack, price, perCredit, best }) => (
-                    <button
-                      key={pack}
-                      type="button"
-                      onClick={() => handleBuyCredits(pack)}
-                      disabled={isBuyingCredits}
-                      className={cn(
-                        "relative flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all text-center",
-                        best
-                          ? "border-purple-600 bg-purple-50"
-                          : "border-neutral-200 bg-white hover:border-purple-300"
-                      )}
-                    >
-                      {best && (
-                        <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white whitespace-nowrap">
-                          BEST VALUE
-                        </span>
-                      )}
-                      <span className="text-lg font-extrabold text-black">{pack}</span>
-                      <span className="text-[10px] text-neutral-500">credits</span>
-                      <span className="text-sm font-bold text-purple-600">{price}</span>
-                      <span className="text-[10px] text-neutral-400">{perCredit}/credit</span>
-                    </button>
-                  ))}
-                </div>
-
-                <Link href="/review" className="flex items-center justify-center gap-1.5 text-sm text-amber-800 hover:text-purple-600 font-medium transition-colors">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Or earn free credits by reviewing others
+              <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-5 space-y-3">
+                <p className="text-sm font-bold text-amber-900">
+                  You need {creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}
+                </p>
+                <p className="text-xs text-amber-700">
+                  Earn free credits by reviewing other artists&apos; tracks.
+                </p>
+                <Link
+                  href="/review"
+                  className="flex items-center justify-center gap-1.5 w-full h-11 rounded-xl border-2 border-amber-300 bg-white text-sm font-semibold text-amber-900 hover:border-purple-400 hover:text-purple-700 transition-colors"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Earn credits by reviewing
                 </Link>
               </div>
             )}

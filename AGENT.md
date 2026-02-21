@@ -52,7 +52,8 @@ Every user is unified — they submit tracks and review others from the same acc
 /review/history         Past reviews submitted
 /reviewers              Browse reviewers
 /reviewers/[id]         Reviewer profile
-/account                Settings, credit purchase
+/account                Settings
+/pro                    Pro subscription pricing + upgrade
 /support                Support tickets
 ```
 
@@ -75,6 +76,7 @@ src/lib/
   auth.ts              # NextAuth config, JWT caching, role sync
   prisma.ts            # Prisma singleton
   queue.ts             # Core assignment logic, reviewer tier rules, genre matching
+  slots.ts             # Slot constants (FREE_MAX_SLOTS=1, PRO_MAX_SLOTS=3), helpers
   email/               # Modular email system (split from monolithic email.ts)
     index.ts           # Re-exports all email functions
     templates.ts       # Shared HTML helpers, sendEmail(), brand constants
@@ -111,13 +113,35 @@ prisma/schema.prisma   # Source of truth for DB models
 
 ---
 
-## Package Types (monetisation)
+## Slot Model (monetisation)
+
+Free users get **1 concurrent review slot**, Pro subscribers get **3**. A slot is occupied when a track has status `QUEUED`, `IN_PROGRESS`, or `PENDING_PAYMENT`. Slot enforcement lives in `src/lib/slots.ts` and is checked in `/api/tracks` POST and `/api/tracks/[id]/request-reviews` POST.
+
+**Credits** still work: 1 credit = 1 review. Earn by reviewing others. No more buying credit packs.
+
+**Pro subscription** ($9.99/month or $79.99/year):
+- 3 concurrent review slots
+- Priority queue placement (Pro tracks appear first in review queue)
+- Pro badge
+- Early access to new features
+
+Stripe Price IDs configured via env vars (see below). Subscription lifecycle handled by webhook (`customer.subscription.created/updated/deleted`).
+
+### Package Types
 
 | Type | Model | Notes |
 |---|---|---|
 | `PEER` | Freemium — 1 credit per review | Active |
 | `RELEASE_DECISION` | Expert panel — $9.95 cash | Active |
 | `STARTER`, `STANDARD`, `PRO`, `DEEP_DIVE` | Legacy paid packages | Deprecated — keep in schema, old DB rows reference them |
+
+### Removed Features (do not re-add)
+
+- Credit pack purchases (`/api/review-credits/checkout` — deleted)
+- PRO reviewer add-on (`requestedProReviewers` — deprecated field)
+- Rush delivery (`rushDelivery`, `rushDeliveryDeadline` — deprecated fields)
+- Checkout add-ons (`/api/tracks/[id]/checkout-addons` — deleted)
+- Rush delivery cron (`/api/cron/check-rush-delivery` — deleted)
 
 ---
 
@@ -163,6 +187,19 @@ Scripts in `/scripts/` use Prisma directly. Always:
 - **Daily review limit** — enforced in `/api/reviews/claim` AND the queue page — keep both in sync
 - **Legacy packages** — `STARTER`, `STANDARD`, `PRO`, `DEEP_DIVE` exist in `metadata.ts` `PACKAGES` object and Prisma enum; do not remove
 - **email/** — modular email system; import from `@/lib/email` (resolves to index.ts re-exports)
+
+---
+
+## Env Vars (subscription-specific)
+
+```
+STRIPE_PRO_MONTHLY_PRICE_ID   # Stripe Price ID for Pro monthly ($9.99)
+STRIPE_PRO_YEARLY_PRICE_ID    # Stripe Price ID for Pro yearly ($79.99)
+```
+
+Also needs existing `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
+
+Stripe webhook must listen for: `checkout.session.completed`, `checkout.session.expired`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`.
 
 ---
 

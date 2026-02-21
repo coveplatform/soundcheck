@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { TrackStatus } from "@prisma/client";
 import { z } from "zod";
 import { detectSource, resolveShortUrl, PackageType } from "@/lib/metadata";
+import { hasAvailableSlot } from "@/lib/slots";
 
 const createTrackSchema = z.object({
   sourceUrl: z.string().min(1, "Track source is required"),
@@ -42,6 +43,19 @@ export async function POST(request: Request) {
     }
 
     const isSubscribed = artistProfile.subscriptionStatus === "active";
+
+    // Slot enforcement: check if user has an available queue slot
+    const slotCheck = await hasAvailableSlot(artistProfile.id, isSubscribed);
+    if (!slotCheck.available) {
+      return NextResponse.json(
+        {
+          error: "All your review slots are in use. Wait for current reviews to complete, or upgrade to Pro for more slots.",
+          activeCount: slotCheck.activeCount,
+          maxSlots: slotCheck.maxSlots,
+        },
+        { status: 409 }
+      );
+    }
 
     const body = await request.json();
     const data = createTrackSchema.parse(body);

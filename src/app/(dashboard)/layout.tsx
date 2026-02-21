@@ -17,6 +17,7 @@ const getSidebarData = unstable_cache(
           artistName: true,
           reviewCredits: true,
           completedOnboarding: true,
+          subscriptionStatus: true,
         },
       });
     } catch {
@@ -97,6 +98,7 @@ export default async function DashboardLayout({
         artistName={artistName}
         credits={credits}
         pendingReviews={artistProfile.pendingReviews}
+        isPro={artistProfile.subscriptionStatus === "active"}
       />
 
       {/* Main content with sidebar offset */}

@@ -2,7 +2,6 @@ import { prisma } from "./prisma";
 import { PackageType, ReviewerTier } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import { sendTierChangeEmail } from "@/lib/email";
-import { PACKAGES } from "@/lib/metadata";
 
 const MIN_REVIEWER_ACCOUNT_AGE_HOURS = Number(
   process.env.MIN_REVIEWER_ACCOUNT_AGE_HOURS ?? "24"
@@ -375,113 +374,56 @@ export async function assignReviewersToTrack(trackId: string) {
       }),
     ]);
 
-    const countedStatuses = new Set(["ASSIGNED", "IN_PROGRESS", "COMPLETED"]);
-    const existingProCount = track.Review.filter(
-      (r) => countedStatuses.has(r.status) && r.ReviewerProfile?.tier === "PRO"
-    ).length;
-
     const neededReviews =
       track.reviewsRequested - countedCompletedReviews - activeAssignments;
 
     if (neededReviews <= 0) return;
 
-    // PEER package: assign ArtistProfile peer reviewers
-    // Legacy packages: assign ReviewerProfile reviewers
-    const isPeerPackage = track.packageType === "PEER";
-
-    if (isPeerPackage) {
-      // PEER tracks use a claim model: users browse available tracks in /review
-      // and claim them on-click via POST /api/reviews/claim.
-      // No proactive assignment needed.
+    // PEER package: uses a claim model — users browse available tracks in /review
+    // and claim them on-click via POST /api/reviews/claim.
+    // No proactive assignment needed.
+    if (track.packageType === "PEER") {
       return;
-    } else {
-      // Legacy flow for STARTER/STANDARD/PRO/DEEP_DIVE packages
-      let eligibleReviewers = await getEligibleReviewers(
-        trackId,
-        track.packageType,
-        tx
-      );
+    }
 
-      // Apply tier filtering based on track's requested add-ons
-      if (track.requestedProReviewers) {
-        // Filter to Pro tier (100+ reviews, 4.5+ rating)
-        eligibleReviewers = eligibleReviewers.filter(
-          (r) => r.totalReviews >= 100 && r.averageRating >= 4.5
-        );
-      }
+    // Legacy/Release Decision flow: assign ReviewerProfile reviewers
+    const eligibleReviewers = await getEligibleReviewers(
+      trackId,
+      track.packageType,
+      tx
+    );
 
-      const existingReviewerIds = new Set(track.Review.map((r: any) => r.reviewerId));
-      const eligibleUnique = eligibleReviewers.filter(
-        (r) => !existingReviewerIds.has(r.id)
-      );
+    const existingReviewerIds = new Set(track.Review.map((r: any) => r.reviewerId));
+    const eligibleUnique = eligibleReviewers.filter(
+      (r) => !existingReviewerIds.has(r.id)
+    );
 
-      const packageConfig = (PACKAGES as unknown as Record<string, { minProReviews?: number }>)[
-        track.packageType
-      ];
-      const proReviewCap = Math.max(0, packageConfig?.minProReviews ?? 0);
+    const reviewersToAssign = eligibleUnique.slice(0, neededReviews);
 
-      const proShortfall = Math.max(
-        0,
-        Math.min(proReviewCap, track.reviewsRequested) - existingProCount
-      );
-      const proSlotsToReserve = Math.min(proShortfall, neededReviews);
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 48);
 
-      const proCandidates = eligibleUnique.filter((r) => r.tier === "PRO");
-      const proToAssign = proCandidates.slice(
-        0,
-        Math.min(proSlotsToReserve, proCandidates.length)
-      );
-      const proToAssignIds = new Set(proToAssign.map((r) => r.id));
+    const priority = track.packageType === "RELEASE_DECISION" ? 10 : 0;
 
-      const unfilledProSlots = proSlotsToReserve - proToAssign.length;
-      const nonProSlots = neededReviews - proSlotsToReserve + unfilledProSlots;
+    if (reviewersToAssign.length > 0) {
+      await tx.reviewQueue.createMany({
+        data: reviewersToAssign.map((reviewer) => ({
+          trackId,
+          reviewerId: reviewer.id,
+          expiresAt,
+          priority,
+        })),
+        skipDuplicates: true,
+      });
 
-      const additionalCandidates = eligibleUnique.filter(
-        (r) => !proToAssignIds.has(r.id) && r.tier !== "PRO"
-      );
-      const additionalToAssign = additionalCandidates.slice(
-        0,
-        Math.min(nonProSlots, additionalCandidates.length)
-      );
-
-      const reviewersToAssign = [...proToAssign, ...additionalToAssign];
-
-      const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 48);
-
-      // Calculate priority with Rush Delivery support
-      let priority =
-        track.packageType === "PRO" || track.packageType === "DEEP_DIVE"
-          ? 10
-          : track.packageType === "STANDARD"
-            ? 5
-            : 0;
-
-      // RUSH DELIVERY: Highest priority (15)
-      if (track.rushDelivery) {
-        priority = 15;
-      }
-
-      if (reviewersToAssign.length > 0) {
-        await tx.reviewQueue.createMany({
-          data: reviewersToAssign.map((reviewer) => ({
-            trackId,
-            reviewerId: reviewer.id,
-            expiresAt,
-            priority,
-          })),
-          skipDuplicates: true,
-        });
-
-        await tx.review.createMany({
-          data: reviewersToAssign.map((reviewer) => ({
-            trackId,
-            reviewerId: reviewer.id,
-            status: "ASSIGNED",
-          })),
-          skipDuplicates: true,
-        });
-      }
+      await tx.review.createMany({
+        data: reviewersToAssign.map((reviewer) => ({
+          trackId,
+          reviewerId: reviewer.id,
+          status: "ASSIGNED",
+        })),
+        skipDuplicates: true,
+      });
     }
 
     // Track.status is not updated here.

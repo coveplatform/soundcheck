@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,6 @@ export function AccountSettingsClient({
   reviewCredits: number;
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [name, setName] = useState(initialName);
   const [artistName, setArtistName] = useState(initialArtistName ?? "");
@@ -38,18 +37,6 @@ export function AccountSettingsClient({
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
-  const [isBuyingCredits, setIsBuyingCredits] = useState(false);
-  const [buyCreditsError, setBuyCreditsError] = useState("");
-  const [selectedCreditPack, setSelectedCreditPack] = useState<3 | 10 | 25 | null>(null);
-
-  // Handle credits success redirect
-  useEffect(() => {
-    const creditsSuccess = searchParams.get("credits") === "success";
-
-    if (creditsSuccess) {
-      router.refresh();
-    }
-  }, [searchParams, router]);
 
   async function saveProfile() {
     setProfileError("");
@@ -79,32 +66,6 @@ export function AccountSettingsClient({
       setProfileError("Failed to update profile");
     } finally {
       setIsSavingProfile(false);
-    }
-  }
-
-  async function buyCredits(pack: 3 | 10 | 25) {
-    setBuyCreditsError("");
-    setIsBuyingCredits(true);
-
-    try {
-      const res = await fetch("/api/review-credits/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "pack", pack }),
-      });
-
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok || !data?.url) {
-        setBuyCreditsError(data?.error || "Failed to start checkout");
-        return;
-      }
-
-      window.location.href = data.url;
-    } catch {
-      setBuyCreditsError("Failed to start checkout");
-    } finally {
-      setIsBuyingCredits(false);
     }
   }
 
@@ -186,76 +147,6 @@ export function AccountSettingsClient({
               Earn more credits by reviewing
               <span aria-hidden="true">&rarr;</span>
             </Link>
-          </div>
-
-          {/* Credit Top-Up */}
-          <div className="border-t border-neutral-200 pt-4">
-            <p className="text-sm font-bold text-neutral-950 mb-3">Top up credits</p>
-
-            {buyCreditsError ? (
-              <div className="bg-red-50 border-2 border-red-200 text-red-700 text-sm p-3 font-medium mb-3 rounded-lg">
-                {buyCreditsError}
-              </div>
-            ) : null}
-
-            <div className="grid grid-cols-3 gap-3">
-              <button
-                onClick={() => setSelectedCreditPack(3)}
-                disabled={isBuyingCredits}
-                className={`flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-4 transition-all disabled:opacity-50 shadow-sm hover:shadow ${
-                  selectedCreditPack === 3
-                    ? "border-purple-500 bg-purple-100 ring-2 ring-purple-300"
-                    : "border-neutral-200 bg-white hover:border-purple-300 hover:bg-purple-50"
-                }`}
-              >
-                <span className="text-lg font-bold text-purple-700">3</span>
-                <span className="text-xs font-medium text-neutral-600">credits</span>
-                <span className="text-sm font-bold text-neutral-950 mt-1">$2.95</span>
-              </button>
-              <button
-                onClick={() => setSelectedCreditPack(10)}
-                disabled={isBuyingCredits}
-                className={`relative flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-4 transition-all disabled:opacity-50 shadow-sm hover:shadow ${
-                  selectedCreditPack === 10
-                    ? "border-purple-500 bg-purple-100 ring-2 ring-purple-300"
-                    : "border-purple-300 bg-purple-50 hover:border-purple-400 hover:bg-purple-100"
-                }`}
-              >
-                <div className="absolute -top-2 -right-2 bg-purple-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
-                  BEST
-                </div>
-                <span className="text-lg font-bold text-purple-700">10</span>
-                <span className="text-xs font-medium text-neutral-600">credits</span>
-                <span className="text-sm font-bold text-neutral-950 mt-1">$7.95</span>
-              </button>
-              <button
-                onClick={() => setSelectedCreditPack(25)}
-                disabled={isBuyingCredits}
-                className={`flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-4 transition-all disabled:opacity-50 shadow-sm hover:shadow ${
-                  selectedCreditPack === 25
-                    ? "border-purple-500 bg-purple-100 ring-2 ring-purple-300"
-                    : "border-neutral-200 bg-white hover:border-purple-300 hover:bg-purple-50"
-                }`}
-              >
-                <span className="text-lg font-bold text-purple-700">25</span>
-                <span className="text-xs font-medium text-neutral-600">credits</span>
-                <span className="text-sm font-bold text-neutral-950 mt-1">$14.95</span>
-              </button>
-            </div>
-
-            {/* Continue to checkout button */}
-            {selectedCreditPack && (
-              <div className="pt-2">
-                <Button
-                  variant="primary"
-                  onClick={() => buyCredits(selectedCreditPack)}
-                  isLoading={isBuyingCredits}
-                  className="w-full"
-                >
-                  Continue to checkout — ${selectedCreditPack === 3 ? "2.95" : selectedCreditPack === 10 ? "7.95" : "14.95"}
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       </div>

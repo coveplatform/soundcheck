@@ -5,9 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { PageHeader } from "@/components/ui/page-header";
-import { ArrowRight, Check, Music } from "lucide-react";
+import { ArrowRight, Music, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -29,13 +27,10 @@ export default function RequestReviewsPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [isBuyingCredits, setIsBuyingCredits] = useState(false);
 
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-  const [isSubscribed, setIsSubscribed] = useState(false);
   const [reviewTokens, setReviewTokens] = useState<number>(0);
   const [desiredReviews, setDesiredReviews] = useState<number>(5);
-  const [isDraggingSlider, setIsDraggingSlider] = useState(false);
 
   const [trackInfo, setTrackInfo] = useState<{
     title: string;
@@ -44,33 +39,6 @@ export default function RequestReviewsPage() {
     genres: { id: string; name: string }[];
     sourceUrl: string | null;
   } | null>(null);
-
-  const buyCredits = async (payload: { kind: "quantity"; quantity: number } | { kind: "pack"; pack: 5 | 20 | 50 }) => {
-    if (isBuyingCredits) return;
-    setIsBuyingCredits(true);
-    setError("");
-
-    try {
-      const res = await fetch("/api/review-credits/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, trackId }),
-      });
-
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok || !data?.url) {
-        setError(data?.error || "Failed to start checkout");
-        return;
-      }
-
-      window.location.href = data.url;
-    } catch {
-      setError("Failed to start checkout");
-    } finally {
-      setIsBuyingCredits(false);
-    }
-  };
 
   useEffect(() => {
     let cancelled = false;
@@ -84,9 +52,8 @@ export default function RequestReviewsPage() {
         if (profileRes.ok) {
           const data = (await profileRes.json()) as any;
           if (!cancelled) {
-            setIsSubscribed(data?.subscriptionStatus === "active");
             setReviewTokens(typeof data?.reviewCredits === "number" ? data.reviewCredits : 0);
-            setDesiredReviews(data?.subscriptionStatus === "active" ? 20 : 5);
+            setDesiredReviews(data?.subscriptionStatus === "active" ? 10 : 5);
           }
         }
 
@@ -257,22 +224,18 @@ export default function RequestReviewsPage() {
                 <input
                   type="range"
                   min="1"
-                  max="50"
+                  max="10"
                   value={desiredReviews}
                   onChange={(e) => setDesiredReviews(parseInt(e.target.value))}
-                  onMouseDown={() => setIsDraggingSlider(true)}
-                  onMouseUp={() => setIsDraggingSlider(false)}
-                  onTouchStart={() => setIsDraggingSlider(true)}
-                  onTouchEnd={() => setIsDraggingSlider(false)}
                   className="w-full h-3 bg-neutral-200 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-600 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-purple-600 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:transition-transform [&::-moz-range-thumb]:hover:scale-110"
                   style={{
-                    background: `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${((desiredReviews - 1) / 49) * 100}%, rgb(229 231 235) ${((desiredReviews - 1) / 49) * 100}%, rgb(229 231 235) 100%)`
+                    background: `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${((desiredReviews - 1) / 9) * 100}%, rgb(229 231 235) ${((desiredReviews - 1) / 9) * 100}%, rgb(229 231 235) 100%)`
                   }}
                 />
 
                 {/* Quick select markers */}
                 <div className="flex justify-between mt-2 px-1">
-                  {[1, 5, 10, 20, 30, 50].map((mark) => (
+                  {[1, 3, 5, 7, 10].map((mark) => (
                     <button
                       key={mark}
                       type="button"
@@ -327,19 +290,14 @@ export default function RequestReviewsPage() {
             </div>
 
             {(needsCredits || error.toLowerCase().includes("not enough") || error.toLowerCase().includes("token")) && (
-              <div className="pt-4 border-t border-neutral-200">
-                <div className="text-center mb-4">
-                  <p className="text-sm text-neutral-600">
-                    You need <span className="font-bold text-neutral-950">{Math.max(1, desiredReviews - reviewTokens)}</span> more {Math.max(1, desiredReviews - reviewTokens) === 1 ? "credit" : "credits"}
-                  </p>
-                </div>
-
-                <Link href="/account" className="block">
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                  >
-                    Buy credits
+              <div className="pt-4 border-t border-neutral-200 space-y-3">
+                <p className="text-sm text-neutral-600 text-center">
+                  You need <span className="font-bold text-neutral-950">{Math.max(1, desiredReviews - reviewTokens)}</span> more {Math.max(1, desiredReviews - reviewTokens) === 1 ? "credit" : "credits"}
+                </p>
+                <Link href="/review" className="block">
+                  <Button variant="outline" className="w-full">
+                    <Sparkles className="h-4 w-4 mr-1.5" />
+                    Earn credits by reviewing
                   </Button>
                 </Link>
               </div>

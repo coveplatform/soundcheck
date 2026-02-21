@@ -224,7 +224,7 @@ export default async function DashboardPage() {
       createdAt: true,
       reviewsRequested: true,
       Genre: true,
-      ArtistProfile: { select: { artistName: true, User: { select: { email: true } } } },
+      ArtistProfile: { select: { artistName: true, subscriptionStatus: true, User: { select: { email: true } } } },
       _count: { select: { Review: { where: { status: { in: ["ASSIGNED", "IN_PROGRESS", "COMPLETED"] } } } } },
     },
     orderBy: { createdAt: "asc" },
@@ -232,6 +232,11 @@ export default async function DashboardPage() {
   const availableQueueTracks = availableTracksRaw
     .filter((t) => t._count.Review < t.reviewsRequested)
     .sort((a, b) => {
+      // Pro subscribers get priority
+      const aIsPro = a.ArtistProfile?.subscriptionStatus === "active";
+      const bIsPro = b.ArtistProfile?.subscriptionStatus === "active";
+      if (aIsPro !== bIsPro) return aIsPro ? -1 : 1;
+
       const aIsSeed = a.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       const bIsSeed = b.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       if (aIsSeed !== bIsSeed) return aIsSeed ? 1 : -1;
@@ -371,14 +376,9 @@ export default async function DashboardPage() {
             <p className="text-sm text-black/50 mt-1">You need credits to get feedback on your tracks.</p>
             <div className="flex flex-col sm:flex-row gap-2.5 mt-4">
               <Link href="/review">
-                <Button className="w-full sm:w-auto border-2 border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 font-semibold text-sm h-10 px-5 rounded-xl">
-                  <Headphones className="h-3.5 w-3.5 mr-2" />
-                  Review a track to earn one
-                </Button>
-              </Link>
-              <Link href="/submit">
                 <Button className="w-full sm:w-auto bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out text-sm h-10 px-5 rounded-xl">
-                  Buy credits
+                  <Headphones className="h-3.5 w-3.5 mr-2" />
+                  Review a track to earn credits
                   <ArrowRight className="h-3.5 w-3.5 ml-2" />
                 </Button>
               </Link>

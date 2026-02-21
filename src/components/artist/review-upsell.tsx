@@ -43,7 +43,6 @@ export function ReviewUpsell({
         </p>
 
         <div className="space-y-3">
-          {/* Consensus teaser */}
           <div className="flex items-start gap-3">
             <div className="h-8 w-8 bg-lime-500/20 border border-lime-500/30 flex items-center justify-center flex-shrink-0">
               <Users className="h-4 w-4 text-lime-500" />
@@ -56,7 +55,6 @@ export function ReviewUpsell({
             </div>
           </div>
 
-          {/* Confidence teaser */}
           <div className="flex items-start gap-3">
             <div className="h-8 w-8 bg-orange-400/20 border border-orange-400/30 flex items-center justify-center flex-shrink-0">
               <TrendingUp className="h-4 w-4 text-orange-400" />
@@ -69,7 +67,6 @@ export function ReviewUpsell({
             </div>
           </div>
 
-          {/* Multiple perspectives */}
           <div className="flex items-start gap-3">
             <div className="h-8 w-8 bg-blue-400/20 border border-blue-400/30 flex items-center justify-center flex-shrink-0">
               <MessageSquare className="h-4 w-4 text-blue-400" />
@@ -84,27 +81,18 @@ export function ReviewUpsell({
         </div>
       </div>
 
-      {/* Pricing teaser */}
-      <div className="text-center mb-6">
-        <div className="inline-flex items-baseline gap-2">
-          <span className="text-neutral-500 text-sm">Starting at</span>
-          <span className="text-3xl font-black text-white">$4.95</span>
-          <span className="text-neutral-500 text-sm">for 2 reviews</span>
-        </div>
-      </div>
-
       {/* CTA */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-        <Link href="/submit">
+        <Link href="/review">
           <Button
             size="lg"
             className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
           >
-            Get more feedback <ArrowRight className="ml-2 h-4 w-4" />
+            Earn credits &amp; get more feedback <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
         <p className="text-xs text-neutral-500">
-          Submit this track or a new one
+          Review others to earn credits for more reviews
         </p>
       </div>
     </div>

@@ -181,8 +181,7 @@ export const PACKAGES = {
       "Community reviews",
       "Genre matching",
       "Earn credits by reviewing others",
-      "Flexible review count (1-50)",
-      "Optional add-ons (Verified Reviewers, Rush Delivery)",
+      "Flexible review count (1-10)",
     ],
   },
   // DEPRECATED - Legacy packages kept for backwards compatibility only

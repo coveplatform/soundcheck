@@ -36,10 +36,10 @@ model ArtistProfile {
   stripeAccountId              String?       @unique         // DEPRECATED — artist Stripe Connect removed
   stripeConnectedAt            DateTime?                     // DEPRECATED — artist Stripe Connect removed
   totalEarnings                Int           @default(0)     // DEPRECATED — artist earnings removed
-  stripeCustomerId             String?                       // DEPRECATED — subscriptions removed
-  subscriptionId               String?                       // DEPRECATED — subscriptions removed
-  subscriptionStatus           String?                       // DEPRECATED — subscriptions removed
-  subscriptionTier             String?                       // DEPRECATED — subscriptions removed
+  stripeCustomerId             String?                       // Stripe customer ID for billing
+  subscriptionId               String?                       // Stripe subscription ID (Pro)
+  subscriptionStatus           String?                       // "active" | "canceled" | "past_due" | null
+  subscriptionTier             String?                       // DEPRECATED — single Pro tier only
   completedOnboarding          Boolean       @default(false)
   hasSeenCreditGuide           Boolean       @default(false)
   hasSeenWelcome               Boolean       @default(false)
@@ -403,9 +403,13 @@ model Track {
   showReviewsOnPublicPage Boolean              @default(true)
   trackShareId            String?              @unique
   creditsSpent            Int                  @default(0)
+  // DEPRECATED — add-on features removed in slot model migration
   requestedProReviewers   Boolean              @default(false)
+  // DEPRECATED — rush delivery feature removed
   rushDelivery            Boolean              @default(false)
+  // DEPRECATED — rush delivery feature removed
   rushDeliveryDeadline    DateTime?
+  // DEPRECATED — add-on features removed
   cashAddOnTotal          Int                  @default(0)
   releaseDecisionReport   Json?                // Compiled Release Decision report
   releaseDecisionGeneratedAt DateTime?         // When report was generated
