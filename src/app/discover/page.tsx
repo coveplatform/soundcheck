@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
 import { PageHeader } from "@/components/ui/page-header";
-import { cn } from "@/lib/utils";
 import { TrackTile } from "./track-tile";
 
 export const dynamic = "force-dynamic";
@@ -62,27 +61,13 @@ const DEMO_TILES = Array.from({ length: 20 }).map((_, idx) => {
   };
 });
 
-export default async function DiscoverPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ genre?: string }>;
-}) {
-  const { genre: selectedGenreSlug } = await searchParams;
-
+export default async function DiscoverPage() {
   const trackWhere = {
     isPublic: true,
+    artworkUrl: { not: null },
     status: {
       in: ["UPLOADED", "QUEUED", "IN_PROGRESS", "COMPLETED"] as TrackStatus[],
     },
-    ...(selectedGenreSlug
-      ? {
-          Genre: {
-            some: {
-              slug: selectedGenreSlug,
-            },
-          },
-        }
-      : {}),
   };
 
   const trackSelect = {
@@ -94,14 +79,8 @@ export default async function DiscoverPage({
     createdAt: true,
     reviewsRequested: true,
     reviewsCompleted: true,
-    Genre: { select: { id: true, name: true } },
     ArtistProfile: { select: { artistName: true } },
   };
-
-  const genres = await prisma.genre.findMany({
-    select: { id: true, name: true, slug: true },
-    orderBy: { name: "asc" },
-  });
 
   type DiscoverTrack = Awaited<ReturnType<typeof prisma.track.findMany<{ where: typeof trackWhere; select: typeof trackSelect }>>>[number];
   let tracks: DiscoverTrack[] = [];
@@ -124,9 +103,36 @@ export default async function DiscoverPage({
     }
   }
 
-  const selectedGenreName = selectedGenreSlug
-    ? genres.find((g) => g.slug === selectedGenreSlug)?.name ?? "Genre"
-    : null;
+  // Backfill missing artwork from oEmbed (best-effort, fire-and-forget persist)
+  await Promise.all(
+    tracks
+      .filter((t) => !t.artworkUrl && t.sourceType !== "UPLOAD" && t.sourceUrl)
+      .map(async (t) => {
+        try {
+          const hostname = new URL(t.sourceUrl!).hostname.toLowerCase();
+          let oembedUrl: string | null = null;
+          if (hostname.includes("soundcloud.com")) {
+            oembedUrl = `https://soundcloud.com/oembed?url=${encodeURIComponent(t.sourceUrl!)}&format=json`;
+          } else if (hostname.includes("bandcamp.com")) {
+            oembedUrl = `https://bandcamp.com/oembed?url=${encodeURIComponent(t.sourceUrl!)}&format=json`;
+          } else if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) {
+            oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(t.sourceUrl!)}&format=json`;
+          }
+          if (!oembedUrl) return;
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 5000);
+          const res = await fetch(oembedUrl, { signal: controller.signal });
+          clearTimeout(timeout);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.thumbnail_url) {
+              t.artworkUrl = data.thumbnail_url;
+              prisma.track.update({ where: { id: t.id }, data: { artworkUrl: data.thumbnail_url } }).catch(() => {});
+            }
+          }
+        } catch { /* best-effort */ }
+      })
+  );
 
   return (
     <div className="min-h-screen bg-[#faf8f5] text-neutral-950 pt-14">
@@ -146,37 +152,9 @@ export default async function DiscoverPage({
       <main className="mx-auto px-6 sm:px-8 lg:px-12 py-10">
         <PageHeader
           eyebrow="Discover"
-          title={selectedGenreName ? `Discover: ${selectedGenreName}` : "Discover"}
-          description="Browse tracks by genre. Find something new."
+          title="Discover"
+          description="Browse tracks submitted by artists on Soundcheck."
         />
-
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Link
-            href="/discover"
-            className={cn(
-              "px-3 py-1.5 rounded-full text-sm border border-black/10 bg-white/50 hover:bg-white/70 transition-colors duration-150 ease-out motion-reduce:transition-none",
-              !selectedGenreSlug
-                ? "bg-black text-white border-black hover:bg-black"
-                : "text-black/70"
-            )}
-          >
-            All
-          </Link>
-          {genres.map((g) => (
-            <Link
-              key={g.id}
-              href={`/discover?genre=${encodeURIComponent(g.slug)}`}
-              className={cn(
-                "px-3 py-1.5 rounded-full text-sm border border-black/10 bg-white/50 hover:bg-white/70 transition-colors duration-150 ease-out motion-reduce:transition-none",
-                selectedGenreSlug === g.slug
-                  ? "bg-black text-white border-black hover:bg-black"
-                  : "text-black/70"
-              )}
-            >
-              {g.name}
-            </Link>
-          ))}
-        </div>
 
         {requiresMigration ? (
           <div className="mt-10 text-sm text-black/50">
@@ -191,7 +169,7 @@ export default async function DiscoverPage({
             const sourceUrl = isDemo ? "/signup" : t.sourceUrl;
             const artworkUrl = isDemo ? t.artworkUrl : t.artworkUrl;
             const title = isDemo ? t.title : t.title;
-            const artistName = isDemo ? t.artist : t.artist?.artistName;
+            const artistName = isDemo ? t.ArtistProfile : t.ArtistProfile?.artistName;
 
             return (
               <TrackTile
