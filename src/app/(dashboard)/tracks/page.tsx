@@ -13,6 +13,7 @@ import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
 import { TracksViewToggle } from "@/components/tracks/tracks-view-toggle";
 import { PortfolioView } from "@/components/tracks/portfolio-view";
 import { DequeueButton } from "@/components/tracks/dequeue-button";
+import { TrackStatsView } from "@/components/tracks/track-stats-view";
 import {
   analyzeFeedbackPatterns,
   calculateReviewVelocity,
@@ -264,6 +265,38 @@ export default async function TracksPage({
       topQuickWins,
     };
   }
+
+  // Compute per-track stats for Stats tab
+  const trackStats = tracks.map((track) => {
+    const completed = (track.Review ?? []).filter((r: any) => r.status === "COMPLETED");
+    const scores = completed.filter((r: any) => r.productionScore != null);
+    const avgProduction = scores.length > 0 ? scores.reduce((s: number, r: any) => s + r.productionScore, 0) / scores.length : null;
+    const avgOriginality = scores.length > 0 ? scores.reduce((s: number, r: any) => s + r.originalityScore, 0) / scores.length : null;
+    const avgVocal = scores.length > 0 ? scores.reduce((s: number, r: any) => s + (r.vocalScore ?? 0), 0) / scores.length : null;
+    const overallAvg = avgProduction !== null && avgOriginality !== null
+      ? (avgProduction + avgOriginality + (avgVocal ?? 0)) / (avgVocal !== null ? 3 : 2)
+      : null;
+    const listenAgain = completed.filter((r: any) => r.wouldListenAgain != null);
+    const wouldListenAgainPct = listenAgain.length > 0
+      ? (listenAgain.filter((r: any) => r.wouldListenAgain === true).length / listenAgain.length) * 100
+      : null;
+
+    return {
+      id: track.id,
+      title: track.title,
+      artworkUrl: track.artworkUrl,
+      status: track.status,
+      genreName: (track as any).Genre?.[0]?.name ?? null,
+      reviewsRequested: track.reviewsRequested ?? 0,
+      reviewsCompleted: completed.length,
+      avgProduction,
+      avgOriginality,
+      avgVocal,
+      overallAvg,
+      wouldListenAgainPct,
+      createdAt: track.createdAt,
+    };
+  });
 
   return (
     <div className="pt-8 pb-24">
@@ -576,6 +609,9 @@ export default async function TracksPage({
                 })}
               </div>
             )
+          }
+          statsView={
+            <TrackStatsView tracks={trackStats} />
           }
           insightsView={
             <PortfolioView

@@ -3,15 +3,16 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Layers, Grid3x3, BarChart3 } from "lucide-react";
+import { Layers, Grid3x3, TableProperties, BarChart3 } from "lucide-react";
 
-type ViewType = "queue" | "grid" | "insights";
+type ViewType = "queue" | "grid" | "stats" | "insights";
 
 interface TracksViewToggleProps {
   defaultView?: ViewType;
   onViewChange?: (view: ViewType) => void;
   queueView?: React.ReactNode;
   gridView: React.ReactNode;
+  statsView?: React.ReactNode;
   insightsView: React.ReactNode;
 }
 
@@ -20,12 +21,14 @@ export function TracksViewToggle({
   onViewChange,
   queueView,
   gridView,
+  statsView,
   insightsView,
 }: TracksViewToggleProps) {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get("view") as ViewType | null;
   const initialView: ViewType =
     viewParam === "insights" ? "insights" :
+    viewParam === "stats" ? "stats" :
     viewParam === "grid" ? "grid" :
     defaultView;
   const [activeView, setActiveView] = useState<ViewType>(initialView);
@@ -38,6 +41,7 @@ export function TracksViewToggle({
   const tabs: { id: ViewType; label: string; icon: React.ReactNode }[] = [
     ...(queueView ? [{ id: "queue" as ViewType, label: "Queue", icon: <Layers className="h-4 w-4" /> }] : []),
     { id: "grid", label: "My Tracks", icon: <Grid3x3 className="h-4 w-4" /> },
+    ...(statsView ? [{ id: "stats" as ViewType, label: "Stats", icon: <TableProperties className="h-4 w-4" /> }] : []),
     { id: "insights", label: "Insights", icon: <BarChart3 className="h-4 w-4" /> },
   ];
 
@@ -68,6 +72,7 @@ export function TracksViewToggle({
       <div>
         {activeView === "queue" && queueView}
         {activeView === "grid" && gridView}
+        {activeView === "stats" && statsView}
         {activeView === "insights" && insightsView}
       </div>
     </div>
