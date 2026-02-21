@@ -39,6 +39,7 @@ export default async function TracksPage({
 
   const { view } = await searchParams;
   const isInsightsView = view === "insights";
+  const isStatsView = view === "stats";
 
   // Get basic artist profile with subscription info for slots
   const basicProfile = await prisma.artistProfile.findUnique({
@@ -69,6 +70,23 @@ export default async function TracksPage({
               originalityScore: true,
               vocalScore: true,
               wouldListenAgain: true,
+              ...((isStatsView || isInsightsView) ? {
+                bestPart: true,
+                weakestPart: true,
+                additionalNotes: true,
+                firstImpression: true,
+                createdAt: true,
+                ReviewerProfile: {
+                  select: {
+                    User: { select: { name: true } },
+                  },
+                },
+                ArtistProfile: {
+                  select: {
+                    User: { select: { name: true } },
+                  },
+                },
+              } : {}),
               ...(isInsightsView ? {
                 wouldAddToPlaylist: true,
                 wouldShare: true,
@@ -295,6 +313,19 @@ export default async function TracksPage({
       overallAvg,
       wouldListenAgainPct,
       createdAt: track.createdAt,
+      reviews: completed.map((r: any) => ({
+        id: r.id,
+        productionScore: r.productionScore as number | null,
+        originalityScore: r.originalityScore as number | null,
+        vocalScore: r.vocalScore as number | null,
+        wouldListenAgain: r.wouldListenAgain as boolean | null,
+        firstImpression: (r.firstImpression as string) ?? null,
+        bestPart: (r.bestPart as string) ?? null,
+        weakestPart: (r.weakestPart as string) ?? null,
+        additionalNotes: (r.additionalNotes as string) ?? null,
+        reviewerName: r.ReviewerProfile?.User?.name ?? r.ArtistProfile?.User?.name ?? "Anonymous",
+        createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : null,
+      })),
     };
   });
 
