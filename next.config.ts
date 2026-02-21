@@ -40,6 +40,60 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      // Old /artist/tracks → /tracks
+      {
+        source: "/artist/tracks",
+        destination: "/tracks",
+        permanent: true,
+      },
+      {
+        source: "/artist/tracks/:id",
+        destination: "/tracks/:id",
+        permanent: true,
+      },
+      {
+        source: "/artist/tracks/:id/request-reviews",
+        destination: "/tracks/:id/request-reviews",
+        permanent: true,
+      },
+      // Old /artist/reviewers → /reviewers
+      {
+        source: "/artist/reviewers",
+        destination: "/reviewers",
+        permanent: true,
+      },
+      {
+        source: "/artist/reviewers/:id",
+        destination: "/reviewers/:id",
+        permanent: true,
+      },
+      // Old /artist/submit → /submit
+      {
+        source: "/artist/submit",
+        destination: "/submit",
+        permanent: true,
+      },
+      {
+        source: "/artist/submit/:path*",
+        destination: "/submit/:path*",
+        permanent: true,
+      },
+      // Old /reviewer/review → /review (supplement page-level redirect)
+      {
+        source: "/reviewer/review/:id",
+        destination: "/review/:id",
+        permanent: true,
+      },
+      // Old /reviewer/earnings — feature removed, send to dashboard
+      {
+        source: "/reviewer/earnings",
+        destination: "/dashboard",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {
