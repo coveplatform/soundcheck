@@ -37,9 +37,7 @@ export default async function SupportTicketDetailPage({
 
   const { id } = await params;
 
-  const prismaAny = prisma as any;
-
-  const ticket: TicketDetail | null = await prismaAny.supportTicket.findFirst({
+  const ticket: TicketDetail | null = await prisma.supportTicket.findFirst({
     where: { id, userId: session.user.id },
     select: {
       id: true,

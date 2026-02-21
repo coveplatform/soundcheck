@@ -24,7 +24,6 @@ interface TrackData {
     playlist: number;
     share: number;
   };
-  earnings: number;
 }
 
 interface ExpandableTrackListProps {
@@ -134,8 +133,8 @@ export function ExpandableTrackList({ tracks, variant = "all" }: ExpandableTrack
                     <p className="text-2xl font-black">{track.engagement.share}%</p>
                   </div>
                   <div className="bg-white rounded-lg p-4 border border-black/5">
-                    <p className="text-xs font-mono text-black/40 uppercase mb-1">Earnings</p>
-                    <p className="text-2xl font-black">${track.earnings.toFixed(2)}</p>
+                    <p className="text-xs font-mono text-black/40 uppercase mb-1">Reviews</p>
+                    <p className="text-2xl font-black">{track.reviewsCompleted}</p>
                   </div>
                 </div>
 

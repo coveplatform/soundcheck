@@ -5,14 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TimePeriodSelector, TimePeriod } from "./time-period-selector";
 import { ScoreTrendChart } from "./score-trend-chart";
 import { ExpandableTrackList } from "./expandable-track-list";
-import { EarningsChart } from "./earnings-chart";
 import { ReviewVelocity } from "./review-velocity";
 import { FeedbackPatterns } from "./feedback-patterns";
 import {
   Music,
   Award,
   Sparkles,
-  DollarSign,
   TrendingUp,
   MessageSquare,
   Zap,
@@ -39,13 +37,11 @@ interface TrackData {
     playlist: number;
     share: number;
   };
-  earnings: number;
 }
 
 interface AnalyticsDashboardProps {
   tracks: TrackData[];
   totalReviews: number;
-  totalEarnings: number;
   totalTracks: number;
   overallAvg: number;
   highestScore: number;
@@ -58,11 +54,6 @@ interface AnalyticsDashboardProps {
     vocals: number;
     originality: number;
     overall: number;
-  }>;
-  earningsData: Array<{
-    month: string;
-    earnings: number;
-    trackCount: number;
   }>;
   reviewVelocity: {
     avgTimeToComplete: number;
@@ -87,7 +78,6 @@ interface AnalyticsDashboardProps {
 export function AnalyticsDashboard({
   tracks,
   totalReviews,
-  totalEarnings,
   totalTracks,
   overallAvg,
   highestScore,
@@ -95,7 +85,6 @@ export function AnalyticsDashboard({
   wouldListenAgainPercent,
   categories,
   trendData,
-  earningsData,
   reviewVelocity,
   feedbackPatterns,
   qualityLevels,
@@ -128,7 +117,6 @@ export function AnalyticsDashboard({
       return {
         totalReviews: 0,
         avgScore: 0,
-        totalEarnings: 0,
         listenAgainPercent: 0,
       };
     }
@@ -136,7 +124,6 @@ export function AnalyticsDashboard({
     const reviews = filteredTracks.reduce((sum, t) => sum + t.reviewsCompleted, 0);
     const avgScore =
       filteredTracks.reduce((sum, t) => sum + t.avgScore, 0) / filteredTracks.length;
-    const earnings = filteredTracks.reduce((sum, t) => sum + t.earnings, 0);
     const listenAgain =
       filteredTracks.reduce((sum, t) => sum + t.engagement.listenAgain, 0) /
       filteredTracks.length;
@@ -144,7 +131,6 @@ export function AnalyticsDashboard({
     return {
       totalReviews: reviews,
       avgScore,
-      totalEarnings: earnings,
       listenAgainPercent: Math.round(listenAgain),
     };
   }, [filteredTracks]);
@@ -154,7 +140,7 @@ export function AnalyticsDashboard({
   }, [filteredTracks]);
 
   const displayStats = timePeriod === "all"
-    ? { totalReviews, avgScore: overallAvg, totalEarnings, listenAgainPercent: wouldListenAgainPercent }
+    ? { totalReviews, avgScore: overallAvg, listenAgainPercent: wouldListenAgainPercent }
     : filteredStats;
 
   return (
@@ -214,21 +200,6 @@ export function AnalyticsDashboard({
         </div>
         <TimePeriodSelector selected={timePeriod} onChange={setTimePeriod} />
       </div>
-
-      {/* EARNINGS ANALYSIS */}
-      {(totalEarnings > 0 || earningsData.length > 0) && (
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <DollarSign className="w-6 h-6 text-green-600" />
-            <h3 className="text-xl font-black">Earnings Analysis</h3>
-          </div>
-          <Card variant="soft" elevated className="rounded-3xl overflow-hidden">
-            <CardContent className="pt-6">
-              <EarningsChart data={earningsData} />
-            </CardContent>
-          </Card>
-        </section>
-      )}
 
       {/* SCORE TRENDS */}
       <section>

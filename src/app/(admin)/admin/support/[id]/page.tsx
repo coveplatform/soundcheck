@@ -29,9 +29,7 @@ export default async function AdminSupportTicketPage({
 }) {
   const { id } = await params;
 
-  const prismaAny = prisma as any;
-
-  const ticket: AdminTicketDetail | null = await prismaAny.supportTicket.findUnique({
+  const ticket: AdminTicketDetail | null = await prisma.supportTicket.findUnique({
     where: { id },
     select: {
       id: true,

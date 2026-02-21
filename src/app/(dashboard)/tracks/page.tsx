@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Plus, Music, DollarSign, MessageSquare, CheckCircle2 } from "lucide-react";
+import { Plus, Music, MessageSquare, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,6 @@ import { PortfolioView } from "@/components/tracks/portfolio-view";
 import {
   analyzeFeedbackPatterns,
   calculateReviewVelocity,
-  generateEarningsData,
   analyzeQualityLevels,
   analyzeTechnicalIssues,
   analyzeNextFocus,
@@ -43,8 +42,6 @@ export default async function TracksPage({
     where: { userId: session.user.id },
     select: {
       id: true,
-      totalEarnings: true,
-      pendingBalance: true,
     },
   });
 
@@ -91,11 +88,6 @@ export default async function TracksPage({
               } : {}),
             },
           },
-          Purchase: {
-            select: {
-              amount: true,
-            },
-          },
         },
         orderBy: { createdAt: "desc" },
       },
@@ -107,9 +99,6 @@ export default async function TracksPage({
   }
 
   const tracks = artistProfile.Track;
-  const totalEarnings = basicProfile.totalEarnings / 100;
-  const pendingBalance = basicProfile.pendingBalance / 100;
-
   // Calculate portfolio analytics data
   const tracksWithReviews = tracks.filter(t => t.Review && t.Review.length > 0);
   const hasAnalyticsData = tracksWithReviews.length > 0;
@@ -203,8 +192,6 @@ export default async function TracksPage({
       const shareTotal = t.Review.filter((r) => r.wouldShare !== null).length;
       const sharePercent = shareTotal > 0 ? Math.round((shareYes / shareTotal) * 100) : 0;
 
-      const trackEarnings = t.Purchase.reduce((sum, p) => sum + p.amount, 0) / 100;
-
       return {
         id: t.id,
         title: t.title,
@@ -219,19 +206,11 @@ export default async function TracksPage({
           playlist: playlistPercent,
           share: sharePercent,
         },
-        earnings: trackEarnings,
       };
     });
 
     // Generate trend data
     const trendData = generateTrendData(tracksWithReviews);
-
-    // Generate earnings data
-    const earningsDataTracks = trackData.map((t) => ({
-      createdAt: t.createdAt,
-      earnings: t.earnings,
-    }));
-    const earningsData = generateEarningsData(earningsDataTracks);
 
     // Calculate review velocity
     const reviewVelocityTracks = tracksWithReviews.map((t) => ({
@@ -255,7 +234,6 @@ export default async function TracksPage({
     portfolioData = {
       trackData,
       totalReviews,
-      totalEarnings: artistProfile.totalEarnings / 100,
       totalTracks,
       overallAvg,
       highestScore,
@@ -263,7 +241,6 @@ export default async function TracksPage({
       wouldListenAgainPercent,
       categories,
       trendData,
-      earningsData,
       reviewVelocity,
       feedbackPatterns,
       // V2 analytics
@@ -288,12 +265,6 @@ export default async function TracksPage({
           </h1>
           <div className="flex items-center gap-4 text-sm mt-2">
             <span className="text-black/60">{tracks.length} {tracks.length === 1 ? "track" : "tracks"}</span>
-            {totalEarnings > 0 && (
-              <>
-                <span className="text-black/20">&bull;</span>
-                <span className="font-semibold text-teal-600">${totalEarnings.toFixed(2)} earned</span>
-              </>
-            )}
           </div>
         </div>
 
@@ -328,8 +299,6 @@ export default async function TracksPage({
                   const completedReviews = (track.Review ?? []).filter(
                     (r: any) => r.status === "COMPLETED"
                   ).length;
-                  const totalPurchases =
-                    (track.Purchase ?? []).reduce((sum: number, p: any) => sum + p.amount, 0) / 100;
                   const hasReviews = track.reviewsRequested > 0;
                   const reviewProgress = hasReviews
                     ? completedReviews / track.reviewsRequested
@@ -346,7 +315,6 @@ export default async function TracksPage({
                       reviewProgress={reviewProgress}
                       completedReviews={completedReviews}
                       totalReviews={track.reviewsRequested}
-                      earnings={totalPurchases}
                     />
                   );
                 })}
@@ -374,7 +342,6 @@ function TrackCard({
   reviewProgress,
   completedReviews,
   totalReviews,
-  earnings,
 }: {
   id: string;
   title: string;
@@ -384,7 +351,6 @@ function TrackCard({
   reviewProgress: number;
   completedReviews: number;
   totalReviews: number;
-  earnings: number;
 }) {
   const isPending = status === "PENDING_PAYMENT";
   const isReviewing = status === "IN_PROGRESS" || status === "QUEUED";
@@ -460,9 +426,6 @@ function TrackCard({
                   {completedReviews}/{totalReviews} reviews
                 </span>
               </div>
-              {earnings > 0 && (
-                <span className="text-[10px] font-semibold text-emerald-600">${earnings.toFixed(2)}</span>
-              )}
             </div>
           ) : (
             <p className={cn("text-xs", isUploaded ? "text-purple-600 font-medium" : "text-black/30")}>

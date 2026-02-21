@@ -26,9 +26,7 @@ export default async function SupportTicketsPage() {
     redirect("/login");
   }
 
-  const prismaAny = prisma as any;
-
-  const tickets: TicketListItem[] = await prismaAny.supportTicket.findMany({
+  const tickets: TicketListItem[] = await prisma.supportTicket.findMany({
     where: { userId: session.user.id },
     orderBy: { updatedAt: "desc" },
     take: 50,

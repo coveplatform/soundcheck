@@ -11,17 +11,10 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Try to update the hasSeenWelcome field
-    // If the field doesn't exist yet (before migration), this will fail silently
-    try {
-      await prisma.artistProfile.updateMany({
-        where: { userId: session.user.id },
-        data: { hasSeenWelcome: true } as any,
-      });
-    } catch (updateError) {
-      // Field might not exist yet - that's okay, just log and continue
-      console.log("Could not update hasSeenWelcome (field may not exist yet):", updateError);
-    }
+    await prisma.artistProfile.updateMany({
+      where: { userId: session.user.id },
+      data: { hasSeenWelcome: true },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

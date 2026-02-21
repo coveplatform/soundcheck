@@ -8,7 +8,6 @@ interface PortfolioViewProps {
   hasData: boolean;
   trackData?: any[];
   totalReviews?: number;
-  totalEarnings?: number;
   totalTracks?: number;
   overallAvg?: number;
   highestScore?: number;
@@ -16,7 +15,6 @@ interface PortfolioViewProps {
   wouldListenAgainPercent?: number;
   categories?: any[];
   trendData?: any[];
-  earningsData?: any[];
   reviewVelocity?: any;
   feedbackPatterns?: any;
   // V2 analytics
@@ -33,7 +31,6 @@ export function PortfolioView({
   hasData,
   trackData = [],
   totalReviews = 0,
-  totalEarnings = 0,
   totalTracks = 0,
   overallAvg = 0,
   highestScore = 0,
@@ -41,7 +38,6 @@ export function PortfolioView({
   wouldListenAgainPercent = 0,
   categories = [],
   trendData = [],
-  earningsData = [],
   reviewVelocity,
   feedbackPatterns,
   qualityLevels,
@@ -146,7 +142,6 @@ export function PortfolioView({
     <AnalyticsDashboard
       tracks={trackData}
       totalReviews={totalReviews}
-      totalEarnings={totalEarnings}
       totalTracks={totalTracks}
       overallAvg={overallAvg}
       highestScore={highestScore}
@@ -154,7 +149,6 @@ export function PortfolioView({
       wouldListenAgainPercent={wouldListenAgainPercent}
       categories={categories}
       trendData={trendData}
-      earningsData={earningsData}
       reviewVelocity={reviewVelocity}
       feedbackPatterns={feedbackPatterns}
       qualityLevels={qualityLevels}

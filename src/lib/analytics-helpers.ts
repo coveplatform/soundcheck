@@ -172,48 +172,6 @@ export function calculateReviewVelocity(
   };
 }
 
-// Generate earnings data by month
-export function generateEarningsData(
-  tracks: Array<{
-    createdAt: Date;
-    earnings: number;
-  }>
-): Array<{ month: string; earnings: number; trackCount: number }> {
-  const monthMap = new Map<string, { earnings: number; trackCount: number }>();
-
-  tracks.forEach((track) => {
-    if (track.earnings > 0) {
-      const date = new Date(track.createdAt);
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-
-      if (!monthMap.has(monthKey)) {
-        monthMap.set(monthKey, { earnings: 0, trackCount: 0 });
-      }
-
-      const month = monthMap.get(monthKey)!;
-      month.earnings += track.earnings;
-      month.trackCount += 1;
-    }
-  });
-
-  return Array.from(monthMap.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([month, data]) => {
-      const [year, monthNum] = month.split("-");
-      const date = new Date(parseInt(year), parseInt(monthNum) - 1);
-      const monthLabel = date.toLocaleDateString("en-US", {
-        month: "short",
-        year: "numeric",
-      });
-
-      return {
-        month: monthLabel,
-        earnings: data.earnings,
-        trackCount: data.trackCount,
-      };
-    });
-}
-
 // V2 Analytics: Analyze quality level distribution
 export function analyzeQualityLevels(reviews: Review[]) {
   const reviewsWithQuality = reviews.filter((r) => r.qualityLevel);

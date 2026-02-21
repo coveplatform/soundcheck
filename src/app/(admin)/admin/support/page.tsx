@@ -24,9 +24,7 @@ export default async function AdminSupportPage({
   const status = typeof statusParam === "string" ? statusParam : "";
   const q = typeof query === "string" ? query.trim() : "";
 
-  const prismaAny = prisma as any;
-
-  const tickets: AdminTicketListItem[] = await prismaAny.supportTicket.findMany({
+  const tickets: AdminTicketListItem[] = await prisma.supportTicket.findMany({
     where: {
       ...(status ? { status: status as never } : {}),
       ...(q

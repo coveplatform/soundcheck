@@ -32,14 +32,14 @@ model ArtistProfile {
   totalSpent                   Int           @default(0)
   createdAt                    DateTime      @default(now())
   updatedAt                    DateTime @updatedAt
-  pendingBalance               Int           @default(0)
-  stripeAccountId              String?       @unique
-  stripeConnectedAt            DateTime?
-  totalEarnings                Int           @default(0)
-  stripeCustomerId             String?
-  subscriptionId               String?
-  subscriptionStatus           String?
-  subscriptionTier             String?
+  pendingBalance               Int           @default(0)    // DEPRECATED — artist payouts removed
+  stripeAccountId              String?       @unique         // DEPRECATED — artist Stripe Connect removed
+  stripeConnectedAt            DateTime?                     // DEPRECATED — artist Stripe Connect removed
+  totalEarnings                Int           @default(0)     // DEPRECATED — artist earnings removed
+  stripeCustomerId             String?                       // DEPRECATED — subscriptions removed
+  subscriptionId               String?                       // DEPRECATED — subscriptions removed
+  subscriptionStatus           String?                       // DEPRECATED — subscriptions removed
+  subscriptionTier             String?                       // DEPRECATED — subscriptions removed
   completedOnboarding          Boolean       @default(false)
   hasSeenCreditGuide           Boolean       @default(false)
   hasSeenWelcome               Boolean       @default(false)
@@ -300,9 +300,9 @@ model ReviewerProfile {
   tier                                                    ReviewerTier  @default(NORMAL)
   totalReviews                                            Int           @default(0)
   averageRating                                           Float         @default(0)
-  totalEarnings                                           Int           @default(0)
-  pendingBalance                                          Int           @default(0)
-  stripeAccountId                                         String?       @unique
+  totalEarnings                                           Int           @default(0)  // DEPRECATED — reviewer payouts removed (still written by review submission)
+  pendingBalance                                          Int           @default(0)  // DEPRECATED — reviewer payouts removed (still written by review submission)
+  stripeAccountId                                         String?       @unique      // DEPRECATED — reviewer Stripe Connect removed
   flagCount                                               Int           @default(0)
   isRestricted                                            Boolean       @default(false)
   completedOnboarding                                     Boolean       @default(false)
@@ -315,8 +315,8 @@ model ReviewerProfile {
   onboardingQuizScore                                     Int           @default(0)
   gemCount                                                Int           @default(0)
   country                                                 String?
-  stripeConnectedAt                                       DateTime?
-  affiliateEarnings                                       Int           @default(0)
+  stripeConnectedAt                                       DateTime?                 // DEPRECATED — reviewer Stripe Connect removed
+  affiliateEarnings                                       Int           @default(0)  // DEPRECATED — affiliate system removed
   Payout                                                  Payout[]
   Purchase_Purchase_referredByReviewerIdToReviewerProfile Purchase[]    @relation("Purchase_referredByReviewerIdToReviewerProfile")
   Purchase_Purchase_reviewerIdToReviewerProfile           Purchase[]    @relation("Purchase_reviewerIdToReviewerProfile")
