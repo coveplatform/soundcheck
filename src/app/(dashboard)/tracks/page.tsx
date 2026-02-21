@@ -393,18 +393,26 @@ export default async function TracksPage({
                   return (
                     <div key={`empty-${slotIndex}`}>
                       <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/30 mb-2">Slot {slotNum} — open</p>
-                      <Link href="/submit" className="group block">
-                        <Card variant="soft" interactive className="border-2 border-dashed border-black/10 bg-white/40 hover:bg-white/60 hover:border-black/20">
-                          <div className="aspect-[4/3] flex flex-col items-center justify-center gap-2">
-                            <div className="h-12 w-12 rounded-full bg-black/5 group-hover:bg-black flex items-center justify-center transition-colors duration-150 ease-out">
-                              <Plus className="h-5 w-5 text-black/40 group-hover:text-white transition-colors duration-150 ease-out" />
-                            </div>
+                      <Card variant="soft" className="border-2 border-dashed border-black/10 bg-white/40 overflow-hidden">
+                        <div className="aspect-[4/3] flex flex-col items-center justify-center gap-3 p-4">
+                          <div className="h-10 w-10 rounded-full bg-black/5 flex items-center justify-center">
+                            <Plus className="h-4 w-4 text-black/30" />
                           </div>
-                          <div className="p-3 text-center">
-                            <p className="text-sm font-semibold text-black/50 group-hover:text-black transition-colors">Submit a track</p>
-                          </div>
-                        </Card>
-                      </Link>
+                          <p className="text-xs font-semibold text-black/40">Add to queue</p>
+                        </div>
+                        <div className="border-t border-black/5">
+                          <Link href="/submit" className="flex items-center gap-2 px-3 py-2.5 hover:bg-black/[0.03] transition-colors group">
+                            <Plus className="h-3 w-3 text-black/30 group-hover:text-black/60" />
+                            <span className="text-xs font-medium text-black/50 group-hover:text-black/80 transition-colors">Upload new track</span>
+                          </Link>
+                          {eligibleForQueue.length > 0 && (
+                            <Link href={`/tracks/${eligibleForQueue[0].id}`} className="flex items-center gap-2 px-3 py-2.5 hover:bg-purple-50/50 transition-colors group border-t border-black/5">
+                              <Music className="h-3 w-3 text-purple-400 group-hover:text-purple-600" />
+                              <span className="text-xs font-medium text-purple-500 group-hover:text-purple-700 transition-colors">Queue existing track</span>
+                            </Link>
+                          )}
+                        </div>
+                      </Card>
                     </div>
                   );
                 })}
