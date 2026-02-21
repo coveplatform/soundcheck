@@ -19,7 +19,9 @@ import {
   CheckCircle2,
   Clock,
   Loader2,
+  Crown,
 } from "lucide-react";
+import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
 
 export const dynamic = 'force-dynamic';
 
@@ -96,6 +98,18 @@ export default async function TrackDetailPage({
       data: { feedbackViewedAt: new Date() },
     }).catch(() => {});
   }
+
+  // Slot availability check for "Request Reviews" button
+  const isPro = track.ArtistProfile.subscriptionStatus === "active";
+  const maxSlots = getMaxSlots(isPro);
+  const isTrackActive = (ACTIVE_TRACK_STATUSES as readonly string[]).includes(track.status);
+  const activeTrackCount = await prisma.track.count({
+    where: {
+      artistId: track.ArtistProfile.id,
+      status: { in: ACTIVE_TRACK_STATUSES as any },
+    },
+  });
+  const hasAvailableSlot = activeTrackCount < maxSlots || isTrackActive;
 
   // Auto-fetch missing artwork from oEmbed and persist it
   if (!track.artworkUrl && track.sourceType !== "UPLOAD" && track.sourceUrl) {
@@ -297,12 +311,25 @@ export default async function TrackDetailPage({
                       : "Reviews will appear here once they're completed."}
                   </p>
                   {(track.status === "UPLOADED" || track.status === "PENDING_PAYMENT") && (
-                    <Link href={`/tracks/${track.id}/request-reviews`}>
-                      <Button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:shadow-[3px_3px_0_rgba(0,0,0,0.6)] active:shadow-[1px_1px_0_rgba(0,0,0,0.6)] transition-all">
-                        Request reviews
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Button>
-                    </Link>
+                    hasAvailableSlot ? (
+                      <Link href={`/tracks/${track.id}/request-reviews`}>
+                        <Button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:shadow-[3px_3px_0_rgba(0,0,0,0.6)] active:shadow-[1px_1px_0_rgba(0,0,0,0.6)] transition-all">
+                          Request reviews
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </Button>
+                      </Link>
+                    ) : (
+                      <div className="space-y-2">
+                        <Button disabled className="opacity-50 cursor-not-allowed">
+                          All review slots full
+                        </Button>
+                        <p className="text-xs text-black/40">
+                          Wait for a queued track to complete, or{" "}
+                          <Link href="/pro" className="text-purple-600 hover:underline font-medium">upgrade to Pro</Link>
+                          {" "}for more slots.
+                        </p>
+                      </div>
+                    )
                   )}
                 </CardContent>
               </Card>
@@ -333,12 +360,24 @@ export default async function TrackDetailPage({
                   Quick Actions
                 </p>
                 {(track.status === "UPLOADED" || track.status === "PENDING_PAYMENT" || track.status === "COMPLETED") && (
-                  <Link href={`/tracks/${track.id}/request-reviews`} className="block">
-                    <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:shadow-[3px_3px_0_rgba(0,0,0,0.6)] active:shadow-[1px_1px_0_rgba(0,0,0,0.6)] active:translate-x-[1px] active:translate-y-[1px] transition-all">
-                      {track.status === "COMPLETED" ? "Request more reviews" : "Request reviews"}
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Button>
-                  </Link>
+                  hasAvailableSlot ? (
+                    <Link href={`/tracks/${track.id}/request-reviews`} className="block">
+                      <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-[2px_2px_0_rgba(0,0,0,0.6)] hover:shadow-[3px_3px_0_rgba(0,0,0,0.6)] active:shadow-[1px_1px_0_rgba(0,0,0,0.6)] active:translate-x-[1px] active:translate-y-[1px] transition-all">
+                        {track.status === "COMPLETED" ? "Request more reviews" : "Request reviews"}
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    </Link>
+                  ) : (
+                    <div className="space-y-2">
+                      <Button disabled className="w-full opacity-50 cursor-not-allowed">
+                        All slots full
+                      </Button>
+                      <Link href="/pro" className="flex items-center justify-center gap-1.5 text-xs text-purple-600 hover:text-purple-700 font-medium">
+                        <Crown className="h-3 w-3" />
+                        Upgrade to Pro for more slots
+                      </Link>
+                    </div>
+                  )
                 )}
                 <a href={track.sourceUrl} target="_blank" rel="noopener noreferrer" className="block">
                   <Button variant="airy" className="w-full">
