@@ -30,6 +30,7 @@ import { PendingReviewCard } from "@/components/dashboard/pending-review-card";
 import { WhatsNextCard } from "@/components/dashboard/whats-next-card";
 import { CreditGuide } from "@/components/dashboard/credit-guide";
 import { MobileStickyCTA } from "@/components/dashboard/mobile-sticky-cta";
+import { QueueAnnouncement } from "@/components/dashboard/queue-announcement";
 import {
   calculateDashboardStats,
   getWhatsNextGuidance,
@@ -298,6 +299,9 @@ export default async function DashboardPage() {
             </div>
           </Tooltip>
         </div>
+
+        {/* Queue system announcement for existing users */}
+        {tracks.length > 0 && <QueueAnnouncement />}
 
         {/* Feedback Alert Banner */}
         {tracksWithFeedback.length > 0 && (
