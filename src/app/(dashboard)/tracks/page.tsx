@@ -108,6 +108,8 @@ export default async function TracksPage({
   const activeStatuses = ACTIVE_TRACK_STATUSES as readonly string[];
   const activeTracks = tracks.filter((t) => activeStatuses.includes(t.status));
   const completedTracks = tracks.filter((t) => !activeStatuses.includes(t.status));
+  const eligibleForQueue = tracks.filter((t) => t.status === "UPLOADED" || t.status === "COMPLETED");
+  const hasOpenSlots = activeTracks.length < maxSlots;
 
   // Calculate portfolio analytics data
   const tracksWithReviews = tracks.filter(t => t.Review && t.Review.length > 0);
@@ -443,6 +445,64 @@ export default async function TracksPage({
                                   <MessageSquare className="h-3 w-3 text-purple-500" />
                                   <span className="text-xs font-semibold text-purple-700">{completedReviews}/{track.reviewsRequested}</span>
                                 </div>
+                              )}
+                            </div>
+                          </Card>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Ready to queue — eligible tracks that can be added to a slot */}
+              {eligibleForQueue.length > 0 && (
+                <div className="mt-10">
+                  <div className="flex items-center gap-3 mb-4">
+                    <h3 className="text-sm font-bold text-black">Ready to queue</h3>
+                    <div className="h-px flex-1 bg-black/5" />
+                    {hasOpenSlots ? (
+                      <span className="text-xs text-lime-700 font-medium">{maxSlots - activeTracks.length} {maxSlots - activeTracks.length === 1 ? "slot" : "slots"} open</span>
+                    ) : (
+                      <span className="text-xs text-black/30">All slots full</span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {eligibleForQueue.map((track) => {
+                      const completedReviews = (track.Review ?? []).filter((r: any) => r.status === "COMPLETED").length;
+                      const hasReviews = track.reviewsRequested > 0;
+                      const isCompleted = track.status === "COMPLETED";
+                      return (
+                        <Link key={track.id} href={`/tracks/${track.id}`} className="group block">
+                          <Card variant="soft" interactive className={cn("overflow-hidden", !hasOpenSlots && "opacity-50")}>
+                            <div className="relative aspect-[4/3] bg-neutral-100">
+                              {track.artworkUrl ? (
+                                <Image src={track.artworkUrl} alt={track.title} fill className="object-cover transition-transform duration-150 ease-out group-hover:scale-[1.02]" sizes="33vw" />
+                              ) : (
+                                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
+                                  <Music className="h-8 w-8 text-black/15" />
+                                </div>
+                              )}
+                              <div className="absolute top-2 left-2">
+                                <span className={cn(
+                                  "inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md backdrop-blur-sm",
+                                  isCompleted
+                                    ? "bg-lime-100 text-lime-800 border border-lime-300"
+                                    : "bg-white/80 text-black/50 border border-black/10"
+                                )}>
+                                  {isCompleted ? "Completed" : "Uploaded"}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="p-3 space-y-1.5">
+                              <h3 className="font-semibold text-[13px] leading-snug text-black line-clamp-2 group-hover:text-black/70 transition-colors">{track.title}</h3>
+                              {hasReviews ? (
+                                <p className="text-xs text-black/40">{completedReviews}/{track.reviewsRequested} reviews done</p>
+                              ) : (
+                                <p className="text-xs text-black/30">No reviews yet</p>
+                              )}
+                              {hasOpenSlots && (
+                                <p className="text-xs font-semibold text-purple-600 group-hover:text-purple-700">Request reviews →</p>
                               )}
                             </div>
                           </Card>
