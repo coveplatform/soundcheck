@@ -3,10 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Music, MessageSquare, Lock } from "lucide-react";
+import { Plus, Music, MessageSquare, Lock, Crown, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { DequeueButton } from "@/components/tracks/dequeue-button";
 import { QueueTrackPicker } from "@/components/tracks/queue-track-picker";
 
@@ -39,25 +38,53 @@ interface QueueViewProps {
 
 export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credits }: QueueViewProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
-  const hasOpenSlots = activeTracks.length < maxSlots;
+  const usedSlots = Math.min(activeTracks.length, maxSlots);
 
   return (
     <div>
-      {/* Queue header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
-        <p className="text-sm text-black/40">
-          Submit a track → it fills a slot → artists review it → slot frees up.
-          {!isPro && <>{" "}<Link href="/pro" className="text-purple-600 hover:text-purple-700 font-medium">Upgrade to Pro for 3 slots →</Link></>}
-        </p>
+      {/* Queue status bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8 p-4 rounded-xl bg-neutral-50 border border-black/5">
+        <div className="flex items-center gap-4">
+          {/* Slot usage dots */}
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: maxSlots }, (_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "h-3 w-3 rounded-full transition-colors",
+                  i < usedSlots ? "bg-purple-500" : "bg-black/10"
+                )}
+              />
+            ))}
+            {!isPro && Array.from({ length: 3 - maxSlots }, (_, i) => (
+              <div key={`locked-${i}`} className="h-3 w-3 rounded-full bg-black/5 border border-dashed border-black/10" />
+            ))}
+          </div>
+          <span className="text-sm text-black/50">
+            <span className="font-bold text-black">{usedSlots}/{maxSlots}</span> slots used
+          </span>
+          {!isPro && (
+            <Link href="/pro" className="hidden sm:inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700 font-semibold">
+              <Crown className="h-3 w-3" />
+              Get 3 slots
+            </Link>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Coins className="h-3.5 w-3.5 text-black/25" />
+          <span className="text-sm text-black/50"><span className="font-bold text-black">{credits}</span> credits</span>
+          <Link href="/review" className="text-xs text-purple-600 hover:text-purple-700 font-medium ml-1">Earn more →</Link>
+        </div>
       </div>
 
-      {/* Slot grid — always show all 3 slots */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
+      {/* Slot grid */}
+      <div className="grid grid-cols-3 gap-3 sm:gap-5 max-w-2xl mx-auto">
         {Array.from({ length: 3 }, (_, slotIndex) => {
           const track = activeTracks[slotIndex];
           const isLocked = !isPro && slotIndex >= maxSlots;
           const slotNum = slotIndex + 1;
 
+          // Filled slot
           if (track) {
             const completedReviews = track.reviews.filter((r) => r.status === "COMPLETED").length;
             const hasReviews = track.reviewsRequested > 0;
@@ -67,74 +94,72 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
             const isPending = track.status === "PENDING_PAYMENT";
 
             return (
-              <div key={track.id}>
-                <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/30 mb-2">Slot {slotNum}</p>
-                <div className="group relative">
+              <div key={track.id} className="flex flex-col items-center">
+                <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/25 mb-1.5 text-center">{slotNum}</p>
+                <div className="group relative w-full">
                   <Card variant="soft" interactive className="overflow-hidden">
                     <Link href={`/tracks/${track.id}`} className="block">
-                      <div className="relative aspect-[4/3] bg-neutral-100">
+                      <div className="relative aspect-square bg-neutral-100">
                         {track.artworkUrl ? (
                           <Image
                             src={track.artworkUrl}
                             alt={track.title}
                             fill
                             className="object-cover transition-transform duration-150 ease-out group-hover:scale-[1.02]"
-                            sizes="(max-width: 640px) 50vw, 33vw"
+                            sizes="(max-width: 640px) 33vw, 200px"
                           />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-                            <Music className="h-8 w-8 text-black/15" />
+                            <Music className="h-6 w-6 text-black/15" />
                           </div>
                         )}
-                        <div className="absolute top-2 left-2">
+                        <div className="absolute top-1.5 left-1.5">
                           {isPending ? (
-                            <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/80 text-black/60 border border-black/10 backdrop-blur-sm">Pending</span>
+                            <span className="inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/80 text-black/60 border border-black/10 backdrop-blur-sm">Pending</span>
                           ) : isQueued ? (
-                            <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-purple-600 text-white shadow-sm">Queued</span>
+                            <span className="inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-600 text-white shadow-sm">Queued</span>
                           ) : isInProgress ? (
-                            <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-purple-600 text-white shadow-sm">Reviewing</span>
+                            <span className="inline-flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-600 text-white shadow-sm">Reviewing</span>
                           ) : null}
                         </div>
                         <DequeueButton trackId={track.id} trackTitle={track.title} />
                         {hasReviews && (
-                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/30 to-transparent pt-6 pb-2 px-2">
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/40 to-transparent pt-4 pb-1.5 px-1.5">
                             <div className="h-1 bg-white/30 rounded-full overflow-hidden">
-                              <div className="h-full bg-white rounded-full transition-[width] duration-150 ease-out" style={{ width: `${reviewProgress * 100}%` }} />
+                              <div className="h-full bg-white rounded-full" style={{ width: `${reviewProgress * 100}%` }} />
                             </div>
                           </div>
                         )}
                       </div>
-                      <div className="p-3 space-y-1.5">
-                        <h3 className="font-semibold text-[13px] leading-snug text-black line-clamp-2 group-hover:text-black/70 transition-colors duration-150 ease-out">{track.title}</h3>
-                        {hasReviews ? (
-                          <div className="flex items-center gap-1.5">
-                            <MessageSquare className="h-3 w-3 text-purple-500" />
-                            <span className="text-xs font-semibold text-purple-700">{completedReviews}/{track.reviewsRequested} reviews</span>
-                          </div>
-                        ) : (
-                          <p className="text-xs text-black/30">Awaiting reviews</p>
-                        )}
-                      </div>
                     </Link>
                   </Card>
+                  <div className="mt-2 text-center px-1">
+                    <p className="text-xs font-semibold text-black truncate">{track.title}</p>
+                    {hasReviews ? (
+                      <div className="flex items-center justify-center gap-1 mt-0.5">
+                        <MessageSquare className="h-2.5 w-2.5 text-purple-500" />
+                        <span className="text-[11px] font-semibold text-purple-700">{completedReviews}/{track.reviewsRequested}</span>
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-black/30 mt-0.5">Waiting for reviewers</p>
+                    )}
+                  </div>
                 </div>
               </div>
             );
           }
 
+          // Locked slot
           if (isLocked) {
             return (
-              <div key={`locked-${slotIndex}`}>
-                <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/20 mb-2">Slot {slotNum}</p>
-                <Link href="/pro" className="group block">
-                  <Card variant="soft" interactive className="border-2 border-dashed border-black/5 bg-neutral-50/50 hover:bg-purple-50/50 hover:border-purple-200">
-                    <div className="aspect-[4/3] flex flex-col items-center justify-center gap-2">
-                      <Lock className="h-6 w-6 text-black/10 group-hover:text-purple-400 transition-colors" />
-                    </div>
-                    <div className="p-3 text-center">
-                      <p className="text-xs font-semibold text-black/20 group-hover:text-purple-600 transition-colors">Unlock with Pro</p>
-                    </div>
-                  </Card>
+              <div key={`locked-${slotIndex}`} className="flex flex-col items-center">
+                <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/15 mb-1.5 text-center">{slotNum}</p>
+                <Link href="/pro" className="group w-full">
+                  <div className="aspect-square rounded-xl border-2 border-dashed border-black/[0.06] bg-neutral-50/50 hover:bg-purple-50/30 hover:border-purple-200 flex flex-col items-center justify-center gap-1.5 transition-colors">
+                    <Lock className="h-5 w-5 text-black/[0.08] group-hover:text-purple-400 transition-colors" />
+                    <Crown className="h-3 w-3 text-purple-300 group-hover:text-purple-500 transition-colors" />
+                  </div>
+                  <p className="text-[11px] text-center mt-2 font-medium text-black/20 group-hover:text-purple-600 transition-colors">Pro slot</p>
                 </Link>
               </div>
             );
@@ -142,23 +167,20 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
 
           // Empty slot — add to queue
           return (
-            <div key={`empty-${slotIndex}`}>
-              <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/30 mb-2">Slot {slotNum} — open</p>
+            <div key={`empty-${slotIndex}`} className="flex flex-col items-center">
+              <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/25 mb-1.5 text-center">{slotNum}</p>
               <button
                 onClick={() => setPickerOpen(true)}
-                className="w-full group text-left"
+                className="w-full group"
               >
-                <Card variant="soft" interactive className="border-2 border-dashed border-black/10 bg-white/40 hover:bg-white/60 hover:border-purple-200">
-                  <div className="aspect-[4/3] flex flex-col items-center justify-center gap-2">
-                    <div className="h-10 w-10 rounded-full bg-black/5 group-hover:bg-purple-100 flex items-center justify-center transition-colors duration-150 ease-out">
-                      <Plus className="h-4 w-4 text-black/30 group-hover:text-purple-600 transition-colors duration-150 ease-out" />
-                    </div>
+                <div className="aspect-square rounded-xl border-2 border-dashed border-black/10 bg-white/50 hover:bg-purple-50/40 hover:border-purple-300 flex flex-col items-center justify-center gap-2 transition-all">
+                  <div className="h-9 w-9 rounded-full bg-black/[0.04] group-hover:bg-purple-100 flex items-center justify-center transition-colors">
+                    <Plus className="h-4 w-4 text-black/25 group-hover:text-purple-600 transition-colors" />
                   </div>
-                  <div className="p-3 text-center">
-                    <p className="text-xs font-semibold text-black/40 group-hover:text-purple-600 transition-colors">Add to queue</p>
-                  </div>
-                </Card>
+                  <span className="text-[11px] font-medium text-black/30 group-hover:text-purple-600 transition-colors">Add track</span>
+                </div>
               </button>
+              <p className="text-[11px] text-center mt-2 text-black/20">Open</p>
             </div>
           );
         })}
@@ -166,56 +188,57 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
 
       {/* Grandfathered tracks beyond slot limit */}
       {activeTracks.length > 3 && (
-        <div className="mt-6">
-          <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-amber-600 mb-2">Grandfathered</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="mt-8 max-w-2xl mx-auto">
+          <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-amber-600 mb-3">Grandfathered tracks</p>
+          <div className="grid grid-cols-3 gap-3 sm:gap-5">
             {activeTracks.slice(3).map((track) => {
               const completedReviews = track.reviews.filter((r) => r.status === "COMPLETED").length;
               const hasReviews = track.reviewsRequested > 0;
               const reviewProgress = hasReviews ? completedReviews / track.reviewsRequested : 0;
               return (
-                <Link key={track.id} href={`/tracks/${track.id}`} className="group block">
-                  <Card variant="soft" interactive className="overflow-hidden ring-2 ring-amber-300">
-                    <div className="relative aspect-[4/3] bg-neutral-100">
-                      {track.artworkUrl ? (
-                        <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="33vw" />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-                          <Music className="h-8 w-8 text-black/15" />
-                        </div>
-                      )}
-                      {hasReviews && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/30 to-transparent pt-6 pb-2 px-2">
-                          <div className="h-1 bg-white/30 rounded-full overflow-hidden">
-                            <div className="h-full bg-white rounded-full" style={{ width: `${reviewProgress * 100}%` }} />
+                <div key={track.id} className="flex flex-col items-center">
+                  <Link href={`/tracks/${track.id}`} className="group w-full">
+                    <Card variant="soft" interactive className="overflow-hidden ring-2 ring-amber-300">
+                      <div className="relative aspect-square bg-neutral-100">
+                        {track.artworkUrl ? (
+                          <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="200px" />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
+                            <Music className="h-6 w-6 text-black/15" />
                           </div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-3 space-y-1.5">
-                      <h3 className="font-semibold text-[13px] text-black line-clamp-2">{track.title}</h3>
+                        )}
+                        {hasReviews && (
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/30 to-transparent pt-4 pb-1.5 px-1.5">
+                            <div className="h-1 bg-white/30 rounded-full overflow-hidden">
+                              <div className="h-full bg-white rounded-full" style={{ width: `${reviewProgress * 100}%` }} />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                    <div className="mt-2 text-center px-1">
+                      <p className="text-xs font-semibold text-black truncate">{track.title}</p>
                       {hasReviews && (
-                        <div className="flex items-center gap-1.5">
-                          <MessageSquare className="h-3 w-3 text-purple-500" />
-                          <span className="text-xs font-semibold text-purple-700">{completedReviews}/{track.reviewsRequested}</span>
-                        </div>
+                        <span className="text-[11px] font-semibold text-purple-700">{completedReviews}/{track.reviewsRequested}</span>
                       )}
                     </div>
-                  </Card>
-                </Link>
+                  </Link>
+                </div>
               );
             })}
           </div>
         </div>
       )}
 
-      {/* Track picker panel — appears below slots when "Add to queue" is clicked */}
-      <QueueTrackPicker
-        tracks={eligibleTracks}
-        credits={credits}
-        open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
-      />
+      {/* Track picker panel */}
+      <div className="max-w-2xl mx-auto">
+        <QueueTrackPicker
+          tracks={eligibleTracks}
+          credits={credits}
+          open={pickerOpen}
+          onClose={() => setPickerOpen(false)}
+        />
+      </div>
     </div>
   );
 }
