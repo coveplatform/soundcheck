@@ -1,103 +1,80 @@
 # MixReflect Developer Documentation
 
-> MixReflect is a two-sided music feedback marketplace where artists submit tracks for structured reviews from genre-matched reviewers.
+> Two-sided music feedback SaaS. Artists submit tracks, genre-matched reviewers give structured feedback.
+> Live at: https://www.mixreflect.com
 
 ## Quick Start
 
-### Prerequisites
-
-- Node.js (project uses Next.js `16.x`, see `package.json`)
-- PostgreSQL (Prisma datasource is `postgresql`, see `prisma/schema.prisma`)
-
-### Install
-
 ```bash
 npm install
-```
-
-### Configure environment
-
-Copy the example env file:
-
-```bash
-cp .env.example .env
-```
-
-At minimum you’ll need:
-
-- `DATABASE_URL`
-- `NEXTAUTH_URL`
-- `NEXTAUTH_SECRET`
-
-For payments/webhooks:
-
-- `STRIPE_SECRET_KEY`
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-
-### Database
-
-```bash
+cp .env.example .env.local
 npm run db:push
 npm run db:seed
+npm run dev          # http://localhost:3000
 ```
 
-### Run
+Minimum required env vars: `DATABASE_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`
 
-```bash
-npm run dev
-```
+For payments: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
 
-Open `http://localhost:3000`.
+## Documentation
 
-## Documentation Index
+| File | What it covers |
+|---|---|
+| `AGENT.md` (root) | Quick reference for AI agents — patterns, gotchas, schema notes |
+| `docs/ARCHITECTURE.md` | System design, data flow diagrams |
+| `docs/DATA_MODELS.md` | Prisma schema walkthrough |
+| `docs/DEVELOPMENT.md` | Local dev setup, testing, DB commands |
+| `docs/DEPLOYMENT.md` | Vercel deployment, env vars, Sentry |
+| `docs/COMPONENTS.md` | UI component library |
+| `docs/FEATURES/track-submission.md` | Track submission flow |
+| `docs/FEATURES/review-system.md` | Review assignment, tiers, schema versions |
+| `docs/FEATURES/payments.md` | Stripe integration, credit system |
+| `docs/FEATURES/support.md` | Support ticket system |
+| `docs/FEATURES/admin.md` | Admin panel capabilities |
+| `docs/API/overview.md` | API conventions |
+| `docs/API/artist-endpoints.md` | Artist-facing API routes |
+| `docs/API/reviewer-endpoints.md` | Reviewer-facing API routes |
+| `docs/API/admin-endpoints.md` | Admin API routes |
+| `docs/API/public-endpoints.md` | Public/unauthenticated routes |
 
-- `docs/ARCHITECTURE.md`
-- `docs/DATA_MODELS.md`
-- `docs/COMPONENTS.md`
-- `docs/DEPLOYMENT.md`
-- `docs/DEVELOPMENT.md`
-- `docs/ROADMAP.md`
+## Roles
 
-### Features
-
-- `docs/FEATURES/track-submission.md`
-- `docs/FEATURES/review-system.md`
-- `docs/FEATURES/payments.md`
-- `docs/FEATURES/support.md`
-- `docs/FEATURES/admin.md`
-
-### API Reference
-
-- `docs/API/overview.md`
-- `docs/API/artist-endpoints.md`
-- `docs/API/reviewer-endpoints.md`
-- `docs/API/admin-endpoints.md`
-- `docs/API/public-endpoints.md`
-
-## Roles & Access Model
-
-MixReflect stores roles as boolean flags on `User` (see `prisma/schema.prisma`):
-
-- **Artist**: `User.isArtist = true` and has an `ArtistProfile`
-- **Reviewer**: `User.isReviewer = true` and has a `ReviewerProfile`
-- **Admin**: determined by email allowlist (`ADMIN_EMAILS` / `ADMIN_EMAIL`) in `src/lib/admin.ts`
-
-Route protection is implemented in `middleware.ts` using a NextAuth JWT token.
+- **Artist** — `User.isArtist = true` + `ArtistProfile`. Submits tracks, spends/earns credits.
+- **Reviewer** — `User.isReviewer = true` + `ReviewerProfile`. Tier: `NORMAL` or `PRO`.
+- **Admin** — email allowlist in `src/lib/admin.ts`.
+- Users can hold both roles simultaneously.
 
 ## Key Entry Points
 
-- **Auth config**: `src/lib/auth.ts`
-- **DB client**: `src/lib/prisma.ts`
-- **Queue/assignment**: `src/lib/queue.ts`
-- **Stripe**: `src/lib/stripe.ts`, `src/app/api/webhooks/stripe/route.ts`
+| Concern | File |
+|---|---|
+| Auth config | `src/lib/auth.ts` |
+| DB client | `src/lib/prisma.ts` |
+| Queue & assignment | `src/lib/queue.ts` |
+| Email | `src/lib/email.ts` |
+| Payments / Stripe | `src/lib/stripe.ts`, `src/lib/payments.ts` |
+| URL metadata | `src/lib/metadata.ts` |
+| Stripe webhooks | `src/app/api/webhooks/stripe/route.ts` |
+| Route protection | `middleware.ts` |
 
-## Documentation Maintenance
+## Active Package Types
 
-**Last Updated:** 2026-01-07
+| Type | Model | Price |
+|---|---|---|
+| `PEER` | Freemium — 1 credit per review | Free (credits earned by reviewing) |
+| `RELEASE_DECISION` | Expert panel — 10-12 PRO reviewers | $9.95 cash |
 
-**How to Update:**
+Legacy packages (`STARTER`, `STANDARD`, `PRO`, `DEEP_DIVE`) exist in the DB for old orders — do not remove from schema.
 
-- When adding a new API route, update `docs/API/*`.
-- When changing Prisma models/enums, update `docs/DATA_MODELS.md`.
-- When changing core flows (submission/assignment/reviews/payments), update `docs/FEATURES/*` and `docs/ARCHITECTURE.md`.
+## Review Schema Versions
+
+- **v1** — legacy, DB only, no active UI
+- **v2** — active peer review form (technical analysis + structured feedback)
+- **v3** — Release Decision form (adds verdict, readiness score, top fixes)
+
+See `AGENT.md` for derived field rules used in inject scripts.
+
+## Last Updated
+
+2026-02-21
