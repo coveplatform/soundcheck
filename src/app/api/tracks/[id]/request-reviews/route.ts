@@ -92,39 +92,24 @@ export async function POST(
       );
     }
 
-    await prisma.$transaction(async (tx) => {
-      const updatedCredits = await tx.artistProfile.updateMany({
+    // Determine new status before transaction to minimise work inside it
+    const hasExistingReviews = track.Review.length > 0;
+    const currentReviewsRequested = track.reviewsRequested ?? 0;
+    const newReviewsRequested = currentReviewsRequested + desired;
+    const newStatus = hasExistingReviews ? "IN_PROGRESS" : "QUEUED";
+
+    await prisma.$transaction([
+      prisma.artistProfile.updateMany({
         where: {
           id: track.artistId,
-          reviewCredits: {
-            gte: cost,
-          },
+          reviewCredits: { gte: cost },
         },
         data: {
-          reviewCredits: {
-            decrement: cost,
-          },
-          totalCreditsSpent: {
-            increment: cost,
-          },
+          reviewCredits: { decrement: cost },
+          totalCreditsSpent: { increment: cost },
         },
-      });
-
-      if (updatedCredits.count === 0) {
-        throw new Error("INSUFFICIENT_TOKENS");
-      }
-
-      // Determine new status based on current state
-      const currentReviewsCompleted = track.reviewsCompleted ?? 0;
-      const hasExistingReviews = track.Review.length > 0;
-      const currentReviewsRequested = track.reviewsRequested ?? 0;
-      const newReviewsRequested = currentReviewsRequested + desired;
-
-      // If adding more reviews and already have some completed, go to IN_PROGRESS
-      // If no reviews yet, go to QUEUED
-      const newStatus = hasExistingReviews ? "IN_PROGRESS" : "QUEUED";
-
-      await tx.track.update({
+      }),
+      prisma.track.update({
         where: { id: track.id },
         data: {
           packageType: hasExistingReviews ? track.packageType : "PEER",
@@ -132,10 +117,10 @@ export async function POST(
           creditsSpent: { increment: cost },
           status: newStatus,
           paidAt: track.paidAt ?? new Date(),
-          completedAt: null, // Clear completion if it was completed
+          completedAt: null,
         },
-      });
-    });
+      }),
+    ]);
 
     await assignReviewersToTrack(track.id);
     revalidateTag("sidebar", { expire: 0 });
