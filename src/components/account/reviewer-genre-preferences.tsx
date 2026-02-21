@@ -69,7 +69,7 @@ export function ReviewerGenrePreferences({
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/reviewer/profile", {
+      const response = await fetch("/api/profile/reviewer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ genreIds: selectedGenres }),

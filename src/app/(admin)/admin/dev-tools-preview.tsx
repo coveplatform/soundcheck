@@ -25,7 +25,7 @@ export function DevToolsPreview() {
         return;
       }
 
-      setReviewUrl(`/reviewer/review/${data.reviewId}`);
+      setReviewUrl(`/review/${data.reviewId}`);
     } catch {
       setError("Failed to create preview");
     } finally {
@@ -46,7 +46,7 @@ export function DevToolsPreview() {
         return;
       }
 
-      setTrackUrl(`/artist/tracks/${data.trackId}`);
+      setTrackUrl(`/tracks/${data.trackId}`);
     } catch {
       setError("Failed to create preview");
     } finally {
@@ -67,7 +67,7 @@ export function DevToolsPreview() {
         return;
       }
 
-      setSingleReviewTrackUrl(`/artist/tracks/${data.trackId}`);
+      setSingleReviewTrackUrl(`/tracks/${data.trackId}`);
     } catch {
       setError("Failed to create preview");
     } finally {

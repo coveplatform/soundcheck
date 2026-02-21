@@ -39,7 +39,7 @@ export function ClaimButton({ trackId, reviewsRemaining, isPro }: ClaimButtonPro
       }
 
       // Navigate to the review page
-      router.push(`/reviewer/review/${data.reviewId}`);
+      router.push(`/review/${data.reviewId}`);
     } catch {
       setError("Something went wrong");
       setLoading(false);

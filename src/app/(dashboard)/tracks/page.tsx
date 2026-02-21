@@ -392,7 +392,7 @@ function TrackCard({
   const isUploaded = status === "UPLOADED" || isPending;
 
   return (
-    <Link href={`/artist/tracks/${id}`} className="group block">
+    <Link href={`/tracks/${id}`} className="group block">
       <Card variant="soft" interactive className="overflow-hidden">
         {/* Artwork - 4:3 ratio to leave more room for text */}
         <div className="relative aspect-[4/3] bg-neutral-100">

@@ -12,7 +12,7 @@ export function SocialLoginButtons() {
     setIsLoading(true);
     try {
       // Redirect to onboarding - middleware will redirect to dashboard if already an artist
-      await signIn("google", { callbackUrl: "/artist/onboarding" });
+      await signIn("google", { callbackUrl: "/onboarding" });
     } catch (error) {
       console.error("Google login failed:", error);
     } finally {

@@ -92,8 +92,8 @@ export async function POST(
           quantity: 1,
         },
       ],
-      success_url: `${appUrl}/artist/tracks/${trackId}?upgraded=true`,
-      cancel_url: `${appUrl}/artist/tracks/${trackId}?canceled=true`,
+      success_url: `${appUrl}/tracks/${trackId}?upgraded=true`,
+      cancel_url: `${appUrl}/tracks/${trackId}?canceled=true`,
       metadata: {
         type: "release_decision",
         trackId: track.id,

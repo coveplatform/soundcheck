@@ -11,7 +11,6 @@ import {
   Music,
   Upload,
   Headphones,
-  DollarSign,
   Settings,
   LogOut,
   Coins,
@@ -48,7 +47,6 @@ export function Sidebar({ artistName, credits, pendingReviews }: SidebarProps) {
     { href: "/review/history", label: "Review History", icon: History },
   ];
 
-  const proLinks: typeof mainLinks = [];
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
@@ -113,20 +111,6 @@ export function Sidebar({ artistName, credits, pendingReviews }: SidebarProps) {
             ))}
           </div>
 
-          {proLinks.length > 0 && (
-            <>
-              <div className="my-4 border-t border-black/8" />
-
-              <p className="px-4 mb-2 text-[10px] font-mono tracking-widest text-black/35 uppercase">
-                Business
-              </p>
-              <div className="space-y-1">
-                {proLinks.map((link) => (
-                  <NavLink key={link.href} {...link} />
-                ))}
-              </div>
-            </>
-          )}
 
         </nav>
 
@@ -248,7 +232,6 @@ function MobileBottomNav({
 
   const moreLinks = [
     { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
-    { href: "/reviewer/earnings", label: "Earnings", icon: Coins },
     { href: "/review/history", label: "Review History", icon: History },
     { href: "/support", label: "Support", icon: LifeBuoy },
     { href: "/account", label: "Settings", icon: Settings },

@@ -39,25 +39,32 @@ Every user is unified — they submit tracks and review others from the same acc
 ## Live Navigation (what users actually see)
 
 ```
-/dashboard          Main dashboard (tracks + review queue summary)
-/tracks             My tracks + feedback received
-/tracks?view=insights  Analytics/insights
-/submit             Submit a track
-/review             Review queue (claim tracks to review)
-/review/history     Past reviews submitted
-/reviewer/earnings  Earnings & payout (old path — still canonical)
-/account            Settings, credit purchase
-/support            Support tickets
+/dashboard              Main dashboard (tracks + review queue summary)
+/tracks                 My tracks list
+/tracks/[id]            Track detail + reviews
+/tracks/[id]/request-reviews  Request reviews for a track
+/tracks?view=insights   Analytics/insights
+/submit                 Submit a track
+/submit/checkout        Stripe checkout redirect
+/submit/success         Post-payment success page
+/review                 Review queue (claim tracks to review)
+/review/[id]            Review form
+/review/history         Past reviews submitted
+/reviewers              Browse reviewers
+/reviewers/[id]         Reviewer profile
+/account                Settings, credit purchase
+/support                Support tickets
 ```
 
 ---
 
-## Route Quirks (important — don't blindly rename)
+## Route Quirks
 
-- `/review/[id]` → redirects to `/reviewer/review/[id]`. The review form lives at the old path.
-- `/artist/*` directories exist in the filesystem but have **no page.tsx** — they are dead and can be deleted.
-- `/reviewer/layout.tsx` and `/reviewer/earnings/` are still in use via the mobile nav "More" menu.
-- API routes `/api/artist/profile` and `/api/reviewer/profile` are split but both in use. Don't remove either without checking callers.
+- `/reviewer/review/[id]` → legacy redirect to `/review/[id]`. The review form now lives at `/review/[id]`.
+- `/reviewer/` directory only contains the redirect — earnings page was removed.
+- `/artist/` directory was removed entirely. All pages moved to clean paths (`/tracks/[id]`, `/reviewers/`, `/submit/*`).
+- Business/earnings/sales pages and payout APIs were removed. DB fields preserved for historical data.
+- API routes: `/api/profile` (artist), `/api/profile/reviewer`, `/api/welcome-seen`.
 
 ---
 
@@ -68,7 +75,14 @@ src/lib/
   auth.ts              # NextAuth config, JWT caching, role sync
   prisma.ts            # Prisma singleton
   queue.ts             # Core assignment logic, reviewer tier rules, genre matching
-  email.ts             # All email sending — large (~35KB), edit carefully
+  email/               # Modular email system (split from monolithic email.ts)
+    index.ts           # Re-exports all email functions
+    templates.ts       # Shared HTML helpers, sendEmail(), brand constants
+    auth.ts            # Password reset email
+    reviews.ts         # Track queued, progress, intent, tier change, invalid link, release decision
+    payments.ts        # Purchase confirmation email
+    admin.ts           # Admin new track notification
+    announcements.ts   # Blast/announcement emails
   metadata.ts          # URL detection, oEmbed, package definitions
   payments.ts          # Stripe helpers
   stripe.ts            # Stripe client
@@ -81,7 +95,6 @@ src/app/(dashboard)/   # All protected pages (unified — no role split)
 src/app/(admin)/       # Admin panel
 middleware.ts          # Route protection, role checks
 prisma/schema.prisma   # Source of truth for DB models
-scripts/               # One-off utility scripts (not part of the app)
 ```
 
 ---
@@ -149,8 +162,7 @@ Scripts in `/scripts/` use Prisma directly. Always:
 - **Bandcamp oEmbed** — unreliable; falls back to page scraping in `/api/metadata/route.ts`
 - **Daily review limit** — enforced in `/api/reviews/claim` AND the queue page — keep both in sync
 - **Legacy packages** — `STARTER`, `STANDARD`, `PRO`, `DEEP_DIVE` exist in `metadata.ts` `PACKAGES` object and Prisma enum; do not remove
-- **email.ts** — all email in one file (~35KB); tightly coupled, edit carefully
-- **Scripts** — excluded from TypeScript compilation; run with `npx tsx --env-file=.env.local scripts/foo.ts`
+- **email/** — modular email system; import from `@/lib/email` (resolves to index.ts re-exports)
 
 ---
 
@@ -160,7 +172,6 @@ Scripts in `/scripts/` use Prisma directly. Always:
 npm install
 cp .env.example .env.local   # fill in DATABASE_URL, NEXTAUTH_*, STRIPE_*, etc.
 npm run db:push
-npm run db:seed
 npm run dev                  # http://localhost:3000
 ```
 

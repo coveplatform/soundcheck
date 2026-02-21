@@ -297,7 +297,7 @@ export default async function DashboardPage() {
         {/* Feedback Alert Banner */}
         {tracksWithFeedback.length > 0 && (
           <Link
-            href={`/artist/tracks/${tracksWithFeedback[0].id}`}
+            href={`/tracks/${tracksWithFeedback[0].id}`}
             className="flex items-center gap-3 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 mb-5 group transition-colors duration-150 ease-out hover:bg-purple-100/80"
           >
             <div className="h-8 w-8 rounded-lg bg-purple-600 flex items-center justify-center flex-shrink-0">

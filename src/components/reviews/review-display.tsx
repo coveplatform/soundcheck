@@ -110,7 +110,7 @@ export function ReviewDisplay({
           {/* Avatar */}
           {showControls && reviewerProfileId ? (
             <Link
-              href={`/artist/reviewers/${reviewerProfileId}`}
+              href={`/reviewers/${reviewerProfileId}`}
               className="h-9 w-9 min-w-[2.25rem] flex-shrink-0 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-xs font-black text-purple-700 hover:from-purple-200 hover:to-purple-300 transition-colors duration-150 ease-out motion-reduce:transition-none"
             >
               {getInitial(reviewerName)}
@@ -126,7 +126,7 @@ export function ReviewDisplay({
             <div className="flex items-center gap-2 flex-wrap">
               {showControls && reviewerProfileId ? (
                 <Link
-                  href={`/artist/reviewers/${reviewerProfileId}`}
+                  href={`/reviewers/${reviewerProfileId}`}
                   className="font-bold text-sm text-black hover:underline truncate"
                 >
                   {getFirstName(reviewerName)}

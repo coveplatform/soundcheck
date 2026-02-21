@@ -160,7 +160,7 @@ export function TrackSharingModal({
   };
 
   const handleUpgrade = () => {
-    router.push("/artist/submit");
+    router.push("/submit");
   };
 
   return (

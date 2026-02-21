@@ -164,7 +164,7 @@ function buildPreviewHtml(type: string): string {
         { issue: "Low end is muddy around 80-120Hz - kick and bass fighting", avgImpact: "HIGH", avgTimeEstimate: 25, mentionedBy: 5 },
         { issue: "De-essing needed - sibilance is distracting", avgImpact: "MEDIUM", avgTimeEstimate: 10, mentionedBy: 4 },
       ];
-      const trackUrl = `${appUrl}/artist/tracks/demo-track-id`;
+      const trackUrl = `${appUrl}/tracks/demo-track-id`;
       const fixesHtml = topFixes.map((fix: any, i: number) => `
         <div style="background-color: ${COLORS.bg}; border-left: 4px solid ${fix.avgImpact === 'HIGH' ? '#ef4444' : '#f59e0b'}; padding: 16px; margin-bottom: 12px; border-radius: 0 10px 10px 0;">
           <p style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: ${COLORS.black};">${i + 1}. ${fix.issue}</p>

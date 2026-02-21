@@ -44,7 +44,7 @@ export function PendingReviewCard({ review }: PendingReviewCardProps) {
         </div>
       </div>
       <div className="flex items-center pr-3 sm:pr-4">
-        <Link href={`/reviewer/review/${review.id}`}>
+        <Link href={`/review/${review.id}`}>
           <Button size="sm" variant="primary" className="text-xs h-8 px-3">
             Review
           </Button>

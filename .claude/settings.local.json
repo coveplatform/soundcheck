@@ -100,7 +100,12 @@
       "Bash(git reset:*)",
       "Bash(test:*)",
       "Bash(powershell.exe -Command:*)",
-      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" npx tsx:*)"
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" npx tsx:*)",
+      "Bash(npx --yes sharp-cli:*)",
+      "WebFetch(domain:unsplash.com)",
+      "Bash(/c/Users/simli/Desktop/review/soundcheck/scripts/inject-deja-reve-fireside-reviews.ts:*)",
+      "Bash(sort -u grep -oE '\"\"current\"\":\\\\{[^}]{1,200}\\\\}' /tmp/bc.html)",
+      "Bash(uniq grep -o 'data-tralbum[^>]*' /tmp/bc.html)"
     ]
   }
 }

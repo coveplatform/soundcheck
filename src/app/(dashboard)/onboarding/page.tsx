@@ -63,7 +63,7 @@ export default function OnboardingPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/artist/profile", {
+      const response = await fetch("/api/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -77,7 +77,7 @@ export default function OnboardingPage() {
         const data = await response.json().catch(() => null);
         if (response.status === 409) {
           // Profile already exists, try updating instead
-          const updateRes = await fetch("/api/artist/profile", {
+          const updateRes = await fetch("/api/profile", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

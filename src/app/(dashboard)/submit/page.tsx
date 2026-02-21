@@ -120,7 +120,7 @@ export default function SubmitTrackPage() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const res = await fetch("/api/artist/profile");
+        const res = await fetch("/api/profile");
         if (res.ok) {
           const data = await res.json();
           setProfile({

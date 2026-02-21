@@ -166,7 +166,7 @@ export function ExpandableTrackList({ tracks, variant = "all" }: ExpandableTrack
 
                 {/* View full details link */}
                 <Link
-                  href={`/artist/tracks/${track.id}`}
+                  href={`/tracks/${track.id}`}
                   className="inline-flex items-center gap-2 text-sm font-bold text-black/70 hover:text-black transition-colors"
                 >
                   View full track details →

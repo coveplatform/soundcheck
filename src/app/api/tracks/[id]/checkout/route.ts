@@ -87,8 +87,8 @@ export async function POST(
           quantity: 1,
         },
       ],
-      success_url: `${appUrl}/artist/submit/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/artist/submit?canceled=true`,
+      success_url: `${appUrl}/submit/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/submit?canceled=true`,
       metadata: {
         trackId: track.id,
         userId: session.user.id,

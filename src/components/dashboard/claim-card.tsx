@@ -37,7 +37,7 @@ export function ClaimCard({ trackId, title, artistName, artworkUrl }: ClaimCardP
         return;
       }
 
-      router.push(`/reviewer/review/${data.reviewId}`);
+      router.push(`/review/${data.reviewId}`);
     } catch {
       setError("Something went wrong");
       setLoading(false);

@@ -95,7 +95,7 @@ export function ReviewUpsell({
 
       {/* CTA */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-        <Link href="/artist/submit">
+        <Link href="/submit">
           <Button
             size="lg"
             className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"

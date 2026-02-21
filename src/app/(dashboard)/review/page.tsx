@@ -267,7 +267,7 @@ export default async function ReviewQueuePage({
                             </span>
                           </div>
                         </div>
-                        <Link href={`/reviewer/review/${review.id}`} className="flex-shrink-0">
+                        <Link href={`/review/${review.id}`} className="flex-shrink-0">
                           <Button size="sm" variant="primary">
                             Continue
                             <ArrowRight className="h-4 w-4 ml-1" />

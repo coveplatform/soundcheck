@@ -13,7 +13,7 @@ export function CreditGuide() {
   const handleDismiss = async () => {
     setDismissed(true);
     try {
-      await fetch("/api/artist/welcome-seen", { method: "POST" });
+      await fetch("/api/welcome-seen", { method: "POST" });
       router.refresh();
     } catch {
       // Already hidden client-side, no need to handle

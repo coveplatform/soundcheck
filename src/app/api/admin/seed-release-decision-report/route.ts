@@ -274,7 +274,7 @@ export async function POST(request: Request) {
       trackTitle: track.title,
       emailSent: !!sendEmail,
       message: `Report seeded on "${track.title}" (${track.id})${sendEmail ? ` and email sent to ${user.email}` : ""}`,
-      viewUrl: `/artist/tracks/${track.id}`,
+      viewUrl: `/tracks/${track.id}`,
     });
   } catch (error) {
     console.error("Error seeding report:", error);

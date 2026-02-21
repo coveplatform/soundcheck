@@ -207,10 +207,10 @@ describe('Checkout Session Creation', () => {
       const baseUrl = 'http://localhost:3000'
       const trackId = 'track-123'
 
-      const successUrl = `${baseUrl}/artist/submit/success?session_id={CHECKOUT_SESSION_ID}`
-      const cancelUrl = `${baseUrl}/artist/submit?trackId=${trackId}`
+      const successUrl = `${baseUrl}/submit/success?session_id={CHECKOUT_SESSION_ID}`
+      const cancelUrl = `${baseUrl}/submit?trackId=${trackId}`
 
-      expect(successUrl).toContain('/artist/submit/success')
+      expect(successUrl).toContain('/submit/success')
       expect(successUrl).toContain('session_id={CHECKOUT_SESSION_ID}')
       expect(cancelUrl).toContain('trackId=track-123')
     })
