@@ -133,6 +133,8 @@ export default async function AdminUsersPage({
       isReviewer: true,
       createdAt: true,
       lastActiveAt: true,
+      referredByCode: true,
+      totalReferrals: true,
       ArtistProfile: {
         select: {
           artistName: true,
@@ -143,6 +145,7 @@ export default async function AdminUsersPage({
           Track: {
             select: {
               reviewsRequested: true,
+              status: true,
             },
           },
         },
@@ -248,10 +251,12 @@ export default async function AdminUsersPage({
                 <th className="text-left font-medium px-4 py-3">Email</th>
                 <th className="text-left font-medium px-4 py-3">Artist Name</th>
                 <th className="text-left font-medium px-4 py-3">Activity</th>
-                <th className="text-right font-medium px-4 py-3">Tracks Uploaded</th>
-                <th className="text-right font-medium px-4 py-3">Reviews Req.</th>
+                <th className="text-right font-medium px-4 py-3">Uploaded</th>
+                <th className="text-right font-medium px-4 py-3">In Queue</th>
                 <th className="text-right font-medium px-4 py-3">Reviews Done</th>
                 <th className="text-right font-medium px-4 py-3">Credits</th>
+                <th className="text-right font-medium px-4 py-3">Refs Made</th>
+                <th className="text-left font-medium px-4 py-3">Referred By</th>
                 <th className="text-left font-medium px-4 py-3">Last Active</th>
                 <th className="text-left font-medium px-4 py-3">Created</th>
               </tr>
@@ -259,8 +264,9 @@ export default async function AdminUsersPage({
             <tbody className="divide-y divide-neutral-100">
               {users.map((u) => {
                 const tracksPosted = u.ArtistProfile?.totalTracks ?? 0;
-                const reviewsRequested = u.ArtistProfile?.Track?.reduce((sum, t) => sum + t.reviewsRequested, 0) ?? 0;
-                // Count both peer reviews and professional reviews
+                const tracksInQueue = u.ArtistProfile?.Track?.filter(t =>
+                  t.status === "QUEUED" || t.status === "IN_PROGRESS" || t.status === "PENDING_PAYMENT"
+                ).length ?? 0;
                 const peerReviewsDone = u.ArtistProfile?.totalPeerReviews ?? 0;
                 const proReviewsDone = u.ReviewerProfile?.totalReviews ?? 0;
                 const reviewsDone = peerReviewsDone + proReviewsDone;
@@ -296,8 +302,8 @@ export default async function AdminUsersPage({
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">
-                    {reviewsRequested > 0 ? (
-                      <span className="font-medium tabular-nums">{reviewsRequested}</span>
+                    {tracksInQueue > 0 ? (
+                      <span className="font-medium tabular-nums text-purple-600">{tracksInQueue}</span>
                     ) : (
                       <span className="text-neutral-400">—</span>
                     )}
@@ -314,6 +320,20 @@ export default async function AdminUsersPage({
                   <td className="px-4 py-3 text-right">
                     {u.ArtistProfile ? (
                       <span className="font-medium tabular-nums">{u.ArtistProfile.reviewCredits ?? 0}</span>
+                    ) : (
+                      <span className="text-neutral-400">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {(u.totalReferrals ?? 0) > 0 ? (
+                      <span className="font-medium tabular-nums text-green-600">{u.totalReferrals}</span>
+                    ) : (
+                      <span className="text-neutral-400">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {u.referredByCode ? (
+                      <span className="inline-flex items-center text-[11px] font-mono font-medium px-1.5 py-0.5 rounded bg-green-50 text-green-700">{u.referredByCode}</span>
                     ) : (
                       <span className="text-neutral-400">—</span>
                     )}
@@ -341,7 +361,7 @@ export default async function AdminUsersPage({
               })}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-neutral-500">
+                  <td colSpan={11} className="px-4 py-8 text-center text-neutral-500">
                     No users found
                   </td>
                 </tr>
