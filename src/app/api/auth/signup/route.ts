@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE } from "@/lib/password";
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
-import { generateReferralCode, REFERRAL_CREDITS } from "@/lib/referral-system";
+import { generateReferralCode } from "@/lib/referral-system";
 
 export const runtime = "nodejs";
 
@@ -100,21 +100,6 @@ export async function POST(request: Request) {
         referralCode: newUserReferralCode,
       },
     });
-
-    // Grant bonus credits to new user if they signed up via referral link
-    if (validReferralCode) {
-      try {
-        await prisma.artistProfile.updateMany({
-          where: { userId: user.id },
-          data: {
-            reviewCredits: { increment: REFERRAL_CREDITS },
-            totalCreditsEarned: { increment: REFERRAL_CREDITS },
-          },
-        });
-      } catch (error) {
-        console.error("Failed to grant referral credits:", error);
-      }
-    }
 
     return NextResponse.json(
       {

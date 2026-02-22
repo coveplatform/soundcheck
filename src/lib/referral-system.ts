@@ -4,7 +4,8 @@ import { prisma } from "./prisma";
 import Stripe from "stripe";
 
 export const REFERRAL_DISCOUNT_AMOUNT = 500; // $5.00 in cents — kept for backwards compat with existing Stripe coupons
-export const REFERRAL_CREDITS = 10; // Credits granted to both referrer and referee
+export const REFERRAL_CREDITS = 10; // Bonus credits granted to referee on signup
+export const REFERRER_REWARD_CREDITS = 3; // Credits granted to referrer when their referral completes onboarding
 export const REFERRAL_COOKIE_NAME = "mr_signup_ref";
 export const REFERRAL_COOKIE_EXPIRY_DAYS = 30;
 
@@ -74,41 +75,38 @@ export async function applyCouponToCheckout(
 }
 
 /**
- * Reward a referrer when their referee makes first purchase — grants credits directly
+ * Reward a referrer when their referee completes onboarding — grants credits directly
  */
 export async function rewardReferrer(referredByCode: string, refereeUserId: string): Promise<void> {
-  // Find the referrer's artist profile
+  // Avoid self-referral edge case
   const referrer = await prisma.user.findUnique({
     where: { referralCode: referredByCode },
     select: {
       id: true,
-      name: true,
-      totalReferrals: true,
       ArtistProfile: { select: { id: true } },
     },
   });
 
-  if (!referrer?.ArtistProfile) return;
+  if (!referrer || referrer.id === refereeUserId || !referrer.ArtistProfile) return;
 
-  // Grant credits directly to referrer's artist profile
-  await prisma.artistProfile.update({
-    where: { id: referrer.ArtistProfile.id },
-    data: {
-      reviewCredits: { increment: REFERRAL_CREDITS },
-      totalCreditsEarned: { increment: REFERRAL_CREDITS },
-    },
-  });
+  await prisma.$transaction([
+    prisma.artistProfile.update({
+      where: { id: referrer.ArtistProfile.id },
+      data: {
+        reviewCredits: { increment: REFERRER_REWARD_CREDITS },
+        totalCreditsEarned: { increment: REFERRER_REWARD_CREDITS },
+      },
+    }),
+    prisma.user.update({
+      where: { id: referrer.id },
+      data: {
+        totalReferrals: { increment: 1 },
+        referralRewardsEarned: { increment: REFERRER_REWARD_CREDITS * 100 },
+      },
+    }),
+  ]);
 
-  // Update referral tracking
-  await prisma.user.update({
-    where: { id: referrer.id },
-    data: {
-      totalReferrals: { increment: 1 },
-      referralRewardsEarned: { increment: REFERRAL_CREDITS * 100 }, // store as cents-equivalent for consistency
-    },
-  });
-
-  console.log(`✅ Rewarded referrer ${referrer.id} with ${REFERRAL_CREDITS} credits`);
+  console.log(`✅ Rewarded referrer ${referrer.id} with ${REFERRER_REWARD_CREDITS} credits for referral`);
 }
 
 /**

@@ -54,7 +54,7 @@ export function ReferralCard() {
   if (!stats?.code) return null;
 
   const referralLink = `${typeof window !== "undefined" ? window.location.origin : ""}/?ref=${stats.code}`;
-  const creditsEarned = stats.totalReferrals * 10;
+  const creditsEarned = stats.totalReferrals * 3;
 
   return (
     <div className="rounded-2xl border border-purple-200/60 bg-gradient-to-br from-purple-50/80 to-white p-4">
@@ -64,9 +64,9 @@ export function ReferralCard() {
           <Coins className="w-4 h-4 text-purple-600" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-bold text-black">Invite a producer, get 10 free credits</h3>
+          <h3 className="text-sm font-bold text-black">Invite an artist, get 3 free credits</h3>
           <p className="text-xs text-black/50 mt-0.5">
-            They get 10 free credits too. No purchase needed.
+            They get 10 bonus credits when they join. You get 3 when they finish signing up.
           </p>
         </div>
       </div>
@@ -115,11 +115,6 @@ export function ReferralCard() {
         )}
       </div>
 
-      {stats.pendingReferrals > 0 && (
-        <p className="text-[11px] text-black/35 mt-2">
-          You&apos;ll get 2 credits when each pending friend makes their first purchase.
-        </p>
-      )}
     </div>
   );
 }
