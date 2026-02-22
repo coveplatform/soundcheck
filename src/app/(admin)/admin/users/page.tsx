@@ -52,6 +52,24 @@ export default async function AdminUsersPage({
     "bogushogus@gmail.com",
     "hot23@gmail.com",
     "bigbadbozo@gmail.com",
+    // Seed / fake reviewer accounts used for review injection
+    "marcus.chen.music@gmail.com",
+    "sarahbeatsldn@hotmail.com",
+    "djmikewilliams@yahoo.com",
+    "emilysounddesign@gmail.com",
+    "olivia.musichead@icloud.com",
+    "ryan.audioeng@gmail.com",
+    "natasha.beats@hotmail.com",
+    "chris.soundwave@gmail.com",
+    "jessica.melodic@yahoo.com",
+    "sophie.synths@outlook.com",
+    "kevin.grooves@gmail.com",
+    "amanda.vibes@icloud.com",
+    "tyler.mixmaster@gmail.com",
+    "rachel.audiophile@hotmail.com",
+    "brandon.lowend@gmail.com",
+    "megan.frequencies@yahoo.com",
+    "david.waveform@gmail.com",
     // Additional test / friends / family accounts
     "daniel.basshead@gmail.com",
     "alexkimbeats@gmail.com",
@@ -245,20 +263,19 @@ export default async function AdminUsersPage({
 
       <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-neutral-50 text-neutral-600">
+          <table className="min-w-full text-xs">
+            <thead className="bg-neutral-50 text-neutral-500">
               <tr>
-                <th className="text-left font-medium px-4 py-3">Email</th>
-                <th className="text-left font-medium px-4 py-3">Artist Name</th>
-                <th className="text-left font-medium px-4 py-3">Activity</th>
-                <th className="text-right font-medium px-4 py-3">Uploaded</th>
-                <th className="text-right font-medium px-4 py-3">In Queue</th>
-                <th className="text-right font-medium px-4 py-3">Reviews Done</th>
-                <th className="text-right font-medium px-4 py-3">Credits</th>
-                <th className="text-right font-medium px-4 py-3">Refs Made</th>
-                <th className="text-left font-medium px-4 py-3">Referred By</th>
-                <th className="text-left font-medium px-4 py-3">Last Active</th>
-                <th className="text-left font-medium px-4 py-3">Created</th>
+                <th className="text-left font-medium px-3 py-2">Email</th>
+                <th className="text-left font-medium px-3 py-2">Artist Name</th>
+                <th className="text-right font-medium px-3 py-2">Uploaded</th>
+                <th className="text-right font-medium px-3 py-2">In Queue</th>
+                <th className="text-right font-medium px-3 py-2">Reviews</th>
+                <th className="text-right font-medium px-3 py-2">Credits</th>
+                <th className="text-right font-medium px-3 py-2">Refs</th>
+                <th className="text-left font-medium px-3 py-2">Ref By</th>
+                <th className="text-left font-medium px-3 py-2">Active</th>
+                <th className="text-left font-medium px-3 py-2">Joined</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
@@ -273,87 +290,74 @@ export default async function AdminUsersPage({
 
                 return (
                 <tr key={u.id} className="text-neutral-700 hover:bg-neutral-50">
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2">
                     <Link className="underline hover:text-purple-600" href={`/admin/users/${u.id}`}>
                       {u.email}
                     </Link>
                   </td>
-                  <td className="px-4 py-3">{u.ArtistProfile?.artistName ?? u.name ?? ""}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-1 flex-wrap">
-                      {u.isArtist && (
-                        <span className="inline-flex items-center text-[11px] font-medium px-1.5 py-0.5 rounded bg-purple-50 text-purple-700">Tracks</span>
-                      )}
-                      {u.isReviewer && (
-                        <span className="inline-flex items-center text-[11px] font-medium px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">Reviews</span>
-                      )}
-                      {!u.isArtist && !u.isReviewer && (
-                        <span className="text-neutral-400">—</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-2 text-neutral-500">{u.ArtistProfile?.artistName ?? u.name ?? ""}</td>
+                  <td className="px-3 py-2 text-right">
                     {tracksPosted > 0 ? (
                       <span className={`font-medium tabular-nums ${tracksPosted >= 5 ? 'text-green-600' : tracksPosted >= 3 ? 'text-blue-600' : ''}`}>
                         {tracksPosted}
                       </span>
                     ) : (
-                      <span className="text-neutral-400">—</span>
+                      <span className="text-neutral-300">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-2 text-right">
                     {tracksInQueue > 0 ? (
                       <span className="font-medium tabular-nums text-purple-600">{tracksInQueue}</span>
                     ) : (
-                      <span className="text-neutral-400">—</span>
+                      <span className="text-neutral-300">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-2 text-right">
                     {reviewsDone > 0 ? (
                       <span className={`font-medium tabular-nums ${reviewsDone >= 25 ? 'text-purple-600' : reviewsDone >= 5 ? 'text-blue-600' : ''}`}>
                         {reviewsDone}
                       </span>
                     ) : (
-                      <span className="text-neutral-400">—</span>
+                      <span className="text-neutral-300">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-2 text-right">
                     {u.ArtistProfile ? (
                       <span className="font-medium tabular-nums">{u.ArtistProfile.reviewCredits ?? 0}</span>
                     ) : (
-                      <span className="text-neutral-400">—</span>
+                      <span className="text-neutral-300">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-2 text-right">
                     {(u.totalReferrals ?? 0) > 0 ? (
                       <span className="font-medium tabular-nums text-green-600">{u.totalReferrals}</span>
                     ) : (
-                      <span className="text-neutral-400">—</span>
+                      <span className="text-neutral-300">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2">
                     {u.referredByCode ? (
-                      <span className="inline-flex items-center text-[11px] font-mono font-medium px-1.5 py-0.5 rounded bg-green-50 text-green-700">{u.referredByCode}</span>
+                      <span className="inline-flex items-center font-mono font-medium px-1 py-0.5 rounded bg-green-50 text-green-700">{u.referredByCode}</span>
                     ) : (
-                      <span className="text-neutral-400">—</span>
+                      <span className="text-neutral-300">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2">
                     {u.lastActiveAt ? (
-                      <span className={`text-sm ${
+                      <span className={
                         new Date().getTime() - new Date(u.lastActiveAt).getTime() < 86400000
                           ? 'text-green-600 font-medium'
                           : new Date().getTime() - new Date(u.lastActiveAt).getTime() < 604800000
                           ? 'text-blue-600'
-                          : 'text-neutral-600'
-                      }`} title={new Date(u.lastActiveAt).toLocaleString()}>
+                          : 'text-neutral-500'
+                      } title={new Date(u.lastActiveAt).toLocaleString()}>
                         {getRelativeTime(u.lastActiveAt)}
                       </span>
                     ) : (
-                      <span className="text-neutral-400 text-sm">Never</span>
+                      <span className="text-neutral-300">Never</span>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2 text-neutral-500">
                     {new Date(u.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
@@ -361,7 +365,7 @@ export default async function AdminUsersPage({
               })}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={11} className="px-4 py-8 text-center text-neutral-500">
+                  <td colSpan={10} className="px-3 py-8 text-center text-neutral-500">
                     No users found
                   </td>
                 </tr>
