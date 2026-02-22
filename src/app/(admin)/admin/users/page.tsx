@@ -70,6 +70,8 @@ export default async function AdminUsersPage({
     "brandon.lowend@gmail.com",
     "megan.frequencies@yahoo.com",
     "david.waveform@gmail.com",
+    "natasha.beats@hotmail.com",
+    "chris.soundwave@gmail.com",
     // Additional test / friends / family accounts
     "daniel.basshead@gmail.com",
     "alexkimbeats@gmail.com",
