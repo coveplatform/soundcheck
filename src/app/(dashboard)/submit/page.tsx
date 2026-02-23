@@ -502,72 +502,58 @@ export default function SubmitTrackPage() {
 
   if (profileLoading) {
     return (
-      <div className="pt-8 pb-24">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 min-h-[60vh] flex items-center justify-center">
-          <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
-        </div>
+      <div className="min-h-screen bg-[#faf7f2] flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
       </div>
     );
   }
 
   // ---- render ---------------------------------------------------------------
 
-  return (
-    <div className="pt-8 pb-24">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
-        {/* Header with step indicator */}
-        <div className="mb-8 pb-6 border-b border-black/10">
-          <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40">
-            Submit
-          </p>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black mt-2">
-            Submit Track
-          </h1>
+  const stepLabels = ["Track", "Details", "Reviews"];
 
-          {/* Step indicator */}
-          <div className="flex items-center gap-2 mt-6">
-            {[1, 2, 3].map((s) => (
-              <div key={s} className="flex items-center gap-2">
-                <div
-                  className={cn(
-                    "flex items-center justify-center h-8 w-8 rounded-full border-2 transition-all",
-                    s < step
-                      ? "bg-purple-600 border-purple-600"
-                      : s === step
-                      ? "bg-purple-600 border-purple-600"
-                      : "bg-white border-neutral-200"
-                  )}
-                >
-                  {s < step ? (
-                    <CheckCircle2 className="h-4 w-4 text-white" />
-                  ) : (
-                    <span
-                      className={cn(
-                        "text-sm font-bold",
-                        s === step ? "text-white" : "text-neutral-400"
-                      )}
-                    >
-                      {s}
-                    </span>
-                  )}
-                </div>
-                {s < 3 && (
-                  <div
-                    className={cn(
-                      "h-0.5 w-12 transition-colors",
-                      s < step ? "bg-purple-600" : "bg-neutral-200"
-                    )}
-                  />
-                )}
-              </div>
-            ))}
+  return (
+    <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
+
+      {/* ── HERO ───────────────────────────────────────────────── */}
+      <div className="bg-white border-b-2 border-black">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+          <div className="flex items-start justify-between gap-6">
+            <div className="min-w-0">
+              <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-[0.95]">
+                Submit.
+              </h1>
+              <p className="text-sm text-black/40 font-medium mt-2">
+                Get real feedback from fellow artists in your genre.
+              </p>
+            </div>
+            {/* Step pills */}
+            <div className="flex-shrink-0 flex items-center gap-2">
+              {stepLabels.map((label, i) => {
+                const s = i + 1;
+                return (
+                  <div key={s} className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 text-[11px] font-black uppercase tracking-wider transition-all",
+                    s < step ? "bg-lime-400 border-lime-400 text-black" :
+                    s === step ? "bg-black border-black text-white" :
+                    "bg-white border-black/10 text-black/25"
+                  )}>
+                    {s < step ? <CheckCircle2 className="h-3 w-3" /> : <span>{s}</span>}
+                    <span className="hidden sm:inline">{label}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
 
         {/* Error display */}
         {error && (
-          <div className="mb-6 rounded-2xl border-2 border-red-200 bg-red-50 p-4">
-            <p className="text-sm text-red-700 font-medium">{error}</p>
+          <div className="mb-6 bg-red-500 text-white rounded-2xl px-4 py-3">
+            <p className="text-sm font-bold">{error}</p>
           </div>
         )}
 
@@ -578,14 +564,15 @@ export default function SubmitTrackPage() {
         {/* STEP 1: Upload your track                                         */}
         {/* ================================================================= */}
         {step === 1 && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <div>
-              <h2 className="text-xl font-semibold text-black mb-1">Upload your track</h2>
-              <p className="text-sm text-neutral-600">Choose how you want to add your music</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">Step 1</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight leading-none">Upload your track</h2>
+              <p className="text-sm text-black/40 font-medium mt-1">Choose how you want to add your music</p>
             </div>
 
             {/* Upload mode toggle */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => {
@@ -596,13 +583,13 @@ export default function SubmitTrackPage() {
                   setError("");
                 }}
                 className={cn(
-                  "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 font-semibold transition-all",
+                  "flex items-center gap-2 px-4 py-2 rounded-full border-2 font-black text-[11px] uppercase tracking-wider transition-all",
                   uploadMode === "link"
-                    ? "border-purple-600 bg-purple-600 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                    : "border-neutral-200 bg-white text-neutral-700 hover:border-purple-300"
+                    ? "bg-black border-black text-white"
+                    : "bg-white border-black/10 text-black/40 hover:border-black/25 hover:text-black/70"
                 )}
               >
-                <Link2 className="h-4 w-4" />
+                <Link2 className="h-3.5 w-3.5" />
                 Link
               </button>
               <button
@@ -616,14 +603,14 @@ export default function SubmitTrackPage() {
                   setError("");
                 }}
                 className={cn(
-                  "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 font-semibold transition-all",
+                  "flex items-center gap-2 px-4 py-2 rounded-full border-2 font-black text-[11px] uppercase tracking-wider transition-all",
                   uploadMode === "file"
-                    ? "border-purple-600 bg-purple-600 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                    : "border-neutral-200 bg-white text-neutral-700 hover:border-purple-300"
+                    ? "bg-black border-black text-white"
+                    : "bg-white border-black/10 text-black/40 hover:border-black/25 hover:text-black/70"
                 )}
               >
-                <Upload className="h-4 w-4" />
-                Upload
+                <Upload className="h-3.5 w-3.5" />
+                Upload MP3
               </button>
             </div>
 
@@ -776,17 +763,18 @@ export default function SubmitTrackPage() {
         {/* STEP 2: Track details                                             */}
         {/* ================================================================= */}
         {step === 2 && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
+          <div className="space-y-5">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-semibold text-black mb-1">Track details</h2>
-                <p className="text-sm text-neutral-600">Add title and genres</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">Step 2</p>
+                <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight leading-none">Track details</h2>
+                <p className="text-sm text-black/40 font-medium mt-1">Add title and genres</p>
               </div>
               <button
                 onClick={goBack}
-                className="flex items-center gap-1 text-sm text-neutral-500 hover:text-black transition-colors"
+                className="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors mt-1"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-3 w-3" />
                 Back
               </button>
             </div>
@@ -943,170 +931,124 @@ export default function SubmitTrackPage() {
         {/* STEP 3: Review count                                              */}
         {/* ================================================================= */}
         {step === 3 && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
+          <div className="space-y-5">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-semibold text-black mb-1">
-                  How many reviews?
-                </h2>
-                <p className="text-sm text-neutral-600">
-                  Each review costs 1 credit
-                </p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">Step 3</p>
+                <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight leading-none">How many reviews?</h2>
+                <p className="text-sm text-black/40 font-medium mt-1">Each review costs 1 credit</p>
               </div>
               <button
                 onClick={goBack}
-                className="flex items-center gap-1 text-sm text-neutral-500 hover:text-black transition-colors"
+                className="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors mt-1"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-3 w-3" />
                 Back
               </button>
             </div>
 
-            {/* Slot status */}
+            {/* Slot full warning */}
             {!slotAvailable && (
-              <div className="rounded-xl bg-amber-50 border-2 border-amber-300 p-4">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-bold text-amber-900 mb-1">Your review slot is full</p>
-                    <p className="text-sm text-amber-800">
-                      You can have {slotInfo?.maxSlots ?? 1} track{(slotInfo?.maxSlots ?? 1) > 1 ? "s" : ""} in the review queue at a time.
-                      Wait for current reviews to complete, or{" "}
-                      <Link href="/pro" className="font-bold text-purple-700 underline underline-offset-2 hover:text-purple-900">
-                        upgrade to Pro
-                      </Link>{" "}
-                      for 3 slots.
-                    </p>
-                  </div>
+              <div className="bg-amber-400 rounded-2xl px-5 py-4 flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-black flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-black text-black mb-1">Your review slot is full</p>
+                  <p className="text-sm text-black/70 font-medium">
+                    You can have {slotInfo?.maxSlots ?? 1} track{(slotInfo?.maxSlots ?? 1) > 1 ? "s" : ""} in the queue at a time. Wait for current reviews to complete, or{" "}
+                    <Link href="/pro" className="font-black underline underline-offset-2">upgrade to Pro</Link>{" "}for 3 slots.
+                  </p>
                 </div>
               </div>
             )}
 
-            {/* Credit Balance Display */}
-            <div className="flex items-center gap-3 rounded-xl bg-purple-50 border-2 border-purple-200 px-4 py-3">
-              <Coins className="h-5 w-5 text-purple-600 flex-shrink-0" />
-              <p className="text-sm font-medium text-purple-900">
-                You have{" "}
-                <span className="text-lg font-bold text-purple-600">{creditBalance}</span>{" "}
-                {creditBalance === 1 ? "credit" : "credits"}
-              </p>
-            </div>
-
-            {/* Insufficient credits warning */}
-            {!hasEnoughCredits && reviewCount > 0 && (
-              <div className="rounded-xl bg-amber-50 border-2 border-amber-300 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center text-white font-bold text-xs">!</div>
-                  <div className="flex-1">
-                    <p className="text-sm font-bold text-amber-900 mb-1">Not enough credits</p>
-                    <p className="text-sm text-amber-800">
-                      You need <strong>{creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}</strong> to request {reviewCount} reviews.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Review count slider */}
-            <div className="bg-white border-2 border-neutral-200 rounded-2xl p-6 shadow-sm">
-              {/* Large display */}
-              <div className="text-center mb-6">
+            {/* Review count card */}
+            <div className="bg-white rounded-2xl border-2 border-black/8 p-6 space-y-6">
+              {/* Big number */}
+              <div className="text-center">
                 <div className="inline-flex items-baseline gap-2">
-                  <span className="text-5xl font-bold text-purple-600 tabular-nums">
-                    {reviewCount}
-                  </span>
-                  <span className="text-xl text-neutral-600 font-medium">
-                    {reviewCount === 1 ? "review" : "reviews"}
-                  </span>
+                  <span className="text-6xl font-black text-black tabular-nums">{reviewCount}</span>
+                  <span className="text-xl text-black/40 font-black">{reviewCount === 1 ? "review" : "reviews"}</span>
                 </div>
-                <p className="text-sm text-neutral-600 mt-2">
+                <p className="text-sm text-black/40 font-medium mt-1">
                   {reviewCount} {reviewCount === 1 ? "credit" : "credits"} required
                 </p>
               </div>
 
               {/* Slider */}
-              <div className="mb-6">
-                <div className="relative">
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={reviewCount}
-                    onChange={(e) => setReviewCount(parseInt(e.target.value))}
-                    className="w-full h-3 bg-neutral-200 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-600 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-purple-600 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:transition-transform [&::-moz-range-thumb]:hover:scale-110"
-                    style={{
-                      background: `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${((reviewCount - 1) / 9) * 100}%, rgb(229 231 235) ${((reviewCount - 1) / 9) * 100}%, rgb(229 231 235) 100%)`
-                    }}
-                  />
-
-                  {/* Quick select markers */}
-                  <div className="flex justify-between mt-2 px-1">
-                    {[1, 3, 5, 7, 10].map((mark) => (
-                      <button
-                        key={mark}
-                        type="button"
-                        onClick={() => setReviewCount(mark)}
-                        className={cn(
-                          "text-xs font-medium transition-colors",
-                          reviewCount === mark
-                            ? "text-purple-600"
-                            : "text-neutral-400 hover:text-purple-600"
-                        )}
-                      >
-                        {mark}
-                      </button>
-                    ))}
-                  </div>
+              <div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={reviewCount}
+                  onChange={(e) => setReviewCount(parseInt(e.target.value))}
+                  className="w-full h-3 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-600 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-purple-600 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${((reviewCount - 1) / 9) * 100}%, rgb(229 231 235) ${((reviewCount - 1) / 9) * 100}%, rgb(229 231 235) 100%)`
+                  }}
+                />
+                <div className="flex justify-between mt-2">
+                  {[1, 3, 5, 7, 10].map((mark) => (
+                    <button
+                      key={mark}
+                      type="button"
+                      onClick={() => setReviewCount(mark)}
+                      className={cn(
+                        "text-xs font-black transition-colors",
+                        reviewCount === mark ? "text-purple-600" : "text-black/25 hover:text-purple-600"
+                      )}
+                    >
+                      {mark}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Unlocked benefits - show current level */}
-              <div className="text-center py-4 border-t border-neutral-200">
-                <div className="flex items-center justify-center gap-1.5 mb-3">
+              {/* Insight level */}
+              <div className="border-t-2 border-black/8 pt-5">
+                <div className="flex items-center gap-1.5 mb-2">
                   {REVIEW_BENEFITS.filter((b) => b.minReviews <= 10).map((benefit) => (
                     <div
                       key={benefit.label}
                       className={cn(
-                        "h-1.5 w-8 rounded-full transition-all duration-300",
-                        reviewCount >= benefit.minReviews
-                          ? "bg-purple-600"
-                          : "bg-neutral-200"
+                        "h-2 flex-1 rounded-full transition-all duration-300",
+                        reviewCount >= benefit.minReviews ? "bg-purple-600" : "bg-black/8"
                       )}
                     />
                   ))}
                 </div>
-                <p className="text-sm font-medium text-neutral-900">
+                <p className="text-sm font-black text-black">
+                  {REVIEW_BENEFITS.filter((b) => reviewCount >= b.minReviews).slice(-1)[0]?.icon}{" "}
                   {REVIEW_BENEFITS.filter((b) => reviewCount >= b.minReviews).slice(-1)[0]?.label || "Select reviews"}
                 </p>
-                <p className="text-xs text-neutral-400 mt-1">
-                  Current insight level
-                </p>
+                <p className="text-[11px] text-black/30 font-medium mt-0.5">Current insight level</p>
+              </div>
+
+              {/* Credit balance */}
+              <div className="border-t-2 border-black/8 pt-5 flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-wider text-black/30">Available</p>
+                  <p className={`text-3xl font-black tabular-nums ${creditBalance === 0 ? "text-red-500" : "text-black"}`}>{creditBalance}</p>
+                  <p className="text-[11px] text-black/30 font-medium">credits</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[11px] font-black uppercase tracking-wider text-black/30">Will use</p>
+                  <p className={`text-3xl font-black tabular-nums ${!hasEnoughCredits ? "text-red-500" : "text-purple-600"}`}>{reviewCount}</p>
+                  <p className="text-[11px] text-black/30 font-medium">credits</p>
+                </div>
               </div>
             </div>
 
-            {/* Submit button */}
-            <Button
-              onClick={handleSubmit}
-              disabled={!hasEnoughCredits || !slotAvailable || isSubmitting}
-              isLoading={isSubmitting}
-              className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
-            >
-              Submit for Review
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-
-            {/* Not enough credits — earn more */}
+            {/* Not enough credits */}
             {!hasEnoughCredits && (
-              <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-5 space-y-3">
-                <p className="text-sm font-bold text-amber-900">
+              <div className="bg-neutral-900 rounded-2xl px-5 py-5 space-y-3">
+                <p className="text-base font-black text-white">
                   You need {creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}
                 </p>
-                <p className="text-xs text-amber-700">
-                  Earn free credits by reviewing other artists&apos; tracks.
-                </p>
+                <p className="text-sm text-white/40 font-medium">Earn free credits by reviewing other artists&apos; tracks.</p>
                 <Link
                   href="/review"
-                  className="flex items-center justify-center gap-1.5 w-full h-11 rounded-xl border-2 border-amber-300 bg-white text-sm font-semibold text-amber-900 hover:border-purple-400 hover:text-purple-700 transition-colors"
+                  className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-lime-400 hover:bg-lime-300 text-black text-[11px] font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                 >
                   <Sparkles className="h-4 w-4" />
                   Earn credits by reviewing
@@ -1114,12 +1056,22 @@ export default function SubmitTrackPage() {
               </div>
             )}
 
-            {/* Upload without reviews */}
-            <div className="text-center pt-2">
+            {/* Submit */}
+            <Button
+              onClick={handleSubmit}
+              disabled={!hasEnoughCredits || !slotAvailable || isSubmitting}
+              isLoading={isSubmitting}
+              className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all h-12 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
+            >
+              Submit for Review
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+
+            <div className="text-center">
               <button
                 onClick={handleUploadOnly}
                 disabled={isSubmitting}
-                className="text-sm text-neutral-500 hover:text-purple-600 underline underline-offset-2 transition-colors"
+                className="text-sm text-black/30 hover:text-purple-600 font-bold underline underline-offset-2 transition-colors"
               >
                 Upload without reviews
               </button>
