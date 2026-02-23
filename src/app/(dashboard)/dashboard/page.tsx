@@ -17,6 +17,12 @@ import {
 import { ClaimCard } from "@/components/dashboard/claim-card";
 import { MobileStickyCTA } from "@/components/dashboard/mobile-sticky-cta";
 import {
+  SparklesDoodle,
+  SquiggleDoodle,
+  StarDoodle,
+  DotsDoodle,
+} from "@/components/dashboard/doodles";
+import {
   DashboardArtistProfile,
   MinimalArtistProfile,
 } from "@/types/dashboard";
@@ -210,16 +216,17 @@ export default async function DashboardPage() {
     whatsNext?.priority === "high" || whatsNext?.priority === "medium";
 
   return (
-    <div className="min-h-screen bg-[#f7f5f2] pb-24 overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8f7ff] pb-24 overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
       <div className="bg-white border-b-2 border-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-          <div className="flex items-start justify-between gap-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10 relative overflow-hidden">
+          {/* Doodles — big, intentional, not shy */}
+          <SquiggleDoodle className="absolute -bottom-5 left-[42%] w-24 h-24 text-purple-400/20 pointer-events-none rotate-6" />
+          <SparklesDoodle className="absolute top-2 right-[36%] w-9 h-9 text-purple-500/25 pointer-events-none" />
+
+          <div className="flex items-start justify-between gap-6 relative">
             <div className="min-w-0">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-2">
-                Soundcheck
-              </p>
               <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-[0.95]">
                 Hey,{" "}
                 <span className="block sm:inline">
@@ -227,12 +234,17 @@ export default async function DashboardPage() {
                 </span>
               </h1>
             </div>
-            <div className="flex-shrink-0 text-right pl-5 sm:pl-8 border-l-2 border-black/10">
+            <div className="flex-shrink-0 text-right pl-5 sm:pl-8 border-l-2 border-black/10 relative">
+              <StarDoodle className="absolute -top-4 -right-1 w-12 h-12 text-purple-400/30 pointer-events-none" />
               <p className="text-5xl sm:text-6xl font-black text-black leading-none tabular-nums">
                 {credits}
               </p>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mt-1.5">
-                credits
+                {credits === 1
+                  ? "credit to spend"
+                  : credits > 0
+                  ? "credits to spend"
+                  : "credits"}
               </p>
               <Link
                 href={credits > 0 ? "/submit" : "/review"}
@@ -286,7 +298,8 @@ export default async function DashboardPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
 
         {/* ── YOUR QUEUE ─────────────────────────────────────── */}
-        <section className="pt-10 pb-10">
+        <section className="pt-10 pb-10 relative">
+          <DotsDoodle className="absolute top-8 right-0 w-14 h-14 text-purple-400/15 pointer-events-none" />
           <div className="flex items-end justify-between mb-5">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">
