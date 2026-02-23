@@ -20,40 +20,150 @@ interface Review {
   biggestWeaknessSpecific?: string | null;
 }
 
-// Stop words to filter out
+// Generic stop words — common English words with no musical signal
 const STOP_WORDS = new Set([
+  // articles / conjunctions / prepositions
   "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
-  "of", "with", "by", "from", "up", "about", "into", "through", "is",
-  "are", "was", "were", "been", "be", "have", "has", "had", "do", "does",
-  "did", "will", "would", "could", "should", "may", "might", "can",
-  "very", "really", "just", "some", "more", "much", "this", "that",
+  "of", "with", "by", "from", "up", "about", "into", "through", "over",
+  "under", "after", "before", "between", "during", "without", "within",
+  "along", "across", "behind", "beyond", "plus", "except", "until",
+  // verbs (generic)
+  "is", "are", "was", "were", "been", "be", "have", "has", "had",
+  "do", "does", "did", "will", "would", "could", "should", "may",
+  "might", "can", "shall", "need", "used", "get", "got", "gets",
+  "make", "makes", "made", "feel", "feels", "felt", "seem", "seems",
+  "think", "thought", "know", "knew", "want", "wanted", "like", "liked",
+  "love", "loved", "hear", "heard", "sound", "sounds", "work", "works",
+  "come", "comes", "came", "give", "gives", "gave", "take", "takes",
+  "keep", "keeps", "kept", "let", "lets", "try", "tries", "tried",
+  "add", "adds", "added", "use", "uses", "bring", "brings", "brought",
+  "help", "helps", "helped", "move", "moves", "moved", "push", "pulls",
+  "hit", "hits", "play", "plays", "played", "put", "puts",
+  // pronouns
   "it", "its", "your", "you", "i", "me", "my", "we", "they", "them",
+  "their", "our", "us", "he", "she", "his", "her", "who", "what",
+  "which", "that", "this", "these", "those",
+  // adverbs / adjectives (generic, no musical signal)
+  "very", "really", "just", "some", "more", "much", "most", "many",
+  "also", "even", "still", "well", "good", "great", "nice", "bit",
+  "little", "quite", "rather", "too", "so", "how", "when", "where",
+  "why", "then", "than", "there", "here", "now", "already", "always",
+  "never", "often", "maybe", "perhaps", "almost", "enough", "only",
+  "both", "each", "every", "any", "all", "few", "same", "other",
+  "another", "such", "own", "right", "left", "long", "short", "high",
+  "low", "big", "small", "new", "old", "next", "last", "first",
+  "second", "third", "overall", "general", "certain", "sure", "able",
+  // filler / transition words that appear in review text
+  "think", "feel", "feels", "feeling", "sounds", "seems", "around",
+  "seconds", "minutes", "time", "times", "things", "something",
+  "anything", "everything", "nothing", "someone", "anyone", "everyone",
+  "really", "actually", "basically", "honestly", "personally",
+  "definitely", "absolutely", "totally", "completely", "especially",
+  "particularly", "generally", "usually", "typically", "mostly",
+  "slightly", "somewhat", "pretty", "fairly", "kind", "sort", "type",
+  "way", "ways", "part", "parts", "point", "points", "place", "places",
+  "area", "areas", "level", "levels", "amount", "number", "lot", "lots",
+  "bit", "bits", "piece", "pieces", "section", "sections", "moment",
+  "moments", "start", "end", "beginning", "middle", "throughout",
+  "track", "song", "music", "listen", "listener", "listeners",
+  "reviewer", "review", "feedback", "overall", "though", "although",
+  "however", "because", "since", "while", "where", "when", "whether",
+  "could", "would", "should", "might", "must", "shall",
 ]);
 
-// Extract word frequencies from text
-function extractWords(text: string): string[] {
+// Music-domain terms that are always meaningful — never filtered
+const MUSIC_TERMS = new Set([
+  "bass", "kick", "snare", "drums", "drum", "percussion", "hihat", "hats",
+  "vocals", "vocal", "voice", "lyrics", "lyric", "melody", "melodies",
+  "hook", "chorus", "verse", "bridge", "intro", "outro", "drop",
+  "build", "breakdown", "transition", "arrangement", "structure",
+  "mix", "mixing", "master", "mastering", "production", "producer",
+  "beat", "beats", "rhythm", "groove", "tempo", "bpm",
+  "synth", "synths", "synthesizer", "piano", "guitar", "strings",
+  "pads", "lead", "arp", "arpeggio", "chords", "chord", "harmony",
+  "harmonies", "pitch", "tuning", "autotune",
+  "reverb", "delay", "compression", "compressor", "limiter", "eq",
+  "equalizer", "saturation", "distortion", "overdrive", "filter",
+  "sidechain", "stereo", "mono", "panning", "width", "space",
+  "loudness", "volume", "dynamics", "transients", "attack", "release",
+  "frequency", "frequencies", "low-end", "midrange", "highs", "lows",
+  "mids", "sub", "muddy", "clarity", "crisp", "warm", "cold", "bright",
+  "dark", "punchy", "tight", "loose", "thin", "full", "heavy", "light",
+  "energy", "vibe", "mood", "emotion", "emotional", "atmosphere",
+  "genre", "style", "originality", "creative", "unique", "catchy",
+  "memorable", "repetitive", "boring", "engaging", "interesting",
+  "commercial", "radio", "playlist", "streaming",
+]);
+
+// Tokenise a review text into cleaned words
+function tokenise(text: string): string[] {
   return text
     .toLowerCase()
-    .replace(/[^\w\s]/g, " ") // Remove punctuation
-    .split(/\s+/)
-    .filter((word) => word.length > 3 && !STOP_WORDS.has(word));
+    .replace(/[^\w\s'-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .map((w) => w.replace(/^[-']+|[-']+$/g, "")) // strip leading/trailing hyphens/apostrophes
+    .filter((w) => w.length >= 3);
 }
 
-// Get top N words from an array of texts
+// Return true if a word carries musical signal
+function isMeaningful(word: string): boolean {
+  if (MUSIC_TERMS.has(word)) return true;
+  if (STOP_WORDS.has(word)) return false;
+  if (word.length < 4) return false;
+  // filter pure numbers
+  if (/^\d+$/.test(word)) return false;
+  return true;
+}
+
+// Extract single meaningful words + 2-word phrases from a text
+function extractPhrases(text: string): string[] {
+  const tokens = tokenise(text);
+  const results: string[] = [];
+
+  for (let i = 0; i < tokens.length; i++) {
+    const w = tokens[i];
+    if (isMeaningful(w)) {
+      results.push(w);
+    }
+
+    // Bigram: pair current word with next if both are meaningful OR
+    // if one is a music term and the other is a meaningful modifier
+    if (i < tokens.length - 1) {
+      const next = tokens[i + 1];
+      const wOk = isMeaningful(w) || MUSIC_TERMS.has(w);
+      const nextOk = isMeaningful(next) || MUSIC_TERMS.has(next);
+      // At least one must be a music term to form a bigram
+      if (wOk && nextOk && (MUSIC_TERMS.has(w) || MUSIC_TERMS.has(next))) {
+        results.push(`${w} ${next}`);
+      }
+    }
+  }
+
+  return results;
+}
+
+// Get top N phrases from an array of review texts
 export function getTopWords(
   texts: string[],
   limit: number = 10
 ): Array<{ word: string; count: number }> {
-  const wordCounts = new Map<string, number>();
+  const counts = new Map<string, number>();
 
   texts.forEach((text) => {
-    const words = extractWords(text);
-    words.forEach((word) => {
-      wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
+    // Deduplicate within a single review so one reviewer saying "kick" 5 times
+    // doesn't dominate — count each phrase once per review
+    const seen = new Set<string>();
+    extractPhrases(text).forEach((phrase) => {
+      if (!seen.has(phrase)) {
+        seen.add(phrase);
+        counts.set(phrase, (counts.get(phrase) || 0) + 1);
+      }
     });
   });
 
-  return Array.from(wordCounts.entries())
+  return Array.from(counts.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, limit)
     .map(([word, count]) => ({ word, count }));
