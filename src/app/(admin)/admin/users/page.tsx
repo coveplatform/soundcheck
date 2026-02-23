@@ -70,8 +70,16 @@ export default async function AdminUsersPage({
     "brandon.lowend@gmail.com",
     "megan.frequencies@yahoo.com",
     "david.waveform@gmail.com",
-    "natasha.beats@hotmail.com",
-    "chris.soundwave@gmail.com",
+    // inject-the-pattern
+    "jake.soundcheck@gmail.com",
+    "carlos.wav@hotmail.com",
+    "tanya.mixhead@gmail.com",
+    // inject-blackout
+    "sarah.vibecheck@gmail.com",
+    "marcus.alt.ears@hotmail.com",
+    "donna.listens22@gmail.com",
+    // inject-king-rolly
+    "wavtek23@gmail.com",
     // Additional test / friends / family accounts
     "daniel.basshead@gmail.com",
     "alexkimbeats@gmail.com",
