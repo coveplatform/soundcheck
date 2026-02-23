@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Tooltip } from "@/components/ui/tooltip";
-import { ArrowRight, MessageCircle, Trophy, Music, Headphones, BarChart3, Lock, Crown, Plus } from "lucide-react";
+import { ArrowRight, MessageCircle, Trophy, Music, Headphones, BarChart3, Lock, Crown, Plus, HelpCircle } from "lucide-react";
 import {
   SparklesDoodle,
   SquiggleDoodle,
@@ -384,7 +384,12 @@ export default async function DashboardPage() {
             <section aria-label="Your queue" className="relative">
               <SquiggleDoodle className="absolute -top-2 -right-2 w-10 h-10 text-black/[0.04] pointer-events-none hidden sm:block" />
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base font-bold text-black">Your Queue</h2>
+                <div className="flex items-center gap-1.5">
+                  <h2 className="text-base font-bold text-black">Your Queue</h2>
+                  <Tooltip content="Tracks you've submitted for feedback. Each slot holds one track while it's being reviewed by other artists.">
+                    <HelpCircle className="h-3.5 w-3.5 text-black/25 cursor-help hover:text-black/50 transition-colors" />
+                  </Tooltip>
+                </div>
                 <Link
                   href="/tracks"
                   className="text-[11px] font-mono tracking-[0.15em] uppercase text-black/40 hover:text-black transition-colors duration-150 ease-out"
@@ -499,6 +504,9 @@ export default async function DashboardPage() {
                       {availableQueueTracks.length}
                     </span>
                   )}
+                  <Tooltip content="Listen to other artists' tracks and leave feedback. Each completed review earns you 1 credit to spend on your own reviews.">
+                    <HelpCircle className="h-3.5 w-3.5 text-black/25 cursor-help hover:text-black/50 transition-colors" />
+                  </Tooltip>
                 </div>
                 <Link
                   href="/review"
