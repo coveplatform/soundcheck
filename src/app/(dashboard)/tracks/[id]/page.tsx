@@ -177,7 +177,9 @@ export default async function TrackDetailPage({
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Music className="w-10 h-10 text-white/30" />
+                  <span className="text-3xl font-black text-white/80 select-none">
+                    {track.title.trim()[0]?.toUpperCase() ?? "♪"}
+                  </span>
                 </div>
               )}
             </div>
