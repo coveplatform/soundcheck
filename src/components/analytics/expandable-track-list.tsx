@@ -44,73 +44,67 @@ export function ExpandableTrackList({ tracks, variant = "all" }: ExpandableTrack
         const isExpanded = expandedId === track.id;
 
         return (
-          <div key={track.id} className="rounded-xl overflow-hidden">
+          <div key={track.id} className="rounded-2xl overflow-hidden border-2 border-black/8">
             {/* Main track row */}
             <button
               onClick={() => toggleExpand(track.id)}
-              className="w-full p-3 sm:p-4 rounded-lg bg-white hover:bg-black/5 border border-black/5 hover:border-black/10 transition-all text-left"
+              className="w-full p-3 bg-white hover:bg-black/[0.02] transition-colors text-left"
             >
-              <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-3">
+                {/* Rank badge (top variant only) */}
                 {variant === "top" && (
-                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-lime-400 to-lime-600 flex items-center justify-center text-white font-black text-sm">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-black flex items-center justify-center text-white font-black text-[10px]">
                     {index + 1}
                   </div>
                 )}
 
-                {track.artworkUrl ? (
-                  <img
-                    src={track.artworkUrl}
-                    alt={track.title}
-                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg object-cover flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center flex-shrink-0">
-                    <Music className="w-6 h-6 text-white/30" />
-                  </div>
-                )}
-
-                <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold truncate text-sm sm:text-base">{track.title}</p>
-                    <p className="text-xs text-black/50">
-                      {new Date(track.createdAt).toLocaleDateString()} · {track.reviewsCompleted} reviews
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="flex gap-2">
-                      <div className="text-center">
-                        <p className="text-xs text-black/40">Prod</p>
-                        <p className="text-sm font-bold">
-                          {track.categoryScores.production.toFixed(1)}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-xs text-black/40">Orig</p>
-                        <p className="text-sm font-bold">
-                          {track.categoryScores.originality.toFixed(1)}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-xs text-black/40">Vocals</p>
-                        <p className="text-sm font-bold">
-                          {track.categoryScores.vocals.toFixed(1)}
-                        </p>
-                      </div>
+                {/* Artwork */}
+                <div className="flex-shrink-0 w-11 h-11 rounded-xl overflow-hidden border border-black/8">
+                  {track.artworkUrl ? (
+                    <img
+                      src={track.artworkUrl}
+                      alt={track.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center">
+                      <Music className="w-4 h-4 text-white/60" />
                     </div>
+                  )}
+                </div>
 
-                    <div className="text-right pl-3 sm:pl-4 border-l border-black/10 flex items-center gap-2">
-                      <div>
-                        <p className="text-xl sm:text-2xl font-black">{track.avgScore.toFixed(1)}</p>
-                        <p className="text-xs text-black/40">avg</p>
-                      </div>
-                      {isExpanded ? (
-                        <ChevronUp className="h-5 w-5 text-black/40" />
-                      ) : (
-                        <ChevronDown className="h-5 w-5 text-black/40" />
-                      )}
-                    </div>
+                {/* Title + meta + scores */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-black text-sm text-black truncate leading-tight">{track.title}</p>
+                  <p className="text-[10px] text-black/35 font-medium mt-0.5">
+                    {new Date(track.createdAt).toLocaleDateString()} · {track.reviewsCompleted} {track.reviewsCompleted === 1 ? "review" : "reviews"}
+                  </p>
+                  {/* Score pills — always below title, never overlapping */}
+                  <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                    {[
+                      { label: "Prod", value: track.categoryScores.production },
+                      { label: "Orig", value: track.categoryScores.originality },
+                      { label: "Vocals", value: track.categoryScores.vocals },
+                    ].map((s) => (
+                      <span key={s.label} className="inline-flex items-center gap-1 bg-black/5 rounded-full px-2 py-0.5">
+                        <span className="text-[9px] font-black uppercase tracking-wider text-black/35">{s.label}</span>
+                        <span className="text-[11px] font-black text-black">{s.value.toFixed(1)}</span>
+                      </span>
+                    ))}
                   </div>
+                </div>
+
+                {/* Avg score + chevron */}
+                <div className="flex-shrink-0 flex items-center gap-2 pl-3 border-l-2 border-black/8">
+                  <div className="text-right">
+                    <p className="text-2xl font-black text-black leading-none tabular-nums">{track.avgScore.toFixed(1)}</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-black/30 mt-0.5">avg</p>
+                  </div>
+                  {isExpanded ? (
+                    <ChevronUp className="h-4 w-4 text-black/30 flex-shrink-0" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-black/30 flex-shrink-0" />
+                  )}
                 </div>
               </div>
             </button>
