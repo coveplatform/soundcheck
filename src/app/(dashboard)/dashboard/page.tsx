@@ -216,7 +216,7 @@ export default async function DashboardPage() {
     whatsNext?.priority === "high" || whatsNext?.priority === "medium";
 
   return (
-    <div className="min-h-screen bg-[#f8f7ff] pb-24 overflow-x-hidden">
+    <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
       <div className="bg-white border-b-2 border-black">
