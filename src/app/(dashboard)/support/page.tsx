@@ -8,16 +8,13 @@ export default function SupportPage() {
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@mixreflect.com";
 
   return (
-    <div className="min-h-screen bg-[#f7f5f2] pb-24 overflow-x-hidden">
+    <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
       <div className="bg-white border-b-2 border-black">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10 relative overflow-hidden">
-          <DotsDoodle className="absolute -top-2 right-6 w-14 h-14 text-purple-400/15 pointer-events-none" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10 relative overflow-hidden">
+          <DotsDoodle className="absolute -bottom-3 left-[40%] w-20 h-20 text-purple-400/20 pointer-events-none rotate-12" />
           <div className="relative">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-2">
-              Help
-            </p>
             <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-[0.95]">
               Support.
             </h1>
@@ -29,7 +26,7 @@ export default function SupportPage() {
       </div>
 
       {/* ── CONTENT ────────────────────────────────────────────── */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-6">
 
         {/* Email CTA — dark block */}
         <div className="bg-neutral-900 rounded-2xl px-6 py-6 flex flex-col sm:flex-row sm:items-center gap-5">

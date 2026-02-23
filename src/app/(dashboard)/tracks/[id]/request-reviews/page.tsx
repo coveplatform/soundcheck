@@ -117,18 +117,17 @@ export default function RequestReviewsPage() {
   const needsCredits = !isLoadingProfile && desiredReviews > reviewTokens;
 
   return (
-    <div className="min-h-screen bg-[#f7f5f2] pb-24 overflow-x-hidden">
+    <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
       <div className="bg-white border-b-2 border-black">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           <Link
             href={trackId ? `/tracks/${trackId}` : "/tracks"}
             className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors mb-3"
           >
             ← Back to track
           </Link>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-2">Reviews</p>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-[0.95]">
             Request Reviews.
           </h1>
@@ -139,7 +138,7 @@ export default function RequestReviewsPage() {
       </div>
 
       {/* ── CONTENT ────────────────────────────────────────────── */}
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 space-y-5">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-5">
 
         {/* Track info */}
         {trackInfo && (

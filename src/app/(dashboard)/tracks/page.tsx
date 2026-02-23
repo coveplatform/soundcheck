@@ -6,6 +6,7 @@ import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Plus, Music, CheckCircle2, Lock, Crown } from "lucide-react";
+import { SquiggleDoodle, StarDoodle } from "@/components/dashboard/doodles";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
@@ -326,29 +327,35 @@ export default async function TracksPage({
     };
   });
 
+  const credits = artistProfile.reviewCredits ?? 0;
+
   return (
-    <div className="min-h-screen bg-[#f7f5f2] pb-24 overflow-x-hidden">
+    <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
       <div className="bg-white border-b-2 border-black">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-          <div className="flex items-start justify-between gap-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10 relative overflow-hidden">
+          <SquiggleDoodle className="absolute -bottom-5 left-[45%] w-20 h-20 text-purple-400/20 pointer-events-none rotate-6" />
+          <div className="flex items-start justify-between gap-6 relative">
             <div className="min-w-0">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-2">Soundcheck</p>
               <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-[0.95]">
                 My Music.
               </h1>
+              <p className="text-sm text-black/40 font-medium mt-2">
+                {tracks.length === 0 ? "No tracks yet — upload your first." : `${tracks.length} track${tracks.length === 1 ? "" : "s"} in your library.`}
+              </p>
             </div>
-            <div className="flex-shrink-0 text-right pl-5 sm:pl-8 border-l-2 border-black/10">
-              <p className="text-5xl sm:text-6xl font-black text-black leading-none tabular-nums">{tracks.length}</p>
+            <div className="flex-shrink-0 text-right pl-5 sm:pl-8 border-l-2 border-black/10 relative">
+              <StarDoodle className="absolute -top-4 -right-1 w-12 h-12 text-purple-400/30 pointer-events-none" />
+              <p className="text-5xl sm:text-6xl font-black text-black leading-none tabular-nums">{credits}</p>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mt-1.5">
-                {tracks.length === 1 ? "track" : "tracks"}
+                {credits === 1 ? "credit" : "credits"}
               </p>
               <Link
-                href="/submit"
+                href={credits > 0 ? "/submit" : "/review"}
                 className="text-[11px] font-bold text-purple-600 hover:text-purple-800 mt-2 block transition-colors"
               >
-                + Add track
+                {credits > 0 ? "Spend →" : "Earn more →"}
               </Link>
             </div>
           </div>
@@ -356,7 +363,7 @@ export default async function TracksPage({
       </div>
 
       {/* ── TABS + CONTENT ─────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <TracksViewToggle
           queueView={
             <QueueView

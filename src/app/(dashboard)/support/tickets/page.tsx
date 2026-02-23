@@ -46,11 +46,11 @@ export default async function SupportTicketsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#f7f5f2] pb-24 overflow-x-hidden">
+    <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
       <div className="bg-white border-b-2 border-black">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           <Link
             href="/support"
             className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors mb-3"
@@ -81,7 +81,7 @@ export default async function SupportTicketsPage() {
 
       {/* ── CREATE FORM ─────────────────────────────────────────── */}
       <div className="bg-neutral-900">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-1">
             New ticket
           </p>
@@ -93,7 +93,7 @@ export default async function SupportTicketsPage() {
       </div>
 
       {/* ── TICKET LIST ─────────────────────────────────────────── */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
         <div className="flex items-end justify-between mb-5">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">Your tickets</p>

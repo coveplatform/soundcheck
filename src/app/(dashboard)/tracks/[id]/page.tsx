@@ -4,6 +4,7 @@ import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
+import { SparklesDoodle } from "@/components/dashboard/doodles";
 import { AudioPlayer } from "@/components/audio/audio-player";
 import { TrackDashboardTabs } from "@/components/tracks/track-dashboard-tabs";
 import { StatsTab } from "@/components/tracks/stats-tab";
@@ -152,11 +153,12 @@ export default async function TrackDetailPage({
 
 
   return (
-    <div className="min-h-screen bg-[#f7f5f2] pb-24 overflow-x-hidden">
+    <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
       <div className="bg-white border-b-2 border-black">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10 relative overflow-hidden">
+          <SparklesDoodle className="absolute top-2 right-[30%] w-9 h-9 text-purple-500/20 pointer-events-none" />
           <Link
             href="/tracks"
             className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors mb-4"
@@ -223,8 +225,8 @@ export default async function TrackDetailPage({
       </div>
 
       {/* ── MAIN CONTENT ─────────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] gap-8">
 
           {/* LEFT — tabs */}
           <div className="min-w-0 overflow-hidden">

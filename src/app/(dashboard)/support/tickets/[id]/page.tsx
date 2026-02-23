@@ -59,11 +59,11 @@ export default async function SupportTicketDetailPage({
   const isOpen = ticket.status === "OPEN";
 
   return (
-    <div className="min-h-screen bg-[#f7f5f2] pb-24 overflow-x-hidden">
+    <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
       <div className="bg-white border-b-2 border-black">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           <Link
             href="/support/tickets"
             className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors mb-3"
@@ -97,7 +97,7 @@ export default async function SupportTicketDetailPage({
       </div>
 
       {/* ── CONVERSATION ─────────────────────────────────────────── */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
         {ticket.SupportMessage.length === 0 ? (
           <div className="border-2 border-black/8 rounded-2xl px-6 py-10 text-center bg-white/40">
             <p className="text-base font-bold text-black/40">No messages yet.</p>
