@@ -293,7 +293,7 @@ export async function POST(request: Request) {
     if (
       !skipListenTimer &&
       (!review.lastHeartbeat ||
-        Date.now() - review.lastHeartbeat.getTime() > 2 * 60 * 1000)
+        Date.now() - review.lastHeartbeat.getTime() > 10 * 60 * 1000)
     ) {
       return NextResponse.json(
         { error: "Listen session expired. Please keep listening and try again." },
@@ -338,7 +338,7 @@ export async function POST(request: Request) {
     const now = new Date();
     const startOfToday = new Date(now);
     startOfToday.setHours(0, 0, 0, 0);
-    const heartbeatCutoff = new Date(now.getTime() - 2 * 60 * 1000);
+    const heartbeatCutoff = new Date(now.getTime() - 10 * 60 * 1000);
 
     // Daily review cap: 2/day for all users (bypass for admin emails only)
     const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
