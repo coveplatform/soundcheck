@@ -86,138 +86,112 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
 
   if (isPro || isSuccess) {
     return (
-      <div className="text-center py-16">
+      <div className="space-y-5">
         {isSuccess && (
-          <div className="mb-8 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-50 border-2 border-emerald-200 text-emerald-800 text-sm font-semibold">
-            <Check className="h-4 w-4" />
-            Welcome to Pro! Your subscription is now active.
+          <div className="bg-lime-400 border-2 border-black rounded-2xl px-5 py-4 flex items-center gap-3">
+            <Check className="h-5 w-5 text-black flex-shrink-0" />
+            <p className="text-sm font-black text-black">Welcome to Pro! Your subscription is now active.</p>
           </div>
         )}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100 text-purple-700 font-bold text-sm mb-6">
-          <Crown className="h-4 w-4" />
-          You&apos;re on Pro
+        <div className="bg-neutral-900 rounded-2xl px-6 py-8 flex flex-col sm:flex-row sm:items-center gap-6">
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-2 bg-purple-600 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full mb-3">
+              <Crown className="h-3 w-3" />
+              Pro Member
+            </div>
+            <h2 className="text-2xl font-black text-white tracking-tight">You&apos;re on Pro.</h2>
+            <p className="text-sm text-white/40 font-medium mt-1">
+              3 slots, priority placement, Pro badge — all active.
+            </p>
+          </div>
+          <Button
+            onClick={handleManage}
+            isLoading={isLoading}
+            className="flex-shrink-0 border-2 border-white/20 bg-white/10 hover:bg-white/20 text-white font-black h-10 px-5 rounded-xl text-sm transition-all"
+          >
+            Manage subscription
+          </Button>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-light tracking-tight text-black mb-3">
-          You&apos;re already a Pro member
-        </h1>
-        <p className="text-black/50 mb-8 max-w-md mx-auto">
-          You have access to all Pro features including 3 review slots, priority queue placement, and your Pro badge.
-        </p>
-        <Button
-          onClick={handleManage}
-          isLoading={isLoading}
-          variant="outline"
-          className="h-12 px-6"
-        >
-          Manage subscription
-        </Button>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="space-y-10">
+
       {isCanceled && (
-        <div className="mb-6 text-center">
-          <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-neutral-100 border-2 border-neutral-200 text-neutral-700 text-sm font-medium">
-            Checkout canceled. No charges were made.
-          </div>
+        <div className="bg-black/5 border-2 border-black/10 rounded-2xl px-5 py-4 text-center">
+          <p className="text-sm font-bold text-black/50">Checkout canceled. No charges were made.</p>
         </div>
       )}
 
-      {/* Header */}
-      <div className="text-center mb-12">
-        <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-purple-600 mb-3">
-          Upgrade
-        </p>
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black mb-4">
-          Get more from your music
-        </h1>
-        <p className="text-black/50 max-w-lg mx-auto text-lg">
-          Submit more tracks, get feedback faster, and stand out in the community.
-        </p>
-      </div>
-
       {/* Pricing cards */}
-      <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+      <div className="grid md:grid-cols-2 gap-5">
+
         {/* Free tier */}
-        <div className="bg-white border-2 border-neutral-200 rounded-2xl p-8">
-          <div className="mb-6">
-            <h3 className="text-xl font-bold text-black mb-1">Free</h3>
-            <p className="text-sm text-black/50">For getting started</p>
+        <div className="bg-white border-2 border-black/8 rounded-2xl p-7 flex flex-col">
+          <div className="mb-5">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-1">Current plan</p>
+            <h3 className="text-2xl font-black text-black tracking-tight">Free</h3>
+            <p className="text-sm text-black/40 font-medium mt-0.5">For getting started</p>
           </div>
 
           <div className="mb-6">
             <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold text-black">$0</span>
-              <span className="text-black/40 text-sm">/forever</span>
+              <span className="text-5xl font-black text-black tabular-nums">$0</span>
+              <span className="text-black/30 text-sm font-black">/forever</span>
             </div>
           </div>
 
-          <div className="space-y-3 mb-8">
+          <div className="space-y-2.5 mb-8 flex-1">
             {FREE_FEATURES.map((feature) => (
               <div key={feature.text} className="flex items-start gap-2.5">
                 {feature.included ? (
-                  <Check className="h-4 w-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                  <Check className="h-4 w-4 text-lime-500 flex-shrink-0 mt-0.5" />
                 ) : (
-                  <X className="h-4 w-4 text-neutral-300 flex-shrink-0 mt-0.5" />
+                  <X className="h-4 w-4 text-black/15 flex-shrink-0 mt-0.5" />
                 )}
-                <span
-                  className={cn(
-                    "text-sm",
-                    feature.included ? "text-black" : "text-neutral-400"
-                  )}
-                >
+                <span className={cn("text-sm font-medium", feature.included ? "text-black" : "text-black/30")}>
                   {feature.text}
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="text-center text-sm text-black/40 font-medium">
+          <div className="text-center text-[11px] font-black uppercase tracking-wider text-black/25 border-t-2 border-black/8 pt-5">
             Your current plan
           </div>
         </div>
 
         {/* Pro tier */}
-        <div className="bg-white border-2 border-purple-500 rounded-2xl p-8 relative shadow-lg shadow-purple-100">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-            <span className="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-              RECOMMENDED
+        <div className="bg-neutral-900 border-2 border-black rounded-2xl p-7 flex flex-col relative shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+          <div className="absolute -top-3 left-6">
+            <span className="bg-purple-600 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border-2 border-black">
+              Recommended
             </span>
           </div>
 
-          <div className="mb-6">
-            <div className="flex items-center gap-2">
-              <h3 className="text-xl font-bold text-black">Pro</h3>
-              <Crown className="h-5 w-5 text-purple-600" />
+          <div className="mb-5 mt-2">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-2xl font-black text-white tracking-tight">Pro</h3>
+              <Crown className="h-5 w-5 text-purple-400" />
             </div>
-            <p className="text-sm text-black/50">For serious artists</p>
+            <p className="text-sm text-white/40 font-medium">For serious artists</p>
           </div>
 
           <div className="mb-6">
             <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold text-purple-600">$9.99</span>
-              <span className="text-black/40 text-sm">/month</span>
+              <span className="text-5xl font-black text-white tabular-nums">$9.99</span>
+              <span className="text-white/30 text-sm font-black">/month</span>
             </div>
-            <p className="text-xs text-black/40 mt-1">Cancel anytime</p>
+            <p className="text-[11px] text-white/25 font-medium mt-1">Cancel anytime</p>
           </div>
 
-          <div className="space-y-3 mb-8">
+          <div className="space-y-2.5 mb-8 flex-1">
             {PRO_FEATURES.map((feature) => (
               <div key={feature.text} className="flex items-start gap-2.5">
-                <Check
-                  className={cn(
-                    "h-4 w-4 flex-shrink-0 mt-0.5",
-                    feature.highlight ? "text-purple-600" : "text-emerald-500"
-                  )}
-                />
-                <span
-                  className={cn(
-                    "text-sm",
-                    feature.highlight ? "text-black font-semibold" : "text-black"
-                  )}
-                >
+                <Check className={cn("h-4 w-4 flex-shrink-0 mt-0.5", feature.highlight ? "text-purple-400" : "text-white/40")} />
+                <span className={cn("text-sm font-medium", feature.highlight ? "text-white font-black" : "text-white/60")}>
                   {feature.text}
                 </span>
               </div>
@@ -227,7 +201,7 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
           <Button
             onClick={handleUpgrade}
             isLoading={isLoading}
-            className="w-full h-12 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out rounded-xl"
+            className="w-full h-12 bg-purple-600 text-white hover:bg-purple-500 font-black border-2 border-white/20 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.15)] hover:shadow-[1px_1px_0px_0px_rgba(255,255,255,0.15)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl"
           >
             Upgrade to Pro
             <ArrowRight className="h-4 w-4 ml-2" />
@@ -235,52 +209,32 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
         </div>
       </div>
 
-      {/* Why Pro section */}
-      <div className="mt-16 max-w-3xl mx-auto">
-        <h2 className="text-2xl font-bold text-center text-black mb-8">
-          Why artists upgrade
-        </h2>
-
-        <div className="grid sm:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mx-auto mb-3">
-              <Zap className="h-6 w-6 text-purple-600" />
+      {/* Why Pro — dark block */}
+      <div className="bg-neutral-900 rounded-2xl px-6 py-8">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-1">Why upgrade</p>
+        <h2 className="text-2xl font-black text-white tracking-tight mb-6">Why artists go Pro.</h2>
+        <div className="grid sm:grid-cols-3 gap-5">
+          {[
+            { icon: <Zap className="h-5 w-5 text-black" />, title: "Move faster", body: "3 tracks in the queue means you can iterate on multiple ideas at once instead of waiting." },
+            { icon: <MessageSquare className="h-5 w-5 text-black" />, title: "Get heard first", body: "Priority queue placement means reviewers see your tracks before free-tier submissions." },
+            { icon: <Shield className="h-5 w-5 text-black" />, title: "Support the community", body: "Your subscription keeps MixReflect running and free for everyone." },
+          ].map((item) => (
+            <div key={item.title} className="bg-white/5 rounded-xl p-5">
+              <div className="w-9 h-9 rounded-xl bg-lime-400 flex items-center justify-center mb-3">
+                {item.icon}
+              </div>
+              <p className="text-sm font-black text-white mb-1">{item.title}</p>
+              <p className="text-sm text-white/40 font-medium leading-relaxed">{item.body}</p>
             </div>
-            <h3 className="font-semibold text-black mb-1">Move faster</h3>
-            <p className="text-sm text-black/50">
-              3 tracks in the queue means you can iterate on multiple ideas at once instead of waiting.
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mx-auto mb-3">
-              <MessageSquare className="h-6 w-6 text-purple-600" />
-            </div>
-            <h3 className="font-semibold text-black mb-1">Get heard first</h3>
-            <p className="text-sm text-black/50">
-              Priority queue placement means reviewers see your tracks before free-tier submissions.
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mx-auto mb-3">
-              <Shield className="h-6 w-6 text-purple-600" />
-            </div>
-            <h3 className="font-semibold text-black mb-1">Support the community</h3>
-            <p className="text-sm text-black/50">
-              Your subscription keeps MixReflect running and free for everyone.
-            </p>
-          </div>
+          ))}
         </div>
       </div>
 
       {/* FAQ */}
-      <div className="mt-16 max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold text-center text-black mb-8">
-          Common questions
-        </h2>
-
-        <div className="space-y-4">
+      <div>
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">FAQ</p>
+        <h2 className="text-2xl font-black text-black tracking-tight mb-5">Common questions.</h2>
+        <div className="space-y-3">
           {[
             {
               q: "Can I cancel anytime?",
@@ -299,9 +253,9 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
               a: "MixReflect itself is free forever. You can submit tracks, get reviews, and earn credits without paying anything. Pro is for artists who want to move faster.",
             },
           ].map(({ q, a }) => (
-            <div key={q} className="border-2 border-neutral-200 rounded-xl p-5">
-              <h3 className="font-semibold text-black mb-1.5">{q}</h3>
-              <p className="text-sm text-black/60">{a}</p>
+            <div key={q} className="bg-white border-2 border-black/8 rounded-2xl p-5">
+              <h3 className="font-black text-black mb-1.5">{q}</h3>
+              <p className="text-sm text-black/50 font-medium leading-relaxed">{a}</p>
             </div>
           ))}
         </div>
