@@ -63,42 +63,54 @@ function FeedbackSummaryBanner({ reviews }: { reviews: any[] }) {
 
   const impressionLine =
     hookCount === total && total > 0
-      ? `All ${total} listeners hooked`
+      ? total === 1
+        ? "1 listener hooked"
+        : `All ${total} listeners hooked`
       : hookCount > 0
       ? `${hookCount} of ${total} listeners hooked`
       : decentCount === total && total > 0
-      ? "Solid reception across the board"
+      ? total === 1
+        ? "Solid reception"
+        : "Solid reception across the board"
       : `${total} listener${total !== 1 ? "s" : ""} reviewed`;
 
   return (
-    <div className={`rounded-2xl bg-gradient-to-br ${gradient} p-6 text-white`}>
-      <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-white/60 mb-3">
-        Listener Verdict · {total} review{total !== 1 ? "s" : ""}
-      </p>
-      {topQuality && qualityLabels[topQuality] && (
-        <h2 className="text-4xl sm:text-5xl font-black leading-tight tracking-tight mb-2">
-          {qualityLabels[topQuality]}
-        </h2>
-      )}
-      <p className="text-sm text-white/80 mb-4">
-        {impressionLine}
-        {replayTotal > 0 && ` · ${replayYes}/${replayTotal} would replay`}
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {issues.map(({ label, count }) => (
-          <span
-            key={label}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/20 text-xs font-semibold text-white"
-          >
-            ⚠ {label}
-            {count === total && total > 1 ? " · all" : count > 1 ? ` · ${count}/${total}` : ""}
-          </span>
-        ))}
-        {issues.length === 0 && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-xs font-semibold">
-            ✓ No major technical issues flagged
-          </span>
+    <div className="rounded-2xl bg-white border border-black/10 overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.06)]">
+      {/* Colour accent bar — varies by quality verdict */}
+      <div className={`h-1.5 bg-gradient-to-r ${gradient}`} />
+      <div className="p-6">
+        <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40 mb-3">
+          Listener Verdict · {total} review{total !== 1 ? "s" : ""}
+        </p>
+        {topQuality && qualityLabels[topQuality] && (
+          <h2 className="text-4xl sm:text-5xl font-black text-black leading-tight tracking-tight mb-2">
+            {qualityLabels[topQuality]}
+          </h2>
         )}
+        <p className="text-sm text-black/60 mb-4">
+          {impressionLine}
+          {replayTotal > 0 && (
+            <span className="text-purple-600 font-semibold">
+              {" "}· {replayYes}/{replayTotal} would replay
+            </span>
+          )}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {issues.map(({ label, count }) => (
+            <span
+              key={label}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800"
+            >
+              ⚠ {label}
+              {count === total && total > 1 ? " · all" : count > 1 ? ` · ${count}/${total}` : ""}
+            </span>
+          ))}
+          {issues.length === 0 && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-xs font-semibold text-purple-700">
+              ✓ No major technical issues
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
