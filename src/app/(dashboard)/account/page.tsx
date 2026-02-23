@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { AccountSettingsClient } from "@/components/account/account-settings-client";
 import { ReviewerGenrePreferences } from "@/components/account/reviewer-genre-preferences";
 import { ReferralCard } from "@/components/referral/referral-card";
+import { SparklesDoodle } from "@/components/dashboard/doodles";
 
 export const dynamic = "force-dynamic";
 
@@ -44,21 +45,28 @@ export default async function AccountPage() {
   const isReviewer = Boolean(reviewerProfile);
 
   return (
-    <div className="pt-8 pb-24">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6">
-        {/* Header */}
-        <div className="mb-10 pb-6 border-b border-black/10">
-          <p className="text-[11px] font-mono tracking-[0.2em] uppercase text-black/40 mb-2">
-            Settings
-          </p>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight text-black">
-            Account
-          </h1>
-          <p className="text-sm text-black/50 mt-2">
-            Manage your profile, credits, and preferences
-          </p>
-        </div>
+    <div className="min-h-screen bg-[#f7f5f2] pb-24 overflow-x-hidden">
 
+      {/* ── HERO ───────────────────────────────────────────────── */}
+      <div className="bg-white border-b-2 border-black">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10 relative overflow-hidden">
+          <SparklesDoodle className="absolute -top-2 right-8 w-14 h-14 text-purple-400/15 pointer-events-none" />
+          <div className="relative">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-2">
+              Settings
+            </p>
+            <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-[0.95]">
+              Account.
+            </h1>
+            <p className="text-sm text-black/40 font-medium mt-3">
+              Manage your profile, credits, and preferences.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── CONTENT ────────────────────────────────────────────── */}
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
         <div className="space-y-6">
           <ReferralCard />
 
