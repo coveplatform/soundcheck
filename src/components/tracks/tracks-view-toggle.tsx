@@ -47,25 +47,23 @@ export function TracksViewToggle({
 
   return (
     <div>
-      {/* View Toggle */}
-      <div className="border-b-2 border-neutral-200 mb-8">
-        <div className="flex gap-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => handleViewChange(tab.id)}
-              className={cn(
-                "flex items-center gap-2 px-4 py-3 font-bold text-sm whitespace-nowrap transition-all duration-150 ease-out border-b-2 -mb-0.5",
-                activeView === tab.id
-                  ? "text-purple-600 border-purple-600"
-                  : "text-black/40 border-transparent hover:text-black/60 hover:border-black/20"
-              )}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      {/* Tab bar */}
+      <div className="flex gap-2 mb-8 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => handleViewChange(tab.id)}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 rounded-full font-black text-[11px] uppercase tracking-wider whitespace-nowrap transition-all duration-150 border-2",
+              activeView === tab.id
+                ? "bg-black text-white border-black"
+                : "bg-white text-black/40 border-black/10 hover:border-black/25 hover:text-black/70"
+            )}
+          >
+            {tab.icon}
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* View Content */}

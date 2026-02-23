@@ -73,17 +73,16 @@ export function TrackDashboardTabs({
 
       <div>
         {/* Tab Navigation */}
-      <div className="border-b-2 border-neutral-200 mb-8 -mx-6 px-6 sm:-mx-8 sm:px-8">
-        <div className="flex gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex gap-2 mb-8 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
               className={cn(
-                "flex items-center gap-2 px-4 py-3 font-bold text-sm whitespace-nowrap transition-all duration-150 ease-out border-b-2 -mb-0.5",
+                "flex items-center gap-2 px-4 py-2 rounded-full font-black text-[11px] uppercase tracking-wider whitespace-nowrap transition-all duration-150 border-2",
                 activeTab === tab.id
-                  ? "text-purple-600 border-purple-600"
-                  : "text-black/40 border-transparent hover:text-black/60 hover:border-black/20"
+                  ? "bg-black text-white border-black"
+                  : "bg-white text-black/40 border-black/10 hover:border-black/25 hover:text-black/70"
               )}
             >
               {tab.icon}
@@ -91,7 +90,6 @@ export function TrackDashboardTabs({
             </button>
           ))}
         </div>
-      </div>
 
       {/* Tab Content */}
       <div>
