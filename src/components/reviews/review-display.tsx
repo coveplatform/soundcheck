@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
-import { ThumbsUp, ThumbsDown, ListMusic, Share2, UserPlus } from "lucide-react";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 import { ReviewRating } from "@/components/artist/review-rating";
 import { ReviewFlag } from "@/components/artist/review-flag";
 import { ReviewGem } from "@/components/artist/review-gem";
@@ -30,10 +30,51 @@ function getInitial(name: string) {
 
 function formatEnum(value: string): string {
   return value
-    .split('_')
-    .map(word => word.charAt(0) + word.slice(1).toLowerCase())
-    .join(' ');
+    .split("_")
+    .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+    .join(" ");
 }
+
+const qualityConfig: Record<
+  string,
+  { label: string; bg: string; border: string; text: string; dot: string }
+> = {
+  PROFESSIONAL: {
+    label: "Professional",
+    bg: "bg-lime-50",
+    border: "border-lime-300",
+    text: "text-lime-800",
+    dot: "bg-lime-500",
+  },
+  RELEASE_READY: {
+    label: "Release Ready",
+    bg: "bg-lime-50",
+    border: "border-lime-300",
+    text: "text-lime-800",
+    dot: "bg-lime-500",
+  },
+  ALMOST_THERE: {
+    label: "Almost There",
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    text: "text-amber-800",
+    dot: "bg-amber-400",
+  },
+  DEMO_STAGE: {
+    label: "Demo Stage",
+    bg: "bg-orange-50",
+    border: "border-orange-200",
+    text: "text-orange-800",
+    dot: "bg-orange-400",
+  },
+  NOT_READY: {
+    label: "Not Ready Yet",
+    bg: "bg-red-50",
+    border: "border-red-200",
+    text: "text-red-700",
+    dot: "bg-red-400",
+  },
+};
 
 export type ReviewData = {
   id: string;
@@ -74,6 +115,7 @@ export type ReviewData = {
   expectedPlacement?: string | null;
   quickWin?: string | null;
   biggestWeaknessSpecific?: string | null;
+  tooRepetitive?: boolean | null;
   ReviewerProfile: {
     id: string;
     User: {
@@ -99,13 +141,31 @@ export function ReviewDisplay({
   index: _index,
   showControls = true,
 }: ReviewDisplayProps) {
-  const reviewerName = review.ReviewerProfile?.User?.name ?? review.ArtistProfile?.User?.name ?? "Reviewer";
-  const reviewerProfileId = review.ReviewerProfile?.id ?? review.ArtistProfile?.id;
+  const reviewerName =
+    review.ReviewerProfile?.User?.name ??
+    review.ArtistProfile?.User?.name ??
+    "Reviewer";
+  const reviewerProfileId =
+    review.ReviewerProfile?.id ?? review.ArtistProfile?.id;
+
+  const quality = review.qualityLevel
+    ? qualityConfig[review.qualityLevel as string]
+    : null;
+
+  // Issue chips — only show problems, not clean signals
+  const issueChips: string[] = [];
+  if (review.vocalClarity === "BURIED") issueChips.push("Vocals buried");
+  if (review.lowEndClarity === "BOTH_MUDDY") issueChips.push("Low end muddy");
+  if (review.highEndQuality === "TOO_HARSH") issueChips.push("Highs harsh");
+  if (review.stereoWidth === "TOO_NARROW") issueChips.push("Too narrow");
+  if (review.dynamics === "TOO_COMPRESSED") issueChips.push("Over-compressed");
+  if (review.tooRepetitive) issueChips.push("Too repetitive");
+  if (review.trackLength === "WAY_TOO_LONG") issueChips.push("Too long");
 
   return (
     <article className="px-5 sm:px-6 py-5">
       {/* Header: Reviewer + Actions */}
-      <header className="mb-5">
+      <header className="mb-4">
         <div className="flex items-center gap-3">
           {/* Avatar */}
           {showControls && reviewerProfileId ? (
@@ -159,216 +219,88 @@ export function ReviewDisplay({
             </time>
           </div>
         </div>
-
       </header>
 
-      {/* Scores */}
-      <div className="flex flex-wrap items-center gap-2 mb-4">
-        {review.productionScore != null && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
-            <span className="text-black/50">Production</span>
-            <strong className="text-black">{review.productionScore}/5</strong>
-          </span>
-        )}
-        {review.vocalScore != null && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
-            <span className="text-black/50">Vocals</span>
-            <strong className="text-black">{review.vocalScore}/5</strong>
-          </span>
-        )}
-        {review.originalityScore != null && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
-            <span className="text-black/50">Originality</span>
-            <strong className="text-black">{review.originalityScore}/5</strong>
-          </span>
-        )}
-        {review.wouldListenAgain !== null && (
-          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
-            review.wouldListenAgain
-              ? "bg-purple-50 text-purple-700"
-              : "bg-black/5 text-black/40"
-          }`}>
-            {review.wouldListenAgain ? (
-              <><ThumbsUp className="h-3 w-3" /> Replay</>            ) : (
-              <><ThumbsDown className="h-3 w-3" /> No replay</>            )}
-          </span>
-        )}
-      </div>
-
-      {/* Listener Signals */}
-      {(review.wouldAddToPlaylist !== null || review.wouldShare !== null || review.wouldFollow !== null) && (
-        <div className="flex flex-wrap items-center gap-1.5 mb-5">
-          {review.wouldAddToPlaylist !== null && (
-            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold ${
-              review.wouldAddToPlaylist
-                ? "bg-purple-50 text-purple-700"
-                : "bg-black/5 text-black/35"
-            }`}>
-              <ListMusic className="h-3 w-3" />
-              {review.wouldAddToPlaylist ? "Playlist" : "No playlist"}
+      {/* Quality verdict + replay — prominent badges */}
+      {(quality || review.wouldListenAgain !== null) && (
+        <div className="flex flex-wrap items-center gap-2 mb-5">
+          {quality && (
+            <span
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold border ${quality.bg} ${quality.border} ${quality.text}`}
+            >
+              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${quality.dot}`} />
+              {quality.label}
             </span>
           )}
-          {review.wouldShare !== null && (
-            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold ${
-              review.wouldShare
-                ? "bg-purple-50 text-purple-700"
-                : "bg-black/5 text-black/35"
-            }`}>
-              <Share2 className="h-3 w-3" />
-              {review.wouldShare ? "Share" : "No share"}
-            </span>
-          )}
-          {review.wouldFollow !== null && (
-            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold ${
-              review.wouldFollow
-                ? "bg-purple-50 text-purple-700"
-                : "bg-black/5 text-black/35"
-            }`}>
-              <UserPlus className="h-3 w-3" />
-              {review.wouldFollow ? "Follow" : "No follow"}
+          {review.wouldListenAgain !== null && (
+            <span
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border ${
+                review.wouldListenAgain
+                  ? "bg-purple-50 border-purple-200 text-purple-700"
+                  : "bg-black/5 border-black/10 text-black/40"
+              }`}
+            >
+              {review.wouldListenAgain ? "↺ Would replay" : "✕ Wouldn't replay"}
             </span>
           )}
         </div>
       )}
 
-      {/* V2 Quick Win - Legacy reviews only (both fields populated) */}
-      {review.quickWin && (
-        <div className="mb-5 p-4 bg-lime-50 border-2 border-lime-300 rounded-xl">
-          <h4 className="text-xs font-bold text-lime-900 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-            <span className="text-base">🎯</span>
-            Quick Win
-          </h4>
-          <p className="text-sm text-lime-900 font-medium leading-relaxed">
-            {review.quickWin}
-          </p>
-        </div>
-      )}
-
-      {/* V2 Technical Feedback */}
-      {(review.lowEndClarity || review.vocalClarity || review.highEndQuality || review.stereoWidth || review.dynamics) && (
-        <div className="mb-5 p-4 bg-purple-50 border border-purple-200 rounded-xl">
-          <h4 className="text-xs font-bold text-purple-900 uppercase tracking-widest mb-3">
-            Technical Feedback
-          </h4>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            {review.lowEndClarity && (
-              <div className="flex items-center gap-1.5">
-                <span className="text-purple-600/60">Low End:</span>
-                <span className="font-semibold text-purple-900">{formatEnum(review.lowEndClarity)}</span>
-              </div>
-            )}
-            {review.vocalClarity && (
-              <div className="flex items-center gap-1.5">
-                <span className="text-purple-600/60">Vocals:</span>
-                <span className="font-semibold text-purple-900">{formatEnum(review.vocalClarity)}</span>
-              </div>
-            )}
-            {review.highEndQuality && (
-              <div className="flex items-center gap-1.5">
-                <span className="text-purple-600/60">High End:</span>
-                <span className="font-semibold text-purple-900">{formatEnum(review.highEndQuality)}</span>
-              </div>
-            )}
-            {review.stereoWidth && (
-              <div className="flex items-center gap-1.5">
-                <span className="text-purple-600/60">Stereo:</span>
-                <span className="font-semibold text-purple-900">{formatEnum(review.stereoWidth)}</span>
-              </div>
-            )}
-            {review.dynamics && (
-              <div className="flex items-center gap-1.5">
-                <span className="text-purple-600/60">Dynamics:</span>
-                <span className="font-semibold text-purple-900">{formatEnum(review.dynamics)}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* V2 Quality & Next Steps */}
-      {(review.qualityLevel || review.nextFocus || review.expectedPlacement) && (
-        <div className="mb-5 flex flex-wrap gap-2 items-center">
-          {review.qualityLevel && (
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
-              review.qualityLevel === "PROFESSIONAL" || review.qualityLevel === "RELEASE_READY"
-                ? "bg-lime-100 text-lime-800"
-                : review.qualityLevel === "ALMOST_THERE"
-                ? "bg-amber-100 text-amber-800"
-                : "bg-orange-100 text-orange-800"
-            }`}>
-              <span className="text-sm">⭐</span>
-              {formatEnum(review.qualityLevel)}
-            </span>
-          )}
-          {review.nextFocus && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
-              <span className="text-sm">📋</span>
-              Focus: {formatEnum(review.nextFocus)}
-            </span>
-          )}
-          {review.expectedPlacement && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
-              <span className="text-sm">📍</span>
-              {formatEnum(review.expectedPlacement)}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Written Feedback */}
-      <div className="space-y-4 mb-5">
+      {/* Written feedback — the HERO */}
+      <div className="space-y-3 mb-5">
         {review.addressedArtistNote && (
           <p className="text-xs text-black/40 font-mono">
-            Addressed your note: <strong className="text-black/60">{review.addressedArtistNote}</strong>
+            Re: your note —{" "}
+            <strong className="text-black/60">{review.addressedArtistNote}</strong>
           </p>
         )}
+
         {review.bestPart && (
-          <div>
-            <h4 className="text-[11px] font-bold text-purple-600 uppercase tracking-widest mb-1.5">
-              What Worked
-            </h4>
-            <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-purple-400">
-              {review.bestPart}
+          <div className="rounded-xl bg-purple-50 border border-purple-200 p-4">
+            <p className="text-[10px] font-bold text-purple-700 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <CheckCircle2 className="h-3 w-3" />
+              What worked
             </p>
+            <p className="text-sm text-black/80 leading-relaxed">{review.bestPart}</p>
           </div>
         )}
-        {review.weakestPart && (
-          <div>
-            <h4 className="text-[11px] font-bold text-red-500 uppercase tracking-widest mb-1.5">
-              To Improve
-            </h4>
-            <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-red-300">
-              {review.weakestPart}
+
+        {/* Legacy: quickWin */}
+        {review.quickWin && (
+          <div className="rounded-xl bg-lime-50 border-2 border-lime-300 p-4">
+            <p className="text-[10px] font-bold text-lime-800 uppercase tracking-widest mb-2">
+              🎯 Quick Win
             </p>
+            <p className="text-sm text-lime-900 font-medium leading-relaxed">{review.quickWin}</p>
           </div>
         )}
-        {review.biggestWeaknessSpecific && review.quickWin && (
-          // Legacy review — both fields exist, label as "Biggest Weakness"
-          <div>
-            <h4 className="text-[11px] font-bold text-orange-600 uppercase tracking-widest mb-1.5">
-              Biggest Weakness
-            </h4>
-            <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-orange-400">
+
+        {/* Main feedback — v3 (biggestWeaknessSpecific) or legacy (weakestPart only) */}
+        {review.biggestWeaknessSpecific ? (
+          <div className="rounded-xl bg-amber-50 border border-amber-200 p-4">
+            <p className="text-[10px] font-bold text-amber-700 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <AlertCircle className="h-3 w-3" />
+              {review.quickWin ? "Biggest weakness" : "Main feedback"}
+            </p>
+            <p className="text-sm text-black/80 leading-relaxed">
               {review.biggestWeaknessSpecific}
             </p>
           </div>
-        )}
-        {review.biggestWeaknessSpecific && !review.quickWin && (
-          // New review — single merged field, label as "Main Feedback"
-          <div>
-            <h4 className="text-[11px] font-bold text-orange-600 uppercase tracking-widest mb-1.5">
-              Main Feedback
-            </h4>
-            <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-orange-400">
-              {review.biggestWeaknessSpecific}
+        ) : review.weakestPart ? (
+          <div className="rounded-xl bg-amber-50 border border-amber-200 p-4">
+            <p className="text-[10px] font-bold text-amber-700 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <AlertCircle className="h-3 w-3" />
+              To improve
             </p>
+            <p className="text-sm text-black/80 leading-relaxed">{review.weakestPart}</p>
           </div>
-        )}
+        ) : null}
+
         {review.additionalNotes && (
           <div>
-            <h4 className="text-[11px] font-bold text-black/40 uppercase tracking-widest mb-1.5">
-              Additional Notes
-            </h4>
+            <p className="text-[11px] font-bold text-black/40 uppercase tracking-widest mb-1.5">
+              Additional notes
+            </p>
             <p className="text-sm text-black/70 leading-relaxed pl-3 border-l-2 border-black/10">
               {review.additionalNotes}
             </p>
@@ -377,48 +309,104 @@ export function ReviewDisplay({
 
         {review.nextActions && (
           <div>
-            <h4 className="text-[11px] font-bold text-black/70 uppercase tracking-widest mb-1.5">
-              Next Actions
-            </h4>
+            <p className="text-[11px] font-bold text-black/70 uppercase tracking-widest mb-1.5">
+              Next actions
+            </p>
             <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-black/30 whitespace-pre-wrap">
               {review.nextActions}
             </p>
           </div>
         )}
-
-        {Array.isArray(review.timestamps) &&
-          review.timestamps.filter(isTimestampNote).length > 0 && (
-            <div>
-              <h4 className="text-[11px] font-bold text-purple-600 uppercase tracking-widest mb-1.5">
-                Timestamps
-              </h4>
-              <div className="space-y-2">
-                {review.timestamps.filter(isTimestampNote).map((t, i) => (
-                  <div
-                    key={`${t.seconds}-${i}`}
-                    className="pl-3 border-l-2 border-purple-300"
-                  >
-                    <p className="text-xs font-mono text-black/40">
-                      {`${Math.floor(t.seconds / 60)}:${String(
-                        Math.floor(t.seconds % 60)
-                      ).padStart(2, "0")}`}
-                    </p>
-                    <p className="text-sm text-black/80 leading-relaxed">
-                      {t.note}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
       </div>
 
-      {/* Genre / Similar artists */}
+      {/* Technical issue chips — amber, only problems */}
+      {issueChips.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {issueChips.map((chip) => (
+            <span
+              key={chip}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800"
+            >
+              ⚠ {chip}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Legacy: nextFocus / expectedPlacement */}
+      {(review.nextFocus || review.expectedPlacement) && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {review.nextFocus && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+              📋 Focus: {formatEnum(review.nextFocus)}
+            </span>
+          )}
+          {review.expectedPlacement && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
+              📍 {formatEnum(review.expectedPlacement)}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Scores — compact row, moved to bottom */}
+      {(review.productionScore != null ||
+        review.vocalScore != null ||
+        review.originalityScore != null) && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {review.productionScore != null && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
+              <span className="text-black/50">Production</span>
+              <strong className="text-black">{review.productionScore}/5</strong>
+            </span>
+          )}
+          {review.vocalScore != null && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
+              <span className="text-black/50">Vocals</span>
+              <strong className="text-black">{review.vocalScore}/5</strong>
+            </span>
+          )}
+          {review.originalityScore != null && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
+              <span className="text-black/50">Originality</span>
+              <strong className="text-black">{review.originalityScore}/5</strong>
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Timestamps */}
+      {Array.isArray(review.timestamps) &&
+        review.timestamps.filter(isTimestampNote).length > 0 && (
+          <div className="mb-4">
+            <h4 className="text-[11px] font-bold text-purple-600 uppercase tracking-widest mb-1.5">
+              Timestamps
+            </h4>
+            <div className="space-y-2">
+              {review.timestamps.filter(isTimestampNote).map((t, i) => (
+                <div
+                  key={`${t.seconds}-${i}`}
+                  className="pl-3 border-l-2 border-purple-300"
+                >
+                  <p className="text-xs font-mono text-black/40">
+                    {`${Math.floor(t.seconds / 60)}:${String(
+                      Math.floor(t.seconds % 60)
+                    ).padStart(2, "0")}`}
+                  </p>
+                  <p className="text-sm text-black/80 leading-relaxed">{t.note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      {/* Genre / similar artists */}
       {(review.perceivedGenre || review.similarArtists) && (
         <div className="text-xs text-black/40 mb-4">
           {review.perceivedGenre && (
             <span>
-              Sounds like <strong className="text-black/60">{review.perceivedGenre}</strong>
+              Sounds like{" "}
+              <strong className="text-black/60">{review.perceivedGenre}</strong>
             </span>
           )}
           {review.perceivedGenre && review.similarArtists && (
@@ -426,7 +414,8 @@ export function ReviewDisplay({
           )}
           {review.similarArtists && (
             <span>
-              Similar to <strong className="text-black/60">{review.similarArtists}</strong>
+              Similar to{" "}
+              <strong className="text-black/60">{review.similarArtists}</strong>
             </span>
           )}
         </div>
@@ -449,7 +438,7 @@ export function ReviewDisplay({
               <span className="text-xs text-black/50">Rate this review</span>
             </div>
 
-            {/* Gem - prominent */}
+            {/* Gem */}
             <div className="flex items-start gap-3 rounded-lg bg-white border border-black/10 p-3">
               <ReviewGem reviewId={review.id} initialIsGem={review.isGem ?? false} />
               <div className="flex-1 min-w-0">
@@ -457,13 +446,14 @@ export function ReviewDisplay({
                   Award a Gem for exceptional feedback
                 </p>
                 <p className="text-[11px] text-black/50 mt-0.5">
-                  Gems reward reviewers who go above and beyond. They&apos;ll earn recognition and priority in future reviews.
+                  Gems reward reviewers who go above and beyond. They&apos;ll earn recognition and
+                  priority in future reviews.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Flag - kept small */}
+          {/* Flag */}
           <div className="mt-3">
             <ReviewFlag
               reviewId={review.id}
