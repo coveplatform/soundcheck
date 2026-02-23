@@ -17,8 +17,6 @@ import {
   ExternalLink,
   Music,
   CheckCircle2,
-  Clock,
-  Loader2,
   Crown,
 } from "lucide-react";
 import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
@@ -153,16 +151,6 @@ export default async function TrackDetailPage({
 
   const canUpdateSource = track.status !== "CANCELLED" && completedReviews === 0;
 
-  // Estimated wait time for tracks still awaiting reviews
-  const needsMoreReviews = track.reviewsRequested > 0 && countedCompletedReviews < track.reviewsRequested;
-  let estimatedWaitHours: number | null = null;
-
-  if (needsMoreReviews && (track.status === "QUEUED" || track.status === "IN_PROGRESS")) {
-    const remainingReviews = track.reviewsRequested - countedCompletedReviews;
-    // Standard: ~24-36h per review
-    const hoursPerReview = 30;
-    estimatedWaitHours = Math.max(1, remainingReviews * hoursPerReview);
-  }
 
   return (
     <div className="pt-8 pb-24">
@@ -388,40 +376,6 @@ export default async function TrackDetailPage({
               </CardContent>
             </Card>
 
-            {/* Queue Status */}
-            {needsMoreReviews && estimatedWaitHours !== null && (
-              <Card variant="soft" elevated>
-                <CardContent className="pt-6">
-                  <p className="text-xs font-mono tracking-widest uppercase text-black/40 mb-3">
-                    Queue Status
-                  </p>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-black/40" />
-                        <span className="text-sm text-black/60">Est. wait</span>
-                      </div>
-                      <span className="text-sm font-bold text-black">
-                        {estimatedWaitHours < 24
-                          ? `~${estimatedWaitHours}h`
-                          : estimatedWaitHours < 48
-                            ? "~1 day"
-                            : `~${Math.round(estimatedWaitHours / 24)} days`}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 text-black/40" />
-                        <span className="text-sm text-black/60">Remaining</span>
-                      </div>
-                      <span className="text-sm font-bold text-black">
-                        {track.reviewsRequested - countedCompletedReviews} review{track.reviewsRequested - countedCompletedReviews !== 1 ? "s" : ""}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Share Card */}
             {track.trackShareId && completedReviews > 0 && (
