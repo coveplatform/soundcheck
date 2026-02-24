@@ -235,94 +235,18 @@ export function buildDiscoverAnnouncementEmail(params: { userName?: string }): {
   const appUrl = getAppUrl();
   const discoverUrl = `${appUrl}/discover`;
 
-  // Visual hero that looks like the actual discover page
+  // Screenshot-like hero image of the 3D discover space, hosted as static asset
+  const heroImageUrl = `${appUrl}/email/discover-hero.svg`;
   const heroSection = `
-    <div style="background-color: #050510; border-radius: 14px; overflow: hidden; margin-bottom: 24px;">
-      <!-- Hero visual mimicking the 3D discover page -->
-      <div style="padding: 40px 24px 32px; text-align: center; background: linear-gradient(180deg, #0a0a1a 0%, #050510 50%, #0a0520 100%);">
-        <!-- Subtle branding -->
-        <p style="margin: 0 0 16px; font-size: 10px; letter-spacing: 5px; color: #00e5ff; opacity: 0.5; text-transform: uppercase; font-family: monospace;">
-          mixreflect
-        </p>
-        <!-- Big title -->
-        <h2 style="margin: 0 0 8px; font-size: 36px; font-weight: 900; color: #ffffff; letter-spacing: -1px; line-height: 1;">
-          WEEKLY
-        </h2>
-        <h2 style="margin: 0 0 20px; font-size: 36px; font-weight: 900; color: #ffffff; letter-spacing: -1px; line-height: 1;">
-          DISCOVER
-        </h2>
-        <p style="margin: 0 0 24px; font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.5;">
-          Explore music from independent artists around the world.
-        </p>
-
-        <!-- Floating "cards" visual - 3 sample tracks -->
-        <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 20px;">
-          <tr>
-            <td style="width: 33%; padding: 0 4px; vertical-align: top;">
-              <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(0,229,255,0.15); border-radius: 8px; padding: 12px 8px; text-align: center;">
-                <div style="font-size: 20px; margin-bottom: 6px;">🎵</div>
-                <div style="font-size: 10px; font-weight: 700; color: #ffffff; margin-bottom: 2px;">Neon Pulse</div>
-                <div style="font-size: 9px; color: rgba(255,255,255,0.4);">Maya Kim</div>
-                <div style="margin-top: 6px;">
-                  <span style="display: inline-block; background: rgba(0,229,255,0.15); border: 1px solid rgba(0,229,255,0.25); border-radius: 10px; padding: 2px 6px; font-size: 8px; color: #00e5ff;">Electronic</span>
-                </div>
-              </div>
-            </td>
-            <td style="width: 33%; padding: 0 4px; vertical-align: top;">
-              <div style="background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 100%); border: 1px solid rgba(147,51,234,0.2); border-radius: 8px; padding: 12px 8px; text-align: center; transform: translateY(-4px);">
-                <div style="font-size: 20px; margin-bottom: 6px;">⭐</div>
-                <div style="font-size: 10px; font-weight: 700; color: #ffffff; margin-bottom: 2px;">Golden Hour</div>
-                <div style="font-size: 9px; color: rgba(255,255,255,0.4);">James Cole</div>
-                <div style="margin-top: 6px;">
-                  <span style="display: inline-block; background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); border-radius: 10px; padding: 2px 6px; font-size: 8px; color: #fbbf24;">Featured</span>
-                </div>
-              </div>
-            </td>
-            <td style="width: 33%; padding: 0 4px; vertical-align: top;">
-              <div style="background: linear-gradient(135deg, #1a1a2e 0%, #1e3a2f 100%); border: 1px solid rgba(16,185,129,0.15); border-radius: 8px; padding: 12px 8px; text-align: center;">
-                <div style="font-size: 20px; margin-bottom: 6px;">🎧</div>
-                <div style="font-size: 10px; font-weight: 700; color: #ffffff; margin-bottom: 2px;">City Rain</div>
-                <div style="font-size: 9px; color: rgba(255,255,255,0.4);">DJ Nova</div>
-                <div style="margin-top: 6px;">
-                  <span style="display: inline-block; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.25); border-radius: 10px; padding: 2px 6px; font-size: 8px; color: #10b981;">Lo-Fi</span>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </table>
-
-        <!-- Stats bar mimicking the real one -->
-        <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
-          <tr>
-            <td style="padding: 6px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;">
-              <span style="font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.5); font-family: monospace; text-transform: uppercase;">
-                12,847 plays &nbsp;·&nbsp; 342 reviews &nbsp;·&nbsp; 4.2 avg &nbsp;·&nbsp; 34 tracks
-              </span>
-            </td>
-          </tr>
-        </table>
-
-        <!-- Benefit pills -->
-        <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 16px auto 0;">
-          <tr>
-            <td style="padding: 0 4px;">
-              <span style="display: inline-block; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 4px 10px; font-size: 9px; color: rgba(255,255,255,0.6);">
-                <span style="color: #00e5ff;">●</span> Expert reviews
-              </span>
-            </td>
-            <td style="padding: 0 4px;">
-              <span style="display: inline-block; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 4px 10px; font-size: 9px; color: rgba(255,255,255,0.6);">
-                <span style="color: #a855f7;">●</span> Real listeners
-              </span>
-            </td>
-            <td style="padding: 0 4px;">
-              <span style="display: inline-block; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 4px 10px; font-size: 9px; color: rgba(255,255,255,0.6);">
-                <span style="color: #ec4899;">●</span> Grow your audience
-              </span>
-            </td>
-          </tr>
-        </table>
-      </div>
+    <div style="margin-bottom: 24px;">
+      <a href="${discoverUrl}" style="display: block; text-decoration: none;">
+        <img
+          src="${heroImageUrl}"
+          alt="Weekly Discover — floating album art in a 3D space with stars"
+          width="600"
+          style="display: block; width: 100%; max-width: 600px; height: auto; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06);"
+        />
+      </a>
     </div>
   `;
 
