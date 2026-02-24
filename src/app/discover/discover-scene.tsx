@@ -84,6 +84,7 @@ function generateLayout(count: number) {
 
 function TrackCard({
   track,
+  index,
   position,
   cardScale,
   glowColor,
@@ -91,8 +92,10 @@ function TrackCard({
   onLeave,
   onClick,
   interactive,
+  isTouchDevice,
 }: {
   track: DiscoverTrackData;
+  index: number;
   position: [number, number, number];
   cardScale: number;
   glowColor: string;
@@ -100,6 +103,7 @@ function TrackCard({
   onLeave: () => void;
   onClick: () => void;
   interactive: boolean;
+  isTouchDevice: boolean;
 }) {
   const groupRef = useRef<THREE.Group>(null!);
   const glowRef = useRef<THREE.Mesh>(null!);
@@ -161,8 +165,6 @@ function TrackCard({
   const TAP_THRESHOLD = 20; // px — larger for fat-finger tolerance
   const TAP_MIN_MS = 80;    // ignore ultra-fast accidental touches
   const TAP_MAX_MS = 600;   // ignore long presses (likely drag intent)
-  const isTouchDevice = typeof window !== "undefined" && "ontouchstart" in window;
-
   const pointerOver = () => {
     if (!interactive || isTouchDevice) return;
     setHovered(true);
@@ -193,7 +195,7 @@ function TrackCard({
   };
 
   return (
-    <group position={position}>
+    <group position={position} userData={{ trackIndex: index }}>
       <Billboard>
         <group ref={groupRef} scale={cardScale}>
           {/* Glow halo */}
@@ -208,14 +210,14 @@ function TrackCard({
             />
           </mesh>
 
-          {/* Card face — on touch devices we skip hover handlers and never
-             call stopPropagation so OrbitControls receives every touch for
-             rotate / pinch-to-zoom even when a finger lands on a card. */}
+          {/* Card face — on touch devices we attach NO pointer handlers so
+             OrbitControls receives every gesture for rotate / pinch-to-zoom.
+             Taps are detected at the Scene level via manual raycasting. */}
           <mesh
-            onPointerOver={pointerOver}
-            onPointerOut={pointerOut}
-            onPointerDown={(e) => pointerDown(e)}
-            onPointerUp={(e) => pointerUp(e)}
+            onPointerOver={isTouchDevice ? undefined : pointerOver}
+            onPointerOut={isTouchDevice ? undefined : pointerOut}
+            onPointerDown={isTouchDevice ? undefined : (e) => pointerDown(e)}
+            onPointerUp={isTouchDevice ? undefined : (e) => pointerUp(e)}
           >
             <planeGeometry args={[1, 1]} />
             <meshBasicMaterial
@@ -453,6 +455,57 @@ function Scene({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const controlsRef = useRef<any>(null);
   const layout = useMemo(() => generateLayout(tracks.length), [tracks.length]);
+  const isTouchDevice = useMemo(() => typeof window !== "undefined" && "ontouchstart" in window, []);
+
+  // Scene-level tap detection for touch devices.
+  // Card meshes have NO pointer handlers on mobile so OrbitControls gets every
+  // gesture unimpeded.  Taps are detected here via native DOM events + raycast.
+  const { gl, camera, scene } = useThree();
+  useEffect(() => {
+    if (!isTouchDevice) return;
+    const canvas = gl.domElement;
+    let tapStart: { x: number; y: number; t: number } | null = null;
+
+    const onDown = (e: PointerEvent) => {
+      tapStart = { x: e.clientX, y: e.clientY, t: Date.now() };
+    };
+    const onUp = (e: PointerEvent) => {
+      if (!tapStart || !hasInteracted) { tapStart = null; return; }
+      const dx = e.clientX - tapStart.x;
+      const dy = e.clientY - tapStart.y;
+      const dt = Date.now() - tapStart.t;
+      tapStart = null;
+      if (dx * dx + dy * dy > 25 * 25 || dt < 60 || dt > 800) return;
+
+      // Raycast to find which card was tapped
+      const rect = canvas.getBoundingClientRect();
+      const ndc = new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1,
+      );
+      const rc = new THREE.Raycaster();
+      rc.setFromCamera(ndc, camera);
+      const hits = rc.intersectObjects(scene.children, true);
+      for (const hit of hits) {
+        let cur: THREE.Object3D | null = hit.object;
+        while (cur) {
+          if (cur.userData?.trackIndex != null) {
+            const t = tracks[cur.userData.trackIndex];
+            if (t) onSelectTrack(t);
+            return;
+          }
+          cur = cur.parent;
+        }
+      }
+    };
+
+    canvas.addEventListener("pointerdown", onDown, { passive: true });
+    canvas.addEventListener("pointerup", onUp, { passive: true });
+    return () => {
+      canvas.removeEventListener("pointerdown", onDown);
+      canvas.removeEventListener("pointerup", onUp);
+    };
+  }, [isTouchDevice, gl, camera, scene, hasInteracted, tracks, onSelectTrack]);
 
   // Camera zoom-to-track state
   const wasSelected = useRef(false);
@@ -542,8 +595,8 @@ function Scene({
         maxDistance={55}
         enablePan
         panSpeed={0.4}
-        rotateSpeed={0.45}
-        zoomSpeed={0.7}
+        rotateSpeed={isTouchDevice ? 0.8 : 0.45}
+        zoomSpeed={isTouchDevice ? 1.4 : 0.7}
         /* Mobile: one finger rotates, two fingers dolly+pan (pinch to zoom) */
         touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
       />
@@ -556,6 +609,7 @@ function Scene({
         <TrackCard
           key={track.id}
           track={track}
+          index={i}
           position={layout[i].position}
           cardScale={track.isFeatured ? layout[i].scale * 1.15 : layout[i].scale}
           glowColor={track.isFeatured ? "#fbbf24" : layout[i].glowColor}
@@ -563,6 +617,7 @@ function Scene({
           onLeave={() => onHoverTrack(null)}
           onClick={() => onSelectTrack(track)}
           interactive={hasInteracted}
+          isTouchDevice={isTouchDevice}
         />
       ))}
     </>
@@ -1254,20 +1309,9 @@ export function DiscoverScene({
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  // Block ALL default touch behavior at the document level while on this page.
-  // This prevents the browser from interpreting pinch/swipe as back/forward navigation.
+  // CSS touch-action: none on the container handles browser gesture prevention.
+  // No JS touch event interception needed — that was blocking OrbitControls.
   const containerRef = useRef<HTMLDivElement>(null!);
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const prevent = (e: TouchEvent) => { e.preventDefault(); };
-    el.addEventListener("touchstart", prevent, { passive: false });
-    el.addEventListener("touchmove", prevent, { passive: false });
-    return () => {
-      el.removeEventListener("touchstart", prevent);
-      el.removeEventListener("touchmove", prevent);
-    };
-  }, []);
 
   return (
     <div

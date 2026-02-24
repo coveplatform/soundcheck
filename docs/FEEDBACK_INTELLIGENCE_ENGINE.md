@@ -4,6 +4,33 @@
 
 ---
 
+## Design Philosophy: The Nightclub Vibe Check
+
+**The core insight**: The research and engine complexity lives *behind the scenes*. The reviewer experience should feel like reacting to music at a nightclub — visceral, low-friction, almost fun — not filling out an academic survey.
+
+> "Imagine playing your music to a packed nightclub where everyone gives you a vibe check."
+
+### Principles
+
+1. **Reviewers react, the engine analyzes.** Quick emoji-style first impressions, short free-text reactions, one-tap choices. The behavioral layer passively captures the deep data (seek patterns, replays, attention) without the reviewer doing anything extra.
+
+2. **Less asking, more observing.** The 8 perceptual dimensions and sub-scales are *derived intelligence*, not reviewer-facing form fields. Instead of asking "Rate spectral balance 1-7", we observe that 3 listeners replayed the chorus and 2 skipped the bridge — and we *compute* spectral balance insights from behavioral consensus + targeted micro-questions.
+
+3. **Interactive > Interrogative.** Instead of a long form, the review experience is *interactive*. Behavioral-driven questions ("You replayed 1:30 — what caught your ear?") feel conversational, not clinical. The form adapts in real-time based on what the listener actually did.
+
+4. **The magic is in the synthesis.** Individual reviews are just vibe checks. The engine's job is to synthesize 5-10 casual reactions into a rigorous, research-backed feedback report with confidence intervals, action priorities, and behavioral evidence. Artists get *intelligence*, reviewers give *reactions*.
+
+5. **Lower friction = more honest data.** Academic-style forms trigger performative responses. Quick, intuitive reactions are harder to fake and more emotionally honest — especially when cross-referenced against behavioral signals.
+
+### What This Means for Implementation
+
+- **Reviewer form**: Stays lightweight (first impression → would-listen-again → best moment → main feedback → quality gut check). The research informs *what we ask* and *how we score it*, not form complexity.
+- **Behavioral layer**: Does the heavy lifting invisibly. Every play, pause, seek, volume change, and tab switch is captured and analyzed.
+- **Text quality scoring**: Runs server-side after submission. Reviewers never see their "specificity score" — but high-quality reviewers get surfaced more prominently.
+- **Artist-facing output**: Where the full research power shows up. Engagement curves, hottest moments, drop-off points, behavioral-explicit alignment, consensus synthesis — all derived from casual reviewer reactions.
+
+---
+
 ## Table of Contents
 
 1. [Current State Analysis](#current-state-analysis)
