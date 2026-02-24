@@ -208,14 +208,14 @@ function TrackCard({
             />
           </mesh>
 
-          {/* Card face — on touch devices skip onPointerOver/Out so
-             multi-finger gestures (pinch-to-zoom) pass through to OrbitControls
-             instead of being captured by the mesh raycaster. */}
+          {/* Card face — on touch devices we skip hover handlers and never
+             call stopPropagation so OrbitControls receives every touch for
+             rotate / pinch-to-zoom even when a finger lands on a card. */}
           <mesh
             onPointerOver={pointerOver}
             onPointerOut={pointerOut}
-            onPointerDown={(e) => { if (isTouchDevice) e.stopPropagation(); pointerDown(e); }}
-            onPointerUp={(e) => { pointerUp(e); }}
+            onPointerDown={(e) => pointerDown(e)}
+            onPointerUp={(e) => pointerUp(e)}
           >
             <planeGeometry args={[1, 1]} />
             <meshBasicMaterial
