@@ -1,7 +1,6 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AnalyticsDashboard } from "@/components/analytics/analytics-dashboard";
-import { BarChart3, TrendingUp } from "lucide-react";
+import { BarChart3, TrendingUp, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface PortfolioViewProps {
@@ -46,98 +45,102 @@ export function PortfolioView({
   playlistActionsData,
   topQuickWins,
 }: PortfolioViewProps) {
-  // Empty state - no tracks submitted yet
+  // Empty state — no tracks submitted yet
   if (!hasData) {
     return (
-      <div className="max-w-3xl mx-auto">
-        <Card variant="soft" elevated>
-          <CardContent className="pt-6 text-center py-12">
-            <BarChart3 className="h-12 w-12 text-black/20 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-black mb-2">No insights yet</h3>
-            <p className="text-sm text-black/60 mb-6">
-              Submit a track and get reviews to start seeing insights and trends.
-            </p>
-            <Link href="/submit">
-              <Button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all">
-                Submit your first track
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+      <div className="bg-white rounded-2xl border-2 border-black/10 overflow-hidden shadow-[3px_3px_0_rgba(0,0,0,0.06)]">
+        <div className="bg-black px-6 py-8 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-purple-600 flex items-center justify-center mx-auto mb-4 shadow-[3px_3px_0_rgba(0,0,0,0.5)]">
+            <BarChart3 className="h-7 w-7 text-white" />
+          </div>
+          <h3 className="text-2xl font-black tracking-tighter text-white mb-1">No insights yet</h3>
+          <p className="text-sm text-white/40 max-w-xs mx-auto">
+            Submit a track and get reviews to unlock trends, scores, and feedback patterns.
+          </p>
+        </div>
+        <div className="px-6 py-5 flex items-center justify-between gap-4">
+          <p className="text-[13px] font-bold text-black/40">
+            Insights unlock after your first reviews
+          </p>
+          <Link href="/submit">
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-10 px-5 rounded-xl whitespace-nowrap">
+              Submit a track
+              <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+            </Button>
+          </Link>
+        </div>
       </div>
     );
   }
 
-  // Not enough reviews for meaningful insights
+  // Not enough reviews yet
   if (totalReviews < MIN_REVIEWS_FOR_INSIGHTS) {
     const reviewsNeeded = MIN_REVIEWS_FOR_INSIGHTS - totalReviews;
 
     return (
-      <div className="max-w-3xl mx-auto">
-        <Card variant="soft" elevated className="border-2 border-amber-200">
-          <CardContent className="pt-6 text-center py-12">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center mx-auto mb-5">
-              <TrendingUp className="h-7 w-7 text-amber-700" />
+      <div className="bg-white rounded-2xl border-2 border-black/10 overflow-hidden shadow-[3px_3px_0_rgba(0,0,0,0.06)]">
+        {/* Dark header */}
+        <div className="bg-black px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-1">Insights</p>
+              <h3 className="text-2xl font-black tracking-tighter text-white leading-tight">
+                {reviewsNeeded} more {reviewsNeeded === 1 ? "review" : "reviews"} to go
+              </h3>
             </div>
-            <h3 className="text-2xl font-bold text-black mb-2">Get {reviewsNeeded} more {reviewsNeeded === 1 ? 'review' : 'reviews'} for insights</h3>
-            <p className="text-sm text-black/60 mb-6 max-w-md mx-auto">
-              You have <span className="font-bold text-amber-700">{totalReviews} {totalReviews === 1 ? 'review' : 'reviews'}</span> so far.
-              We need at least <span className="font-bold">{MIN_REVIEWS_FOR_INSIGHTS} reviews</span> to show meaningful analytics like trends, patterns, and category breakdowns.
-            </p>
-
-            <div className="mb-6">
-              <div className="h-2 bg-neutral-200 rounded-full overflow-hidden max-w-xs mx-auto">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-400 to-amber-600 transition-all duration-500 rounded-full"
-                  style={{ width: `${Math.min(100, (totalReviews / MIN_REVIEWS_FOR_INSIGHTS) * 100)}%` }}
-                />
-              </div>
-              <p className="text-xs text-neutral-500 mt-2 font-mono">
-                {totalReviews} / {MIN_REVIEWS_FOR_INSIGHTS} reviews
+            <div className="flex-shrink-0 text-right pl-5 border-l border-white/10">
+              <p className="text-4xl font-black text-white tabular-nums leading-none">{totalReviews}</p>
+              <p className="text-[10px] font-black uppercase tracking-wider text-white/30 mt-1">
+                of {MIN_REVIEWS_FOR_INSIGHTS}
               </p>
             </div>
+          </div>
 
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-2xl p-5 max-w-md mx-auto mb-6">
-              <p className="text-xs font-mono text-purple-700/60 uppercase tracking-widest mb-3">What you'll unlock</p>
-              <div className="grid grid-cols-1 gap-2 text-left text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="text-purple-600">📈</span>
-                  <span className="text-black/70">Score trends over time</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-purple-600">🎯</span>
-                  <span className="text-black/70">Category breakdowns (production, vocals, originality)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-purple-600">💬</span>
-                  <span className="text-black/70">Common feedback patterns</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-purple-600">⚡</span>
-                  <span className="text-black/70">Review velocity and engagement metrics</span>
-                </div>
+          {/* Progress bar */}
+          <div className="mt-4 h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-purple-400 rounded-full transition-all duration-500"
+              style={{ width: `${Math.min(100, (totalReviews / MIN_REVIEWS_FOR_INSIGHTS) * 100)}%` }}
+            />
+          </div>
+        </div>
+
+        {/* What unlocks */}
+        <div className="px-6 py-5 border-b border-black/5">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-4">What you'll unlock</p>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "Score trends", sub: "Over time" },
+              { label: "Category breakdown", sub: "Production · Vocals · Originality" },
+              { label: "Feedback patterns", sub: "What reviewers keep saying" },
+              { label: "Review velocity", sub: "Engagement metrics" },
+            ].map((item) => (
+              <div key={item.label} className="bg-neutral-50 rounded-xl px-3 py-2.5 border border-black/5">
+                <p className="text-[12px] font-black text-black">{item.label}</p>
+                <p className="text-[10px] text-black/35 mt-0.5">{item.sub}</p>
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/submit">
-                <Button variant="primary" size="lg">
-                  Get more reviews
-                </Button>
-              </Link>
-              <Link href="/tracks">
-                <Button variant="outline" size="lg">
-                  View my tracks
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        {/* CTA */}
+        <div className="px-6 py-5 flex items-center justify-between gap-4">
+          <p className="text-[13px] font-bold text-black/40">
+            You have <span className="font-black text-black">{totalReviews}</span> so far
+          </p>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Link href="/submit">
+              <Button className="bg-purple-600 hover:bg-purple-700 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-9 px-4 rounded-xl whitespace-nowrap text-[11px]">
+                Get more reviews
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
 
-  // Enough reviews - show full analytics
+  // Enough reviews — show full analytics
   return (
     <AnalyticsDashboard
       tracks={trackData}

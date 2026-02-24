@@ -13,9 +13,13 @@ import {
   Lock,
   Crown,
   Plus,
+  ChevronUp,
+  Play,
+  Trophy,
 } from "lucide-react";
 import { ClaimCard } from "@/components/dashboard/claim-card";
 import { MobileStickyCTA } from "@/components/dashboard/mobile-sticky-cta";
+import { DashboardWinner } from "@/components/charts/dashboard-winner";
 import {
   SparklesDoodle,
   SquiggleDoodle,
@@ -215,6 +219,24 @@ export default async function DashboardPage() {
   const isHighOrMedium =
     whatsNext?.priority === "high" || whatsNext?.priority === "medium";
 
+  // Today's chart submission (for live activity strip)
+  let todayChartSubmission: {
+    rank: number | null;
+    voteCount: number;
+    playCount: number;
+    title: string;
+  } | null = null;
+  try {
+    const todayUTC = new Date();
+    todayUTC.setUTCHours(0, 0, 0, 0);
+    todayChartSubmission = await (prisma as any).chartSubmission.findFirst({
+      where: { artistId: artistProfile.id, chartDate: todayUTC },
+      select: { rank: true, voteCount: true, playCount: true, title: true },
+    });
+  } catch {
+    // chartSubmission table may not exist in all environments
+  }
+
   return (
     <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
 
@@ -293,6 +315,51 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* ── LIVE CHART ACTIVITY ────────────────────────────────── */}
+      {todayChartSubmission && (
+        <Link
+          href="/charts"
+          className="block bg-neutral-900 hover:bg-neutral-800 transition-colors"
+        >
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-4">
+            {/* Rank */}
+            <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10">
+              {todayChartSubmission.rank === 1 ? (
+                <Trophy className="h-4 w-4 text-amber-400" />
+              ) : (
+                <span className={`text-base font-black tabular-nums ${todayChartSubmission.rank && todayChartSubmission.rank <= 3 ? "text-white" : "text-white/50"}`}>
+                  {todayChartSubmission.rank ? `#${todayChartSubmission.rank}` : "—"}
+                </span>
+              )}
+            </div>
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/30 mb-0.5">
+                Live on today&apos;s chart
+              </p>
+              <p className="text-sm font-bold text-white truncate">
+                {todayChartSubmission.title}
+              </p>
+            </div>
+            {/* Stats */}
+            <div className="flex-shrink-0 flex items-center gap-3 text-white/40">
+              <span className="flex items-center gap-1 text-[11px] font-bold tabular-nums">
+                <ChevronUp className="h-3 w-3" />
+                {todayChartSubmission.voteCount}
+              </span>
+              <span className="flex items-center gap-1 text-[11px] font-bold tabular-nums">
+                <Play className="h-3 w-3" />
+                {todayChartSubmission.playCount}
+              </span>
+            </div>
+            <ArrowRight className="h-4 w-4 text-white/20 flex-shrink-0" />
+          </div>
+        </Link>
+      )}
+
+      {/* ── TRACK OF THE DAY WINNER ─────────────────────────────── */}
+      <DashboardWinner />
 
       {/* ── MAIN CONTENT ───────────────────────────────────────── */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6">

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
-import { Sparkle, Cross, MusicNote, Scribble, Zigzag } from "@/components/landing/doodles";
+import { SpeakerBuddies } from "@/components/ui/speaker-buddies";
 
 export default function AuthLayout({
   children,
@@ -30,19 +30,14 @@ export default function AuthLayout({
 
       {/* Right side — Marketing promo (hidden on mobile) */}
       <div className="hidden lg:flex lg:w-[480px] xl:w-[520px] bg-purple-600 text-white relative overflow-hidden flex-col justify-between p-10 xl:p-14">
-        {/* Doodles scattered around */}
+        {/* Ambient gradient blobs */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <Sparkle className="absolute top-8 right-12 w-12 h-12 text-white/20" />
-          <Cross className="absolute top-32 left-8 w-10 h-10 text-white/15" />
-          <MusicNote className="absolute bottom-40 right-16 w-14 h-14 text-white/15" />
-          <Scribble className="absolute top-1/2 left-4 w-20 h-16 text-white/10" />
-          <Zigzag className="absolute bottom-20 left-12 w-8 h-20 text-white/15" />
-          <Sparkle className="absolute bottom-60 right-8 w-8 h-8 text-white/10" />
-          <Cross className="absolute top-60 right-32 w-6 h-6 text-white/20" />
-          {/* Big gradient blobs */}
           <div className="absolute -top-32 -right-32 w-80 h-80 bg-purple-500/30 rounded-full blur-3xl" />
           <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-400/20 rounded-full blur-3xl" />
         </div>
+
+        {/* Interactive speaker buddies */}
+        <SpeakerBuddies />
 
         {/* Content */}
         <div className="relative z-10 flex-1 flex flex-col justify-center">

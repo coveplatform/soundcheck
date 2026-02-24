@@ -48,15 +48,15 @@ export function TracksViewToggle({
   return (
     <div>
       {/* Tab bar */}
-      <div className="flex gap-2 mb-8 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex gap-1.5 mb-8 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => handleViewChange(tab.id)}
             className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-full font-black text-[11px] uppercase tracking-wider whitespace-nowrap transition-all duration-150 border-2",
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-wider whitespace-nowrap transition-all duration-150 border-2",
               activeView === tab.id
-                ? "bg-black text-white border-black"
+                ? "bg-black text-white border-black shadow-[3px_3px_0_rgba(0,0,0,0.15)]"
                 : "bg-white text-black/40 border-black/10 hover:border-black/25 hover:text-black/70"
             )}
           >

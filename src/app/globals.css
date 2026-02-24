@@ -201,3 +201,9 @@ details:not(.details-no-marker)[open] summary::before {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Speaker buddy idle bob */
+@keyframes speaker-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}

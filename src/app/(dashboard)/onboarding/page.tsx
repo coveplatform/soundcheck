@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   Crown, Lock, Link2, Check,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import { SparklesDoodle } from "@/components/dashboard/doodles";
 
 interface Genre {
   id: string;
@@ -204,8 +205,9 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-[#faf7f2] flex items-center justify-center px-4 sm:px-6 py-12">
       <div className="w-full max-w-lg">
-        <div className="flex justify-center mb-8">
-          <Logo className="scale-110" />
+        <div className="flex justify-center mb-8 relative">
+          <SparklesDoodle className="absolute -top-3 -right-6 w-12 h-12 text-purple-400/25 pointer-events-none" />
+          <Logo className="scale-110 relative" />
         </div>
 
         {/* Step pills */}
@@ -337,8 +339,8 @@ export default function OnboardingPage() {
                     { icon: <Gift className="h-5 w-5 text-black" />, label: "Credit", sub: "Earn 1 credit" },
                     { icon: <Music className="h-5 w-5 text-black" />, label: "Feedback", sub: "Real artists" },
                   ].map((item, i, arr) => (
-                    <>
-                      <div key={item.label} className="flex-1 rounded-xl bg-lime-400 p-3 text-center">
+                    <Fragment key={item.label}>
+                      <div className="flex-1 rounded-xl bg-lime-400 p-3 text-center">
                         <div className="flex justify-center mb-2">{item.icon}</div>
                         <p className="text-xs font-black text-black">{item.label}</p>
                         <p className="text-[10px] text-black/50 mt-0.5">{item.sub}</p>
@@ -346,7 +348,7 @@ export default function OnboardingPage() {
                       {i < arr.length - 1 && (
                         <div className="flex items-center text-white/20 font-black text-lg">→</div>
                       )}
-                    </>
+                    </Fragment>
                   ))}
                 </div>
               </div>

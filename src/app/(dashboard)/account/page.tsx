@@ -81,8 +81,19 @@ export default async function AccountPage() {
         </div>
       </div>
 
+      {/* ── DARK STRIP ──────────────────────────────────────────── */}
+      <div className="bg-black">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-3">
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/55">Account</span>
+          <span className="w-px h-3 bg-white/15" />
+          <span className="text-[11px] font-bold text-white/55">
+            {artistProfile?.artistName ?? dbUser.name ?? dbUser.email}
+          </span>
+        </div>
+      </div>
+
       {/* ── CONTENT ─────────────────────────────────────────────── */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="space-y-4">
           <AccountSettingsClient
             initialName={dbUser.name ?? ""}

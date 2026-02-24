@@ -8,8 +8,9 @@ import {
   Suspense,
   useCallback,
 } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Stars, Sparkles, OrbitControls, Billboard } from "@react-three/drei";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
 import Link from "next/link";
 import { X, ExternalLink, Star, Play, Upload } from "lucide-react";
@@ -239,6 +240,200 @@ function TrackCard({
 }
 
 /* ------------------------------------------------------------------ */
+/*  Nebula clouds – large soft glowing spheres in the background       */
+/* ------------------------------------------------------------------ */
+
+const NEBULA_CLOUDS = [
+  { pos: [25, 12, -40] as [number, number, number], color: "#00f0ff", scale: 18, opacity: 0.045 },
+  { pos: [-30, -8, -35] as [number, number, number], color: "#a855f7", scale: 22, opacity: 0.04 },
+  { pos: [10, -20, -50] as [number, number, number], color: "#ff2d9b", scale: 16, opacity: 0.035 },
+  { pos: [-20, 15, -45] as [number, number, number], color: "#10b981", scale: 20, opacity: 0.03 },
+  { pos: [35, -5, -55] as [number, number, number], color: "#fbbf24", scale: 14, opacity: 0.025 },
+];
+
+function NebulaClouds() {
+  const groupRef = useRef<THREE.Group>(null!);
+
+  useFrame((state) => {
+    if (!groupRef.current) return;
+    const t = state.clock.elapsedTime;
+    groupRef.current.children.forEach((child, i) => {
+      const mesh = child as THREE.Mesh;
+      const mat = mesh.material as THREE.MeshBasicMaterial;
+      const base = NEBULA_CLOUDS[i].opacity;
+      mat.opacity = base + Math.sin(t * 0.3 + i * 2) * base * 0.4;
+      mesh.scale.setScalar(
+        NEBULA_CLOUDS[i].scale + Math.sin(t * 0.15 + i * 3) * 1.5,
+      );
+    });
+  });
+
+  return (
+    <group ref={groupRef}>
+      {NEBULA_CLOUDS.map((cloud, i) => (
+        <mesh key={i} position={cloud.pos}>
+          <sphereGeometry args={[1, 16, 16]} />
+          <meshBasicMaterial
+            color={cloud.color}
+            transparent
+            opacity={cloud.opacity}
+            side={THREE.BackSide}
+            depthWrite={false}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Constellation lines – faint lines between nearby track cards       */
+/* ------------------------------------------------------------------ */
+
+function ConstellationLines({ layout }: { layout: { position: [number, number, number] }[] }) {
+  const lineRef = useRef<THREE.LineSegments>(null!);
+
+  const geometry = useMemo(() => {
+    const MAX_DIST = 12;
+    const verts: number[] = [];
+    for (let i = 0; i < layout.length; i++) {
+      for (let j = i + 1; j < layout.length; j++) {
+        const a = layout[i].position;
+        const b = layout[j].position;
+        const dx = a[0] - b[0], dy = a[1] - b[1], dz = a[2] - b[2];
+        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (dist < MAX_DIST) {
+          verts.push(a[0], a[1], a[2], b[0], b[1], b[2]);
+        }
+      }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
+    return geo;
+  }, [layout]);
+
+  useFrame((state) => {
+    if (!lineRef.current) return;
+    const mat = lineRef.current.material as THREE.LineBasicMaterial;
+    mat.opacity = 0.06 + Math.sin(state.clock.elapsedTime * 0.4) * 0.02;
+  });
+
+  return (
+    <lineSegments ref={lineRef} geometry={geometry}>
+      <lineBasicMaterial color="#00f0ff" transparent opacity={0.06} depthWrite={false} />
+    </lineSegments>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Shooting stars – fast animated streaks across the sky              */
+/* ------------------------------------------------------------------ */
+
+function ShootingStars() {
+  const COUNT = 5;
+  const groupRef = useRef<THREE.Group>(null!);
+
+  const stars = useMemo(() => {
+    return Array.from({ length: COUNT }, (_, i) => ({
+      delay: i * 4 + seededRandom(i * 77) * 6,
+      speed: 25 + seededRandom(i * 33) * 20,
+      startPos: [
+        (seededRandom(i * 11) - 0.5) * 80,
+        20 + seededRandom(i * 22) * 20,
+        (seededRandom(i * 44) - 0.5) * 60,
+      ] as [number, number, number],
+      dir: new THREE.Vector3(
+        -0.5 + seededRandom(i * 55) * -0.5,
+        -0.3 - seededRandom(i * 66) * 0.4,
+        -0.2 + seededRandom(i * 88) * -0.3,
+      ).normalize(),
+      length: 3 + seededRandom(i * 99) * 4,
+    }));
+  }, []);
+
+  useFrame((state) => {
+    if (!groupRef.current) return;
+    const t = state.clock.elapsedTime;
+
+    groupRef.current.children.forEach((child, i) => {
+      const line = child as THREE.Line;
+      const s = stars[i];
+      const cycle = 12 + s.delay;
+      const phase = ((t + s.delay) % cycle) / cycle;
+
+      if (phase < 0.15) {
+        line.visible = true;
+        const progress = phase / 0.15;
+        const pos = new THREE.Vector3(...s.startPos).addScaledVector(s.dir, progress * s.speed);
+        const tail = pos.clone().addScaledVector(s.dir, -s.length);
+        const positions = line.geometry.getAttribute("position");
+        positions.setXYZ(0, tail.x, tail.y, tail.z);
+        positions.setXYZ(1, pos.x, pos.y, pos.z);
+        positions.needsUpdate = true;
+        const mat = line.material as THREE.LineBasicMaterial;
+        const fade = progress < 0.3 ? progress / 0.3 : progress > 0.7 ? (1 - progress) / 0.3 : 1;
+        mat.opacity = fade * 0.5;
+      } else {
+        line.visible = false;
+      }
+    });
+  });
+
+  const lines = useMemo(() => {
+    return stars.map(() => {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.Float32BufferAttribute([0, 0, 0, 0, 0, 0], 3));
+      const mat = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0, depthWrite: false });
+      return new THREE.Line(geo, mat);
+    });
+  }, [stars]);
+
+  return (
+    <group ref={groupRef}>
+      {lines.map((lineObj, i) => (
+        <primitive key={i} object={lineObj} />
+      ))}
+    </group>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Holographic grid floor                                             */
+/* ------------------------------------------------------------------ */
+
+function HoloGrid() {
+  const gridRef = useRef<THREE.Group>(null!);
+
+  useFrame((state) => {
+    if (!gridRef.current) return;
+    const mat = (gridRef.current.children[0] as THREE.LineSegments)
+      .material as THREE.LineBasicMaterial;
+    mat.opacity = 0.04 + Math.sin(state.clock.elapsedTime * 0.3) * 0.015;
+  });
+
+  const geometry = useMemo(() => {
+    const size = 120;
+    const step = 4;
+    const verts: number[] = [];
+    for (let i = -size / 2; i <= size / 2; i += step) {
+      verts.push(i, 0, -size / 2, i, 0, size / 2);
+      verts.push(-size / 2, 0, i, size / 2, 0, i);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
+    return geo;
+  }, []);
+
+  return (
+    <group ref={gridRef} position={[0, -18, 0]}>
+      <lineSegments geometry={geometry}>
+        <lineBasicMaterial color="#00f0ff" transparent opacity={0.04} depthWrite={false} />
+      </lineSegments>
+    </group>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Full 3-D scene                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -352,6 +547,12 @@ function Scene({
         /* Mobile: one finger rotates, two fingers dolly+pan (pinch to zoom) */
         touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
       />
+
+      {/* --- Visual enhancements --- */}
+      <NebulaClouds />
+      <ConstellationLines layout={layout} />
+      <ShootingStars />
+      <HoloGrid />
 
       {tracks.map((track, i) => (
         <TrackCard
@@ -1066,6 +1267,14 @@ export function DiscoverScene({
             hasInteracted={hasInteracted}
           />
         </Suspense>
+        <EffectComposer>
+          <Bloom
+            intensity={0.8}
+            luminanceThreshold={0.15}
+            luminanceSmoothing={0.9}
+            mipmapBlur
+          />
+        </EffectComposer>
       </Canvas>
 
       <HUD

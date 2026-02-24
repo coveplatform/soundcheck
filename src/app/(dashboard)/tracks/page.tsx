@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Plus, Music, CheckCircle2, Lock, Crown } from "lucide-react";
+import { Plus, Music, ArrowRight, CheckCircle2, Lock, Crown } from "lucide-react";
 import { SquiggleDoodle, StarDoodle } from "@/components/dashboard/doodles";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -362,6 +362,45 @@ export default async function TracksPage({
         </div>
       </div>
 
+      {/* ── SLOTS STRIP ─────────────────────────────────────────── */}
+      <div className="bg-black">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/55">
+              Review Slots
+            </span>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: maxSlots }).map((_, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "w-2 h-2 rounded-full transition-colors",
+                    i < activeTracks.length ? "bg-purple-400" : "bg-white/20"
+                  )}
+                />
+              ))}
+            </div>
+            <span className="text-[11px] font-bold text-white/60 tabular-nums">
+              {activeTracks.length}/{maxSlots}
+            </span>
+          </div>
+          {hasOpenSlots && tracks.length > 0 && (
+            <Link
+              href="/submit"
+              className="flex items-center gap-1.5 text-[11px] font-black text-white/60 hover:text-white transition-colors"
+            >
+              Add track
+              <ArrowRight className="w-3 h-3" />
+            </Link>
+          )}
+          {!hasOpenSlots && (
+            <span className="text-[11px] font-black text-purple-400">
+              All slots active
+            </span>
+          )}
+        </div>
+      </div>
+
       {/* ── TABS + CONTENT ─────────────────────────────────────── */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <TracksViewToggle
@@ -398,15 +437,15 @@ export default async function TracksPage({
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
                 <Link href="/submit" className="group block">
-                  <div className="aspect-square rounded-2xl border-2 border-dashed border-black/10 bg-white/40 hover:border-purple-400 hover:bg-purple-50/50 flex flex-col items-center justify-center gap-2 transition-all duration-150">
-                    <div className="h-10 w-10 rounded-full bg-black/[0.04] group-hover:bg-purple-100 flex items-center justify-center transition-colors border-2 border-black/[0.06] group-hover:border-purple-200">
-                      <Plus className="h-5 w-5 text-black/20 group-hover:text-purple-600 transition-colors" />
+                  <div className="aspect-square rounded-2xl border-2 border-dashed border-black/10 bg-white hover:border-black/25 hover:bg-white flex flex-col items-center justify-center gap-2.5 transition-all duration-150 shadow-[2px_2px_0_rgba(0,0,0,0.04)] group-hover:shadow-[3px_3px_0_rgba(0,0,0,0.08)]">
+                    <div className="h-10 w-10 rounded-xl bg-black/5 group-hover:bg-black/8 flex items-center justify-center transition-colors border border-black/8">
+                      <Plus className="h-5 w-5 text-black/30 group-hover:text-black/60 transition-colors" />
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-black/20 group-hover:text-purple-600 transition-colors">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-black/25 group-hover:text-black/50 transition-colors">
                       Add track
                     </span>
                   </div>
-                  <p className="text-[11px] font-medium text-center text-black/20 mt-2">Open slot</p>
+                  <p className="text-[11px] font-bold text-center text-black/20 mt-2">Open slot</p>
                 </Link>
 
                 {tracks.map((track) => {
@@ -477,7 +516,7 @@ function TrackCard({
 
   return (
     <Link href={`/tracks/${id}`} className="group block">
-      <div className="relative aspect-square rounded-2xl overflow-hidden border-2 border-black/8 group-hover:border-black/20 transition-all duration-150 shadow-sm">
+      <div className="relative aspect-square rounded-2xl overflow-hidden border-2 border-black/8 group-hover:border-black/20 transition-all duration-150 shadow-[2px_2px_0_rgba(0,0,0,0.06)] group-hover:shadow-[4px_4px_0_rgba(0,0,0,0.1)]">
         {artworkUrl ? (
           <Image
             src={artworkUrl}
@@ -487,40 +526,43 @@ function TrackCard({
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center">
-            <Music className="h-8 w-8 text-black/20" />
+          <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
+            <Music className="h-8 w-8 text-black/15" />
           </div>
         )}
 
+        {/* Status badge */}
         <div className="absolute top-2 left-2">
           <span className={cn(
-            "text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full backdrop-blur-sm",
+            "text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-lg backdrop-blur-sm",
             isComplete ? "bg-lime-400 text-black" :
             isReviewing ? "bg-purple-600 text-white" :
-            "bg-white/90 text-black/60"
+            "bg-black/60 text-white/80"
           )}>
-            {isComplete ? "Done" : isReviewing ? (status === "QUEUED" ? "Queued" : "Reviewing") : "Uploaded"}
+            {isComplete ? "Done" : isReviewing ? (status === "QUEUED" ? "Queued" : "Live") : "Uploaded"}
           </span>
         </div>
 
+        {/* Review progress overlay */}
         {hasReviews && (
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-2.5 pt-4 pb-2">
-            <div className="flex items-baseline justify-between mb-1">
-              <span className="text-xs font-black text-white leading-none">{completedReviews}/{totalReviews}</span>
-              <span className="text-[9px] text-white/50">reviews</span>
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent px-3 pt-6 pb-2.5">
+            <div className="flex items-baseline justify-between mb-1.5">
+              <span className="text-xs font-black text-white leading-none tabular-nums">{completedReviews}/{totalReviews}</span>
+              <span className="text-[9px] font-bold text-white/40">reviews</span>
             </div>
-            <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
+            <div className="h-1 bg-white/20 rounded-full overflow-hidden">
               <div
-                className={cn("h-full rounded-full", isDone ? "bg-lime-400" : "bg-white")}
+                className={cn("h-full rounded-full transition-all", isDone ? "bg-lime-400" : "bg-purple-400")}
                 style={{ width: `${reviewProgress * 100}%` }}
               />
             </div>
           </div>
         )}
       </div>
-      <p className="text-xs font-black text-black mt-2 truncate leading-tight">{title}</p>
+
+      <p className="text-[12px] font-black text-black mt-2.5 truncate leading-tight">{title}</p>
       {!hasReviews && isUploaded && (
-        <p className="text-[11px] text-purple-600 font-bold mt-0.5">Request reviews →</p>
+        <p className="text-[10px] font-black text-purple-600 uppercase tracking-wider mt-0.5">Get reviews →</p>
       )}
     </Link>
   );
@@ -528,20 +570,29 @@ function TrackCard({
 
 function EmptyState() {
   return (
-    <div className="border-2 border-dashed border-black/10 rounded-2xl px-6 py-16 text-center bg-white/40">
-      <div className="h-16 w-16 rounded-2xl bg-black/5 flex items-center justify-center mx-auto mb-4">
-        <Music className="h-8 w-8 text-black/20" />
+    <div className="bg-white rounded-2xl border-2 border-black/10 overflow-hidden shadow-[4px_4px_0_rgba(0,0,0,0.06)]">
+      {/* Dark top section */}
+      <div className="bg-black px-6 py-8 text-center">
+        <div className="h-16 w-16 rounded-2xl bg-purple-600 flex items-center justify-center mx-auto mb-4 shadow-[3px_3px_0_rgba(0,0,0,0.5)]">
+          <Music className="h-8 w-8 text-white" />
+        </div>
+        <h2 className="text-2xl font-black tracking-tighter text-white mb-1">No tracks yet.</h2>
+        <p className="text-white/40 text-sm max-w-xs mx-auto">
+          Upload your first track and start getting real feedback.
+        </p>
       </div>
-      <h2 className="text-2xl font-black tracking-tight text-black mb-2">No tracks yet.</h2>
-      <p className="text-black/40 font-medium text-sm max-w-xs mx-auto mb-6">
-        Upload your first track and get real feedback from fellow artists.
-      </p>
-      <Link href="/submit">
-        <Button className="bg-purple-600 hover:bg-purple-700 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-10 px-6 rounded-xl">
-          <Plus className="h-4 w-4 mr-2" />
-          Upload a track
-        </Button>
-      </Link>
+      {/* CTA section */}
+      <div className="px-6 py-5 flex items-center justify-between gap-4">
+        <p className="text-[13px] font-bold text-black/50">
+          Free to upload · community-reviewed
+        </p>
+        <Link href="/submit">
+          <Button className="bg-purple-600 hover:bg-purple-700 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-10 px-5 rounded-xl whitespace-nowrap">
+            <Plus className="h-4 w-4 mr-2" />
+            Upload a track
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }

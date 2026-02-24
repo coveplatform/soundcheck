@@ -3,9 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Music, MessageSquare, Lock, Crown, Coins, ArrowRight } from "lucide-react";
+import { Plus, Music, Lock, Crown, ArrowRight, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DequeueButton } from "@/components/tracks/dequeue-button";
 import { QueueTrackPicker } from "@/components/tracks/queue-track-picker";
@@ -47,200 +46,176 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
   };
 
   return (
-    <div>
-      {/* Slim header: credits + pro upsell */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-1.5">
-          <Coins className="h-3.5 w-3.5 text-black/25" />
-          <span className="text-sm text-black/50">
-            <span className="font-bold text-black">{credits}</span> credits
-          </span>
-          <Link href="/review" className="text-xs text-purple-600 hover:text-purple-700 font-medium ml-2">
-            Earn more →
-          </Link>
+    <div className="space-y-8">
+
+      {/* ── ACTIVE SLOTS ──────────────────────────────────────── */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">
+            Active Review Slots
+          </p>
+          <div className="flex items-center gap-1.5">
+            <Coins className="h-3 w-3 text-black/25" />
+            <span className="text-[11px] font-black text-black/50">
+              <span className="text-black">{credits}</span> credits
+            </span>
+            <Link href="/review" className="text-[11px] font-black text-purple-600 hover:text-purple-800 transition-colors ml-1">
+              Earn →
+            </Link>
+          </div>
         </div>
-        {!isPro && (
-          <Link href="/pro" className="inline-flex items-center gap-1.5 text-xs text-purple-600 hover:text-purple-700 font-semibold">
-            <Crown className="h-3 w-3" />
-            Get 3 slots
-          </Link>
-        )}
-      </div>
 
-      {/* Slot grid — full width */}
-      <div className="grid grid-cols-3 gap-4 sm:gap-6">
-        {Array.from({ length: 3 }, (_, slotIndex) => {
-          const track = activeTracks[slotIndex];
-          const isLocked = !isPro && slotIndex >= maxSlots;
+        <div className="grid grid-cols-3 gap-3 sm:gap-4">
+          {Array.from({ length: 3 }, (_, slotIndex) => {
+            const track = activeTracks[slotIndex];
+            const isLocked = !isPro && slotIndex >= maxSlots;
 
-          // Filled slot
-          if (track) {
-            const completedReviews = track.reviews.filter((r) => r.status === "COMPLETED").length;
-            const hasReviews = track.reviewsRequested > 0;
-            const reviewProgress = hasReviews ? completedReviews / track.reviewsRequested : 0;
-            const isQueued = track.status === "QUEUED";
-            const isInProgress = track.status === "IN_PROGRESS";
-            const isPending = track.status === "PENDING_PAYMENT";
+            if (track) {
+              const completedReviews = track.reviews.filter((r) => r.status === "COMPLETED").length;
+              const hasReviews = track.reviewsRequested > 0;
+              const reviewProgress = hasReviews ? completedReviews / track.reviewsRequested : 0;
+              const isQueued = track.status === "QUEUED";
+              const isInProgress = track.status === "IN_PROGRESS";
+              const isPending = track.status === "PENDING_PAYMENT";
 
-            return (
-              <div key={track.id} className="group">
-                <Card variant="soft" interactive className="overflow-hidden">
-                  <Link href={`/tracks/${track.id}`} className="block">
-                    <div className="relative aspect-square bg-neutral-100">
+              return (
+                <div key={track.id} className="group">
+                  <div className="relative rounded-2xl overflow-hidden border-2 border-black/8 group-hover:border-black/20 transition-all shadow-[2px_2px_0_rgba(0,0,0,0.06)] group-hover:shadow-[4px_4px_0_rgba(0,0,0,0.1)] aspect-square">
+                    <Link href={`/tracks/${track.id}`} className="block w-full h-full">
                       {track.artworkUrl ? (
                         <Image
                           src={track.artworkUrl}
                           alt={track.title}
                           fill
-                          className="object-cover transition-transform duration-150 ease-out group-hover:scale-[1.02]"
-                          sizes="(max-width: 640px) 33vw, 400px"
+                          className="object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                          sizes="(max-width: 640px) 33vw, 280px"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-                          <Music className="h-10 w-10 text-black/10" />
+                        <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
+                          <Music className="h-8 w-8 text-black/15" />
                         </div>
                       )}
+
                       {/* Status badge */}
                       <div className="absolute top-2 left-2">
                         {isPending ? (
-                          <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-white/80 text-black/60 border border-black/10 backdrop-blur-sm">Pending</span>
+                          <span className="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-black/60 text-white/80">Pending</span>
                         ) : isQueued ? (
-                          <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-purple-600 text-white shadow-sm">Queued</span>
+                          <span className="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-purple-600 text-white">Queued</span>
                         ) : isInProgress ? (
-                          <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-purple-600 text-white shadow-sm">Reviewing</span>
+                          <span className="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-purple-600 text-white">Live</span>
                         ) : null}
                       </div>
-                      <DequeueButton trackId={track.id} trackTitle={track.title} />
-                    </div>
-                  </Link>
-                </Card>
 
-                {/* Info below artwork */}
-                <div className="mt-3 px-0.5">
-                  <p className="text-sm font-semibold text-black truncate mb-2">{track.title}</p>
-                  {hasReviews ? (
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-1">
-                          <MessageSquare className="h-3 w-3 text-purple-500" />
-                          <span className="text-[11px] font-semibold text-purple-700">{completedReviews}/{track.reviewsRequested} reviews</span>
+                      {/* Review progress overlay */}
+                      {hasReviews && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent px-3 pt-6 pb-2.5">
+                          <div className="flex items-baseline justify-between mb-1.5">
+                            <span className="text-xs font-black text-white tabular-nums">{completedReviews}/{track.reviewsRequested}</span>
+                            <span className="text-[9px] font-bold text-white/40">reviews</span>
+                          </div>
+                          <div className="h-1 bg-white/20 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-purple-400 rounded-full transition-all"
+                              style={{ width: `${reviewProgress * 100}%` }}
+                            />
+                          </div>
                         </div>
-                        <span className="text-[11px] text-black/30">{Math.round(reviewProgress * 100)}%</span>
-                      </div>
-                      <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-purple-500 rounded-full transition-[width] duration-300"
-                          style={{ width: `${reviewProgress * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-[11px] text-black/30">Waiting for reviewers</p>
-                  )}
+                      )}
+                    </Link>
+                    <DequeueButton trackId={track.id} trackTitle={track.title} />
+                  </div>
+                  <p className="text-[12px] font-black text-black mt-2.5 truncate">{track.title}</p>
                 </div>
-              </div>
-            );
-          }
+              );
+            }
 
-          // Locked slot
-          if (isLocked) {
-            return (
-              <div key={`locked-${slotIndex}`}>
-                <Link href="/pro" className="group block">
-                  <div className="aspect-square rounded-xl border-2 border-dashed border-black/[0.06] bg-neutral-50/30 hover:bg-purple-50/40 hover:border-purple-200 flex flex-col items-center justify-center gap-3 transition-colors">
-                    <div className="h-12 w-12 rounded-full bg-black/[0.03] group-hover:bg-purple-100 flex items-center justify-center transition-colors">
-                      <Lock className="h-5 w-5 text-black/[0.08] group-hover:text-purple-400 transition-colors" />
+            if (isLocked) {
+              return (
+                <Link key={`locked-${slotIndex}`} href="/pro" className="group block">
+                  <div className="aspect-square rounded-2xl border-2 border-dashed border-black/10 bg-white hover:border-purple-200 hover:bg-purple-50/50 flex flex-col items-center justify-center gap-2.5 transition-all">
+                    <div className="h-10 w-10 rounded-xl bg-black/5 group-hover:bg-purple-100 flex items-center justify-center transition-colors">
+                      <Lock className="h-4 w-4 text-black/20 group-hover:text-purple-500 transition-colors" />
                     </div>
-                    <div className="text-center px-4">
-                      <p className="text-sm font-semibold text-black/20 group-hover:text-purple-600 transition-colors">Pro slot</p>
-                      <p className="text-[11px] text-black/15 group-hover:text-purple-400 transition-colors mt-0.5">Run 3 tracks at once</p>
-                    </div>
-                    <div className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-300 group-hover:text-purple-600 transition-colors">
-                      <Crown className="h-3 w-3" />
-                      Upgrade
+                    <div className="text-center px-3">
+                      <p className="text-[10px] font-black uppercase tracking-wider text-black/20 group-hover:text-purple-600 transition-colors">Pro slot</p>
+                      <div className="flex items-center justify-center gap-1 mt-1">
+                        <Crown className="h-3 w-3 text-purple-300 group-hover:text-purple-500 transition-colors" />
+                        <span className="text-[10px] font-black text-purple-300 group-hover:text-purple-500 transition-colors">Upgrade</span>
+                      </div>
                     </div>
                   </div>
+                  <p className="text-[11px] font-bold text-black/20 mt-2 text-center">Locked</p>
                 </Link>
-                <div className="mt-3 px-0.5 h-[42px]" />
+              );
+            }
+
+            return (
+              <div key={`empty-${slotIndex}`}>
+                <button onClick={() => openPickerFor()} className="w-full group">
+                  <div className="aspect-square rounded-2xl border-2 border-dashed border-black/10 bg-white hover:border-black/25 flex flex-col items-center justify-center gap-2.5 transition-all shadow-[2px_2px_0_rgba(0,0,0,0.04)] group-hover:shadow-[3px_3px_0_rgba(0,0,0,0.08)]">
+                    <div className="h-10 w-10 rounded-xl bg-black/5 group-hover:bg-black/8 flex items-center justify-center transition-colors">
+                      <Plus className="h-5 w-5 text-black/25 group-hover:text-black/50 transition-colors" />
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-black/25 group-hover:text-black/50 transition-colors">Add track</span>
+                  </div>
+                </button>
+                <p className="text-[11px] font-bold text-black/20 mt-2 text-center">Open slot</p>
               </div>
             );
-          }
-
-          // Empty slot
-          return (
-            <div key={`empty-${slotIndex}`}>
-              <button onClick={() => openPickerFor()} className="w-full group">
-                <div className="aspect-square rounded-xl border-2 border-dashed border-black/10 bg-white/50 hover:bg-purple-50/40 hover:border-purple-300 flex flex-col items-center justify-center gap-3 transition-all">
-                  <div className="h-12 w-12 rounded-full bg-black/[0.04] group-hover:bg-purple-100 flex items-center justify-center transition-colors">
-                    <Plus className="h-5 w-5 text-black/20 group-hover:text-purple-600 transition-colors" />
-                  </div>
-                  <div className="text-center px-4">
-                    <p className="text-sm font-semibold text-black/30 group-hover:text-purple-600 transition-colors">Add a track</p>
-                    <p className="text-[11px] text-black/20 group-hover:text-purple-400 transition-colors mt-0.5">Slot is open</p>
-                  </div>
-                </div>
-              </button>
-              <div className="mt-3 px-0.5 h-[42px]" />
-            </div>
-          );
-        })}
+          })}
+        </div>
       </div>
 
-      {/* Grandfathered tracks beyond slot limit */}
+      {/* ── GRANDFATHERED ─────────────────────────────────────── */}
       {activeTracks.length > 3 && (
-        <div className="mt-10">
-          <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-amber-600 mb-4">Grandfathered tracks</p>
-          <div className="grid grid-cols-3 gap-4 sm:gap-6">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-600/70 mb-4">Grandfathered tracks</p>
+          <div className="grid grid-cols-3 gap-3 sm:gap-4">
             {activeTracks.slice(3).map((track) => {
               const completedReviews = track.reviews.filter((r) => r.status === "COMPLETED").length;
               const hasReviews = track.reviewsRequested > 0;
               const reviewProgress = hasReviews ? completedReviews / track.reviewsRequested : 0;
               return (
-                <div key={track.id}>
-                  <Link href={`/tracks/${track.id}`} className="group block">
-                    <Card variant="soft" interactive className="overflow-hidden ring-2 ring-amber-300">
-                      <div className="relative aspect-square bg-neutral-100">
-                        {track.artworkUrl ? (
-                          <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="400px" />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
-                            <Music className="h-10 w-10 text-black/10" />
-                          </div>
-                        )}
+                <Link key={track.id} href={`/tracks/${track.id}`} className="group block">
+                  <div className="relative aspect-square rounded-2xl overflow-hidden border-2 border-amber-300/60">
+                    {track.artworkUrl ? (
+                      <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="280px" />
+                    ) : (
+                      <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
+                        <Music className="h-8 w-8 text-black/15" />
                       </div>
-                    </Card>
-                    <div className="mt-3 px-0.5">
-                      <p className="text-sm font-semibold text-black truncate mb-2">{track.title}</p>
-                      {hasReviews && (
-                        <div>
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-[11px] font-semibold text-purple-700">{completedReviews}/{track.reviewsRequested} reviews</span>
-                          </div>
-                          <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-purple-500 rounded-full" style={{ width: `${reviewProgress * 100}%` }} />
-                          </div>
+                    )}
+                    {hasReviews && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent px-3 pt-6 pb-2.5">
+                        <div className="h-1 bg-white/20 rounded-full overflow-hidden">
+                          <div className="h-full bg-amber-400 rounded-full" style={{ width: `${reviewProgress * 100}%` }} />
                         </div>
-                      )}
-                    </div>
-                  </Link>
-                </div>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-[12px] font-black text-black mt-2.5 truncate">{track.title}</p>
+                </Link>
               );
             })}
           </div>
         </div>
       )}
 
-      {/* Your Library section */}
+      {/* ── YOUR LIBRARY ──────────────────────────────────────── */}
       {eligibleTracks.length > 0 && (
-        <div className="mt-10">
-          <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-black/30 mb-4">Your Library</p>
-          <div className="space-y-2">
-            {eligibleTracks.map((track) => (
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-4">Your Library</p>
+          <div className="bg-white rounded-2xl border-2 border-black/8 overflow-hidden">
+            {eligibleTracks.map((track, i) => (
               <div
                 key={track.id}
-                className="flex items-center gap-3 p-3 rounded-xl border border-black/5 bg-white/60 hover:bg-white/90 transition-colors"
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3.5",
+                  i > 0 && "border-t border-black/5"
+                )}
               >
-                <div className="w-10 h-10 rounded-lg bg-neutral-100 flex-shrink-0 overflow-hidden relative">
+                <div className="w-10 h-10 rounded-xl bg-neutral-100 flex-shrink-0 overflow-hidden relative border border-black/5">
                   {track.artworkUrl ? (
                     <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="40px" />
                   ) : (
@@ -250,22 +225,24 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-black truncate">{track.title}</p>
-                  <div className="flex items-center gap-2">
-                    {track.genreName && <span className="text-[11px] text-black/30">{track.genreName}</span>}
+                  <p className="text-[13px] font-black text-black truncate">{track.title}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {track.genreName && (
+                      <span className="text-[10px] text-black/30 font-medium">{track.genreName}</span>
+                    )}
                     <span className={cn(
-                      "text-[10px] font-bold uppercase",
-                      track.status === "COMPLETED" ? "text-emerald-600" : "text-black/25"
+                      "text-[10px] font-black uppercase tracking-wider",
+                      track.status === "COMPLETED" ? "text-purple-500" : "text-black/25"
                     )}>
-                      {track.status === "COMPLETED" ? `Completed · ${track.reviewsCompleted} reviews` : "Uploaded"}
+                      {track.status === "COMPLETED" ? `${track.reviewsCompleted} reviews` : "Uploaded"}
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => openPickerFor(track.id)}
-                  className="flex items-center gap-1 text-xs font-semibold text-purple-600 hover:text-purple-700 transition-colors flex-shrink-0"
+                  className="flex items-center gap-1.5 text-[11px] font-black text-purple-600 hover:text-purple-800 transition-colors flex-shrink-0"
                 >
-                  Queue it
+                  Queue
                   <ArrowRight className="h-3 w-3" />
                 </button>
               </div>
