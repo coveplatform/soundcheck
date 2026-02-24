@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, Lock } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
-import { prisma } from "@/lib/prisma";
 import { TrackReportDemo } from "@/components/landing/track-report-demo";
 import { PeerModelSection } from "@/components/landing/peer-model-section";
 import { ActivityFeed } from "@/components/landing/activity-feed";
@@ -20,19 +19,18 @@ import { SignupLink } from "@/components/landing/signup-link";
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
 
-export default async function Home() {
-  // Fetch real public tracks with artwork for the Discover visual
-  const discoverTracks = await prisma.track.findMany({
-    where: {
-      isPublic: true,
-      artworkUrl: { not: null },
-      status: { in: ["UPLOADED", "QUEUED", "IN_PROGRESS", "COMPLETED"] },
-    },
-    select: { id: true, title: true, artworkUrl: true },
-    orderBy: { createdAt: "desc" },
-    take: 8,
-  }).catch(() => [] as { id: string; title: string; artworkUrl: string | null }[]);
+const discoverArtwork = [
+  "/activity-artwork/1.jpg",
+  "/activity-artwork/5.jpg",
+  "/activity-artwork/9.jpg",
+  "/activity-artwork/12.jpg",
+  "/activity-artwork/18.jpg",
+  "/activity-artwork/22.jpg",
+  "/activity-artwork/27.jpg",
+  "/activity-artwork/31.jpg",
+];
 
+export default function Home() {
   return (
     <div className="min-h-screen bg-[#faf8f5] text-neutral-950 pt-14">
       {/* Header */}
@@ -174,51 +172,39 @@ export default async function Home() {
                 }} />
 
                 {/* Album cards floating at different depths — real artwork */}
-                {(() => {
-                  const positions = [
-                    { x: "8%", y: "15%", rot: -8, size: 90, glow: "#00f0ff", z: 10 },
-                    { x: "28%", y: "5%", rot: 4, size: 110, glow: "#a855f7", z: 30 },
-                    { x: "52%", y: "12%", rot: -3, size: 100, glow: "#ff2d9b", z: 20 },
-                    { x: "75%", y: "8%", rot: 6, size: 85, glow: "#fbbf24", z: 15 },
-                    { x: "15%", y: "55%", rot: 5, size: 80, glow: "#10b981", z: 12 },
-                    { x: "38%", y: "48%", rot: -6, size: 120, glow: "#00f0ff", z: 35 },
-                    { x: "62%", y: "52%", rot: 3, size: 95, glow: "#a855f7", z: 25 },
-                    { x: "82%", y: "45%", rot: -4, size: 75, glow: "#ff2d9b", z: 8 },
-                  ];
-                  return positions.slice(0, Math.max(discoverTracks.length, 1)).map((card, i) => {
-                    const track = discoverTracks[i];
-                    return (
-                      <div
-                        key={track?.id ?? i}
-                        className="absolute rounded-xl overflow-hidden"
-                        style={{
-                          left: card.x,
-                          top: card.y,
-                          width: card.size,
-                          height: card.size,
-                          transform: `rotate(${card.rot}deg)`,
-                          zIndex: card.z,
-                          boxShadow: `0 0 25px ${card.glow}20, 0 8px 32px rgba(0,0,0,0.6)`,
-                          border: `1px solid ${card.glow}30`,
-                        }}
-                      >
-                        {track?.artworkUrl ? (
-                          <Image
-                            src={track.artworkUrl}
-                            alt={track.title}
-                            fill
-                            className="object-cover"
-                            sizes={`${card.size}px`}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
-                            <svg className="w-6 h-6 text-white/10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  });
-                })()}
+                {[
+                  { x: "8%", y: "15%", rot: -8, size: 90, glow: "#00f0ff", z: 10 },
+                  { x: "28%", y: "5%", rot: 4, size: 110, glow: "#a855f7", z: 30 },
+                  { x: "52%", y: "12%", rot: -3, size: 100, glow: "#ff2d9b", z: 20 },
+                  { x: "75%", y: "8%", rot: 6, size: 85, glow: "#fbbf24", z: 15 },
+                  { x: "15%", y: "55%", rot: 5, size: 80, glow: "#10b981", z: 12 },
+                  { x: "38%", y: "48%", rot: -6, size: 120, glow: "#00f0ff", z: 35 },
+                  { x: "62%", y: "52%", rot: 3, size: 95, glow: "#a855f7", z: 25 },
+                  { x: "82%", y: "45%", rot: -4, size: 75, glow: "#ff2d9b", z: 8 },
+                ].map((card, i) => (
+                  <div
+                    key={i}
+                    className="absolute rounded-xl overflow-hidden"
+                    style={{
+                      left: card.x,
+                      top: card.y,
+                      width: card.size,
+                      height: card.size,
+                      transform: `rotate(${card.rot}deg)`,
+                      zIndex: card.z,
+                      boxShadow: `0 0 25px ${card.glow}20, 0 8px 32px rgba(0,0,0,0.6)`,
+                      border: `1px solid ${card.glow}30`,
+                    }}
+                  >
+                    <Image
+                      src={discoverArtwork[i]}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes={`${card.size}px`}
+                    />
+                  </div>
+                ))}
 
                 {/* Faint grid lines — holographic floor effect */}
                 <div className="absolute bottom-0 left-0 right-0 h-24 opacity-10" style={{
