@@ -393,7 +393,7 @@ export default async function DashboardPage() {
                     Explore music in 3D.
                   </h2>
                   <p className="text-sm text-white/40 mt-3 font-medium leading-relaxed max-w-sm">
-                    Float through a galaxy of independent tracks. Click any album to listen instantly.
+                    Submit your tracks and they&apos;ll appear here instantly. Explore what other artists are making.
                   </p>
                   <div className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.08] border border-white/[0.12] text-white/80 text-sm font-bold group-hover:bg-white/[0.14] group-hover:border-white/[0.2] transition-all duration-200">
                     Enter the space
