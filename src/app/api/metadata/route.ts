@@ -81,6 +81,8 @@ export async function POST(request: Request) {
       oembedUrl = `https://bandcamp.com/oembed?url=${encodeURIComponent(url)}&format=json`;
     } else if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) {
       oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+    } else if (hostname.includes("spotify.com")) {
+      oembedUrl = `https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`;
     }
 
     if (!oembedUrl) {

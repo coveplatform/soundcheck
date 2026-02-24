@@ -1,7 +1,7 @@
 // URL metadata extraction utilities
 // Note: In production, you'd use oEmbed APIs or scraping for more accurate data
 
-export type TrackSource = "SOUNDCLOUD" | "BANDCAMP" | "YOUTUBE" | "UPLOAD";
+export type TrackSource = "SOUNDCLOUD" | "BANDCAMP" | "YOUTUBE" | "SPOTIFY" | "UPLOAD";
 
 export interface TrackMetadata {
   title: string;
@@ -45,6 +45,9 @@ export function detectSource(url: string): TrackSource | null {
     if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) {
       return "YOUTUBE";
     }
+    if (hostname.includes("spotify.com")) {
+      return "SPOTIFY";
+    }
 
     return null;
   } catch {
@@ -67,7 +70,7 @@ export function validateTrackUrl(url: string): { valid: boolean; error?: string 
   if (!source) {
     return {
       valid: false,
-      error: "Please enter a SoundCloud, Bandcamp, or YouTube URL",
+      error: "Please enter a SoundCloud, Bandcamp, YouTube, or Spotify URL",
     };
   }
 

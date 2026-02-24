@@ -618,11 +618,11 @@ export default function SubmitTrackPage() {
             {uploadMode === "link" && (
               <div className="space-y-3">
                 <Input
-                  placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
+                  placeholder="Paste SoundCloud, Bandcamp, YouTube, or Spotify link"
                   value={url}
                   onChange={(e) => handleUrlChange(e.target.value)}
                   className={cn(
-                    "h-12 rounded-xl border-2 border-neutral-200 bg-white focus:border-purple-500",
+                    "h-12 rounded-xl border-2 border-black/10 bg-white focus:border-purple-500",
                     urlError && "border-red-500"
                   )}
                   autoFocus
@@ -632,7 +632,7 @@ export default function SubmitTrackPage() {
                   <p className="text-sm text-red-600 font-medium">{urlError}</p>
                 )}
                 {isLoadingMetadata && (
-                  <div className="flex items-center gap-2 text-sm text-neutral-500">
+                  <div className="flex items-center gap-2 text-sm text-black/40">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Getting track info...
                   </div>
@@ -651,13 +651,13 @@ export default function SubmitTrackPage() {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-black truncate">
+                      <p className="font-black text-black truncate">
                         {title}
                       </p>
                       <div className="flex items-center gap-1.5 mt-1">
                         <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                        <span className="text-xs font-medium text-neutral-500">
-                          {sourceType === "SOUNDCLOUD" ? "SoundCloud" : sourceType === "BANDCAMP" ? "Bandcamp" : sourceType === "YOUTUBE" ? "YouTube" : "Ready"}
+                        <span className="text-xs font-bold text-black/40">
+                          {sourceType === "SOUNDCLOUD" ? "SoundCloud" : sourceType === "BANDCAMP" ? "Bandcamp" : sourceType === "YOUTUBE" ? "YouTube" : sourceType === "SPOTIFY" ? "Spotify" : "Ready"}
                         </span>
                       </div>
                     </div>
@@ -705,7 +705,7 @@ export default function SubmitTrackPage() {
                     isDragging && "border-purple-400 bg-purple-50",
                     !isDragging &&
                       !uploadedFileName &&
-                      "border-neutral-300 hover:border-purple-400 hover:bg-purple-50/50",
+                      "border-black/10 hover:border-purple-400 hover:bg-purple-50/50",
                     uploadedFileName &&
                       !isUploading &&
                       "border-emerald-400 bg-emerald-50"
@@ -722,10 +722,10 @@ export default function SubmitTrackPage() {
                         <Check className="h-7 w-7 text-white" />
                       </div>
                       <div>
-                        <p className="font-semibold text-neutral-900">
+                        <p className="font-black text-black">
                           {uploadedFileName}
                         </p>
-                        <p className="text-sm text-neutral-500 mt-1">Click to change</p>
+                        <p className="text-sm text-black/40 mt-1">Click to change</p>
                       </div>
                     </div>
                   ) : (
@@ -734,10 +734,10 @@ export default function SubmitTrackPage() {
                         <Upload className="h-7 w-7 text-purple-600" />
                       </div>
                       <div>
-                        <p className="font-semibold text-neutral-900">
+                        <p className="font-black text-black">
                           Drop your MP3 here
                         </p>
-                        <p className="text-sm text-neutral-500 mt-1">
+                        <p className="text-sm text-black/40 mt-1">
                           or click to browse (max 25 MB)
                         </p>
                       </div>
@@ -797,7 +797,7 @@ export default function SubmitTrackPage() {
                   type="button"
                   onClick={() => artworkInputRef.current?.click()}
                   disabled={isUploadingArtwork}
-                  className="group relative h-[72px] w-[72px] rounded-xl border-2 border-dashed border-neutral-300 hover:border-purple-400 bg-neutral-50 hover:bg-purple-50/50 overflow-hidden transition-all duration-150 ease-out flex items-center justify-center"
+                  className="group relative h-[72px] w-[72px] rounded-xl border-2 border-dashed border-black/10 hover:border-black/20 bg-white hover:bg-neutral-50 overflow-hidden transition-all duration-150 ease-out flex items-center justify-center"
                 >
                   {isUploadingArtwork ? (
                     <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
@@ -819,7 +819,7 @@ export default function SubmitTrackPage() {
               <div className="flex-1">
                 <label
                   htmlFor="track-title"
-                  className="block text-sm font-medium text-neutral-700 mb-2"
+                  className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-2"
                 >
                   Title
                 </label>
@@ -828,7 +828,7 @@ export default function SubmitTrackPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="What's your track called?"
-                  className="h-12 rounded-xl border-2 border-neutral-200 bg-white focus:border-purple-500"
+                  className="h-12 rounded-xl border-2 border-black/10 bg-white focus:border-purple-500"
                   autoFocus
                 />
               </div>
@@ -836,11 +836,11 @@ export default function SubmitTrackPage() {
 
             {/* Genres */}
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-2">
                 Genres <span className="text-neutral-400">(select 1-3)</span>
               </label>
               {genres.length === 0 ? (
-                <div className="flex items-center gap-2 text-sm text-neutral-500">
+                <div className="flex items-center gap-2 text-sm text-black/40">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Loading genres...
                 </div>
@@ -859,7 +859,7 @@ export default function SubmitTrackPage() {
             <div>
               <label
                 htmlFor="feedback-focus"
-                className="block text-sm font-medium text-neutral-700 mb-2"
+                className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-2"
               >
                 Feedback focus <span className="text-neutral-400">(optional)</span>
               </label>
@@ -870,13 +870,13 @@ export default function SubmitTrackPage() {
                 placeholder="Anything you want reviewers to focus on? e.g. mix balance, arrangement, vocal processing..."
                 rows={3}
                 maxLength={1000}
-                className="w-full rounded-xl border-2 border-neutral-200 bg-white px-4 py-3 text-sm placeholder:text-neutral-400 focus:border-purple-500 focus:outline-none resize-none"
+                className="w-full rounded-xl border-2 border-black/10 bg-white px-4 py-3 text-sm placeholder:text-black/25 focus:border-purple-500 focus:outline-none resize-none"
               />
             </div>
 
             {/* Visibility */}
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-3">
+              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-3">
                 Visibility
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -887,12 +887,12 @@ export default function SubmitTrackPage() {
                     "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-150 ease-out",
                     !isPublic
                       ? "border-purple-500 bg-purple-50/60"
-                      : "border-neutral-200 bg-white hover:border-neutral-300"
+                      : "border-black/10 bg-white hover:border-black/20"
                   )}
                 >
                   <Lock className={cn("h-5 w-5", !isPublic ? "text-purple-600" : "text-neutral-400")} />
                   <span className={cn("text-sm font-semibold", !isPublic ? "text-purple-700" : "text-neutral-600")}>Private</span>
-                  <span className="text-[11px] text-neutral-500 text-center leading-snug">
+                  <span className="text-[11px] text-black/40 text-center leading-snug">
                     Only you and assigned reviewers can access this track
                   </span>
                 </button>
@@ -903,12 +903,12 @@ export default function SubmitTrackPage() {
                     "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-150 ease-out",
                     isPublic
                       ? "border-purple-500 bg-purple-50/60"
-                      : "border-neutral-200 bg-white hover:border-neutral-300"
+                      : "border-black/10 bg-white hover:border-black/20"
                   )}
                 >
                   <Globe className={cn("h-5 w-5", isPublic ? "text-purple-600" : "text-neutral-400")} />
                   <span className={cn("text-sm font-semibold", isPublic ? "text-purple-700" : "text-neutral-600")}>Public</span>
-                  <span className="text-[11px] text-neutral-500 text-center leading-snug">
+                  <span className="text-[11px] text-black/40 text-center leading-snug">
                     Discoverable by the community, eligible for Top Rated charts, and shareable via link
                   </span>
                 </button>

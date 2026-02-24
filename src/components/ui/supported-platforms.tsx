@@ -1,9 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { SoundCloudIcon, BandcampIcon, YouTubeIcon } from "./platform-icons";
+import { SoundCloudIcon, BandcampIcon, YouTubeIcon, SpotifyIcon } from "./platform-icons";
 
-type SourceType = "SOUNDCLOUD" | "BANDCAMP" | "YOUTUBE" | "UPLOAD" | null;
+type SourceType = "SOUNDCLOUD" | "BANDCAMP" | "YOUTUBE" | "SPOTIFY" | "UPLOAD" | null;
 
 interface SupportedPlatformsProps {
   /** Currently detected source from URL, if any */
@@ -37,6 +37,14 @@ const platforms = [
     color: "#ff0000",
     bgActive: "bg-red-50",
     borderActive: "border-red-400"
+  },
+  {
+    id: "SPOTIFY" as const,
+    name: "Spotify",
+    Icon: SpotifyIcon,
+    color: "#1DB954",
+    bgActive: "bg-green-50",
+    borderActive: "border-green-400"
   },
 ];
 

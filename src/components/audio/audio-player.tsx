@@ -149,8 +149,8 @@ export function AudioPlayer({
     seekToRatio(ratio);
   };
 
-  // For embedded players (SoundCloud, YouTube, Bandcamp)
-  const isEmbedded = sourceType === "SOUNDCLOUD" || sourceType === "YOUTUBE" || sourceType === "BANDCAMP";
+  // For embedded players (SoundCloud, YouTube, Bandcamp, Spotify)
+  const isEmbedded = sourceType === "SOUNDCLOUD" || sourceType === "YOUTUBE" || sourceType === "BANDCAMP" || sourceType === "SPOTIFY";
 
   // On touch devices, embedded iframes can capture touch gestures and make the page feel like it won't scroll.
   // Default to non-interactive embeds and let the user tap to enable.
@@ -236,6 +236,17 @@ export function AudioPlayer({
     }
     if (sourceType === "BANDCAMP") {
       return bandcampEmbedUrl || "";
+    }
+    if (sourceType === "SPOTIFY") {
+      try {
+        const url = new URL(sourceUrl);
+        // Handle both /track/ and /intl-xx/track/ paths
+        const trackIdMatch = url.pathname.match(/\/track\/([a-zA-Z0-9]+)/);
+        const trackId = trackIdMatch?.[1] ?? "";
+        return `https://open.spotify.com/embed/track/${trackId}?utm_source=generator`;
+      } catch {
+        return sourceUrl;
+      }
     }
     return sourceUrl;
   };
@@ -580,6 +591,7 @@ export function AudioPlayer({
       !isEmbedInteractive &&
       (sourceType === "SOUNDCLOUD" ||
         sourceType === "YOUTUBE" ||
+        sourceType === "SPOTIFY" ||
         (sourceType === "BANDCAMP" && !!bandcampEmbedUrl));
 
     return (
@@ -650,6 +662,15 @@ export function AudioPlayer({
                 Loading Bandcamp player...
               </div>
             )
+          ) : sourceType === "SPOTIFY" ? (
+            <iframe
+              src={getEmbedUrl()}
+              width="100%"
+              height={152}
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              className={cn("border-0 rounded-xl", !isEmbedInteractive && "pointer-events-none")}
+            />
           ) : null}
 
           {showEnableOverlay && (

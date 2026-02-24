@@ -7,7 +7,7 @@ datasource db {
 }
 
 model Account {
-  id                String @id @default(cuid())
+  id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
@@ -25,42 +25,45 @@ model Account {
 }
 
 model ArtistProfile {
-  id                           String @id @default(cuid())
-  userId                       String        @unique
+  id                           String             @id @default(cuid())
+  userId                       String             @unique
   artistName                   String
-  totalTracks                  Int           @default(0)
-  totalSpent                   Int           @default(0)
-  createdAt                    DateTime      @default(now())
-  updatedAt                    DateTime @updatedAt
-  pendingBalance               Int           @default(0)    // DEPRECATED — artist payouts removed
-  stripeAccountId              String?       @unique         // DEPRECATED — artist Stripe Connect removed
-  stripeConnectedAt            DateTime?                     // DEPRECATED — artist Stripe Connect removed
-  totalEarnings                Int           @default(0)     // DEPRECATED — artist earnings removed
-  stripeCustomerId             String?                       // Stripe customer ID for billing
-  subscriptionId               String?                       // Stripe subscription ID (Pro)
-  subscriptionStatus           String?                       // "active" | "canceled" | "past_due" | null
-  subscriptionTier             String?                       // DEPRECATED — single Pro tier only
-  completedOnboarding          Boolean       @default(false)
-  hasSeenCreditGuide           Boolean       @default(false)
-  hasSeenWelcome               Boolean       @default(false)
-  peerFlagCount                Int           @default(0)
-  peerGemCount                 Int           @default(0)
-  peerReviewRating             Float         @default(0)
-  reviewCredits                Int           @default(3)
-  totalCreditsEarned           Int           @default(0)
-  totalCreditsSpent            Int           @default(0)
-  totalPeerReviews             Int           @default(0)
+  totalTracks                  Int                @default(0)
+  totalSpent                   Int                @default(0)
+  createdAt                    DateTime           @default(now())
+  updatedAt                    DateTime           @updatedAt
+  pendingBalance               Int                @default(0)
+  stripeAccountId              String?            @unique
+  stripeConnectedAt            DateTime?
+  totalEarnings                Int                @default(0)
+  stripeCustomerId             String?
+  subscriptionCanceledAt       DateTime?
+  subscriptionCurrentPeriodEnd DateTime?
+  subscriptionId               String?
+  subscriptionStatus           String?
+  subscriptionTier             String?
+  completedOnboarding          Boolean            @default(false)
+  hasSeenCreditGuide           Boolean            @default(false)
+  hasSeenWelcome               Boolean            @default(false)
+  peerFlagCount                Int                @default(0)
+  peerGemCount                 Int                @default(0)
+  peerReviewRating             Float              @default(0)
+  reviewCredits                Int                @default(1)
+  totalCreditsEarned           Int                @default(0)
+  totalCreditsSpent            Int                @default(0)
+  totalPeerReviews             Int                @default(0)
   reviewerExpertise            ReviewerExpertise?
-  User                         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User                         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   Review                       Review[]
   ReviewQueue                  ReviewQueue[]
   Track                        Track[]
-  Genre_ArtistGenres           Genre[]       @relation("ArtistGenres")
-  Genre_ArtistReviewGenres     Genre[]       @relation("ArtistReviewGenres")
+  Genre_ArtistGenres           Genre[]            @relation("ArtistGenres")
+  Genre_ArtistReviewGenres     Genre[]            @relation("ArtistReviewGenres")
+  ChartSubmission              ChartSubmission[]
 }
 
 model EmailVerificationToken {
-  id        String @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
   tokenHash String    @unique
   expiresAt DateTime
@@ -72,7 +75,7 @@ model EmailVerificationToken {
 }
 
 model ExternalPurchase {
-  id                      String @id @default(cuid())
+  id                      String                 @id @default(cuid())
   trackId                 String
   buyerEmail              String
   buyerName               String?
@@ -101,7 +104,7 @@ model ExternalPurchase {
 }
 
 model Genre {
-  id                               String @id @default(cuid())
+  id                               String            @id @default(cuid())
   name                             String            @unique
   slug                             String            @unique
   ArtistProfile_ArtistGenres       ArtistProfile[]   @relation("ArtistGenres")
@@ -111,7 +114,7 @@ model Genre {
 }
 
 model PasswordResetToken {
-  id        String @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
   tokenHash String    @unique
   expiresAt DateTime
@@ -123,7 +126,7 @@ model PasswordResetToken {
 }
 
 model Payment {
-  id              String @id @default(cuid())
+  id              String        @id @default(cuid())
   trackId         String        @unique
   amount          Int
   stripeSessionId String        @unique
@@ -135,7 +138,7 @@ model Payment {
 }
 
 model Payout {
-  id              String @id @default(cuid())
+  id              String          @id @default(cuid())
   reviewerId      String
   amount          Int
   method          PayoutMethod
@@ -147,7 +150,7 @@ model Payout {
 }
 
 model Purchase {
-  id                                                             String @id @default(cuid())
+  id                                                             String           @id @default(cuid())
   trackId                                                        String
   reviewerId                                                     String
   amount                                                         Int
@@ -166,7 +169,7 @@ model Purchase {
 }
 
 model RateLimit {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   count     Int      @default(0)
   resetAt   DateTime
   createdAt DateTime @default(now())
@@ -176,86 +179,84 @@ model RateLimit {
 }
 
 model Review {
-  id                     String @id @default(cuid())
-  trackId                String
-  reviewerId             String?
-  status                 ReviewStatus         @default(ASSIGNED)
-  listenDuration         Int                  @default(0)
-  lastHeartbeat          DateTime?
-  firstImpression        FirstImpression?
-  productionScore        Int?
-  vocalScore             Int?
-  originalityScore       Int?
-  wouldListenAgain       Boolean?
-  perceivedGenre         String?
-  similarArtists         String?
-  bestPart               String?
-  bestPartTimestamp      Int?
-  weakestPart            String?
-  weakestTimestamp       Int?
-  additionalNotes        String?
-  paidAmount             Int                  @default(0)
-  artistRating           Int?
-  wasFlagged             Boolean              @default(false)
-  flagReason             String?
-  createdAt              DateTime             @default(now())
-  updatedAt              DateTime @updatedAt
-  isGem                  Boolean              @default(false)
-  addressedArtistNote    AddressedArtistNote?
-  nextActions            String?
-  timestamps             Json?
-  wouldAddToPlaylist     Boolean?
-  wouldFollow            Boolean?
-  wouldShare             Boolean?
-  shareId                String?              @unique
-  countsTowardAnalytics  Boolean              @default(true)
-  countsTowardCompletion Boolean              @default(true)
-  reviewSchemaVersion    Int                  @default(1)
-  isPeerReview           Boolean              @default(false)
-  peerReviewerArtistId   String?
-  // Enhanced feedback fields (v2)
-  lowEndClarity          LowEndClarity?
-  vocalClarity           VocalClarity?
-  highEndQuality         HighEndQuality?
-  stereoWidth            StereoWidth?
-  dynamics               DynamicsQuality?
-  energyCurve            EnergyCurve?
-  tooRepetitive          Boolean?
-  repetitiveNote         String?
-  lostInterestAt         Int?
-  lostInterestReason     String?
-  trackLength            TrackLength?
-  emotionalImpact        Json?
-  memorableMoment        String?
-  playlistAction         PlaylistAction?
+  id                      String               @id @default(cuid())
+  trackId                 String
+  reviewerId              String?
+  status                  ReviewStatus         @default(ASSIGNED)
+  listenDuration          Int                  @default(0)
+  lastHeartbeat           DateTime?
+  firstImpression         FirstImpression?
+  productionScore         Int?
+  vocalScore              Int?
+  originalityScore        Int?
+  wouldListenAgain        Boolean?
+  perceivedGenre          String?
+  similarArtists          String?
+  bestPart                String?
+  bestPartTimestamp       Int?
+  weakestPart             String?
+  weakestTimestamp        Int?
+  additionalNotes         String?
+  paidAmount              Int                  @default(0)
+  artistRating            Int?
+  wasFlagged              Boolean              @default(false)
+  flagReason              String?
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+  isGem                   Boolean              @default(false)
+  addressedArtistNote     AddressedArtistNote?
+  nextActions             String?
+  timestamps              Json?
+  wouldAddToPlaylist      Boolean?
+  wouldFollow             Boolean?
+  wouldShare              Boolean?
+  shareId                 String?              @unique
+  countsTowardAnalytics   Boolean              @default(true)
+  countsTowardCompletion  Boolean              @default(true)
+  reviewSchemaVersion     Int                  @default(1)
+  isPeerReview            Boolean              @default(false)
+  peerReviewerArtistId    String?
+  abTestComment           String?
+  abTestPreference        ABTestPreference?
   biggestWeaknessSpecific String?
-  quickWin               String?
-  targetAudience         Json?
-  nextFocus              NextFocus?
-  expectedPlacement      ExpectedPlacement?
-  qualityLevel           QualityLevel?
-  reviewerExpertise      ReviewerExpertise?
-
-  // Release Decision fields (v3)
-  releaseVerdict         ReleaseVerdict?      // Overall verdict
-  releaseReadinessScore  Int?                 // 0-100 score
-  topFixRank1            String?              // #1 priority fix
-  topFixRank1Impact      FixImpact?           // Impact level
-  topFixRank1TimeMin     Int?                 // Estimated minutes
-  topFixRank2            String?              // #2 priority fix
-  topFixRank2Impact      FixImpact?
-  topFixRank2TimeMin     Int?
-  topFixRank3            String?              // #3 priority fix
-  topFixRank3Impact      FixImpact?
-  topFixRank3TimeMin     Int?
-  strongestElement       String?              // What's working best
-  biggestRisk            String?              // Main release concern
-  competitiveBenchmark   String?              // Where it stands vs competition
-
-  ArtistProfile          ArtistProfile?       @relation(fields: [peerReviewerArtistId], references: [id])
-  ReviewerProfile        ReviewerProfile?     @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
-  Track                  Track                @relation(fields: [trackId], references: [id], onDelete: Cascade)
-  ReviewTimestamp        ReviewTimestamp[]
+  dynamics                DynamicsQuality?
+  emotionalImpact         Json?
+  energyCurve             EnergyCurve?
+  expectedPlacement       ExpectedPlacement?
+  highEndQuality          HighEndQuality?
+  lostInterestAt          Int?
+  lostInterestReason      String?
+  lowEndClarity           LowEndClarity?
+  memorableMoment         String?
+  nextFocus               NextFocus?
+  playlistAction          PlaylistAction?
+  qualityLevel            QualityLevel?
+  quickWin                String?
+  repetitiveNote          String?
+  reviewerExpertise       ReviewerExpertise?
+  stereoWidth             StereoWidth?
+  targetAudience          Json?
+  tooRepetitive           Boolean?
+  trackLength             TrackLength?
+  vocalClarity            VocalClarity?
+  biggestRisk             String?
+  competitiveBenchmark    String?
+  releaseReadinessScore   Int?
+  releaseVerdict          ReleaseVerdict?
+  strongestElement        String?
+  topFixRank1             String?
+  topFixRank1Impact       FixImpact?
+  topFixRank1TimeMin      Int?
+  topFixRank2             String?
+  topFixRank2Impact       FixImpact?
+  topFixRank2TimeMin      Int?
+  topFixRank3             String?
+  topFixRank3Impact       FixImpact?
+  topFixRank3TimeMin      Int?
+  ArtistProfile           ArtistProfile?       @relation(fields: [peerReviewerArtistId], references: [id])
+  ReviewerProfile         ReviewerProfile?     @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  Track                   Track                @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  ReviewTimestamp         ReviewTimestamp[]
 
   @@unique([trackId, reviewerId])
   @@unique([trackId, peerReviewerArtistId])
@@ -265,16 +266,16 @@ model Review {
 }
 
 model ReviewQueue {
-  id               String @id @default(cuid())
+  id               String           @id @default(cuid())
   trackId          String
   reviewerId       String?
-  priority         Int             @default(0)
-  assignedAt       DateTime        @default(now())
+  priority         Int              @default(0)
+  assignedAt       DateTime         @default(now())
   expiresAt        DateTime
   artistReviewerId String?
-  ArtistProfile    ArtistProfile?  @relation(fields: [artistReviewerId], references: [id], onDelete: Cascade)
+  ArtistProfile    ArtistProfile?   @relation(fields: [artistReviewerId], references: [id], onDelete: Cascade)
   ReviewerProfile  ReviewerProfile? @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
-  Track            Track           @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  Track            Track            @relation(fields: [trackId], references: [id], onDelete: Cascade)
 
   @@unique([trackId, reviewerId])
   @@unique([trackId, artistReviewerId])
@@ -283,7 +284,7 @@ model ReviewQueue {
 }
 
 model ReviewTimestamp {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   reviewId  String
   seconds   Int
   note      String
@@ -295,28 +296,35 @@ model ReviewTimestamp {
 }
 
 model ReviewerProfile {
-  id                                                      String @id @default(cuid())
+  id                                                      String        @id @default(cuid())
   userId                                                  String        @unique
   tier                                                    ReviewerTier  @default(NORMAL)
   totalReviews                                            Int           @default(0)
   averageRating                                           Float         @default(0)
-  totalEarnings                                           Int           @default(0)  // DEPRECATED — reviewer payouts removed (still written by review submission)
-  pendingBalance                                          Int           @default(0)  // DEPRECATED — reviewer payouts removed (still written by review submission)
-  stripeAccountId                                         String?       @unique      // DEPRECATED — reviewer Stripe Connect removed
+  totalEarnings                                           Int           @default(0)
+  pendingBalance                                          Int           @default(0)
+  spotifyId                                               String?
+  lastfmUsername                                          String?
+  stripeAccountId                                         String?       @unique
   flagCount                                               Int           @default(0)
   isRestricted                                            Boolean       @default(false)
   completedOnboarding                                     Boolean       @default(false)
   reviewsToday                                            Int           @default(0)
   lastReviewDate                                          DateTime?
   createdAt                                               DateTime      @default(now())
-  updatedAt                                               DateTime @updatedAt
+  updatedAt                                               DateTime      @updatedAt
   onboardingQuizCompletedAt                               DateTime?
   onboardingQuizPassed                                    Boolean       @default(false)
   onboardingQuizScore                                     Int           @default(0)
   gemCount                                                Int           @default(0)
   country                                                 String?
-  stripeConnectedAt                                       DateTime?                 // DEPRECATED — reviewer Stripe Connect removed
-  affiliateEarnings                                       Int           @default(0)  // DEPRECATED — affiliate system removed
+  stripeConnectedAt                                       DateTime?
+  affiliateEarnings                                       Int           @default(0)
+  expertBio                                               String?
+  expertCredentials                                       String?
+  expertVerifiedAt                                        DateTime?
+  expertVerifiedBy                                        String?
+  isIndustryExpert                                        Boolean       @default(false)
   Payout                                                  Payout[]
   Purchase_Purchase_referredByReviewerIdToReviewerProfile Purchase[]    @relation("Purchase_referredByReviewerIdToReviewerProfile")
   Purchase_Purchase_reviewerIdToReviewerProfile           Purchase[]    @relation("Purchase_reviewerIdToReviewerProfile")
@@ -329,7 +337,7 @@ model ReviewerProfile {
 }
 
 model Session {
-  id           String @id @default(cuid())
+  id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
@@ -337,7 +345,7 @@ model Session {
 }
 
 model StripeWebhookEvent {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   type      String
   expiresAt DateTime
   createdAt DateTime @default(now())
@@ -346,7 +354,7 @@ model StripeWebhookEvent {
 }
 
 model SupportMessage {
-  id            String @id @default(cuid())
+  id            String                   @id @default(cuid())
   ticketId      String
   authorType    SupportMessageAuthorType
   authorUserId  String?
@@ -359,12 +367,12 @@ model SupportMessage {
 }
 
 model SupportTicket {
-  id             String @id @default(cuid())
+  id             String              @id @default(cuid())
   userId         String
   subject        String
   status         SupportTicketStatus @default(OPEN)
   createdAt      DateTime            @default(now())
-  updatedAt      DateTime @updatedAt
+  updatedAt      DateTime            @updatedAt
   SupportMessage SupportMessage[]
   User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -373,63 +381,71 @@ model SupportTicket {
 }
 
 model Track {
-  id                      String @id @default(cuid())
-  artistId                String
-  sourceUrl               String
-  sourceType              TrackSource
-  title                   String
-  artworkUrl              String?
-  duration                Int?
-  feedbackFocus           String?
-  status                  TrackStatus          @default(PENDING_PAYMENT)
-  packageType             PackageType
-  reviewsRequested        Int
-  reviewsCompleted        Int                  @default(0)
-  createdAt               DateTime             @default(now())
-  paidAt                  DateTime?
-  completedAt             DateTime?
-  bpm                     Int?
-  promoCode               String?
-  linkIssueNotifiedAt     DateTime?
-  allowPurchase           Boolean              @default(false)
-  isPublic                Boolean              @default(false)
-  feedbackViewedAt        DateTime?
-  lastViewedAt            DateTime?
-  viewCount               Int                  @default(0)
-  publicPlayCount         Int                  @default(0)
-  salePrice               Int?
-  sharingEnabled          Boolean              @default(false)
-  sharingMode             SharingMode?
-  showReviewsOnPublicPage Boolean              @default(true)
-  trackShareId            String?              @unique
-  creditsSpent            Int                  @default(0)
-  // DEPRECATED — add-on features removed in slot model migration
-  requestedProReviewers   Boolean              @default(false)
-  // DEPRECATED — rush delivery feature removed
-  rushDelivery            Boolean              @default(false)
-  // DEPRECATED — rush delivery feature removed
-  rushDeliveryDeadline    DateTime?
-  // DEPRECATED — add-on features removed
-  cashAddOnTotal          Int                  @default(0)
-  releaseDecisionReport   Json?                // Compiled Release Decision report
-  releaseDecisionGeneratedAt DateTime?         // When report was generated
-  ExternalPurchase        ExternalPurchase[]
-  Payment                 Payment?
-  Purchase                Purchase[]
-  Review                  Review[]
-  ReviewQueue             ReviewQueue[]
-  ArtistProfile           ArtistProfile        @relation(fields: [artistId], references: [id], onDelete: Cascade)
-  TrackAffiliateLink      TrackAffiliateLink[]
-  Genre                   Genre[]              @relation("TrackGenres")
-  AddOnPayment            AddOnPayment[]
+  id                         String               @id @default(cuid())
+  artistId                   String
+  sourceUrl                  String
+  sourceType                 TrackSource
+  title                      String
+  artworkUrl                 String?
+  duration                   Int?
+  feedbackFocus              String?
+  status                     TrackStatus          @default(PENDING_PAYMENT)
+  packageType                PackageType
+  reviewsRequested           Int
+  reviewsCompleted           Int                  @default(0)
+  createdAt                  DateTime             @default(now())
+  paidAt                     DateTime?
+  completedAt                DateTime?
+  bpm                        Int?
+  promoCode                  String?
+  linkIssueNotifiedAt        DateTime?
+  allowPurchase              Boolean              @default(false)
+  isPublic                   Boolean              @default(false)
+  hasStems                   Boolean              @default(false)
+  abletonProjectUrl          String?
+  abletonProjectData         Json?
+  abletonRenderStatus        AbletonRenderStatus?
+  lastViewedAt               DateTime?
+  viewCount                  Int                  @default(0)
+  publicPlayCount            Int                  @default(0)
+  salePrice                  Int?
+  sharingEnabled             Boolean              @default(false)
+  sharingMode                SharingMode?
+  showReviewsOnPublicPage    Boolean              @default(true)
+  trackShareId               String?              @unique
+  creditsSpent               Int                  @default(0)
+  feedbackViewedAt           DateTime?
+  abTestPrimaryTrackId       String?              @unique
+  cashAddOnTotal             Int                  @default(0)
+  isAbTest                   Boolean              @default(false)
+  requestedExpertReviewers   Boolean              @default(false)
+  requestedProReviewers      Boolean              @default(false)
+  rushDelivery               Boolean              @default(false)
+  rushDeliveryDeadline       DateTime?
+  releaseDecisionGeneratedAt DateTime?
+  releaseDecisionReport      Json?
+  AddOnPayment               AddOnPayment[]
+  ExternalPurchase           ExternalPurchase[]
+  Payment                    Payment?
+  Purchase                   Purchase[]
+  Review                     Review[]
+  ReviewQueue                ReviewQueue[]
+  Track                      Track?               @relation("TrackToTrack", fields: [abTestPrimaryTrackId], references: [id])
+  other_Track                Track?               @relation("TrackToTrack")
+  ArtistProfile              ArtistProfile        @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  TrackAffiliateLink         TrackAffiliateLink[]
+  TrackStem                  TrackStem[]
+  Genre                      Genre[]              @relation("TrackGenres")
+  ChartSubmission            ChartSubmission[]
 
   @@index([artistId])
   @@index([paidAt])
   @@index([status, createdAt])
+  @@index([abletonRenderStatus])
 }
 
 model TrackAffiliateLink {
-  id              String @id @default(cuid())
+  id              String   @id @default(cuid())
   trackId         String
   code            String   @unique
   name            String
@@ -450,24 +466,24 @@ model TrackAffiliateLink {
 }
 
 model User {
-  id                     String @id @default(cuid())
+  id                     String                   @id @default(cuid())
   email                  String                   @unique
   password               String?
   name                   String?
   image                  String?
   emailVerified          DateTime?
   createdAt              DateTime                 @default(now())
-  updatedAt              DateTime @updatedAt
-  lastActiveAt           DateTime?
+  updatedAt              DateTime                 @updatedAt
   isArtist               Boolean                  @default(true)
   isReviewer             Boolean                  @default(true)
   referralSource         String?
   trialReminderSentAt    DateTime?
+  lastActiveAt           DateTime?
   referralCode           String?                  @unique
-  referredByCode         String?
   referralCouponId       String?
-  totalReferrals         Int                      @default(0)
   referralRewardsEarned  Int                      @default(0)
+  referredByCode         String?
+  totalReferrals         Int                      @default(0)
   Account                Account[]
   ArtistProfile          ArtistProfile?
   EmailVerificationToken EmailVerificationToken[]
@@ -477,6 +493,7 @@ model User {
   Session                Session[]
   SupportTicket          SupportTicket[]
   TrackAffiliateLink     TrackAffiliateLink[]
+  ChartVote              ChartVote[]
 }
 
 model VerificationToken {
@@ -502,10 +519,42 @@ model AddOnPayment {
   @@index([status])
 }
 
+model LeadCapture {
+  id         String   @id
+  email      String
+  source     String   @default("get-feedback")
+  reminded   Boolean  @default(false)
+  converted  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+  artistName String?
+
+  @@index([email])
+  @@index([reminded, createdAt])
+}
+
+model TrackStem {
+  id           String   @id
+  trackId      String
+  stemUrl      String
+  stemType     StemType
+  label        String
+  order        Int
+  duration     Int?
+  waveformData Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime
+  Track        Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@index([trackId])
+  @@index([trackId, order])
+}
+
 enum AddOnType {
   PRO_REVIEWERS
   EXPERT_REVIEWERS
   RUSH_DELIVERY
+  AB_TEST
 }
 
 enum AddressedArtistNote {
@@ -619,12 +668,12 @@ enum ReviewerExpertise {
 }
 
 enum PackageType {
-  STARTER         // DEPRECATED - kept for existing data only
-  STANDARD        // DEPRECATED - kept for existing data only
-  PRO             // DEPRECATED - kept for existing data only
-  DEEP_DIVE       // DEPRECATED - kept for existing data only
-  PEER            // Active: Credit-based community reviews
-  RELEASE_DECISION // Active: Premium expert review service
+  STARTER
+  STANDARD
+  PRO
+  DEEP_DIVE
+  PEER
+  RELEASE_DECISION
 }
 
 enum PaymentStatus {
@@ -681,6 +730,7 @@ enum TrackSource {
   SOUNDCLOUD
   BANDCAMP
   YOUTUBE
+  SPOTIFY
   UPLOAD
 }
 
@@ -694,13 +744,79 @@ enum TrackStatus {
 }
 
 enum ReleaseVerdict {
-  RELEASE_NOW    // Track is ready to release
-  FIX_FIRST      // Close, but needs specific fixes
-  NEEDS_WORK     // Not ready, requires significant work
+  RELEASE_NOW
+  FIX_FIRST
+  NEEDS_WORK
 }
 
 enum FixImpact {
-  HIGH           // Critical issue affecting listenability
-  MEDIUM         // Noticeable but not fatal
-  LOW            // Nice to have improvement
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum ABTestPreference {
+  VERSION_A
+  VERSION_B
+  NO_PREFERENCE
+}
+
+enum AbletonRenderStatus {
+  PENDING
+  RENDERING
+  COMPLETED
+  FAILED
+}
+
+enum StemType {
+  MASTER
+  DRUMS
+  BASS
+  SYNTHS
+  VOCALS
+  MELODY
+  FX
+  OTHER
+}
+
+// ── Daily Chart ─────────────────────────────────────────────────
+model ChartSubmission {
+  id            String        @id @default(cuid())
+  trackId       String
+  artistId      String
+  chartDate     DateTime      @db.Date
+  title         String
+  artworkUrl    String?
+  sourceUrl     String
+  sourceType    TrackSource
+  genre         String?
+  voteCount     Int           @default(0)
+  playCount     Int           @default(0)
+  rank          Int?
+  isFeatured    Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+
+  Track         Track         @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  ArtistProfile ArtistProfile @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  ChartVote     ChartVote[]
+
+  @@unique([trackId, chartDate])
+  @@unique([artistId, chartDate])
+  @@index([chartDate, voteCount])
+  @@index([chartDate, rank])
+  @@index([isFeatured])
+}
+
+model ChartVote {
+  id              String          @id @default(cuid())
+  submissionId    String
+  voterId         String
+  listenDuration  Int             @default(0)
+  createdAt       DateTime        @default(now())
+
+  ChartSubmission ChartSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  User            User            @relation(fields: [voterId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, voterId])
+  @@index([voterId, createdAt])
 }
