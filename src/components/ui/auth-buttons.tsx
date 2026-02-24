@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -15,12 +16,18 @@ export function AuthButtons({
   const searchParams = useSearchParams();
   const ref = searchParams.get("ref");
 
+  // Prevent hydration mismatch: server always renders "loading" skeleton,
+  // so the first client render must also be the skeleton.  After mount we
+  // switch to the real UI.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   // Preserve referral code in auth links
   const loginUrl = ref ? `/login?ref=${ref}` : "/login";
   const signupUrl = ref ? `/signup?ref=${ref}` : "/signup";
 
-  // Show nothing while loading to avoid layout shift
-  if (status === "loading") {
+  // Show skeleton until mounted + session resolved
+  if (!mounted || status === "loading") {
     return (
       <div className="flex items-center gap-3">
         <div className="h-9 w-20 bg-neutral-100 animate-pulse rounded" />

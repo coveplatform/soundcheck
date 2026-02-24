@@ -115,173 +115,124 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Your Review Queue — quirky visual section */}
-      <section className="pb-16 sm:pb-24 pt-0 bg-neutral-900 text-neutral-50 overflow-visible font-sans">
-        <div className="w-full overflow-hidden bg-purple-400/10">
+      {/* Weekly Discover — immersive dark section */}
+      <section className="pb-16 sm:pb-24 pt-0 bg-black text-neutral-50 overflow-visible font-sans relative">
+        {/* Radial glow background */}
+        <div className="absolute inset-0 opacity-60 pointer-events-none" style={{
+          background: "radial-gradient(ellipse 80% 50% at 50% 30%, rgba(0,240,255,0.10) 0%, rgba(168,85,247,0.05) 40%, transparent 70%)",
+        }} />
+
+        <div className="w-full overflow-hidden bg-cyan-400/5">
           <div className="h-12 flex items-center">
             <div
-              className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-purple-300 text-3xl font-bold leading-none`}
+              className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-cyan-400/40 text-3xl font-bold leading-none`}
             >
               {Array.from({ length: 60 }).map((_, i) => (
-                <span key={i}>new</span>
+                <span key={i}>discover</span>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 pt-12 sm:pt-16">
+        <div className="max-w-4xl mx-auto px-4 pt-12 sm:pt-16 relative">
           {/* Heading */}
           <AnimatedSection className="max-w-2xl mb-14 sm:mb-20">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.1]">
-              Your{" "}
+              Explore music{" "}
               <span className="relative inline-block">
-                <span className="relative z-10">review queue</span>
-                <span className="absolute bottom-1 left-0 right-0 h-3 bg-purple-500/40 -rotate-[0.5deg] z-0" />
+                <span className="relative z-10">in 3D</span>
+                <span className="absolute bottom-1 left-0 right-0 h-3 bg-cyan-400/30 -rotate-[0.5deg] z-0" />
               </span>
             </h2>
             <p className="mt-5 text-neutral-400 text-lg max-w-xl">
-              Submit a track, it goes in a slot. Artists review it. Slot frees up. Simple.
+              Float through a galaxy of independent tracks. Click any album to listen instantly. A whole new way to discover music.
             </p>
           </AnimatedSection>
 
-          {/* Queue slot visual — hand-drawn style */}
           <AnimatedSection className="relative">
-            <div className="relative max-w-2xl mx-auto">
+            <div className="relative max-w-3xl mx-auto">
+              {/* Floating album artwork grid — simulating the 3D space */}
+              <div className="relative h-[320px] sm:h-[380px] flex items-center justify-center">
+                {/* Glow orb behind */}
+                <div className="absolute w-64 h-64 rounded-full opacity-20 blur-3xl" style={{
+                  background: "radial-gradient(circle, rgba(0,240,255,0.4) 0%, rgba(168,85,247,0.2) 50%, transparent 70%)",
+                  top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+                }} />
 
-              {/* FREE queue — one filled slot + two locked */}
-              <div className="mb-16 sm:mb-20">
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-xs font-mono tracking-[0.2em] uppercase text-neutral-500">Free</span>
-                  <div className="h-px flex-1 bg-neutral-800" />
-                </div>
-
-                <div className="flex items-start gap-3 sm:gap-5 justify-center">
-                  {/* Filled slot */}
-                  <div className="relative">
-                    <div className="w-24 h-28 sm:w-32 sm:h-36 bg-purple-600 border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center gap-2 rotate-[-2deg]">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                        <svg className="h-5 w-5 sm:h-6 sm:w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                      </div>
-                      <div className="text-center px-2">
-                        <p className="text-[10px] sm:text-xs font-bold text-white/90">Neon Pulse</p>
-                        <p className="text-[9px] sm:text-[10px] text-white/50">2/5 reviews</p>
-                      </div>
+                {/* Album cards floating at different depths */}
+                {[
+                  { x: "8%", y: "15%", rot: -8, size: 90, glow: "#00f0ff", z: 10 },
+                  { x: "28%", y: "5%", rot: 4, size: 110, glow: "#a855f7", z: 30 },
+                  { x: "52%", y: "12%", rot: -3, size: 100, glow: "#ff2d9b", z: 20 },
+                  { x: "75%", y: "8%", rot: 6, size: 85, glow: "#fbbf24", z: 15 },
+                  { x: "15%", y: "55%", rot: 5, size: 80, glow: "#10b981", z: 12 },
+                  { x: "38%", y: "48%", rot: -6, size: 120, glow: "#00f0ff", z: 35 },
+                  { x: "62%", y: "52%", rot: 3, size: 95, glow: "#a855f7", z: 25 },
+                  { x: "82%", y: "45%", rot: -4, size: 75, glow: "#ff2d9b", z: 8 },
+                ].map((card, i) => (
+                  <div
+                    key={i}
+                    className="absolute rounded-xl bg-neutral-800 overflow-hidden"
+                    style={{
+                      left: card.x,
+                      top: card.y,
+                      width: card.size,
+                      height: card.size,
+                      transform: `rotate(${card.rot}deg)`,
+                      zIndex: card.z,
+                      boxShadow: `0 0 25px ${card.glow}15, 0 8px 32px rgba(0,0,0,0.6)`,
+                      border: `1px solid ${card.glow}25`,
+                      background: `linear-gradient(135deg, ${card.glow}08 0%, ${card.glow}03 100%)`,
+                    }}
+                  >
+                    <div className="w-full h-full flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white/10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
                     </div>
-                    <span className={`${caveat.className} absolute -top-7 left-1/2 -translate-x-1/2 text-purple-400 text-lg sm:text-xl whitespace-nowrap rotate-[-4deg]`}>
-                      your track
-                    </span>
-                    <span className={`${caveat.className} absolute -bottom-7 left-1/2 -translate-x-1/2 text-neutral-500 text-base sm:text-lg whitespace-nowrap rotate-[2deg]`}>
-                      24-48 hrs ⏱
-                    </span>
                   </div>
+                ))}
 
-                  {/* Locked slot */}
-                  <div className="w-24 h-28 sm:w-32 sm:h-36 border-2 border-dashed border-neutral-700 rounded-2xl flex flex-col items-center justify-center gap-1.5 rotate-[1deg] opacity-40">
-                    <Lock className="h-5 w-5 text-neutral-600" />
-                    <span className="text-[10px] text-neutral-600 font-bold">PRO</span>
-                  </div>
-
-                  {/* Locked slot */}
-                  <div className="w-24 h-28 sm:w-32 sm:h-36 border-2 border-dashed border-neutral-700 rounded-2xl flex flex-col items-center justify-center gap-1.5 rotate-[-1.5deg] opacity-40">
-                    <Lock className="h-5 w-5 text-neutral-600" />
-                    <span className="text-[10px] text-neutral-600 font-bold">PRO</span>
-                  </div>
-                </div>
+                {/* Faint grid lines — holographic floor effect */}
+                <div className="absolute bottom-0 left-0 right-0 h-24 opacity-10" style={{
+                  background: "repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,240,255,0.3) 39px, rgba(0,240,255,0.3) 40px), repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,240,255,0.3) 39px, rgba(0,240,255,0.3) 40px)",
+                  maskImage: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%)",
+                  WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%)",
+                }} />
               </div>
 
-              {/* Divider with "vs" */}
-              <div className="flex items-center gap-4 mb-16 sm:mb-20 max-w-xs mx-auto">
-                <div className="h-px flex-1 bg-neutral-800" />
-                <span className={`${caveat.className} text-2xl text-neutral-500`}>upgrade?</span>
-                <div className="h-px flex-1 bg-neutral-800" />
-              </div>
-
-              {/* PRO queue — three filled slots */}
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-xs font-mono tracking-[0.2em] uppercase text-purple-400">Pro · $9.99/mo</span>
-                  <div className="h-px flex-1 bg-neutral-800" />
-                </div>
-
-                <div className="flex items-start gap-3 sm:gap-5 justify-center">
-                  {/* Slot 1 */}
-                  <div className="relative">
-                    <div className="w-24 h-28 sm:w-32 sm:h-36 bg-purple-600 border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center gap-2 rotate-[-1deg]">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                        <svg className="h-5 w-5 sm:h-6 sm:w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                      </div>
-                      <div className="text-center px-2">
-                        <p className="text-[10px] sm:text-xs font-bold text-white/90">Neon Pulse</p>
-                        <p className="text-[9px] sm:text-[10px] text-white/50">4/5 reviews</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Slot 2 */}
-                  <div className="relative">
-                    <div className="w-24 h-28 sm:w-32 sm:h-36 bg-orange-400 border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center gap-2 rotate-[2deg]">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-black/15 flex items-center justify-center">
-                        <svg className="h-5 w-5 sm:h-6 sm:w-6 text-black/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                      </div>
-                      <div className="text-center px-2">
-                        <p className="text-[10px] sm:text-xs font-bold text-black/80">Late Night</p>
-                        <p className="text-[9px] sm:text-[10px] text-black/50">1/3 reviews</p>
-                      </div>
-                    </div>
-                    <span className={`${caveat.className} absolute -top-7 left-1/2 -translate-x-1/2 text-orange-400 text-lg sm:text-xl whitespace-nowrap rotate-[5deg]`}>
-                      priority! ⚡
-                    </span>
-                  </div>
-
-                  {/* Slot 3 */}
-                  <div className="relative">
-                    <div className="w-24 h-28 sm:w-32 sm:h-36 bg-neutral-950 border-2 border-purple-500 rounded-2xl shadow-[4px_4px_0px_0px_rgba(124,58,237,0.5)] flex flex-col items-center justify-center gap-2 rotate-[-2.5deg]">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/10 flex items-center justify-center">
-                        <svg className="h-5 w-5 sm:h-6 sm:w-6 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                      </div>
-                      <div className="text-center px-2">
-                        <p className="text-[10px] sm:text-xs font-bold text-white/90">Golden Hour</p>
-                        <p className="text-[9px] sm:text-[10px] text-white/50">0/5 reviews</p>
-                      </div>
-                    </div>
-                    <span className={`${caveat.className} absolute -bottom-7 left-1/2 -translate-x-1/2 text-neutral-500 text-base sm:text-lg whitespace-nowrap rotate-[-3deg]`}>
-                      just submitted
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom badges */}
-              <div className="mt-14 flex flex-wrap justify-center gap-3">
-                <span className="bg-purple-500/20 border border-purple-400/30 text-purple-300 text-xs font-bold px-3 py-1.5 rounded-full rotate-[-1deg]">
-                  3 tracks at once
+              {/* Feature badges */}
+              <div className="mt-10 flex flex-wrap justify-center gap-3">
+                <span className="bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-xs font-bold px-3 py-1.5 rounded-full">
+                  3D space exploration
                 </span>
-                <span className="bg-orange-400/20 border border-orange-400/30 text-orange-300 text-xs font-bold px-3 py-1.5 rounded-full rotate-[2deg]">
-                  Reviewed faster
+                <span className="bg-purple-500/10 border border-purple-400/20 text-purple-300 text-xs font-bold px-3 py-1.5 rounded-full">
+                  Click to listen
                 </span>
-                <span className="bg-white/10 border border-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-full rotate-[-1.5deg]">
-                  Cancel anytime
+                <span className="bg-pink-500/10 border border-pink-400/20 text-pink-300 text-xs font-bold px-3 py-1.5 rounded-full">
+                  Updated weekly
                 </span>
               </div>
 
               {/* CTA */}
-              <div className="mt-10 text-center">
+              <div className="mt-8 text-center">
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link href="/discover">
+                    <Button
+                      size="lg"
+                      className="bg-white/[0.08] text-white hover:bg-white/[0.14] font-black border border-white/[0.12] hover:border-white/[0.2] transition-all"
+                    >
+                      Enter the space <ArrowRight className="ml-2 h-4 w-4 text-cyan-400" />
+                    </Button>
+                  </Link>
                   <SignupLink>
                     <Button
                       size="lg"
                       className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all"
                     >
-                      Get started free <ArrowRight className="ml-2 h-4 w-4" />
+                      Get started free
                     </Button>
                   </SignupLink>
-                  <Link href="#pricing">
-                    <Button variant="outline" size="lg" className="bg-white/10 text-neutral-50 border-white/20 hover:bg-white/15">
-                      See pricing
-                    </Button>
-                  </Link>
                 </div>
-                <p className="mt-4 text-sm text-neutral-500">Start with <span className="font-bold text-purple-400">3 free credits</span> — no card needed</p>
+                <p className="mt-4 text-sm text-neutral-500">No account needed to explore</p>
               </div>
             </div>
           </AnimatedSection>
