@@ -549,7 +549,6 @@ function Scene({
       />
 
       {/* --- Visual enhancements --- */}
-      <NebulaClouds />
       <ShootingStars />
       <HoloGrid />
 
