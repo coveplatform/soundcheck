@@ -846,9 +846,6 @@ function HUD({
         }}
       >
         <div className="text-center px-4 max-w-2xl">
-          <p className="text-[10px] sm:text-xs tracking-[0.5em] text-cyan-400/50 uppercase font-mono mb-4 select-none">
-            mixreflect
-          </p>
           <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-none select-none">
             WEEKLY<br />DISCOVER
           </h1>
