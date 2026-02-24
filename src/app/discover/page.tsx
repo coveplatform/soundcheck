@@ -1,65 +1,58 @@
-import Link from "next/link";
 import { TrackStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { Logo } from "@/components/ui/logo";
-import { AuthButtons } from "@/components/ui/auth-buttons";
-import { PageHeader } from "@/components/ui/page-header";
-import { TrackTile } from "./track-tile";
+import { DiscoverScene, type DiscoverTrackData } from "./discover-scene";
 
 export const dynamic = "force-dynamic";
 
-const DEMO_TILES = Array.from({ length: 20 }).map((_, idx) => {
-  const i = idx + 1;
-  return {
-    id: `demo-${i}`,
-    title: [
-      "Neon Pulse",
-      "Golden Hour",
-      "Street Lights",
-      "Echoes",
-      "City Rain",
-      "Drift Away",
-      "Midnight Drive",
-      "Soft Focus",
-      "Afterglow",
-      "Static Bloom",
-      "Low Tide",
-      "Glass Rooms",
-      "Black Velvet",
-      "Mercury",
-      "Night Market",
-      "Cold Warmth",
-      "Pale Signals",
-      "Slow Burn",
-      "Skyline",
-      "Velvet Noise",
-    ][idx] ?? `Demo Track ${i}`,
-    ArtistProfile: [
-      "Maya Kim",
-      "James Cole",
-      "DJ Nova",
-      "Sarah Moon",
-      "Tom West",
-      "Luna Park",
-      "Arden",
-      "Noah Lane",
-      "Rosa",
-      "Kei",
-      "Sable",
-      "River",
-      "Juno",
-      "Haze",
-      "Marlow",
-      "Nico",
-      "Ivy",
-      "Atlas",
-      "Skye",
-      "Moss",
-    ][idx] ?? `Artist ${i}`,
-    artworkUrl: `/activity-artwork/${i}.jpg`,
-  };
-});
+const DEMO_TILES: DiscoverTrackData[] = Array.from({ length: 34 }).map(
+  (_, idx) => {
+    const i = idx + 1;
+    const names = [
+      "Neon Pulse", "Golden Hour", "Street Lights", "Echoes", "City Rain",
+      "Drift Away", "Midnight Drive", "Soft Focus", "Afterglow", "Static Bloom",
+      "Low Tide", "Glass Rooms", "Black Velvet", "Mercury", "Night Market",
+      "Cold Warmth", "Pale Signals", "Slow Burn", "Skyline", "Velvet Noise",
+      "Deep Signal", "Ghost Freq", "Plasma", "Orbit", "Flux",
+      "Void Echo", "Phase Shift", "Lumina", "Sub Rosa", "Dark Matter",
+      "Zenith", "Penumbra", "Quasar", "Nebula",
+    ];
+    const artists = [
+      "Maya Kim", "James Cole", "DJ Nova", "Sarah Moon", "Tom West",
+      "Luna Park", "Arden", "Noah Lane", "Rosa", "Kei",
+      "Sable", "River", "Juno", "Haze", "Marlow",
+      "Nico", "Ivy", "Atlas", "Skye", "Moss",
+      "Onyx", "Prism", "Echo", "Zara", "Kai",
+      "Vega", "Lyra", "Orion", "Celeste", "Drift",
+      "Nova", "Astra", "Cosmo", "Stella",
+    ];
+    const genres = [
+      "Electronic", "Indie Pop", "Hip-Hop", "R&B", "Lo-Fi",
+      "Ambient", "Synthwave", "Dream Pop", "Alternative", "Electronica",
+      "Chillwave", "Art Pop", "Soul", "Indie Rock", "Trip-Hop",
+      "Downtempo", "Post-Punk", "Neo-Soul", "Future Bass", "Shoegaze",
+      "Techno", "IDM", "Minimal", "Deep House", "Breakbeat",
+      "Dark Ambient", "Progressive", "Cinematic", "Experimental", "Drum & Bass",
+      "Trance", "Glitch", "Space Rock", "Psych",
+    ];
+    const featured = [0, 4, 11, 19, 27];
+    const seed = Math.sin(i * 9301 + 49297) * 233280;
+    const r = (seed - Math.floor(seed));
+    return {
+      id: `demo-${i}`,
+      title: names[idx] ?? `Demo Track ${i}`,
+      artistName: artists[idx] ?? `Artist ${i}`,
+      artworkUrl: `/activity-artwork/${i}.jpg`,
+      sourceUrl: "/signup",
+      isDemo: true,
+      genre: genres[idx] ?? "Other",
+      playCount: Math.floor(r * 800) + 20,
+      reviewCount: Math.floor(r * 12) + 1,
+      rating: Math.round((3.5 + r * 1.5) * 10) / 10,
+      isFeatured: featured.includes(idx),
+    };
+  },
+);
 
 export default async function DiscoverPage() {
   const trackWhere = {
@@ -134,57 +127,18 @@ export default async function DiscoverPage() {
       })
   );
 
-  return (
-    <div className="min-h-screen bg-[#faf8f5] text-neutral-950 pt-14">
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#faf8f5]/90 backdrop-blur-sm border-b border-black/10">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center justify-between h-14">
-            <Link href="/" className="flex items-center gap-2">
-              <Logo />
-            </Link>
-            <div className="flex items-center gap-3">
-              <AuthButtons theme="light" />
-            </div>
-          </div>
-        </div>
-      </header>
+  // Map DB tracks → DiscoverTrackData shape
+  const sceneData: DiscoverTrackData[] =
+    tracks.length > 0
+      ? tracks.map((t) => ({
+          id: t.id,
+          title: t.title,
+          artistName: t.ArtistProfile?.artistName ?? "Unknown",
+          artworkUrl: t.artworkUrl ?? null,
+          sourceUrl: t.sourceUrl ?? "/signup",
+          isDemo: false,
+        }))
+      : DEMO_TILES;
 
-      <main className="mx-auto px-6 sm:px-8 lg:px-12 py-10">
-        <PageHeader
-          eyebrow="Discover"
-          title="Discover"
-          description="Browse tracks submitted by artists on Soundcheck."
-        />
-
-        {requiresMigration ? (
-          <div className="mt-10 text-sm text-black/50">
-            Discover needs a quick update. Run Prisma migrate + generate to enable public/private discover visibility.
-          </div>
-        ) : null}
-
-        <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
-          {(tracks.length > 0 ? tracks : DEMO_TILES).map((t: any) => {
-            const isDemo = tracks.length === 0;
-            const trackId = isDemo ? null : t.id;
-            const sourceUrl = isDemo ? "/signup" : t.sourceUrl;
-            const artworkUrl = isDemo ? t.artworkUrl : t.artworkUrl;
-            const title = isDemo ? t.title : t.title;
-            const artistName = isDemo ? t.ArtistProfile : t.ArtistProfile?.artistName;
-
-            return (
-              <TrackTile
-                key={t.id}
-                trackId={trackId}
-                title={title}
-                artistName={artistName}
-                artworkUrl={artworkUrl}
-                sourceUrl={sourceUrl}
-                isDemo={isDemo}
-              />
-            );
-          })}
-        </div>
-      </main>
-    </div>
-  );
+  return <DiscoverScene tracks={sceneData} />;
 }

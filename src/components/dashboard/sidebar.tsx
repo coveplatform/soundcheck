@@ -9,7 +9,6 @@ import { Logo } from "@/components/ui/logo";
 import {
   Home,
   Music,
-  Upload,
   Headphones,
   Settings,
   LogOut,
@@ -21,6 +20,7 @@ import {
   BarChart3,
   Crown,
   ArrowRight,
+  TrendingUp,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -35,9 +35,9 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
 
   const mainLinks = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
+    { href: "/charts", label: "Track of the Day", icon: TrendingUp, comingSoon: true },
     { href: "/tracks", label: "My Tracks", icon: Music },
     { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
-    { href: "/submit", label: "Submit Track", icon: Upload },
   ];
 
   const reviewLinks = [
@@ -59,35 +59,63 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
     label,
     icon: Icon,
     badge,
+    isNew,
+    comingSoon,
   }: {
     href: string;
     label: string;
     icon: React.ComponentType<{ className?: string }>;
     badge?: number;
-  }) => (
-    <Link
-      href={href}
-      className={cn(
-        "flex items-center gap-3 px-4 py-2.5 text-[13px] transition-colors border-l-2",
-        isActive(href)
-          ? "text-black font-medium border-purple-600"
-          : "text-neutral-600 border-transparent hover:text-black hover:border-purple-300"
-      )}
-    >
-      <Icon className="w-4 h-4 opacity-70" />
-      <span className="flex-1">{label}</span>
-      {badge !== undefined && (
-        <span className="bg-purple-100 text-purple-700 text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
-          {badge}
-        </span>
-      )}
-    </Link>
-  );
+    isNew?: boolean;
+    comingSoon?: boolean;
+  }) => {
+    const inner = (
+      <>
+        <Icon className="w-4 h-4 opacity-70" />
+        <span className="flex-1">{label}</span>
+        {badge !== undefined && (
+          <span className="bg-purple-100 text-purple-700 text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+            {badge}
+          </span>
+        )}
+        {isNew && (
+          <span className="bg-amber-400 text-amber-900 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+            New
+          </span>
+        )}
+        {comingSoon && (
+          <span className="bg-neutral-200 text-neutral-500 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+            Soon
+          </span>
+        )}
+      </>
+    );
+
+    if (comingSoon) {
+      return (
+        <ComingSoonNavItem inner={inner} />
+      );
+    }
+
+    return (
+      <Link
+        href={href}
+        className={cn(
+          "flex items-center gap-3 px-4 py-2.5 text-[13px] transition-colors border-l-2",
+          isActive(href)
+            ? "text-black font-medium border-purple-600"
+            : "text-neutral-600 border-transparent hover:text-black hover:border-purple-300"
+        )}
+      >
+        {inner}
+      </Link>
+    );
+  };
 
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 bg-[#faf8f5] border-r border-black/10 flex-col z-40 overflow-hidden">
+      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 bg-[#faf8f5] border-r border-black/10 flex-col z-40">
         {/* Header */}
         <div className="p-6 border-b border-black/10">
           <Link href="/dashboard" className="flex items-center gap-2.5">
@@ -207,6 +235,41 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
   );
 }
 
+function ComingSoonNavItem({ inner }: { inner: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [tooltipTop, setTooltipTop] = useState(0);
+  const [show, setShow] = useState(false);
+
+  const handleMouseEnter = () => {
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      setTooltipTop(rect.top + rect.height / 2);
+    }
+    setShow(true);
+  };
+
+  return (
+    <div
+      ref={ref}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => setShow(false)}
+    >
+      <div className="flex items-center gap-3 px-4 py-2.5 text-[13px] border-l-2 border-transparent text-neutral-400 cursor-not-allowed select-none">
+        {inner}
+      </div>
+      {show && (
+        <div
+          className="pointer-events-none fixed z-[9999] w-56 rounded-lg bg-neutral-900 text-white text-xs px-3.5 py-2.5 leading-relaxed shadow-xl"
+          style={{ left: 264, top: tooltipTop, transform: "translateY(-50%)" }}
+        >
+          Discover which tracks are getting the most buzz each day. Curated picks from artists in your genre. Coming soon!
+          <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-neutral-900" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MobileBottomNav({
   isActive,
   pendingReviews,
@@ -238,11 +301,11 @@ function MobileBottomNav({
   const primaryLinks = [
     { href: "/dashboard", label: "Home", icon: Home },
     { href: "/tracks", label: "Tracks", icon: Music },
-    { href: "/submit", label: "Submit", icon: Upload },
     { href: "/review", label: "Review", icon: Headphones },
   ];
 
   const moreLinks = [
+    { href: "/charts", label: "Track of the Day", icon: TrendingUp, comingSoon: true },
     { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
     { href: "/review/history", label: "Review History", icon: History },
     { href: "/support", label: "Support", icon: LifeBuoy },
@@ -303,6 +366,20 @@ function MobileBottomNav({
             <div className="absolute bottom-full right-0 mb-2 w-56 bg-white rounded-xl border border-neutral-200 shadow-lg py-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
               {moreLinks.map((link) => {
                 const Icon = link.icon;
+                if (link.comingSoon) {
+                  return (
+                    <div
+                      key={link.href}
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-400 cursor-not-allowed select-none"
+                    >
+                      <Icon className="w-4 h-4 opacity-50 flex-shrink-0" />
+                      <span className="flex-1">{link.label}</span>
+                      <span className="bg-neutral-200 text-neutral-500 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                        Soon
+                      </span>
+                    </div>
+                  );
+                }
                 return (
                   <Link
                     key={link.href}
