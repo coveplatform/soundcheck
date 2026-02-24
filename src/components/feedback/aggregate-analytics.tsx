@@ -123,7 +123,7 @@ function ScoreCircle({
 }: {
   score: number;
   label: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   platformAvg?: number;
 }) {
   const percentage = (score / 5) * 100;
