@@ -11,7 +11,7 @@ import { PeerModelSection } from "@/components/landing/peer-model-section";
 import { ActivityFeed } from "@/components/landing/activity-feed";
 import { BrowserMockup } from "@/components/landing/browser-mockup";
 import { TrackPageMockup } from "@/components/landing/track-page-mockup";
-import { DiscoverMockup } from "@/components/landing/discover-mockup";
+
 import { Sparkle, Star, Squiggle, Dots } from "@/components/landing/doodles";
 import { AnimatedSection } from "@/components/landing/animated-section";
 import { OnlineListeners } from "@/components/landing/online-listeners";
@@ -286,30 +286,6 @@ export default async function Home() {
 
             <BrowserMockup url="mixreflect.com/track/midnight-drive">
               <TrackPageMockup />
-            </BrowserMockup>
-          </AnimatedSection>
-        </div>
-      </section>
-
-
-      {/* Discover & Review */}
-      <section className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
-        <div className="max-w-5xl mx-auto px-4">
-          <AnimatedSection className="max-w-2xl mb-12">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">A community of artists helping artists</h2>
-            <p className="mt-5 text-neutral-600 text-lg max-w-xl">
-              Your tracks are automatically shown to artists who share your genre. Everyone reviews, everyone gets reviewed. Quality stays high because every reviewer is rated after each review.
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection className="relative">
-            {/* Decorative doodles */}
-            <Dots className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-44 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-80 rotate-12" />
-            <Sparkle className="pointer-events-none absolute -top-2 right-2 sm:-right-12 lg:-right-20 w-12 h-12 sm:w-14 sm:h-14 text-orange-300 opacity-85 -rotate-6" />
-            <Squiggle className="pointer-events-none absolute -bottom-8 -left-12 sm:-left-24 lg:-left-36 w-32 h-10 sm:w-44 sm:h-12 text-purple-400 opacity-90 rotate-6" />
-
-            <BrowserMockup url="mixreflect.com/discover">
-              <DiscoverMockup />
             </BrowserMockup>
           </AnimatedSection>
         </div>
