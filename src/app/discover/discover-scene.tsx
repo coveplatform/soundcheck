@@ -776,9 +776,10 @@ function HUD({
                 boxShadow: `0 0 60px ${selectedGlowColor}18`,
               }}
             >
-              {/* Embedded player — smaller on mobile */}
+              {/* Embedded player — hidden on mobile (audio still auto-plays),
+                 visible on desktop */}
               {embedUrl && (
-                <div className="w-full border-b border-white/[0.06]">
+                <div className="w-full border-b border-white/[0.06] overflow-hidden h-0 sm:h-auto">
                   <iframe
                     src={embedUrl}
                     className="w-full"
