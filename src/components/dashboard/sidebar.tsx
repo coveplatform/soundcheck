@@ -20,7 +20,7 @@ import {
   BarChart3,
   Crown,
   ArrowRight,
-  TrendingUp,
+  Compass,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -35,7 +35,7 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
 
   const mainLinks = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
-    { href: "/charts", label: "Track of the Day", icon: TrendingUp, comingSoon: true },
+    { href: "/discover", label: "Discover", icon: Compass, isNew: true },
     { href: "/tracks", label: "My Tracks", icon: Music },
     { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
   ];
@@ -300,12 +300,12 @@ function MobileBottomNav({
 
   const primaryLinks = [
     { href: "/dashboard", label: "Home", icon: Home },
+    { href: "/discover", label: "Discover", icon: Compass },
     { href: "/tracks", label: "Tracks", icon: Music },
     { href: "/review", label: "Review", icon: Headphones },
   ];
 
   const moreLinks = [
-    { href: "/charts", label: "Track of the Day", icon: TrendingUp, comingSoon: true },
     { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
     { href: "/review/history", label: "Review History", icon: History },
     { href: "/support", label: "Support", icon: LifeBuoy },
@@ -366,20 +366,6 @@ function MobileBottomNav({
             <div className="absolute bottom-full right-0 mb-2 w-56 bg-white rounded-xl border border-neutral-200 shadow-lg py-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
               {moreLinks.map((link) => {
                 const Icon = link.icon;
-                if (link.comingSoon) {
-                  return (
-                    <div
-                      key={link.href}
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-400 cursor-not-allowed select-none"
-                    >
-                      <Icon className="w-4 h-4 opacity-50 flex-shrink-0" />
-                      <span className="flex-1">{link.label}</span>
-                      <span className="bg-neutral-200 text-neutral-500 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
-                        Soon
-                      </span>
-                    </div>
-                  );
-                }
                 return (
                   <Link
                     key={link.href}
