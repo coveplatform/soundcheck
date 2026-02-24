@@ -153,33 +153,39 @@ function TrackCard({
     }
   });
 
-  // Tap detection: track pointer start position, fire onClick only if
-  // the finger/cursor moved less than TAP_THRESHOLD px (fixes mobile drag-vs-tap).
-  const tapStart = useRef<{ x: number; y: number } | null>(null);
-  const TAP_THRESHOLD = 10;
+  // Tap detection: track pointer start position + time, fire onClick only if
+  // the finger/cursor moved less than TAP_THRESHOLD px AND held for min duration.
+  // This prevents accidental taps during fast scrolling on mobile.
+  const tapStart = useRef<{ x: number; y: number; t: number } | null>(null);
+  const TAP_THRESHOLD = 20; // px — larger for fat-finger tolerance
+  const TAP_MIN_MS = 80;    // ignore ultra-fast accidental touches
+  const TAP_MAX_MS = 600;   // ignore long presses (likely drag intent)
+  const isTouchDevice = typeof window !== "undefined" && "ontouchstart" in window;
 
   const pointerOver = () => {
-    if (!interactive) return;
+    if (!interactive || isTouchDevice) return;
     setHovered(true);
     onHover();
     document.body.style.cursor = "pointer";
   };
   const pointerOut = () => {
-    if (!interactive) return;
+    if (!interactive || isTouchDevice) return;
     setHovered(false);
     onLeave();
     document.body.style.cursor = "default";
   };
   const pointerDown = (e: { clientX: number; clientY: number }) => {
     if (!interactive) return;
-    tapStart.current = { x: e.clientX, y: e.clientY };
+    tapStart.current = { x: e.clientX, y: e.clientY, t: Date.now() };
   };
   const pointerUp = (e: { clientX: number; clientY: number }) => {
     if (!interactive) return;
     if (!tapStart.current) return;
     const dx = e.clientX - tapStart.current.x;
     const dy = e.clientY - tapStart.current.y;
-    if (dx * dx + dy * dy < TAP_THRESHOLD * TAP_THRESHOLD) {
+    const dt = Date.now() - tapStart.current.t;
+    const distSq = dx * dx + dy * dy;
+    if (distSq < TAP_THRESHOLD * TAP_THRESHOLD && dt >= TAP_MIN_MS && dt <= TAP_MAX_MS) {
       onClick();
     }
     tapStart.current = null;
@@ -684,8 +690,13 @@ function HUD({
             </span>
           </div>
 
-          <p className="mt-8 sm:mt-12 text-sm sm:text-base text-white/60 font-normal tracking-widest uppercase select-none animate-bounce">
+          {/* Desktop hint */}
+          <p className="hidden sm:block mt-12 text-base text-white/60 font-normal tracking-widest uppercase select-none animate-bounce">
             drag to explore &middot; scroll to zoom
+          </p>
+          {/* Mobile hint */}
+          <p className="block sm:hidden mt-8 text-sm text-white/60 font-normal tracking-widest uppercase select-none animate-bounce">
+            swipe to explore &middot; pinch to zoom
           </p>
         </div>
       </div>
@@ -736,6 +747,15 @@ function HUD({
         </div>
       )}
 
+      {/* ---- Tap-to-dismiss backdrop (mobile-friendly) ---- */}
+      {selectedTrack && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={onDeselect}
+          onTouchEnd={onDeselect}
+        />
+      )}
+
       {/* ---- Selected track panel (zoomed-in view + embedded player) ---- */}
       <div
         className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-lg transition-all duration-500 ${
@@ -751,6 +771,8 @@ function HUD({
           return (
             <div
               className="bg-black/70 backdrop-blur-2xl border border-white/[0.08] rounded-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
               style={{
                 boxShadow: `0 0 60px ${selectedGlowColor}18`,
               }}
@@ -817,9 +839,9 @@ function HUD({
 
                   <button
                     onClick={onDeselect}
-                    className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
+                    className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
                   >
-                    <X className="w-3.5 h-3.5 text-white/50" />
+                    <X className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white/50" />
                   </button>
                 </div>
               </div>
@@ -828,7 +850,7 @@ function HUD({
         })()}
       </div>
 
-      {/* ---- ESC to close hint ---- */}
+      {/* ---- Close hint (ESC on desktop, tap on mobile) ---- */}
       <div
         className={`fixed bottom-2 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${
           selectedTrack
@@ -836,9 +858,14 @@ function HUD({
             : "opacity-0 translate-y-4 pointer-events-none"
         }`}
       >
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-md border border-white/[0.08]">
+        {/* Desktop: ESC to close */}
+        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-md border border-white/[0.08]">
           <kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-[10px] font-mono text-white/60">ESC</kbd>
           <span className="text-[11px] text-white/40">to close</span>
+        </div>
+        {/* Mobile: tap anywhere to close */}
+        <div className="flex sm:hidden items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-md border border-white/[0.08]">
+          <span className="text-[11px] text-white/40">Tap anywhere to close</span>
         </div>
       </div>
 
@@ -981,6 +1008,7 @@ export function DiscoverScene({
   return (
     <div
       className="fixed inset-0 bg-black overflow-hidden"
+      style={{ touchAction: "none" }}
       onWheel={handleInteraction}
       onPointerDown={handleInteraction}
       onTouchStart={handleInteraction}
