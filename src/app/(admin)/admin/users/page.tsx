@@ -80,6 +80,36 @@ export default async function AdminUsersPage({
     "donna.listens22@gmail.com",
     // inject-king-rolly
     "wavtek23@gmail.com",
+    // inject-grit-it-takes
+    "marcus.hardriff@gmail.com",
+    "jenny.rawmix@gmail.com",
+    // inject-if-this-is-it
+    "lisa.popwave@gmail.com",
+    "dan.retropop@gmail.com",
+    // inject-grudge
+    "alex.rawcuts@gmail.com",
+    // inject-heart (<3 by darnellsimon)
+    "omar.wavehead@gmail.com",
+    "sophie.digitalmix@gmail.com",
+    "jamal.beatcrave@gmail.com",
+    // inject-lead-me
+    "kezia.vibes@gmail.com",
+    "ray.trackhead@gmail.com",
+    "leon.freshear@gmail.com",
+    // inject-ahora-si
+    "felix.techsound@gmail.com",
+    "nina.rave3am@gmail.com",
+    // inject-misery
+    "tyler.heavyriff@gmail.com",
+    "ash.metalcraft@gmail.com",
+    "cass.loudpunk@gmail.com",
+    // inject-with-me
+    "maya.hiphophead@gmail.com",
+    "dre.trackfan@gmail.com",
+    // inject-skyscraper
+    "marcus.breakhead@gmail.com",
+    "zara.crate@gmail.com",
+    "joel.beatcraft@gmail.com",
     // Additional test / friends / family accounts
     "daniel.basshead@gmail.com",
     "alexkimbeats@gmail.com",
