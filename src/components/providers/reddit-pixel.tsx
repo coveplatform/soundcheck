@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
+import { useCookieConsent } from "./cookie-consent";
 
 // Reddit Pixel type definition
 type RedditPixelType = {
@@ -21,6 +22,7 @@ export function RedditPixel() {
   const pixelId = process.env.NEXT_PUBLIC_REDDIT_PIXEL_ID;
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { consent } = useCookieConsent();
 
   // Track page views on route changes (for client-side navigation)
   useEffect(() => {
@@ -29,7 +31,7 @@ export function RedditPixel() {
     }
   }, [pathname, searchParams]);
 
-  if (!pixelId) return null;
+  if (!pixelId || consent !== "granted") return null;
 
   return (
     <Script

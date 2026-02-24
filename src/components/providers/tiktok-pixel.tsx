@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
+import { useCookieConsent } from "./cookie-consent";
 
 // Type for the TikTok pixel
 type TikTokPixelType = {
@@ -14,6 +15,7 @@ export function TikTokPixel() {
   const pixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { consent } = useCookieConsent();
 
   // Track page views on route changes (for client-side navigation)
   useEffect(() => {
@@ -25,7 +27,7 @@ export function TikTokPixel() {
     }
   }, [pathname, searchParams]);
 
-  if (!pixelId) return null;
+  if (!pixelId || consent !== "granted") return null;
 
   return (
     <Script

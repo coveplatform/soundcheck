@@ -29,7 +29,8 @@ export default function TermsPage() {
           <p>
             MixReflect (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is a two-sided marketplace
             that helps artists collect structured, expert feedback on their music and helps
-            reviewers earn money for completing high-quality reviews. By creating an account or
+            reviewers earn money for completing high-quality reviews. MixReflect is operated by
+            MixReflect, based in Melbourne, Victoria, Australia. By creating an account or
             using MixReflect, you agree to these terms.
           </p>
 
@@ -196,6 +197,20 @@ export default function TermsPage() {
               We may update these terms from time to time. Material changes will be communicated
               via email or an in-app notice. Continued use of MixReflect after changes constitutes
               acceptance of the updated terms.
+            </p>
+          </div>
+
+          {/* ── 11. Governing Law ── */}
+          <div className="border-t-2 border-black pt-6">
+            <h2 className="text-xl font-black mb-3">11. Governing law</h2>
+            <p>
+              These Terms of Service are governed by the laws of Victoria, Australia. Any dispute
+              arising out of or in connection with these terms that cannot be resolved informally
+              will be subject to the exclusive jurisdiction of the courts of Victoria, Australia.
+            </p>
+            <p className="mt-3">
+              If you access MixReflect from outside Australia, you are responsible for compliance
+              with your local laws to the extent they are applicable.
             </p>
           </div>
 

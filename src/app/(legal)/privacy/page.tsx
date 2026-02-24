@@ -31,6 +31,14 @@ export default function PrivacyPage() {
             and shares information when you use our music feedback marketplace. By creating an
             account or using MixReflect, you agree to the practices described here.
           </p>
+          <p>
+            MixReflect is operated by MixReflect, based in Melbourne, Victoria, Australia. For
+            privacy enquiries, contact us at{" "}
+            <a href="mailto:privacy@mixreflect.com" className="underline font-bold">
+              privacy@mixreflect.com
+            </a>
+            .
+          </p>
 
           {/* ── 1. Data We Collect ── */}
           <div className="border-t-2 border-black pt-6">
@@ -101,8 +109,10 @@ export default function PrivacyPage() {
             <p>
               We use PostHog for product analytics and may optionally use Microsoft Clarity for
               session replays. These tools collect anonymised interaction data such as page views,
-              clicks, scroll depth, and device information. Public play counts on tracks are also
-              recorded.
+              clicks, scroll depth, and device information. We also use TikTok Pixel and Reddit
+              Pixel to measure the performance of our advertising campaigns. These tools are only
+              activated with your consent — see section 5 below. Public play counts on tracks are
+              also recorded.
             </p>
 
             <h3 className="font-bold mt-4 mb-1">Support tickets</h3>
@@ -115,7 +125,8 @@ export default function PrivacyPage() {
             <p>
               We use cookies to authenticate your session (via NextAuth) and to remember your
               preferences. Authentication cookies are essential for the service to function.
-              Analytics tools may set their own cookies — see section 5 below.
+              Analytics and advertising tools may set their own cookies only after you give consent
+              — see section 5 below.
             </p>
           </div>
 
@@ -135,6 +146,7 @@ export default function PrivacyPage() {
               <li>Detect and prevent abuse, fraud, and low-quality reviews.</li>
               <li>Improve product quality through analytics and aggregated usage patterns.</li>
               <li>Enforce slot limits (Free: 1 active slot, Pro: 3 active slots) and subscription status.</li>
+              <li>Measure the effectiveness of advertising campaigns on TikTok and Reddit (only with your consent).</li>
             </ul>
           </div>
 
@@ -170,29 +182,71 @@ export default function PrivacyPage() {
               <li><strong>Amazon S3 / Cloudflare R2</strong> — cloud storage for uploaded audio files and artwork. Files are stored securely and served via signed or public URLs.</li>
               <li><strong>Vercel</strong> — hosting and deployment. Vercel processes web requests and may log IP addresses and request metadata.</li>
               <li><strong>Neon</strong> — managed PostgreSQL database hosting. All account, track, review, and behavioural data is stored in Neon&apos;s infrastructure.</li>
-              <li><strong>PostHog</strong> — product analytics. PostHog receives anonymised event data about how you interact with the product.</li>
-              <li><strong>Microsoft Clarity</strong> (optional) — session replay and heatmaps. If enabled, Clarity captures anonymised interaction recordings.</li>
+              <li><strong>PostHog</strong> — product analytics. PostHog receives anonymised event data about how you interact with the product. Activated only with your consent.</li>
+              <li><strong>Microsoft Clarity</strong> (optional) — session replay and heatmaps. If enabled, Clarity captures anonymised interaction recordings. Activated only with your consent.</li>
+              <li><strong>TikTok Pixel</strong> — advertising measurement. If you consent to analytics cookies, the TikTok Pixel fires on page load and sends anonymised event data (page views, conversions) to TikTok to measure the performance of our ads. TikTok may use this data in accordance with their own privacy policy. No personal data you enter on MixReflect is sent to TikTok.</li>
+              <li><strong>Reddit Pixel</strong> — advertising measurement. If you consent to analytics cookies, the Reddit Pixel fires on page load and sends anonymised event data (page views, conversions) to Reddit to measure the performance of our ads. Reddit may use this data in accordance with their own privacy policy. No personal data you enter on MixReflect is sent to Reddit.</li>
             </ul>
             <p className="mt-3">
               We do not sell your personal data to any third party.
             </p>
           </div>
 
-          {/* ── 5. Cookies ── */}
+          {/* ── 5. Cookies and Consent ── */}
           <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">5. Cookies</h2>
+            <h2 className="text-xl font-black mb-3">5. Cookies and consent</h2>
             <p>
               We use the following types of cookies:
             </p>
             <ul className="list-disc pl-5 space-y-2 mt-2">
-              <li><strong>Essential cookies</strong> — authentication session tokens (NextAuth). Required for the service to function. Cannot be disabled.</li>
-              <li><strong>Analytics cookies</strong> — set by PostHog and optionally Microsoft Clarity to understand product usage. You can control these via your browser settings or opt out through the respective providers.</li>
+              <li>
+                <strong>Essential cookies</strong> — authentication session tokens (NextAuth).
+                Required for the service to function. Set immediately on login and cannot be
+                disabled without logging out.
+              </li>
+              <li>
+                <strong>Analytics cookies</strong> — set by PostHog and optionally Microsoft
+                Clarity to understand product usage. These are only set after you accept cookies
+                via the consent banner.
+              </li>
+              <li>
+                <strong>Advertising cookies</strong> — set by TikTok Pixel and Reddit Pixel to
+                measure advertising campaign performance. These are only set after you accept
+                cookies via the consent banner. If you decline, these scripts are never loaded.
+              </li>
             </ul>
+            <p className="mt-3">
+              When you first visit MixReflect, a banner will ask for your consent to set
+              non-essential cookies. You can decline and the service will still work fully —
+              only the authentication cookie will be set. You can change your preference at any
+              time by clearing your browser&apos;s local storage for mixreflect.com.
+            </p>
           </div>
 
-          {/* ── 6. Data Retention ── */}
+          {/* ── 6. Lawful Basis for Processing ── */}
           <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">6. Data retention</h2>
+            <h2 className="text-xl font-black mb-3">6. Lawful basis for processing</h2>
+            <p>
+              Where the General Data Protection Regulation (GDPR) applies (including for users in
+              the European Economic Area and United Kingdom), we process your personal data on the
+              following legal bases:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 mt-2">
+              <li><strong>Performance of a contract</strong> — account data, track submissions, review data, payment and subscription data, and transactional emails are processed to fulfil our agreement with you when you use MixReflect.</li>
+              <li><strong>Legal obligation</strong> — payment records and related data may be retained to comply with financial and tax regulations.</li>
+              <li><strong>Legitimate interests</strong> — listening behaviour analytics (presented only in aggregate to track owners), fraud detection, abuse prevention, and product improvement through anonymised usage data. We have assessed that these interests are not overridden by your data protection rights.</li>
+              <li><strong>Consent</strong> — advertising pixels (TikTok, Reddit), session replay (Microsoft Clarity), product analytics (PostHog), and marketing emails. You can withdraw consent at any time — for cookies by clearing your consent preference in browser local storage, and for marketing emails by unsubscribing via the link in any email.</li>
+            </ul>
+            <p className="mt-3">
+              MixReflect is also subject to the Australian Privacy Act 1988 and the Australian
+              Privacy Principles (APPs). Users in Australia have the right to access, correct, and
+              complain about the handling of their personal information.
+            </p>
+          </div>
+
+          {/* ── 7. Data Retention ── */}
+          <div className="border-t-2 border-black pt-6">
+            <h2 className="text-xl font-black mb-3">7. Data retention</h2>
             <p>
               We retain your account data, track submissions, reviews, and listening behaviour data
               for as long as your account is active. If you delete your account, we will remove your
@@ -203,9 +257,9 @@ export default function PrivacyPage() {
             </p>
           </div>
 
-          {/* ── 7. Data Security ── */}
+          {/* ── 8. Data Security ── */}
           <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">7. Data security</h2>
+            <h2 className="text-xl font-black mb-3">8. Data security</h2>
             <p>
               We use industry-standard measures to protect your data, including HTTPS encryption in
               transit, hashed passwords, secure session tokens, and access-controlled cloud storage
@@ -214,25 +268,30 @@ export default function PrivacyPage() {
             </p>
           </div>
 
-          {/* ── 8. Your Rights ── */}
+          {/* ── 9. Your Rights ── */}
           <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">8. Your rights</h2>
+            <h2 className="text-xl font-black mb-3">9. Your rights</h2>
             <ul className="list-disc pl-5 space-y-2">
               <li><strong>Access</strong> — you can request a copy of the personal data we hold about you.</li>
               <li><strong>Correction</strong> — you can update your account information, artist profile, and track details at any time.</li>
-              <li><strong>Deletion</strong> — you can request deletion of your account and associated data. Some data may be retained as described in section 6.</li>
+              <li><strong>Deletion</strong> — you can request deletion of your account and associated data. Some data may be retained as described in section 7.</li>
               <li><strong>Visibility control</strong> — you can change any track between public and private at any time from your track settings, immediately removing it from or adding it to the Discover section.</li>
               <li><strong>Opt out of marketing</strong> — you can unsubscribe from announcement emails at any time. Transactional emails (e.g. review completion, payment receipts) cannot be opted out of while your account is active.</li>
               <li><strong>Data portability</strong> — you can request an export of your reviews and track data in a machine-readable format.</li>
+              <li><strong>Withdraw consent</strong> — where we process data based on your consent, you can withdraw it at any time without affecting the lawfulness of processing before withdrawal.</li>
+              <li><strong>Object to processing</strong> — you can object to processing based on legitimate interests. We will stop unless we have compelling legitimate grounds.</li>
             </ul>
             <p className="mt-3">
-              To exercise any of these rights, contact us using the details in section 10 below.
+              To exercise any of these rights, contact us using the details in the Contact section below.
+              If you are in the EEA or UK and are unsatisfied with our response, you have the right
+              to lodge a complaint with your local data protection authority. If you are in Australia,
+              you may contact the Office of the Australian Information Commissioner (OAIC).
             </p>
           </div>
 
-          {/* ── 9. Children ── */}
+          {/* ── 10. Children ── */}
           <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">9. Children</h2>
+            <h2 className="text-xl font-black mb-3">10. Children</h2>
             <p>
               MixReflect is not intended for use by anyone under the age of 13. We do not knowingly
               collect personal data from children. If we learn that we have collected data from a
@@ -240,9 +299,24 @@ export default function PrivacyPage() {
             </p>
           </div>
 
-          {/* ── 10. Changes & Contact ── */}
+          {/* ── 11. Governing Law ── */}
           <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">10. Changes to this policy</h2>
+            <h2 className="text-xl font-black mb-3">11. Governing law</h2>
+            <p>
+              This Privacy Policy is governed by the laws of Victoria, Australia. Any disputes
+              relating to this policy that cannot be resolved informally will be subject to the
+              exclusive jurisdiction of the courts of Victoria, Australia.
+            </p>
+            <p className="mt-3">
+              Where you access MixReflect from the European Economic Area or the United Kingdom,
+              the General Data Protection Regulation (GDPR) or UK GDPR also applies to the
+              processing of your personal data, in addition to Australian law.
+            </p>
+          </div>
+
+          {/* ── 12. Changes to this policy ── */}
+          <div className="border-t-2 border-black pt-6">
+            <h2 className="text-xl font-black mb-3">12. Changes to this policy</h2>
             <p>
               We may update this policy from time to time. If we make material changes, we will
               notify you by email or by posting a notice on the site. Your continued use of
@@ -256,7 +330,8 @@ export default function PrivacyPage() {
               For privacy questions or to exercise your data rights, contact us at{" "}
               <a href="mailto:privacy@mixreflect.com" className="underline font-bold">
                 privacy@mixreflect.com
-              </a>.
+              </a>
+              .
             </p>
           </div>
         </div>

@@ -1,11 +1,13 @@
 "use client";
 
 import Script from "next/script";
+import { useCookieConsent } from "./cookie-consent";
 
 export function ClarityScript() {
   const clarityId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
+  const { consent } = useCookieConsent();
 
-  if (!clarityId) return null;
+  if (!clarityId || consent !== "granted") return null;
 
   return (
     <Script

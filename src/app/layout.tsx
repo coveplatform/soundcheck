@@ -2,7 +2,19 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "@/components/providers";
+import { headers } from "next/headers";
 import "./globals.css";
+
+const GDPR_COUNTRIES = new Set([
+  // EU member states
+  "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR",
+  "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL",
+  "PT", "RO", "SE", "SI", "SK",
+  // EEA non-EU
+  "IS", "LI", "NO",
+  // UK
+  "GB",
+]);
 
 const inter = Inter({
   variable: "--font-inter",
@@ -100,11 +112,15 @@ const jsonLd = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const country = headersList.get("x-vercel-ip-country") ?? "";
+  const requiresConsent = GDPR_COUNTRIES.has(country);
+
   return (
     <html lang="en" data-theme="light" style={{ colorScheme: "light" }}>
       <head>
@@ -116,7 +132,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers requiresConsent={requiresConsent}>{children}</Providers>
         <Analytics />
       </body>
     </html>
