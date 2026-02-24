@@ -2,353 +2,257 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-/* ── Beamed quaver pair config (♫) ────────────────────────── */
-// Each entry is a PAIR of notes joined by a beam.
-// Positions: avoid the text content zone (roughly y 20%-80%).
-// The cy is where the NOTE HEADS sit; stems + beam grow upward from there.
-const PAIRS = [
+/* ── Vinyl record config ──────────────────────────────────── */
+const RECORDS = [
   {
     id: 0,
-    cx: 0.22,
-    cy: 0.15,
-    size: 22,
-    tilt: -8,
+    cx: 0.20,
+    cy: 0.12,
+    size: 38,
+    baseTilt: -12,
     bob: 0,
-    fill: "#facc15",
-    stroke: "#92400e",
-    highlight: "#fef08a",
+    spinSpeed: 8,
+    vinyl: "#1a1a2e",
+    label: "#facc15",
+    labelStroke: "#92400e",
+    labelHighlight: "#fef08a",
   },
   {
     id: 1,
-    cx: 0.78,
-    cy: 0.14,
-    size: 18,
-    tilt: 10,
-    bob: 0.8,
-    fill: "#f472b6",
-    stroke: "#881337",
-    highlight: "#fbcfe8",
+    cx: 0.82,
+    cy: 0.10,
+    size: 30,
+    baseTilt: 15,
+    bob: 0.7,
+    spinSpeed: 10,
+    vinyl: "#1a1a2e",
+    label: "#f472b6",
+    labelStroke: "#881337",
+    labelHighlight: "#fbcfe8",
   },
   {
     id: 2,
-    cx: 0.88,
-    cy: 0.48,
-    size: 20,
-    tilt: 6,
-    bob: 1.5,
-    fill: "#60a5fa",
-    stroke: "#1e3a8a",
-    highlight: "#bfdbfe",
+    cx: 0.90,
+    cy: 0.50,
+    size: 34,
+    baseTilt: 8,
+    bob: 1.4,
+    spinSpeed: 7,
+    vinyl: "#1a1a2e",
+    label: "#60a5fa",
+    labelStroke: "#1e3a8a",
+    labelHighlight: "#bfdbfe",
   },
   {
     id: 3,
-    cx: 0.12,
-    cy: 0.82,
-    size: 20,
-    tilt: -7,
-    bob: 2.2,
-    fill: "#4ade80",
-    stroke: "#14532d",
-    highlight: "#bbf7d0",
+    cx: 0.10,
+    cy: 0.84,
+    size: 32,
+    baseTilt: -10,
+    bob: 2.1,
+    spinSpeed: 9,
+    vinyl: "#1a1a2e",
+    label: "#4ade80",
+    labelStroke: "#14532d",
+    labelHighlight: "#bbf7d0",
   },
   {
     id: 4,
-    cx: 0.75,
-    cy: 0.90,
-    size: 16,
-    tilt: 12,
-    bob: 2.9,
-    fill: "#c084fc",
-    stroke: "#581c87",
-    highlight: "#e9d5ff",
+    cx: 0.78,
+    cy: 0.92,
+    size: 26,
+    baseTilt: 14,
+    bob: 2.8,
+    spinSpeed: 11,
+    vinyl: "#1a1a2e",
+    label: "#c084fc",
+    labelStroke: "#581c87",
+    labelHighlight: "#e9d5ff",
   },
 ];
 
-const MAX_STEM_EXTRA = 60;
-const BASE_STEM = 50;
-const NEAR_PX = 150;
+const NEAR_PX = 160;
 const EASE = "cubic-bezier(.34,1.56,.64,1)";
 
 function clamp(v: number, lo: number, hi: number) {
   return Math.max(lo, Math.min(hi, v));
 }
 
-/* ── Beamed quaver pair: all-in-one SVG ♫ ─────────────────── */
-// Two note heads at the bottom, two stems going up, one thick beam across the top.
-// The whole thing is rendered as a single SVG so alignment is pixel-perfect.
-function BeamedQuaverSvg({
+/* ── Vinyl record SVG ─────────────────────────────────────── */
+function VinylRecordSvg({
   size,
-  stemH,
-  bend,
   eyeX,
   eyeY,
-  stretch,
   near,
-  fill,
-  stroke,
-  highlight,
+  spinDeg,
+  vinyl,
+  label,
+  labelStroke,
+  labelHighlight,
 }: {
   size: number;
-  stemH: number;
-  bend: number; // 0-1, how much the stems curve toward the form
   eyeX: number;
   eyeY: number;
-  stretch: number;
   near: boolean;
-  fill: string;
-  stroke: string;
-  highlight: string;
+  spinDeg: number;
+  vinyl: string;
+  label: string;
+  labelStroke: string;
+  labelHighlight: string;
 }) {
-  // note head dimensions
-  const headRx = size * 0.52;
-  const headRy = size * 0.38;
-  const headW = headRx * 2 + 4;
-  const gap = size * 1.5;
-  const headsW = headW + gap + 12;
-  // extra space on left for bent stems, and extra vertical for beam rotation
-  const stemGapX = gap + headRx; // horizontal distance between stem bases
-  const bendRoom = stemH * bend * 1.1;
-  const maxVGap = stemGapX * 0.25; // tight cap so beam stays compact
-  const vertExtra = maxVGap * bend * 0.4;
-  const totalW = headsW + bendRoom;
-  const headAreaH = headRy * 2 + 6;
-  const stemW = Math.max(2.5, size * 0.13);
-  const beamH = Math.max(4, size * 0.18);
-  const totalH = headAreaH + stemH + beamH + vertExtra;
+  const r = size; // outer radius
+  const cx = r + 4;
+  const cy = r + 4;
+  const svgSize = (r + 4) * 2;
+  const labelR = r * 0.38; // center label radius
+  const holeR = r * 0.06; // spindle hole
 
-  // heads are on the RIGHT side of the SVG (fixed, upright)
-  const headOffset = bendRoom;
-  const head1Cx = headOffset + headsW * 0.25;
-  const head2Cx = headOffset + headsW * 0.75;
-  const headCy = totalH - headAreaH / 2;
-  const stemBot1 = headCy - headRy * 0.3;
-  const stemBot2 = headCy - headRy * 0.3;
-  const stem1BotX = head1Cx + headRx * 0.55;
-  const stem2BotX = head2Cx + headRx * 0.55;
+  // groove rings
+  const grooveCount = 5;
+  const grooveStart = labelR + (r - labelR) * 0.15;
+  const grooveEnd = r * 0.92;
+  const grooveStep = (grooveEnd - grooveStart) / grooveCount;
 
-  // At rest: stem tops side by side horizontally, beam is horizontal
-  // At full bend: stem tops stacked vertically on the left, beam is ~vertical
-  // Each stem displaces from its OWN bottom to avoid crossing
-  const topDisplace = stemH * bend * 1.05;
-  const vGap = maxVGap * bend; // vertical separation grows but capped
+  // eyes on the label
+  const eyeR = size * 0.09;
+  const pupilR = size * (near ? 0.04 : 0.055);
+  const shineR = size * 0.022;
+  const eyeGap = labelR * 0.38;
+  const eyeCy = cy - labelR * 0.12;
+  const maxMove = eyeR * 0.45;
 
-  // Left head → lower beam point, Right head → upper beam point
-  // This "fan" pattern keeps stems in their own lanes
-  const stem1TopX = stem1BotX - topDisplace;
-  const stem2TopX = stem2BotX - topDisplace;
-  const baseStemTopY = beamH + vertExtra / 2;
-  const stem1TopY = baseStemTopY + vGap / 2; // lower (left head fans down-left)
-  const stem2TopY = baseStemTopY - vGap / 2; // upper (right head fans up-left)
-
-  // L-bend bezier: stem goes straight UP then curves to its target
-  function stemPath(botX: number, botY: number, topX: number, topY: number) {
-    const cp1x = botX;
-    const cp1y = topY; // directly above bottom = vertical lower portion
-    const cp2x = botX;
-    const cp2y = topY; // creates sharp L-corner
-    return `M ${botX} ${botY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${topX} ${topY}`;
-  }
-
-  // eye params
-  const eyeR = size * (0.16 + stretch * 0.02);
-  const pupilR = size * (near ? 0.07 : 0.09);
-  const shineR = size * 0.035;
-  const eyeGap = size * 0.17;
-  const maxMove = eyeR * 0.40;
-
-  function renderHead(hcx: number) {
-    const hcy = headCy;
-    return (
-      <>
-        {/* shadow */}
-        <ellipse
-          cx={hcx + 1.5}
-          cy={hcy + 1.5}
-          rx={headRx}
-          ry={headRy}
-          transform={`rotate(-18, ${hcx + 1.5}, ${hcy + 1.5})`}
-          fill="rgba(0,0,0,0.20)"
-        />
-        {/* head fill */}
-        <ellipse
-          cx={hcx}
-          cy={hcy}
-          rx={headRx}
-          ry={headRy}
-          transform={`rotate(-18, ${hcx}, ${hcy})`}
-          fill={fill}
-          stroke={stroke}
-          strokeWidth={2.2}
-        />
-        {/* highlight */}
-        <ellipse
-          cx={hcx - headRx * 0.20}
-          cy={hcy - headRy * 0.28}
-          rx={headRx * 0.30}
-          ry={headRy * 0.22}
-          transform={`rotate(-18, ${hcx - headRx * 0.20}, ${hcy - headRy * 0.28})`}
-          fill={highlight}
-          opacity={0.50}
-        />
-        {/* left eye */}
-        <circle cx={hcx - eyeGap} cy={hcy} r={eyeR} fill="white" stroke={stroke} strokeWidth={1.1} />
-        <circle
-          cx={hcx - eyeGap + eyeX * maxMove}
-          cy={hcy + eyeY * maxMove}
-          r={pupilR}
-          fill="#0f0a1a"
-        />
-        <circle
-          cx={hcx - eyeGap + eyeX * maxMove * 0.1 + shineR * 0.5}
-          cy={hcy + eyeY * maxMove * 0.1 - shineR}
-          r={shineR}
-          fill="white"
-        />
-        {/* right eye */}
-        <circle cx={hcx + eyeGap} cy={hcy} r={eyeR} fill="white" stroke={stroke} strokeWidth={1.1} />
-        <circle
-          cx={hcx + eyeGap + eyeX * maxMove}
-          cy={hcy + eyeY * maxMove}
-          r={pupilR}
-          fill="#0f0a1a"
-        />
-        <circle
-          cx={hcx + eyeGap + eyeX * maxMove * 0.1 + shineR * 0.5}
-          cy={hcy + eyeY * maxMove * 0.1 - shineR}
-          r={shineR}
-          fill="white"
-        />
-        {/* blush */}
-        {near && (
-          <>
-            <ellipse
-              cx={hcx - eyeGap - eyeR * 0.4}
-              cy={hcy + eyeR * 1.05}
-              rx={size * 0.05}
-              ry={size * 0.03}
-              fill="rgba(255,100,150,0.40)"
-            />
-            <ellipse
-              cx={hcx + eyeGap + eyeR * 0.4}
-              cy={hcy + eyeR * 1.05}
-              rx={size * 0.05}
-              ry={size * 0.03}
-              fill="rgba(255,100,150,0.40)"
-            />
-          </>
-        )}
-        {/* mouth */}
-        {stretch > 0.2 ? (
-          <ellipse
-            cx={hcx}
-            cy={hcy + size * 0.22}
-            rx={size * 0.05 + stretch * size * 0.025}
-            ry={size * 0.04 + stretch * size * 0.02}
-            fill={stroke}
-            opacity={0.6}
-          />
-        ) : (
-          <path
-            d={`M ${hcx - size * 0.05} ${hcy + size * 0.20} Q ${hcx} ${hcy + size * 0.26} ${hcx + size * 0.05} ${hcy + size * 0.20}`}
-            fill="none"
-            stroke={stroke}
-            strokeWidth={1.5}
-            strokeLinecap="round"
-          />
-        )}
-      </>
-    );
-  }
+  // mouth
+  const mouthCy = cy + labelR * 0.35;
 
   return (
     <svg
-      viewBox={`0 0 ${totalW} ${totalH}`}
-      width={totalW}
-      height={totalH}
+      viewBox={`0 0 ${svgSize} ${svgSize}`}
+      width={svgSize}
+      height={svgSize}
       className="overflow-visible block"
     >
-      {/* stem shadows */}
-      <path d={stemPath(stem1BotX + 1, stemBot1 + 1, stem1TopX + 1, stem1TopY + 1)} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth={stemW + 1} strokeLinecap="round" />
-      <path d={stemPath(stem2BotX + 1, stemBot2 + 1, stem2TopX + 1, stem2TopY + 1)} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth={stemW + 1} strokeLinecap="round" />
+      {/* drop shadow */}
+      <circle cx={cx + 2} cy={cy + 2} r={r} fill="rgba(0,0,0,0.25)" />
 
-      {/* stems — L-bend curves that bow left */}
-      <path d={stemPath(stem1BotX, stemBot1, stem1TopX, stem1TopY)} fill="none" stroke={stroke} strokeWidth={stemW} strokeLinecap="round" />
-      <path d={stemPath(stem2BotX, stemBot2, stem2TopX, stem2TopY)} fill="none" stroke={stroke} strokeWidth={stemW} strokeLinecap="round" />
+      {/* vinyl disc — spins */}
+      <g transform={`rotate(${spinDeg}, ${cx}, ${cy})`}>
+        {/* outer disc */}
+        <circle cx={cx} cy={cy} r={r} fill={vinyl} stroke="rgba(255,255,255,0.08)" strokeWidth={1.5} />
 
-      {/* beam — connects two stem tops, rotates from horizontal to vertical */}
-      <line x1={stem1TopX + 1} y1={stem1TopY + 1} x2={stem2TopX + 1} y2={stem2TopY + 1} stroke="rgba(0,0,0,0.15)" strokeWidth={beamH + 1} strokeLinecap="round" />
-      <line x1={stem1TopX} y1={stem1TopY} x2={stem2TopX} y2={stem2TopY} stroke={fill} strokeWidth={beamH} strokeLinecap="round" />
-      <line x1={stem1TopX} y1={stem1TopY} x2={stem2TopX} y2={stem2TopY} stroke={stroke} strokeWidth={beamH} strokeLinecap="round" opacity={0.3} />
+        {/* subtle sheen on vinyl */}
+        <circle cx={cx} cy={cy} r={r * 0.95} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth={r * 0.08} />
 
-      {/* note heads */}
-      {renderHead(head1Cx)}
-      {renderHead(head2Cx)}
-    </svg>
-  );
-}
-
-/* ── Full beamed quaver character ─────────────────────────── */
-function BeamedQuaver({
-  size,
-  tilt,
-  eyeX,
-  eyeY,
-  stemExtra,
-  headX,
-  near,
-  bobDelay,
-  fill,
-  stroke,
-  highlight,
-}: {
-  size: number;
-  tilt: number;
-  eyeX: number;
-  eyeY: number;
-  stemExtra: number;
-  headX: number;
-  near: boolean;
-  bobDelay: number;
-  fill: string;
-  stroke: string;
-  highlight: string;
-}) {
-  const stretch = stemExtra / MAX_STEM_EXTRA;
-  const totalStem = BASE_STEM + stemExtra;
-
-  return (
-    <div
-      style={{
-        animationName: "speaker-idle",
-        animationDuration: "3.2s",
-        animationTimingFunction: "ease-in-out",
-        animationDelay: `${bobDelay}s`,
-        animationIterationCount: "infinite",
-      }}
-    >
-      <div style={{ transform: `rotate(${tilt}deg)` }}>
-        <div
-          style={{
-            transform: near ? "scale(1.15)" : "scale(1)",
-            transition: `transform 0.4s ${EASE}`,
-            willChange: "transform",
-          }}
-        >
-          <BeamedQuaverSvg
-            size={size}
-            stemH={totalStem}
-            bend={stretch}
-            eyeX={eyeX}
-            eyeY={eyeY}
-            stretch={stretch}
-            near={near}
-            fill={fill}
-            stroke={stroke}
-            highlight={highlight}
+        {/* groove rings */}
+        {Array.from({ length: grooveCount }, (_, i) => (
+          <circle
+            key={i}
+            cx={cx}
+            cy={cy}
+            r={grooveStart + i * grooveStep}
+            fill="none"
+            stroke="rgba(255,255,255,0.07)"
+            strokeWidth={0.8}
           />
-        </div>
-      </div>
-    </div>
+        ))}
+
+        {/* edge highlight — top-left gloss */}
+        <path
+          d={`M ${cx - r * 0.5} ${cy - r * 0.86} A ${r} ${r} 0 0 1 ${cx + r * 0.86} ${cy - r * 0.5}`}
+          fill="none"
+          stroke="rgba(255,255,255,0.12)"
+          strokeWidth={2}
+          strokeLinecap="round"
+        />
+      </g>
+
+      {/* center label — does NOT spin (face stays upright) */}
+      {/* label shadow */}
+      <circle cx={cx + 1} cy={cy + 1} r={labelR} fill="rgba(0,0,0,0.2)" />
+      {/* label fill */}
+      <circle cx={cx} cy={cy} r={labelR} fill={label} stroke={labelStroke} strokeWidth={2} />
+      {/* label highlight */}
+      <ellipse
+        cx={cx - labelR * 0.18}
+        cy={cy - labelR * 0.22}
+        rx={labelR * 0.35}
+        ry={labelR * 0.20}
+        fill={labelHighlight}
+        opacity={0.5}
+      />
+
+      {/* spindle hole */}
+      <circle cx={cx} cy={cy - labelR * 0.48} r={holeR} fill={vinyl} stroke={labelStroke} strokeWidth={0.8} />
+
+      {/* left eye */}
+      <circle cx={cx - eyeGap} cy={eyeCy} r={eyeR} fill="white" stroke={labelStroke} strokeWidth={1.2} />
+      <circle
+        cx={cx - eyeGap + eyeX * maxMove}
+        cy={eyeCy + eyeY * maxMove}
+        r={pupilR}
+        fill="#0f0a1a"
+      />
+      <circle
+        cx={cx - eyeGap + eyeX * maxMove * 0.1 + shineR * 0.5}
+        cy={eyeCy + eyeY * maxMove * 0.1 - shineR}
+        r={shineR}
+        fill="white"
+      />
+
+      {/* right eye */}
+      <circle cx={cx + eyeGap} cy={eyeCy} r={eyeR} fill="white" stroke={labelStroke} strokeWidth={1.2} />
+      <circle
+        cx={cx + eyeGap + eyeX * maxMove}
+        cy={eyeCy + eyeY * maxMove}
+        r={pupilR}
+        fill="#0f0a1a"
+      />
+      <circle
+        cx={cx + eyeGap + eyeX * maxMove * 0.1 + shineR * 0.5}
+        cy={eyeCy + eyeY * maxMove * 0.1 - shineR}
+        r={shineR}
+        fill="white"
+      />
+
+      {/* blush */}
+      {near && (
+        <>
+          <ellipse
+            cx={cx - eyeGap - eyeR * 0.6}
+            cy={eyeCy + eyeR * 1.4}
+            rx={size * 0.035}
+            ry={size * 0.022}
+            fill="rgba(255,100,150,0.45)"
+          />
+          <ellipse
+            cx={cx + eyeGap + eyeR * 0.6}
+            cy={eyeCy + eyeR * 1.4}
+            rx={size * 0.035}
+            ry={size * 0.022}
+            fill="rgba(255,100,150,0.45)"
+          />
+        </>
+      )}
+
+      {/* mouth — smile normally, surprised "o" when near */}
+      {near ? (
+        <ellipse
+          cx={cx}
+          cy={mouthCy}
+          rx={size * 0.035}
+          ry={size * 0.03}
+          fill={labelStroke}
+          opacity={0.7}
+        />
+      ) : (
+        <path
+          d={`M ${cx - labelR * 0.18} ${mouthCy} Q ${cx} ${mouthCy + labelR * 0.15} ${cx + labelR * 0.18} ${mouthCy}`}
+          fill="none"
+          stroke={labelStroke}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
   );
 }
 
@@ -357,8 +261,10 @@ export function SpeakerBuddies() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mouse, setMouse] = useState({ x: -9999, y: -9999 });
   const [rect, setRect] = useState<DOMRect | null>(null);
+  const [tick, setTick] = useState(0);
   const rafId = useRef<number | null>(null);
   const latest = useRef({ x: -9999, y: -9999 });
+  const animRef = useRef<number>(0);
 
   const updateRect = useCallback(() => {
     if (containerRef.current) {
@@ -377,6 +283,7 @@ export function SpeakerBuddies() {
     };
   }, [updateRect]);
 
+  // mouse tracking
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       latest.current = { x: e.clientX, y: e.clientY };
@@ -394,22 +301,40 @@ export function SpeakerBuddies() {
     };
   }, []);
 
+  // spin animation — tick updates every ~50ms for smooth rotation
+  useEffect(() => {
+    let running = true;
+    const step = () => {
+      if (!running) return;
+      setTick((t) => t + 1);
+      animRef.current = requestAnimationFrame(step);
+    };
+    const id = setInterval(() => {
+      // throttle to ~20fps for spin (plenty smooth for rotation)
+    }, 50);
+    animRef.current = requestAnimationFrame(step);
+    return () => {
+      running = false;
+      cancelAnimationFrame(animRef.current);
+      clearInterval(id);
+    };
+  }, []);
+
   return (
     <div
       ref={containerRef}
       className="absolute inset-0 pointer-events-none overflow-hidden"
       aria-hidden="true"
     >
-      {PAIRS.map((p) => {
+      {RECORDS.map((rec) => {
         let eyeX = 0;
         let eyeY = 0;
-        let stemExtra = 0;
-        let headX = 0;
+        let tiltX = 0; // lean toward form
         let near = false;
 
         if (rect) {
-          const sx = rect.left + p.cx * rect.width;
-          const sy = rect.top + p.cy * rect.height;
+          const sx = rect.left + rec.cx * rect.width;
+          const sy = rect.top + rec.cy * rect.height;
           const dx = mouse.x - sx;
           const dy = mouse.y - sy;
           const dist = Math.sqrt(dx * dx + dy * dy);
@@ -419,43 +344,61 @@ export function SpeakerBuddies() {
             eyeY = dy / dist;
           }
 
+          // tilt toward form when cursor is over it
           const relX = (mouse.x - rect.left) / rect.width;
           if (relX < 0) {
-            // wider range (1.2) so full extend needs cursor far into the form
-            // easeIn power curve so it starts slow and accelerates
             const raw = clamp(Math.abs(relX), 0, 1.2);
-            const factor = Math.pow(raw / 1.2, 1.8); // 0-1 with easeIn
-            stemExtra = factor * MAX_STEM_EXTRA;
-            headX = clamp(-factor * 28, -28, 0);
+            const factor = Math.pow(raw / 1.2, 1.8);
+            tiltX = factor * -18; // lean left toward form
           }
 
           near = dist < NEAR_PX;
         }
 
+        // continuous spin
+        const spinDeg = (tick * (360 / (rec.spinSpeed * 60))) % 360;
+
         return (
           <div
-            key={p.id}
+            key={rec.id}
             className="absolute"
             style={{
-              left: `${p.cx * 100}%`,
-              top: `${p.cy * 100}%`,
-              transform: "translate(-50%, -100%)",
-              transformOrigin: "right bottom",
+              left: `${rec.cx * 100}%`,
+              top: `${rec.cy * 100}%`,
+              transform: "translate(-50%, -50%)",
             }}
           >
-            <BeamedQuaver
-              size={p.size}
-              tilt={p.tilt}
-              eyeX={eyeX}
-              eyeY={eyeY}
-              stemExtra={stemExtra}
-              headX={headX}
-              near={near}
-              bobDelay={p.bob}
-              fill={p.fill}
-              stroke={p.stroke}
-              highlight={p.highlight}
-            />
+            {/* idle bob */}
+            <div
+              style={{
+                animationName: "speaker-idle",
+                animationDuration: "3.2s",
+                animationTimingFunction: "ease-in-out",
+                animationDelay: `${rec.bob}s`,
+                animationIterationCount: "infinite",
+              }}
+            >
+              {/* base tilt + lean toward form */}
+              <div
+                style={{
+                  transform: `rotate(${rec.baseTilt + tiltX}deg) ${near ? "scale(1.12)" : "scale(1)"}`,
+                  transition: `transform 0.5s ${EASE}`,
+                  willChange: "transform",
+                }}
+              >
+                <VinylRecordSvg
+                  size={rec.size}
+                  eyeX={eyeX}
+                  eyeY={eyeY}
+                  near={near}
+                  spinDeg={spinDeg}
+                  vinyl={rec.vinyl}
+                  label={rec.label}
+                  labelStroke={rec.labelStroke}
+                  labelHighlight={rec.labelHighlight}
+                />
+              </div>
+            </div>
           </div>
         );
       })}

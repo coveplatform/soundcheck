@@ -10,9 +10,6 @@ import {
   MessageCircle,
   Music,
   Headphones,
-  Lock,
-  Crown,
-  Plus,
   ChevronUp,
   Play,
   Trophy,
@@ -24,7 +21,6 @@ import {
   SparklesDoodle,
   SquiggleDoodle,
   StarDoodle,
-  DotsDoodle,
 } from "@/components/dashboard/doodles";
 import {
   DashboardArtistProfile,
@@ -138,6 +134,23 @@ export default async function DashboardPage() {
       (r) => new Date(r.createdAt).getTime() > viewedAt
     );
   });
+
+  // Discover preview — grab 8 public tracks with artwork for the visual
+  const discoverTracks = await prisma.track.findMany({
+    where: {
+      isPublic: true,
+      artworkUrl: { not: null },
+      status: { in: ["UPLOADED", "QUEUED", "IN_PROGRESS", "COMPLETED"] },
+    },
+    select: {
+      id: true,
+      title: true,
+      artworkUrl: true,
+      ArtistProfile: { select: { artistName: true } },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 8,
+  }).catch(() => [] as { id: string; title: string; artworkUrl: string | null; ArtistProfile: { artistName: string } | null }[]);
 
   const excludeTrackIds = await prisma.review
     .findMany({
@@ -361,171 +374,188 @@ export default async function DashboardPage() {
       {/* ── TRACK OF THE DAY WINNER ─────────────────────────────── */}
       <DashboardWinner />
 
-      {/* ── MAIN CONTENT ───────────────────────────────────────── */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+      {/* ── WEEKLY DISCOVER — immersive full-bleed section ────── */}
+      {discoverTracks.length > 0 && (
+        <Link href="/discover" className="block group">
+          <div className="relative overflow-hidden bg-black">
+            {/* Radial glow background */}
+            <div className="absolute inset-0 opacity-60" style={{
+              background: "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,240,255,0.12) 0%, rgba(168,85,247,0.06) 40%, transparent 70%)",
+            }} />
 
-        {/* ── YOUR QUEUE ─────────────────────────────────────── */}
-        <section className="pt-10 pb-10 relative">
-          <DotsDoodle className="absolute top-8 right-0 w-14 h-14 text-purple-400/15 pointer-events-none" />
-          <div className="flex items-end justify-between mb-5">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">
-                Your Queue
-              </p>
-              <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight mt-0.5 leading-none">
-                {activeTracks.length === 0
-                  ? "No tracks queued"
-                  : `${activeTracks.length} of ${maxSlots} slot${maxSlots === 1 ? "" : "s"} active`}
-              </h2>
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16 relative">
+              <div className="flex flex-col sm:flex-row items-center gap-8 sm:gap-12">
+
+                {/* Floating album artwork mosaic */}
+                <div className="relative w-full sm:w-[340px] h-[200px] sm:h-[220px] flex-shrink-0">
+                  {discoverTracks.slice(0, 6).map((dt, i) => {
+                    const transforms = [
+                      { x: 0, y: 10, rot: -6, scale: 1, z: 10 },
+                      { x: 90, y: 0, rot: 3, scale: 1.08, z: 30 },
+                      { x: 180, y: 15, rot: -4, scale: 0.95, z: 20 },
+                      { x: 40, y: 90, rot: 5, scale: 0.9, z: 15 },
+                      { x: 140, y: 85, rot: -3, scale: 1, z: 25 },
+                      { x: 230, y: 70, rot: 2, scale: 0.85, z: 5 },
+                    ];
+                    const t = transforms[i];
+                    const glowColors = ["#00f0ff", "#a855f7", "#ff2d9b", "#fbbf24", "#10b981", "#00f0ff"];
+                    return dt.artworkUrl ? (
+                      <div
+                        key={dt.id}
+                        className="absolute rounded-xl overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-105"
+                        style={{
+                          left: t.x,
+                          top: t.y,
+                          width: 100 * t.scale,
+                          height: 100 * t.scale,
+                          transform: `rotate(${t.rot}deg)`,
+                          zIndex: t.z,
+                          boxShadow: `0 0 30px ${glowColors[i]}20, 0 8px 32px rgba(0,0,0,0.5)`,
+                          border: `1px solid ${glowColors[i]}30`,
+                        }}
+                      >
+                        <Image
+                          src={dt.artworkUrl}
+                          alt={dt.title}
+                          fill
+                          className="object-cover"
+                          sizes="120px"
+                        />
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+
+                {/* Text + CTA */}
+                <div className="flex-1 min-w-0 text-center sm:text-left">
+                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400/60 mb-2">
+                    Weekly Discover
+                  </p>
+                  <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-[0.95]">
+                    Explore music in 3D.
+                  </h2>
+                  <p className="text-sm text-white/40 mt-3 font-medium leading-relaxed max-w-sm">
+                    Float through a galaxy of independent tracks. Click any album to listen instantly.
+                  </p>
+                  <div className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.08] border border-white/[0.12] text-white/80 text-sm font-bold group-hover:bg-white/[0.14] group-hover:border-white/[0.2] transition-all duration-200">
+                    Enter the space
+                    <ArrowRight className="h-4 w-4 text-cyan-400 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
             </div>
-            <Link
-              href="/tracks"
-              className="text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors"
-            >
-              Manage →
-            </Link>
           </div>
+        </Link>
+      )}
 
-          <div className="grid grid-cols-3 gap-3 sm:gap-4">
-            {Array.from({ length: 3 }, (_, slotIndex) => {
-              const track = activeTracks[slotIndex];
-              const isLocked = !isPro && slotIndex >= maxSlots;
+      {/* ── YOUR QUEUE — compact strip ──────────────────────── */}
+      <div className="bg-white border-b-2 border-black/8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
+          <div className="flex items-center gap-4 sm:gap-6">
+            {/* Label + slot dots */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-black/35">
+                Queue
+              </span>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: maxSlots }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`w-2 h-2 rounded-full ${
+                      i < activeTracks.length ? "bg-purple-500" : "bg-black/10"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-[11px] font-bold text-black/40 tabular-nums">
+                {activeTracks.length}/{maxSlots}
+              </span>
+            </div>
 
-              if (track) {
+            {/* Active track thumbnails */}
+            <div className="flex-1 flex items-center gap-2 overflow-x-auto min-w-0">
+              {activeTracks.map((track) => {
                 const completedReviews = track.Review.filter(
                   (r) => r.status === "COMPLETED"
                 ).length;
-                const hasReviews = track.reviewsRequested > 0;
-                const reviewProgress = hasReviews
-                  ? completedReviews / track.reviewsRequested
-                  : 0;
-                const isDone = reviewProgress >= 1;
-
                 return (
                   <Link
                     key={track.id}
                     href={`/tracks/${track.id}`}
-                    className="group block"
+                    className="flex items-center gap-2.5 flex-shrink-0 group/track"
                   >
-                    <div className="relative aspect-square rounded-2xl overflow-hidden border-2 border-black/8 group-hover:border-black/20 transition-all duration-150 shadow-sm">
+                    <div className="relative w-9 h-9 rounded-lg overflow-hidden border border-black/10 flex-shrink-0">
                       {track.artworkUrl ? (
                         <Image
                           src={track.artworkUrl}
                           alt={track.title}
                           fill
-                          className="object-cover group-hover:scale-[1.03] transition-transform duration-200"
-                          sizes="(max-width: 640px) 33vw, 220px"
+                          className="object-cover"
+                          sizes="36px"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center">
-                          <Music className="h-8 w-8 text-black/20" />
-                        </div>
-                      )}
-                      <div className="absolute top-2 left-2">
-                        <span
-                          className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full backdrop-blur-sm ${
-                            track.status === "QUEUED"
-                              ? "bg-purple-600 text-white"
-                              : track.status === "IN_PROGRESS"
-                              ? "bg-lime-400 text-black"
-                              : "bg-white/90 text-black"
-                          }`}
-                        >
-                          {track.status === "QUEUED"
-                            ? "Queued"
-                            : track.status === "IN_PROGRESS"
-                            ? "Reviewing"
-                            : track.status}
-                        </span>
-                      </div>
-                      {hasReviews && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-2.5 pt-4 pb-2">
-                          <div className="flex items-baseline justify-between mb-1">
-                            <span className="text-xs font-black text-white leading-none">
-                              {completedReviews}/{track.reviewsRequested}
-                            </span>
-                            <span className="text-[9px] text-white/50">
-                              reviews
-                            </span>
-                          </div>
-                          <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${
-                                isDone ? "bg-lime-400" : "bg-white"
-                              }`}
-                              style={{ width: `${reviewProgress * 100}%` }}
-                            />
-                          </div>
+                        <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
+                          <Music className="h-3.5 w-3.5 text-black/20" />
                         </div>
                       )}
                     </div>
-                    <p className="text-xs font-black text-black mt-2 truncate leading-tight">
-                      {track.title}
-                    </p>
-                  </Link>
-                );
-              }
-
-              if (isLocked) {
-                return (
-                  <Link
-                    key={`locked-${slotIndex}`}
-                    href="/pro"
-                    className="group block"
-                  >
-                    <div className="aspect-square rounded-2xl border-2 border-dashed border-black/10 bg-white/60 flex flex-col items-center justify-center gap-2 hover:border-purple-300 hover:bg-purple-50/40 transition-all duration-150">
-                      <Lock className="h-5 w-5 text-black/15 group-hover:text-purple-400 transition-colors" />
-                      <Crown className="h-4 w-4 text-purple-300/60 group-hover:text-purple-400 transition-colors" />
-                      <span className="text-[9px] font-black uppercase tracking-widest text-black/20 group-hover:text-purple-500 transition-colors">
-                        Pro only
-                      </span>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-bold text-black truncate max-w-[100px] group-hover/track:text-purple-600 transition-colors">
+                        {track.title}
+                      </p>
+                      <p className="text-[10px] text-black/35 font-medium">
+                        {completedReviews}/{track.reviewsRequested} reviews
+                      </p>
                     </div>
                   </Link>
                 );
-              }
+              })}
+              {activeTracks.length === 0 && (
+                <p className="text-xs text-black/30 font-medium">No active tracks</p>
+              )}
+            </div>
 
-              return (
+            {/* Actions */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {activeTracks.length < maxSlots && (
                 <Link
-                  key={`empty-${slotIndex}`}
                   href="/submit"
-                  className="group block"
+                  className="text-[11px] font-black text-purple-600 hover:text-purple-800 transition-colors whitespace-nowrap"
                 >
-                  <div className="aspect-square rounded-2xl border-2 border-dashed border-black/10 bg-white/40 hover:border-purple-400 hover:bg-purple-50/50 flex flex-col items-center justify-center gap-2 transition-all duration-150">
-                    <div className="h-10 w-10 rounded-full bg-black/[0.04] group-hover:bg-purple-100 flex items-center justify-center transition-colors border-2 border-black/[0.06] group-hover:border-purple-200">
-                      <Plus className="h-5 w-5 text-black/20 group-hover:text-purple-600 transition-colors" />
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-black/20 group-hover:text-purple-600 transition-colors">
-                      Add track
-                    </span>
-                  </div>
-                  <p className="text-[11px] font-medium text-center text-black/20 mt-2">
-                    Open slot
-                  </p>
+                  + Add
                 </Link>
-              );
-            })}
-          </div>
-
-          {/* First-time user CTA */}
-          {tracks.length === 0 && credits >= 2 && (
-            <div className="mt-5 border-2 border-lime-500 bg-lime-50 rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="flex-1 min-w-0">
-                <p className="text-base font-black text-black">
-                  You&apos;ve got {credits} credits.
-                </p>
-                <p className="text-sm text-black/50 mt-0.5">
-                  Drop your first track and get real ears on it.
-                </p>
-              </div>
-              <Link href="/submit" className="flex-shrink-0">
-                <Button className="w-full sm:w-auto bg-lime-500 hover:bg-lime-600 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-sm h-10 px-5 rounded-xl">
-                  Submit track <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
-                </Button>
+              )}
+              <Link
+                href="/tracks"
+                className="text-[11px] font-black uppercase tracking-wider text-black/25 hover:text-black transition-colors whitespace-nowrap"
+              >
+                Manage →
               </Link>
             </div>
-          )}
-        </section>
+          </div>
+        </div>
       </div>
+
+      {/* First-time user CTA */}
+      {tracks.length === 0 && credits >= 2 && (
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
+          <div className="border-2 border-lime-500 bg-lime-50 rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1 min-w-0">
+              <p className="text-base font-black text-black">
+                You&apos;ve got {credits} credits.
+              </p>
+              <p className="text-sm text-black/50 mt-0.5">
+                Drop your first track and get real ears on it.
+              </p>
+            </div>
+            <Link href="/submit" className="flex-shrink-0">
+              <Button className="w-full sm:w-auto bg-lime-500 hover:bg-lime-600 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-sm h-10 px-5 rounded-xl">
+                Submit track <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* ── REVIEW & EARN — full-bleed dark section ─────────── */}
       <div className="bg-neutral-900">
