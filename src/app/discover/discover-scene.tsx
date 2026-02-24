@@ -904,21 +904,41 @@ function HUD({
       </div>
 
       {/* ---- Stats counter bar ---- */}
-      <div
-        className={`fixed top-[52px] sm:top-14 left-1/2 -translate-x-1/2 z-20 pointer-events-none select-none transition-all duration-1000 ${
-          hasInteracted ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        <div className="flex items-center gap-2 sm:gap-5 px-3 sm:px-7 py-2 sm:py-3 bg-black/60 backdrop-blur-xl border border-white/[0.1] rounded-full text-[9px] sm:text-xs tracking-[0.1em] sm:tracking-[0.2em] text-white/70 uppercase font-mono">
-          <span>{animPlays.toLocaleString()} plays</span>
-          <span className="w-px h-3 sm:h-3.5 bg-white/25" />
-          <span>{animReviews} reviews</span>
-          <span className="hidden sm:block w-px h-3.5 bg-white/25" />
-          <span className="hidden sm:inline">{animRating} avg</span>
-          <span className="w-px h-3 sm:h-3.5 bg-white/25" />
-          <span>{animTracks} tracks</span>
-        </div>
-      </div>
+      {(() => {
+        const focused = selectedTrack || hoveredTrack;
+        const showTrack = !!focused;
+        return (
+          <div
+            className={`fixed top-[52px] sm:top-14 left-1/2 -translate-x-1/2 z-20 pointer-events-none select-none transition-all duration-1000 ${
+              hasInteracted ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <div className="flex items-center gap-2 sm:gap-5 px-3 sm:px-7 py-2 sm:py-3 bg-black/60 backdrop-blur-xl border border-white/[0.1] rounded-full text-[9px] sm:text-xs tracking-[0.1em] sm:tracking-[0.2em] text-white/70 uppercase font-mono transition-all duration-300">
+              {showTrack ? (
+                <>
+                  <span className="text-white/90 truncate max-w-[120px] sm:max-w-none">{focused!.title}</span>
+                  <span className="w-px h-3 sm:h-3.5 bg-white/25" />
+                  <span>{(focused!.playCount ?? 0).toLocaleString()} plays</span>
+                  <span className="w-px h-3 sm:h-3.5 bg-white/25" />
+                  <span>{focused!.reviewCount ?? 0} reviews</span>
+                  <span className="hidden sm:block w-px h-3.5 bg-white/25" />
+                  <span className="hidden sm:inline">{focused!.rating ?? "—"} avg</span>
+                </>
+              ) : (
+                <>
+                  <span>{animPlays.toLocaleString()} plays</span>
+                  <span className="w-px h-3 sm:h-3.5 bg-white/25" />
+                  <span>{animReviews} reviews</span>
+                  <span className="hidden sm:block w-px h-3.5 bg-white/25" />
+                  <span className="hidden sm:inline">{animRating} avg</span>
+                  <span className="w-px h-3 sm:h-3.5 bg-white/25" />
+                  <span>{animTracks} tracks</span>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ---- Activity feed ---- */}
       <ActivityFeed />
