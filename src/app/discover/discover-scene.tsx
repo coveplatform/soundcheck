@@ -550,7 +550,6 @@ function Scene({
 
       {/* --- Visual enhancements --- */}
       <NebulaClouds />
-      <ConstellationLines layout={layout} />
       <ShootingStars />
       <HoloGrid />
 
