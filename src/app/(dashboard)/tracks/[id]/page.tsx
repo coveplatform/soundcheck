@@ -18,6 +18,7 @@ import {
   Music,
   CheckCircle2,
   Crown,
+  Play,
 } from "lucide-react";
 import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
 
@@ -194,15 +195,19 @@ export default async function TrackDetailPage({
                 )}
               </div>
 
-              {track.Genre.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {track.Genre.map((genre) => (
-                    <span key={genre.id} className="px-2.5 py-0.5 bg-black/5 rounded-full text-xs font-bold text-black/50">
-                      {genre.name}
-                    </span>
-                  ))}
-                </div>
-              )}
+              <div className="flex flex-wrap items-center gap-1.5 mb-3">
+                {track.Genre.map((genre) => (
+                  <span key={genre.id} className="px-2.5 py-0.5 bg-black/5 rounded-full text-xs font-bold text-black/50">
+                    {genre.name}
+                  </span>
+                ))}
+                {(track.publicPlayCount ?? 0) > 0 && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-black/5 rounded-full text-xs font-bold text-black/50">
+                    <Play className="w-3 h-3 fill-black/40 text-black/40" />
+                    {track.publicPlayCount.toLocaleString()} plays
+                  </span>
+                )}
+              </div>
 
               {track.reviewsRequested > 0 && (
                 <div className="flex items-center gap-4">

@@ -2,17 +2,17 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-/* ── Banjo-Kazooie quaver config ──────────────────────────── */
-// Positions chosen to sit in gaps around the text content:
-//   Content occupies roughly y 15%-85% of the panel, with p-10/p-14 padding.
-//   Notes go in: top corners, side edges in padding zone, bottom edge.
-const NOTES = [
+/* ── Beamed quaver pair config (♫) ────────────────────────── */
+// Each entry is a PAIR of notes joined by a beam.
+// Positions: avoid the text content zone (roughly y 20%-80%).
+// The cy is where the NOTE HEADS sit; stems + beam grow upward from there.
+const PAIRS = [
   {
     id: 0,
-    cx: 0.14,
-    cy: 0.04,
-    size: 30,
-    tilt: -15,
+    cx: 0.22,
+    cy: 0.15,
+    size: 22,
+    tilt: -8,
     bob: 0,
     fill: "#facc15",
     stroke: "#92400e",
@@ -20,52 +20,52 @@ const NOTES = [
   },
   {
     id: 1,
-    cx: 0.88,
-    cy: 0.06,
-    size: 26,
-    tilt: 12,
-    bob: 0.7,
+    cx: 0.78,
+    cy: 0.14,
+    size: 18,
+    tilt: 10,
+    bob: 0.8,
     fill: "#f472b6",
     stroke: "#881337",
     highlight: "#fbcfe8",
   },
   {
     id: 2,
-    cx: 0.92,
-    cy: 0.44,
-    size: 32,
-    tilt: 8,
-    bob: 1.4,
+    cx: 0.88,
+    cy: 0.48,
+    size: 20,
+    tilt: 6,
+    bob: 1.5,
     fill: "#60a5fa",
     stroke: "#1e3a8a",
     highlight: "#bfdbfe",
   },
   {
     id: 3,
-    cx: 0.06,
-    cy: 0.76,
-    size: 28,
-    tilt: -10,
-    bob: 2.1,
+    cx: 0.12,
+    cy: 0.82,
+    size: 20,
+    tilt: -7,
+    bob: 2.2,
     fill: "#4ade80",
     stroke: "#14532d",
     highlight: "#bbf7d0",
   },
   {
     id: 4,
-    cx: 0.82,
-    cy: 0.95,
-    size: 24,
-    tilt: 14,
-    bob: 2.8,
+    cx: 0.75,
+    cy: 0.90,
+    size: 16,
+    tilt: 12,
+    bob: 2.9,
     fill: "#c084fc",
     stroke: "#581c87",
     highlight: "#e9d5ff",
   },
 ];
 
-const MAX_STEM = 36;
-const BASE_STEM = 22;
+const MAX_STEM_EXTRA = 60;
+const BASE_STEM = 50;
 const NEAR_PX = 150;
 const EASE = "cubic-bezier(.34,1.56,.64,1)";
 
@@ -73,9 +73,13 @@ function clamp(v: number, lo: number, hi: number) {
   return Math.max(lo, Math.min(hi, v));
 }
 
-/* ── Quaver Head (the face — sits at BOTTOM) ──────────────── */
-function QuaverHead({
+/* ── Beamed quaver pair: all-in-one SVG ♫ ─────────────────── */
+// Two note heads at the bottom, two stems going up, one thick beam across the top.
+// The whole thing is rendered as a single SVG so alignment is pixel-perfect.
+function BeamedQuaverSvg({
   size,
+  stemH,
+  bend,
   eyeX,
   eyeY,
   stretch,
@@ -85,6 +89,8 @@ function QuaverHead({
   highlight,
 }: {
   size: number;
+  stemH: number;
+  bend: number; // 0-1, how much the stems curve toward the form
   eyeX: number;
   eyeY: number;
   stretch: number;
@@ -93,207 +99,196 @@ function QuaverHead({
   stroke: string;
   highlight: string;
 }) {
-  const w = size * 1.15;
-  const h = size * 0.95;
-  const cx = w * 0.50;
-  const cy = h * 0.50;
-  const rx = size * 0.52;
-  const ry = size * 0.38;
+  // note head dimensions
+  const headRx = size * 0.52;
+  const headRy = size * 0.38;
+  const headW = headRx * 2 + 4;
+  const gap = size * 1.5;
+  const headsW = headW + gap + 12;
+  // extra space on left for bent stems, and extra vertical for beam rotation
+  const stemGapX = gap + headRx; // horizontal distance between stem bases
+  const bendRoom = stemH * bend * 1.1;
+  const maxVGap = stemGapX * 0.25; // tight cap so beam stays compact
+  const vertExtra = maxVGap * bend * 0.4;
+  const totalW = headsW + bendRoom;
+  const headAreaH = headRy * 2 + 6;
+  const stemW = Math.max(2.5, size * 0.13);
+  const beamH = Math.max(4, size * 0.18);
+  const totalH = headAreaH + stemH + beamH + vertExtra;
 
-  // big cartoon eyes
-  const eyeR = size * (0.15 + stretch * 0.02);
-  const pupilR = size * (near ? 0.065 : 0.085);
+  // heads are on the RIGHT side of the SVG (fixed, upright)
+  const headOffset = bendRoom;
+  const head1Cx = headOffset + headsW * 0.25;
+  const head2Cx = headOffset + headsW * 0.75;
+  const headCy = totalH - headAreaH / 2;
+  const stemBot1 = headCy - headRy * 0.3;
+  const stemBot2 = headCy - headRy * 0.3;
+  const stem1BotX = head1Cx + headRx * 0.55;
+  const stem2BotX = head2Cx + headRx * 0.55;
+
+  // At rest: stem tops side by side horizontally, beam is horizontal
+  // At full bend: stem tops stacked vertically on the left, beam is ~vertical
+  // Each stem displaces from its OWN bottom to avoid crossing
+  const topDisplace = stemH * bend * 1.05;
+  const vGap = maxVGap * bend; // vertical separation grows but capped
+
+  // Left head → lower beam point, Right head → upper beam point
+  // This "fan" pattern keeps stems in their own lanes
+  const stem1TopX = stem1BotX - topDisplace;
+  const stem2TopX = stem2BotX - topDisplace;
+  const baseStemTopY = beamH + vertExtra / 2;
+  const stem1TopY = baseStemTopY + vGap / 2; // lower (left head fans down-left)
+  const stem2TopY = baseStemTopY - vGap / 2; // upper (right head fans up-left)
+
+  // L-bend bezier: stem goes straight UP then curves to its target
+  function stemPath(botX: number, botY: number, topX: number, topY: number) {
+    const cp1x = botX;
+    const cp1y = topY; // directly above bottom = vertical lower portion
+    const cp2x = botX;
+    const cp2y = topY; // creates sharp L-corner
+    return `M ${botX} ${botY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${topX} ${topY}`;
+  }
+
+  // eye params
+  const eyeR = size * (0.16 + stretch * 0.02);
+  const pupilR = size * (near ? 0.07 : 0.09);
   const shineR = size * 0.035;
-  const eyeGap = size * 0.19;
-  const eyeCY = cy - size * 0.02;
-  const maxMove = eyeR * 0.42;
+  const eyeGap = size * 0.17;
+  const maxMove = eyeR * 0.40;
 
-  // mouth
-  const mouthCY = cy + size * 0.22;
-
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} width={w} height={h} className="overflow-visible block">
-      {/* drop shadow */}
-      <ellipse
-        cx={cx + 1.5}
-        cy={cy + 2}
-        rx={rx}
-        ry={ry}
-        transform={`rotate(-20, ${cx + 1.5}, ${cy + 2})`}
-        fill="rgba(0,0,0,0.22)"
-      />
-
-      {/* note head — solid, chunky, tilted oval */}
-      <ellipse
-        cx={cx}
-        cy={cy}
-        rx={rx}
-        ry={ry}
-        transform={`rotate(-20, ${cx}, ${cy})`}
-        fill={fill}
-        stroke={stroke}
-        strokeWidth={2.5}
-      />
-
-      {/* glossy highlight */}
-      <ellipse
-        cx={cx - rx * 0.22}
-        cy={cy - ry * 0.30}
-        rx={rx * 0.32}
-        ry={ry * 0.25}
-        transform={`rotate(-20, ${cx - rx * 0.22}, ${cy - ry * 0.30})`}
-        fill={highlight}
-        opacity={0.55}
-      />
-
-      {/* left eye */}
-      <circle cx={cx - eyeGap} cy={eyeCY} r={eyeR} fill="white" stroke={stroke} strokeWidth={1.3} />
-      <circle
-        cx={cx - eyeGap + eyeX * maxMove}
-        cy={eyeCY + eyeY * maxMove}
-        r={pupilR}
-        fill="#0f0a1a"
-      />
-      <circle
-        cx={cx - eyeGap + eyeX * maxMove * 0.1 + shineR * 0.5}
-        cy={eyeCY + eyeY * maxMove * 0.1 - shineR}
-        r={shineR}
-        fill="white"
-      />
-
-      {/* right eye */}
-      <circle cx={cx + eyeGap} cy={eyeCY} r={eyeR} fill="white" stroke={stroke} strokeWidth={1.3} />
-      <circle
-        cx={cx + eyeGap + eyeX * maxMove}
-        cy={eyeCY + eyeY * maxMove}
-        r={pupilR}
-        fill="#0f0a1a"
-      />
-      <circle
-        cx={cx + eyeGap + eyeX * maxMove * 0.1 + shineR * 0.5}
-        cy={eyeCY + eyeY * maxMove * 0.1 - shineR}
-        r={shineR}
-        fill="white"
-      />
-
-      {/* blush */}
-      {near && (
-        <>
-          <ellipse
-            cx={cx - eyeGap - eyeR * 0.5}
-            cy={eyeCY + eyeR * 1.1}
-            rx={size * 0.055}
-            ry={size * 0.035}
-            fill="rgba(255,100,150,0.40)"
-          />
-          <ellipse
-            cx={cx + eyeGap + eyeR * 0.5}
-            cy={eyeCY + eyeR * 1.1}
-            rx={size * 0.055}
-            ry={size * 0.035}
-            fill="rgba(255,100,150,0.40)"
-          />
-        </>
-      )}
-
-      {/* mouth */}
-      {stretch > 0.2 ? (
+  function renderHead(hcx: number) {
+    const hcy = headCy;
+    return (
+      <>
+        {/* shadow */}
         <ellipse
-          cx={cx}
-          cy={mouthCY}
-          rx={size * 0.055 + stretch * size * 0.03}
-          ry={size * 0.045 + stretch * size * 0.025}
-          fill={stroke}
-          opacity={0.65}
+          cx={hcx + 1.5}
+          cy={hcy + 1.5}
+          rx={headRx}
+          ry={headRy}
+          transform={`rotate(-18, ${hcx + 1.5}, ${hcy + 1.5})`}
+          fill="rgba(0,0,0,0.20)"
         />
-      ) : (
-        <path
-          d={`M ${cx - size * 0.06} ${mouthCY} Q ${cx} ${mouthCY + size * 0.06} ${cx + size * 0.06} ${mouthCY}`}
-          fill="none"
+        {/* head fill */}
+        <ellipse
+          cx={hcx}
+          cy={hcy}
+          rx={headRx}
+          ry={headRy}
+          transform={`rotate(-18, ${hcx}, ${hcy})`}
+          fill={fill}
           stroke={stroke}
-          strokeWidth={1.8}
-          strokeLinecap="round"
+          strokeWidth={2.2}
         />
-      )}
-    </svg>
-  );
-}
-
-/* ── Stem going UP + curly flag at top (proper ♪ quaver) ──── */
-function QuaverStem({
-  size,
-  stemH,
-  headX,
-  fill,
-  stroke,
-}: {
-  size: number;
-  stemH: number;
-  headX: number;
-  fill: string;
-  stroke: string;
-}) {
-  const stemW = 3;
-  const w = size * 1.6;
-  const h = stemH + 4;
-  // stem attaches to right side of note head
-  const stemX = w * 0.55;
-
-  // stem bows when head shifts
-  const bowX = headX * 0.3;
-  const midY = h * 0.5;
-
-  // flag starts at TOP of stem (y=0) and curls to the right
-  const flagStartX = stemX + headX * 0.6;
+        {/* highlight */}
+        <ellipse
+          cx={hcx - headRx * 0.20}
+          cy={hcy - headRy * 0.28}
+          rx={headRx * 0.30}
+          ry={headRy * 0.22}
+          transform={`rotate(-18, ${hcx - headRx * 0.20}, ${hcy - headRy * 0.28})`}
+          fill={highlight}
+          opacity={0.50}
+        />
+        {/* left eye */}
+        <circle cx={hcx - eyeGap} cy={hcy} r={eyeR} fill="white" stroke={stroke} strokeWidth={1.1} />
+        <circle
+          cx={hcx - eyeGap + eyeX * maxMove}
+          cy={hcy + eyeY * maxMove}
+          r={pupilR}
+          fill="#0f0a1a"
+        />
+        <circle
+          cx={hcx - eyeGap + eyeX * maxMove * 0.1 + shineR * 0.5}
+          cy={hcy + eyeY * maxMove * 0.1 - shineR}
+          r={shineR}
+          fill="white"
+        />
+        {/* right eye */}
+        <circle cx={hcx + eyeGap} cy={hcy} r={eyeR} fill="white" stroke={stroke} strokeWidth={1.1} />
+        <circle
+          cx={hcx + eyeGap + eyeX * maxMove}
+          cy={hcy + eyeY * maxMove}
+          r={pupilR}
+          fill="#0f0a1a"
+        />
+        <circle
+          cx={hcx + eyeGap + eyeX * maxMove * 0.1 + shineR * 0.5}
+          cy={hcy + eyeY * maxMove * 0.1 - shineR}
+          r={shineR}
+          fill="white"
+        />
+        {/* blush */}
+        {near && (
+          <>
+            <ellipse
+              cx={hcx - eyeGap - eyeR * 0.4}
+              cy={hcy + eyeR * 1.05}
+              rx={size * 0.05}
+              ry={size * 0.03}
+              fill="rgba(255,100,150,0.40)"
+            />
+            <ellipse
+              cx={hcx + eyeGap + eyeR * 0.4}
+              cy={hcy + eyeR * 1.05}
+              rx={size * 0.05}
+              ry={size * 0.03}
+              fill="rgba(255,100,150,0.40)"
+            />
+          </>
+        )}
+        {/* mouth */}
+        {stretch > 0.2 ? (
+          <ellipse
+            cx={hcx}
+            cy={hcy + size * 0.22}
+            rx={size * 0.05 + stretch * size * 0.025}
+            ry={size * 0.04 + stretch * size * 0.02}
+            fill={stroke}
+            opacity={0.6}
+          />
+        ) : (
+          <path
+            d={`M ${hcx - size * 0.05} ${hcy + size * 0.20} Q ${hcx} ${hcy + size * 0.26} ${hcx + size * 0.05} ${hcy + size * 0.20}`}
+            fill="none"
+            stroke={stroke}
+            strokeWidth={1.5}
+            strokeLinecap="round"
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <svg
-      viewBox={`0 0 ${w} ${h}`}
-      width={w}
-      height={h}
+      viewBox={`0 0 ${totalW} ${totalH}`}
+      width={totalW}
+      height={totalH}
       className="overflow-visible block"
-      style={{ marginBottom: -4 }}
     >
-      {/* stem shadow */}
-      <path
-        d={`M ${stemX + 1.5} ${h} Q ${stemX + bowX + 1.5} ${midY} ${flagStartX + 1.5} 1.5`}
-        fill="none"
-        stroke="rgba(0,0,0,0.15)"
-        strokeWidth={stemW + 1}
-        strokeLinecap="round"
-      />
-      {/* stem */}
-      <path
-        d={`M ${stemX} ${h} Q ${stemX + bowX} ${midY} ${flagStartX} 0`}
-        fill="none"
-        stroke={stroke}
-        strokeWidth={stemW}
-        strokeLinecap="round"
-      />
+      {/* stem shadows */}
+      <path d={stemPath(stem1BotX + 1, stemBot1 + 1, stem1TopX + 1, stem1TopY + 1)} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth={stemW + 1} strokeLinecap="round" />
+      <path d={stemPath(stem2BotX + 1, stemBot2 + 1, stem2TopX + 1, stem2TopY + 1)} fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth={stemW + 1} strokeLinecap="round" />
 
-      {/* curly flag at TOP — curves right then down */}
-      {/* flag shadow */}
-      <path
-        d={`M ${flagStartX + 1} 1 C ${flagStartX + size * 0.6} ${size * 0.05}, ${flagStartX + size * 0.55} ${size * 0.4}, ${flagStartX + size * 0.15} ${size * 0.6}`}
-        fill="none"
-        stroke="rgba(0,0,0,0.12)"
-        strokeWidth={4.5}
-        strokeLinecap="round"
-      />
-      {/* flag colored */}
-      <path
-        d={`M ${flagStartX} 0 C ${flagStartX + size * 0.6} ${size * 0.05}, ${flagStartX + size * 0.55} ${size * 0.4}, ${flagStartX + size * 0.15} ${size * 0.6}`}
-        fill="none"
-        stroke={fill}
-        strokeWidth={3.5}
-        strokeLinecap="round"
-      />
+      {/* stems — L-bend curves that bow left */}
+      <path d={stemPath(stem1BotX, stemBot1, stem1TopX, stem1TopY)} fill="none" stroke={stroke} strokeWidth={stemW} strokeLinecap="round" />
+      <path d={stemPath(stem2BotX, stemBot2, stem2TopX, stem2TopY)} fill="none" stroke={stroke} strokeWidth={stemW} strokeLinecap="round" />
+
+      {/* beam — connects two stem tops, rotates from horizontal to vertical */}
+      <line x1={stem1TopX + 1} y1={stem1TopY + 1} x2={stem2TopX + 1} y2={stem2TopY + 1} stroke="rgba(0,0,0,0.15)" strokeWidth={beamH + 1} strokeLinecap="round" />
+      <line x1={stem1TopX} y1={stem1TopY} x2={stem2TopX} y2={stem2TopY} stroke={fill} strokeWidth={beamH} strokeLinecap="round" />
+      <line x1={stem1TopX} y1={stem1TopY} x2={stem2TopX} y2={stem2TopY} stroke={stroke} strokeWidth={beamH} strokeLinecap="round" opacity={0.3} />
+
+      {/* note heads */}
+      {renderHead(head1Cx)}
+      {renderHead(head2Cx)}
     </svg>
   );
 }
 
-/* ── Full quaver character ────────────────────────────────── */
-function QuaverCharacter({
+/* ── Full beamed quaver character ─────────────────────────── */
+function BeamedQuaver({
   size,
   tilt,
   eyeX,
@@ -318,11 +313,10 @@ function QuaverCharacter({
   stroke: string;
   highlight: string;
 }) {
-  const stretch = stemExtra / MAX_STEM;
+  const stretch = stemExtra / MAX_STEM_EXTRA;
   const totalStem = BASE_STEM + stemExtra;
 
   return (
-    /* idle bob */
     <div
       style={{
         animationName: "speaker-idle",
@@ -332,56 +326,26 @@ function QuaverCharacter({
         animationIterationCount: "infinite",
       }}
     >
-      {/* tilt */}
       <div style={{ transform: `rotate(${tilt}deg)` }}>
-        {/* proximity scale */}
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
             transform: near ? "scale(1.15)" : "scale(1)",
             transition: `transform 0.4s ${EASE}`,
             willChange: "transform",
           }}
         >
-          {/* stem + flag on TOP (grows upward) */}
-          <div
-            style={{
-              height: totalStem,
-              transition: `height 0.5s ${EASE}`,
-              willChange: "height",
-              overflow: "visible",
-            }}
-          >
-            <QuaverStem
-              size={size}
-              stemH={totalStem}
-              headX={headX}
-              fill={fill}
-              stroke={stroke}
-            />
-          </div>
-
-          {/* note head (face) at BOTTOM — shifts + tilts */}
-          <div
-            style={{
-              transform: `translateX(${headX}px) rotate(${headX * 0.4}deg)`,
-              transition: `transform 0.5s ${EASE}`,
-              willChange: "transform",
-            }}
-          >
-            <QuaverHead
-              size={size}
-              eyeX={eyeX}
-              eyeY={eyeY}
-              stretch={stretch}
-              near={near}
-              fill={fill}
-              stroke={stroke}
-              highlight={highlight}
-            />
-          </div>
+          <BeamedQuaverSvg
+            size={size}
+            stemH={totalStem}
+            bend={stretch}
+            eyeX={eyeX}
+            eyeY={eyeY}
+            stretch={stretch}
+            near={near}
+            fill={fill}
+            stroke={stroke}
+            highlight={highlight}
+          />
         </div>
       </div>
     </div>
@@ -436,7 +400,7 @@ export function SpeakerBuddies() {
       className="absolute inset-0 pointer-events-none overflow-hidden"
       aria-hidden="true"
     >
-      {NOTES.map((note) => {
+      {PAIRS.map((p) => {
         let eyeX = 0;
         let eyeY = 0;
         let stemExtra = 0;
@@ -444,8 +408,8 @@ export function SpeakerBuddies() {
         let near = false;
 
         if (rect) {
-          const sx = rect.left + note.cx * rect.width;
-          const sy = rect.top + note.cy * rect.height;
+          const sx = rect.left + p.cx * rect.width;
+          const sy = rect.top + p.cy * rect.height;
           const dx = mouse.x - sx;
           const dy = mouse.y - sy;
           const dist = Math.sqrt(dx * dx + dy * dy);
@@ -457,9 +421,12 @@ export function SpeakerBuddies() {
 
           const relX = (mouse.x - rect.left) / rect.width;
           if (relX < 0) {
-            const factor = clamp(Math.abs(relX), 0, 0.55);
-            stemExtra = factor * (MAX_STEM / 0.55);
-            headX = clamp(-factor * 25, -18, 0);
+            // wider range (1.2) so full extend needs cursor far into the form
+            // easeIn power curve so it starts slow and accelerates
+            const raw = clamp(Math.abs(relX), 0, 1.2);
+            const factor = Math.pow(raw / 1.2, 1.8); // 0-1 with easeIn
+            stemExtra = factor * MAX_STEM_EXTRA;
+            headX = clamp(-factor * 28, -28, 0);
           }
 
           near = dist < NEAR_PX;
@@ -467,26 +434,27 @@ export function SpeakerBuddies() {
 
         return (
           <div
-            key={note.id}
+            key={p.id}
             className="absolute"
             style={{
-              left: `${note.cx * 100}%`,
-              top: `${note.cy * 100}%`,
+              left: `${p.cx * 100}%`,
+              top: `${p.cy * 100}%`,
               transform: "translate(-50%, -100%)",
+              transformOrigin: "right bottom",
             }}
           >
-            <QuaverCharacter
-              size={note.size}
-              tilt={note.tilt}
+            <BeamedQuaver
+              size={p.size}
+              tilt={p.tilt}
               eyeX={eyeX}
               eyeY={eyeY}
               stemExtra={stemExtra}
               headX={headX}
               near={near}
-              bobDelay={note.bob}
-              fill={note.fill}
-              stroke={note.stroke}
-              highlight={note.highlight}
+              bobDelay={p.bob}
+              fill={p.fill}
+              stroke={p.stroke}
+              highlight={p.highlight}
             />
           </div>
         );

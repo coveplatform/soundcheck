@@ -5,7 +5,7 @@ import Image from "next/image";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Plus, Music, ArrowRight, CheckCircle2, Lock, Crown } from "lucide-react";
+import { Plus, Music, ArrowRight, CheckCircle2, Lock, Crown, Play } from "lucide-react";
 import { SquiggleDoodle, StarDoodle } from "@/components/dashboard/doodles";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -468,6 +468,7 @@ export default async function TracksPage({
                       reviewProgress={reviewProgress}
                       completedReviews={completedReviews}
                       totalReviews={track.reviewsRequested}
+                      playCount={track.publicPlayCount ?? 0}
                     />
                   );
                 })}
@@ -498,6 +499,7 @@ function TrackCard({
   reviewProgress,
   completedReviews,
   totalReviews,
+  playCount,
 }: {
   id: string;
   title: string;
@@ -507,6 +509,7 @@ function TrackCard({
   reviewProgress: number;
   completedReviews: number;
   totalReviews: number;
+  playCount: number;
 }) {
   const isPending = status === "PENDING_PAYMENT";
   const isReviewing = status === "IN_PROGRESS" || status === "QUEUED";
@@ -561,9 +564,14 @@ function TrackCard({
       </div>
 
       <p className="text-[12px] font-black text-black mt-2.5 truncate leading-tight">{title}</p>
-      {!hasReviews && isUploaded && (
+      {playCount > 0 ? (
+        <p className="flex items-center gap-1 text-[10px] font-bold text-black/40 mt-0.5">
+          <Play className="w-2.5 h-2.5 fill-black/30 text-black/30" />
+          {playCount.toLocaleString()}
+        </p>
+      ) : !hasReviews && isUploaded ? (
         <p className="text-[10px] font-black text-purple-600 uppercase tracking-wider mt-0.5">Get reviews →</p>
-      )}
+      ) : null}
     </Link>
   );
 }
