@@ -232,12 +232,6 @@ export function createMockReview(overrides: Partial<Review> = {}): Review {
     strongestElement: null,
     biggestRisk: null,
     competitiveBenchmark: null,
-    // FIE fields
-    textQualityScore: null,
-    textSpecificity: null,
-    textActionability: null,
-    textTechnicalDepth: null,
-    behavioralAlignment: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,

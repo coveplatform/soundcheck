@@ -13,7 +13,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { WordCounter, countWords } from "@/components/ui/word-counter";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, Download, ShoppingCart, SkipForward, VolumeX } from "lucide-react";
-import { useListenBehavior } from "@/hooks/use-listen-behavior";
 import {
   Dialog,
   DialogContent,
@@ -91,12 +90,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [qualityLevel, setQualityLevel] = useState<string | null>(null);
 
   const [audioDuration, setAudioDuration] = useState(0);
-
-  // Behavioral Listening Intelligence
-  const listenBehavior = useListenBehavior({
-    trackDuration: audioDuration,
-    enabled: !isLoading && !!review && review.status !== "COMPLETED" && !success,
-  });
 
   // Section refs for scroll-to functionality
   const firstImpressionRef = useRef<HTMLDivElement>(null);
@@ -418,22 +411,13 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     setIsSubmitting(true);
 
     try {
-      // Flush behavioral listening data before submission
+      // Send a final heartbeat with client listen time before submission
       try {
-        listenBehavior.finalFlush();
-      } catch {
-        // Non-fatal
-      }
-
-      // Send a final heartbeat with client listen time + behavioral metrics
-      try {
-        const behaviorMetrics = listenBehavior.getMetrics();
         await fetch(`/api/reviews/${review.id}/heartbeat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             clientListenTime: Math.floor(listenTime),
-            behaviorMetrics,
           }),
         });
       } catch {
@@ -1288,11 +1272,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               addTimestampNote(seconds);
             }}
             showListenTracker
-            onBehaviorPlay={listenBehavior.onPlay}
-            onBehaviorPause={listenBehavior.onPause}
-            onBehaviorTimeUpdate={listenBehavior.onTimeUpdate}
-            onBehaviorVolumeChange={listenBehavior.onVolumeChange}
-            onBehaviorMuteToggle={listenBehavior.onMuteToggle}
           />
 
           {/* Timestamp quick access - visible on mobile */}

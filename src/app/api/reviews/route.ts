@@ -7,7 +7,6 @@ import { z } from "zod";
 import { updateReviewerTier, getTierRateCents, updateReviewerAverageRating, isPeerReviewerPro, TIER_RATES } from "@/lib/queue";
 import { sendReviewProgressEmail, sendListenerIntentEmail } from "@/lib/email";
 import { randomBytes } from "crypto";
-import { scoreReviewTextQuality, computeBehavioralAlignment } from "@/lib/feedback-intelligence";
 
 const MIN_LISTEN_SECONDS = 180;
 
@@ -615,66 +614,6 @@ export async function POST(request: Request) {
     }
 
     await updateReviewerTier(review.reviewerId);
-
-    // ── Feedback Intelligence Engine: post-submission scoring ──
-    try {
-      const submittedReview = result.updatedReview;
-      if (submittedReview) {
-        // Text quality scoring
-        const textResult = scoreReviewTextQuality({
-          bestPart: submittedReview.bestPart ?? "",
-          weakestPart: submittedReview.weakestPart ?? "",
-          biggestWeaknessSpecific: submittedReview.biggestWeaknessSpecific ?? "",
-        });
-
-        // Behavioral alignment — fetch stored ListenBehavior
-        let alignmentScore: number | null = null;
-        const listenBehavior = await prisma.listenBehavior.findUnique({
-          where: { reviewId: submittedReview.id },
-        });
-        if (listenBehavior) {
-          const metrics = {
-            completionRate: listenBehavior.completionRate,
-            attentionScore: listenBehavior.attentionScore,
-            firstSkipAt: listenBehavior.firstSkipAt,
-            replayZones: (listenBehavior.replayZones ?? []) as any[],
-            skipZones: (listenBehavior.skipZones ?? []) as any[],
-            pausePoints: (listenBehavior.pausePoints ?? []) as any[],
-            engagementCurve: (listenBehavior.engagementCurve ?? []) as number[],
-            uniqueSecondsHeard: listenBehavior.uniqueSecondsHeard,
-            totalEvents: listenBehavior.totalEvents,
-          };
-          const explicit = {
-            firstImpression: submittedReview.firstImpression,
-            wouldListenAgain: submittedReview.wouldListenAgain,
-            bestPart: submittedReview.bestPart,
-            qualityLevel: submittedReview.qualityLevel,
-          };
-          const alignment = computeBehavioralAlignment(metrics, explicit, listenBehavior.trackDuration ?? 0);
-          alignmentScore = alignment.score;
-
-          // Save alignment score back to ListenBehavior
-          await prisma.listenBehavior.update({
-            where: { reviewId: submittedReview.id },
-            data: { behavioralAlignmentScore: alignmentScore },
-          });
-        }
-
-        // Update Review with FIE scores
-        await prisma.review.update({
-          where: { id: submittedReview.id },
-          data: {
-            textQualityScore: textResult.compositeOverall,
-            textSpecificity: textResult.compositeSpecificity,
-            textActionability: textResult.compositeActionability,
-            textTechnicalDepth: textResult.compositeTechnicalDepth,
-            behavioralAlignment: alignmentScore,
-          },
-        });
-      }
-    } catch (fieError) {
-      console.error("[FIE] Post-submission scoring failed (non-fatal):", fieError);
-    }
 
     // Auto-trigger Release Decision report generation if all reviews are complete
     if (review.Track.packageType === "RELEASE_DECISION" && result.updatedReview) {

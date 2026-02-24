@@ -9,7 +9,6 @@ import { AudioPlayer } from "@/components/audio/audio-player";
 import { TrackDashboardTabs } from "@/components/tracks/track-dashboard-tabs";
 import { StatsTab } from "@/components/tracks/stats-tab";
 import { ReviewsTab } from "@/components/tracks/reviews-tab";
-import { BehavioralInsights } from "@/components/tracks/behavioral-insights";
 import { SettingsTab } from "@/components/tracks/settings-tab";
 import { ReleaseDecisionReportView } from "@/components/tracks/release-decision-report-view";
 import {
@@ -62,7 +61,6 @@ export default async function TrackDetailPage({
                 User: { select: { name: true } },
               },
             },
-            ListenBehavior: true,
           },
           orderBy: { createdAt: "asc" },
         },
@@ -302,23 +300,14 @@ export default async function TrackDetailPage({
             trackTitle={track.title}
             hasCompletedReviews={completedReviews > 0}
             statsTab={
-              <div className="space-y-6">
-                <StatsTab
-                  reviews={track.Review}
-                  platformAverages={{
-                    production: platformStats._avg.productionScore ?? 0,
-                    originality: platformStats._avg.originalityScore ?? 0,
-                    vocals: platformStats._avg.vocalScore ?? 0,
-                  }}
-                />
-                <BehavioralInsights
-                  behaviors={
-                    track.Review
-                      .map((r: any) => r.ListenBehavior)
-                      .filter(Boolean)
-                  }
-                />
-              </div>
+              <StatsTab
+                reviews={track.Review}
+                platformAverages={{
+                  production: platformStats._avg.productionScore ?? 0,
+                  originality: platformStats._avg.originalityScore ?? 0,
+                  vocals: platformStats._avg.vocalScore ?? 0,
+                }}
+              />
             }
             reviewsTab={
               <ReviewsTab reviews={track.Review} trackId={track.id} />
