@@ -72,7 +72,13 @@ export default async function DiscoverPage() {
     createdAt: true,
     reviewsRequested: true,
     reviewsCompleted: true,
+    publicPlayCount: true,
     ArtistProfile: { select: { artistName: true } },
+    Genre: { select: { name: true }, take: 1 },
+    Review: {
+      where: { status: "COMPLETED" as const },
+      select: { productionScore: true, vocalScore: true, originalityScore: true },
+    },
   };
 
   type DiscoverTrack = Awaited<ReturnType<typeof prisma.track.findMany<{ where: typeof trackWhere; select: typeof trackSelect }>>>[number];
@@ -130,14 +136,32 @@ export default async function DiscoverPage() {
   // Map DB tracks → DiscoverTrackData shape
   const sceneData: DiscoverTrackData[] =
     tracks.length > 0
-      ? tracks.map((t) => ({
-          id: t.id,
-          title: t.title,
-          artistName: t.ArtistProfile?.artistName ?? "Unknown",
-          artworkUrl: t.artworkUrl ?? null,
-          sourceUrl: t.sourceUrl ?? "/signup",
-          isDemo: false,
-        }))
+      ? tracks.map((t) => {
+          // Compute average rating from completed review scores (1-5 scale)
+          const scores = t.Review.flatMap((r) =>
+            [r.productionScore, r.vocalScore, r.originalityScore].filter(
+              (s): s is number => s != null
+            )
+          );
+          const avgRating =
+            scores.length > 0
+              ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10
+              : undefined;
+
+          return {
+            id: t.id,
+            title: t.title,
+            artistName: t.ArtistProfile?.artistName ?? "Unknown",
+            artworkUrl: t.artworkUrl ?? null,
+            sourceUrl: t.sourceUrl ?? "/signup",
+            isDemo: false,
+            genre: t.Genre[0]?.name ?? undefined,
+            playCount: t.publicPlayCount > 0 ? t.publicPlayCount : undefined,
+            reviewCount: t.reviewsCompleted > 0 ? t.reviewsCompleted : undefined,
+            rating: avgRating,
+            isFeatured: (avgRating ?? 0) >= 4.0 && t.reviewsCompleted >= 3,
+          };
+        })
       : DEMO_TILES;
 
   return <DiscoverScene tracks={sceneData} />;
