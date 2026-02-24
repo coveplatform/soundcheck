@@ -9,7 +9,7 @@ import { hasAvailableSlot } from "@/lib/slots";
 
 const createTrackSchema = z.object({
   sourceUrl: z.string().min(1, "Track source is required"),
-  sourceType: z.enum(["SOUNDCLOUD", "BANDCAMP", "YOUTUBE", "SPOTIFY", "UPLOAD"]).optional(),
+  sourceType: z.enum(["SOUNDCLOUD", "BANDCAMP", "YOUTUBE", "UPLOAD"]).optional(),
   title: z.string().min(1, "Title is required").max(200),
   artworkUrl: z.string().url().optional().nullable(),
   duration: z.number().int().positive().max(60 * 60).optional(),

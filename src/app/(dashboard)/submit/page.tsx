@@ -618,7 +618,7 @@ export default function SubmitTrackPage() {
             {uploadMode === "link" && (
               <div className="space-y-3">
                 <Input
-                  placeholder="Paste SoundCloud, Bandcamp, YouTube, or Spotify link"
+                  placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
                   value={url}
                   onChange={(e) => handleUrlChange(e.target.value)}
                   className={cn(
@@ -657,7 +657,7 @@ export default function SubmitTrackPage() {
                       <div className="flex items-center gap-1.5 mt-1">
                         <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                         <span className="text-xs font-bold text-black/40">
-                          {sourceType === "SOUNDCLOUD" ? "SoundCloud" : sourceType === "BANDCAMP" ? "Bandcamp" : sourceType === "YOUTUBE" ? "YouTube" : sourceType === "SPOTIFY" ? "Spotify" : "Ready"}
+                          {sourceType === "SOUNDCLOUD" ? "SoundCloud" : sourceType === "BANDCAMP" ? "Bandcamp" : sourceType === "YOUTUBE" ? "YouTube" : "Ready"}
                         </span>
                       </div>
                     </div>
