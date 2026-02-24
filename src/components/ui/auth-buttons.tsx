@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 export function AuthButtons({
   theme = "light",
@@ -28,44 +29,42 @@ export function AuthButtons({
   }
 
   if (session) {
-    const user = session.user as { isArtist?: boolean; isReviewer?: boolean } | undefined;
-    const dashboardHref = "/dashboard";
-
     return (
-      <Link href={dashboardHref}>
-        <Button
-          className={
-            theme === "dark"
-              ? "bg-purple-600 text-white hover:bg-purple-700 font-medium border-2 border-purple-600"
-              : "bg-black text-white hover:bg-neutral-800 font-medium"
-          }
-        >
-          Dashboard
-        </Button>
+      <Link
+        href="/dashboard"
+        className={cn(
+          buttonVariants(),
+          theme === "dark"
+            ? "bg-purple-600 text-white hover:bg-purple-700 font-medium border-2 border-purple-600"
+            : "bg-black text-white hover:bg-neutral-800 font-medium"
+        )}
+      >
+        Dashboard
       </Link>
     );
   }
 
   return (
     <>
-      <Link href={loginUrl}>
-        <Button
-          variant="ghost"
-          className={theme === "dark" ? "font-medium text-white hover:bg-neutral-900" : "font-medium"}
-        >
-          Sign in
-        </Button>
+      <Link
+        href={loginUrl}
+        className={cn(
+          buttonVariants({ variant: "ghost" }),
+          theme === "dark" ? "font-medium text-white hover:bg-neutral-900" : "font-medium"
+        )}
+      >
+        Sign in
       </Link>
-      <Link href={signupUrl}>
-        <Button
-          className={
-            theme === "dark"
-              ? "bg-purple-600 text-white hover:bg-purple-700 font-medium border-2 border-purple-600"
-              : "bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out"
-          }
-        >
-          Get Started
-        </Button>
+      <Link
+        href={signupUrl}
+        className={cn(
+          buttonVariants(),
+          theme === "dark"
+            ? "bg-purple-600 text-white hover:bg-purple-700 font-medium border-2 border-purple-600"
+            : "bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 ease-out"
+        )}
+      >
+        Get Started
       </Link>
     </>
   );
