@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Send, Eye, Loader2, AlertTriangle, CheckCircle2, Users } from "lucide-react";
+import { ArrowLeft, Send, Eye, Loader2, AlertTriangle, CheckCircle2, Users, Mail } from "lucide-react";
 
 export default function AnnouncementPage() {
   const [previewHtml, setPreviewHtml] = useState("");
@@ -12,6 +12,8 @@ export default function AnnouncementPage() {
   const [sendingAll, setSendingAll] = useState(false);
   const [result, setResult] = useState<{ sent: number; failed: number; total: number; failedEmails?: string[] } | null>(null);
   const [testResult, setTestResult] = useState<string | null>(null);
+  const [sendingTestKris, setSendingTestKris] = useState(false);
+  const [testKrisResult, setTestKrisResult] = useState<string | null>(null);
   const [confirmSendAll, setConfirmSendAll] = useState(false);
 
   useEffect(() => {
@@ -40,6 +42,24 @@ export default function AnnouncementPage() {
       setTestResult("Failed to send test email");
     } finally {
       setSending(false);
+    }
+  };
+
+  const sendTestToKris = async () => {
+    setSendingTestKris(true);
+    setTestKrisResult(null);
+    try {
+      const res = await fetch("/api/admin/send-announcement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ testEmail: "kris.engelhardt4@gmail.com" }),
+      });
+      const data = await res.json();
+      setTestKrisResult(data.success ? "Test email sent to kris.engelhardt4@gmail.com!" : `Failed: ${data.error}`);
+    } catch {
+      setTestKrisResult("Failed to send test email");
+    } finally {
+      setSendingTestKris(false);
     }
   };
 
@@ -99,6 +119,15 @@ export default function AnnouncementPage() {
             Send Test to Me
           </button>
 
+          <button
+            onClick={sendTestToKris}
+            disabled={sendingTestKris}
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            {sendingTestKris ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+            Send Test to Kris
+          </button>
+
           {!confirmSendAll ? (
             <button
               onClick={() => setConfirmSendAll(true)}
@@ -141,6 +170,15 @@ export default function AnnouncementPage() {
           }`}>
             <CheckCircle2 className="h-4 w-4" />
             {testResult}
+          </div>
+        )}
+
+        {testKrisResult && (
+          <div className={`flex items-center gap-2 p-3 rounded-lg mb-4 text-sm font-medium ${
+            testKrisResult.includes("sent") ? "bg-green-50 text-green-800 border border-green-200" : "bg-red-50 text-red-800 border border-red-200"
+          }`}>
+            <CheckCircle2 className="h-4 w-4" />
+            {testKrisResult}
           </div>
         )}
 

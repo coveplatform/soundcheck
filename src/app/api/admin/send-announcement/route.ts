@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { buildAnnouncementEmail, sendAnnouncementEmail } from "@/lib/email";
+import { buildDiscoverAnnouncementEmail, sendDiscoverAnnouncementEmail } from "@/lib/email/announcements";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "").split(",").map((e) => e.trim().toLowerCase());
 
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
   }
 
   // Default: return preview HTML
-  const { html } = buildAnnouncementEmail({ userName: "Test User" });
+  const { html } = buildDiscoverAnnouncementEmail({ userName: "Test User" });
   return new Response(html, { headers: { "Content-Type": "text/html" } });
 }
 
@@ -60,10 +60,20 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { testOnly, retryEmails } = body; // testOnly: send to admin; retryEmails: re-send to specific addresses
+    const { testOnly, testEmail, retryEmails } = body;
 
+    // Send to a specific test email address (e.g. kris.engelhardt4@gmail.com)
+    if (testEmail) {
+      const success = await sendDiscoverAnnouncementEmail({
+        to: testEmail,
+        userName: "Test User",
+      });
+      return NextResponse.json({ success, sent: 1, total: 1 });
+    }
+
+    // Send to the admin's own email
     if (testOnly) {
-      const success = await sendAnnouncementEmail({
+      const success = await sendDiscoverAnnouncementEmail({
         to: session.user.email,
         userName: session.user.name || undefined,
       });
@@ -104,7 +114,7 @@ export async function POST(request: Request) {
       const batch = users.slice(i, i + BATCH_SIZE);
       const results = await Promise.allSettled(
         batch.map((user) =>
-          sendAnnouncementEmail({
+          sendDiscoverAnnouncementEmail({
             to: user.email!,
             userName: user.name || undefined,
           })
