@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useId } from "react";
 import { useListenBehavior } from "@/hooks/use-listen-behavior";
 import {
   computeBehavioralAlignment,
@@ -35,6 +35,41 @@ function formatTime(s: number): string {
 function pct(v: number): string {
   return `${Math.round(v * 100)}%`;
 }
+
+type SourceType = "DIRECT" | "YOUTUBE" | "SOUNDCLOUD" | "BANDCAMP";
+
+function detectSourceType(url: string): SourceType {
+  if (!url) return "DIRECT";
+  const lower = url.toLowerCase();
+  if (lower.includes("youtube.com") || lower.includes("youtu.be")) return "YOUTUBE";
+  if (lower.includes("soundcloud.com")) return "SOUNDCLOUD";
+  if (lower.includes("bandcamp.com")) return "BANDCAMP";
+  return "DIRECT";
+}
+
+function getEmbedUrl(url: string, sourceType: SourceType): string {
+  if (sourceType === "SOUNDCLOUD") {
+    return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%239333ea&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`;
+  }
+  if (sourceType === "YOUTUBE") {
+    try {
+      const parsed = new URL(url);
+      let videoId = parsed.searchParams.get("v");
+      if (!videoId) videoId = parsed.pathname.split("/").pop() || "";
+      return `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+    } catch {
+      return url;
+    }
+  }
+  if (sourceType === "BANDCAMP") {
+    // Bandcamp embeds need album/track ID — show the page in an iframe as fallback
+    return url;
+  }
+  return url;
+}
+
+// YouTube & SoundCloud types (Window.SC / Window.YT already declared in audio-player.tsx)
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // ── Sample tracks for testing ───────────────────────────────────
 
@@ -81,6 +116,12 @@ const QUALITY_OPTIONS = [
 export default function FeedbackEngineSandbox() {
   // ── Audio state ──
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const scIframeRef = useRef<HTMLIFrameElement | null>(null);
+  const scWidgetRef = useRef<any>(null);
+  const ytPlayerRef = useRef<any>(null);
+  const ytReady = useRef(false);
+  const ytContainerId = useId();
+  const embedPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [trackUrl, setTrackUrl] = useState(SAMPLE_TRACKS[1].url);
   const [customUrl, setCustomUrl] = useState("");
   const [useCustomUrl, setUseCustomUrl] = useState(false);
@@ -89,6 +130,9 @@ export default function FeedbackEngineSandbox() {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
+
+  const sourceType = detectSourceType(trackUrl);
+  const isEmbedded = sourceType !== "DIRECT";
 
   // ── Form state ──
   const [firstImpression, setFirstImpression] = useState<string | null>(null);
@@ -118,17 +162,20 @@ export default function FeedbackEngineSandbox() {
 
   // ── Audio player wiring ──
   const togglePlay = useCallback(() => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play().catch(() => { /* interrupted — ignore */ });
+      }
     }
+    // For embeds, playback is controlled via the embed itself
   }, [isPlaying]);
 
   const seek = useCallback((time: number) => {
-    if (!audioRef.current) return;
-    audioRef.current.currentTime = time;
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+    }
   }, []);
 
   const toggleMute = useCallback(() => {
@@ -145,6 +192,104 @@ export default function FeedbackEngineSandbox() {
     setVolume(v);
     behavior.onVolumeChange(v, audioRef.current.currentTime);
   }, [behavior]);
+
+  // ── SoundCloud Widget API ──
+  useEffect(() => {
+    if (sourceType !== "SOUNDCLOUD" || !trackUrl) return;
+    let mounted = true;
+
+    const initWidget = () => {
+      if (!mounted || !scIframeRef.current || !window.SC?.Widget) return;
+      const SC = window.SC as any;
+      const widget = SC.Widget(scIframeRef.current);
+      scWidgetRef.current = widget;
+      widget.bind(SC.Widget.Events.PLAY, () => {
+        if (mounted) { setIsPlaying(true); behavior.onPlay(currentTime); }
+      });
+      widget.bind(SC.Widget.Events.PAUSE, () => {
+        if (mounted) { setIsPlaying(false); behavior.onPause(currentTime); }
+      });
+    };
+
+    if (window.SC?.Widget) {
+      const t = setTimeout(initWidget, 800);
+      return () => { mounted = false; clearTimeout(t); };
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://w.soundcloud.com/player/api.js";
+    script.async = true;
+    script.onload = () => setTimeout(initWidget, 800);
+    document.body.appendChild(script);
+    return () => { mounted = false; };
+  }, [sourceType, trackUrl, behavior, currentTime]);
+
+  // ── YouTube IFrame API ──
+  useEffect(() => {
+    if (sourceType !== "YOUTUBE" || !trackUrl) return;
+    let mounted = true;
+    ytReady.current = false;
+
+    const initPlayer = () => {
+      if (!mounted || !window.YT?.Player) return;
+      try {
+        ytPlayerRef.current = new window.YT.Player(ytContainerId, {
+          events: {
+            onReady: () => { ytReady.current = true; },
+            onStateChange: (event: { data: number }) => {
+              if (!mounted) return;
+              if (event.data === window.YT!.PlayerState.PLAYING) {
+                setIsPlaying(true);
+                behavior.onPlay(ytPlayerRef.current?.getCurrentTime?.() ?? 0);
+              } else if (event.data === window.YT!.PlayerState.PAUSED) {
+                setIsPlaying(false);
+                behavior.onPause(ytPlayerRef.current?.getCurrentTime?.() ?? 0);
+              }
+            },
+          },
+        });
+      } catch { /* ignore */ }
+    };
+
+    if (window.YT?.Player) {
+      const t = setTimeout(initPlayer, 800);
+      return () => { mounted = false; clearTimeout(t); };
+    }
+
+    const existing = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => { existing?.(); setTimeout(initPlayer, 500); };
+    const script = document.createElement("script");
+    script.src = "https://www.youtube.com/iframe_api";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      mounted = false;
+      try { ytPlayerRef.current?.destroy(); } catch { /* ignore */ }
+    };
+  }, [sourceType, trackUrl, ytContainerId, behavior]);
+
+  // ── Embed time polling (SC + YT) ──
+  useEffect(() => {
+    if (!isEmbedded || !trackUrl) return;
+    embedPollRef.current = setInterval(() => {
+      if (sourceType === "SOUNDCLOUD" && scWidgetRef.current) {
+        scWidgetRef.current.getPosition((ms: number) => {
+          const s = Math.floor(ms / 1000);
+          setCurrentTime(s);
+          behavior.onTimeUpdate(s);
+        });
+        scWidgetRef.current.getDuration((ms: number) => setDuration(Math.floor(ms / 1000)));
+      } else if (sourceType === "YOUTUBE" && ytPlayerRef.current && ytReady.current) {
+        try {
+          const s = Math.floor(ytPlayerRef.current.getCurrentTime());
+          setCurrentTime(s);
+          behavior.onTimeUpdate(s);
+          setDuration(Math.floor(ytPlayerRef.current.getDuration()));
+        } catch { /* ignore */ }
+      }
+    }, 1000);
+    return () => { if (embedPollRef.current) clearInterval(embedPollRef.current); };
+  }, [isEmbedded, sourceType, trackUrl, behavior]);
 
   // ── Submit handler ──
   const handleSubmit = useCallback(() => {
@@ -279,7 +424,8 @@ export default function FeedbackEngineSandbox() {
           <div className="lg:col-span-3 space-y-6">
             {/* ── Audio Player ── */}
             <div className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
-              {trackUrl ? (
+              {/* Direct audio */}
+              {trackUrl && sourceType === "DIRECT" && (
                 <audio
                   ref={audioRef}
                   src={trackUrl}
@@ -302,86 +448,149 @@ export default function FeedbackEngineSandbox() {
                     behavior.onPause(audioRef.current?.currentTime ?? 0);
                   }}
                 />
-              ) : null}
+              )}
 
-              <div className="p-5">
-                {/* Waveform-style progress bar */}
-                <div className="relative mb-4">
-                  <div
-                    className="h-12 rounded-lg bg-white/5 cursor-pointer overflow-hidden relative"
-                    onClick={(e) => {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const pctX = (e.clientX - rect.left) / rect.width;
-                      seek(pctX * duration);
-                    }}
-                  >
-                    {/* Progress fill */}
-                    <div
-                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500/30 to-pink-500/30 transition-[width] duration-100"
-                      style={{ width: duration > 0 ? `${(currentTime / duration) * 100}%` : "0%" }}
-                    />
-                    {/* Engagement curve overlay (if available) */}
-                    {liveMetrics && liveMetrics.engagementCurve.length > 0 && (
-                      <div className="absolute inset-0 flex items-end gap-px px-1 pb-1">
-                        {liveMetrics.engagementCurve.map((val, i) => (
-                          <div
-                            key={i}
-                            className={cn(
-                              "flex-1 rounded-t-sm min-w-[2px] transition-all duration-300",
-                              val >= 0.8 ? "bg-purple-400/60" :
-                              val >= 0.4 ? "bg-indigo-400/40" :
-                              val > 0 ? "bg-white/15" : "bg-white/5"
-                            )}
-                            style={{ height: `${Math.max(4, val * 100)}%` }}
-                          />
-                        ))}
-                      </div>
-                    )}
-                    {/* Playhead */}
-                    <div
-                      className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                      style={{ left: duration > 0 ? `${(currentTime / duration) * 100}%` : "0%" }}
-                    />
-                  </div>
+              {/* YouTube embed */}
+              {trackUrl && sourceType === "YOUTUBE" && (
+                <div className="aspect-video bg-black">
+                  <iframe
+                    id={ytContainerId}
+                    src={getEmbedUrl(trackUrl, "YOUTUBE")}
+                    className="w-full h-full"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                  />
                 </div>
+              )}
 
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    {/* Play/Pause */}
-                    <button
-                      onClick={togglePlay}
-                      className="h-12 w-12 rounded-full bg-white flex items-center justify-center hover:scale-105 transition-transform"
+              {/* SoundCloud embed */}
+              {trackUrl && sourceType === "SOUNDCLOUD" && (
+                <div className="h-[166px]">
+                  <iframe
+                    ref={scIframeRef}
+                    src={getEmbedUrl(trackUrl, "SOUNDCLOUD")}
+                    className="w-full h-full"
+                    allow="autoplay"
+                    scrolling="no"
+                    frameBorder="0"
+                  />
+                </div>
+              )}
+
+              {/* Bandcamp embed */}
+              {trackUrl && sourceType === "BANDCAMP" && (
+                <div className="p-4">
+                  <p className="text-xs text-white/40 mb-2">
+                    Bandcamp detected — use the player below. Behavioral tracking active via tab focus.
+                  </p>
+                  <iframe
+                    src={trackUrl}
+                    className="w-full h-[120px] rounded-lg"
+                    allow="autoplay"
+                    seamless
+                  />
+                </div>
+              )}
+
+              {/* Controls: full controls for direct audio, compact status for embeds */}
+              {sourceType === "DIRECT" ? (
+                <div className="p-5">
+                  {/* Waveform-style progress bar */}
+                  <div className="relative mb-4">
+                    <div
+                      className="h-12 rounded-lg bg-white/5 cursor-pointer overflow-hidden relative"
+                      onClick={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const pctX = (e.clientX - rect.left) / rect.width;
+                        seek(pctX * duration);
+                      }}
                     >
-                      {isPlaying ? (
-                        <Pause className="h-5 w-5 text-black" />
-                      ) : (
-                        <Play className="h-5 w-5 text-black ml-0.5" />
+                      {/* Progress fill */}
+                      <div
+                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500/30 to-pink-500/30 transition-[width] duration-100"
+                        style={{ width: duration > 0 ? `${(currentTime / duration) * 100}%` : "0%" }}
+                      />
+                      {/* Engagement curve overlay (if available) */}
+                      {liveMetrics && liveMetrics.engagementCurve.length > 0 && (
+                        <div className="absolute inset-0 flex items-end gap-px px-1 pb-1">
+                          {liveMetrics.engagementCurve.map((val, i) => (
+                            <div
+                              key={i}
+                              className={cn(
+                                "flex-1 rounded-t-sm min-w-[2px] transition-all duration-300",
+                                val >= 0.8 ? "bg-purple-400/60" :
+                                val >= 0.4 ? "bg-indigo-400/40" :
+                                val > 0 ? "bg-white/15" : "bg-white/5"
+                              )}
+                              style={{ height: `${Math.max(4, val * 100)}%` }}
+                            />
+                          ))}
+                        </div>
                       )}
-                    </button>
-
-                    {/* Time */}
-                    <span className="text-xs font-mono text-white/50 tabular-nums">
-                      {formatTime(currentTime)} / {formatTime(duration)}
-                    </span>
+                      {/* Playhead */}
+                      <div
+                        className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_8px_rgba(255,255,255,0.5)]"
+                        style={{ left: duration > 0 ? `${(currentTime / duration) * 100}%` : "0%" }}
+                      />
+                    </div>
                   </div>
 
-                  {/* Volume */}
-                  <div className="flex items-center gap-2">
-                    <button onClick={toggleMute} className="text-white/40 hover:text-white/70 transition-colors">
-                      {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                    </button>
-                    <input
-                      type="range"
-                      min={0}
-                      max={1}
-                      step={0.01}
-                      value={isMuted ? 0 : volume}
-                      onChange={(e) => changeVolume(parseFloat(e.target.value))}
-                      className="w-20 h-1 accent-purple-500"
-                    />
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={togglePlay}
+                        className="h-12 w-12 rounded-full bg-white flex items-center justify-center hover:scale-105 transition-transform"
+                      >
+                        {isPlaying ? (
+                          <Pause className="h-5 w-5 text-black" />
+                        ) : (
+                          <Play className="h-5 w-5 text-black ml-0.5" />
+                        )}
+                      </button>
+                      <span className="text-xs font-mono text-white/50 tabular-nums">
+                        {formatTime(currentTime)} / {formatTime(duration)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={toggleMute} className="text-white/40 hover:text-white/70 transition-colors">
+                        {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                      </button>
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={isMuted ? 0 : volume}
+                        onChange={(e) => changeVolume(parseFloat(e.target.value))}
+                        className="w-20 h-1 accent-purple-500"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : trackUrl ? (
+                /* Compact status bar for embed sources */
+                <div className="px-4 py-3 flex items-center justify-between border-t border-white/5">
+                  <div className="flex items-center gap-2">
+                    <span className={cn(
+                      "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                      sourceType === "YOUTUBE" ? "bg-red-500/20 text-red-400" :
+                      sourceType === "SOUNDCLOUD" ? "bg-orange-500/20 text-orange-400" :
+                      "bg-teal-500/20 text-teal-400"
+                    )}>
+                      {sourceType}
+                    </span>
+                    {isPlaying && (
+                      <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-bold">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        Playing
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs font-mono text-white/40 tabular-nums">
+                    {formatTime(currentTime)}{duration > 0 && ` / ${formatTime(duration)}`}
+                  </span>
+                </div>
+              ) : null}
             </div>
 
             {/* ── Vibe Check Form ── */}

@@ -257,6 +257,13 @@ model Review {
   ReviewerProfile         ReviewerProfile?     @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
   Track                   Track                @relation(fields: [trackId], references: [id], onDelete: Cascade)
   ReviewTimestamp         ReviewTimestamp[]
+  ListenBehavior          ListenBehavior?
+
+  textQualityScore        Float?
+  textSpecificity         Float?
+  textActionability       Float?
+  textTechnicalDepth      Float?
+  behavioralAlignment     Float?
 
   @@unique([trackId, reviewerId])
   @@unique([trackId, peerReviewerArtistId])
@@ -293,6 +300,28 @@ model ReviewTimestamp {
 
   @@index([reviewId])
   @@index([reviewId, seconds])
+}
+
+model ListenBehavior {
+  id                       String   @id @default(cuid())
+  reviewId                 String   @unique
+  trackDuration            Int?
+  completionRate           Float    @default(0)
+  attentionScore           Float    @default(0)
+  firstSkipAt              Int?
+  replayZones              Json?
+  skipZones                Json?
+  pausePoints              Json?
+  engagementCurve          Json?
+  rawEvents                Json?
+  behavioralAlignmentScore Float?
+  uniqueSecondsHeard       Int      @default(0)
+  totalEvents              Int      @default(0)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  Review                   Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
 }
 
 model ReviewerProfile {

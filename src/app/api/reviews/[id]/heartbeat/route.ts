@@ -20,6 +20,7 @@ export async function POST(
 
     const body = await request.json().catch(() => ({}));
     const clientListenTime = typeof body?.clientListenTime === "number" ? body.clientListenTime : null;
+    const behaviorMetrics = body?.behaviorMetrics ?? null;
 
     const review = await prisma.review.findUnique({
       where: { id },
@@ -82,6 +83,41 @@ export async function POST(
       },
       select: { listenDuration: true, status: true },
     });
+
+    // Upsert behavioral listening data if metrics provided
+    if (behaviorMetrics && typeof behaviorMetrics === "object") {
+      try {
+        await prisma.listenBehavior.upsert({
+          where: { reviewId: id },
+          create: {
+            reviewId: id,
+            completionRate: behaviorMetrics.completionRate ?? 0,
+            attentionScore: behaviorMetrics.attentionScore ?? 0,
+            firstSkipAt: behaviorMetrics.firstSkipAt ?? null,
+            replayZones: behaviorMetrics.replayZones ?? [],
+            skipZones: behaviorMetrics.skipZones ?? [],
+            pausePoints: behaviorMetrics.pausePoints ?? [],
+            engagementCurve: behaviorMetrics.engagementCurve ?? [],
+            uniqueSecondsHeard: behaviorMetrics.uniqueSecondsHeard ?? 0,
+            totalEvents: behaviorMetrics.totalEvents ?? 0,
+          },
+          update: {
+            completionRate: behaviorMetrics.completionRate ?? 0,
+            attentionScore: behaviorMetrics.attentionScore ?? 0,
+            firstSkipAt: behaviorMetrics.firstSkipAt ?? null,
+            replayZones: behaviorMetrics.replayZones ?? [],
+            skipZones: behaviorMetrics.skipZones ?? [],
+            pausePoints: behaviorMetrics.pausePoints ?? [],
+            engagementCurve: behaviorMetrics.engagementCurve ?? [],
+            uniqueSecondsHeard: behaviorMetrics.uniqueSecondsHeard ?? 0,
+            totalEvents: behaviorMetrics.totalEvents ?? 0,
+          },
+        });
+      } catch (e) {
+        console.error("[Heartbeat] Failed to save behavioral metrics:", e);
+        // Non-fatal — don't fail the heartbeat
+      }
+    }
 
     return NextResponse.json({
       success: true,

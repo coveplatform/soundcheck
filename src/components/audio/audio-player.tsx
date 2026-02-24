@@ -64,6 +64,11 @@ interface AudioPlayerProps {
   showListenTracker?: boolean;
   showWaveform?: boolean;
   onAddTimestamp?: (seconds: number) => void; // callback for adding timestamps at current time
+  onBehaviorPlay?: (position: number) => void;
+  onBehaviorPause?: (position: number) => void;
+  onBehaviorTimeUpdate?: (position: number) => void;
+  onBehaviorVolumeChange?: (volume: number, position: number) => void;
+  onBehaviorMuteToggle?: (muted: boolean, position: number) => void;
 }
 
 export function AudioPlayer({
@@ -77,6 +82,11 @@ export function AudioPlayer({
   showListenTracker = true,
   showWaveform = false,
   onAddTimestamp,
+  onBehaviorPlay,
+  onBehaviorPause,
+  onBehaviorTimeUpdate,
+  onBehaviorVolumeChange,
+  onBehaviorMuteToggle,
 }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -852,8 +862,10 @@ export function AudioPlayer({
         src={sourceUrl}
         onTimeUpdate={() => {
           if (audioRef.current) {
-            setCurrentTime(audioRef.current.currentTime);
-            onTimeUpdate?.(audioRef.current.currentTime);
+            const t = audioRef.current.currentTime;
+            setCurrentTime(t);
+            onTimeUpdate?.(t);
+            onBehaviorTimeUpdate?.(t);
           }
         }}
         onLoadedMetadata={() => {
@@ -861,8 +873,19 @@ export function AudioPlayer({
             setDuration(audioRef.current.duration);
           }
         }}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
+        onPlay={() => {
+          setIsPlaying(true);
+          onBehaviorPlay?.(audioRef.current?.currentTime ?? 0);
+        }}
+        onPause={() => {
+          setIsPlaying(false);
+          onBehaviorPause?.(audioRef.current?.currentTime ?? 0);
+        }}
+        onVolumeChange={() => {
+          if (audioRef.current) {
+            onBehaviorVolumeChange?.(audioRef.current.volume, audioRef.current.currentTime);
+          }
+        }}
       />
 
       {showWaveform ? (
@@ -1025,6 +1048,7 @@ export function AudioPlayer({
                 const newMuted = !isMuted;
                 audioRef.current.muted = newMuted;
                 setIsMuted(newMuted);
+                onBehaviorMuteToggle?.(newMuted, audioRef.current.currentTime);
               }
             }}
             className={cn(
