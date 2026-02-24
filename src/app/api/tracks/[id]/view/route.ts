@@ -32,11 +32,12 @@ export async function POST(
       );
     }
 
-    // Increment view count and update last viewed timestamp
+    // Increment view + play count and update last viewed timestamp
     await prisma.track.update({
       where: { id },
       data: {
         viewCount: { increment: 1 },
+        publicPlayCount: { increment: 1 },
         lastViewedAt: new Date(),
       },
     });

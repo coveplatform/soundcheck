@@ -955,6 +955,10 @@ export function DiscoverScene({
   const handleSelectTrack = useCallback((t: DiscoverTrackData) => {
     setSelectedTrack(t);
     setClickCount((c) => c + 1);
+    // Track view/play for real (non-demo) tracks
+    if (!t.isDemo) {
+      fetch(`/api/tracks/${t.id}/view`, { method: "POST" }).catch(() => {});
+    }
   }, []);
 
   const selectedGlowColor = useMemo(() => {
