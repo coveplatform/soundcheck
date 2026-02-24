@@ -235,74 +235,21 @@ export function buildDiscoverAnnouncementEmail(params: { userName?: string }): {
   const appUrl = getAppUrl();
   const discoverUrl = `${appUrl}/discover`;
 
-  // Hero section using the actual album artwork from the discover page,
-  // positioned on a black background to match the real 3D space view.
+  // Hero: 3 album covers on black — matches the discover page view.
+  // Only 3 images to keep loading fast (+ 1 logo = 4 total images in email).
   const art = (n: number) => `${appUrl}/activity-artwork/${n}.jpg`;
   const heroSection = `
     <div style="margin-bottom: 24px; border-radius: 14px; overflow: hidden;">
       <a href="${discoverUrl}" style="display: block; text-decoration: none;">
-        <div style="background-color: #000000; position: relative; width: 100%; padding: 0;">
-          <!--[if mso]><table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color:#000000;"><tr><td><![endif]-->
-
-          <!-- Row 1: far away (small) -->
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #000000;">
-            <tr>
-              <td style="padding: 20px 0 6px; text-align: center; font-size: 0; line-height: 0;">
-                <img src="${art(15)}" width="32" height="32" alt="" style="display: inline-block; width: 32px; height: 32px; object-fit: cover; border: 1px solid rgba(0,240,255,0.15); border-radius: 3px; margin: 0 18px; opacity: 0.3;" />
-                <img src="${art(22)}" width="28" height="28" alt="" style="display: inline-block; width: 28px; height: 28px; object-fit: cover; border: 1px solid rgba(168,85,247,0.12); border-radius: 3px; margin: 0 14px; opacity: 0.25;" />
-                <img src="${art(8)}" width="30" height="30" alt="" style="display: inline-block; width: 30px; height: 30px; object-fit: cover; border: 1px solid rgba(255,45,155,0.12); border-radius: 3px; margin: 0 20px; opacity: 0.25;" />
-                <img src="${art(30)}" width="26" height="26" alt="" style="display: inline-block; width: 26px; height: 26px; object-fit: cover; border: 1px solid rgba(0,240,255,0.1); border-radius: 3px; margin: 0 16px; opacity: 0.2;" />
-              </td>
-            </tr>
-          </table>
-
-          <!-- Row 2: mid distance -->
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #000000;">
-            <tr>
-              <td style="padding: 8px 0; text-align: center; font-size: 0; line-height: 0;">
-                <img src="${art(12)}" width="48" height="48" alt="" style="display: inline-block; width: 48px; height: 48px; object-fit: cover; border: 1px solid rgba(255,45,155,0.2); border-radius: 4px; margin: 0 10px; opacity: 0.45;" />
-                <img src="${art(6)}" width="42" height="42" alt="" style="display: inline-block; width: 42px; height: 42px; object-fit: cover; border: 1px solid rgba(0,240,255,0.18); border-radius: 4px; margin: 0 22px; opacity: 0.4;" />
-                <img src="${art(19)}" width="44" height="44" alt="" style="display: inline-block; width: 44px; height: 44px; object-fit: cover; border: 1px solid rgba(168,85,247,0.18); border-radius: 4px; margin: 0 12px; opacity: 0.4;" />
-                <img src="${art(25)}" width="40" height="40" alt="" style="display: inline-block; width: 40px; height: 40px; object-fit: cover; border: 1px solid rgba(16,185,129,0.15); border-radius: 4px; margin: 0 18px; opacity: 0.35;" />
-              </td>
-            </tr>
-          </table>
-
-          <!-- Row 3: FOREGROUND (large, prominent — the main visual) -->
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #000000;">
-            <tr>
-              <td style="padding: 10px 0; text-align: center; font-size: 0; line-height: 0;">
-                <img src="${art(3)}" width="78" height="78" alt="" style="display: inline-block; width: 78px; height: 78px; object-fit: cover; border: 1px solid rgba(0,240,255,0.3); border-radius: 5px; margin: 0 8px; opacity: 0.85;" />
-                <img src="${art(1)}" width="100" height="100" alt="" style="display: inline-block; width: 100px; height: 100px; object-fit: cover; border: 1px solid rgba(251,191,36,0.35); border-radius: 5px; margin: 0 8px; opacity: 0.95;" />
-                <img src="${art(4)}" width="82" height="82" alt="" style="display: inline-block; width: 82px; height: 82px; object-fit: cover; border: 1px solid rgba(168,85,247,0.3); border-radius: 5px; margin: 0 8px; opacity: 0.85;" />
-              </td>
-            </tr>
-          </table>
-
-          <!-- Row 4: mid-lower -->
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #000000;">
-            <tr>
-              <td style="padding: 8px 0; text-align: center; font-size: 0; line-height: 0;">
-                <img src="${art(9)}" width="46" height="46" alt="" style="display: inline-block; width: 46px; height: 46px; object-fit: cover; border: 1px solid rgba(0,240,255,0.18); border-radius: 4px; margin: 0 14px; opacity: 0.4;" />
-                <img src="${art(14)}" width="50" height="50" alt="" style="display: inline-block; width: 50px; height: 50px; object-fit: cover; border: 1px solid rgba(255,45,155,0.18); border-radius: 4px; margin: 0 10px; opacity: 0.42;" />
-                <img src="${art(21)}" width="44" height="44" alt="" style="display: inline-block; width: 44px; height: 44px; object-fit: cover; border: 1px solid rgba(168,85,247,0.15); border-radius: 4px; margin: 0 16px; opacity: 0.38;" />
-              </td>
-            </tr>
-          </table>
-
-          <!-- Row 5: far bottom -->
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #000000;">
-            <tr>
-              <td style="padding: 6px 0 20px; text-align: center; font-size: 0; line-height: 0;">
-                <img src="${art(27)}" width="30" height="30" alt="" style="display: inline-block; width: 30px; height: 30px; object-fit: cover; border: 1px solid rgba(16,185,129,0.12); border-radius: 3px; margin: 0 20px; opacity: 0.25;" />
-                <img src="${art(33)}" width="34" height="34" alt="" style="display: inline-block; width: 34px; height: 34px; object-fit: cover; border: 1px solid rgba(0,240,255,0.12); border-radius: 3px; margin: 0 14px; opacity: 0.28;" />
-                <img src="${art(10)}" width="28" height="28" alt="" style="display: inline-block; width: 28px; height: 28px; object-fit: cover; border: 1px solid rgba(168,85,247,0.1); border-radius: 3px; margin: 0 18px; opacity: 0.22;" />
-              </td>
-            </tr>
-          </table>
-
-          <!--[if mso]></td></tr></table><![endif]-->
-        </div>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #000000; border-radius: 14px;">
+          <tr>
+            <td style="padding: 40px 0; text-align: center; font-size: 0; line-height: 0;">
+              <img src="${art(3)}" width="110" height="110" alt="" style="display: inline-block; width: 110px; height: 110px; object-fit: cover; border: 1px solid rgba(0,240,255,0.25); border-radius: 6px; margin: 0 6px; vertical-align: middle;" />
+              <img src="${art(1)}" width="140" height="140" alt="" style="display: inline-block; width: 140px; height: 140px; object-fit: cover; border: 1px solid rgba(251,191,36,0.3); border-radius: 6px; margin: 0 6px; vertical-align: middle;" />
+              <img src="${art(4)}" width="110" height="110" alt="" style="display: inline-block; width: 110px; height: 110px; object-fit: cover; border: 1px solid rgba(168,85,247,0.25); border-radius: 6px; margin: 0 6px; vertical-align: middle;" />
+            </td>
+          </tr>
+        </table>
       </a>
     </div>
   `;

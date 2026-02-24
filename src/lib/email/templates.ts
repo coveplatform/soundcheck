@@ -35,8 +35,8 @@ export const COLORS = {
   red: "#ef4444",
 };
 
-// Inline SVG logo for emails (purple rounded rect with white audio bars)
-const EMAIL_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="32" height="32" style="display:block;width:32px;height:32px;"><rect x="10" y="10" width="180" height="180" rx="40" ry="40" fill="#9333ea"/><g fill="white"><rect x="42" y="78" width="16" height="44" rx="3"/><rect x="68" y="55" width="16" height="90" rx="3"/><rect x="94" y="38" width="16" height="124" rx="3"/><rect x="120" y="62" width="16" height="76" rx="3"/><rect x="146" y="82" width="16" height="36" rx="3"/></g></svg>`;
+// Hosted PNG logo for emails (Gmail strips inline SVGs)
+const EMAIL_LOGO_URL = `${getAppUrl()}/email-logo.png`;
 
 // Base email wrapper template - exported for preview
 export function emailWrapper(content: string): string {
@@ -59,7 +59,7 @@ export function emailWrapper(content: string): string {
               <table role="presentation" cellspacing="0" cellpadding="0">
                 <tr>
                   <td style="vertical-align: middle;">
-                    ${EMAIL_LOGO_SVG}
+                    <img src="${EMAIL_LOGO_URL}" alt="MixReflect" width="32" height="32" style="display:block;width:32px;height:32px;border-radius:8px;" />
                   </td>
                   <td style="vertical-align: middle; padding-left: 10px;">
                     <span style="font-size: 20px; letter-spacing: -0.5px; color: ${COLORS.black};"><strong style="font-weight: 800;">Mix</strong><span style="font-weight: 400; color: ${COLORS.grayLight};">Reflect</span></span>
