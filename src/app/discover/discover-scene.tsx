@@ -791,6 +791,10 @@ function HUD({
   clickCount: number;
   tracks: DiscoverTrackData[];
 }) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 640 || "ontouchstart" in window);
+  }, []);
   const totalPlays = useMemo(
     () => tracks.reduce((s, t) => s + (t.playCount ?? 0), 0),
     [tracks],
@@ -846,10 +850,13 @@ function HUD({
         }}
       >
         <div className="text-center px-4 max-w-2xl">
-          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-none select-none">
+          <h1
+            className="text-5xl sm:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-none select-none"
+            style={{ textShadow: "0 2px 20px rgba(0,240,255,0.15), 0 0 60px rgba(0,0,0,0.8)" }}
+          >
             WEEKLY<br />DISCOVER
           </h1>
-          <p className="mt-4 text-base sm:text-lg text-white/50 font-light leading-relaxed select-none">
+          <p className="mt-4 text-base sm:text-lg text-white/70 font-normal leading-relaxed select-none" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.6)" }}>
             Explore music from independent artists around the world.
             <br className="hidden sm:block" />
             Get expert feedback on your own tracks.
@@ -858,39 +865,39 @@ function HUD({
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mt-6 sm:mt-8 pointer-events-auto">
             <Link
               href="/signup"
-              className="px-6 py-3 rounded-xl text-sm font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/20"
+              className="px-6 py-3 rounded-xl text-sm font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-lg shadow-purple-600/30 border border-purple-500/40"
             >
               Start uploading — it&apos;s free
             </Link>
             <Link
               href="/login"
-              className="px-5 py-3 rounded-xl text-sm font-medium text-white/60 hover:text-white border border-white/10 hover:border-white/20 transition-all"
+              className="px-5 py-3 rounded-xl text-sm font-semibold text-white/80 hover:text-white border border-white/15 hover:border-white/25 transition-all"
             >
               Sign in
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-6 sm:mt-10 text-[11px] sm:text-xs text-white/80 font-mono tracking-wide uppercase select-none">
-            <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15">
-              <span className="w-2 h-2 rounded-full bg-cyan-400" />
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-6 sm:mt-10 text-[11px] sm:text-xs text-white/90 font-mono tracking-wide uppercase select-none">
+            <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.12] border border-white/20" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>
+              <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(0,240,255,0.5)]" />
               Expert reviews
             </span>
-            <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15">
-              <span className="w-2 h-2 rounded-full bg-purple-400" />
+            <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.12] border border-white/20" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>
+              <span className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_6px_rgba(168,85,247,0.5)]" />
               Real listeners
             </span>
-            <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15">
-              <span className="w-2 h-2 rounded-full bg-pink-400" />
+            <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.12] border border-white/20" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>
+              <span className="w-2 h-2 rounded-full bg-pink-400 shadow-[0_0_6px_rgba(244,114,182,0.5)]" />
               Grow your audience
             </span>
           </div>
 
           {/* Desktop hint */}
-          <p className="hidden sm:block mt-12 text-base text-white/60 font-normal tracking-widest uppercase select-none animate-bounce">
+          <p className="hidden sm:block mt-12 text-base text-white/70 font-medium tracking-widest uppercase select-none animate-bounce" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
             drag to explore &middot; scroll to zoom
           </p>
           {/* Mobile hint */}
-          <p className="block sm:hidden mt-8 text-sm text-white/60 font-normal tracking-widest uppercase select-none animate-bounce">
+          <p className="block sm:hidden mt-8 text-sm text-white/70 font-medium tracking-widest uppercase select-none animate-bounce" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
             swipe to explore &middot; pinch to zoom
           </p>
         </div>
@@ -906,16 +913,16 @@ function HUD({
           }`}
         >
           {hoveredTrack && (
-            <div className="px-5 sm:px-8 py-4 sm:py-5 bg-black/70 backdrop-blur-2xl border border-white/[0.1] rounded-2xl text-center shadow-[0_0_40px_rgba(0,240,255,0.1)]">
+            <div className="px-5 sm:px-8 py-4 sm:py-5 bg-black/80 backdrop-blur-2xl border border-white/[0.12] rounded-2xl text-center shadow-[0_0_40px_rgba(0,240,255,0.1)]">
               {hoveredTrack.isFeatured && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-400/20 border border-amber-400/30 text-amber-400 text-[11px] font-semibold mb-3">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-400/20 border border-amber-400/30 text-amber-400 text-[11px] font-bold mb-3">
                   <Star className="w-3 h-3 fill-amber-400" /> Featured
                 </span>
               )}
-              <p className="text-white text-lg sm:text-xl font-bold tracking-tight">
+              <p className="text-white text-lg sm:text-xl font-bold tracking-tight" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.5)" }}>
                 {hoveredTrack.title}
               </p>
-              <p className="text-white/45 text-sm mt-1 font-light">
+              <p className="text-white/60 text-sm mt-1 font-medium">
                 {hoveredTrack.artistName}
               </p>
               <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-3">
@@ -972,31 +979,60 @@ function HUD({
                 boxShadow: `0 0 60px ${selectedGlowColor}18`,
               }}
             >
-              {/* Embedded player — compact on mobile, normal on desktop */}
-              {embedUrl && (
-                <div className="w-full border-b border-white/[0.06] overflow-hidden">
-                  <iframe
-                    src={embedUrl}
-                    className="w-full"
-                    style={{
-                      height: embedUrl.includes("soundcloud") ? 80 :
-                              embedUrl.includes("spotify") ? 80 :
-                              embedUrl.includes("youtube") ? 120 : 80,
-                    }}
-                    allow="autoplay; encrypted-media"
-                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                    loading="lazy"
-                  />
-                </div>
+              {/* Player — native audio on mobile, embed on desktop */}
+              {isMobile ? (
+                /* Mobile: native <audio> autoplay for uploads, no embed for external */
+                (selectedTrack.sourceUrl?.startsWith("/") || selectedTrack.sourceUrl?.match(/\.(mp3|wav|ogg|m4a|aac)/i)) ? (
+                  <div className="w-full border-b border-white/[0.06] px-3 py-2.5">
+                    <audio
+                      src={selectedTrack.sourceUrl}
+                      autoPlay
+                      controls
+                      controlsList="nodownload"
+                      className="w-full h-9 opacity-80"
+                      style={{ filter: "invert(1) hue-rotate(180deg)" }}
+                    />
+                  </div>
+                ) : (
+                  /* External source on mobile — prominent play button, no iframe */
+                  <a
+                    href={selectedTrack.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full border-b border-white/[0.06] px-4 py-3 text-sm font-bold transition-colors hover:bg-white/[0.06]"
+                    style={{ color: selectedGlowColor }}
+                  >
+                    <Play className="w-4 h-4" style={{ fill: selectedGlowColor }} />
+                    Listen on {getPlatformName(selectedTrack.sourceUrl)}
+                  </a>
+                )
+              ) : (
+                /* Desktop: iframe embed */
+                embedUrl && (
+                  <div className="w-full border-b border-white/[0.06] overflow-hidden">
+                    <iframe
+                      src={embedUrl}
+                      className="w-full"
+                      style={{
+                        height: embedUrl.includes("soundcloud") ? 80 :
+                                embedUrl.includes("spotify") ? 80 :
+                                embedUrl.includes("youtube") ? 120 : 80,
+                      }}
+                      allow="autoplay; encrypted-media"
+                      sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                      loading="lazy"
+                    />
+                  </div>
+                )
               )}
 
-              {/* Track info + actions — compact on mobile */}
+              {/* Track info + actions */}
               <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-2.5 sm:py-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-white text-[13px] sm:text-sm font-semibold tracking-tight truncate">
+                  <p className="text-white text-[13px] sm:text-sm font-bold tracking-tight truncate" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>
                     {selectedTrack.title}
                   </p>
-                  <p className="text-white/35 text-[11px] sm:text-xs font-light truncate">
+                  <p className="text-white/50 text-[11px] sm:text-xs font-medium truncate">
                     {selectedTrack.artistName}
                   </p>
                 </div>
@@ -1111,7 +1147,7 @@ function HUD({
               hasInteracted ? "opacity-100" : "opacity-0"
             }`}
           >
-            <div className="flex items-center gap-2 sm:gap-5 px-3 sm:px-7 py-2 sm:py-3 bg-black/60 backdrop-blur-xl border border-white/[0.1] rounded-full text-[9px] sm:text-xs tracking-[0.1em] sm:tracking-[0.2em] text-white/70 uppercase font-mono transition-all duration-300">
+            <div className="flex items-center gap-2 sm:gap-5 px-3 sm:px-7 py-2 sm:py-3 bg-black/70 backdrop-blur-xl border border-white/[0.12] rounded-full text-[10px] sm:text-xs tracking-[0.1em] sm:tracking-[0.2em] text-white/80 uppercase font-mono transition-all duration-300" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>
               {showTrack ? (
                 <>
                   <span>{(focused!.playCount ?? 0).toLocaleString()} plays</span>
@@ -1236,7 +1272,7 @@ export function DiscoverScene({
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 bg-black overflow-hidden"
+      className="fixed inset-0 bg-black overflow-hidden antialiased"
       style={{ touchAction: "none", overscrollBehavior: "none" }}
       onWheel={handleInteraction}
       onPointerDown={handleInteraction}

@@ -89,6 +89,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [nextFocus, setNextFocus] = useState<string | null>(null);
   const [qualityLevel, setQualityLevel] = useState<string | null>(null);
 
+  const [audioDuration, setAudioDuration] = useState(0);
+
   // Section refs for scroll-to functionality
   const firstImpressionRef = useRef<HTMLDivElement>(null);
   const wouldListenAgainRef = useRef<HTMLDivElement>(null);
@@ -409,12 +411,14 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     setIsSubmitting(true);
 
     try {
-      // Send a final heartbeat with client listen time to sync server before submitting
+      // Send a final heartbeat with client listen time before submission
       try {
         await fetch(`/api/reviews/${review.id}/heartbeat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ clientListenTime: Math.floor(listenTime) }),
+          body: JSON.stringify({
+            clientListenTime: Math.floor(listenTime),
+          }),
         });
       } catch {
         // Non-fatal: submission will still attempt
@@ -1253,7 +1257,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             showWaveform={review.Track.sourceType === "UPLOAD"}
             minListenTime={review.skipListenTimer ? 0 : MIN_LISTEN_SECONDS}
             initialListenTime={listenTime}
-            onTimeUpdate={(seconds) => setPlayerSeconds(seconds)}
+            onTimeUpdate={(seconds) => {
+              setPlayerSeconds(seconds);
+              if (seconds > audioDuration) setAudioDuration(seconds);
+            }}
             onListenProgress={(seconds) => {
               setListenTime((prev) => Math.max(prev, seconds));
               void maybeSendHeartbeat();

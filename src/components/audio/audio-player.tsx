@@ -852,9 +852,8 @@ export function AudioPlayer({
         src={sourceUrl}
         onTimeUpdate={() => {
           if (audioRef.current) {
-            const t = audioRef.current.currentTime;
-            setCurrentTime(t);
-            onTimeUpdate?.(t);
+            setCurrentTime(audioRef.current.currentTime);
+            onTimeUpdate?.(audioRef.current.currentTime);
           }
         }}
         onLoadedMetadata={() => {
@@ -1023,8 +1022,9 @@ export function AudioPlayer({
           <button
             onClick={() => {
               if (audioRef.current) {
-                audioRef.current.muted = !isMuted;
-                setIsMuted(!isMuted);
+                const newMuted = !isMuted;
+                audioRef.current.muted = newMuted;
+                setIsMuted(newMuted);
               }
             }}
             className={cn(
