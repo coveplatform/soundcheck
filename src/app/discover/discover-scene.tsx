@@ -828,6 +828,20 @@ function HUD({
         })()}
       </div>
 
+      {/* ---- ESC to close hint ---- */}
+      <div
+        className={`fixed bottom-2 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${
+          selectedTrack
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-4 pointer-events-none"
+        }`}
+      >
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-md border border-white/[0.08]">
+          <kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-[10px] font-mono text-white/60">ESC</kbd>
+          <span className="text-[11px] text-white/40">to close</span>
+        </div>
+      </div>
+
       {/* ---- Scanline overlay ---- */}
       <div
         className="fixed inset-0 z-40 pointer-events-none opacity-[0.035]"
