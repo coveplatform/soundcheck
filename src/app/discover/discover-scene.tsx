@@ -1002,10 +1002,26 @@ export function DiscoverScene({
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
+  // Block ALL default touch behavior at the document level while on this page.
+  // This prevents the browser from interpreting pinch/swipe as back/forward navigation.
+  const containerRef = useRef<HTMLDivElement>(null!);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const prevent = (e: TouchEvent) => { e.preventDefault(); };
+    el.addEventListener("touchstart", prevent, { passive: false });
+    el.addEventListener("touchmove", prevent, { passive: false });
+    return () => {
+      el.removeEventListener("touchstart", prevent);
+      el.removeEventListener("touchmove", prevent);
+    };
+  }, []);
+
   return (
     <div
+      ref={containerRef}
       className="fixed inset-0 bg-black overflow-hidden"
-      style={{ touchAction: "none" }}
+      style={{ touchAction: "none", overscrollBehavior: "none" }}
       onWheel={handleInteraction}
       onPointerDown={handleInteraction}
       onTouchStart={handleInteraction}
