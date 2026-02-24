@@ -347,6 +347,8 @@ function Scene({
         panSpeed={0.4}
         rotateSpeed={0.45}
         zoomSpeed={0.7}
+        /* Mobile: one finger rotates, two fingers dolly+pan (pinch to zoom) */
+        touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
       />
 
       {tracks.map((track, i) => (
@@ -477,14 +479,14 @@ function ActivityFeed() {
 
   return (
     <div
-      className={`fixed top-16 sm:top-20 right-4 sm:right-6 z-30 transition-all duration-500 ${
+      className={`fixed top-16 sm:top-20 right-4 sm:right-6 z-30 transition-all duration-500 hidden sm:block ${
         visible && msg
           ? "opacity-100 translate-x-0"
           : "opacity-0 translate-x-8 pointer-events-none"
       }`}
     >
       {msg && (
-        <div className="px-3 sm:px-4 py-2 sm:py-2.5 bg-black/50 backdrop-blur-xl border border-white/[0.08] rounded-xl text-[11px] sm:text-xs max-w-[200px] sm:max-w-[240px]">
+        <div className="px-4 py-2.5 bg-black/50 backdrop-blur-xl border border-white/[0.08] rounded-xl text-xs max-w-[240px]">
           <span className="mr-1.5">{msg.icon}</span>
           <span className="text-white/70 font-medium">{msg.artist}</span>
           <span className="text-white/35"> {msg.action}</span>
@@ -503,24 +505,19 @@ function UploadCTA({ clickCount }: { clickCount: number }) {
 
   return (
     <div
-      className={`fixed top-[110px] sm:top-[120px] left-1/2 -translate-x-1/2 z-30 transition-all duration-700 ${
+      className={`fixed top-[90px] sm:top-[120px] left-1/2 -translate-x-1/2 z-30 transition-all duration-700 ${
         show
           ? "opacity-100 translate-y-0"
           : "opacity-0 -translate-y-4 pointer-events-none"
       }`}
     >
-      <div className="flex items-center gap-4 px-5 py-3 bg-black/60 backdrop-blur-xl border border-white/[0.08] rounded-2xl">
-        <p className="text-white/50 text-xs">
-          Like what you hear?
-        </p>
-        <Link
-          href="/signup"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-md shadow-purple-600/20"
-        >
-          <Upload className="w-3 h-3" />
-          Upload your track
-        </Link>
-      </div>
+      <Link
+        href="/signup"
+        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-md shadow-purple-600/20 border border-purple-500/30"
+      >
+        <Upload className="w-3 h-3" />
+        Upload your track
+      </Link>
     </div>
   );
 }
@@ -758,7 +755,7 @@ function HUD({
 
       {/* ---- Selected track panel (zoomed-in view + embedded player) ---- */}
       <div
-        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-lg transition-all duration-500 ${
+        className={`fixed bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-lg transition-all duration-500 ${
           selectedTrack
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-8 pointer-events-none"
@@ -770,14 +767,14 @@ function HUD({
             : getEmbedUrl(selectedTrack.sourceUrl);
           return (
             <div
-              className="bg-black/70 backdrop-blur-2xl border border-white/[0.08] rounded-2xl overflow-hidden"
+              className="bg-black/80 backdrop-blur-2xl border border-white/[0.08] rounded-xl sm:rounded-2xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
               onTouchEnd={(e) => e.stopPropagation()}
               style={{
                 boxShadow: `0 0 60px ${selectedGlowColor}18`,
               }}
             >
-              {/* Embedded player */}
+              {/* Embedded player — smaller on mobile */}
               {embedUrl && (
                 <div className="w-full border-b border-white/[0.06]">
                   <iframe
@@ -786,7 +783,7 @@ function HUD({
                     style={{
                       height: embedUrl.includes("soundcloud") ? 80 :
                               embedUrl.includes("spotify") ? 80 :
-                              embedUrl.includes("youtube") ? 160 : 80,
+                              embedUrl.includes("youtube") ? 120 : 80,
                     }}
                     allow="autoplay; encrypted-media"
                     sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
@@ -795,22 +792,22 @@ function HUD({
                 </div>
               )}
 
-              {/* Track info + actions */}
-              <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3">
+              {/* Track info + actions — compact on mobile */}
+              <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-2.5 sm:py-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-white text-sm font-semibold tracking-tight truncate">
+                  <p className="text-white text-[13px] sm:text-sm font-semibold tracking-tight truncate">
                     {selectedTrack.title}
                   </p>
-                  <p className="text-white/35 text-xs font-light truncate">
+                  <p className="text-white/35 text-[11px] sm:text-xs font-light truncate">
                     {selectedTrack.artistName}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                   {selectedTrack.isDemo ? (
                     <Link
                       href="/signup"
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all hover:brightness-125"
+                      className="flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-all hover:brightness-125 whitespace-nowrap"
                       style={{
                         backgroundColor: `${selectedGlowColor}25`,
                         border: `1px solid ${selectedGlowColor}40`,
@@ -818,14 +815,14 @@ function HUD({
                       }}
                     >
                       Sign up
-                      <ExternalLink className="w-3 h-3" />
+                      <ExternalLink className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                     </Link>
                   ) : (
                     <a
                       href={selectedTrack.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all hover:brightness-125"
+                      className="flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-all hover:brightness-125 whitespace-nowrap"
                       style={{
                         backgroundColor: `${selectedGlowColor}25`,
                         border: `1px solid ${selectedGlowColor}40`,
@@ -833,7 +830,7 @@ function HUD({
                       }}
                     >
                       {getPlatformName(selectedTrack.sourceUrl)}
-                      <ExternalLink className="w-3 h-3" />
+                      <ExternalLink className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                     </a>
                   )}
 
@@ -908,17 +905,17 @@ function HUD({
 
       {/* ---- Stats counter bar ---- */}
       <div
-        className={`fixed top-14 left-1/2 -translate-x-1/2 z-20 pointer-events-none select-none transition-all duration-1000 ${
+        className={`fixed top-[52px] sm:top-14 left-1/2 -translate-x-1/2 z-20 pointer-events-none select-none transition-all duration-1000 ${
           hasInteracted ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="flex items-center gap-3 sm:gap-5 px-5 sm:px-7 py-2.5 sm:py-3 bg-black/60 backdrop-blur-xl border border-white/[0.1] rounded-full text-[10px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] text-white/70 uppercase font-mono">
+        <div className="flex items-center gap-2 sm:gap-5 px-3 sm:px-7 py-2 sm:py-3 bg-black/60 backdrop-blur-xl border border-white/[0.1] rounded-full text-[9px] sm:text-xs tracking-[0.1em] sm:tracking-[0.2em] text-white/70 uppercase font-mono">
           <span>{animPlays.toLocaleString()} plays</span>
-          <span className="w-px h-3.5 bg-white/25" />
+          <span className="w-px h-3 sm:h-3.5 bg-white/25" />
           <span>{animReviews} reviews</span>
           <span className="hidden sm:block w-px h-3.5 bg-white/25" />
-          <span className="hidden sm:inline">{animRating} avg rating</span>
-          <span className="w-px h-3.5 bg-white/25" />
+          <span className="hidden sm:inline">{animRating} avg</span>
+          <span className="w-px h-3 sm:h-3.5 bg-white/25" />
           <span>{animTracks} tracks</span>
         </div>
       </div>
