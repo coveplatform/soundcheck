@@ -207,12 +207,14 @@ function TrackCard({
             />
           </mesh>
 
-          {/* Card face */}
+          {/* Card face — on touch devices skip onPointerOver/Out so
+             multi-finger gestures (pinch-to-zoom) pass through to OrbitControls
+             instead of being captured by the mesh raycaster. */}
           <mesh
             onPointerOver={pointerOver}
             onPointerOut={pointerOut}
-            onPointerDown={(e) => pointerDown(e)}
-            onPointerUp={(e) => pointerUp(e)}
+            onPointerDown={(e) => { if (isTouchDevice) e.stopPropagation(); pointerDown(e); }}
+            onPointerUp={(e) => { pointerUp(e); }}
           >
             <planeGeometry args={[1, 1]} />
             <meshBasicMaterial
@@ -916,8 +918,6 @@ function HUD({
             <div className="flex items-center gap-2 sm:gap-5 px-3 sm:px-7 py-2 sm:py-3 bg-black/60 backdrop-blur-xl border border-white/[0.1] rounded-full text-[9px] sm:text-xs tracking-[0.1em] sm:tracking-[0.2em] text-white/70 uppercase font-mono transition-all duration-300">
               {showTrack ? (
                 <>
-                  <span className="text-white/90 truncate max-w-[120px] sm:max-w-none">{focused!.title}</span>
-                  <span className="w-px h-3 sm:h-3.5 bg-white/25" />
                   <span>{(focused!.playCount ?? 0).toLocaleString()} plays</span>
                   <span className="w-px h-3 sm:h-3.5 bg-white/25" />
                   <span>{focused!.reviewCount ?? 0} reviews</span>
