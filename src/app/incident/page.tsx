@@ -30,7 +30,7 @@ export default function IncidentPage() {
           <section>
             <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 mb-3">What happened</h2>
             <p className="text-base leading-relaxed">
-              On March 13, 2026, a database migration error resulted in the loss of all user account data on MixReflect. This affected all 245 registered users — including track submissions, reviews, credits, and account profiles. We have no backup from before the incident.
+              On March 13, 2026, a database migration error caused the loss of all user account data on MixReflect. Every account, track, review, and credit balance was affected. We take full responsibility for this and are deeply sorry.
             </p>
           </section>
 
@@ -42,7 +42,7 @@ export default function IncidentPage() {
                 "All submitted tracks and associated artwork",
                 "All reviews and feedback received",
                 "All credits earned and spent",
-                "All subscription and payment history",
+                "All subscription records",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-red-400 flex-shrink-0" />
@@ -53,12 +53,30 @@ export default function IncidentPage() {
           </section>
 
           <section>
-            <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 mb-3">What we&apos;re doing</h2>
+            <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 mb-3">If you had a Pro subscription</h2>
+            <p className="text-base leading-relaxed mb-4">
+              Sign up again with any email address, then contact us at{" "}
+              <a href="mailto:support@mixreflect.com" className="font-bold text-purple-600 underline underline-offset-2">
+                support@mixreflect.com
+              </a>
+              . We will transfer your Pro subscription to your new account at no charge, and add a free month on top as an apology. We are also reaching out directly to known subscribers.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 mb-3">For all returning users</h2>
+            <p className="text-base leading-relaxed mb-4">
+              If you had a free account, sign up again and email us — we will credit your new account with <span className="font-bold text-neutral-900">10 free credits</span> to get you back up and running straight away.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 mb-3">What we have done to prevent this</h2>
             <ul className="space-y-2 text-base leading-relaxed list-none">
               {[
-                "All paying subscribers will receive a full refund for the current billing period — no action needed on your part.",
-                "Automated database backups are now in place to prevent this happening again.",
-                "We are reviewing our deployment process to ensure migrations cannot be run without a verified backup.",
+                "Automated daily database backups are now active.",
+                "Database migrations now require a verified backup before they can run.",
+                "We are reviewing our full deployment process to add additional safeguards.",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-lime-500 flex-shrink-0" />
@@ -69,20 +87,9 @@ export default function IncidentPage() {
           </section>
 
           <section>
-            <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 mb-3">If you were a subscriber</h2>
-            <p className="text-base leading-relaxed">
-              If you had an active Pro subscription, please email us at{" "}
-              <a href="mailto:support@mixreflect.com" className="font-bold text-purple-600 underline underline-offset-2">
-                support@mixreflect.com
-              </a>{" "}
-              and we will process your refund immediately. We are also contacting known subscribers directly.
-            </p>
-          </section>
-
-          <section>
             <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 mb-3">Our apology</h2>
             <p className="text-base leading-relaxed">
-              We are genuinely sorry. Losing your data is the worst outcome we could cause as a platform, and we take full responsibility. We understand if this has broken your trust in MixReflect. For those who choose to return, we are committed to ensuring this never happens again.
+              Losing your data — your tracks, your feedback, your work — is the worst thing we could do as a platform. We are sorry. We understand if this has shaken your confidence in MixReflect, and we will earn that trust back through our actions.
             </p>
           </section>
 
