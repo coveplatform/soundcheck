@@ -16,6 +16,7 @@ import { AnimatedSection } from "@/components/landing/animated-section";
 import { OnlineListeners } from "@/components/landing/online-listeners";
 import { HeroCTA } from "@/components/landing/hero-cta";
 import { SignupLink } from "@/components/landing/signup-link";
+import { OutageBanner } from "@/components/landing/outage-banner";
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
 
@@ -33,6 +34,7 @@ const discoverArtwork = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#faf8f5] text-neutral-950 pt-14">
+      <OutageBanner />
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50  bg-[#faf8f5]/90 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4">

@@ -127,15 +127,12 @@ const genres = [
 async function main() {
   console.log("Seeding genres...");
 
-  for (const genre of genres) {
-    await prisma.genre.upsert({
-      where: { slug: genre.slug },
-      update: {},
-      create: genre,
-    });
-  }
+  const result = await prisma.genre.createMany({
+    data: genres,
+    skipDuplicates: true,
+  });
 
-  console.log(`Seeded ${genres.length} genres`);
+  console.log(`Seeded ${result.count} new genres (${genres.length - result.count} already existed)`);
 }
 
 main()
