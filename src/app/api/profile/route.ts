@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       return NextResponse.json(profile);
     }
 
-    const startingCredits = 3;
+    const startingCredits = 1;
 
     const profile = await prisma.artistProfile.create({
       data: {

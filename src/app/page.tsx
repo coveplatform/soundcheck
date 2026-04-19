@@ -64,7 +64,7 @@ export default function Home() {
           <HeroCTA />
 
           <p className="mt-6 text-sm text-neutral-500">
-            Start with <span className="font-bold text-purple-600">3 free credits</span> • Earn more by reviewing • No credit card required
+            Start with <span className="font-bold text-purple-600">1 free credit</span> • Earn more by reviewing • No credit card required
           </p>
 
         </div>

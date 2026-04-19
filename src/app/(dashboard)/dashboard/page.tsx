@@ -319,7 +319,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         <div className="bg-lime-400 border-b border-lime-500">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
             <p className="text-sm font-black text-black flex-1">
-              Your 3 free credits were used to queue 3 reviews for your track. You&apos;ll be notified as feedback comes in.
+              Your free credit was used to queue a review for your track. You&apos;ll be notified as feedback comes in.
             </p>
             <Link
               href="/review"

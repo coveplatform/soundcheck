@@ -193,11 +193,11 @@ export default function OnboardingPage() {
 
       const trackData = await trackRes.json();
 
-      // 3. Request 3 reviews (uses their 3 free credits)
+      // Request 1 review (uses their free credit)
       await fetch(`/api/tracks/${trackData.id}/request-reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ desiredReviews: 3 }),
+        body: JSON.stringify({ desiredReviews: 1 }),
       });
 
       await updateSession();
@@ -346,9 +346,9 @@ export default function OnboardingPage() {
                   <span className="text-lime-400 text-sm font-black">1</span>
                 </div>
                 <div>
-                  <p className="text-sm font-black text-black">You start with 3 free credits.</p>
+                  <p className="text-sm font-black text-black">You start with 1 free credit.</p>
                   <p className="text-xs text-black/60 font-medium mt-0.5">
-                    No reviewing needed yet — use them to get your first track reviewed right away.
+                    No reviewing needed yet — use it to get your first track reviewed right away.
                   </p>
                 </div>
               </div>
@@ -466,7 +466,7 @@ export default function OnboardingPage() {
                 <div className="bg-lime-400 rounded-xl border-2 border-black px-4 py-3 flex items-center gap-2">
                   <Gift className="h-4 w-4 text-black flex-shrink-0" />
                   <p className="text-xs text-black font-black">
-                    Your 3 free credits will be used — you&apos;ll get 3 real artist reviews.
+                    Your free credit will be used — you&apos;ll get 1 real artist review.
                   </p>
                 </div>
               </div>

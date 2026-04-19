@@ -52,7 +52,7 @@ export default function Home() {
           <HeroCTA />
 
           <p className="mt-6 text-sm text-neutral-500">
-            Start with <span className="font-bold text-purple-600">3 free credits</span> • Earn more by reviewing • No credit card required
+            Start with <span className="font-bold text-purple-600">1 free credit</span> • Earn more by reviewing • No credit card required
           </p>
 
         </div>
@@ -281,7 +281,7 @@ export default function Home() {
                     </Button>
                   </Link>
                 </div>
-                <p className="mt-4 text-sm text-neutral-500">Start with <span className="font-bold text-purple-400">3 free credits</span> — no card needed</p>
+                <p className="mt-4 text-sm text-neutral-500">Start with <span className="font-bold text-purple-400">1 free credit</span> — no card needed</p>
               </div>
             </div>
           </AnimatedSection>
