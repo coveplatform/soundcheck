@@ -237,6 +237,22 @@ export default async function ReviewQueuePage({
         </div>
       </div>
 
+      {/* ── DAILY LIMIT WARNING ────────────────────────────────── */}
+      {!bypassLimit && reviewsRemaining === 1 && (
+        <div className="bg-amber-400 border-b-2 border-black/10">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3">
+            <p className="text-sm font-black text-black">Last review for today — limit resets at midnight.</p>
+          </div>
+        </div>
+      )}
+      {!bypassLimit && reviewsRemaining === 0 && available.length > 0 && (
+        <div className="bg-red-500 border-b-2 border-red-600">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3">
+            <p className="text-sm font-black text-white">Daily limit reached ({MAX_REVIEWS_PER_DAY}/day). Come back tomorrow!</p>
+          </div>
+        </div>
+      )}
+
       {/* ── NOTICE STRIPS ──────────────────────────────────────── */}
       {notice === "skipped" && (
         <div className="bg-lime-400 border-b border-lime-500">

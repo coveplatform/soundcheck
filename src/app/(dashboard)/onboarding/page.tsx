@@ -483,7 +483,7 @@ export default function OnboardingPage() {
                 isLoading={isSubmittingTrack}
                 onClick={handleCompleteWithTrack}
               >
-                Submit &amp; Get 3 Reviews
+                Submit &amp; Get 1 Review
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
 

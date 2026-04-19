@@ -260,7 +260,7 @@ export default function Home() {
           <AnimatedSection className="max-w-2xl mb-12">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">Your music has a home</h2>
             <p className="mt-5 text-neutral-600 text-lg max-w-xl">
-              Every track you upload gets its own page. Listeners can discover it, listen, and if they like it, buy it and share it with their audience.
+              Every track you upload gets its own page. Listeners can discover it, listen, and share it with their audience.
             </p>
           </AnimatedSection>
 
@@ -417,11 +417,11 @@ export default function Home() {
               },
               {
                 q: "What does Pro get me?",
-                a: "Pro gives you 3 concurrent review slots (vs 1 for free), priority queue placement so your tracks get reviewed faster, a Pro badge, and early access to new features. $9.99/month, cancel anytime.",
+                a: "Pro gives you 3 tracks in review at once (vs 1 for free), priority queue placement so your tracks get reviewed faster, a Pro badge, and early access to new features. $9.99/month, cancel anytime.",
               },
               {
                 q: "Is it really free?",
-                a: "Yes. You can upload tracks, earn credits by reviewing, and access full analytics — all for free, forever. Pro is for artists who want to move faster with more concurrent queue slots.",
+                a: "Yes. You can upload tracks, earn credits by reviewing, and access full analytics — all for free, forever. Pro is for artists who want to move faster with more tracks in review at once.",
               },
               {
                 q: "Who reviews my tracks?",

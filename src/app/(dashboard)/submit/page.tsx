@@ -563,6 +563,15 @@ export default function SubmitTrackPage() {
               <p className="text-sm text-black/40 font-medium mt-2">
                 Get real feedback from fellow artists in your genre.
               </p>
+              {!profileLoading && (
+                <div className="flex items-center gap-1.5 mt-3">
+                  <Coins className="h-4 w-4 text-purple-600" />
+                  <span className={`text-sm font-black tabular-nums ${(profile?.reviewCredits ?? 0) === 0 ? "text-red-500" : "text-black"}`}>
+                    {profile?.reviewCredits ?? 0}
+                  </span>
+                  <span className="text-sm text-black/40 font-medium">credits available</span>
+                </div>
+              )}
             </div>
             {/* Step pills */}
             <div className="flex-shrink-0 flex items-center gap-2">
@@ -1059,15 +1068,15 @@ export default function SubmitTrackPage() {
               </button>
             </div>
 
-            {/* Slot full warning */}
+            {/* Queue full warning */}
             {!slotAvailable && (
               <div className="bg-amber-400 rounded-2xl px-5 py-4 flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 text-black flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-black text-black mb-1">Your review slot is full</p>
+                  <p className="text-sm font-black text-black mb-1">Your review queue is full</p>
                   <p className="text-sm text-black/70 font-medium">
-                    You can have {slotInfo?.maxSlots ?? 1} track{(slotInfo?.maxSlots ?? 1) > 1 ? "s" : ""} in the queue at a time. Wait for current reviews to complete, or{" "}
-                    <Link href="/pro" className="font-black underline underline-offset-2">upgrade to Pro</Link>{" "}for 3 slots.
+                    Free accounts can have {slotInfo?.maxSlots ?? 1} track{(slotInfo?.maxSlots ?? 1) > 1 ? "s" : ""} in review at a time. Wait for current reviews to complete, or{" "}
+                    <Link href="/pro" className="font-black underline underline-offset-2">upgrade to Pro</Link>{" "}for 3 concurrent tracks.
                   </p>
                 </div>
               </div>
