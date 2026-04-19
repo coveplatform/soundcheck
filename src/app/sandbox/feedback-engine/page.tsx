@@ -17,18 +17,13 @@ import {
   type BehavioralFingerprint,
 } from "@/lib/feedback-intelligence";
 import { cn } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
 import {
-  Music,
   Check,
-  Download,
-  SkipForward,
   VolumeX,
   RotateCcw,
   Play,
   Pause,
   Volume2,
-  Eye,
   ArrowRight,
   Ear,
   Target,
@@ -100,6 +95,7 @@ export default function FeedbackEngineSandbox() {
   const ytReady = useRef(false);
   const ytContainerId = useId();
   const embedPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const [trackUrl, setTrackUrl] = useState(SAMPLE_TRACKS[1].url);
   const [customUrl, setCustomUrl] = useState("");
   const [useCustomUrl, setUseCustomUrl] = useState(false);
@@ -469,15 +465,18 @@ export default function FeedbackEngineSandbox() {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // REVIEW FORM — Dashboard aesthetic
+  // REVIEW FORM — Single-column guided flow
   // ═══════════════════════════════════════════════════════════════
 
+  const completedSteps = [fiTouched, wouldListenAgain !== null, !!playlistAction, mainWords >= 20, bestWords >= 15, !!qualityLevel, !!nextFocus];
+  const progress = Math.round((completedSteps.filter(Boolean).length / completedSteps.length) * 100);
+
   return (
-    <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
+    <div className="min-h-screen bg-white">
 
       {/* ── HERO ── */}
       <div className="bg-white border-b-2 border-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           <div className="flex items-start justify-between gap-6">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">Sandbox</p>
@@ -485,8 +484,11 @@ export default function FeedbackEngineSandbox() {
                 Feedback<br />Intelligence Engine.
               </h1>
               <p className="text-sm text-black/40 mt-3 max-w-md">
-                Play audio. Fill the form. Watch the engine capture your behavior in real-time — then see how it all lines up.
+                Play. Listen. Review. The engine captures your behavior in real-time — then shows how it all lines up.
               </p>
+              <a href="/sandbox/feedback-engine/artist" className="inline-flex items-center gap-1.5 mt-3 text-xs font-black text-purple-600 hover:text-purple-800 transition-colors">
+                <ArrowRight className="h-3.5 w-3.5" /> View Artist Dashboard
+              </a>
             </div>
             <div className="flex-shrink-0 text-right pl-5 sm:pl-8 border-l-2 border-black/10">
               <p className="text-5xl font-black text-black leading-none tabular-nums">{behavior.eventCount}</p>
@@ -496,315 +498,315 @@ export default function FeedbackEngineSandbox() {
         </div>
       </div>
 
-      {/* ── LIVE INTELLIGENCE STRIP — dark full-bleed ── */}
-      <div className="bg-neutral-900 border-b-2 border-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
-          <div className="flex items-end justify-between mb-4">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Live Intelligence</p>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5 leading-none flex items-center gap-2">
-                <Radio className="h-4 w-4 text-lime-400 animate-pulse" /> Capturing
-              </h2>
-            </div>
-            <div className="flex gap-2">
-              <span className="px-2.5 py-1 text-[10px] font-black rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">{liveMetrics.replayZones.length} replays</span>
-              <span className="px-2.5 py-1 text-[10px] font-black rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">{liveMetrics.skipZones.length} skips</span>
-              <span className="px-2.5 py-1 text-[10px] font-black rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">{liveMetrics.pausePoints.length} pauses</span>
-            </div>
+      {/* ── Purple bleed strip ── */}
+      <div className="bg-purple-600 border-b-2 border-black">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+          <p className="text-sm font-bold text-white/80">Listen first, then review — your behavior is being tracked</p>
+          <span className="text-[10px] font-black text-white/40 uppercase tracking-wider">{progress}% complete</span>
+        </div>
+      </div>
+
+      {/* ── STICKY PLAYER BAR ── */}
+      <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-sm">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          {/* Progress bar */}
+          <div className="h-1 bg-neutral-100 -mx-4 sm:-mx-6">
+            <div className="h-full bg-purple-500 transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
           </div>
 
-          {/* Metrics row */}
-          <div className="grid grid-cols-4 gap-2 mb-4">
-            <DarkStat label="Completion" value={pct(liveMetrics.completionRate)} />
-            <DarkStat label="Attention" value={pct(liveMetrics.attentionScore)} />
-            <DarkStat label="Unique Secs" value={String(liveMetrics.uniqueSecondsHeard)} />
-            <DarkStat label="Events" value={String(liveMetrics.totalEvents)} />
-          </div>
+          <div className="py-3 flex items-center gap-4">
+            {/* Play/Pause */}
+            <button onClick={togglePlay} className="h-10 w-10 rounded-full bg-neutral-900 text-white flex items-center justify-center flex-shrink-0 hover:bg-neutral-800 active:scale-95 transition-all">
+              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
+            </button>
 
-          {/* Live engagement heatmap */}
-          {duration > 0 && liveMetrics.engagementCurve.length > 0 && (
-            <div className="mb-4">
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 mb-1">Engagement Heatmap</p>
-              <div className="h-6 rounded-lg overflow-hidden flex items-end gap-[1px] bg-white/[0.04]">
-                {liveMetrics.engagementCurve.map((v, i) => (
-                  <div key={i} className="flex-1 min-w-[2px] rounded-t" style={{ height: `${Math.max(8, v * 100)}%`, background: v >= 0.8 ? "#a855f7" : v >= 0.6 ? "#c084fc" : v >= 0.3 ? "#7c3aed40" : v > 0 ? "#7c3aed20" : "transparent" }} />
-                ))}
+            {/* Real-time frequency visualizer */}
+            <div className="flex-1 min-w-0 h-8 rounded-lg overflow-hidden bg-neutral-50">
+              <AudioVisualizer isPlaying={isPlaying} />
+            </div>
+
+            {/* Time + volume */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="text-xs font-mono text-neutral-400 tabular-nums">{fmt(currentTime)}/{fmt(duration)}</span>
+              <button onClick={toggleMute} className={cn("h-7 w-7 rounded-full flex items-center justify-center transition-colors", isMuted ? "text-red-500" : "text-neutral-300 hover:text-neutral-500")}>
+                {isMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Hidden audio element */}
+      {trackUrl && sourceType === "DIRECT" && (
+        <audio ref={audioRef} src={trackUrl.startsWith("/") ? trackUrl : `/api/audio-proxy?url=${encodeURIComponent(trackUrl)}`}
+          preload="auto"
+          onTimeUpdate={() => { if (audioRef.current) { const t = audioRef.current.currentTime; setCurrentTime(t); behavior.onTimeUpdate(t); } }}
+          onLoadedMetadata={() => { if (audioRef.current) setDuration(audioRef.current.duration); }}
+          onPlay={() => { setIsPlaying(true); behavior.onPlay(audioRef.current?.currentTime ?? 0); }}
+          onPause={() => { setIsPlaying(false); behavior.onPause(audioRef.current?.currentTime ?? 0); }}
+        />
+      )}
+
+      {/* ── MAIN CONTENT — single column ── */}
+      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+
+        {/* Spacer */}
+        <div className="pt-6" />
+
+        {/* ── Track Source ── */}
+        <section className="pb-8">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {SAMPLE_TRACKS.map((t, i) => (
+              <button key={i} onClick={() => { if (t.url) { setTrackUrl(t.url); setUseCustomUrl(false); } else { setUseCustomUrl(true); setTrackUrl(customUrl || ""); } }} className={cn("px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all", (t.url ? trackUrl === t.url && !useCustomUrl : useCustomUrl) ? "bg-neutral-900 text-white border-neutral-900" : "bg-neutral-50 text-neutral-500 border-neutral-200 hover:border-neutral-400")}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+          {useCustomUrl && (
+            <input type="text" placeholder="Paste URL (MP3, YouTube, SoundCloud...)" value={customUrl} onChange={(e) => { setCustomUrl(e.target.value); setTrackUrl(e.target.value.trim() || ""); }} className="w-full px-4 py-3 rounded-xl bg-neutral-50 border border-neutral-200 text-sm font-medium placeholder-neutral-300 outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 mb-3" />
+          )}
+          {trackUrl && sourceType === "YOUTUBE" && <div className="aspect-video bg-black rounded-2xl overflow-hidden"><iframe id={ytContainerId} src={embedUrl(trackUrl, "YOUTUBE")} className="w-full h-full" allow="autoplay; encrypted-media" allowFullScreen /></div>}
+          {trackUrl && sourceType === "SOUNDCLOUD" && <div className="h-[166px] rounded-2xl overflow-hidden"><iframe ref={scIframeRef} src={embedUrl(trackUrl, "SOUNDCLOUD")} className="w-full h-full" allow="autoplay" scrolling="no" frameBorder="0" /></div>}
+          {trackUrl && sourceType === "BANDCAMP" && <div><iframe src={trackUrl} className="w-full h-[120px] rounded-xl" allow="autoplay" seamless /></div>}
+
+          {/* Real audio waveform with engagement heatmap */}
+          {trackUrl && sourceType === "DIRECT" && (
+            <div className="mt-4">
+              <div className="h-20 rounded-2xl overflow-hidden bg-neutral-50 border border-neutral-100">
+                <Waveform
+                  audioUrl={trackUrl}
+                  currentTime={currentTime}
+                  duration={duration}
+                  engagementCurve={liveMetrics.engagementCurve}
+                  replayZones={liveMetrics.replayZones}
+                  skipZones={liveMetrics.skipZones}
+                  onSeek={seek}
+                />
+              </div>
+              <div className="flex items-center justify-between mt-2">
+                <div className="flex gap-3 text-[9px] font-bold text-neutral-400">
+                  <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-purple-500" /> Played</span>
+                  <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-violet-600" /> Replayed</span>
+                  <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-amber-500" /> Skipped</span>
+                  <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-purple-100 border border-purple-200" /> Unplayed</span>
+                </div>
+                <span className="text-xs font-mono text-neutral-400 tabular-nums">{fmt(currentTime)} / {fmt(duration)}</span>
               </div>
             </div>
           )}
+        </section>
 
-          {/* Event stream — last 8 events */}
-          <div className="flex gap-1.5 overflow-x-auto pb-1">
-            {eventLog.slice(-8).reverse().map((e, i) => (
-              <span key={i} className={cn("flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap border", "bg-white/[0.04] border-white/[0.08]")}>
-                <span className={EVT_CLR[e.type]}>{EVT_ICON[e.type]}</span>
-                <span className="text-white/50">{e.type}</span>
-                <span className="text-white/20 font-mono">@{fmt(e.pos)}</span>
-              </span>
-            ))}
-            {eventLog.length === 0 && <span className="text-white/20 text-xs">Play audio to see events stream here</span>}
-          </div>
-        </div>
-      </div>
+        <div className="h-px bg-neutral-100" />
 
-      {/* ── AUDIO PLAYER ── */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-3">Track Source</p>
-
-        {/* Source selection */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {SAMPLE_TRACKS.map((t, i) => (
-            <button key={i} onClick={() => { if (t.url) { setTrackUrl(t.url); setUseCustomUrl(false); } else { setUseCustomUrl(true); setTrackUrl(customUrl || ""); } }} className={cn("px-3 py-1.5 rounded-full text-xs font-black border-2 transition-all", (t.url ? trackUrl === t.url && !useCustomUrl : useCustomUrl) ? "bg-black text-white border-black" : "bg-white text-black border-black/10 hover:border-black/30")}>
-              {t.label}
-            </button>
-          ))}
-        </div>
-        {useCustomUrl && (
-          <input type="text" placeholder="Paste URL (MP3, YouTube, SoundCloud...)" value={customUrl} onChange={(e) => { setCustomUrl(e.target.value); setTrackUrl(e.target.value.trim() || ""); }} className="w-full px-4 py-3 rounded-xl bg-white border-2 border-black/10 text-sm font-medium placeholder-black/25 outline-none focus:border-black mb-4" />
-        )}
-
-        {/* Audio elements */}
-        {trackUrl && sourceType === "DIRECT" && (
-          <audio ref={audioRef} src={trackUrl}
-            onTimeUpdate={() => { if (audioRef.current) { const t = audioRef.current.currentTime; setCurrentTime(t); behavior.onTimeUpdate(t); } }}
-            onLoadedMetadata={() => { if (audioRef.current) setDuration(audioRef.current.duration); }}
-            onPlay={() => { setIsPlaying(true); behavior.onPlay(audioRef.current?.currentTime ?? 0); }}
-            onPause={() => { setIsPlaying(false); behavior.onPause(audioRef.current?.currentTime ?? 0); }}
-          />
-        )}
-        {trackUrl && sourceType === "YOUTUBE" && <div className="aspect-video bg-black rounded-2xl overflow-hidden border-2 border-black mb-4"><iframe id={ytContainerId} src={embedUrl(trackUrl, "YOUTUBE")} className="w-full h-full" allow="autoplay; encrypted-media" allowFullScreen /></div>}
-        {trackUrl && sourceType === "SOUNDCLOUD" && <div className="h-[166px] rounded-2xl overflow-hidden border-2 border-black mb-4"><iframe ref={scIframeRef} src={embedUrl(trackUrl, "SOUNDCLOUD")} className="w-full h-full" allow="autoplay" scrolling="no" frameBorder="0" /></div>}
-        {trackUrl && sourceType === "BANDCAMP" && <div className="mb-4"><iframe src={trackUrl} className="w-full h-[120px] rounded-xl" allow="autoplay" seamless /></div>}
-
-        {/* Waveform / Progress with heatmap */}
-        {sourceType === "DIRECT" && trackUrl && (
-          <div className="bg-white border-2 border-black rounded-2xl p-5">
-            {/* Engagement heatmap on waveform */}
-            <div className="mb-2 relative">
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20 mb-1">Waveform Heatmap</p>
-              <div className="h-10 rounded-xl overflow-hidden flex items-end gap-[1px] bg-black/[0.02] border border-black/[0.06]">
-                {(duration > 0 && liveMetrics.engagementCurve.length > 0 ? liveMetrics.engagementCurve : Array(Math.max(1, Math.ceil((duration || 60) / 10))).fill(0)).map((v, i) => {
-                  const barStart = i * 10;
-                  const barEnd = (i + 1) * 10;
-                  const isCurrent = currentTime >= barStart && currentTime < barEnd;
-                  const hasReplay = liveMetrics.replayZones.some(z => z.start < barEnd && z.end > barStart);
-                  const hasSkip = liveMetrics.skipZones.some(z => z.from < barEnd && z.to > barStart);
-                  let bg = "bg-black/[0.03]";
-                  if (v >= 0.8) bg = "bg-purple-500";
-                  else if (v >= 0.6) bg = "bg-purple-400";
-                  else if (v >= 0.3) bg = "bg-purple-200";
-                  else if (v > 0) bg = "bg-purple-100";
-                  if (hasReplay) bg = "bg-purple-500";
-                  if (hasSkip) bg = "bg-amber-400";
-                  return (
-                    <div key={i} className={cn("flex-1 min-w-[3px] rounded-t relative transition-all", bg, isCurrent && "ring-2 ring-black ring-offset-1")} style={{ height: `${Math.max(12, (v || 0.05) * 100)}%` }}>
-                      {hasReplay && <div className="absolute bottom-0 left-0 right-0 h-1 bg-purple-600 rounded-b" />}
-                      {hasSkip && <div className="absolute top-0 left-0 right-0 h-1 bg-amber-500 rounded-t" />}
-                    </div>
-                  );
-                })}
-              </div>
-              {/* Playhead */}
-              {duration > 0 && <div className="absolute bottom-0 h-10 w-[2px] bg-black rounded-full pointer-events-none transition-all" style={{ left: `${(currentTime / duration) * 100}%` }} />}
-            </div>
-
-            {/* Legend */}
-            <div className="flex gap-3 mb-3 text-[9px] font-bold text-black/30">
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded bg-purple-500" /> High engagement</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded bg-purple-200" /> Some engagement</span>
-              <span className="flex items-center gap-1"><span className="h-2 w-2 rounded bg-amber-400" /> Skipped</span>
-            </div>
-
-            {/* Progress bar */}
-            <div className="h-2 bg-black/[0.06] rounded-full cursor-pointer overflow-hidden mb-4" onClick={(e) => { if (!duration) return; const r = e.currentTarget.getBoundingClientRect(); seek(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * duration); }}>
-              <div className="h-full bg-black rounded-full transition-all" style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }} />
-            </div>
-
-            {/* Controls */}
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <button onClick={togglePlay} className="h-12 w-12 rounded-full bg-black text-white flex items-center justify-center border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,0.15)] hover:shadow-[1px_1px_0_rgba(0,0,0,0.15)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none transition-all">
-                  {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
-                </button>
-                <span className="text-sm font-black font-mono text-black/50">{fmt(currentTime)} / {fmt(duration)}</span>
-              </div>
+        {/* ── Live Intelligence (collapsible) ── */}
+        <section className="py-6">
+          <div className="bg-neutral-900 rounded-2xl p-5 text-white">
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <button onClick={toggleMute} className={cn("h-8 w-8 rounded-full flex items-center justify-center border-2", isMuted ? "bg-red-100 border-red-300 text-red-600" : "bg-white border-black/10 text-black/60 hover:border-black/30")}>
-                  {isMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
-                </button>
-                <input type="range" min={0} max={1} step={0.01} value={isMuted ? 0 : volume} onChange={(e) => changeVolume(parseFloat(e.target.value))} className="w-20 accent-black" />
+                <Radio className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
+                <p className="text-xs font-black text-white/50">Live Intelligence</p>
+              </div>
+              <div className="flex gap-1.5">
+                <span className="px-2 py-0.5 text-[9px] font-bold rounded-full bg-purple-500/15 text-purple-300">{liveMetrics.replayZones.length} replay</span>
+                <span className="px-2 py-0.5 text-[9px] font-bold rounded-full bg-amber-500/15 text-amber-300">{liveMetrics.skipZones.length} skip</span>
+                <span className="px-2 py-0.5 text-[9px] font-bold rounded-full bg-blue-500/15 text-blue-300">{liveMetrics.pausePoints.length} pause</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-4 gap-2 mb-3">
+              <DarkStat label="Completion" value={pct(liveMetrics.completionRate)} />
+              <DarkStat label="Attention" value={pct(liveMetrics.attentionScore)} />
+              <DarkStat label="Unique Secs" value={String(liveMetrics.uniqueSecondsHeard)} />
+              <DarkStat label="Events" value={String(liveMetrics.totalEvents)} />
+            </div>
+            {/* Event stream — no scroll */}
+            <div className="flex gap-1 overflow-hidden">
+              {eventLog.slice(-6).reverse().map((e, i) => (
+                <span key={i} className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold whitespace-nowrap bg-white/[0.05]">
+                  <span className={EVT_CLR[e.type]}>{EVT_ICON[e.type]}</span>
+                  <span className="text-white/40">{e.type}</span>
+                  <span className="text-white/15 font-mono">@{fmt(e.pos)}</span>
+                </span>
+              ))}
+              {eventLog.length === 0 && <span className="text-white/20 text-[10px]">Play audio to see events</span>}
+            </div>
+          </div>
+        </section>
+
+        <div className="h-px bg-neutral-100" />
+
+        {/* ═══════════════════════════════════════════════════
+            QUESTIONS — single column, one at a time feel
+            ═══════════════════════════════════════════════════ */}
+
+        {/* Q1: First Impression */}
+        <ScrollReveal><section className="py-8 border-b border-neutral-100">
+          <p className="text-xs font-bold text-purple-600 mb-1">Question 1</p>
+          <h2 className="text-lg font-black text-neutral-900 mb-1">First Impression</h2>
+          <p className="text-sm text-neutral-400 mb-5">How did the first 30 seconds hit?</p>
+          <div className="flex gap-2">
+            {[{ s: 1, e: "😐", l: "Nah" }, { s: 2, e: "🤷", l: "Meh" }, { s: 3, e: "👍", l: "Solid" }, { s: 4, e: "🔥", l: "Into it" }, { s: 5, e: "🤯", l: "Hooked" }].map(({ s, e, l }) => (
+              <button key={s} type="button" onClick={() => { setFiScore(s); setFiTouched(true); }} className={cn("flex-1 flex flex-col items-center gap-1.5 py-4 rounded-2xl border-2 font-bold text-sm transition-all", fiTouched && fiScore === s ? fiColor(s) : "border-neutral-200 bg-white hover:bg-neutral-50 hover:border-neutral-300 hover:scale-[1.02] text-neutral-400")}>
+                <span className="text-xl">{e}</span>
+                <span className="text-[11px]">{l}</span>
+              </button>
+            ))}
+          </div>
+          {fiTouched && <p className={cn("text-sm font-bold px-4 py-2.5 rounded-xl mt-3", fiColor(fiScore))}>{fiLabel(fiScore)}</p>}
+        </section></ScrollReveal>
+
+        {/* Q2: Would Listen Again */}
+        <ScrollReveal delay={50}><section className="py-8 border-b border-neutral-100">
+          <p className="text-xs font-bold text-purple-600 mb-1">Question 2</p>
+          <h2 className="text-lg font-black text-neutral-900 mb-1">Would you listen again?</h2>
+          <p className="text-sm text-neutral-400 mb-5">Be honest — would you come back to this?</p>
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setWouldListenAgain(true)} className={cn("flex-1 py-4 text-sm font-black rounded-2xl border-2 transition-all flex items-center justify-center gap-2", wouldListenAgain === true ? "bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20" : "border-neutral-200 bg-white text-neutral-400 hover:border-emerald-300 hover:text-emerald-600")}><span className="text-lg">👍</span> Yes, I would</button>
+            <button type="button" onClick={() => setWouldListenAgain(false)} className={cn("flex-1 py-4 text-sm font-black rounded-2xl border-2 transition-all flex items-center justify-center gap-2", wouldListenAgain === false ? "bg-red-500 text-white border-red-500 shadow-lg shadow-red-500/20" : "border-neutral-200 bg-white text-neutral-400 hover:border-red-300 hover:text-red-500")}><span className="text-lg">👎</span> Probably not</button>
+          </div>
+        </section></ScrollReveal>
+
+        {/* Q3: Main Feedback (largest section) */}
+        <ScrollReveal delay={100}><section className="py-8 border-b border-neutral-100">
+          <p className="text-xs font-bold text-purple-600 mb-1">Question 3</p>
+          <h2 className="text-lg font-black text-neutral-900 mb-1">What needs work? <span className="text-purple-500">*</span></h2>
+          <p className="text-sm text-neutral-400 mb-4">Be specific — timestamps, elements, frequencies. The more detail, the higher your quality score.</p>
+          <textarea value={mainFeedback} onChange={(e) => setMainFeedback(e.target.value)} placeholder="E.g., 'The low-mids around 200-300Hz make the mix feel heavy. Try a gentle 2dB cut on the pads around that range to let the bass breathe. The transition at 2:30 could use a filter sweep...'" className="w-full px-4 py-3.5 bg-neutral-50 border-2 border-neutral-200 rounded-xl text-sm text-neutral-900 min-h-[160px] resize-none outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 focus:bg-white placeholder:text-neutral-300 transition-all" />
+          <div className="flex items-center justify-between mt-2">
+            <span className={cn("text-xs font-bold font-mono", mainWords >= 20 ? "text-emerald-600" : "text-neutral-300")}>{mainWords} / 20 words</span>
+            {mainWords >= 20 && <span className="text-xs font-bold text-emerald-600 flex items-center gap-1"><Check className="h-3.5 w-3.5" /> Minimum met</span>}
+          </div>
+          {/* Live quality */}
+          {mainFeedback.length > 15 && (
+            <div className="mt-4 bg-neutral-50 rounded-xl p-4 space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1">Live Quality Score</p>
+              <QBar label="Specificity" value={mainQ.specificity} />
+              <QBar label="Actionability" value={mainQ.actionability} />
+              <QBar label="Tech Depth" value={mainQ.technicalDepth} />
+            </div>
+          )}
+        </section></ScrollReveal>
+
+        {/* Q4: Best Moment */}
+        <ScrollReveal delay={100}><section className="py-8 border-b border-neutral-100">
+          <p className="text-xs font-bold text-purple-600 mb-1">Question 4</p>
+          <h2 className="text-lg font-black text-neutral-900 mb-1">What&apos;s the best moment? <span className="text-purple-500">*</span></h2>
+          <p className="text-sm text-neutral-400 mb-4">What stood out? What should they keep doing?</p>
+          <textarea value={bestMoment} onChange={(e) => setBestMoment(e.target.value)} placeholder="E.g., 'The atmospheric pad that enters at 0:35 is gorgeous — it creates this space that makes you want to float in it. The vocal processing in the bridge has this haunting quality...'" className="w-full px-4 py-3.5 bg-neutral-50 border-2 border-neutral-200 rounded-xl text-sm text-neutral-900 min-h-[130px] resize-none outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 focus:bg-white placeholder:text-neutral-300 transition-all" />
+          <div className="flex items-center justify-between mt-2">
+            <span className={cn("text-xs font-bold font-mono", bestWords >= 15 ? "text-emerald-600" : "text-neutral-300")}>{bestWords} / 15 words</span>
+            {bestWords >= 15 && <span className="text-xs font-bold text-emerald-600 flex items-center gap-1"><Check className="h-3.5 w-3.5" /> Minimum met</span>}
+          </div>
+          {bestMoment.length > 15 && (
+            <div className="mt-4 bg-neutral-50 rounded-xl p-4 space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1">Live Quality Score</p>
+              <QBar label="Specificity" value={bestQ.specificity} />
+              <QBar label="Actionability" value={bestQ.actionability} />
+              <QBar label="Tech Depth" value={bestQ.technicalDepth} />
+            </div>
+          )}
+        </section></ScrollReveal>
+
+        {/* Q5: Playlist Action */}
+        <ScrollReveal delay={100}><section className="py-8 border-b border-neutral-100">
+          <p className="text-xs font-bold text-purple-600 mb-1">Question 5</p>
+          <h2 className="text-lg font-black text-neutral-900 mb-1">Playlist action <span className="text-purple-500">*</span></h2>
+          <p className="text-sm text-neutral-400 mb-5">If this came on shuffle, you&apos;d...</p>
+          <div className="grid grid-cols-2 gap-3">
+            {[{ id: "ADD_TO_LIBRARY", e: "💾", l: "Add to library" }, { id: "LET_PLAY", e: "▶️", l: "Let it play" }, { id: "SKIP", e: "⏭️", l: "Skip it" }, { id: "DISLIKE", e: "👎", l: "Dislike" }].map((a) => (
+              <button key={a.id} type="button" onClick={() => setPlaylistAction(a.id)} className={cn("flex items-center gap-3 px-5 py-4 rounded-2xl border-2 font-bold text-sm transition-all text-left", playlistAction === a.id ? "bg-purple-50 text-purple-700 border-purple-400 shadow-sm" : "border-neutral-200 bg-white text-neutral-500 hover:border-neutral-300 hover:bg-neutral-50")}>
+                <span className="text-lg">{a.e}</span>{a.l}
+              </button>
+            ))}
+          </div>
+        </section></ScrollReveal>
+
+        {/* Q6 + Q7: Quality + Focus side by side */}
+        <ScrollReveal delay={100}><section className="py-8 border-b border-neutral-100">
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div>
+              <p className="text-xs font-bold text-purple-600 mb-1">Question 6</p>
+              <h2 className="text-lg font-black text-neutral-900 mb-1">Quality level <span className="text-purple-500">*</span></h2>
+              <p className="text-sm text-neutral-400 mb-4">How would you rate the production?</p>
+              <div className="space-y-1.5">
+                {[{ id: "PROFESSIONAL", e: "💎", l: "Professional" }, { id: "RELEASE_READY", e: "✅", l: "Release ready" }, { id: "ALMOST_THERE", e: "🔧", l: "Almost there" }, { id: "DEMO_STAGE", e: "🛠️", l: "Demo stage" }, { id: "NOT_READY", e: "⚠️", l: "Not ready" }].map(lv => (
+                  <button key={lv.id} type="button" onClick={() => setQualityLevel(lv.id)} className={cn("w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-bold transition-all flex items-center gap-3", qualityLevel === lv.id ? "bg-purple-50 text-purple-700 border-purple-400" : "border-neutral-200 bg-white text-neutral-500 hover:border-neutral-300 hover:bg-neutral-50")}>
+                    <span className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all {0}" style={{ borderColor: qualityLevel === lv.id ? '#7c3aed' : '#d4d4d4' }}>{qualityLevel === lv.id && <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />}</span>
+                    {lv.l}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-purple-600 mb-1">Question 7</p>
+              <h2 className="text-lg font-black text-neutral-900 mb-1">Next focus <span className="text-purple-500">*</span></h2>
+              <p className="text-sm text-neutral-400 mb-4">What should the artist work on next?</p>
+              <div className="space-y-1.5">
+                {[{ id: "MIXING", e: "🎚️", l: "Mixing" }, { id: "ARRANGEMENT", e: "🎼", l: "Arrangement" }, { id: "SOUND_DESIGN", e: "🎛️", l: "Sound design" }, { id: "SONGWRITING", e: "✍️", l: "Songwriting" }, { id: "PERFORMANCE", e: "🎤", l: "Performance" }, { id: "READY_TO_RELEASE", e: "🚀", l: "Ship it!" }].map(f => (
+                  <button key={f.id} type="button" onClick={() => setNextFocus(f.id)} className={cn("w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-bold transition-all flex items-center gap-3", nextFocus === f.id ? "bg-purple-50 text-purple-700 border-purple-400" : "border-neutral-200 bg-white text-neutral-500 hover:border-neutral-300 hover:bg-neutral-50")}>
+                    <span className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all" style={{ borderColor: nextFocus === f.id ? '#7c3aed' : '#d4d4d4' }}>{nextFocus === f.id && <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />}</span>
+                    {f.l}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
-        )}
+        </section></ScrollReveal>
+
+        {/* Q-optional: Technical Issues */}
+        <ScrollReveal delay={100}><section className="py-8 border-b border-neutral-100">
+          <p className="text-xs font-bold text-neutral-400 mb-1">Optional</p>
+          <h2 className="text-lg font-black text-neutral-900 mb-1">Technical issues?</h2>
+          <p className="text-sm text-neutral-400 mb-5">Flag anything that stood out</p>
+          <div className="flex flex-wrap gap-2">
+            {[{ id: "vocals-buried", e: "🎙️", l: "Vocals buried" }, { id: "muddy-low", e: "🔈", l: "Muddy low end" }, { id: "compressed", e: "📦", l: "Over-compressed" }, { id: "harsh-highs", e: "⚡", l: "Harsh highs" }, { id: "narrow-stereo", e: "↔️", l: "Narrow stereo" }, { id: "repetitive", e: "🔁", l: "Too repetitive" }, { id: "too-long", e: "⏱️", l: "Too long" }].map((iss) => (
+              <button key={iss.id} type="button" onClick={() => setTechnicalIssues(p => p.includes(iss.id) ? p.filter(x => x !== iss.id) : [...p, iss.id])} className={cn("px-4 py-2.5 text-sm font-bold rounded-2xl border-2 transition-all flex items-center gap-2", technicalIssues.includes(iss.id) ? "bg-amber-50 text-amber-700 border-amber-400 shadow-sm" : "border-neutral-200 bg-white text-neutral-400 hover:border-neutral-300 hover:bg-neutral-50")}>
+                <span className="text-base">{iss.e}</span> {iss.l}
+              </button>
+            ))}
+          </div>
+        </section></ScrollReveal>
+
+        {/* Tips */}
+        <ScrollReveal delay={100}><section className="py-8">
+          <div className="bg-neutral-50 rounded-2xl p-5 border border-neutral-100">
+            <p className="text-xs font-black text-neutral-900 mb-3">Tips to score higher</p>
+            <div className="grid sm:grid-cols-3 gap-4 text-[12px] text-neutral-500 leading-relaxed">
+              <div>
+                <p className="font-black text-purple-600 mb-1">Specificity</p>
+                <p>Use timestamps (1:30), name elements (kick, vocal, pad), reference sections (verse, chorus)</p>
+              </div>
+              <div>
+                <p className="font-black text-emerald-600 mb-1">Actionability</p>
+                <p>Give suggestions (try, consider), explain reasoning, use comparisons</p>
+              </div>
+              <div>
+                <p className="font-black text-blue-600 mb-1">Technical depth</p>
+                <p>Use production terms (EQ, compression), mention dB/Hz values, cover multiple dimensions</p>
+              </div>
+            </div>
+          </div>
+        </section></ScrollReveal>
       </div>
 
-      {/* ── REVIEW FORM ── */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-2 gap-6">
-
-          {/* LEFT — Quick Reactions */}
-          <div className="space-y-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">Quick Reactions</p>
-
-            {/* First Impression */}
-            <div className="bg-white border-2 border-black/10 rounded-2xl p-5">
-              <Label className="text-sm font-black text-black">First Impression</Label>
-              <p className="text-[11px] text-black/40 mt-0.5 mb-3">How did the first 30 seconds hit?</p>
-              <div className="grid grid-cols-5 gap-1.5">
-                {[{ s: 1, n: "1", l: "Nah" }, { s: 2, n: "2", l: "Meh" }, { s: 3, n: "3", l: "Solid" }, { s: 4, n: "4", l: "Into it" }, { s: 5, n: "5", l: "Hooked" }].map(({ s, n, l }) => (
-                  <button key={s} type="button" onClick={() => { setFiScore(s); setFiTouched(true); }} className={cn("flex flex-col items-center gap-0.5 py-3 px-1 rounded-xl border-2 font-black transition-all", fiTouched && fiScore === s ? fiColor(s) : "border-black/10 bg-white hover:border-black/20 text-black/50")}>
-                    <span className="text-lg leading-none">{n}</span>
-                    <span className="text-[9px] font-bold">{l}</span>
-                  </button>
+      {/* ── SUBMIT — sticky bottom bar ── */}
+      <div className="sticky bottom-0 z-40 bg-white/95 backdrop-blur-md border-t border-neutral-200">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="h-9 w-9 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs font-black text-neutral-500">{progress}%</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-neutral-900 truncate">{canSubmit ? "Ready to analyze" : `${completedSteps.filter(Boolean).length} of ${completedSteps.length} complete`}</p>
+              <div className="flex gap-1.5 mt-0.5">
+                {completedSteps.map((done, i) => (
+                  <div key={i} className={cn("h-1 rounded-full transition-all", done ? "w-4 bg-purple-500" : "w-2 bg-neutral-200")} />
                 ))}
-              </div>
-              {fiTouched && <p className={cn("text-xs font-black px-3 py-2 rounded-lg mt-3", fiColor(fiScore))}>{fiLabel(fiScore)}</p>}
-            </div>
-
-            {/* Would Listen Again */}
-            <div className="bg-white border-2 border-black/10 rounded-2xl p-5">
-              <Label className="text-sm font-black text-black">Would you listen again?</Label>
-              <div className="flex gap-2 mt-3">
-                <button type="button" onClick={() => setWouldListenAgain(true)} className={cn("flex-1 py-3 text-sm font-black rounded-xl border-2 transition-all", wouldListenAgain === true ? "bg-black text-white border-black" : "bg-white text-black border-black/10 hover:border-black/20")}>Yes</button>
-                <button type="button" onClick={() => setWouldListenAgain(false)} className={cn("flex-1 py-3 text-sm font-black rounded-xl border-2 transition-all", wouldListenAgain === false ? "bg-black text-white border-black" : "bg-white text-black border-black/10 hover:border-black/20")}>No</button>
-              </div>
-            </div>
-
-            {/* Technical Issues */}
-            <div className="bg-white border-2 border-black/10 rounded-2xl p-5">
-              <Label className="text-sm font-black text-black">Technical Issues</Label>
-              <p className="text-[11px] text-black/40 mt-0.5 mb-3">Optional — select any you noticed</p>
-              <div className="flex flex-wrap gap-1.5">
-                {[{ id: "vocals-buried", l: "Vocals buried" }, { id: "muddy-low", l: "Muddy low end" }, { id: "compressed", l: "Over-compressed" }, { id: "harsh-highs", l: "Harsh highs" }, { id: "narrow-stereo", l: "Narrow stereo" }, { id: "repetitive", l: "Too repetitive" }, { id: "too-long", l: "Too long" }].map((iss) => (
-                  <button key={iss.id} type="button" onClick={() => setTechnicalIssues(p => p.includes(iss.id) ? p.filter(x => x !== iss.id) : [...p, iss.id])} className={cn("px-3 py-1.5 text-xs font-black rounded-full border-2 transition-all", technicalIssues.includes(iss.id) ? "bg-black text-white border-black" : "bg-white text-black/60 border-black/10 hover:border-black/20")}>
-                    {iss.l}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Playlist Action */}
-            <div className="bg-white border-2 border-black/10 rounded-2xl p-5">
-              <Label className="text-sm font-black text-black">Playlist Action *</Label>
-              <p className="text-[11px] text-black/40 mt-0.5 mb-3">If this came on shuffle, you&apos;d...</p>
-              <div className="grid grid-cols-2 gap-2">
-                {[{ id: "ADD_TO_LIBRARY", l: "Add to library", icon: Download }, { id: "LET_PLAY", l: "Let it play", icon: Music }, { id: "SKIP", l: "Skip", icon: SkipForward }, { id: "DISLIKE", l: "Dislike", icon: VolumeX }].map((a) => (
-                  <button key={a.id} type="button" onClick={() => setPlaylistAction(a.id)} className={cn("flex items-center justify-center gap-2 py-3 text-xs font-black rounded-xl border-2 transition-all", playlistAction === a.id ? "bg-purple-600 text-white border-purple-600" : "bg-white text-black border-black/10 hover:border-black/20")}>
-                    <a.icon className="h-3.5 w-3.5" />{a.l}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Quality + Next Focus side by side */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white border-2 border-black/10 rounded-2xl p-4">
-                <Label className="text-xs font-black text-black">Quality *</Label>
-                <div className="grid gap-1 mt-2">
-                  {[{ id: "PROFESSIONAL", l: "Pro" }, { id: "RELEASE_READY", l: "Release ready" }, { id: "ALMOST_THERE", l: "Almost" }, { id: "DEMO_STAGE", l: "Demo" }, { id: "NOT_READY", l: "Not ready" }].map(lv => (
-                    <button key={lv.id} type="button" onClick={() => setQualityLevel(lv.id)} className={cn("text-left py-1.5 px-2.5 rounded-lg text-[11px] font-black border-2 transition-all", qualityLevel === lv.id ? "bg-black text-white border-black" : "bg-white text-black/60 border-black/[0.06] hover:border-black/15")}>{lv.l}</button>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-white border-2 border-black/10 rounded-2xl p-4">
-                <Label className="text-xs font-black text-black">Next Focus *</Label>
-                <div className="grid gap-1 mt-2">
-                  {[{ id: "MIXING", l: "Mixing" }, { id: "ARRANGEMENT", l: "Arrangement" }, { id: "SOUND_DESIGN", l: "Sound design" }, { id: "SONGWRITING", l: "Songwriting" }, { id: "PERFORMANCE", l: "Performance" }, { id: "READY_TO_RELEASE", l: "Ship it!" }].map(f => (
-                    <button key={f.id} type="button" onClick={() => setNextFocus(f.id)} className={cn("text-left py-1.5 px-2.5 rounded-lg text-[11px] font-black border-2 transition-all", nextFocus === f.id ? "bg-purple-600 text-white border-purple-600" : "bg-white text-black/60 border-black/[0.06] hover:border-black/15")}>{f.l}</button>
-                  ))}
-                </div>
               </div>
             </div>
           </div>
-
-          {/* RIGHT — Written Feedback + Live Scoring */}
-          <div className="space-y-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">Written Feedback</p>
-
-            {/* Main Feedback */}
-            <div className="bg-white border-2 border-black/10 rounded-2xl p-5">
-              <Label className="text-sm font-black text-black">Main Feedback *</Label>
-              <p className="text-[11px] text-black/40 mt-0.5 mb-3">What&apos;s holding the track back? Be specific — timestamps, elements, frequencies.</p>
-              <textarea value={mainFeedback} onChange={(e) => setMainFeedback(e.target.value)} placeholder="E.g., 'The low-mids around 200-300Hz make the mix feel heavy. Try cutting 2-3dB there...'" className="w-full px-3 py-2.5 border-2 border-black/[0.06] rounded-xl text-sm min-h-[130px] resize-none outline-none focus:border-black/20 placeholder:text-black/20" />
-              <div className="flex items-center justify-between mt-2">
-                <span className={cn("text-xs font-black font-mono", mainWords >= 20 ? "text-lime-600" : "text-black/25")}>{mainWords}/20</span>
-                {mainWords >= 20 && <span className="text-[10px] font-black text-lime-600 flex items-center gap-1"><Check className="h-3 w-3" /> Done</span>}
-              </div>
-              {/* Live text quality */}
-              {mainFeedback.length > 15 && (
-                <div className="mt-3 pt-3 border-t border-black/[0.04] space-y-1.5">
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20">Live Quality Score</p>
-                  <QBar label="Specificity" value={mainQ.specificity} />
-                  <QBar label="Actionability" value={mainQ.actionability} />
-                  <QBar label="Tech Depth" value={mainQ.technicalDepth} />
-                </div>
-              )}
-            </div>
-
-            {/* Best Moment */}
-            <div className="bg-white border-2 border-black/10 rounded-2xl p-5">
-              <Label className="text-sm font-black text-black">Best Moment *</Label>
-              <p className="text-[11px] text-black/40 mt-0.5 mb-3">What stood out? What should they keep doing?</p>
-              <textarea value={bestMoment} onChange={(e) => setBestMoment(e.target.value)} placeholder="E.g., 'The vocal ad-libs at 2:15 add energy. The synth texture in the breakdown is unique...'" className="w-full px-3 py-2.5 border-2 border-black/[0.06] rounded-xl text-sm min-h-[110px] resize-none outline-none focus:border-black/20 placeholder:text-black/20" />
-              <div className="flex items-center justify-between mt-2">
-                <span className={cn("text-xs font-black font-mono", bestWords >= 15 ? "text-lime-600" : "text-black/25")}>{bestWords}/15</span>
-                {bestWords >= 15 && <span className="text-[10px] font-black text-lime-600 flex items-center gap-1"><Check className="h-3 w-3" /> Done</span>}
-              </div>
-              {bestMoment.length > 15 && (
-                <div className="mt-3 pt-3 border-t border-black/[0.04] space-y-1.5">
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/20">Live Quality Score</p>
-                  <QBar label="Specificity" value={bestQ.specificity} />
-                  <QBar label="Actionability" value={bestQ.actionability} />
-                  <QBar label="Tech Depth" value={bestQ.technicalDepth} />
-                </div>
-              )}
-            </div>
-
-            {/* Tips */}
-            <div className="bg-purple-50 border-2 border-purple-200 rounded-2xl p-5">
-              <p className="text-xs font-black text-purple-800 mb-2 flex items-center gap-1.5"><Eye className="h-3.5 w-3.5" /> Score Higher</p>
-              <div className="grid gap-2 text-[10px] text-purple-700/70">
-                <p><span className="font-black text-purple-900">Specificity:</span> Use timestamps (1:30), name elements (kick, vocal, pad), reference sections (verse, chorus)</p>
-                <p><span className="font-black text-purple-900">Actionability:</span> Give suggestions (try, consider), explain why (because, which causes), compare (instead of X, try Y)</p>
-                <p><span className="font-black text-purple-900">Technical:</span> Use production terms (EQ, compression, stereo width), mention dB/Hz values, cover multiple dimensions</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── SUBMIT — color-blocked CTA ── */}
-      <div className={cn("mt-8 border-t-2 border-black", canSubmit ? "bg-lime-400" : "bg-neutral-200")}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-            <div className="flex-1 min-w-0">
-              <p className={cn("text-[10px] font-black uppercase tracking-[0.3em] mb-1", canSubmit ? "text-black/40" : "text-black/25")}>
-                {canSubmit ? "Ready to analyze" : "Complete the form"}
-              </p>
-              <h2 className={cn("text-2xl sm:text-3xl font-black tracking-tight leading-tight", canSubmit ? "text-black" : "text-black/40")}>
-                {canSubmit ? "Submit & See Results" : "Fill all required fields"}
-              </h2>
-              <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
-                {[
-                  { done: fiTouched, l: "Impression" },
-                  { done: wouldListenAgain !== null, l: "Listen again" },
-                  { done: !!playlistAction, l: "Playlist" },
-                  { done: mainWords >= 20, l: "Feedback 20w" },
-                  { done: bestWords >= 15, l: "Best moment 15w" },
-                  { done: !!qualityLevel, l: "Quality" },
-                  { done: !!nextFocus, l: "Focus" },
-                ].map(r => (
-                  <span key={r.l} className={cn("text-[10px] font-black flex items-center gap-1", r.done ? (canSubmit ? "text-black/60" : "text-black/40") : "text-black/20")}>
-                    {r.done ? <Check className="h-3 w-3" /> : <span className="h-3 w-3 rounded-full border-2 border-current" />} {r.l}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <button onClick={handleSubmit} disabled={!canSubmit} className={cn("flex-shrink-0 font-black text-base border-2 border-black px-6 py-3 rounded-xl transition-all flex items-center gap-2", canSubmit ? "bg-black text-lime-400 shadow-[4px_4px_0_rgba(0,0,0,0.15)] hover:shadow-[2px_2px_0_rgba(0,0,0,0.15)] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]" : "bg-black/10 text-black/25 border-black/10 cursor-not-allowed")}>
-              Analyze <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
+          <button onClick={handleSubmit} disabled={!canSubmit} className={cn("font-black text-sm px-6 py-2.5 rounded-xl transition-all flex items-center gap-2 flex-shrink-0", canSubmit ? "bg-neutral-900 text-white hover:bg-neutral-800 active:scale-95" : "bg-neutral-100 text-neutral-300 cursor-not-allowed")}>
+            Analyze <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>
@@ -940,6 +942,259 @@ function RadarChart({ dimensions }: { dimensions: { axis: string; value: number;
           );
         })}
       </svg>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIO VISUALIZER — real-time frequency bars via Web Audio API
+// ═══════════════════════════════════════════════════════════════
+
+function AudioVisualizer({ isPlaying }: { isPlaying: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef<number>(0);
+  const timeRef = useRef(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const barCount = 48;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const w = rect.width;
+    const h = rect.height;
+    const gap = 1.5;
+    const barW = (w - gap * (barCount - 1)) / barCount;
+
+    if (!isPlaying) {
+      // Idle state — subtle flat bars
+      ctx.clearRect(0, 0, w, h);
+      for (let i = 0; i < barCount; i++) {
+        const x = i * (barW + gap);
+        ctx.fillStyle = "rgba(200,200,200,0.25)";
+        ctx.beginPath();
+        ctx.roundRect(x, h - 3, barW, 3, 1);
+        ctx.fill();
+      }
+      return;
+    }
+
+    // Animated wave motion when playing
+    const draw = () => {
+      rafRef.current = requestAnimationFrame(draw);
+      timeRef.current += 0.04;
+      const t = timeRef.current;
+      ctx.clearRect(0, 0, w, h);
+
+      for (let i = 0; i < barCount; i++) {
+        // Multiple sine waves for organic motion
+        const v1 = Math.sin(t * 2.5 + i * 0.15) * 0.3;
+        const v2 = Math.sin(t * 1.7 + i * 0.25) * 0.25;
+        const v3 = Math.sin(t * 3.2 + i * 0.1) * 0.15;
+        const v4 = Math.sin(t * 0.8 + i * 0.4) * 0.2;
+        const intensity = Math.max(0.08, 0.4 + v1 + v2 + v3 + v4);
+        const barH = Math.max(2, intensity * h * 0.9);
+        const x = i * (barW + gap);
+
+        // Purple gradient
+        const r2 = Math.round(168 - intensity * 60);
+        const g2 = Math.round(85 + intensity * 40);
+        ctx.fillStyle = intensity > 0.3 ? `rgba(${r2},${g2},247,${0.5 + intensity * 0.5})` : "rgba(200,200,200,0.15)";
+        ctx.beginPath();
+        ctx.roundRect(x, h - barH, barW, barH, 1);
+        ctx.fill();
+      }
+    };
+
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [isPlaying]);
+
+  return <canvas ref={canvasRef} className="w-full h-full" />;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WAVEFORM — decode audio, extract peaks, render with heatmap
+// ═══════════════════════════════════════════════════════════════
+
+function Waveform({ audioUrl, currentTime, duration, engagementCurve, replayZones, skipZones, onSeek }: {
+  audioUrl: string;
+  currentTime: number;
+  duration: number;
+  engagementCurve: number[];
+  replayZones: { start: number; end: number; count: number }[];
+  skipZones: { from: number; to: number }[];
+  onSeek: (t: number) => void;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const peaksRef = useRef<number[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const barCount = 120;
+
+  // Decode audio and extract peaks
+  useEffect(() => {
+    if (!audioUrl) return;
+    let cancelled = false;
+    const ac = new AudioContext();
+
+    const fetchUrl = audioUrl.startsWith("/")
+      ? audioUrl
+      : `/api/audio-proxy?url=${encodeURIComponent(audioUrl)}`;
+
+    fetch(fetchUrl)
+      .then(r => r.arrayBuffer())
+      .then(buf => ac.decodeAudioData(buf))
+      .then(decoded => {
+        if (cancelled) return;
+        const raw = decoded.getChannelData(0);
+        const peaks: number[] = [];
+        const chunkSize = Math.floor(raw.length / barCount);
+        for (let i = 0; i < barCount; i++) {
+          let max = 0;
+          const start = i * chunkSize;
+          const end = Math.min(start + chunkSize, raw.length);
+          for (let j = start; j < end; j++) {
+            const v = Math.abs(raw[j]);
+            if (v > max) max = v;
+          }
+          peaks.push(max);
+        }
+        // Normalize
+        const peakMax = Math.max(...peaks, 0.01);
+        peaksRef.current = peaks.map(p => p / peakMax);
+        setLoaded(true);
+      })
+      .catch(() => {});
+
+    return () => { cancelled = true; ac.close().catch(() => {}); };
+  }, [audioUrl]);
+
+  // Draw waveform
+  useEffect(() => {
+    if (!loaded || !canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const w = rect.width;
+    const h = rect.height;
+    const peaks = peaksRef.current;
+    const gap = 1.5;
+    const barW = (w - gap * (peaks.length - 1)) / peaks.length;
+    const playProgress = duration > 0 ? currentTime / duration : 0;
+    const playBar = Math.floor(playProgress * peaks.length);
+
+    ctx.clearRect(0, 0, w, h);
+
+    for (let i = 0; i < peaks.length; i++) {
+      const x = i * (barW + gap);
+      const peakH = Math.max(3, peaks[i] * h * 0.9);
+      const topY = (h - peakH) / 2;
+      const isPast = i <= playBar;
+
+      // Determine color from engagement data
+      const engIdx = Math.floor((i / peaks.length) * (engagementCurve.length || 1));
+      const engVal = engagementCurve[engIdx] ?? 0;
+      const barTimeSec = (i / peaks.length) * duration;
+      const hasReplay = replayZones.some(z => z.start < barTimeSec + (duration / peaks.length) && z.end > barTimeSec);
+      const hasSkip = skipZones.some(z => z.from < barTimeSec + (duration / peaks.length) && z.to > barTimeSec);
+
+      if (hasReplay && isPast) {
+        ctx.fillStyle = "#7c3aed"; // deep purple for replays
+      } else if (hasSkip && isPast) {
+        ctx.fillStyle = "#f59e0b"; // amber for skips
+      } else if (isPast) {
+        // Purple intensity based on engagement
+        if (engVal >= 0.7) ctx.fillStyle = "#9333ea";
+        else if (engVal >= 0.4) ctx.fillStyle = "#a855f7";
+        else ctx.fillStyle = "#c084fc";
+      } else {
+        // Future: light gray with slight engagement tint
+        if (engVal >= 0.5) ctx.fillStyle = "#e9d5ff";
+        else if (engVal > 0) ctx.fillStyle = "#f3e8ff";
+        else ctx.fillStyle = "#f0f0f0";
+      }
+
+      ctx.beginPath();
+      ctx.roundRect(x, topY, barW, peakH, 1.5);
+      ctx.fill();
+    }
+
+    // Playhead
+    if (duration > 0) {
+      const px = playProgress * w;
+      ctx.fillStyle = "#171717";
+      ctx.fillRect(px - 1, 0, 2, h);
+      // Playhead dot
+      ctx.beginPath();
+      ctx.arc(px, h / 2, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "#171717";
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }, [loaded, currentTime, duration, engagementCurve, replayZones, skipZones]);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!duration || !canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    onSeek(pct * duration);
+  };
+
+  if (!loaded) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <p className="text-xs font-bold text-neutral-300 animate-pulse">Loading waveform…</p>
+      </div>
+    );
+  }
+
+  return <canvas ref={canvasRef} className="w-full h-full cursor-pointer" onClick={handleClick} />;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCROLL REVEAL — Intersection Observer entrance animations
+// ═══════════════════════════════════════════════════════════════
+
+function ScrollReveal({ children, className, delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(16px)",
+        transition: `opacity 0.5s ease ${delay}ms, transform 0.5s ease ${delay}ms`,
+      }}
+    >
+      {children}
     </div>
   );
 }

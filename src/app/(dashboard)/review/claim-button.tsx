@@ -59,7 +59,7 @@ export function ClaimButton({ trackId, reviewsRemaining, isPro }: ClaimButtonPro
           Limit Reached
         </Button>
         <Link
-          href="/submit"
+          href="/pro"
           className="block text-xs text-purple-600 hover:text-purple-700 font-semibold mt-1 hover:underline"
         >
           Get Pro

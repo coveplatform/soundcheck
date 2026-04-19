@@ -53,6 +53,7 @@ model ArtistProfile {
   totalCreditsSpent            Int                @default(0)
   totalPeerReviews             Int                @default(0)
   reviewerExpertise            ReviewerExpertise?
+  experienceLevel              ExperienceLevel?
   User                         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   Review                       Review[]
   ReviewQueue                  ReviewQueue[]
@@ -389,6 +390,7 @@ model Track {
   artworkUrl                 String?
   duration                   Int?
   feedbackFocus              String?
+  feedbackAreas              String[]             @default([])
   status                     TrackStatus          @default(PENDING_PAYMENT)
   packageType                PackageType
   reviewsRequested           Int
@@ -776,6 +778,13 @@ enum StemType {
   MELODY
   FX
   OTHER
+}
+
+enum ExperienceLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  PROFESSIONAL
 }
 
 // ── Daily Chart ─────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
@@ -8,8 +8,6 @@ import {
   MessageSquare,
   Settings
 } from "lucide-react";
-import { PostReviewModal } from "@/components/referral/post-review-modal";
-
 interface Tab {
   id: "stats" | "reviews" | "settings";
   label: string;
@@ -29,7 +27,6 @@ interface TrackDashboardTabsProps {
   reviewsTab?: React.ReactNode;
   settingsTab?: React.ReactNode;
   trackTitle?: string;
-  hasCompletedReviews?: boolean;
 }
 
 export function TrackDashboardTabs({
@@ -39,23 +36,12 @@ export function TrackDashboardTabs({
   reviewsTab,
   settingsTab,
   trackTitle,
-  hasCompletedReviews = false,
 }: TrackDashboardTabsProps) {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as "stats" | "reviews" | "settings" | null;
   const validTabs: Array<"stats" | "reviews" | "settings"> = ["stats", "reviews", "settings"];
   const initialTab = tabParam && validTabs.includes(tabParam) ? tabParam : defaultTab;
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [showReferralModal, setShowReferralModal] = useState(false);
-
-  // Show referral modal when viewing reviews tab with completed reviews
-  useEffect(() => {
-    const hasSeenModal = sessionStorage.getItem("post-review-modal-seen");
-    if (activeTab === "reviews" && hasCompletedReviews && !hasSeenModal) {
-      setShowReferralModal(true);
-      sessionStorage.setItem("post-review-modal-seen", "true");
-    }
-  }, [activeTab, hasCompletedReviews]);
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId as "stats" | "reviews" | "settings");
@@ -63,15 +49,7 @@ export function TrackDashboardTabs({
   };
 
   return (
-    <>
-      {showReferralModal && trackTitle && (
-        <PostReviewModal
-          trackTitle={trackTitle}
-          onClose={() => setShowReferralModal(false)}
-        />
-      )}
-
-      <div>
+    <div>
         {/* Tab Navigation */}
         <div className="flex gap-2 mb-8 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((tab) => (
@@ -98,6 +76,5 @@ export function TrackDashboardTabs({
         {activeTab === "settings" && settingsTab}
       </div>
     </div>
-    </>
   );
 }

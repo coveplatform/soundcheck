@@ -10,7 +10,6 @@ import { GenreSelector } from "@/components/ui/genre-selector";
 import { SupportedPlatforms } from "@/components/ui/supported-platforms";
 import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, detectSource } from "@/lib/metadata";
-import { OutOfCreditsBanner } from "@/components/referral/out-of-credits-banner";
 import {
   ArrowRight,
   ArrowLeft,
@@ -103,6 +102,13 @@ export default function SubmitTrackPage() {
   const [feedbackFocus, setFeedbackFocus] = useState("");
   const [isPublic, setIsPublic] = useState(false);
 
+  // ---- experience level (from artist profile) + feedback areas (per-track) --
+  type ExperienceLevel = "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "PROFESSIONAL";
+  type FeedbackArea = "OVERALL_VIBE" | "MIXING" | "ARRANGEMENT" | "SONGWRITING" | "SOUND_DESIGN" | "RELEASE_READINESS";
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | null>(null);
+  const [selectedFeedbackAreas, setSelectedFeedbackAreas] = useState<FeedbackArea[]>([]);
+  const [experienceLevelDirty, setExperienceLevelDirty] = useState(false);
+
   // ---- step 3: review count state ----------------------------------------
   const [reviewCount, setReviewCount] = useState<number>(5);
   const [slotInfo, setSlotInfo] = useState<{ maxSlots: number; activeCount: number; isPro: boolean } | null>(null);
@@ -124,6 +130,9 @@ export default function SubmitTrackPage() {
             totalTracks: data.totalTracks ?? 0,
             reviewCredits: data.reviewCredits ?? 0,
           });
+          if (data.experienceLevel) {
+            setExperienceLevel(data.experienceLevel as ExperienceLevel);
+          }
         }
       } catch (err) {
         console.error("Failed to load profile:", err);
@@ -384,9 +393,21 @@ export default function SubmitTrackPage() {
           artworkUrl: artworkUrl || undefined,
           genreIds: selectedGenres,
           feedbackFocus: feedbackFocus.trim() || undefined,
+          feedbackAreas: selectedFeedbackAreas.length > 0 ? selectedFeedbackAreas : undefined,
           isPublic,
         }),
       });
+
+      // Save experience level to profile if changed
+      if (experienceLevelDirty && experienceLevel && profile) {
+        try {
+          await fetch("/api/profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ artistName: profile.artistName, experienceLevel }),
+          });
+        } catch {}
+      }
 
       const trackData = await createRes.json();
 
@@ -429,6 +450,10 @@ export default function SubmitTrackPage() {
     artworkUrl,
     selectedGenres,
     feedbackFocus,
+    selectedFeedbackAreas,
+    experienceLevel,
+    experienceLevelDirty,
+    profile,
     isPublic,
     reviewCount,
     router,
@@ -453,9 +478,21 @@ export default function SubmitTrackPage() {
           artworkUrl: artworkUrl || undefined,
           genreIds: selectedGenres,
           feedbackFocus: feedbackFocus.trim() || undefined,
+          feedbackAreas: selectedFeedbackAreas.length > 0 ? selectedFeedbackAreas : undefined,
           isPublic,
         }),
       });
+
+      // Save experience level to profile if changed
+      if (experienceLevelDirty && experienceLevel && profile) {
+        try {
+          await fetch("/api/profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ artistName: profile.artistName, experienceLevel }),
+          });
+        } catch {}
+      }
 
       const trackData = await createRes.json();
 
@@ -556,9 +593,6 @@ export default function SubmitTrackPage() {
             <p className="text-sm font-bold">{error}</p>
           </div>
         )}
-
-        {/* Out of credits banner */}
-        {profile && profile.reviewCredits <= 3 && <OutOfCreditsBanner />}
 
         {/* ================================================================= */}
         {/* STEP 1: Upload your track                                         */}
@@ -855,20 +889,98 @@ export default function SubmitTrackPage() {
               )}
             </div>
 
-            {/* Feedback focus (optional) */}
+            {/* Experience Level */}
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">
+                Your experience level
+              </label>
+              <p className="text-xs text-black/40 mb-3">Helps reviewers tailor their feedback to you</p>
+              <div className="grid gap-2">
+                {([
+                  { id: "BEGINNER" as ExperienceLevel, label: "Just Starting Out", desc: "I'm new to music production and learning the basics" },
+                  { id: "INTERMEDIATE" as ExperienceLevel, label: "Getting Serious", desc: "I know the fundamentals and want to level up" },
+                  { id: "ADVANCED" as ExperienceLevel, label: "Experienced Producer", desc: "I've been at this a while — give me the technical details" },
+                  { id: "PROFESSIONAL" as ExperienceLevel, label: "Professional", desc: "I release music commercially — hold nothing back" },
+                ] as const).map((level) => (
+                  <button
+                    key={level.id}
+                    type="button"
+                    onClick={() => {
+                      setExperienceLevel(level.id);
+                      setExperienceLevelDirty(true);
+                    }}
+                    className={cn(
+                      "text-left px-4 py-3 rounded-xl border-2 transition-all duration-150 ease-out",
+                      experienceLevel === level.id
+                        ? "border-purple-500 bg-purple-50/60"
+                        : "border-black/10 bg-white hover:border-black/20"
+                    )}
+                  >
+                    <div className={cn("text-sm font-bold", experienceLevel === level.id ? "text-purple-700" : "text-black")}>{level.label}</div>
+                    <div className="text-[11px] text-black/40 mt-0.5">{level.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Feedback Areas */}
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">
+                What feedback do you want? <span className="text-neutral-400">(pick 1–3)</span>
+              </label>
+              <p className="text-xs text-black/40 mb-3">Reviewers will focus on what matters to you</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {([
+                  { id: "OVERALL_VIBE" as FeedbackArea, emoji: "🎵", label: "Overall Vibe", desc: "Does it feel good?" },
+                  { id: "MIXING" as FeedbackArea, emoji: "🎚️", label: "Mixing & Sound", desc: "Mix quality & clarity" },
+                  { id: "ARRANGEMENT" as FeedbackArea, emoji: "🎼", label: "Arrangement", desc: "Structure & pacing" },
+                  { id: "SONGWRITING" as FeedbackArea, emoji: "✍️", label: "Songwriting", desc: "Melody, hooks, lyrics" },
+                  { id: "SOUND_DESIGN" as FeedbackArea, emoji: "🎛️", label: "Sound Design", desc: "Sounds & textures" },
+                  { id: "RELEASE_READINESS" as FeedbackArea, emoji: "🚀", label: "Release Readiness", desc: "Is it ready to ship?" },
+                ] as const).map((area) => {
+                  const isSelected = selectedFeedbackAreas.includes(area.id);
+                  return (
+                    <button
+                      key={area.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedFeedbackAreas((prev) => {
+                          if (prev.includes(area.id)) return prev.filter((a) => a !== area.id);
+                          if (prev.length >= 3) return prev;
+                          return [...prev, area.id];
+                        });
+                      }}
+                      className={cn(
+                        "flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all duration-150 ease-out text-center",
+                        isSelected
+                          ? "border-purple-500 bg-purple-50/60"
+                          : "border-black/10 bg-white hover:border-black/20",
+                        !isSelected && selectedFeedbackAreas.length >= 3 && "opacity-40 cursor-not-allowed"
+                      )}
+                    >
+                      <span className="text-lg">{area.emoji}</span>
+                      <span className={cn("text-xs font-bold", isSelected ? "text-purple-700" : "text-black")}>{area.label}</span>
+                      <span className="text-[10px] text-black/40 leading-tight">{area.desc}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Anything specific (optional free-text) */}
             <div>
               <label
                 htmlFor="feedback-focus"
                 className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-2"
               >
-                Feedback focus <span className="text-neutral-400">(optional)</span>
+                Anything specific? <span className="text-neutral-400">(optional)</span>
               </label>
               <textarea
                 id="feedback-focus"
                 value={feedbackFocus}
                 onChange={(e) => setFeedbackFocus(e.target.value)}
-                placeholder="Anything you want reviewers to focus on? e.g. mix balance, arrangement, vocal processing..."
-                rows={3}
+                placeholder="e.g. 'I changed the bassline since last version — does it sit better now?'"
+                rows={2}
                 maxLength={1000}
                 className="w-full rounded-xl border-2 border-black/10 bg-white px-4 py-3 text-sm placeholder:text-black/25 focus:border-purple-500 focus:outline-none resize-none"
               />

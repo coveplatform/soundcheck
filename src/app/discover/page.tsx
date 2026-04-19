@@ -3,7 +3,7 @@ import { TrackStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { DiscoverScene, type DiscoverTrackData } from "./discover-scene";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // Cache for 5 minutes
 
 const DEMO_TILES: DiscoverTrackData[] = Array.from({ length: 34 }).map(
   (_, idx) => {

@@ -4,12 +4,11 @@ import { revalidateTag } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { REFERRAL_CREDITS, rewardReferrer } from "@/lib/referral-system";
-
 const createProfileSchema = z.object({
   artistName: z.string().min(1, "Artist name is required").max(100),
   genreIds: z.array(z.string()).max(5).optional(),
   completedOnboarding: z.boolean().optional(),
+  experienceLevel: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED", "PROFESSIONAL"]).optional(),
 });
 
 export async function POST(request: Request) {
@@ -22,7 +21,7 @@ export async function POST(request: Request) {
 
     const existingUser = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, referredByCode: true },
+      select: { id: true },
     });
 
     if (!existingUser) {
@@ -33,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { artistName, genreIds, completedOnboarding } = createProfileSchema.parse(body);
+    const { artistName, genreIds, completedOnboarding, experienceLevel } = createProfileSchema.parse(body);
 
     // Check if profile already exists
     const existingProfile = await prisma.artistProfile.findUnique({
@@ -47,6 +46,7 @@ export async function POST(request: Request) {
         data: {
           artistName,
           ...(completedOnboarding ? { completedOnboarding: true } : {}),
+          ...(experienceLevel ? { experienceLevel } : {}),
           ...(genreIds !== undefined
             ? {
                 Genre_ArtistGenres: {
@@ -62,9 +62,7 @@ export async function POST(request: Request) {
       return NextResponse.json(profile);
     }
 
-    // Create new profile — apply referral bonus credits if applicable
-    const wasReferred = !!existingUser.referredByCode;
-    const startingCredits = wasReferred ? 3 + REFERRAL_CREDITS : 3;
+    const startingCredits = 3;
 
     const profile = await prisma.artistProfile.create({
       data: {
@@ -83,15 +81,6 @@ export async function POST(request: Request) {
       },
       include: { Genre_ArtistGenres: true },
     });
-
-    // Reward the referrer now that the referee has completed onboarding
-    if (wasReferred && existingUser.referredByCode) {
-      try {
-        await rewardReferrer(existingUser.referredByCode, session.user.id);
-      } catch (error) {
-        console.error("Failed to reward referrer:", error);
-      }
-    }
 
     // Update user to mark as artist
     await prisma.user.update({

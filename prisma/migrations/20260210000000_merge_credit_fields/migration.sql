@@ -19,5 +19,6 @@ BEGIN
   END IF;
 END $$;
 
--- Step 2: Change the default value of reviewCredits to 1 (so new users get 1 free credit)
+-- Step 2: Add reviewCredits column if it doesn't exist, then set default to 1
+ALTER TABLE "ArtistProfile" ADD COLUMN IF NOT EXISTS "reviewCredits" INTEGER NOT NULL DEFAULT 1;
 ALTER TABLE "ArtistProfile" ALTER COLUMN "reviewCredits" SET DEFAULT 1;

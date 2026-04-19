@@ -11,7 +11,6 @@ import {
   sendTrackQueuedEmail,
   sendReviewProgressEmail,
   sendInvalidTrackLinkEmail,
-  sendPurchaseConfirmationEmail,
   sendReleaseDecisionReport,
 } from "@/lib/email";
 import { generateReleaseDecisionReport } from "@/lib/release-decision-report";
@@ -245,9 +244,6 @@ export async function POST(request: Request) {
         break;
       case "invalid-track":
         await sendInvalidTrackLinkEmail({ to: recipientEmail, trackTitle: "Summer Nights (Test)", trackId: "test-id", sourceUrl: "https://soundcloud.com/broken" });
-        break;
-      case "purchase-confirmation":
-        await sendPurchaseConfirmationEmail({ buyerEmail: recipientEmail, buyerName: "Test User", trackTitle: "Summer Nights", artistName: "Demo Artist", downloadUrl: `${getAppUrl()}/downloads/test`, purchaseId: "test-purchase" });
         break;
       case "release-decision-report": {
         const report = await generateReleaseDecisionReport("test-track", mockReviews);

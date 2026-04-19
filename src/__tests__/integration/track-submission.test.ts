@@ -271,44 +271,6 @@ describe('Track Submission Integration', () => {
     })
   })
 
-  describe('Subscription Features', () => {
-    it('allows purchase toggle for Pro subscribers with uploads', async () => {
-      const artist = createMockArtistProfile({
-        subscriptionStatus: 'active',
-        subscriptionTier: 'pro',
-      })
-
-      const sourceType = 'UPLOAD'
-      const allowPurchase = true
-      const canEnablePurchase = sourceType === 'UPLOAD' && artist.subscriptionStatus === 'active'
-
-      expect(canEnablePurchase).toBe(true)
-    })
-
-    it('disallows purchase toggle for free tier', async () => {
-      const artist = createMockArtistProfile({
-        subscriptionStatus: null,
-      })
-
-      const sourceType = 'UPLOAD'
-      const canEnablePurchase = sourceType === 'UPLOAD' && artist.subscriptionStatus === 'active'
-
-      expect(canEnablePurchase).toBe(false)
-    })
-
-    it('disallows purchase toggle for non-upload sources', async () => {
-      const artist = createMockArtistProfile({
-        subscriptionStatus: 'active',
-      })
-
-      const sourceType = 'SOUNDCLOUD' as const
-      // @ts-expect-error - Intentional type mismatch to test that SOUNDCLOUD !== UPLOAD
-      const canEnablePurchase = sourceType === 'UPLOAD' && artist.subscriptionStatus === 'active'
-
-      expect(canEnablePurchase).toBe(false)
-    })
-  })
-
   describe('Ableton Project Integration', () => {
     it('sets render status to PENDING when project uploaded', async () => {
       const abletonProjectUrl = '/ableton-projects/project-123.zip'

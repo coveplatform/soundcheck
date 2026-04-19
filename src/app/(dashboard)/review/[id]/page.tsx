@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 // Removed unused imports
 import { WordCounter, countWords } from "@/components/ui/word-counter";
 import { ErrorAlert } from "@/components/ui/error-alert";
-import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, Download, ShoppingCart, SkipForward, VolumeX } from "lucide-react";
+import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, SkipForward, VolumeX } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
-import { getReferralCookie, clearReferralCookie } from "@/lib/referral";
 import { Review, FirstImpression, MIN_LISTEN_SECONDS } from "./types";
 import { ReleaseDecisionForm, type ReleaseDecisionFormData } from "./components/release-decision-form";
 import {
@@ -35,6 +34,7 @@ import {
   firstImpressionColor,
   firstImpressionEnumFromScore,
 } from "./utils";
+import { getReviewFormConfig } from "./feedback-config";
 // V2 components removed - using streamlined inline form instead
 
 // Types and utilities imported from ./types and ./utils
@@ -57,12 +57,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [showUnplayableDialog, setShowUnplayableDialog] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-
-  // Purchase state
-  const [isPurchasing, setIsPurchasing] = useState(false);
-  const [hasPurchased, setHasPurchased] = useState(false);
-  const [purchaseError, setPurchaseError] = useState("");
-  const [reviewerBalance, setReviewerBalance] = useState<number | null>(null);
 
   const [draftReady, setDraftReady] = useState(false);
   const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
@@ -647,72 +641,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     }
   };
 
-  const handlePurchase = async () => {
-    if (!review) return;
-
-    setPurchaseError("");
-    setIsPurchasing(true);
-
-    try {
-      // Get referral data from cookie if it matches this track
-      const referralCookie = getReferralCookie();
-      const referral =
-        referralCookie && referralCookie.trackId === review.Track.id
-          ? { reviewerId: referralCookie.reviewerId, shareId: referralCookie.shareId }
-          : undefined;
-
-      const response = await fetch("/api/purchases", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ trackId: review.Track.id, referral }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setPurchaseError(data?.error || "Failed to purchase track");
-        return;
-      }
-
-      // Clear referral cookie after successful purchase
-      clearReferralCookie();
-
-      setHasPurchased(true);
-      // Update balance after purchase
-      if (reviewerBalance !== null) {
-        setReviewerBalance(reviewerBalance - 50);
-      }
-    } catch {
-      setPurchaseError("Failed to purchase track");
-    } finally {
-      setIsPurchasing(false);
-    }
-  };
-
-  const handleDownload = async () => {
-    if (!review) return;
-
-    try {
-      const response = await fetch(`/api/tracks/${review.Track.id}/download`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        setPurchaseError(data?.error || "Failed to get download link");
-        return;
-      }
-
-      // Trigger download
-      const link = document.createElement("a");
-      link.href = data.downloadUrl;
-      link.download = data.filename || "track.mp3";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch {
-      setPurchaseError("Failed to download track");
-    }
-  };
-
   const isReleaseDecision = review?.Track?.packageType === "RELEASE_DECISION";
 
   const handleReleaseDecisionSubmit = async (data: ReleaseDecisionFormData) => {
@@ -1039,12 +967,18 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const bestMomentWords = countWords(bestPart);
   const biggestIssueWords = countWords(biggestWeaknessSpecific);
 
+  // Compute adaptive form config from track context
+  const formConfig = review ? getReviewFormConfig(
+    review.Track.ArtistProfile?.experienceLevel,
+    review.Track.feedbackAreas,
+    review.Track.feedbackFocus,
+  ) : null;
+
   const meetsTextMinimum =
-    bestMomentWords >= 15 &&
-    biggestIssueWords >= 20;
+    bestMomentWords >= (formConfig?.bestMomentMinWords ?? 15) &&
+    biggestIssueWords >= (formConfig?.mainFeedbackMinWords ?? 20);
 
   if (success) {
-    const canPurchase = review.Track.sourceType === "UPLOAD" && review.Track.allowPurchase;
     const isPeer = review.isPeerReview || !!review.peerReviewerArtistId;
     const totalReviews = review.ArtistProfile?.totalPeerReviews ?? 0;
     const avgRating = review.ArtistProfile?.peerReviewRating ?? 0;
@@ -1115,50 +1049,6 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 mb-6 text-center">
             <p className="text-sm font-bold text-amber-800">You&apos;re a PRO Reviewer</p>
             <p className="text-xs text-amber-700/60 mt-0.5">You earn $1.50 cash for every review</p>
-          </div>
-        )}
-
-        {/* Purchase option for uploaded tracks */}
-        {canPurchase && (
-          <div className="mb-6 p-4 border border-black/10 bg-white rounded-xl text-left">
-            <div className="flex items-center gap-3 mb-3">
-              <Music className="h-5 w-5 text-neutral-600" />
-              <div>
-                <p className="font-bold text-black">{review.Track.title}</p>
-                {review.Track.ArtistProfile?.artistName && (
-                  <p className="text-sm text-black/50">{review.Track.ArtistProfile.artistName}</p>
-                )}
-              </div>
-            </div>
-
-            {purchaseError && (
-              <p className="text-sm text-red-600 mb-3">{purchaseError}</p>
-            )}
-
-            {hasPurchased ? (
-              <Button
-                variant="primary"
-                className="w-full"
-                onClick={handleDownload}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Download MP3
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={handlePurchase}
-                isLoading={isPurchasing}
-                disabled={isPurchasing}
-              >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Buy Track - $0.50
-              </Button>
-            )}
-            <p className="text-xs text-black/40 mt-2 text-center">
-              {hasPurchased ? "Thanks for supporting the artist!" : "Support the artist by purchasing their track"}
-            </p>
           </div>
         )}
 
@@ -1242,7 +1132,38 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               </button>
             </div>
           </div>
-          {review.Track.feedbackFocus && (
+          {/* Context Banner: Experience Level + Feedback Areas + Artist Note */}
+          {formConfig?.hasContext && (
+            <div className="mt-4 p-4 bg-gradient-to-br from-purple-50 to-indigo-50 border-2 border-purple-200/60 rounded-xl space-y-2.5">
+              {/* Tags row */}
+              <div className="flex flex-wrap items-center gap-2">
+                {formConfig.experienceLabel && (
+                  <span className={cn("px-2.5 py-1 text-[11px] font-black rounded-lg border", formConfig.experienceTagColor)}>
+                    👤 {formConfig.experienceLabel}
+                  </span>
+                )}
+                {formConfig.areaLabels.map((label) => (
+                  <span key={label} className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-white border border-purple-200 text-purple-700">
+                    {label}
+                  </span>
+                ))}
+              </div>
+              {/* Guidance text */}
+              <p className="text-sm text-purple-900/70 leading-relaxed">
+                {formConfig.guidanceText}
+              </p>
+              {/* Artist note (free-text) */}
+              {review.Track.feedbackFocus && (
+                <div className="pt-2 border-t border-purple-200/50">
+                  <p className="text-sm text-purple-900">
+                    <span className="font-bold">Artist says:</span> &ldquo;{review.Track.feedbackFocus}&rdquo;
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+          {/* Fallback: show old-style artist note if no structured context */}
+          {!formConfig?.hasContext && review.Track.feedbackFocus && (
             <div className="mt-4 p-3 bg-gradient-to-br from-amber-50 to-amber-100/50 border border-amber-300/50 rounded-xl">
               <p className="text-sm text-amber-900">
                 <span className="font-bold">Artist note:</span> {review.Track.feedbackFocus}
@@ -1495,7 +1416,8 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             </div>
           </div>
 
-          {/* Technical Issues */}
+          {/* Technical Issues — conditional on feedback areas */}
+          {(formConfig?.showTechnicalIssues ?? true) && (
           <div
             ref={technicalIssuesRef}
             className="space-y-3 p-4 -m-4 rounded-xl transition-all duration-200 bg-gradient-to-br from-orange-50/40 to-transparent"
@@ -1503,7 +1425,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <Label className="text-base font-bold text-orange-900">Technical Issues (optional)</Label>
             <p className="text-xs text-orange-700/60">Select any technical problems you noticed</p>
             <div className="grid grid-cols-2 gap-2">
-              {[
+              {(formConfig?.technicalIssueOptions ?? [
                 { id: "vocals-buried", label: "Vocals buried" },
                 { id: "muddy-low", label: "Muddy low end" },
                 { id: "compressed", label: "Over-compressed" },
@@ -1511,7 +1433,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
                 { id: "narrow-stereo", label: "Narrow stereo" },
                 { id: "repetitive", label: "Too repetitive" },
                 { id: "too-long", label: "Too long" },
-              ].map((issue) => (
+              ]).map((issue) => (
                 <button
                   key={issue.id}
                   type="button"
@@ -1534,8 +1456,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               ))}
             </div>
           </div>
+          )}
 
-          {/* Playlist Action */}
+          {/* Playlist Action — conditional on feedback areas */}
+          {(formConfig?.showPlaylistAction ?? true) && (
           <div
             ref={playlistActionRef}
             className={cn(
@@ -1577,6 +1501,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
               ))}
             </div>
           </div>
+          )}
         </CardContent>
       </Card>
         </div>
@@ -1601,12 +1526,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
           {/* Main Feedback */}
           <div ref={biggestIssueRef} className={cn("space-y-3 p-4 -m-4 rounded-xl transition-all duration-200", validationIssues.some((i) => i.section === "biggestIssue") ? "bg-red-50 border-2 border-red-300" : "bg-gradient-to-br from-orange-50/50 to-transparent border border-orange-200/30")}>
-            <Label htmlFor="mainfeedback" className="text-base font-bold text-orange-900">Main Feedback *</Label>
-            <p className="text-xs text-orange-700/60">What's holding the track back, and what would you change? Be specific — mention elements, timestamps, or frequency ranges if relevant.</p>
+            <Label htmlFor="mainfeedback" className="text-base font-bold text-orange-900">{formConfig?.mainFeedbackLabel ?? "Main Feedback *"}</Label>
+            <p className="text-xs text-orange-700/60">{formConfig?.mainFeedbackPrompt ?? "What's holding the track back, and what would you change? Be specific — mention elements, timestamps, or frequency ranges if relevant."}</p>
             {validationIssues.some((i) => i.section === "biggestIssue") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "biggestIssue")?.message}</p>)}
             <textarea
               id="mainfeedback"
-              placeholder="E.g., 'The low-mids are building up around 200-300Hz which makes the mix feel heavy on a proper system. A few surgical cuts there and some more air above 10kHz would open it up significantly.'"
+              placeholder={formConfig?.mainFeedbackPrompt ?? "E.g., 'The low-mids are building up around 200-300Hz which makes the mix feel heavy on a proper system. A few surgical cuts there and some more air above 10kHz would open it up significantly.'"}
               value={biggestWeaknessSpecific}
               onChange={(e) => setBiggestWeaknessSpecific(e.target.value)}
               className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[120px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
@@ -1614,11 +1539,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <div className="flex items-center justify-between">
               <p className={cn(
                 "text-xs font-mono",
-                biggestIssueWords >= 20 ? "text-lime-600" : "text-neutral-500"
+                biggestIssueWords >= (formConfig?.mainFeedbackMinWords ?? 20) ? "text-lime-600" : "text-neutral-500"
               )}>
-                {biggestIssueWords}/20 words
+                {biggestIssueWords}/{formConfig?.mainFeedbackMinWords ?? 20} words
               </p>
-              {biggestIssueWords >= 20 && (
+              {biggestIssueWords >= (formConfig?.mainFeedbackMinWords ?? 20) && (
                 <span className="text-xs font-bold text-lime-600 flex items-center gap-1">
                   <Check className="h-3 w-3" /> Complete
                 </span>
@@ -1628,12 +1553,12 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
 
           {/* Best Moment */}
           <div ref={bestPartRef} className={cn("space-y-3 p-4 -m-4 rounded-xl transition-all duration-200", validationIssues.some((i) => i.section === "bestPart") ? "bg-red-50 border-2 border-red-300" : "bg-gradient-to-br from-emerald-50/50 to-transparent border border-emerald-200/30")}>
-            <Label htmlFor="bestmoment" className="text-base font-bold text-emerald-900">Best Moment *</Label>
-            <p className="text-xs text-emerald-700/60">What stood out? What should they keep doing?</p>
+            <Label htmlFor="bestmoment" className="text-base font-bold text-emerald-900">{formConfig?.bestMomentLabel ?? "Best Moment *"}</Label>
+            <p className="text-xs text-emerald-700/60">{formConfig?.bestMomentPrompt ?? "What stood out? What should they keep doing?"}</p>
             {validationIssues.some((i) => i.section === "bestPart") && (<p className="text-xs font-medium text-red-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />{validationIssues.find((i) => i.section === "bestPart")?.message}</p>)}
             <textarea
               id="bestmoment"
-              placeholder="E.g., 'The vocal ad-libs at 2:15 add energy and personality' or 'The synth texture in the breakdown is unique'"
+              placeholder={formConfig?.bestMomentPrompt ?? "E.g., 'The vocal ad-libs at 2:15 add energy and personality' or 'The synth texture in the breakdown is unique'"}
               value={bestPart}
               onChange={(e) => setBestPart(e.target.value)}
               className="w-full px-3 py-2 border border-black/10 rounded-xl text-sm min-h-[100px] resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 focus-visible:ring-offset-1"
@@ -1641,11 +1566,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             <div className="flex items-center justify-between">
               <p className={cn(
                 "text-xs font-mono",
-                bestMomentWords >= 15 ? "text-lime-600" : "text-neutral-500"
+                bestMomentWords >= (formConfig?.bestMomentMinWords ?? 15) ? "text-lime-600" : "text-neutral-500"
               )}>
-                {bestMomentWords}/15 words
+                {bestMomentWords}/{formConfig?.bestMomentMinWords ?? 15} words
               </p>
-              {bestMomentWords >= 15 && (
+              {bestMomentWords >= (formConfig?.bestMomentMinWords ?? 15) && (
                 <span className="text-xs font-bold text-lime-600 flex items-center gap-1">
                   <Check className="h-3 w-3" /> Complete
                 </span>

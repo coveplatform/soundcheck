@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect, useCallback, Fragment } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { validateTrackUrl, fetchTrackMetadata, detectSource } from "@/lib/metadata";
 import {
-  ArrowRight, ArrowLeft, Music, Gift, Loader2, Headphones,
-  Crown, Lock, Link2, Check,
+  ArrowRight, ArrowLeft, Music, Gift, Loader2,
+  Link2, Check,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { SparklesDoodle } from "@/components/dashboard/doodles";
@@ -107,6 +107,11 @@ export default function OnboardingPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => null);
+        if (response.status === 401) {
+          // Stale session from before the DB wipe — sign out and redirect to sign in
+          await signOut({ callbackUrl: "/signup" });
+          return;
+        }
         if (response.status === 409) {
           const updateRes = await fetch("/api/profile", {
             method: "PATCH",
@@ -149,6 +154,11 @@ export default function OnboardingPage() {
 
       if (!profileRes.ok && profileRes.status !== 409) {
         const profileData = await profileRes.json().catch(() => null);
+        if (profileRes.status === 401) {
+          // Stale session from before the DB wipe — sign out and redirect to sign in
+          await signOut({ callbackUrl: "/signup" });
+          return;
+        }
         // Try PATCH if POST fails
         const patchRes = await fetch("/api/profile", {
           method: "PATCH",
@@ -191,7 +201,7 @@ export default function OnboardingPage() {
       });
 
       await updateSession();
-      router.push("/dashboard");
+      router.push("/dashboard?welcome=1");
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
@@ -322,81 +332,54 @@ export default function OnboardingPage() {
           <>
             <div className="mb-8 text-center">
               <h1 className="text-3xl sm:text-4xl font-black tracking-tighter text-black leading-tight">
-                Here&apos;s the deal.
+                Here&apos;s how it works.
               </h1>
               <p className="mt-2 text-sm text-black/40 font-medium">
-                3 minutes to review. Everyone does it. That&apos;s why it works.
+                Simple credit system. Real feedback from real artists.
               </p>
             </div>
 
-            <div className="space-y-4">
-              {/* The loop — dark block */}
-              <div className="bg-neutral-900 rounded-2xl p-6">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-4">The Loop</p>
-                <div className="flex items-stretch gap-2">
-                  {[
-                    { icon: <Headphones className="h-5 w-5 text-black" />, label: "Review", sub: "Listen ~3 min" },
-                    { icon: <Gift className="h-5 w-5 text-black" />, label: "Credit", sub: "Earn 1 credit" },
-                    { icon: <Music className="h-5 w-5 text-black" />, label: "Feedback", sub: "Real artists" },
-                  ].map((item, i, arr) => (
-                    <Fragment key={item.label}>
-                      <div className="flex-1 rounded-xl bg-lime-400 p-3 text-center">
-                        <div className="flex justify-center mb-2">{item.icon}</div>
-                        <p className="text-xs font-black text-black">{item.label}</p>
-                        <p className="text-[10px] text-black/50 mt-0.5">{item.sub}</p>
-                      </div>
-                      {i < arr.length - 1 && (
-                        <div className="flex items-center text-white/20 font-black text-lg">→</div>
-                      )}
-                    </Fragment>
-                  ))}
+            <div className="space-y-3">
+              {/* Free credits — most important, first */}
+              <div className="bg-lime-400 rounded-2xl px-5 py-4 border-2 border-black flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-lime-400 text-sm font-black">1</span>
+                </div>
+                <div>
+                  <p className="text-sm font-black text-black">You start with 3 free credits.</p>
+                  <p className="text-xs text-black/60 font-medium mt-0.5">
+                    No reviewing needed yet — use them to get your first track reviewed right away.
+                  </p>
                 </div>
               </div>
 
-              {/* Slots */}
-              <div className="bg-white rounded-2xl border-2 border-black/8 p-6 space-y-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30">Your Slots</p>
-                <p className="text-sm text-black/50 font-medium leading-relaxed">
-                  One track at a time on Free. Run 3 at once on Pro.
-                </p>
-                <div className="space-y-2">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-black/30">Free</p>
-                  <div className="flex gap-2">
-                    <div className="flex-1 h-10 rounded-xl bg-lime-400 border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                      <Music className="h-4 w-4 text-black" />
-                    </div>
-                    <div className="flex-1 h-10 rounded-xl border-2 border-dashed border-black/10 bg-white flex items-center justify-center">
-                      <Lock className="h-3.5 w-3.5 text-black/15" />
-                    </div>
-                    <div className="flex-1 h-10 rounded-xl border-2 border-dashed border-black/10 bg-white flex items-center justify-center">
-                      <Lock className="h-3.5 w-3.5 text-black/15" />
-                    </div>
-                  </div>
+              {/* Earn credits */}
+              <div className="bg-white rounded-2xl border-2 border-black/8 px-5 py-4 flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-sm font-black">2</span>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-purple-600">Pro</p>
-                    <Crown className="h-3 w-3 text-purple-500" />
-                  </div>
-                  <div className="flex gap-2">
-                    {[0, 1, 2].map((i) => (
-                      <div key={i} className="flex-1 h-10 rounded-xl bg-purple-600 border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                        <Music className="h-4 w-4 text-white" />
-                      </div>
-                    ))}
-                  </div>
+                <div>
+                  <p className="text-sm font-black text-black">Review others to earn more credits.</p>
+                  <p className="text-xs text-black/50 font-medium mt-0.5">
+                    Each review takes about 3 minutes. You earn 1 credit per completed review.
+                  </p>
                 </div>
               </div>
 
-              {/* Free credits callout */}
-              <div className="bg-lime-400 rounded-2xl px-5 py-4 border-2 border-black">
-                <p className="text-sm font-black text-black mb-1">🎁 You&apos;re starting with 3 free credits.</p>
-                <p className="text-xs text-black/60 font-medium">
-                  That&apos;s enough to get your first track reviewed right away.
-                </p>
+              {/* Spend credits */}
+              <div className="bg-white rounded-2xl border-2 border-black/8 px-5 py-4 flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-sm font-black">3</span>
+                </div>
+                <div>
+                  <p className="text-sm font-black text-black">1 credit = 1 peer review on your track.</p>
+                  <p className="text-xs text-black/50 font-medium mt-0.5">
+                    Artists in your genre listen and give you written feedback. Free plan: one track at a time.
+                  </p>
+                </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 pt-1">
                 <button onClick={() => setStep(2)} className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors">
                   <ArrowLeft className="h-3 w-3" /> Back
                 </button>

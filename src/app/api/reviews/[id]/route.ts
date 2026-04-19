@@ -26,6 +26,7 @@ export async function GET(
             ArtistProfile: {
               select: {
                 artistName: true,
+                experienceLevel: true,
               },
             },
           },

@@ -3,6 +3,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  serverExternalPackages: ["pg", "pg-pool", "@prisma/client", "@prisma/adapter-pg", "prisma"],
   experimental: {
     turbopackFileSystemCacheForDev: false,
     viewTransition: true,

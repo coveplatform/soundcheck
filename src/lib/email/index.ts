@@ -14,9 +14,6 @@ export {
   sendReleaseDecisionReport,
 } from "./reviews";
 
-// Payment emails
-export { sendPurchaseConfirmationEmail } from "./payments";
-
 // Admin emails
 export { sendAdminNewTrackNotification } from "./admin";
 

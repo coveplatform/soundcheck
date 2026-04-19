@@ -16,6 +16,9 @@ const createTrackSchema = z.object({
   bpm: z.number().int().min(1).max(999).optional(),
   genreIds: z.array(z.string()).min(1, "Select at least one genre").max(3),
   feedbackFocus: z.string().max(1000).optional(),
+  feedbackAreas: z.array(
+    z.enum(["OVERALL_VIBE", "MIXING", "ARRANGEMENT", "SONGWRITING", "SOUND_DESIGN", "RELEASE_READINESS"])
+  ).min(1).max(3).optional(),
   packageType: z.enum(["PEER", "RELEASE_DECISION"]).optional(),
   reviewsRequested: z.number().int().min(1).max(50).optional(),
   allowPurchase: z.boolean().optional(),
@@ -112,6 +115,7 @@ export async function POST(request: Request) {
       duration: data.duration,
       bpm: data.bpm,
       feedbackFocus: data.feedbackFocus,
+      feedbackAreas: data.feedbackAreas ?? [],
       isPublic: data.isPublic ?? false,
       packageType,
       reviewsRequested: 0,

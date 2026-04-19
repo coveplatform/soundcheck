@@ -24,10 +24,12 @@ export interface Review {
     sourceType: string;
     packageType: string;
     feedbackFocus: string | null;
+    feedbackAreas: string[];
     Genre: { id: string; name: string }[];
     allowPurchase: boolean;
     ArtistProfile?: {
       artistName: string;
+      experienceLevel?: string | null;
     };
   };
   ReviewerProfile: {

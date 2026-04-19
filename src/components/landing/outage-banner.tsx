@@ -12,6 +12,11 @@ export function OutageBanner() {
     if (!dismissed) setVisible(true);
   }, []);
 
+  useEffect(() => {
+    document.documentElement.style.setProperty("--banner-h", visible ? "40px" : "0px");
+    return () => document.documentElement.style.setProperty("--banner-h", "0px");
+  }, [visible]);
+
   if (!visible) return null;
 
   return (

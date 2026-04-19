@@ -8,8 +8,6 @@ import { prisma } from "@/lib/prisma";
 
 const sharingConfigSchema = z.object({
   sharingEnabled: z.boolean(),
-  sharingMode: z.enum(["EXPOSURE", "SALES"]).optional(),
-  salePrice: z.number().int().min(100).max(10000).optional(), // $1 - $100 in cents
   showReviewsOnPublicPage: z.boolean().optional(),
 });
 
@@ -54,23 +52,9 @@ export async function POST(
     // Validate track eligibility
     if (track.sourceType !== "UPLOAD") {
       return NextResponse.json(
-        {
-          error:
-            "Only uploaded tracks (MP3/WAV) can be shared. Linked tracks from SoundCloud, YouTube, or Bandcamp cannot be sold.",
-        },
+        { error: "Only uploaded tracks (MP3/WAV) can be shared. Linked tracks from SoundCloud, YouTube, or Bandcamp are not eligible." },
         { status: 400 }
       );
-    }
-
-    // Validate SALES mode requirements
-    if (config.sharingMode === "SALES") {
-      // Require sale price for SALES mode
-      if (!config.salePrice) {
-        return NextResponse.json(
-          { error: "Sale price is required for SALES mode" },
-          { status: 400 }
-        );
-      }
     }
 
     // Generate trackShareId if enabling sharing and doesn't have one
@@ -84,8 +68,7 @@ export async function POST(
       where: { id: trackId },
       data: {
         sharingEnabled: config.sharingEnabled,
-        sharingMode: config.sharingMode ?? (config.sharingEnabled ? "EXPOSURE" : null),
-        salePrice: config.salePrice,
+        sharingMode: config.sharingEnabled ? "EXPOSURE" : null,
         showReviewsOnPublicPage: config.showReviewsOnPublicPage ?? track.showReviewsOnPublicPage,
         trackShareId,
       },
@@ -93,8 +76,6 @@ export async function POST(
         id: true,
         trackShareId: true,
         sharingEnabled: true,
-        sharingMode: true,
-        salePrice: true,
         showReviewsOnPublicPage: true,
       },
     });
@@ -162,15 +143,12 @@ export async function GET(
     return NextResponse.json({
       trackShareId: track.trackShareId,
       sharingEnabled: track.sharingEnabled,
-      sharingMode: track.sharingMode,
-      salePrice: track.salePrice,
       showReviewsOnPublicPage: track.showReviewsOnPublicPage,
       publicUrl: track.trackShareId
         ? `${process.env.NEXT_PUBLIC_APP_URL}/t/${track.trackShareId}`
         : null,
       eligibility: {
         canShare: isEligibleForSharing,
-        canSell: isEligibleForSharing,
         reason: !isEligibleForSharing
           ? "Only uploaded tracks (MP3/WAV) can be shared"
           : null,

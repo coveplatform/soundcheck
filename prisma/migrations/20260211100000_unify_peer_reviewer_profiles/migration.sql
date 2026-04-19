@@ -1,6 +1,11 @@
 -- Unify peer reviewer profiles: make reviewerId optional on Review and ReviewQueue
 -- so peer reviews use only peerReviewerArtistId / artistReviewerId without needing ReviewerProfile
 
+-- Add columns if they were not added via a prior migration
+ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "isPeerReview" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "Review" ADD COLUMN IF NOT EXISTS "peerReviewerArtistId" TEXT;
+ALTER TABLE "ReviewQueue" ADD COLUMN IF NOT EXISTS "artistReviewerId" TEXT;
+
 -- Step 1: Make Review.reviewerId nullable
 ALTER TABLE "Review" ALTER COLUMN "reviewerId" DROP NOT NULL;
 

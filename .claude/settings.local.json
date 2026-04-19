@@ -128,7 +128,8 @@
       "Bash(cd /c/Users/simli/Desktop/review/soundcheck && npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/fix-ahora-si-status.ts 2>&1)",
       "Bash(cd /c/Users/simli/Desktop/review/soundcheck && npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/inject-with-me.ts 2>&1)",
       "Bash(cd /c/Users/simli/Desktop/review/soundcheck && npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/inject-skyscraper.ts 2>&1)",
-      "Bash(cd /c/Users/simli/Desktop/review/soundcheck && npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/finish-skyscraper-and-cleanup.ts 2>&1)"
+      "Bash(cd /c/Users/simli/Desktop/review/soundcheck && npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/finish-skyscraper-and-cleanup.ts 2>&1)",
+      "Bash(cd \"C:\\\\Users\\\\simli\\\\Desktop\\\\review\\\\soundcheck\" && DATABASE_URL=\"postgresql://neondb_owner:npg_kpCRT4IHM6Uh@ep-rough-sea-a1lcoouv-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require\" npm run db:seed)"
     ]
   }
 }

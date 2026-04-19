@@ -31,7 +31,8 @@ import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams?: { welcome?: string } }) {
+  const isWelcome = searchParams?.welcome === "1";
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -313,11 +314,28 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      {credits === 0 && (
-        <div className="bg-amber-400 border-b border-amber-500">
+      {credits === 0 && isWelcome && (
+        <div className="bg-lime-400 border-b border-lime-500">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
             <p className="text-sm font-black text-black flex-1">
-              You&apos;re out of credits
+              Your 3 free credits were used to queue 3 reviews for your track. You&apos;ll be notified as feedback comes in.
+            </p>
+            <Link
+              href="/review"
+              className="text-[11px] font-black text-black border-2 border-black px-3 py-1 rounded-full hover:bg-black hover:text-lime-400 transition-colors whitespace-nowrap"
+            >
+              Earn more →
+            </Link>
+          </div>
+        </div>
+      )}
+      {credits === 0 && !isWelcome && (
+        <div className={tracks.some(t => ACTIVE_TRACK_STATUSES.includes(t.status as any)) ? "bg-neutral-100 border-b border-neutral-200" : "bg-amber-400 border-b border-amber-500"}>
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
+            <p className="text-sm font-black text-black flex-1">
+              {tracks.some(t => ACTIVE_TRACK_STATUSES.includes(t.status as any))
+                ? "Reviews in progress · Review others to earn more credits"
+                : "You\u2019re out of credits"}
             </p>
             <Link
               href="/review"

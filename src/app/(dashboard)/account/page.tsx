@@ -5,7 +5,6 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AccountSettingsClient } from "@/components/account/account-settings-client";
 import { ReviewerGenrePreferences } from "@/components/account/reviewer-genre-preferences";
-import { ReferralCard } from "@/components/referral/referral-card";
 import { SparklesDoodle, StarDoodle } from "@/components/dashboard/doodles";
 
 export const dynamic = "force-dynamic";
@@ -107,7 +106,6 @@ export default async function AccountPage() {
             <ReviewerGenrePreferences initialGenreIds={initialGenreIds} />
           )}
 
-          <ReferralCard />
         </div>
       </div>
     </div>
