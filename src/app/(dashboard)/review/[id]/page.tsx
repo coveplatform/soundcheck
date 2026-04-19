@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 // Removed unused imports
 import { WordCounter, countWords } from "@/components/ui/word-counter";
 import { ErrorAlert } from "@/components/ui/error-alert";
-import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, SkipForward, VolumeX } from "lucide-react";
+import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, Download, SkipForward, VolumeX } from "lucide-react";
 import {
   Dialog,
   DialogContent,
