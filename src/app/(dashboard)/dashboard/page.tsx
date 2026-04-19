@@ -31,8 +31,9 @@ import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage({ searchParams }: { searchParams?: { welcome?: string } }) {
-  const isWelcome = searchParams?.welcome === "1";
+export default async function DashboardPage({ searchParams }: { searchParams?: Promise<{ welcome?: string }> }) {
+  const resolvedParams = await searchParams;
+  const isWelcome = resolvedParams?.welcome === "1";
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
