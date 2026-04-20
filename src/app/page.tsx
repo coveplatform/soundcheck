@@ -372,6 +372,10 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm text-neutral-50"><span className="font-bold">20 credits</span> added to your account every month</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
                   <span className="text-sm text-neutral-50"><span className="font-bold">Priority</span> queue placement</span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -417,7 +421,7 @@ export default function Home() {
               },
               {
                 q: "What does Pro get me?",
-                a: "Pro gives you 3 tracks in review at once (vs 1 for free), priority queue placement so your tracks get reviewed faster, a Pro badge, and early access to new features. $9.99/month, cancel anytime.",
+                a: "Pro gives you 3 tracks in review at once (vs 1 for free), 20 credits added to your account every month, priority queue placement so your tracks get reviewed faster, a Pro badge, and early access to new features. $9.99/month, cancel anytime.",
               },
               {
                 q: "Is it really free?",

@@ -32,6 +32,7 @@ const FREE_FEATURES = [
 
 const PRO_FEATURES = [
   { text: "3 tracks in review queue at a time", included: true, highlight: true },
+  { text: "20 credits added to your account every month", included: true, highlight: true },
   { text: "Earn credits by reviewing others", included: true },
   { text: "Genre-matched peer reviews", included: true },
   { text: "Structured feedback on every review", included: true },
@@ -101,7 +102,7 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
             </div>
             <h2 className="text-2xl font-black text-white tracking-tight">You&apos;re on Pro.</h2>
             <p className="text-sm text-white/40 font-medium mt-1">
-              3 slots, priority placement, Pro badge — all active.
+              3 slots, 20 credits/month, priority placement, Pro badge — all active.
             </p>
           </div>
           <Button
@@ -242,7 +243,7 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
             },
             {
               q: "Do I still need credits with Pro?",
-              a: "Yes — credits are how you request reviews. Pro gives you more slots (3 vs 1) so you can have more tracks reviewed at once, but each review still costs 1 credit. Earn credits by reviewing other artists.",
+              a: "Credits are how you request reviews — each costs 1. Pro adds 20 credits to your account every month automatically, plus you keep earning 1 credit per review you give. With 3 slots and a monthly top-up, you can move through feedback cycles much faster.",
             },
             {
               q: "What happens to my tracks if I downgrade?",

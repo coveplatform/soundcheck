@@ -37,10 +37,11 @@ model ArtistProfile {
   stripeConnectedAt            DateTime?
   totalEarnings                Int                @default(0)
   stripeCustomerId             String?
-  subscriptionCanceledAt       DateTime?
-  subscriptionCurrentPeriodEnd DateTime?
-  subscriptionId               String?
-  subscriptionStatus           String?
+  subscriptionCanceledAt         DateTime?
+  subscriptionCurrentPeriodEnd   DateTime?
+  subscriptionCurrentPeriodStart DateTime?
+  subscriptionId                 String?
+  subscriptionStatus             String?
   subscriptionTier             String?
   completedOnboarding          Boolean            @default(false)
   hasSeenCreditGuide           Boolean            @default(false)

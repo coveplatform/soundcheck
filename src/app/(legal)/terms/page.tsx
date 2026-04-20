@@ -104,9 +104,10 @@ export default function TermsPage() {
             <h3 className="font-bold mt-4 mb-1">Pro subscriptions</h3>
             <p>
               MixReflect Pro is available at $9.99/month or $79.99/year. Pro provides 3 active
-              slots, priority queue placement, a Pro badge, and early access to new features. You
-              can manage your subscription and billing through the Stripe Customer Portal. Pro
-              subscriptions auto-renew unless cancelled.
+              slots, 20 review credits added to your account each billing cycle, priority queue
+              placement, a Pro badge, and early access to new features. You can manage your
+              subscription and billing through the Stripe Customer Portal. Pro subscriptions
+              auto-renew unless cancelled.
             </p>
 
             <h3 className="font-bold mt-4 mb-1">Reviewer payouts</h3>

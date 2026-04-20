@@ -216,21 +216,24 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   }
 }
 
+const PRO_MONTHLY_CREDITS = 20;
+
 async function handleSubscriptionChange(subscription: Stripe.Subscription) {
   try {
-    // Find artist profile by Stripe customer ID
     const customerId =
       typeof subscription.customer === "string"
         ? subscription.customer
         : subscription.customer.id;
 
-    const artistProfile = await prisma.artistProfile.findFirst({
+    const newPeriodStart = new Date(subscription.current_period_start * 1000);
+    const isActive = subscription.status === "active";
+
+    let artistProfile = await prisma.artistProfile.findFirst({
       where: { stripeCustomerId: customerId },
-      select: { id: true },
+      select: { id: true, subscriptionCurrentPeriodStart: true },
     });
 
     if (!artistProfile) {
-      // Try metadata fallback
       const artistProfileId = subscription.metadata?.artistProfileId;
       if (!artistProfileId) {
         console.error(
@@ -245,6 +248,11 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
           subscriptionId: subscription.id,
           subscriptionStatus: subscription.status,
           stripeCustomerId: customerId,
+          ...(isActive && {
+            subscriptionCurrentPeriodStart: newPeriodStart,
+            reviewCredits: { increment: PRO_MONTHLY_CREDITS },
+            totalCreditsEarned: { increment: PRO_MONTHLY_CREDITS },
+          }),
         },
       });
       console.log(
@@ -253,14 +261,29 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       return;
     }
 
+    const isNewPeriod =
+      isActive &&
+      (!artistProfile.subscriptionCurrentPeriodStart ||
+        artistProfile.subscriptionCurrentPeriodStart.getTime() !== newPeriodStart.getTime());
+
     await prisma.artistProfile.update({
       where: { id: artistProfile.id },
       data: {
         subscriptionId: subscription.id,
         subscriptionStatus: subscription.status,
+        ...(isActive && { subscriptionCurrentPeriodStart: newPeriodStart }),
+        ...(isNewPeriod && {
+          reviewCredits: { increment: PRO_MONTHLY_CREDITS },
+          totalCreditsEarned: { increment: PRO_MONTHLY_CREDITS },
+        }),
       },
     });
 
+    if (isNewPeriod) {
+      console.log(
+        `Granted ${PRO_MONTHLY_CREDITS} monthly credits to artist ${artistProfile.id}`
+      );
+    }
     console.log(
       `Subscription ${subscription.status} for artist ${artistProfile.id}`
     );
