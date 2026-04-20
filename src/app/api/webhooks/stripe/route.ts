@@ -225,7 +225,8 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
         ? subscription.customer
         : subscription.customer.id;
 
-    const newPeriodStart = new Date(subscription.current_period_start * 1000);
+    const periodStartSeconds = subscription.items?.data?.[0]?.current_period_start;
+    const newPeriodStart = periodStartSeconds ? new Date(periodStartSeconds * 1000) : new Date();
     const isActive = subscription.status === "active";
 
     let artistProfile = await prisma.artistProfile.findFirst({
