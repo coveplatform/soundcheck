@@ -40,6 +40,10 @@ function getS3Client(): { client: S3Client | null; missingEnv: string[] } {
       endpoint: endpoint || undefined,
       forcePathStyle: Boolean(endpoint),
       credentials: { accessKeyId: accessKeyId!, secretAccessKey: secretAccessKey! },
+      // SDK v3.750+ adds CRC32 checksums to PutObject by default, which
+      // breaks browser fetch uploads because the browser can't set the
+      // x-amz-checksum-crc32 header. Opt out to restore the old behaviour.
+      requestChecksumCalculation: "WHEN_REQUIRED",
     }),
     missingEnv: [],
   };
