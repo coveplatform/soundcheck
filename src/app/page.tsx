@@ -412,6 +412,10 @@ export default function Home() {
           <div className="space-y-0 rounded-2xl bg-white shadow-md overflow-hidden">
             {[
               {
+                q: "Where can I get honest feedback on my music before releasing it?",
+                a: "MixReflect is built for exactly that. Upload your track and genre-matched artists review it with structured, honest feedback before you release. You start with one free credit — no credit card required.",
+              },
+              {
                 q: "What is MixReflect?",
                 a: "A peer-to-peer feedback platform for music creators. Upload your tracks, review other artists in your genre, and earn credits you can spend to get feedback on your own music. It's artists helping artists — no middlemen, no gatekeepers.",
               },
@@ -420,12 +424,16 @@ export default function Home() {
                 a: "Every time you review another artist's track, you earn a credit. Spend that credit to get a review on one of your own tracks. It's a simple give-one-get-one system that keeps quality feedback flowing.",
               },
               {
-                q: "What does Pro get me?",
-                a: "Pro gives you 3 tracks in review at once (vs 1 for free), 20 credits added to your account every month, priority queue placement so your tracks get reviewed faster, a Pro badge, and early access to new features. $9.99/month, cancel anytime.",
+                q: "Do I need to pay to get music feedback?",
+                a: "No. MixReflect is free to use. You earn credits by reviewing other artists' tracks, then spend those credits to get reviews on your own music. No upfront cost, no credit card required. Pro ($9.99/month) is there if you want to move faster with more tracks in review at once.",
               },
               {
                 q: "Is it really free?",
                 a: "Yes. You can upload tracks, earn credits by reviewing, and access full analytics — all for free, forever. Pro is for artists who want to move faster with more tracks in review at once.",
+              },
+              {
+                q: "What does Pro get me?",
+                a: "Pro gives you 3 tracks in review at once (vs 1 for free), 20 credits added to your account every month, priority queue placement so your tracks get reviewed faster, a Pro badge, and early access to new features. $9.99/month, cancel anytime.",
               },
               {
                 q: "Who reviews my tracks?",
@@ -434,6 +442,10 @@ export default function Home() {
               {
                 q: "Why do I need multiple reviews?",
                 a: "One person's feedback is just their taste. With multiple reviews, patterns emerge. If one person says your intro is too long, maybe they're wrong. If most reviewers say it, that's signal worth acting on.",
+              },
+              {
+                q: "How do I know if my track is ready to release?",
+                a: "When multiple people who don't know each other say the same thing — that's your signal. MixReflect shows you patterns across your reviews. If four out of five reviewers flag the same issue, it's not taste, it's something worth fixing before you put it out.",
               },
               {
                 q: "Is my music safe?",

@@ -36,17 +36,19 @@ export const metadata: Metadata = {
     template: "%s | MixReflect",
   },
   description:
-    "A private feedback marketplace where artists get structured reviews from a curated listener panel and reviewers get paid to discover new music. Get 5-20 structured reviews starting at $4.95.",
+    "A free peer-to-peer music feedback marketplace. Upload your track, review others in your genre, and earn credits for structured honest feedback. Genre-matched, artist-to-artist. Free forever.",
   keywords: [
     "music feedback",
-    "song reviews",
+    "online music feedback",
     "music production feedback",
-    "track reviews",
+    "peer music review",
+    "song feedback",
+    "track feedback",
     "music critique",
     "pre-release feedback",
-    "music listeners",
-    "artist feedback",
+    "artist feedback platform",
     "honest music reviews",
+    "get feedback on my music",
   ],
   authors: [{ name: "MixReflect" }],
   creator: "MixReflect",
@@ -57,7 +59,7 @@ export const metadata: Metadata = {
     siteName: "MixReflect",
     title: "MixReflect - Get Real Feedback on Your Music",
     description:
-      "A private feedback marketplace where artists get genuine listener feedback and reviewers get paid to discover new music.",
+      "A free peer-to-peer music feedback marketplace. Upload your track, review others in your genre, and earn credits for structured honest feedback.",
     images: [
       {
         url: "/og-image.png",
@@ -71,7 +73,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "MixReflect - Get Real Feedback on Your Music",
     description:
-      "Get structured feedback from genre-matched listeners before you release.",
+      "Free peer-to-peer music feedback. Review others in your genre, earn credits, get honest structured feedback on your own tracks.",
     images: ["/og-image.png"],
     creator: "@mixreflect",
   },
@@ -94,22 +96,47 @@ export const metadata: Metadata = {
   },
 };
 
-// JSON-LD structured data for Google
+// JSON-LD structured data for Google and AI crawlers
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "MixReflect",
-  url: "https://mixreflect.com",
-  logo: "https://mixreflect.com/logo.png",
-  description: "A private feedback marketplace where artists get structured reviews from genre-matched listeners before release.",
-  sameAs: [
-    "https://twitter.com/mixreflect",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      name: "MixReflect",
+      url: "https://mixreflect.com",
+      applicationCategory: "MusicApplication",
+      operatingSystem: "Web",
+      description: "A free peer-to-peer music feedback marketplace where artists upload tracks, review others in their genre, and earn credits for structured honest feedback. Genre-matched, artist-to-artist.",
+      offers: [
+        {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          name: "Free",
+          description: "1 track in review queue, earn credits by reviewing others, full analytics dashboard.",
+        },
+        {
+          "@type": "Offer",
+          price: "9.99",
+          priceCurrency: "USD",
+          name: "Pro",
+          description: "3 tracks in review queue, 20 monthly credits, priority queue placement.",
+        },
+      ],
+    },
+    {
+      "@type": "Organization",
+      name: "MixReflect",
+      url: "https://mixreflect.com",
+      logo: "https://mixreflect.com/logo.png",
+      sameAs: ["https://twitter.com/mixreflect"],
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        url: "https://mixreflect.com/support",
+      },
+    },
   ],
-  contactPoint: {
-    "@type": "ContactPoint",
-    contactType: "customer support",
-    url: "https://mixreflect.com/support",
-  },
 };
 
 export default async function RootLayout({
