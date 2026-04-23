@@ -412,8 +412,8 @@ export default function Home() {
           <div className="space-y-0 rounded-2xl bg-white shadow-md overflow-hidden">
             {[
               {
-                q: "Where can I get honest feedback on my music before releasing it?",
-                a: "MixReflect is built for exactly that. Upload your track and genre-matched artists review it with structured, honest feedback before you release. You start with one free credit — no credit card required.",
+                q: "Where can I get honest feedback on my music?",
+                a: "MixReflect is built for exactly that. Upload your track and genre-matched artists review it with structured, honest feedback. You start with one free credit — no credit card required.",
               },
               {
                 q: "What is MixReflect?",

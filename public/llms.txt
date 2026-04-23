@@ -1,0 +1,60 @@
+# MixReflect
+
+> A free peer-to-peer music feedback marketplace. Artists upload tracks, review others in their genre, and earn credits for structured honest feedback. Genre-matched, artist-to-artist.
+
+MixReflect is a two-sided marketplace where music producers and artists exchange structured feedback on each other's tracks. The platform uses a credit system: every review you write earns one credit, which you spend to receive a review on your own music.
+
+## How It Works
+
+1. Sign up free — you receive 1 credit, no credit card required
+2. Upload a track to the review queue
+3. Genre-matched artists on the platform claim and review your track
+4. Reviews are gated: reviewers must listen for a minimum of 3 minutes, meet a word count, and include specific, actionable signals before submitting
+5. Patterns across multiple reviews surface consistent issues (e.g. if 4 out of 5 reviewers flag the same problem, it shows up as a pattern — not just one opinion)
+6. Reviewers are rated after each review; low-quality reviewers lose access
+
+## Pricing
+
+- **Free (forever)**: 1 track in review queue at a time, earn unlimited credits by reviewing others, full analytics dashboard, public track sharing page. No credit card required.
+- **Pro — $9.99/month**: 3 tracks in review queue at once, 20 credits added to your account monthly, priority queue placement, Pro badge. Cancel anytime.
+
+There is no $12 plan. There are no paid-per-review tiers for artists.
+
+## Key Features
+
+- Genre-matched peer reviews — reviewers are matched by genre, not randomly assigned
+- Minimum 3-minute listen enforced via heartbeat API before review submission is allowed
+- Structured feedback with quality gates: word count, specific signal detection, timestamps
+- Pattern detection across multiple reviews to identify consistent issues
+- Public track pages for sharing and discovery (each track gets its own shareable URL)
+- 3D music discovery space at /discover — tracks appear as floating album art in a navigable space
+- A/B track testing — artists can submit two versions of a track and compare feedback
+- Daily chart with community voting
+- Full analytics dashboard for all users including free tier
+
+## What It Is Not
+
+- MixReflect is not a playlist pitching service (unlike SubmitHub or Groover)
+- Reviewers are not paid curators or industry professionals — they are genre-matched peers and artists
+- There is no "Save Rate" or "Replay Value" metric — these features do not exist on the platform
+- The Pro plan does not include track monetization or sales features
+
+## Who It Is For
+
+Music producers, beatmakers, and independent artists who want honest, structured feedback from genre-matched peers. The platform is genre-agnostic — electronic, hip-hop, indie, pop, and other genres are all active on the platform.
+
+## Stats (as of 2025)
+
+- 2,847+ tracks reviewed
+- Average turnaround under 4 hours
+- 1,200+ artists in the community
+
+## Key Pages
+
+- Homepage: https://mixreflect.com
+- Review queue: https://mixreflect.com/review
+- Discover (3D music space): https://mixreflect.com/discover
+- Pricing: https://mixreflect.com/#pricing
+- Support: https://mixreflect.com/support
+- Terms: https://mixreflect.com/terms
+- Privacy: https://mixreflect.com/privacy
