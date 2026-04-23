@@ -185,9 +185,10 @@ export default function OnboardingPage() {
       });
 
       if (!trackRes.ok) {
-        // Track creation failed — still proceed to dashboard without track
+        const trackErr = await trackRes.json().catch(() => null);
+        setError((trackErr as { error?: string })?.error || "Couldn't add your track. Try a different link, or tap \"I'll do this later\" to set up your track from the dashboard.");
+        setIsSubmittingTrack(false);
         await updateSession();
-        router.push("/dashboard");
         return;
       }
 
@@ -496,9 +497,9 @@ export default function OnboardingPage() {
                 <button
                   onClick={handleComplete}
                   disabled={isLoading}
-                  className="text-sm text-black/30 hover:text-black font-bold transition-colors underline underline-offset-2"
+                  className="text-xs text-black/20 hover:text-black/40 font-medium transition-colors"
                 >
-                  {isLoading ? "Setting up..." : "Skip for now →"}
+                  {isLoading ? "Setting up..." : "I'll do this later"}
                 </button>
               </div>
             </div>

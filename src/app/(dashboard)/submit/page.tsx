@@ -111,6 +111,7 @@ export default function SubmitTrackPage() {
 
   // ---- step 3: review count state ----------------------------------------
   const [reviewCount, setReviewCount] = useState<number>(5);
+  const [reviewCountInitialised, setReviewCountInitialised] = useState(false);
   const [slotInfo, setSlotInfo] = useState<{ maxSlots: number; activeCount: number; isPro: boolean } | null>(null);
 
   // ---- shared UI state ----------------------------------------------------
@@ -124,14 +125,19 @@ export default function SubmitTrackPage() {
         const res = await fetch("/api/profile");
         if (res.ok) {
           const data = await res.json();
+          const balance = data.reviewCredits ?? 0;
           setProfile({
             id: data.id,
             artistName: data.artistName,
             totalTracks: data.totalTracks ?? 0,
-            reviewCredits: data.reviewCredits ?? 0,
+            reviewCredits: balance,
           });
           if (data.experienceLevel) {
             setExperienceLevel(data.experienceLevel as ExperienceLevel);
+          }
+          if (!reviewCountInitialised) {
+            setReviewCount(Math.min(5, Math.max(1, balance)));
+            setReviewCountInitialised(true);
           }
         }
       } catch (err) {

@@ -487,12 +487,12 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
       </div>
 
       {/* First-time user CTA */}
-      {tracks.length === 0 && credits >= 2 && (
+      {tracks.length === 0 && credits >= 1 && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
           <div className="border-2 border-lime-500 bg-lime-50 rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex-1 min-w-0">
               <p className="text-base font-black text-black">
-                You&apos;ve got {credits} credits.
+                {credits === 1 ? "You've got 1 free credit." : `You've got ${credits} credits.`}
               </p>
               <p className="text-sm text-black/50 mt-0.5">
                 Drop your first track and get real ears on it.
