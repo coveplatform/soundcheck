@@ -21,11 +21,14 @@ type CheckoutStatusResponse = {
 export default function SuccessPage() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
+  const trackIdParam = searchParams.get("trackId");
+  // Credit-based submissions have trackId but no session_id
+  const isCreditBased = !sessionId && !!trackIdParam;
   const [status, setStatus] = useState<"loading" | "pending" | "completed" | "failed" | "error">(
-    sessionId ? "loading" : "error"
+    sessionId ? "loading" : isCreditBased ? "completed" : "error"
   );
   const [data, setData] = useState<CheckoutStatusResponse | null>(null);
-  const [error, setError] = useState<string>(sessionId ? "" : "Missing checkout session.");
+  const [error, setError] = useState<string>(sessionId || isCreditBased ? "" : "Missing checkout session.");
 
   const pollAttempts = useRef(0);
   const trackedCompletion = useRef(false);
@@ -112,7 +115,7 @@ export default function SuccessPage() {
     };
   }, [isBypass, sessionId]);
 
-  if (!sessionId) {
+  if (!sessionId && !isCreditBased) {
     return (
       <div className="max-w-md mx-auto mt-20 text-center">
         <p className="text-neutral-600">Missing checkout session.</p>

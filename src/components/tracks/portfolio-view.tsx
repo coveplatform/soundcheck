@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { AnalyticsDashboard } from "@/components/analytics/analytics-dashboard";
-import { BarChart3, TrendingUp, ArrowRight } from "lucide-react";
+import { BarChart3, Clock, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface PortfolioViewProps {
   hasData: boolean;
+  hasTracks?: boolean;
   trackData?: any[];
   totalReviews?: number;
   totalTracks?: number;
@@ -28,6 +29,7 @@ const MIN_REVIEWS_FOR_INSIGHTS = 3;
 
 export function PortfolioView({
   hasData,
+  hasTracks = false,
   trackData = [],
   totalReviews = 0,
   totalTracks = 0,
@@ -45,6 +47,34 @@ export function PortfolioView({
   playlistActionsData,
   topQuickWins,
 }: PortfolioViewProps) {
+  // Empty state — track submitted but awaiting reviews
+  if (!hasData && hasTracks) {
+    return (
+      <div className="bg-white rounded-2xl border-2 border-black/10 overflow-hidden shadow-[3px_3px_0_rgba(0,0,0,0.06)]">
+        <div className="bg-black px-6 py-8 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-purple-600 flex items-center justify-center mx-auto mb-4 shadow-[3px_3px_0_rgba(0,0,0,0.5)]">
+            <Clock className="h-7 w-7 text-white" />
+          </div>
+          <h3 className="text-2xl font-black tracking-tighter text-white mb-1">Waiting for reviews</h3>
+          <p className="text-sm text-white/40 max-w-xs mx-auto">
+            Your track is queued. Insights unlock once your first reviews come in.
+          </p>
+        </div>
+        <div className="px-6 py-5 flex items-center justify-between gap-4">
+          <p className="text-[13px] font-bold text-black/40">
+            Reviewers are being matched to your track
+          </p>
+          <Link href="/submit">
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-10 px-5 rounded-xl whitespace-nowrap">
+              Submit another
+              <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   // Empty state — no tracks submitted yet
   if (!hasData) {
     return (

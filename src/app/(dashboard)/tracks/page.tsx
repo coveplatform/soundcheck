@@ -481,6 +481,7 @@ export default async function TracksPage({
           insightsView={
             <PortfolioView
               hasData={hasAnalyticsData}
+              hasTracks={tracks.length > 0}
               {...portfolioData}
             />
           }
