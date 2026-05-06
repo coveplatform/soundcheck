@@ -39,6 +39,7 @@ export default async function AdminUsersPage({
     "@mixreflect.com",
     "@example.com",
     "@soundcheck.com",
+    "@soundcheck.internal",
   ];
   const DEMO_EMAIL_EXACT = [
     "testlink@gmail.com",
