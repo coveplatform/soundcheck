@@ -200,7 +200,6 @@ export default async function AdminUsersPage({
           completedOnboarding: true,
           totalPeerReviews: true,
           reviewCredits: true,
-          totalTracks: true,
           Track: {
             select: {
               reviewsRequested: true,
@@ -321,7 +320,7 @@ export default async function AdminUsersPage({
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {users.map((u) => {
-                const tracksPosted = u.ArtistProfile?.totalTracks ?? 0;
+                const tracksPosted = u.ArtistProfile?.Track?.length ?? 0;
                 const tracksInQueue = u.ArtistProfile?.Track?.filter(t =>
                   t.status === "QUEUED" || t.status === "IN_PROGRESS" || t.status === "PENDING_PAYMENT"
                 ).length ?? 0;
