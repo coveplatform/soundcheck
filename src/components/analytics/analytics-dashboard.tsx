@@ -78,7 +78,7 @@ interface AnalyticsDashboardProps {
 
 type InsightTab = "overview" | "scores" | "feedback" | "tracks";
 
-const TABS: { id: InsightTab; label: string; icon: React.ElementType }[] = [
+const TABS: { id: InsightTab; label: string; icon: React.FC<{ className?: string }> }[] = [
   { id: "overview", label: "Overview", icon: BarChart3 },
   { id: "scores", label: "Scores", icon: TrendingUp },
   { id: "feedback", label: "Feedback", icon: MessageSquare },
