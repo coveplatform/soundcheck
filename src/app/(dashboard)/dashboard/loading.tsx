@@ -1,63 +1,61 @@
 export default function DashboardLoading() {
   return (
-    <div className="pt-8 pb-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="animate-pulse">
-          {/* Compact header skeleton */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-5 mb-5 border-b border-black/10">
-            <div className="h-8 w-48 bg-black/5 rounded"></div>
-            <div className="flex items-center gap-2.5">
-              <div className="h-9 w-20 bg-black/5 rounded-lg"></div>
-              <div className="h-9 w-28 bg-black/5 rounded-lg"></div>
+    <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden animate-pulse">
+      {/* Hero */}
+      <div className="bg-white border-b-2 border-black">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+          <div className="flex items-start justify-between gap-6">
+            <div>
+              <div className="h-10 w-16 bg-black/5 rounded mb-1" />
+              <div className="h-12 w-56 bg-black/8 rounded" />
+            </div>
+            <div className="flex-shrink-0 text-right pl-5 sm:pl-8 border-l-2 border-black/10">
+              <div className="h-14 w-14 bg-black/8 rounded ml-auto" />
+              <div className="h-3 w-20 bg-black/5 rounded mt-2 ml-auto" />
             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-            <div className="space-y-6">
-              {/* Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="border border-black/8 rounded-xl bg-white/60 px-3.5 py-2.5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="h-7 w-7 rounded-md bg-black/5"></div>
-                      <div className="space-y-1.5">
-                        <div className="h-5 w-10 bg-black/5 rounded"></div>
-                        <div className="h-3 w-16 bg-black/5 rounded"></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Tracks */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="h-5 w-24 bg-black/5 rounded"></div>
-                  <div className="h-3 w-16 bg-black/5 rounded"></div>
-                </div>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="rounded-xl border border-black/8 bg-white overflow-hidden">
-                      <div className="aspect-square bg-black/5"></div>
-                      <div className="p-2 space-y-1">
-                        <div className="h-3 w-3/4 bg-black/5 rounded"></div>
-                        <div className="h-2.5 w-1/2 bg-black/5 rounded"></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+      {/* Queue section */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <div className="h-2.5 w-20 bg-black/5 rounded mb-1.5" />
+            <div className="h-8 w-44 bg-black/8 rounded" />
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3 sm:gap-4">
+          {[0, 1, 2].map((i) => (
+            <div key={i}>
+              <div className="aspect-square rounded-2xl bg-black/6 border-2 border-black/8" />
+              <div className="h-3 w-3/4 bg-black/5 rounded mt-2" />
             </div>
+          ))}
+        </div>
+      </div>
 
-            {/* Sidebar skeleton */}
-            <div className="space-y-4">
-              <div className="border border-black/8 rounded-xl bg-white/60 p-5">
-                <div className="h-20 w-full bg-black/5 rounded-lg"></div>
-              </div>
-              <div className="border border-black/8 rounded-xl bg-white/60 p-5">
-                <div className="h-32 w-full bg-black/5 rounded-lg"></div>
-              </div>
+      {/* Review & Earn dark section */}
+      <div className="bg-neutral-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <div className="h-2.5 w-24 bg-white/10 rounded mb-1.5" />
+              <div className="h-8 w-52 bg-white/10 rounded" />
+              <div className="h-4 w-48 bg-white/5 rounded mt-1.5" />
             </div>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="rounded-xl border border-white/8 bg-white/5 overflow-hidden">
+                <div className="aspect-square bg-white/5" />
+                <div className="p-2 space-y-1.5">
+                  <div className="h-2.5 bg-white/8 rounded" />
+                  <div className="h-2 w-2/3 bg-white/5 rounded" />
+                  <div className="h-6 bg-white/8 rounded-md mt-1" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
