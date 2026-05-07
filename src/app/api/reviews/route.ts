@@ -182,15 +182,16 @@ export async function POST(request: Request) {
     }
 
     // Support both legacy reviewer profiles AND peer reviewers (artist profiles)
-    const reviewerProfile = await prisma.reviewerProfile.findUnique({
-      where: { userId: session.user.id },
-      select: { id: true, isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true, tier: true },
-    });
-
-    const artistProfile = await prisma.artistProfile.findUnique({
-      where: { userId: session.user.id },
-      select: { id: true, completedOnboarding: true },
-    });
+    const [reviewerProfile, artistProfile] = await Promise.all([
+      prisma.reviewerProfile.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true, isRestricted: true, completedOnboarding: true, onboardingQuizPassed: true, tier: true },
+      }),
+      prisma.artistProfile.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true, completedOnboarding: true },
+      }),
+    ]);
 
     // Determine if user is a peer ReviewerProfile:
     // - Must have artist profile
@@ -547,6 +548,7 @@ export async function POST(request: Request) {
       const updatedTrack = await tx.track.update({
         where: { id: review.trackId },
         data: {
+          reviewsCompleted: countedCompletedReviews,
           status: nextTrackStatus,
           ...(nextTrackStatus === "COMPLETED" && {
             completedAt: new Date(),
