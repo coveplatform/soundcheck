@@ -29,61 +29,6 @@ function extractWords(text: string): string[] {
   return text.toLowerCase().match(/[a-z0-9']+/g) ?? [];
 }
 
-function hasSpecificSignals(text: string, words: string[]): boolean {
-  // Timestamps like "1:30" or "at 2:15"
-  if (/\b\d:\d{2}\b/.test(text)) return true;
-
-  // Reasoning/explanation patterns (expanded)
-  if (/(because|since|so that|for example|e\.g\.|which makes|that's why|due to|the reason|this is why)/i.test(text)) return true;
-
-  // Suggestion/actionable patterns
-  if (/(could|should|would|try|consider|maybe|perhaps|suggest|recommend|needs? to|have to)/i.test(text)) return true;
-
-  // Comparative/evaluative language indicating specific feedback
-  if (/(too (loud|quiet|much|little|long|short|fast|slow|busy|empty|muddy|harsh|bright|dark|repetitive))/i.test(text)) return true;
-  if (/(more|less|enough|better|worse|stronger|weaker) (of|than)?/i.test(text)) return true;
-
-  // Temporal/structural references
-  if (/(at the (start|end|beginning|middle)|in the (intro|outro|verse|chorus|bridge|drop|breakdown|buildup)|during the|after the|before the|halfway|second half|first half)/i.test(text)) return true;
-
-  const keywordSet = new Set([
-    // Drums & percussion
-    "kick", "snare", "hihat", "hat", "hats", "clap", "drums", "drum", "percussion", "cymbals", "toms", "rimshot", "shaker",
-    // Bass & low end
-    "bass", "sub", "808", "bassline", "lowend", "low-end",
-    // Vocals & lyrics
-    "vocal", "vocals", "voice", "singing", "singer", "rap", "rapping", "rapper", "lyrics", "lyric", "lyrical", "words", "flow", "delivery", "adlibs", "harmonies", "harmony",
-    // Song structure
-    "hook", "chorus", "verse", "drop", "bridge", "intro", "outro", "breakdown", "buildup", "build-up", "transition", "section", "part", "bar", "bars",
-    // Production terms
-    "mix", "mixing", "master", "mastering", "eq", "compress", "compression", "limiter", "reverb", "delay", "stereo", "mono", "pan", "panning", "automation", "arrangement", "structure", "tempo", "bpm",
-    // Instruments & sounds
-    "melody", "melodies", "beat", "instrumental", "guitar", "piano", "keys", "keyboard", "synth", "synths", "sample", "samples", "loop", "loops", "strings", "brass", "horns", "pad", "pads", "lead", "arp",
-    // Sound qualities
-    "loud", "quiet", "volume", "level", "levels", "tone", "sound", "sounds", "frequency", "muddy", "crisp", "clean", "distorted", "balanced", "heavy", "punchy", "tight", "full", "thin", "warm", "cold", "bright", "dark", "harsh", "smooth",
-    // Feel & energy
-    "energy", "vibe", "vibes", "mood", "feel", "feeling", "atmosphere", "catchy", "repetitive", "dynamic", "dynamics", "flat", "boring", "exciting", "groove", "bounce", "pocket", "swing",
-    // Timing & rhythm
-    "rhythm", "rhythmic", "timing", "offbeat", "onbeat", "quantized", "humanized",
-    // General music terms
-    "track", "song", "music", "production", "producer", "artist", "listener",
-  ]);
-
-  for (const w of words) {
-    if (keywordSet.has(w)) return true;
-  }
-
-  return false;
-}
-
-function countActionLines(text: string): number {
-  const lines = text
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter(Boolean);
-  return lines.length;
-}
-
 function validateReviewText(fieldLabel: string, text: string, minWords: number): string | null {
   const words = extractWords(text);
 
@@ -96,10 +41,6 @@ function validateReviewText(fieldLabel: string, text: string, minWords: number):
 
   if (unique.size < 8 || uniqueRatio < 0.3) {
     return `${fieldLabel} seems too repetitive. Please be more specific.`;
-  }
-
-  if (!hasSpecificSignals(text, words)) {
-    return `${fieldLabel} needs more specific, actionable details (e.g. mention an element like vocals/kick, a section like the drop, or a timestamp).`;
   }
 
   return null;
