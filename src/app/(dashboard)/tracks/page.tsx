@@ -41,21 +41,6 @@ export default async function TracksPage({
   const isInsightsView = view === "insights";
   const isStatsView = view === "stats";
 
-  // Get basic artist profile with subscription info for slots
-  const basicProfile = await prisma.artistProfile.findUnique({
-    where: { userId: session.user.id },
-    select: {
-      id: true,
-      subscriptionStatus: true,
-    },
-  });
-
-  if (!basicProfile) {
-    redirect("/onboarding");
-  }
-
-  // Grid view: lightweight query — only what the track cards need
-  // Insights view: full analytics query with all review fields
   const artistProfile = await prisma.artistProfile.findUnique({
     where: { userId: session.user.id },
     include: {
@@ -90,7 +75,6 @@ export default async function TracksPage({
                 wouldShare: true,
                 wouldFollow: true,
                 countsTowardAnalytics: true,
-                createdAt: true,
                 lowEndClarity: true,
                 vocalClarity: true,
                 highEndQuality: true,
@@ -121,7 +105,7 @@ export default async function TracksPage({
   const tracks = artistProfile.Track;
 
   // Slot computation
-  const isPro = basicProfile.subscriptionStatus === "active";
+  const isPro = artistProfile.subscriptionStatus === "active";
   const maxSlots = getMaxSlots(isPro);
   const activeStatuses = ACTIVE_TRACK_STATUSES as readonly string[];
   const activeTracks = tracks.filter((t) => activeStatuses.includes(t.status));

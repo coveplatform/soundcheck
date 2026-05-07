@@ -40,6 +40,23 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
     redirect("/login");
   }
 
+  // Fire discoverTracks immediately — it's independent of artistProfile
+  const discoverTracksPromise = prisma.track.findMany({
+    where: {
+      isPublic: true,
+      artworkUrl: { not: null },
+      status: { in: ["UPLOADED", "QUEUED", "IN_PROGRESS", "COMPLETED"] },
+    },
+    select: {
+      id: true,
+      title: true,
+      artworkUrl: true,
+      ArtistProfile: { select: { artistName: true } },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 8,
+  }).catch(() => [] as { id: string; title: string; artworkUrl: string | null; ArtistProfile: { artistName: string } | null }[]);
+
   let artistProfile: DashboardArtistProfile | MinimalArtistProfile | null =
     null;
   try {
@@ -137,30 +154,17 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
     );
   });
 
-  // Discover preview — grab 8 public tracks with artwork for the visual
-  const discoverTracks = await prisma.track.findMany({
-    where: {
-      isPublic: true,
-      artworkUrl: { not: null },
-      status: { in: ["UPLOADED", "QUEUED", "IN_PROGRESS", "COMPLETED"] },
-    },
-    select: {
-      id: true,
-      title: true,
-      artworkUrl: true,
-      ArtistProfile: { select: { artistName: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 8,
-  }).catch(() => [] as { id: string; title: string; artworkUrl: string | null; ArtistProfile: { artistName: string } | null }[]);
-
-  const excludeTrackIds = await prisma.review
-    .findMany({
-      where: { peerReviewerArtistId: artistProfile.id },
-      select: { trackId: true },
-    })
-    .then((r: { trackId: string }[]) => r.map((x) => x.trackId))
-    .catch(() => [] as string[]);
+  // Phase 2: run discoverTracks (already in-flight) and excludeTrackIds in parallel
+  const [discoverTracks, excludeTrackIds] = await Promise.all([
+    discoverTracksPromise,
+    prisma.review
+      .findMany({
+        where: { peerReviewerArtistId: artistProfile.id },
+        select: { trackId: true },
+      })
+      .then((r: { trackId: string }[]) => r.map((x) => x.trackId))
+      .catch(() => [] as string[]),
+  ]);
 
   const availableTracksRaw = await prisma.track.findMany({
     where: {
@@ -233,24 +237,6 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
 
   const isHighOrMedium =
     whatsNext?.priority === "high" || whatsNext?.priority === "medium";
-
-  // Today's chart submission (for live activity strip)
-  let todayChartSubmission: {
-    rank: number | null;
-    voteCount: number;
-    playCount: number;
-    title: string;
-  } | null = null;
-  try {
-    const todayUTC = new Date();
-    todayUTC.setUTCHours(0, 0, 0, 0);
-    todayChartSubmission = await (prisma as any).chartSubmission.findFirst({
-      where: { artistId: artistProfile.id, chartDate: todayUTC },
-      select: { rank: true, voteCount: true, playCount: true, title: true },
-    });
-  } catch {
-    // chartSubmission table may not exist in all environments
-  }
 
   return (
     <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
