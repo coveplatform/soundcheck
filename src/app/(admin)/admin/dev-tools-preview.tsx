@@ -25,7 +25,7 @@ export function DevToolsPreview() {
         return;
       }
 
-      setReviewUrl(`/review/${data.reviewId}`);
+      setReviewUrl(`/review/${data.reviewId}/v2`);
     } catch {
       setError("Failed to create preview");
     } finally {

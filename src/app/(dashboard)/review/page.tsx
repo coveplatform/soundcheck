@@ -321,7 +321,7 @@ export default async function ReviewQueuePage({
                       <p className="text-base font-black text-white truncate">{review.Track.title}</p>
                       <p className="text-sm text-white/40 truncate">by {review.Track.ArtistProfile.artistName}</p>
                     </div>
-                    <Link href={`/review/${review.id}`} className="flex-shrink-0">
+                    <Link href={`/review/${review.id}/v2`} className="flex-shrink-0">
                       <Button className="bg-lime-400 hover:bg-lime-300 text-black font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-sm h-9 px-4 rounded-xl">
                         Continue <ArrowRight className="h-3.5 w-3.5 ml-1" />
                       </Button>

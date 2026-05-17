@@ -221,6 +221,7 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
   const [bestPart, setBestPart] = useState("");
   const [biggestWeaknessSpecific, setBiggestWeaknessSpecific] = useState("");
   const [technicalIssues, setTechnicalIssues] = useState<string[]>([]);
+  const [isInstrumental, setIsInstrumental] = useState(false);
   const [qualityLevel, setQualityLevel] = useState<string | null>(null);
   const [nextFocus, setNextFocus] = useState<string | null>(null);
   const [honestFriend, setHonestFriend] = useState("");
@@ -343,7 +344,7 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
         body: JSON.stringify({ clientListenTime: Math.floor(listenTime) }),
       }).catch(() => {});
 
-      const hasVocalIssue = technicalIssues.includes("vocals-buried");
+      const hasVocalIssue = !isInstrumental && technicalIssues.includes("vocals-buried");
       const qualityToScore = (lvl: string | null) =>
         ({ PROFESSIONAL: 5, RELEASE_READY: 4, ALMOST_THERE: 3, DEMO_STAGE: 2, NOT_READY: 1 }[lvl ?? ""] ?? 3);
 
@@ -357,13 +358,13 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
           reviewId: review.id, firstImpression,
           engagementCurve: engagementCurve.length > 0 ? engagementCurve : undefined,
           productionScore: qualityToScore(qualityLevel),
-          vocalScore: hasVocalIssue ? 2 : 4,
+          vocalScore: isInstrumental ? null : (hasVocalIssue ? 2 : 4),
           originalityScore: firstImpressionScore,
           wouldListenAgain, bestPart,
           weakestPart: biggestWeaknessSpecific, biggestWeaknessSpecific,
           timestamps: timestampNotes,
           lowEndClarity: technicalIssues.includes("muddy-low") ? "BOTH_MUDDY" : "PERFECT",
-          vocalClarity: hasVocalIssue ? "BURIED" : "CRYSTAL_CLEAR",
+          vocalClarity: isInstrumental ? "NOT_APPLICABLE" : (hasVocalIssue ? "BURIED" : "CRYSTAL_CLEAR"),
           highEndQuality: technicalIssues.includes("harsh-highs") ? "TOO_HARSH" : "PERFECT",
           stereoWidth: technicalIssues.includes("narrow-stereo") ? "TOO_NARROW" : "GOOD_BALANCE",
           dynamics: technicalIssues.includes("compressed") ? "TOO_COMPRESSED" : "GREAT_DYNAMICS",
@@ -556,10 +557,6 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
           <ArrowLeft className="h-4 w-4" />
           {phase === 2 ? "Back to listening" : "Back to Queue"}
         </button>
-        <Link href={`/review/${id}`}
-          className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors">
-          V2 Preview
-        </Link>
       </div>
       <div className="flex gap-2">
         <Button variant="outline" size="sm" onClick={() => setShowUnplayableDialog(true)} className="text-xs">
@@ -961,12 +958,17 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
               <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-0.5">Technical Issues</p>
               <p className="text-xs text-neutral-500 mb-4">Flag any problems — or leave blank if it sounded clean.</p>
               <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => setTechnicalIssues([])}
+                <button type="button" onClick={() => { setTechnicalIssues([]); setIsInstrumental(false); }}
                   className={cn("px-3 py-2 text-xs font-bold rounded-xl border-2 transition-all",
-                    technicalIssues.length === 0 ? "border-emerald-400 bg-emerald-50 text-emerald-800" : "border-black/8 bg-white text-neutral-500 hover:border-black/20")}>
+                    technicalIssues.length === 0 && !isInstrumental ? "border-emerald-400 bg-emerald-50 text-emerald-800" : "border-black/8 bg-white text-neutral-500 hover:border-black/20")}>
                   ✓ Sounds clean
                 </button>
-                {formConfig.technicalIssueOptions.map((issue) => (
+                <button type="button" onClick={() => { setIsInstrumental((p) => !p); setTechnicalIssues((p) => p.filter((i) => i !== "vocals-buried")); }}
+                  className={cn("px-3 py-2 text-xs font-bold rounded-xl border-2 transition-all",
+                    isInstrumental ? "border-blue-400 bg-blue-50 text-blue-800" : "border-black/8 bg-white text-neutral-500 hover:border-black/20")}>
+                  Instrumental (no vocals)
+                </button>
+                {formConfig.technicalIssueOptions.filter((issue) => !(isInstrumental && issue.id === "vocals-buried")).map((issue) => (
                   <button key={issue.id} type="button"
                     onClick={() => setTechnicalIssues((p) => p.includes(issue.id) ? p.filter((i) => i !== issue.id) : [...p, issue.id])}
                     className={cn("px-3 py-2 text-xs font-bold rounded-xl border-2 transition-all",

@@ -6,5 +6,5 @@ export default async function LegacyReviewPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  redirect(`/review/${id}`);
+  redirect(`/review/${id}/v2`);
 }
