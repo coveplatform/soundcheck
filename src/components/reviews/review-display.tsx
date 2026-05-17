@@ -76,6 +76,143 @@ const qualityConfig: Record<
   },
 };
 
+// ---------------------------------------------------------------------------
+// Engagement curve helpers
+// ---------------------------------------------------------------------------
+
+type CurvePoint = { seconds: number; level: number };
+
+const CURVE_LEVELS = [
+  { value: 1, label: "Lost it", color: "#525252" },
+  { value: 2, label: "Meh",     color: "#3b82f6" },
+  { value: 3, label: "Okay",    color: "#f59e0b" },
+  { value: 4, label: "Good",    color: "#10b981" },
+  { value: 5, label: "Hooked",  color: "#9333ea" },
+];
+
+function curveColor(level: number) {
+  return CURVE_LEVELS.find((l) => l.value === level)?.color ?? "#9333ea";
+}
+
+function curveLabel(level: number) {
+  return CURVE_LEVELS.find((l) => l.value === level)?.label ?? "";
+}
+
+function fmtTime(s: number) {
+  return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+}
+
+function parseCurve(raw: Prisma.JsonValue): CurvePoint[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(
+    (p): p is CurvePoint =>
+      typeof (p as any)?.seconds === "number" && typeof (p as any)?.level === "number"
+  );
+}
+
+function analyzeCurve(curve: CurvePoint[]): { summary: string; insights: string[] } {
+  if (curve.length < 5) return { summary: "", insights: [] };
+
+  const levels = curve.map((p) => p.level);
+  const avg = levels.reduce((a, b) => a + b, 0) / levels.length;
+
+  const peakIdx = levels.indexOf(Math.max(...levels));
+  const peak = curve[peakIdx];
+
+  const opening = curve.slice(0, Math.ceil(curve.length * 0.2));
+  const openAvg = opening.reduce((a, b) => a + b.level, 0) / opening.length;
+
+  const closing = curve.slice(Math.floor(curve.length * 0.8));
+  const closeAvg = closing.reduce((a, b) => a + b.level, 0) / closing.length;
+
+  const midSection = curve.slice(Math.floor(curve.length * 0.25), Math.floor(curve.length * 0.75));
+  const midMin = midSection.length ? Math.min(...midSection.map((p) => p.level)) : 3;
+  const midMinIdx = midSection.findIndex((p) => p.level === midMin);
+  const midDip = midSection[midMinIdx];
+
+  const trajectory = closeAvg - openAvg;
+
+  const insights: string[] = [];
+
+  if (peak.level >= 4) {
+    insights.push(`Peaked at "${curveLabel(peak.level)}" around ${fmtTime(peak.seconds)}`);
+  }
+
+  if (openAvg >= 4) {
+    insights.push("Opening hook landed immediately — held from the first second");
+  } else if (openAvg <= 2) {
+    insights.push("Slow to grab attention — the opening didn't pull them in");
+  }
+
+  if (trajectory >= 1.5) {
+    insights.push("Engagement built consistently — the track improved as it went on");
+  } else if (trajectory <= -1.5) {
+    insights.push(`Dropped off in the final section — ended at "${curveLabel(Math.round(closeAvg))}"`);
+  }
+
+  if (midDip && midDip.level <= 2 && peak.level >= 4) {
+    insights.push(`Dipped to "${curveLabel(midDip.level)}" mid-track around ${fmtTime(midDip.seconds)} — a weak moment`);
+  }
+
+  let summary = "";
+  if (avg >= 4.2) {
+    summary = "This listener was hooked throughout — strong all-round engagement.";
+  } else if (avg >= 3.5) {
+    summary = trajectory > 0.5
+      ? "Good overall engagement with a positive arc — built well toward the end."
+      : trajectory < -0.5
+      ? "Started strong but lost momentum — the second half needs attention."
+      : "Solid, consistent engagement throughout with no major drops.";
+  } else if (avg >= 2.5) {
+    summary = trajectory > 0.5
+      ? "Started tentative but eventually found its footing."
+      : "Mixed engagement — moments of interest but also stretches that lost them.";
+  } else {
+    summary = "This listener struggled to stay engaged — the track didn't hold attention.";
+  }
+
+  return { summary, insights };
+}
+
+function MiniEngagementChart({ curve }: { curve: CurvePoint[] }) {
+  const W = 600;
+  const H = 52;
+  const PAD = 4;
+
+  const maxDur = Math.max(curve[curve.length - 1]?.seconds ?? 1, 1);
+  const toX = (s: number) => PAD + (s / maxDur) * (W - PAD * 2);
+  const toY = (l: number) => H - PAD - ((l - 1) / 4) * (H - PAD * 2);
+  const pts = curve.map((p) => [toX(p.seconds), toY(p.level)] as [number, number]);
+
+  const segments = pts.length >= 2
+    ? pts.slice(0, -1).map((p0, i) => {
+        const p1 = pts[i + 1];
+        const cpx = (p0[0] + p1[0]) / 2;
+        const color = curveColor(curve[i].level);
+        return {
+          color,
+          line: `M ${p0[0]},${p0[1]} C ${cpx},${p0[1]} ${cpx},${p1[1]} ${p1[0]},${p1[1]}`,
+          fill: `M ${p0[0]},${H - PAD} L ${p0[0]},${p0[1]} C ${cpx},${p0[1]} ${cpx},${p1[1]} ${p1[0]},${p1[1]} L ${p1[0]},${H - PAD} Z`,
+        };
+      })
+    : [];
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 52 }} preserveAspectRatio="none">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <line key={i} x1={0} y1={toY(i)} x2={W} y2={toY(i)} stroke="black" strokeOpacity="0.04" strokeWidth="1" />
+      ))}
+      {segments.map((seg, i) => (
+        <path key={`f${i}`} d={seg.fill} fill={seg.color} fillOpacity="0.12" />
+      ))}
+      {segments.map((seg, i) => (
+        <path key={`l${i}`} d={seg.line} fill="none" stroke={seg.color} strokeWidth="2.5"
+          strokeLinecap="round" strokeLinejoin="round" />
+      ))}
+    </svg>
+  );
+}
+
 export type ReviewData = {
   id: string;
   shareId: string | null;
@@ -100,6 +237,7 @@ export type ReviewData = {
   isGem: boolean;
   wasFlagged: boolean;
   flagReason: string | null;
+  engagementCurve?: Prisma.JsonValue;
   // V2 fields
   lowEndClarity?: string | null;
   vocalClarity?: string | null;
@@ -220,6 +358,48 @@ export function ReviewDisplay({
           </div>
         </div>
       </header>
+
+      {/* Engagement curve + analysis */}
+      {(() => {
+        const curve = parseCurve(review.engagementCurve ?? null);
+        if (curve.length < 5) return null;
+        const { summary, insights } = analyzeCurve(curve);
+        const lastLevel = curve[curve.length - 1]?.level ?? 3;
+        const lastColor = curveColor(lastLevel);
+        return (
+          <div className="mb-5 rounded-xl border border-black/8 overflow-hidden">
+            <div className="px-4 pt-3 pb-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-1">
+                Listener engagement curve
+              </p>
+              <div className="flex items-center gap-2 mb-2">
+                {CURVE_LEVELS.map((l) => (
+                  <span key={l.value} className="flex items-center gap-1 text-[9px] font-semibold text-neutral-400">
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: l.color }} />
+                    {l.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <MiniEngagementChart curve={curve} />
+            <div className="px-4 pt-3 pb-4 bg-black/[0.02] border-t border-black/6">
+              {summary && (
+                <p className="text-sm font-semibold text-black/70 mb-3 leading-snug">{summary}</p>
+              )}
+              {insights.length > 0 && (
+                <ul className="space-y-1.5">
+                  {insights.map((insight, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs text-black/60">
+                      <span className="mt-0.5 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: lastColor }} />
+                      {insight}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Quality verdict + replay — prominent badges */}
       {(quality || review.wouldListenAgain !== null) && (
