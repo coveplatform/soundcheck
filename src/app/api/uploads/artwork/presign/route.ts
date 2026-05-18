@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       ContentType: data.contentType,
     });
 
-    const uploadUrl = await getSignedUrl(client, command, { expiresIn: 60 });
+    const uploadUrl = await getSignedUrl(client, command, { expiresIn: 300 });
 
     const baseRaw = publicBaseUrl.trim().replace(/\/+$/, "");
     const base =
