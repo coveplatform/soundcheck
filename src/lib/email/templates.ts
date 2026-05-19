@@ -35,8 +35,8 @@ export const COLORS = {
   red: "#ef4444",
 };
 
-// Hosted PNG logo for emails (Gmail strips inline SVGs)
-const EMAIL_LOGO_URL = `${getAppUrl()}/email-logo.png`;
+// Hardcoded production URL — logo must be publicly reachable in emails regardless of env vars
+const EMAIL_LOGO_URL = "https://www.mixreflect.com/email-logo.png";
 
 // Base email wrapper template - exported for preview
 export function emailWrapper(content: string): string {
