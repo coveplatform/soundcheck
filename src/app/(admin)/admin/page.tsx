@@ -130,6 +130,34 @@ export default async function AdminPage() {
         </div>
       </Link>
 
+      {/* Track Score Demo Banner */}
+      <Link
+        href="/report/demo"
+        className="block rounded-xl border-2 border-emerald-500 bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 hover:shadow-lg transition-all relative overflow-hidden group"
+      >
+        <div className="absolute top-0 right-0 bg-yellow-300 text-emerald-900 text-[10px] font-black px-3 py-1.5 rounded-bl-xl tracking-wider">
+          ✨ NEW PRODUCT
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center flex-shrink-0">
+            <svg viewBox="0 0 44 44" className="h-8 w-8">
+              <circle cx="22" cy="22" r="16" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="4"/>
+              <circle cx="22" cy="22" r="16" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeDasharray="100.5" strokeDashoffset="18" transform="rotate(-90 22 22)"/>
+              <text x="22" y="27" textAnchor="middle" fill="white" fontSize="13" fontWeight="900">82</text>
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-black text-white mb-1">Track Score Report — Demo</h3>
+            <p className="text-sm text-white/90 font-medium">Preview the full $9 report product with dummy data</p>
+          </div>
+          <div className="hidden sm:block text-white group-hover:translate-x-1 transition-transform">
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </div>
+        </div>
+      </Link>
+
       {/* Quick Admin Tools */}
       <div className="grid grid-cols-2 gap-4">
         <Link
@@ -163,6 +191,22 @@ export default async function AdminPage() {
           <div className="text-xs font-semibold text-purple-600 uppercase tracking-wider">Blast</div>
           <div className="mt-2 text-base font-bold text-neutral-950">Send Announcement</div>
           <div className="text-xs text-neutral-400 mt-1">Preview &amp; send feature update to all users</div>
+        </Link>
+        <Link
+          href="/score"
+          className="block rounded-xl border border-emerald-200 bg-emerald-50 p-5 hover:border-emerald-400 transition-colors"
+        >
+          <div className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Product</div>
+          <div className="mt-2 text-base font-bold text-neutral-950">Track Score Landing</div>
+          <div className="text-xs text-neutral-400 mt-1">View the /score sales page</div>
+        </Link>
+        <Link
+          href="/submit-score"
+          className="block rounded-xl border border-neutral-200 bg-white p-5 hover:border-emerald-300 transition-colors"
+        >
+          <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Product</div>
+          <div className="mt-2 text-base font-bold text-neutral-950">Submit Score Form</div>
+          <div className="text-xs text-neutral-400 mt-1">View the track submission + checkout page</div>
         </Link>
       </div>
 

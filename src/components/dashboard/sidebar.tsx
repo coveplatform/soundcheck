@@ -21,6 +21,7 @@ import {
   Crown,
   ArrowRight,
   Compass,
+  Gauge,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -38,6 +39,7 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
     { href: "/discover", label: "Discover", icon: Compass, isNew: true },
     { href: "/tracks", label: "My Tracks", icon: Music },
     { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
+    { href: "/score", label: "Track Score", icon: Gauge, isNew: true },
   ];
 
   const reviewLinks = [
@@ -307,6 +309,7 @@ function MobileBottomNav({
 
   const moreLinks = [
     { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
+    { href: "/score", label: "Track Score", icon: Gauge },
     { href: "/review/history", label: "Review History", icon: History },
     { href: "/support", label: "Support", icon: LifeBuoy },
     { href: "/account", label: "Settings", icon: Settings },

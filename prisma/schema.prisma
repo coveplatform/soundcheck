@@ -62,6 +62,7 @@ model ArtistProfile {
   Genre_ArtistGenres           Genre[]            @relation("ArtistGenres")
   Genre_ArtistReviewGenres     Genre[]            @relation("ArtistReviewGenres")
   ChartSubmission              ChartSubmission[]
+  TrackScoreReport             TrackScoreReport[]
 }
 
 model EmailVerificationToken {
@@ -789,6 +790,7 @@ enum ExperienceLevel {
   PROFESSIONAL
 }
 
+
 // ── Daily Chart ─────────────────────────────────────────────────
 model ChartSubmission {
   id            String        @id @default(cuid())
@@ -829,4 +831,52 @@ model ChartVote {
 
   @@unique([submissionId, voterId])
   @@index([voterId, createdAt])
+}
+
+// ── Track Score Report ───────────────────────────────────────────
+model TrackScoreReport {
+  id               String            @id @default(cuid())
+  slug             String            @unique @default(cuid())
+  email            String
+  trackUrl         String
+  trackTitle       String?
+  genre            String?
+  notes            String?
+  status           ScoreReportStatus @default(PENDING)
+  stripeSessionId  String?           @unique
+  paidAt           DateTime?
+  completedAt      DateTime?
+  score            Int?
+  percentile       Float?
+  verdict          ScoreVerdict?
+  hookScore        Float?
+  productionScore  Float?
+  retentionScore   Float?
+  emotionalScore   Float?
+  commercialScore  Float?
+  aiSummary        String?
+  reviewerQuotes   Json?
+  priorityFixes    Json?
+  artistId         String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  ArtistProfile    ArtistProfile?    @relation(fields: [artistId], references: [id])
+
+  @@index([email])
+  @@index([status])
+}
+
+enum ScoreReportStatus {
+  PENDING
+  PAID
+  IN_REVIEW
+  COMPLETED
+  FAILED
+}
+
+enum ScoreVerdict {
+  RELEASE_READY
+  ALMOST_THERE
+  NEEDS_WORK
+  NOT_READY
 }
