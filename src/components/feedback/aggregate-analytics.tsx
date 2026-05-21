@@ -7,13 +7,15 @@ type ReviewLike = {
   productionScore: number | null;
   vocalScore: number | null;
   originalityScore: number | null;
-  wouldListenAgain: boolean | null;
-  perceivedGenre: string | null;
   similarArtists: string | null;
   firstImpression: FirstImpression | null;
-  wouldAddToPlaylist: boolean | null;
-  wouldShare: boolean | null;
-  wouldFollow: boolean | null;
+  lowEndClarity: string | null;
+  vocalClarity: string | null;
+  highEndQuality: string | null;
+  stereoWidth: string | null;
+  dynamics: string | null;
+  tooRepetitive: boolean | null;
+  trackLength: string | null;
 };
 
 type PlatformAverages = {
@@ -57,7 +59,6 @@ function topFrequencies(items: string[], limit: number) {
 }
 
 function getScoreLabel(score: number): { label: string; color: string } {
-  // Absolute quality labels based on 1-5 scale
   if (score >= 4.5) return { label: "Exceptional", color: "text-lime-600" };
   if (score >= 4.0) return { label: "Strong", color: "text-lime-600" };
   if (score >= 3.5) return { label: "Solid", color: "text-neutral-600" };
@@ -67,47 +68,32 @@ function getScoreLabel(score: number): { label: string; color: string } {
 }
 
 function ComparisonIndicator({ score, platformAvg }: { score: number; platformAvg?: number }) {
-  // If no platform average available, just show the quality label
   if (!platformAvg || platformAvg === 0) {
     const { label, color } = getScoreLabel(score);
-    return (
-      <div className={`text-xs font-medium ${color}`}>
-        {label}
-      </div>
-    );
+    return <div className={`text-xs font-medium ${color}`}>{label}</div>;
   }
 
   const diff = score - platformAvg;
   const absDiff = Math.abs(diff).toFixed(1);
   const { label } = getScoreLabel(score);
 
-  // Show: "Strong · +0.8 vs avg" or "Developing · -0.5 vs avg"
   if (diff > 0.2) {
     return (
-      <div
-        className="flex items-center gap-1 text-xs text-lime-600 font-medium"
-        title={`Platform average: ${platformAvg.toFixed(1)}`}
-      >
+      <div className="flex items-center gap-1 text-xs text-lime-600 font-medium" title={`Platform average: ${platformAvg.toFixed(1)}`}>
         <TrendingUp className="h-3 w-3" />
         <span>{label} · +{absDiff}</span>
       </div>
     );
   } else if (diff < -0.2) {
     return (
-      <div
-        className="flex items-center gap-1 text-xs text-amber-600 font-medium"
-        title={`Platform average: ${platformAvg.toFixed(1)}`}
-      >
+      <div className="flex items-center gap-1 text-xs text-amber-600 font-medium" title={`Platform average: ${platformAvg.toFixed(1)}`}>
         <TrendingDown className="h-3 w-3" />
         <span>{label} · -{absDiff}</span>
       </div>
     );
   } else {
     return (
-      <div
-        className="flex items-center gap-1 text-xs text-neutral-500 font-medium"
-        title={`Platform average: ${platformAvg.toFixed(1)}`}
-      >
+      <div className="flex items-center gap-1 text-xs text-neutral-500 font-medium" title={`Platform average: ${platformAvg.toFixed(1)}`}>
         <Minus className="h-3 w-3" />
         <span>{label} · avg</span>
       </div>
@@ -133,21 +119,10 @@ function ScoreCircle({
   return (
     <div className="flex flex-col items-center">
       <div className="relative w-24 h-24">
-        {/* Background circle */}
         <svg className="w-24 h-24 -rotate-90" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="36" fill="none" stroke="#f5f5f5" strokeWidth="6" />
           <circle
-            cx="40"
-            cy="40"
-            r="36"
-            fill="none"
-            stroke="#f5f5f5"
-            strokeWidth="6"
-          />
-          <circle
-            cx="40"
-            cy="40"
-            r="36"
-            fill="none"
+            cx="40" cy="40" r="36" fill="none"
             stroke={score >= 4 ? "#84cc16" : score >= 3 ? "#fbbf24" : "#f87171"}
             strokeWidth="6"
             strokeLinecap="round"
@@ -156,7 +131,6 @@ function ScoreCircle({
             className="transition-[stroke-dashoffset] duration-300 ease-out motion-reduce:transition-none"
           />
         </svg>
-        {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-2xl font-black">{score.toFixed(1)}</span>
         </div>
@@ -182,25 +156,13 @@ function ImpressionsBar({ impressions, total }: { impressions: { hook: number; d
       <div className="text-sm font-bold text-neutral-700">First Impressions</div>
       <div className="h-4 w-full rounded-full overflow-hidden flex bg-neutral-100">
         {hookPct > 0 && (
-          <div
-            className="h-full bg-lime-500 transition-[width] duration-300 ease-out motion-reduce:transition-none"
-            style={{ width: `${hookPct}%` }}
-            title={`Strong Hook: ${hookPct}%`}
-          />
+          <div className="h-full bg-lime-500 transition-[width] duration-300 ease-out motion-reduce:transition-none" style={{ width: `${hookPct}%` }} title={`Strong Hook: ${hookPct}%`} />
         )}
         {decentPct > 0 && (
-          <div
-            className="h-full bg-amber-400 transition-[width] duration-300 ease-out motion-reduce:transition-none"
-            style={{ width: `${decentPct}%` }}
-            title={`Decent: ${decentPct}%`}
-          />
+          <div className="h-full bg-amber-400 transition-[width] duration-300 ease-out motion-reduce:transition-none" style={{ width: `${decentPct}%` }} title={`Decent: ${decentPct}%`} />
         )}
         {lostPct > 0 && (
-          <div
-            className="h-full bg-neutral-300 transition-[width] duration-300 ease-out motion-reduce:transition-none"
-            style={{ width: `${lostPct}%` }}
-            title={`Lost Interest: ${lostPct}%`}
-          />
+          <div className="h-full bg-neutral-300 transition-[width] duration-300 ease-out motion-reduce:transition-none" style={{ width: `${lostPct}%` }} title={`Lost Interest: ${lostPct}%`} />
         )}
       </div>
       <div className="flex justify-between text-xs font-medium">
@@ -221,129 +183,79 @@ function ImpressionsBar({ impressions, total }: { impressions: { hook: number; d
   );
 }
 
-function EngagementRow({
+function TechMetricRow({
   label,
-  percentage,
-  count,
-  total
+  issueCount,
+  totalCount,
+  issueLabel,
 }: {
   label: string;
-  percentage: number;
-  count: number;
-  total: number;
+  issueCount: number;
+  totalCount: number;
+  issueLabel: string;
 }) {
+  if (totalCount === 0) return null;
+  const issuePct = Math.round((issueCount / totalCount) * 100);
+
+  const barColor =
+    issuePct === 0 ? "bg-lime-400" :
+    issuePct < 40 ? "bg-amber-400" :
+    "bg-red-400";
+
+  const textColor =
+    issuePct === 0 ? "text-lime-600" :
+    issuePct < 40 ? "text-amber-600" :
+    "text-red-500";
+
   return (
-    <div className="flex items-center justify-between">
-      <span className="text-sm text-neutral-600">{label}</span>
-      <div className="flex items-center gap-2">
-        <div className="w-24 h-2 bg-neutral-100 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-lime-500 rounded-full transition-[width] duration-300 ease-out motion-reduce:transition-none"
-            style={{ width: `${percentage}%` }}
-          />
-        </div>
-        <span className="text-sm font-bold text-neutral-800 w-12 text-right">
-          {percentage}%
-        </span>
-        <span className="text-xs text-neutral-400 w-10">
-          {count}/{total}
-        </span>
+    <div className="flex items-center gap-3">
+      <span className="text-sm text-neutral-600 w-32 flex-shrink-0">{label}</span>
+      <div className="flex-1 h-2 bg-neutral-100 rounded-full overflow-hidden">
+        <div className={`h-full rounded-full transition-[width] duration-300 ${barColor}`} style={{ width: `${Math.max(issuePct, issuePct === 0 ? 0 : 4)}%` }} />
       </div>
+      <span className={`text-xs font-bold w-28 text-right flex-shrink-0 ${textColor}`}>
+        {issuePct === 0 ? "All clear" : `${issuePct}% — ${issueLabel}`}
+      </span>
     </div>
   );
 }
 
-function EngagementSection({ reviews }: { reviews: ReviewLike[] }) {
-  // Calculate each metric with its OWN denominator (reviews that have that field answered)
-  // This handles old reviews that may not have newer fields
-  const listenAgainTotal = reviews.filter(r => r.wouldListenAgain !== null).length;
-  const listenAgainYes = reviews.filter(r => r.wouldListenAgain === true).length;
+function TechnicalQualitySection({ reviews }: { reviews: ReviewLike[] }) {
+  const lowEndReviews = reviews.filter(r => r.lowEndClarity !== null);
+  const lowEndIssues = lowEndReviews.filter(r => r.lowEndClarity !== "PERFECT").length;
 
-  const playlistTotal = reviews.filter(r => r.wouldAddToPlaylist !== null).length;
-  const playlistYes = reviews.filter(r => r.wouldAddToPlaylist === true).length;
+  const vocalReviews = reviews.filter(r => r.vocalClarity !== null && r.vocalClarity !== "NOT_APPLICABLE");
+  const vocalIssues = vocalReviews.filter(r => r.vocalClarity !== "CRYSTAL_CLEAR").length;
 
-  const shareTotal = reviews.filter(r => r.wouldShare !== null).length;
-  const shareYes = reviews.filter(r => r.wouldShare === true).length;
+  const highEndReviews = reviews.filter(r => r.highEndQuality !== null);
+  const highEndIssues = highEndReviews.filter(r => r.highEndQuality !== "PERFECT" && r.highEndQuality !== "ACCEPTABLE").length;
 
-  const followTotal = reviews.filter(r => r.wouldFollow !== null).length;
-  const followYes = reviews.filter(r => r.wouldFollow === true).length;
+  const stereoReviews = reviews.filter(r => r.stereoWidth !== null);
+  const stereoIssues = stereoReviews.filter(r => r.stereoWidth !== "GOOD_BALANCE").length;
 
-  // Only show if at least one metric has data
-  const hasAnyData = listenAgainTotal > 0 || playlistTotal > 0 || shareTotal > 0 || followTotal > 0;
-  if (!hasAnyData) return null;
+  const dynamicsReviews = reviews.filter(r => r.dynamics !== null);
+  const dynamicsIssues = dynamicsReviews.filter(r => r.dynamics !== "GREAT_DYNAMICS" && r.dynamics !== "ACCEPTABLE").length;
 
-  // Calculate percentages safely
-  const listenAgainPct = listenAgainTotal > 0 ? Math.round((listenAgainYes / listenAgainTotal) * 100) : null;
-  const playlistPct = playlistTotal > 0 ? Math.round((playlistYes / playlistTotal) * 100) : null;
-  const sharePct = shareTotal > 0 ? Math.round((shareYes / shareTotal) * 100) : null;
-  const followPct = followTotal > 0 ? Math.round((followYes / followTotal) * 100) : null;
+  const lengthReviews = reviews.filter(r => r.trackLength !== null);
+  const lengthIssues = lengthReviews.filter(r => r.trackLength !== "PERFECT").length;
 
-  // Overall engagement: weighted average of available metrics only
-  // Normalizes to account for missing metrics (old reviews without newer fields)
-  let overallEngagement: number | null = null;
-  const weights: { pct: number | null; weight: number }[] = [
-    { pct: listenAgainPct, weight: 0.4 },
-    { pct: playlistPct, weight: 0.3 },
-    { pct: sharePct, weight: 0.2 },
-    { pct: followPct, weight: 0.1 },
-  ];
-  const availableMetrics = weights.filter(w => w.pct !== null);
-  if (availableMetrics.length > 0) {
-    const totalWeight = availableMetrics.reduce((sum, w) => sum + w.weight, 0);
-    const weightedSum = availableMetrics.reduce((sum, w) => sum + (w.pct! * w.weight), 0);
-    overallEngagement = Math.round(weightedSum / totalWeight);
-  }
+  const repetitiveReviews = reviews.filter(r => r.tooRepetitive !== null);
+  const repetitiveIssues = repetitiveReviews.filter(r => r.tooRepetitive === true).length;
+
+  const hasData = [lowEndReviews, vocalReviews, highEndReviews, stereoReviews, dynamicsReviews, lengthReviews, repetitiveReviews].some(arr => arr.length > 0);
+  if (!hasData) return null;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="text-sm font-bold text-neutral-700">Listener Engagement</div>
-        {overallEngagement !== null && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-neutral-500">Overall</span>
-            <span className={`text-sm font-black px-2 py-0.5 rounded ${
-              overallEngagement >= 60 ? 'bg-lime-100 text-lime-700' :
-              overallEngagement >= 40 ? 'bg-amber-100 text-amber-700' :
-              'bg-neutral-100 text-neutral-600'
-            }`}>
-              {overallEngagement}%
-            </span>
-          </div>
-        )}
-      </div>
-      <div className="space-y-2">
-        {listenAgainPct !== null && (
-          <EngagementRow
-            label="Would listen again"
-            percentage={listenAgainPct}
-            count={listenAgainYes}
-            total={listenAgainTotal}
-          />
-        )}
-        {playlistPct !== null && (
-          <EngagementRow
-            label="Would add to playlist"
-            percentage={playlistPct}
-            count={playlistYes}
-            total={playlistTotal}
-          />
-        )}
-        {sharePct !== null && (
-          <EngagementRow
-            label="Would share with friends"
-            percentage={sharePct}
-            count={shareYes}
-            total={shareTotal}
-          />
-        )}
-        {followPct !== null && (
-          <EngagementRow
-            label="Would follow artist"
-            percentage={followPct}
-            count={followYes}
-            total={followTotal}
-          />
-        )}
+    <div className="space-y-3">
+      <div className="text-sm font-bold text-neutral-700">Technical Quality</div>
+      <div className="space-y-2.5">
+        <TechMetricRow label="Low end" issueCount={lowEndIssues} totalCount={lowEndReviews.length} issueLabel="muddy" />
+        <TechMetricRow label="Vocal presence" issueCount={vocalIssues} totalCount={vocalReviews.length} issueLabel="buried" />
+        <TechMetricRow label="High end" issueCount={highEndIssues} totalCount={highEndReviews.length} issueLabel="too harsh" />
+        <TechMetricRow label="Stereo width" issueCount={stereoIssues} totalCount={stereoReviews.length} issueLabel="imbalanced" />
+        <TechMetricRow label="Dynamics" issueCount={dynamicsIssues} totalCount={dynamicsReviews.length} issueLabel="compressed" />
+        <TechMetricRow label="Track length" issueCount={lengthIssues} totalCount={lengthReviews.length} issueLabel="too long" />
+        <TechMetricRow label="Repetitiveness" issueCount={repetitiveIssues} totalCount={repetitiveReviews.length} issueLabel="repetitive" />
       </div>
     </div>
   );
@@ -383,7 +295,6 @@ export function AggregateAnalytics({
     .map((v) => v.trim())
     .filter(Boolean);
 
-  // Limit to top 6 artists
   const topArtists = topFrequencies(artistsItems, 6);
 
   return (
@@ -400,31 +311,16 @@ export function AggregateAnalytics({
       <CardContent className="p-6 sm:p-8 space-y-8">
         {/* Score Circles with Platform Comparison */}
         <div className="flex justify-center gap-8 sm:gap-12">
-          <ScoreCircle
-            score={avgProduction}
-            label="Production"
-            icon={Zap}
-            platformAvg={platformAverages?.production}
-          />
-          <ScoreCircle
-            score={avgOriginality}
-            label="Originality"
-            icon={Sparkles}
-            platformAvg={platformAverages?.originality}
-          />
-          <ScoreCircle
-            score={avgVocals}
-            label="Vocals"
-            icon={Music}
-            platformAvg={platformAverages?.vocals}
-          />
+          <ScoreCircle score={avgProduction} label="Production" icon={Zap} platformAvg={platformAverages?.production} />
+          <ScoreCircle score={avgOriginality} label="Originality" icon={Sparkles} platformAvg={platformAverages?.originality} />
+          <ScoreCircle score={avgVocals} label="Vocals" icon={Music} platformAvg={platformAverages?.vocals} />
         </div>
 
-        {/* Impressions Bar */}
+        {/* First Impressions */}
         <ImpressionsBar impressions={impressions} total={impressionsTotal} />
 
-        {/* Listener Engagement */}
-        <EngagementSection reviews={reviews} />
+        {/* Technical Quality */}
+        <TechnicalQualitySection reviews={reviews} />
 
         {/* Similar Artists */}
         {topArtists.length > 0 && (

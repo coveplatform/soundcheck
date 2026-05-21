@@ -10,7 +10,6 @@ import { TrackDashboardTabs } from "@/components/tracks/track-dashboard-tabs";
 import { StatsTab } from "@/components/tracks/stats-tab";
 import { ReviewsTab } from "@/components/tracks/reviews-tab";
 import { SettingsTab } from "@/components/tracks/settings-tab";
-import { ReleaseDecisionReportView } from "@/components/tracks/release-decision-report-view";
 import {
   ArrowLeft,
   ArrowRight,
@@ -280,15 +279,6 @@ export default async function TrackDetailPage({
 
       {/* ── MAIN CONTENT — single column, spacious ──────────────── */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
-
-        {track.releaseDecisionReport && (
-          <div className="mb-10">
-            <ReleaseDecisionReportView
-              report={track.releaseDecisionReport as any}
-              trackTitle={track.title}
-            />
-          </div>
-        )}
 
         {completedReviews > 0 ? (
           <TrackDashboardTabs
