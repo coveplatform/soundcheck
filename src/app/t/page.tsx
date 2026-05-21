@@ -426,23 +426,19 @@ export default function Home() {
               <div className="space-y-3 text-left mb-8">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">3 tracks</span> in review queue at once</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">Unlimited submissions</span> — no credit grinding</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">20 credits</span> added to your account every month</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">Up to 10 reviews</span> per track</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">Priority</span> queue placement</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">3 tracks</span> in review at once</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Everything in Free, plus:</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Pro badge on your profile</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">Priority</span> placement</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
@@ -479,7 +475,7 @@ export default function Home() {
               },
               {
                 q: "What does Pro get me?",
-                a: "Pro gives you 3 concurrent review slots (vs 1 for free), 20 credits added to your account every month, priority queue placement so your tracks get reviewed faster, a Pro badge, and early access to new features. $14.95/month, cancel anytime.",
+                a: "Pro removes the credit requirement entirely — submit as many tracks as you want, up to 3 at a time, each getting up to 10 reviews. Plus priority placement. $14.95/month, cancel anytime.",
               },
               {
                 q: "Is it really free?",

@@ -45,7 +45,7 @@ async function getOrCreateProMonthlyPrice(): Promise<string> {
   // 4. Create product + price
   const product = await stripe.products.create({
     name: "MixReflect Pro",
-    description: "3 review slots, 20 credits/month, priority queue placement, Pro badge",
+    description: "Unlimited submissions, up to 10 reviews per track, 3 slots, priority placement",
     metadata: {
       app: "mixreflect",
       plan: "pro_monthly",

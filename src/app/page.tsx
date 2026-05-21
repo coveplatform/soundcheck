@@ -288,66 +288,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Track Score — new product section */}
-      <section className="py-14 sm:py-20 bg-neutral-950 text-white overflow-hidden relative">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 50% at 70% 50%, rgba(147,51,234,0.14) 0%, transparent 70%)" }} />
-        <div className="max-w-5xl mx-auto px-4 relative">
-          <div className="grid sm:grid-cols-2 gap-10 items-center">
-            <AnimatedSection>
-              <div className="inline-flex items-center gap-1.5 bg-purple-600/15 border border-purple-500/25 rounded-full px-3 py-1 text-[10px] font-black text-purple-300 uppercase tracking-wider mb-5">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-                New · Track Score
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-[1.05] mb-4">
-                Find out where your track really stands.
-              </h2>
-              <p className="text-neutral-400 text-base leading-relaxed mb-7 max-w-sm">
-                Not sure if your track is ready to release? Get a score out of 100, a percentile rank, and honest feedback from 5 real listeners. One-time. $9.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link href="/score">
-                  <Button size="lg" className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all rounded-xl">
-                    Get My Score — $9 <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link href="/report/demo">
-                  <Button size="lg" className="bg-white/8 text-white/80 hover:bg-white/12 font-semibold border border-white/12 rounded-xl transition-all">
-                    See a sample
-                  </Button>
-                </Link>
-              </div>
-            </AnimatedSection>
-            <AnimatedSection className="flex justify-center sm:justify-end">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: "#9333ea", transform: "scale(0.7)" }} />
-                <div className="relative bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center gap-4 w-52">
-                  <div className="relative w-36 h-36 flex items-center justify-center">
-                    <svg width="144" height="144" viewBox="0 0 144 144" className="absolute inset-0">
-                      <defs>
-                        <linearGradient id="hpScoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#9333ea" stopOpacity="0.6" />
-                          <stop offset="100%" stopColor="#9333ea" />
-                        </linearGradient>
-                      </defs>
-                      <circle cx="72" cy="72" r="60" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="10" />
-                      <circle cx="72" cy="72" r="60" fill="none" stroke="url(#hpScoreGrad)" strokeWidth="10" strokeLinecap="round" strokeDasharray={`${2 * Math.PI * 60}`} strokeDashoffset={`${2 * Math.PI * 60 * (1 - 0.82)}`} transform="rotate(-90 72 72)" />
-                    </svg>
-                    <div className="relative flex flex-col items-center">
-                      <span className="text-5xl font-black text-purple-400 leading-none">82</span>
-                      <span className="text-[10px] text-white/30 font-medium mt-0.5">out of 100</span>
-                    </div>
-                  </div>
-                  <div className="text-center space-y-1.5">
-                    <div className="bg-purple-600/20 border border-purple-500/25 rounded-full px-3 py-1 text-xs font-black text-purple-300">Top 27% of tracks</div>
-                    <div className="bg-amber-500/15 border border-amber-500/20 rounded-full px-3 py-1 text-[10px] font-black text-amber-300 uppercase tracking-wider">Almost There</div>
-                  </div>
-                </div>
-              </div>
-            </AnimatedSection>
-          </div>
-        </div>
-      </section>
-
       {/* Pricing */}
       <section id="pricing" className="py-16 bg-neutral-900 text-neutral-50">
         <div className="max-w-4xl mx-auto px-4">
@@ -374,7 +314,7 @@ export default function Home() {
               <div className="space-y-3 text-left mb-8">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">1 track</span> in review queue at a time</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">1 track</span> in review at a time</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
@@ -382,7 +322,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Genre-matched peer reviews</span>
+                  <span className="text-sm text-neutral-50">Structured peer feedback</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
@@ -428,23 +368,19 @@ export default function Home() {
               <div className="space-y-3 text-left mb-8">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">3 tracks</span> in review queue at once</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">Unlimited submissions</span> — no credit grinding</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">20 credits</span> added to your account every month</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">Up to 10 reviews</span> per track</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">Priority</span> queue placement</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">3 tracks</span> in review at once</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Everything in Free, plus:</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Pro badge on your profile</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">Priority</span> placement</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
@@ -493,7 +429,7 @@ export default function Home() {
               },
               {
                 q: "What does Pro get me?",
-                a: "Pro removes the credit requirement entirely — submit as many tracks as you want, up to 3 at a time, each getting up to 10 reviews. Plus priority placement and a Pro badge. $14.95/month, cancel anytime.",
+                a: "Pro removes the credit requirement entirely — submit as many tracks as you want, up to 3 at a time, each getting up to 10 reviews. Plus priority placement. $14.95/month, cancel anytime.",
               },
               {
                 q: "Who reviews my tracks?",

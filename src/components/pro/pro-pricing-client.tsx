@@ -26,7 +26,6 @@ const FREE_FEATURES = [
   { text: "Public track sharing page", included: true },
   { text: "Unlimited submissions", included: false },
   { text: "Priority placement", included: false },
-  { text: "Pro badge on your profile", included: false },
 ];
 
 const PRO_FEATURES = [
@@ -37,7 +36,6 @@ const PRO_FEATURES = [
   { text: "Structured feedback on every review", included: true },
   { text: "Public track sharing page", included: true },
   { text: "Priority placement", included: true, highlight: true },
-  { text: "Pro badge on your profile", included: true, highlight: true },
   { text: "Early access to new features", included: true },
 ];
 

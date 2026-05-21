@@ -105,7 +105,7 @@ export default function TermsPage() {
             <p>
               MixReflect Pro is available at $14.95/month. Pro provides unlimited submissions (no credit requirement), up to 10 reviews per track, 3 active
               slots, priority queue
-              placement, a Pro badge, and early access to new features. You can manage your
+              placement, and early access to new features. You can manage your
               subscription and billing through the Stripe Customer Portal. Pro subscriptions
               auto-renew unless cancelled.
             </p>
