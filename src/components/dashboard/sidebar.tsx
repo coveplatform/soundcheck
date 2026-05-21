@@ -148,34 +148,40 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
         {/* Credit Balance + Pro */}
         <div className="px-4 py-3 border-t border-black/10 space-y-2">
           {/* Credits */}
-          <div className={`rounded-xl p-3 ${credits === 0 ? 'bg-amber-50 border border-amber-200' : 'bg-purple-50'}`}>
-            <div className="flex items-center gap-2 mb-1.5">
-              <Coins className={`w-4 h-4 ${credits === 0 ? 'text-amber-600' : 'text-purple-600'}`} />
-              <span className={`text-lg font-bold tabular-nums ${credits === 0 ? 'text-amber-900' : 'text-purple-900'}`}>{credits}</span>
-              <span className={`text-[10px] font-medium uppercase tracking-wider ${credits === 0 ? 'text-amber-600/60' : 'text-purple-600/60'}`}>credits</span>
+          {!isPro && (
+            <div className="rounded-xl border-2 border-black bg-[#faf7f2] p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <div className="flex items-center gap-2 mb-1">
+                <Coins className="w-4 h-4 text-black" />
+                <span className="text-xl font-black tabular-nums text-black">{credits}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-black/40">credits</span>
+              </div>
+              <Link
+                href="/review"
+                className="text-[11px] font-black uppercase tracking-wider text-black/40 hover:text-black transition-colors"
+              >
+                {credits === 0 ? 'Earn by reviewing →' : 'Earn more →'}
+              </Link>
             </div>
-            <Link
-              href="/review"
-              className={`text-[11px] font-medium transition-colors ${credits === 0 ? 'text-amber-700 hover:text-amber-900' : 'text-purple-600 hover:text-purple-800'}`}
-            >
-              {credits === 0 ? 'Earn credits by reviewing' : 'Earn more by reviewing'}
-            </Link>
-          </div>
+          )}
 
           {/* Pro badge or upsell */}
           {isPro ? (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-purple-100">
-              <Crown className="w-3.5 h-3.5 text-purple-600" />
-              <span className="text-xs font-bold text-purple-700">Pro</span>
+            <div className="rounded-xl border-2 border-black bg-neutral-900 px-3 py-2.5 flex items-center gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <Crown className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
+              <span className="text-xs font-black text-white">Pro — active</span>
             </div>
           ) : (
-            <Link
-              href="/pro"
-              className="group flex items-center gap-2 px-3 py-2.5 rounded-xl border border-purple-200 bg-purple-50/50 hover:bg-purple-100 hover:border-purple-300 transition-all"
-            >
-              <Crown className="w-3.5 h-3.5 text-purple-500 group-hover:text-purple-600 transition-colors" />
-              <span className="text-xs font-semibold text-purple-700 flex-1">Upgrade to Pro</span>
-              <ArrowRight className="w-3 h-3 text-purple-400 group-hover:text-purple-600 transition-colors" />
+            <Link href="/pro" className="block group">
+              <div className="rounded-xl border-2 border-black bg-neutral-900 px-3 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-all">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <Crown className="w-3.5 h-3.5 text-purple-400" />
+                    <span className="text-xs font-black text-white">Upgrade to Pro</span>
+                  </div>
+                  <ArrowRight className="w-3 h-3 text-white/40 group-hover:text-white transition-colors" />
+                </div>
+                <p className="text-[10px] text-white/35 font-medium leading-snug">Unlimited submissions. Up to 10 reviews.</p>
+              </div>
             </Link>
           )}
         </div>

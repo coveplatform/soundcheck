@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Crown, Music, Sparkles } from "lucide-react";
+import { ArrowRight, Crown, Lock, Music, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -54,7 +54,7 @@ export default function RequestReviewsPage() {
             const proStatus = data?.subscriptionStatus === "active";
             setReviewTokens(typeof data?.reviewCredits === "number" ? data.reviewCredits : 0);
             setIsPro(proStatus);
-            setDesiredReviews(proStatus ? 10 : 5);
+            setDesiredReviews(proStatus ? 10 : 1);
           }
         }
 
@@ -219,29 +219,39 @@ export default function RequestReviewsPage() {
             <input
               type="range"
               min="1"
-              max="10"
+              max={isPro ? 10 : 1}
               value={desiredReviews}
               onChange={(e) => setDesiredReviews(parseInt(e.target.value))}
-              className="w-full h-3 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-600 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-purple-600 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:cursor-pointer"
+              disabled={!isPro}
+              className="w-full h-3 rounded-full appearance-none cursor-pointer disabled:cursor-default [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-600 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-purple-600 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:cursor-pointer"
               style={{
-                background: `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${((desiredReviews - 1) / 9) * 100}%, rgb(229 231 235) ${((desiredReviews - 1) / 9) * 100}%, rgb(229 231 235) 100%)`
+                background: isPro
+                  ? `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${((desiredReviews - 1) / 9) * 100}%, rgb(229 231 235) ${((desiredReviews - 1) / 9) * 100}%, rgb(229 231 235) 100%)`
+                  : "rgb(147 51 234)"
               }}
             />
-            <div className="flex justify-between mt-2">
-              {[1, 3, 5, 7, 10].map((mark) => (
-                <button
-                  key={mark}
-                  type="button"
-                  onClick={() => setDesiredReviews(mark)}
-                  className={cn(
-                    "text-xs font-black transition-colors",
-                    desiredReviews === mark ? "text-purple-600" : "text-black/25 hover:text-purple-600"
-                  )}
-                >
-                  {mark}
-                </button>
-              ))}
-            </div>
+            {isPro ? (
+              <div className="flex justify-between mt-2">
+                {[1, 3, 5, 7, 10].map((mark) => (
+                  <button
+                    key={mark}
+                    type="button"
+                    onClick={() => setDesiredReviews(mark)}
+                    className={cn(
+                      "text-xs font-black transition-colors",
+                      desiredReviews === mark ? "text-purple-600" : "text-black/25 hover:text-purple-600"
+                    )}
+                  >
+                    {mark}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-1.5 mt-2">
+                <Lock className="h-3 w-3 text-black/25" />
+                <p className="text-[11px] text-black/30 font-black uppercase tracking-wider">Free plan: 1 review per track</p>
+              </div>
+            )}
           </div>
 
           {/* Insight level */}
@@ -285,24 +295,38 @@ export default function RequestReviewsPage() {
             </div>
           )}
 
-          {/* Not enough credits */}
-          {(needsCredits || (!isPro && (error.toLowerCase().includes("not enough") || error.toLowerCase().includes("token")))) && (
-            <div className="border-t-2 border-black/8 pt-5 space-y-3">
-              <p className="text-sm text-black/50 font-medium text-center">
-                You need <span className="font-black text-black">{Math.max(1, desiredReviews - reviewTokens)}</span> more {Math.max(1, desiredReviews - reviewTokens) === 1 ? "credit" : "credits"}
+          {/* Out of credits warning */}
+          {needsCredits && (
+            <div className="border-t-2 border-black/8 pt-5">
+              <p className="text-sm text-black/50 font-medium text-center mb-3">
+                You need <span className="font-black text-black">1 more credit</span> to submit
               </p>
               <Link href="/review" className="block">
                 <Button className="w-full border-2 border-black/10 bg-white hover:bg-purple-50 text-black font-black h-10 rounded-xl text-sm">
                   <Sparkles className="h-4 w-4 mr-1.5 text-purple-600" />
-                  Earn credits by reviewing
+                  Earn a credit by reviewing
                 </Button>
               </Link>
-              <Link href="/pro" className="block">
-                <Button className="w-full border-2 border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700 font-black h-10 rounded-xl text-sm">
-                  <Crown className="h-4 w-4 mr-1.5 text-purple-500" />
-                  Go Pro — submit without credits
-                </Button>
-              </Link>
+            </div>
+          )}
+
+          {/* Pro upsell — always visible for free users */}
+          {!isPro && (
+            <div className="border-t-2 border-black/8 pt-5">
+              <div className="bg-neutral-900 border-2 border-black rounded-2xl px-5 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                <div className="flex items-start gap-3 mb-3">
+                  <Crown className="h-5 w-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-black text-white">Get up to 10 reviews with Pro.</p>
+                    <p className="text-xs text-white/40 font-medium mt-0.5">No credits needed — just submit and get comprehensive feedback.</p>
+                  </div>
+                </div>
+                <Link href="/pro" className="block">
+                  <Button className="w-full h-9 bg-purple-600 text-white hover:bg-purple-500 font-black border-2 border-purple-400/30 rounded-xl text-sm">
+                    Upgrade to Pro <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           )}
         </div>
