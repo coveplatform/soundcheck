@@ -7,7 +7,7 @@ import { getStripe } from "@/lib/stripe";
 // Cache the price ID in memory so we only create once per server lifecycle
 let cachedPriceId: string | null = null;
 
-const PRO_MONTHLY_AMOUNT_CENTS = 999; // $9.99
+const PRO_MONTHLY_AMOUNT_CENTS = 1495; // $14.95
 
 async function getOrCreateProMonthlyPrice(): Promise<string> {
   // 1. Check env var

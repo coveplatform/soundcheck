@@ -19,6 +19,7 @@ import {
   Check,
   Music,
   Coins,
+  Crown,
   Sparkles,
   CheckCircle2,
   ImagePlus,
@@ -57,9 +58,7 @@ const REVIEW_BENEFITS = [
   { minReviews: 3, label: "Start seeing patterns", icon: "📊" },
   { minReviews: 5, label: "Reliable consensus", icon: "✓" },
   { minReviews: 8, label: "Detailed insights", icon: "🔍" },
-  { minReviews: 12, label: "Statistical significance", icon: "📈" },
-  { minReviews: 20, label: "Comprehensive feedback", icon: "⭐" },
-  { minReviews: 30, label: "Expert-level analysis", icon: "🎯" },
+  { minReviews: 10, label: "Comprehensive feedback", icon: "⭐" },
 ] as const;
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
@@ -126,6 +125,7 @@ export default function SubmitTrackPage() {
         if (res.ok) {
           const data = await res.json();
           const balance = data.reviewCredits ?? 0;
+          const proStatus = data.subscriptionStatus === "active";
           setProfile({
             id: data.id,
             artistName: data.artistName,
@@ -136,7 +136,7 @@ export default function SubmitTrackPage() {
             setExperienceLevel(data.experienceLevel as ExperienceLevel);
           }
           if (!reviewCountInitialised) {
-            setReviewCount(Math.min(5, Math.max(1, balance)));
+            setReviewCount(proStatus ? 10 : Math.min(5, Math.max(1, balance)));
             setReviewCountInitialised(true);
           }
         }
@@ -373,8 +373,9 @@ export default function SubmitTrackPage() {
 
   // ---- step 3 handlers -----------------------------------------------------
 
+  const isPro = slotInfo?.isPro ?? false;
   const creditBalance = profile?.reviewCredits ?? 0;
-  const hasEnoughCredits = creditBalance >= reviewCount;
+  const hasEnoughCredits = isPro || creditBalance >= reviewCount;
   const creditDeficit = reviewCount - creditBalance;
   const slotAvailable = !slotInfo || slotInfo.activeCount < slotInfo.maxSlots;
 
@@ -567,9 +568,9 @@ export default function SubmitTrackPage() {
                 Submit.
               </h1>
               <p className="text-sm text-black/40 font-medium mt-2">
-                Get real feedback from fellow artists in your genre.
+                Get real feedback from fellow artists.
               </p>
-              {!profileLoading && (
+              {!profileLoading && !isPro && (
                 <div className="flex items-center gap-1.5 mt-3">
                   <Coins className="h-4 w-4 text-purple-600" />
                   <span className={`text-sm font-black tabular-nums ${(profile?.reviewCredits ?? 0) === 0 ? "text-red-500" : "text-black"}`}>
@@ -1097,7 +1098,7 @@ export default function SubmitTrackPage() {
                   <span className="text-xl text-black/40 font-black">{reviewCount === 1 ? "review" : "reviews"}</span>
                 </div>
                 <p className="text-sm text-black/40 font-medium mt-1">
-                  {reviewCount} {reviewCount === 1 ? "credit" : "credits"} required
+                  {isPro ? "Pro — no credits required" : `${reviewCount} ${reviewCount === 1 ? "credit" : "credits"} required`}
                 </p>
               </div>
 
@@ -1151,34 +1152,48 @@ export default function SubmitTrackPage() {
                 <p className="text-[11px] text-black/30 font-medium mt-0.5">Current insight level</p>
               </div>
 
-              {/* Credit balance */}
-              <div className="border-t-2 border-black/8 pt-5 flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-wider text-black/30">Available</p>
-                  <p className={`text-3xl font-black tabular-nums ${creditBalance === 0 ? "text-red-500" : "text-black"}`}>{creditBalance}</p>
-                  <p className="text-[11px] text-black/30 font-medium">credits</p>
+              {/* Credit balance — hidden for Pro */}
+              {isPro ? (
+                <div className="border-t-2 border-black/8 pt-5 flex items-center gap-3">
+                  <Crown className="w-4 h-4 text-purple-500 flex-shrink-0" />
+                  <p className="text-sm font-black text-purple-700">Pro — submit without spending credits</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-[11px] font-black uppercase tracking-wider text-black/30">Will use</p>
-                  <p className={`text-3xl font-black tabular-nums ${!hasEnoughCredits ? "text-red-500" : "text-purple-600"}`}>{reviewCount}</p>
-                  <p className="text-[11px] text-black/30 font-medium">credits</p>
+              ) : (
+                <div className="border-t-2 border-black/8 pt-5 flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-wider text-black/30">Available</p>
+                    <p className={`text-3xl font-black tabular-nums ${creditBalance === 0 ? "text-red-500" : "text-black"}`}>{creditBalance}</p>
+                    <p className="text-[11px] text-black/30 font-medium">credits</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[11px] font-black uppercase tracking-wider text-black/30">Will use</p>
+                    <p className={`text-3xl font-black tabular-nums ${!hasEnoughCredits ? "text-red-500" : "text-purple-600"}`}>{reviewCount}</p>
+                    <p className="text-[11px] text-black/30 font-medium">credits</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Not enough credits */}
-            {!hasEnoughCredits && (
+            {!isPro && !hasEnoughCredits && (
               <div className="bg-neutral-900 rounded-2xl px-5 py-5 space-y-3">
                 <p className="text-base font-black text-white">
                   You need {creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}
                 </p>
-                <p className="text-sm text-white/40 font-medium">Earn free credits by reviewing other artists&apos; tracks.</p>
+                <p className="text-sm text-white/40 font-medium">Earn free credits by reviewing other artists&apos; tracks, or go Pro to submit without credits.</p>
                 <Link
                   href="/review"
                   className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-lime-400 hover:bg-lime-300 text-black text-[11px] font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                 >
                   <Sparkles className="h-4 w-4" />
                   Earn credits by reviewing
+                </Link>
+                <Link
+                  href="/pro"
+                  className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                >
+                  <Crown className="h-4 w-4" />
+                  Go Pro — submit without credits
                 </Link>
               </div>
             )}

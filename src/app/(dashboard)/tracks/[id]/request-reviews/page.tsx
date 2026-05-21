@@ -133,7 +133,7 @@ export default function RequestReviewsPage() {
             Request Reviews.
           </h1>
           <p className="text-sm text-black/40 font-medium mt-3">
-            Get feedback from fellow artists in your genre.
+            Get honest feedback from fellow artists.
           </p>
         </div>
       </div>
@@ -207,9 +207,11 @@ export default function RequestReviewsPage() {
               <span className="text-6xl font-black text-black tabular-nums">{desiredReviews}</span>
               <span className="text-xl text-black/40 font-black">{desiredReviews === 1 ? "review" : "reviews"}</span>
             </div>
-            <p className="text-sm text-black/40 font-medium mt-1">
-              {desiredReviews} {desiredReviews === 1 ? "credit" : "credits"} required
-            </p>
+            {!isPro && (
+              <p className="text-sm text-black/40 font-medium mt-1">
+                {desiredReviews} {desiredReviews === 1 ? "credit" : "credits"} required
+              </p>
+            )}
           </div>
 
           {/* Slider */}

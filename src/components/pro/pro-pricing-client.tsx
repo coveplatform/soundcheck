@@ -181,7 +181,7 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
 
           <div className="mb-6">
             <div className="flex items-baseline gap-1">
-              <span className="text-5xl font-black text-white tabular-nums">$9.99</span>
+              <span className="text-5xl font-black text-white tabular-nums">$14.95</span>
               <span className="text-white/30 text-sm font-black">/month</span>
             </div>
             <p className="text-[11px] text-white/25 font-medium mt-1">Cancel anytime</p>

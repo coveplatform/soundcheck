@@ -419,7 +419,7 @@ export default function Home() {
 
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-white">$9.99</span>
+                  <span className="text-4xl font-bold text-white">$14.95</span>
                   <span className="text-neutral-500 text-sm">/month</span>
                 </div>
                 <p className="text-xs text-neutral-500 mt-1">Cancel anytime</p>
@@ -485,7 +485,7 @@ export default function Home() {
               },
               {
                 q: "Do I need to pay to get music feedback?",
-                a: "No. MixReflect is free to use. You earn credits by reviewing other artists' tracks, then spend those credits to get reviews on your own music. No upfront cost, no credit card required. Pro ($9.99/month) is there if you want to move faster with more tracks in review at once.",
+                a: "No. MixReflect is free to use. You earn credits by reviewing other artists' tracks, then spend those credits to get reviews on your own music. No upfront cost, no credit card required. Pro ($14.95/month) is there if you want to move faster with more tracks in review at once.",
               },
               {
                 q: "Is it really free?",
@@ -493,7 +493,7 @@ export default function Home() {
               },
               {
                 q: "What does Pro get me?",
-                a: "Pro gives you 3 tracks in review at once (vs 1 for free), 20 credits added to your account every month, priority queue placement so your tracks get reviewed faster, a Pro badge, and early access to new features. $9.99/month, cancel anytime.",
+                a: "Pro removes the credit requirement entirely — submit as many tracks as you want, up to 3 at a time, each getting up to 10 reviews. Plus priority placement and a Pro badge. $14.95/month, cancel anytime.",
               },
               {
                 q: "Who reviews my tracks?",

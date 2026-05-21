@@ -199,7 +199,7 @@ export default function Home() {
               {/* PRO queue — three filled slots */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-xs font-mono tracking-[0.2em] uppercase text-purple-400">Pro · $9.99/mo</span>
+                  <span className="text-xs font-mono tracking-[0.2em] uppercase text-purple-400">Pro · $14.95/mo</span>
                   <div className="h-px flex-1 bg-neutral-800" />
                 </div>
 
@@ -417,7 +417,7 @@ export default function Home() {
 
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-white">$9.99</span>
+                  <span className="text-4xl font-bold text-white">$14.95</span>
                   <span className="text-neutral-500 text-sm">/month</span>
                 </div>
                 <p className="text-xs text-neutral-500 mt-1">Cancel anytime</p>
@@ -479,7 +479,7 @@ export default function Home() {
               },
               {
                 q: "What does Pro get me?",
-                a: "Pro gives you 3 concurrent review slots (vs 1 for free), 20 credits added to your account every month, priority queue placement so your tracks get reviewed faster, a Pro badge, and early access to new features. $9.99/month, cancel anytime.",
+                a: "Pro gives you 3 concurrent review slots (vs 1 for free), 20 credits added to your account every month, priority queue placement so your tracks get reviewed faster, a Pro badge, and early access to new features. $14.95/month, cancel anytime.",
               },
               {
                 q: "Is it really free?",

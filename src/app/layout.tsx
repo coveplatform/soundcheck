@@ -118,10 +118,10 @@ const jsonLd = {
         },
         {
           "@type": "Offer",
-          price: "9.99",
+          price: "14.95",
           priceCurrency: "USD",
           name: "Pro",
-          description: "3 tracks in review queue, 20 monthly credits, priority queue placement.",
+          description: "Unlimited submissions, up to 10 reviews per track, priority placement.",
         },
       ],
     },
