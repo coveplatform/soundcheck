@@ -6,8 +6,11 @@ import { getStripe } from "@/lib/stripe";
 
 // Cache the price ID in memory so we only create once per server lifecycle
 let cachedPriceId: string | null = null;
+// Track whether we've synced the product description this server lifecycle
+let productDescriptionSynced = false;
 
 const PRO_MONTHLY_AMOUNT_CENTS = 1495; // $14.95
+const PRO_PRODUCT_DESCRIPTION = "Unlimited submissions, up to 10 reviews per track, 3 active slots, priority placement";
 
 async function getOrCreateProMonthlyPrice(): Promise<string> {
   // 1. Check env var
@@ -29,6 +32,8 @@ async function getOrCreateProMonthlyPrice(): Promise<string> {
 
   if (existingProducts.data.length > 0) {
     const product = existingProducts.data[0];
+    // Keep description current
+    await stripe.products.update(product.id, { description: PRO_PRODUCT_DESCRIPTION });
     // Find the active price for this product
     const prices = await stripe.prices.list({
       product: product.id,
@@ -45,7 +50,7 @@ async function getOrCreateProMonthlyPrice(): Promise<string> {
   // 4. Create product + price
   const product = await stripe.products.create({
     name: "MixReflect Pro",
-    description: "Unlimited submissions, up to 10 reviews per track, 3 slots, priority placement",
+    description: PRO_PRODUCT_DESCRIPTION,
     metadata: {
       app: "mixreflect",
       plan: "pro_monthly",
@@ -66,6 +71,22 @@ async function getOrCreateProMonthlyPrice(): Promise<string> {
   cachedPriceId = price.id;
   console.log(`Created Stripe Pro Monthly price: ${price.id} (product: ${product.id})`);
   return cachedPriceId;
+}
+
+// Sync the Stripe product description once per server lifecycle.
+// When STRIPE_PRO_MONTHLY_PRICE_ID is set we skip getOrCreateProMonthlyPrice,
+// so we need a separate path to keep the existing product's description current.
+async function syncProductDescription(priceId: string): Promise<void> {
+  if (productDescriptionSynced) return;
+  try {
+    const stripe = getStripe();
+    const price = await stripe.prices.retrieve(priceId);
+    const productId = typeof price.product === "string" ? price.product : (price.product as { id: string }).id;
+    await stripe.products.update(productId, { description: PRO_PRODUCT_DESCRIPTION });
+    productDescriptionSynced = true;
+  } catch (err) {
+    console.warn("Could not sync Pro product description:", err);
+  }
 }
 
 export async function POST() {
@@ -117,6 +138,11 @@ export async function POST() {
     }
 
     const priceId = await getOrCreateProMonthlyPrice();
+
+    // Keep the Stripe product description current (fire-and-forget, once per cold start)
+    if (process.env.STRIPE_PRO_MONTHLY_PRICE_ID) {
+      syncProductDescription(priceId).catch(() => {});
+    }
 
     const appUrl =
       process.env.NEXT_PUBLIC_APP_URL ||

@@ -140,16 +140,20 @@ export async function POST(request: Request) {
 }
 
 async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
-  // Check if this is an external purchase (track sale) or track review payment
   if (session.metadata?.type === "release_decision") {
     await handleReleaseDecisionCheckout(session);
+    return;
+  }
+
+  // Pro subscription checkouts are activated via customer.subscription.created — nothing to do here
+  if (session.metadata?.type === "pro_subscription") {
     return;
   }
 
   const trackId = session.metadata?.trackId;
 
   if (!trackId) {
-    console.error("No trackId in session metadata");
+    console.error("No trackId in session metadata", { sessionId: session.id, metadata: session.metadata });
     return;
   }
 
