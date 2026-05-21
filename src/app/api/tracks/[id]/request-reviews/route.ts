@@ -65,10 +65,11 @@ export async function POST(
       );
     }
 
+    const isPro = track.ArtistProfile.subscriptionStatus === "active";
+
     // Slot enforcement: if this track isn't already active, it will occupy a new slot
     const isAlreadyActive = (ACTIVE_TRACK_STATUSES as readonly string[]).includes(track.status);
     if (!isAlreadyActive) {
-      const isPro = track.ArtistProfile.subscriptionStatus === "active";
       const slotCheck = await hasAvailableSlot(track.artistId, isPro);
       if (!slotCheck.available) {
         return NextResponse.json(
@@ -83,11 +84,12 @@ export async function POST(
     }
 
     const desired = data.desiredReviews;
-    const cost = desired;
+    // Pro users submit for free — no credit deduction
+    const cost = isPro ? 0 : desired;
 
-    if ((track.ArtistProfile.reviewCredits ?? 0) < cost) {
+    if (!isPro && (track.ArtistProfile.reviewCredits ?? 0) < cost) {
       return NextResponse.json(
-        { error: "Not enough credits. Earn more by reviewing tracks or buy a top-up." },
+        { error: "Not enough credits. Earn more by reviewing tracks or upgrade to Pro." },
         { status: 403 }
       );
     }

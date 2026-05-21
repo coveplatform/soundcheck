@@ -263,17 +263,13 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
                 {credits}
               </p>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mt-1.5">
-                {credits === 1
-                  ? "credit to spend"
-                  : credits > 0
-                  ? "credits to spend"
-                  : "credits"}
+                {isPro ? "credits" : credits === 1 ? "credit to spend" : credits > 0 ? "credits to spend" : "credits"}
               </p>
               <Link
-                href={credits > 0 ? "/submit" : "/review"}
+                href={isPro || credits > 0 ? "/submit" : "/review"}
                 className="text-[11px] font-bold text-purple-600 hover:text-purple-800 mt-2 block transition-colors"
               >
-                {credits > 0 ? "Spend →" : "Earn more →"}
+                {isPro ? "Submit →" : credits > 0 ? "Spend →" : "Earn more →"}
               </Link>
             </div>
           </div>
@@ -316,7 +312,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
           </div>
         </div>
       )}
-      {credits === 0 && !isWelcome && (
+      {credits === 0 && !isWelcome && !isPro && (
         <div className={tracks.some(t => ACTIVE_TRACK_STATUSES.includes(t.status as any)) ? "bg-neutral-100 border-b border-neutral-200" : "bg-amber-400 border-b border-amber-500"}>
           <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
             <p className="text-sm font-black text-black flex-1">

@@ -20,24 +20,23 @@ interface ProPricingClientProps {
 }
 
 const FREE_FEATURES = [
-  { text: "1 track in review queue at a time", included: true },
+  { text: "1 track in review at a time", included: true },
   { text: "Earn credits by reviewing others", included: true },
-  { text: "Genre-matched peer reviews", included: true },
   { text: "Structured feedback on every review", included: true },
   { text: "Public track sharing page", included: true },
-  { text: "3 concurrent review slots", included: false },
-  { text: "Priority queue placement", included: false },
+  { text: "Unlimited submissions", included: false },
+  { text: "Priority placement", included: false },
   { text: "Pro badge on your profile", included: false },
 ];
 
 const PRO_FEATURES = [
-  { text: "3 tracks in review queue at a time", included: true, highlight: true },
-  { text: "20 credits added to your account every month", included: true, highlight: true },
+  { text: "Unlimited submissions — no credit grinding", included: true, highlight: true },
+  { text: "Up to 10 reviews per track", included: true, highlight: true },
+  { text: "3 tracks in review at a time", included: true, highlight: true },
   { text: "Earn credits by reviewing others", included: true },
-  { text: "Genre-matched peer reviews", included: true },
   { text: "Structured feedback on every review", included: true },
   { text: "Public track sharing page", included: true },
-  { text: "Priority queue placement", included: true, highlight: true },
+  { text: "Priority placement", included: true, highlight: true },
   { text: "Pro badge on your profile", included: true, highlight: true },
   { text: "Early access to new features", included: true },
 ];
@@ -102,7 +101,7 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
             </div>
             <h2 className="text-2xl font-black text-white tracking-tight">You&apos;re on Pro.</h2>
             <p className="text-sm text-white/40 font-medium mt-1">
-              3 slots, 20 credits/month, priority placement, Pro badge — all active.
+              Unlimited submissions, up to 10 reviews per track, priority placement — all active.
             </p>
           </div>
           <Button
@@ -216,8 +215,8 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
         <h2 className="text-2xl font-black text-white tracking-tight mb-6">Why artists go Pro.</h2>
         <div className="grid sm:grid-cols-3 gap-5">
           {[
-            { icon: <Zap className="h-5 w-5 text-black" />, title: "Move faster", body: "3 tracks in the queue means you can iterate on multiple ideas at once instead of waiting." },
-            { icon: <MessageSquare className="h-5 w-5 text-black" />, title: "Get heard first", body: "Priority queue placement means reviewers see your tracks before free-tier submissions." },
+            { icon: <Zap className="h-5 w-5 text-black" />, title: "No grinding", body: "Submit tracks without earning credits first. No reviewing-to-earn loop — just straight to feedback." },
+            { icon: <MessageSquare className="h-5 w-5 text-black" />, title: "Get heard first", body: "Priority placement means reviewers see your tracks before free-tier submissions." },
             { icon: <Shield className="h-5 w-5 text-black" />, title: "Support the community", body: "Your subscription keeps MixReflect running and free for everyone." },
           ].map((item) => (
             <div key={item.title} className="bg-white/5 rounded-xl p-5">
@@ -243,11 +242,11 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
             },
             {
               q: "Do I still need credits with Pro?",
-              a: "Credits are how you request reviews — each costs 1. Pro adds 20 credits to your account every month automatically, plus you keep earning 1 credit per review you give. With 3 slots and a monthly top-up, you can move through feedback cycles much faster.",
+              a: "No. Pro removes the credit requirement entirely. Submit as many tracks as you want — up to 3 at a time, each getting up to 10 reviews — with no credit cost.",
             },
             {
               q: "What happens to my tracks if I downgrade?",
-              a: "Any tracks currently in the queue will finish normally. You just won't be able to submit new tracks beyond 1 slot until the others complete.",
+              a: "Any tracks currently in review will finish normally. You just won't be able to submit new tracks for free — you'll need to earn credits first.",
             },
             {
               q: "Is there a free trial?",
