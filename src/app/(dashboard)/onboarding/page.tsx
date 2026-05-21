@@ -4,7 +4,6 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { validateTrackUrl, fetchTrackMetadata, detectSource } from "@/lib/metadata";
 import { ArrowRight, ArrowLeft, Music, Loader2, Link2, Check } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
@@ -130,6 +129,7 @@ export default function OnboardingPage() {
               This is how you&apos;ll appear to other artists.
             </p>
 
+            {/* Borderless clean input */}
             <input
               type="text"
               placeholder="Your artist or project name"
@@ -137,7 +137,7 @@ export default function OnboardingPage() {
               onChange={(e) => setArtistName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && artistName.trim()) { setError(""); setStep(2); } }}
               autoFocus
-              className="w-full border-0 border-b-2 border-black/20 bg-transparent px-0 py-3 text-2xl font-black text-black placeholder:text-black/20 focus:border-black focus:outline-none transition-colors mb-8"
+              className="w-full border-none bg-transparent px-0 py-3 text-2xl font-black text-black placeholder:text-black/20 focus:outline-none mb-8"
             />
 
             {error && <div className="bg-red-500 text-white text-sm px-4 py-3 font-bold rounded-xl mb-4">{error}</div>}
@@ -162,7 +162,7 @@ export default function OnboardingPage() {
 
         {/* Header */}
         <div className="bg-white border-b-2 border-black">
-          <div className="px-4 sm:px-6 py-6">
+          <div className="max-w-md mx-auto px-4 sm:px-6 py-6">
             <div className="flex items-center justify-between mb-8">
               <Logo />
               <ProgressBar step={step} />
@@ -176,9 +176,9 @@ export default function OnboardingPage() {
           </div>
         </div>
 
-        {/* Step blocks — full bleed */}
+        {/* Step blocks — full bleed color, centered content */}
         <div className="bg-lime-400 border-b-2 border-black">
-          <div className="px-4 sm:px-6 py-7 flex items-center gap-6">
+          <div className="max-w-md mx-auto px-4 sm:px-6 py-7 flex items-center gap-6">
             <span className="text-6xl font-black text-black/15 tabular-nums leading-none flex-shrink-0 select-none">01</span>
             <div>
               <p className="text-xl font-black text-black leading-tight">You start with 1 free credit.</p>
@@ -188,7 +188,7 @@ export default function OnboardingPage() {
         </div>
 
         <div className="bg-neutral-900 border-b-2 border-black">
-          <div className="px-4 sm:px-6 py-7 flex items-center gap-6">
+          <div className="max-w-md mx-auto px-4 sm:px-6 py-7 flex items-center gap-6">
             <span className="text-6xl font-black text-white/10 tabular-nums leading-none flex-shrink-0 select-none">02</span>
             <div>
               <p className="text-xl font-black text-white leading-tight">Review others to earn more.</p>
@@ -198,7 +198,7 @@ export default function OnboardingPage() {
         </div>
 
         <div className="flex-1 bg-[#faf7f2]">
-          <div className="px-4 sm:px-6 py-7 flex items-center gap-6">
+          <div className="max-w-md mx-auto px-4 sm:px-6 py-7 flex items-center gap-6">
             <span className="text-6xl font-black text-black/10 tabular-nums leading-none flex-shrink-0 select-none">03</span>
             <div>
               <p className="text-xl font-black text-black leading-tight">Spend credits to get reviewed.</p>
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
 
         {/* CTA footer */}
         <div className="bg-white border-t-2 border-black">
-          <div className="px-4 sm:px-6 py-5 flex gap-3 items-center">
+          <div className="max-w-md mx-auto px-4 sm:px-6 py-5 flex gap-3 items-center">
             <button
               onClick={() => setStep(1)}
               className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors flex-shrink-0"
@@ -235,7 +235,7 @@ export default function OnboardingPage() {
 
       {/* Header */}
       <div className="bg-white border-b-2 border-black">
-        <div className="px-4 sm:px-6 py-6">
+        <div className="max-w-md mx-auto px-4 sm:px-6 py-6">
           <div className="flex items-center justify-between mb-8">
             <Logo />
             <ProgressBar step={step} />
@@ -249,30 +249,34 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      {/* Input area */}
-      <div className="flex-1 bg-[#faf7f2] px-4 sm:px-6 py-8 space-y-4">
-        <div className="bg-white border-2 border-black rounded-2xl p-5 space-y-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div className="relative">
-            <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black/25" />
-            <Input
+      {/* Input area — clean, no bubble */}
+      <div className="flex-1 bg-[#faf7f2]">
+        <div className="max-w-md mx-auto px-4 sm:px-6 py-10">
+
+          {/* Underline input like artist name step */}
+          <div className={`flex items-center gap-3 border-b-2 transition-colors mb-2 ${trackUrlError ? "border-red-400" : "border-black/20 focus-within:border-black"}`}>
+            <Link2 className="h-4 w-4 text-black/30 flex-shrink-0" />
+            <input
+              type="text"
               placeholder="Paste your track link here"
               value={trackUrl}
               onChange={(e) => handleTrackUrlChange(e.target.value)}
-              className={`pl-9 h-12 rounded-xl border-2 bg-white focus:border-black focus:outline-none text-base ${trackUrlError ? "border-red-400" : "border-black/20"}`}
               autoFocus
+              className="flex-1 border-none bg-transparent py-3 text-xl font-black text-black placeholder:text-black/20 focus:outline-none"
             />
           </div>
 
-          {trackUrlError && <p className="text-sm text-red-500 font-bold">{trackUrlError}</p>}
+          {trackUrlError && <p className="text-sm text-red-500 font-bold mt-2">{trackUrlError}</p>}
 
           {isLoadingTrackMeta && (
-            <div className="flex items-center gap-2 text-sm text-black/40 font-medium">
+            <div className="flex items-center gap-2 text-sm text-black/40 font-medium mt-4">
               <Loader2 className="h-4 w-4 animate-spin" /> Getting track info...
             </div>
           )}
 
+          {/* Detected track — inline, no card */}
           {trackUrl && !trackUrlError && !isLoadingTrackMeta && trackSourceType && (
-            <div className="bg-[#faf7f2] border-2 border-black/15 rounded-xl p-3 flex items-center gap-3">
+            <div className="flex items-center gap-3 mt-6">
               {trackArtworkUrl ? (
                 <img src={trackArtworkUrl} alt="" className="h-12 w-12 rounded-xl object-cover flex-shrink-0 border-2 border-black/10" />
               ) : (
@@ -289,14 +293,14 @@ export default function OnboardingPage() {
               <Check className="h-5 w-5 text-lime-500 flex-shrink-0" />
             </div>
           )}
-        </div>
 
-        {error && <div className="bg-red-500 text-white rounded-xl px-4 py-3 text-sm font-bold">{error}</div>}
+          {error && <div className="bg-red-500 text-white rounded-xl px-4 py-3 text-sm font-bold mt-6">{error}</div>}
+        </div>
       </div>
 
       {/* Lime credit strip — full bleed */}
       <div className="bg-lime-400 border-t-2 border-black">
-        <div className="px-4 sm:px-6 py-5">
+        <div className="max-w-md mx-auto px-4 sm:px-6 py-5">
           <p className="text-base font-black text-black">Your 1 free credit gets used here.</p>
           <p className="text-sm text-black/60 font-medium mt-0.5">You&apos;ll get 1 real artist review back.</p>
         </div>
@@ -304,7 +308,7 @@ export default function OnboardingPage() {
 
       {/* CTA footer */}
       <div className="bg-white border-t-2 border-black">
-        <div className="px-4 sm:px-6 py-5 space-y-3">
+        <div className="max-w-md mx-auto px-4 sm:px-6 py-5 space-y-3">
           <Button
             className="w-full bg-black text-white hover:bg-neutral-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl text-base py-3.5 h-13"
             disabled={!hasValidTrackUrl || isSubmittingTrack}
