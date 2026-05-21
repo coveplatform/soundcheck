@@ -145,10 +145,9 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
 
         </nav>
 
-        {/* Credit Balance + Pro */}
-        <div className="px-4 py-3 border-t border-black/10 space-y-2">
-          {/* Credits */}
-          {!isPro && (
+        {/* Credit Balance */}
+        {!isPro && (
+          <div className="px-4 py-3 border-t border-black/10">
             <div className="rounded-xl border-2 border-black bg-[#faf7f2] p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               <div className="flex items-center gap-2 mb-1">
                 <Coins className="w-4 h-4 text-black" />
@@ -162,29 +161,31 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
                 {credits === 0 ? 'Earn by reviewing →' : 'Earn more →'}
               </Link>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Pro badge or upsell */}
-          {isPro ? (
-            <div className="rounded-xl border-2 border-black bg-neutral-900 px-3 py-2.5 flex items-center gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+        {/* Pro upsell / Pro badge — full width */}
+        {isPro ? (
+          <div className="border-t border-black/10 px-4 py-3">
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-neutral-900 border-2 border-black">
               <Crown className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
               <span className="text-xs font-black text-white">Pro — active</span>
             </div>
-          ) : (
-            <Link href="/pro" className="block group">
-              <div className="rounded-xl border-2 border-black bg-neutral-900 px-3 py-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-all">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1.5">
-                    <Crown className="w-3.5 h-3.5 text-purple-400" />
-                    <span className="text-xs font-black text-white">Upgrade to Pro</span>
-                  </div>
-                  <ArrowRight className="w-3 h-3 text-white/40 group-hover:text-white transition-colors" />
+          </div>
+        ) : (
+          <Link href="/pro" className="block group border-t-2 border-black">
+            <div className="bg-black px-5 py-4 group-hover:bg-neutral-900 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Crown className="w-3.5 h-3.5 text-purple-400" />
+                  <span className="text-sm font-black text-purple-400">Upgrade to Pro</span>
                 </div>
-                <p className="text-[10px] text-white/35 font-medium leading-snug">Unlimited submissions. Up to 10 reviews.</p>
+                <ArrowRight className="w-3.5 h-3.5 text-purple-400/60 group-hover:text-purple-400 transition-colors" />
               </div>
-            </Link>
-          )}
-        </div>
+              <p className="text-[10px] text-white/30 font-medium mt-1 leading-snug">Unlimited submissions. Up to 10 reviews.</p>
+            </div>
+          </Link>
+        )}
 
         {/* Footer */}
         <div className="p-4 border-t border-black/10 space-y-4">
