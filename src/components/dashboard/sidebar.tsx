@@ -43,7 +43,7 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
   const reviewLinks = [
     {
       href: "/review",
-      label: "Review Queue",
+      label: "Listen",
       icon: Headphones,
       badge: pendingReviews > 0 ? pendingReviews : undefined,
     },
@@ -302,7 +302,7 @@ function MobileBottomNav({
     { href: "/dashboard", label: "Home", icon: Home },
     { href: "/discover", label: "Discover", icon: Compass },
     { href: "/tracks", label: "Tracks", icon: Music },
-    { href: "/review", label: "Review", icon: Headphones },
+    { href: "/review", label: "Listen", icon: Headphones },
   ];
 
   const moreLinks = [
