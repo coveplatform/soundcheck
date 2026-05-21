@@ -426,7 +426,7 @@ export default function Home() {
               <div className="space-y-3 text-left mb-8">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">Unlimited submissions</span> — no credit grinding</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">No credits needed</span> — submit any time</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />

@@ -121,7 +121,7 @@ const jsonLd = {
           price: "14.95",
           priceCurrency: "USD",
           name: "Pro",
-          description: "Unlimited submissions, up to 10 reviews per track, priority placement.",
+          description: "No credits needed to submit, up to 10 reviews per track, priority placement.",
         },
       ],
     },

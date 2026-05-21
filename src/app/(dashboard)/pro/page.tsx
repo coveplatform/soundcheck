@@ -39,7 +39,7 @@ export default async function ProPage() {
             Go Pro.
           </h1>
           <p className="text-sm text-black/40 font-medium mt-3">
-            Unlimited submissions. Up to 10 reviews. No credit grinding.
+            No credits needed to submit. Up to 10 reviews per track.
           </p>
         </div>
       </div>

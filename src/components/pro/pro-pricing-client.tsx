@@ -24,12 +24,12 @@ const FREE_FEATURES = [
   { text: "Earn credits by reviewing others", included: true },
   { text: "Structured feedback on every review", included: true },
   { text: "Public track sharing page", included: true },
-  { text: "Unlimited submissions", included: false },
+  { text: "No credits needed to submit", included: false },
   { text: "Priority placement", included: false },
 ];
 
 const PRO_FEATURES = [
-  { text: "Unlimited submissions — no credit grinding", included: true, highlight: true },
+  { text: "No credits needed — submit any time", included: true, highlight: true },
   { text: "Up to 10 reviews per track", included: true, highlight: true },
   { text: "3 tracks in review at a time", included: true, highlight: true },
   { text: "Earn credits by reviewing others", included: true },
@@ -99,7 +99,7 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
             </div>
             <h2 className="text-2xl font-black text-white tracking-tight">You&apos;re on Pro.</h2>
             <p className="text-sm text-white/40 font-medium mt-1">
-              Unlimited submissions, up to 10 reviews per track, priority placement — all active.
+              No credits needed to submit, up to 10 reviews per track, priority placement — all active.
             </p>
           </div>
           <Button

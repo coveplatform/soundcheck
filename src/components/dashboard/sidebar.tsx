@@ -163,7 +163,7 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
                 <ArrowRight className="w-4 h-4 text-purple-400/50 group-hover:text-purple-400 transition-colors flex-shrink-0 mt-0.5" />
               </div>
               <p className="text-xs text-white/40 font-medium leading-snug mb-3">
-                Unlimited submissions.<br />Up to 10 reviews per track.
+                No credits needed to submit.<br />Up to 10 reviews per track.
               </p>
               <div className="inline-flex items-center gap-1.5 bg-purple-600 text-white text-[11px] font-black px-3 py-1.5 rounded-lg">
                 See plans <ArrowRight className="w-3 h-3" />

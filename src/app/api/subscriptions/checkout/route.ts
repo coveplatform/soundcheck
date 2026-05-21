@@ -10,7 +10,7 @@ let cachedPriceId: string | null = null;
 let productDescriptionSynced = false;
 
 const PRO_MONTHLY_AMOUNT_CENTS = 1495; // $14.95
-const PRO_PRODUCT_DESCRIPTION = "Unlimited submissions, up to 10 reviews per track, 3 active slots, priority placement";
+const PRO_PRODUCT_DESCRIPTION = "No credits needed to submit, up to 10 reviews per track, 3 active slots, priority placement";
 
 async function getOrCreateProMonthlyPrice(): Promise<string> {
   // 1. Check env var
