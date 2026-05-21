@@ -253,8 +253,8 @@ export default function OnboardingPage() {
       <div className="flex-1 bg-[#faf7f2]">
         <div className="max-w-md mx-auto px-4 sm:px-6 py-10">
 
-          {/* Underline input like artist name step */}
-          <div className={`flex items-center gap-3 border-b-2 transition-colors mb-2 ${trackUrlError ? "border-red-400" : "border-black/20 focus-within:border-black"}`}>
+          {/* Borderless input — same treatment as artist name */}
+          <div className="flex items-center gap-3 mb-2">
             <Link2 className="h-4 w-4 text-black/30 flex-shrink-0" />
             <input
               type="text"
@@ -274,25 +274,23 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Detected track — bold editorial style */}
+          {/* Detected track */}
           {trackUrl && !trackUrlError && !isLoadingTrackMeta && trackSourceType && (
-            <div className="mt-8 bg-lime-400 border-2 border-black rounded-2xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center gap-4">
+            <div className="mt-8 bg-neutral-900 border-2 border-black rounded-2xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center gap-4">
               {trackArtworkUrl ? (
-                <img src={trackArtworkUrl} alt="" className="h-16 w-16 rounded-xl object-cover flex-shrink-0 border-2 border-black/20" />
+                <img src={trackArtworkUrl} alt="" className="h-16 w-16 rounded-xl object-cover flex-shrink-0 border-2 border-white/10" />
               ) : (
-                <div className="h-16 w-16 rounded-xl bg-black flex items-center justify-center flex-shrink-0">
-                  <Music className="h-7 w-7 text-lime-400" />
+                <div className="h-16 w-16 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <Music className="h-7 w-7 text-white/40" />
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/50 mb-0.5">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5">
                   {trackSourceType === "SOUNDCLOUD" ? "SoundCloud" : trackSourceType === "YOUTUBE" ? "YouTube" : trackSourceType === "BANDCAMP" ? "Bandcamp" : "Track"}
                 </p>
-                <p className="font-black text-black truncate text-lg leading-tight">{trackTitle || "Track detected"}</p>
+                <p className="font-black text-white truncate text-lg leading-tight">{trackTitle || "Track detected"}</p>
               </div>
-              <div className="h-9 w-9 rounded-xl bg-black flex items-center justify-center flex-shrink-0">
-                <Check className="h-5 w-5 text-lime-400" />
-              </div>
+              <Check className="h-6 w-6 text-white/60 flex-shrink-0" />
             </div>
           )}
 
