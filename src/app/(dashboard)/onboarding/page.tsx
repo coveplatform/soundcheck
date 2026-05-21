@@ -137,7 +137,7 @@ export default function OnboardingPage() {
               onChange={(e) => setArtistName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && artistName.trim()) { setError(""); setStep(2); } }}
               autoFocus
-              className="w-full border-none bg-transparent px-0 py-3 text-2xl font-black text-black placeholder:text-black/20 focus:outline-none mb-8"
+              className="w-full border-none bg-transparent px-0 py-3 text-2xl font-black text-black placeholder:text-black/20 focus:outline-none focus:ring-0 mb-8"
             />
 
             {error && <div className="bg-red-500 text-white text-sm px-4 py-3 font-bold rounded-xl mb-4">{error}</div>}
@@ -262,7 +262,7 @@ export default function OnboardingPage() {
               value={trackUrl}
               onChange={(e) => handleTrackUrlChange(e.target.value)}
               autoFocus
-              className="flex-1 border-none bg-transparent py-3 text-xl font-black text-black placeholder:text-black/20 focus:outline-none"
+              className="flex-1 border-none bg-transparent py-3 text-xl font-black text-black placeholder:text-black/20 focus:outline-none focus:ring-0"
             />
           </div>
 
@@ -274,23 +274,25 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Detected track — inline, no card */}
+          {/* Detected track — bold editorial style */}
           {trackUrl && !trackUrlError && !isLoadingTrackMeta && trackSourceType && (
-            <div className="flex items-center gap-3 mt-6">
+            <div className="mt-8 bg-lime-400 border-2 border-black rounded-2xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center gap-4">
               {trackArtworkUrl ? (
-                <img src={trackArtworkUrl} alt="" className="h-12 w-12 rounded-xl object-cover flex-shrink-0 border-2 border-black/10" />
+                <img src={trackArtworkUrl} alt="" className="h-16 w-16 rounded-xl object-cover flex-shrink-0 border-2 border-black/20" />
               ) : (
-                <div className="h-12 w-12 rounded-xl bg-lime-400 border-2 border-black flex items-center justify-center flex-shrink-0">
-                  <Music className="h-5 w-5 text-black" />
+                <div className="h-16 w-16 rounded-xl bg-black flex items-center justify-center flex-shrink-0">
+                  <Music className="h-7 w-7 text-lime-400" />
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="font-black text-black truncate text-sm">{trackTitle || "Track detected"}</p>
-                <p className="text-[10px] font-black uppercase tracking-wider text-black/35 mt-0.5">
-                  {trackSourceType === "SOUNDCLOUD" ? "SoundCloud" : trackSourceType === "YOUTUBE" ? "YouTube" : trackSourceType === "BANDCAMP" ? "Bandcamp" : "Ready"}
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/50 mb-0.5">
+                  {trackSourceType === "SOUNDCLOUD" ? "SoundCloud" : trackSourceType === "YOUTUBE" ? "YouTube" : trackSourceType === "BANDCAMP" ? "Bandcamp" : "Track"}
                 </p>
+                <p className="font-black text-black truncate text-lg leading-tight">{trackTitle || "Track detected"}</p>
               </div>
-              <Check className="h-5 w-5 text-lime-500 flex-shrink-0" />
+              <div className="h-9 w-9 rounded-xl bg-black flex items-center justify-center flex-shrink-0">
+                <Check className="h-5 w-5 text-lime-400" />
+              </div>
             </div>
           )}
 
