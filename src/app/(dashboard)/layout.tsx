@@ -4,6 +4,7 @@ import { unstable_cache } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/dashboard/sidebar";
+import { PurchaseSuccessBanner } from "@/components/credits/purchase-success-banner";
 
 // Cache sidebar data per user for 30s to avoid re-fetching on every navigation
 const getSidebarData = unstable_cache(
@@ -94,6 +95,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-[#faf8f5]">
+      <PurchaseSuccessBanner />
       <Sidebar
         artistName={artistName}
         credits={credits}

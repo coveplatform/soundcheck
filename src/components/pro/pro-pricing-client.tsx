@@ -61,7 +61,6 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
   const searchParams = useSearchParams();
   const isSuccess = searchParams.get("success") === "true";
   const isCanceled = searchParams.get("canceled") === "true";
-  const creditsAdded = searchParams.get("credits_added") === "1";
   const creditsCanceled = searchParams.get("credits_canceled") === "1";
 
   const [isLoading, setIsLoading] = useState(false);
@@ -106,18 +105,6 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
   if (isPro || isSuccess) {
     return (
       <div className="space-y-5">
-        {isSuccess && (
-          <div className="bg-lime-400 border-2 border-black rounded-2xl px-5 py-4 flex items-center gap-3">
-            <Check className="h-5 w-5 text-black flex-shrink-0" />
-            <p className="text-sm font-black text-black">Welcome to Pro! Your subscription is now active.</p>
-          </div>
-        )}
-        {creditsAdded && (
-          <div className="bg-lime-400 border-2 border-black rounded-2xl px-5 py-4 flex items-center gap-3">
-            <Coins className="h-5 w-5 text-black flex-shrink-0" />
-            <p className="text-sm font-black text-black">{CREDIT_PACK_CREDITS} credits added to your wallet.</p>
-          </div>
-        )}
         <div className="bg-neutral-900 rounded-2xl px-6 py-8 flex flex-col sm:flex-row sm:items-center gap-6">
           <div className="flex-1">
             <div className="inline-flex items-center gap-2 bg-purple-600 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full mb-3">
@@ -166,12 +153,6 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
       {creditsCanceled && (
         <div className="bg-black/5 border-2 border-black/10 rounded-2xl px-5 py-4 text-center">
           <p className="text-sm font-bold text-black/50">Credit pack purchase canceled. No charges were made.</p>
-        </div>
-      )}
-      {creditsAdded && (
-        <div className="bg-lime-400 border-2 border-black rounded-2xl px-5 py-4 flex items-center gap-3">
-          <Coins className="h-5 w-5 text-black flex-shrink-0" />
-          <p className="text-sm font-black text-black">{CREDIT_PACK_CREDITS} credits added to your wallet.</p>
         </div>
       )}
 
