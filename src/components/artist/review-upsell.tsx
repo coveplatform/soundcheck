@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, TrendingUp, MessageSquare } from "lucide-react";
+import { BuyCreditsButton } from "@/components/credits/buy-credits-button";
 
 interface ReviewUpsellProps {
   completedReviews: number;
@@ -88,12 +89,14 @@ export function ReviewUpsell({
             size="lg"
             className="bg-lime-500 text-black hover:bg-lime-400 active:bg-lime-600 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
           >
-            Earn credits &amp; get more feedback <ArrowRight className="ml-2 h-4 w-4" />
+            Earn credits by reviewing <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
-        <p className="text-xs text-neutral-500">
-          Review others to earn credits for more reviews
-        </p>
+        <BuyCreditsButton
+          variant="card"
+          className="sm:w-auto sm:px-5 bg-white text-black"
+          label="Or buy 10 credits — $9.95"
+        />
       </div>
     </div>
   );

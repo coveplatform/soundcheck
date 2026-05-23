@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Crown, Lock, Music, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { BuyCreditsButton } from "@/components/credits/buy-credits-button";
 
 // Benefits that unlock at different review counts
 const REVIEW_BENEFITS = [
@@ -295,16 +296,21 @@ export default function RequestReviewsPage() {
             </div>
           )}
 
-          {/* Out of credits warning */}
+          {/* Out of credits — show pack + earn options */}
           {needsCredits && (
-            <div className="border-t-2 border-black/8 pt-5">
-              <p className="text-sm text-black/50 font-medium text-center mb-3">
-                You need <span className="font-black text-black">1 more credit</span> to submit
+            <div className="border-t-2 border-black/8 pt-5 space-y-2.5">
+              <p className="text-sm text-black/50 font-medium text-center mb-2">
+                You need <span className="font-black text-black">{desiredReviews - reviewTokens} more {desiredReviews - reviewTokens === 1 ? "credit" : "credits"}</span> to submit
               </p>
+              <BuyCreditsButton
+                variant="card"
+                className="bg-lime-400 hover:bg-lime-300 text-black"
+                label="Buy 10 credits — $9.95"
+              />
               <Link href="/review" className="block">
                 <Button className="w-full border-2 border-black/10 bg-white hover:bg-purple-50 text-black font-black h-10 rounded-xl text-sm">
                   <Sparkles className="h-4 w-4 mr-1.5 text-purple-600" />
-                  Earn a credit by reviewing
+                  Or earn credits by reviewing
                 </Button>
               </Link>
             </div>
@@ -317,13 +323,13 @@ export default function RequestReviewsPage() {
                 <div className="flex items-start gap-3 mb-3">
                   <Crown className="h-5 w-5 text-purple-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-black text-white">Get up to 10 reviews with Pro.</p>
-                    <p className="text-xs text-white/40 font-medium mt-0.5">No credits needed — just submit and get comprehensive feedback.</p>
+                    <p className="text-sm font-black text-white">Submitting often? Go Pro.</p>
+                    <p className="text-xs text-white/40 font-medium mt-0.5">30 credits every month + priority placement. Cheaper than 3 packs.</p>
                   </div>
                 </div>
                 <Link href="/pro" className="block">
                   <Button className="w-full h-9 bg-purple-600 text-white hover:bg-purple-500 font-black border-2 border-purple-400/30 rounded-xl text-sm">
-                    Upgrade to Pro <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                    See Pro plan <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
                   </Button>
                 </Link>
               </div>

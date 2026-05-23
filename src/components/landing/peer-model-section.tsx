@@ -182,7 +182,7 @@ export function PeerModelSection() {
             </div>
 
             {/* Loop label */}
-            <div className="mt-8 sm:mt-6 flex justify-center">
+            <div className="mt-8 sm:mt-6 flex flex-col items-center gap-2.5">
               <div className="inline-flex items-center gap-2.5 bg-white border-2 border-neutral-200 rounded-full px-5 py-2.5 shadow-sm">
                 <span className={`${caveat.className} text-xl text-purple-600`}>↻</span>
                 <span className="text-sm font-bold text-neutral-700">
@@ -190,6 +190,9 @@ export function PeerModelSection() {
                 </span>
                 <span className="text-sm text-neutral-400">— then spend them</span>
               </div>
+              <p className="text-xs text-neutral-500 font-medium">
+                Don&apos;t want to grind? Buy a 10-credit pack for $9.95, or go Pro for 30/month.
+              </p>
             </div>
 
             {/* Bottom trust badges — small, punchy, scattered feel */}

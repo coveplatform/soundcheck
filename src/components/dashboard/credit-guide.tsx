@@ -38,12 +38,12 @@ export function CreditGuide() {
             <li className="flex items-start gap-2">
               <span className="mt-2 h-1.5 w-1.5 rounded-full bg-purple-600 flex-shrink-0" />
               <span>
-                Earn credits by reviewing other artists (1 review = 1 credit)
+                Earn them by reviewing others (1 review = 1 credit), or buy a 10-pack for $9.95
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-2 h-1.5 w-1.5 rounded-full bg-purple-600 flex-shrink-0" />
-              <span>Your starter credits are ready to use now</span>
+              <span>Submitting often? Pro gets you 30 credits/month + priority placement</span>
             </li>
           </ul>
         </div>

@@ -199,7 +199,7 @@ export default function Home() {
               {/* PRO queue — three filled slots */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-xs font-mono tracking-[0.2em] uppercase text-purple-400">Pro · $14.95/mo</span>
+                  <span className="text-xs font-mono tracking-[0.2em] uppercase text-purple-400">Pro · $24.95/mo</span>
                   <div className="h-px flex-1 bg-neutral-800" />
                 </div>
 
@@ -417,16 +417,16 @@ export default function Home() {
 
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-white">$14.95</span>
+                  <span className="text-4xl font-bold text-white">$24.95</span>
                   <span className="text-neutral-500 text-sm">/month</span>
                 </div>
-                <p className="text-xs text-neutral-500 mt-1">Cancel anytime</p>
+                <p className="text-xs text-neutral-500 mt-1">30 credits/month · cancel anytime</p>
               </div>
 
               <div className="space-y-3 text-left mb-8">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50"><span className="font-bold">No credits needed</span> — submit any time</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">30 credits</span> every month</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
@@ -442,7 +442,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Early access to new features</span>
+                  <span className="text-sm text-neutral-50">Top up anytime with $9.95 credit packs</span>
                 </div>
               </div>
 
@@ -475,7 +475,7 @@ export default function Home() {
               },
               {
                 q: "What does Pro get me?",
-                a: "Pro removes the credit requirement entirely — submit as many tracks as you want, up to 3 at a time, each getting up to 10 reviews. Plus priority placement. $14.95/month, cancel anytime.",
+                a: "Pro gives you 30 fresh credits every month — enough to submit several tracks with multiple reviews each. Up to 3 tracks in review at once, up to 10 reviews per track, plus priority placement. $24.95/month, cancel anytime. Need more in a busy month? Top up with a $9.95 credit pack any time.",
               },
               {
                 q: "Is it really free?",

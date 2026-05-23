@@ -326,6 +326,12 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
             >
               Review a track →
             </Link>
+            <Link
+              href="/pro"
+              className="text-[11px] font-black text-white bg-black border-2 border-black px-3 py-1 rounded-full hover:bg-neutral-800 transition-colors whitespace-nowrap"
+            >
+              Buy credits →
+            </Link>
           </div>
         </div>
       )}

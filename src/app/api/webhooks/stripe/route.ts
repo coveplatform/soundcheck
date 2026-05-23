@@ -145,6 +145,11 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     return;
   }
 
+  if (session.metadata?.type === "credit_pack") {
+    await handleCreditPackCheckout(session);
+    return;
+  }
+
   // Pro subscription checkouts are activated via customer.subscription.created — nothing to do here
   if (session.metadata?.type === "pro_subscription") {
     return;
@@ -220,7 +225,37 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   }
 }
 
-const PRO_MONTHLY_CREDITS = 20;
+const PRO_MONTHLY_CREDITS = 30;
+
+async function handleCreditPackCheckout(session: Stripe.Checkout.Session) {
+  try {
+    const artistProfileId = session.metadata?.artistProfileId;
+    const creditsRaw = session.metadata?.credits;
+    const credits = creditsRaw ? parseInt(creditsRaw, 10) : NaN;
+
+    if (!artistProfileId || !Number.isFinite(credits) || credits <= 0) {
+      console.error("Credit pack checkout missing metadata", {
+        sessionId: session.id,
+        metadata: session.metadata,
+      });
+      return;
+    }
+
+    await prisma.artistProfile.update({
+      where: { id: artistProfileId },
+      data: {
+        reviewCredits: { increment: credits },
+        totalCreditsEarned: { increment: credits },
+      },
+    });
+
+    console.log(
+      `Granted ${credits} credit-pack credits to artist ${artistProfileId} (session ${session.id})`
+    );
+  } catch (error) {
+    console.error("Error handling credit pack checkout:", error);
+  }
+}
 
 async function handleSubscriptionChange(subscription: Stripe.Subscription) {
   try {

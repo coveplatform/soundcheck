@@ -9,8 +9,9 @@ let cachedPriceId: string | null = null;
 // Track whether we've synced the product description this server lifecycle
 let productDescriptionSynced = false;
 
-const PRO_MONTHLY_AMOUNT_CENTS = 1495; // $14.95
-const PRO_PRODUCT_DESCRIPTION = "No credits needed to submit, up to 10 reviews per track, 3 active slots, priority placement";
+const PRO_MONTHLY_AMOUNT_CENTS = 2495; // $24.95
+const PRO_PLAN_METADATA_KEY = "pro_monthly_v2";
+const PRO_PRODUCT_DESCRIPTION = "30 credits every month, up to 10 reviews per track, 3 active slots, priority placement";
 
 async function getOrCreateProMonthlyPrice(): Promise<string> {
   // 1. Check env var
@@ -27,7 +28,7 @@ async function getOrCreateProMonthlyPrice(): Promise<string> {
 
   // 3. Look for existing product by metadata
   const existingProducts = await stripe.products.search({
-    query: 'metadata["app"]:"mixreflect" AND metadata["plan"]:"pro_monthly"',
+    query: `metadata["app"]:"mixreflect" AND metadata["plan"]:"${PRO_PLAN_METADATA_KEY}"`,
   });
 
   if (existingProducts.data.length > 0) {
@@ -53,7 +54,7 @@ async function getOrCreateProMonthlyPrice(): Promise<string> {
     description: PRO_PRODUCT_DESCRIPTION,
     metadata: {
       app: "mixreflect",
-      plan: "pro_monthly",
+      plan: PRO_PLAN_METADATA_KEY,
     },
   });
 
@@ -64,7 +65,7 @@ async function getOrCreateProMonthlyPrice(): Promise<string> {
     recurring: { interval: "month" },
     metadata: {
       app: "mixreflect",
-      plan: "pro_monthly",
+      plan: PRO_PLAN_METADATA_KEY,
     },
   });
 

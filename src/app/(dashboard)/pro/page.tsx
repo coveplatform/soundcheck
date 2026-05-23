@@ -1,6 +1,5 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -34,12 +33,12 @@ export default async function ProPage() {
     <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
       <div className="bg-white border-b-2 border-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-2">Upgrade</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-2">Pricing</p>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-[0.95]">
-            Go Pro.
+            Get more credits.
           </h1>
           <p className="text-sm text-black/40 font-medium mt-3">
-            No credits needed to submit. Up to 10 reviews per track.
+            Buy a one-time pack, or get monthly credits with Pro.
           </p>
         </div>
       </div>

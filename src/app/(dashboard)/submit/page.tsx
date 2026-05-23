@@ -10,6 +10,7 @@ import { GenreSelector } from "@/components/ui/genre-selector";
 import { SupportedPlatforms } from "@/components/ui/supported-platforms";
 import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, detectSource } from "@/lib/metadata";
+import { BuyCreditsButton } from "@/components/credits/buy-credits-button";
 import {
   ArrowRight,
   ArrowLeft,
@@ -1180,10 +1181,15 @@ export default function SubmitTrackPage() {
                 <p className="text-base font-black text-white">
                   You need {creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}
                 </p>
-                <p className="text-sm text-white/40 font-medium">Earn free credits by reviewing other artists&apos; tracks, or go Pro to submit without credits.</p>
+                <p className="text-sm text-white/40 font-medium">Pick whichever works for you — earn credits, grab a quick pack, or go Pro for monthly credits + perks.</p>
+                <BuyCreditsButton
+                  variant="card"
+                  className="bg-lime-400 hover:bg-lime-300 text-black"
+                  label="Buy 10 credits — $9.95"
+                />
                 <Link
                   href="/review"
-                  className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-lime-400 hover:bg-lime-300 text-black text-[11px] font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                  className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[11px] font-black uppercase tracking-wider border-2 border-white/20 transition-all"
                 >
                   <Sparkles className="h-4 w-4" />
                   Earn credits by reviewing
@@ -1193,7 +1199,7 @@ export default function SubmitTrackPage() {
                   className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
                 >
                   <Crown className="h-4 w-4" />
-                  Go Pro — submit without credits
+                  Go Pro — 30 credits/month + priority
                 </Link>
               </div>
             )}
