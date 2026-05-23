@@ -8,6 +8,7 @@ import { Music, Plus, Minus, ArrowRight, Loader2, CheckCircle2 } from "lucide-re
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { BuyCreditsButton } from "@/components/credits/buy-credits-button";
 
 interface EligibleTrack {
   id: string;
@@ -221,11 +222,17 @@ export function QueueTrackPicker({ tracks, credits, open, onClose, initialTrackI
           </div>
 
           {!canAfford && (
-            <div className="rounded-lg bg-red-50 border border-red-100 px-3 py-2 mb-4">
-              <p className="text-xs text-red-600">
-                Not enough credits.{" "}
-                <Link href="/review" className="font-bold hover:underline">Earn more by reviewing →</Link>
-              </p>
+            <div className="rounded-lg bg-red-50 border border-red-100 px-3 py-3 mb-4 space-y-2">
+              <p className="text-xs font-bold text-red-700">Not enough credits</p>
+              <BuyCreditsButton variant="card" className="h-9 text-[10px]" />
+              <div className="flex items-center justify-between text-[11px] text-red-600/80">
+                <Link href="/review" className="font-bold hover:underline">
+                  Earn by reviewing →
+                </Link>
+                <Link href="/pro" className="font-bold hover:underline">
+                  Go Pro →
+                </Link>
+              </div>
             </div>
           )}
 
