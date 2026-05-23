@@ -19,3 +19,6 @@ export { sendAdminNewTrackNotification } from "./admin";
 
 // Announcement emails
 export { buildAnnouncementEmail, sendAnnouncementEmail } from "./announcements";
+
+// Welcome email
+export { sendWelcomeEmail } from "./welcome";

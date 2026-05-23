@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
+import { WelcomeEmailTestCard } from "./welcome-email-test";
 
 export const dynamic = 'force-dynamic';
 
@@ -192,6 +193,7 @@ export default async function AdminPage() {
           <div className="mt-2 text-base font-bold text-neutral-950">Send Announcement</div>
           <div className="text-xs text-neutral-400 mt-1">Preview &amp; send feature update to all users</div>
         </Link>
+        <WelcomeEmailTestCard />
         <Link
           href="/score"
           className="block rounded-xl border border-emerald-200 bg-emerald-50 p-5 hover:border-emerald-400 transition-colors"

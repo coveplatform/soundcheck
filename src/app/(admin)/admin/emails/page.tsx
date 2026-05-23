@@ -12,6 +12,7 @@ const EMAIL_TYPES = [
   { id: "release-decision-report", name: "Release Decision Report", description: "Full report with verdict, score, and fixes", category: "Artist" },
   { id: "invalid-track", name: "Invalid Track Link", description: "Sent when track URL is broken/private", category: "Artist" },
   { id: "purchase-confirmation", name: "Purchase Confirmation", description: "Sent after track purchase with download link", category: "Artist" },
+  { id: "welcome", name: "Welcome Email", description: "Sent to new users on sign-up", category: "Marketing" },
   { id: "trial-reminder", name: "Trial Reminder", description: "Nudge to submit first track", category: "Marketing" },
   { id: "lead-reminder", name: "Lead Reminder", description: "Nudge to finish signing up", category: "Marketing" },
   { id: "finish-later", name: "Finish Later", description: "Resume link for mobile users", category: "Marketing" },

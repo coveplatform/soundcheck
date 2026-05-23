@@ -12,6 +12,7 @@ import {
   sendReviewProgressEmail,
   sendInvalidTrackLinkEmail,
   sendReleaseDecisionReport,
+  sendWelcomeEmail,
 } from "@/lib/email";
 import { generateReleaseDecisionReport } from "@/lib/release-decision-report";
 
@@ -194,6 +195,29 @@ function buildPreviewHtml(type: string): string {
       `;
       return emailWrapper(content);
     }
+    case "welcome": {
+      const content = `
+        ${badge("Welcome to MixReflect 🎵")}
+        <h1 style="margin: 0 0 12px; font-size: 26px; font-weight: 800; color: ${COLORS.black}; text-align: center; line-height: 1.2;">Hey there, welcome to the community 👋</h1>
+        <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: ${COLORS.gray}; text-align: center;">MixReflect is built by artists, for artists. Stoked to have you here.</p>
+        ${card(`
+          <p style="margin: 0 0 16px; font-size: 12px; font-weight: 700; color: ${COLORS.grayLight}; text-transform: uppercase; letter-spacing: 0.8px;">How it works</p>
+          <p style="margin: 0 0 8px; font-size: 14px; color: ${COLORS.black};"><strong>🎧 Review artists</strong> — earn credits</p>
+          <p style="margin: 0 0 12px; font-size: 13px; color: ${COLORS.gray};">Listen in your genre and leave structured honest feedback.</p>
+          <p style="margin: 0 0 8px; font-size: 14px; color: ${COLORS.black};"><strong>🎵 Submit your track</strong> — spend credits</p>
+          <p style="margin: 0 0 12px; font-size: 13px; color: ${COLORS.gray};">Queue your track for genre-matched reviewers with notes + scores.</p>
+          <p style="margin: 0 0 8px; font-size: 14px; color: ${COLORS.black};"><strong>📊 Get actionable feedback</strong></p>
+          <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">Scores, listener intent data, and a release readiness verdict.</p>
+        `)}
+        <div style="background-color: #f3e8ff; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
+          <p style="margin: 0 0 6px; font-size: 12px; font-weight: 700; color: ${COLORS.purple}; text-transform: uppercase; letter-spacing: 0.5px;">Need credits without the grind?</p>
+          <p style="margin: 0; font-size: 14px; color: ${COLORS.gray}; line-height: 1.6;">Grab a <strong style="color: ${COLORS.black};">10-credit pack for $9.95</strong> — they never expire. Or go <strong style="color: ${COLORS.black};">Pro at $24.95/month</strong> for 30 credits/month plus perks.</p>
+        </div>
+        ${emailButton("Start reviewing & earning credits →", `${appUrl}/review`)}
+        <p style="margin: 0; font-size: 13px; color: ${COLORS.grayLight}; text-align: center;">— Kris &amp; the MixReflect team</p>
+      `;
+      return emailWrapper(content);
+    }
     default:
       return emailWrapper(`<p>Unknown email type: ${type}</p>`);
   }
@@ -250,10 +274,13 @@ export async function POST(request: Request) {
         await sendReleaseDecisionReport({ artistEmail: recipientEmail, artistName: "Test User", trackTitle: "Summer Nights (Test)", trackId: "test-track", report });
         break;
       }
-      case "admin-new-track":
-        // Send directly since it goes to admin
+      case "admin-new-track": {
         const { sendAdminNewTrackNotification } = await import("@/lib/email");
         await sendAdminNewTrackNotification({ trackTitle: "Summer Nights (Test)", artistEmail: recipientEmail, packageType: "PEER", reviewsRequested: 10, isPromo: false });
+        break;
+      }
+      case "welcome":
+        await sendWelcomeEmail({ to: recipientEmail, name: "Test Artist" });
         break;
       default:
         return NextResponse.json({ error: `Unknown type: ${type}` }, { status: 400 });
