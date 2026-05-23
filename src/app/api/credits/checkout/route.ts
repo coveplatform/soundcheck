@@ -4,8 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 
-export const CREDIT_PACK_AMOUNT_CENTS = 995; // $9.95
-export const CREDIT_PACK_CREDITS = 10;
+import { CREDIT_PACK_CREDITS, CREDIT_PACK_PRICE_CENTS } from "@/lib/pricing";
+
 const CREDIT_PACK_PRODUCT_NAME = "MixReflect Credit Pack";
 const CREDIT_PACK_PRODUCT_DESCRIPTION = `${CREDIT_PACK_CREDITS} credits — never expire. Use whenever you want feedback on a track.`;
 
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
                 product: "credit_pack",
               },
             },
-            unit_amount: CREDIT_PACK_AMOUNT_CENTS,
+            unit_amount: CREDIT_PACK_PRICE_CENTS,
           },
           quantity: 1,
         },
