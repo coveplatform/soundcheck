@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip } from "@/components/ui/tooltip";
 import { Zap, Sparkles, Music, TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 type FirstImpression = "STRONG_HOOK" | "DECENT" | "LOST_INTEREST";
@@ -106,11 +107,13 @@ function ScoreCircle({
   label,
   icon: Icon,
   platformAvg,
+  tooltipContent,
 }: {
   score: number;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   platformAvg?: number;
+  tooltipContent: string;
 }) {
   const percentage = (score / 5) * 100;
   const circumference = 2 * Math.PI * 36;
@@ -132,13 +135,16 @@ function ScoreCircle({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-2xl font-black">{score.toFixed(1)}</span>
+          <span className="text-xl font-black leading-none">{score.toFixed(1)}</span>
+          <span className="text-[9px] font-bold text-neutral-400 leading-none mt-0.5">/ 5</span>
         </div>
       </div>
-      <div className="mt-2 flex items-center gap-1.5">
-        <Icon className="h-4 w-4 text-neutral-500" />
-        <span className="text-sm font-bold text-neutral-700">{label}</span>
-      </div>
+      <Tooltip content={tooltipContent}>
+        <div className="mt-2 flex items-center gap-1.5 cursor-help">
+          <Icon className="h-4 w-4 text-neutral-500" />
+          <span className="text-sm font-bold text-neutral-700">{label}</span>
+        </div>
+      </Tooltip>
       <ComparisonIndicator score={score} platformAvg={platformAvg} />
     </div>
   );
@@ -153,7 +159,10 @@ function ImpressionsBar({ impressions, total }: { impressions: { hook: number; d
 
   return (
     <div className="space-y-3">
-      <div className="text-sm font-bold text-neutral-700">First Impressions</div>
+      <div>
+        <div className="text-sm font-bold text-neutral-700">First Impressions</div>
+        <p className="text-xs text-neutral-400 mt-0.5">How listeners felt within the first few seconds of your track</p>
+      </div>
       <div className="h-4 w-full rounded-full overflow-hidden flex bg-neutral-100">
         {hookPct > 0 && (
           <div className="h-full bg-lime-500 transition-[width] duration-300 ease-out motion-reduce:transition-none" style={{ width: `${hookPct}%` }} title={`Strong Hook: ${hookPct}%`} />
@@ -179,6 +188,15 @@ function ImpressionsBar({ impressions, total }: { impressions: { hook: number; d
           <span>Lost {lostPct}%</span>
         </div>
       </div>
+      <p className="text-xs text-neutral-500 mt-2">
+        {hookPct >= 60
+          ? `${hookPct}% of listeners were immediately hooked — that's a strong opening.`
+          : hookPct >= 40
+          ? `${hookPct}% got a strong first impression — there's room to sharpen your opening.`
+          : lostPct >= 40
+          ? `${lostPct}% of listeners lost interest early — your intro may need work.`
+          : "Mixed first impressions — consider whether your opening grabs attention fast enough."}
+      </p>
     </div>
   );
 }
@@ -188,11 +206,13 @@ function TechMetricRow({
   issueCount,
   totalCount,
   issueLabel,
+  tooltip,
 }: {
   label: string;
   issueCount: number;
   totalCount: number;
   issueLabel: string;
+  tooltip: string;
 }) {
   if (totalCount === 0) return null;
   const issuePct = Math.round((issueCount / totalCount) * 100);
@@ -209,7 +229,9 @@ function TechMetricRow({
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-neutral-600 w-32 flex-shrink-0">{label}</span>
+      <Tooltip content={tooltip}>
+        <span className="text-sm text-neutral-600 w-32 flex-shrink-0 cursor-help underline decoration-dotted decoration-neutral-300 underline-offset-2">{label}</span>
+      </Tooltip>
       <div className="flex-1 h-2 bg-neutral-100 rounded-full overflow-hidden">
         <div className={`h-full rounded-full transition-[width] duration-300 ${barColor}`} style={{ width: `${Math.max(issuePct, issuePct === 0 ? 0 : 4)}%` }} />
       </div>
@@ -247,15 +269,18 @@ function TechnicalQualitySection({ reviews }: { reviews: ReviewLike[] }) {
 
   return (
     <div className="space-y-3">
-      <div className="text-sm font-bold text-neutral-700">Technical Quality</div>
+      <div>
+        <div className="text-sm font-bold text-neutral-700">Technical Quality</div>
+        <p className="text-xs text-neutral-400 mt-0.5">Lower bars are better — shows how many reviewers flagged each issue</p>
+      </div>
       <div className="space-y-2.5">
-        <TechMetricRow label="Low end" issueCount={lowEndIssues} totalCount={lowEndReviews.length} issueLabel="muddy" />
-        <TechMetricRow label="Vocal presence" issueCount={vocalIssues} totalCount={vocalReviews.length} issueLabel="buried" />
-        <TechMetricRow label="High end" issueCount={highEndIssues} totalCount={highEndReviews.length} issueLabel="too harsh" />
-        <TechMetricRow label="Stereo width" issueCount={stereoIssues} totalCount={stereoReviews.length} issueLabel="imbalanced" />
-        <TechMetricRow label="Dynamics" issueCount={dynamicsIssues} totalCount={dynamicsReviews.length} issueLabel="compressed" />
-        <TechMetricRow label="Track length" issueCount={lengthIssues} totalCount={lengthReviews.length} issueLabel="too long" />
-        <TechMetricRow label="Repetitiveness" issueCount={repetitiveIssues} totalCount={repetitiveReviews.length} issueLabel="repetitive" />
+        <TechMetricRow label="Low end" issueCount={lowEndIssues} totalCount={lowEndReviews.length} issueLabel="muddy" tooltip="How many reviewers felt the bass and low frequencies were muddy or overpowering." />
+        <TechMetricRow label="Vocal presence" issueCount={vocalIssues} totalCount={vocalReviews.length} issueLabel="buried" tooltip="How many reviewers felt the vocals were too quiet or buried under the music." />
+        <TechMetricRow label="High end" issueCount={highEndIssues} totalCount={highEndReviews.length} issueLabel="too harsh" tooltip="How many reviewers found the treble or high frequencies too bright or ear-fatiguing." />
+        <TechMetricRow label="Stereo width" issueCount={stereoIssues} totalCount={stereoReviews.length} issueLabel="imbalanced" tooltip="How many reviewers felt the mix was too narrow or unbalanced across left and right channels." />
+        <TechMetricRow label="Dynamics" issueCount={dynamicsIssues} totalCount={dynamicsReviews.length} issueLabel="compressed" tooltip="How many reviewers felt the track was over-compressed — making it sound flat and lifeless instead of punchy." />
+        <TechMetricRow label="Track length" issueCount={lengthIssues} totalCount={lengthReviews.length} issueLabel="too long" tooltip="How many reviewers felt the track ran on too long and should be trimmed." />
+        <TechMetricRow label="Repetitiveness" issueCount={repetitiveIssues} totalCount={repetitiveReviews.length} issueLabel="repetitive" tooltip="How many reviewers felt the track repeated itself too much without enough variation or progression." />
       </div>
     </div>
   );
@@ -311,9 +336,9 @@ export function AggregateAnalytics({
       <CardContent className="p-6 sm:p-8 space-y-8">
         {/* Score Circles with Platform Comparison */}
         <div className="flex justify-center gap-8 sm:gap-12">
-          <ScoreCircle score={avgProduction} label="Production" icon={Zap} platformAvg={platformAverages?.production} />
-          <ScoreCircle score={avgOriginality} label="Originality" icon={Sparkles} platformAvg={platformAverages?.originality} />
-          <ScoreCircle score={avgVocals} label="Vocals" icon={Music} platformAvg={platformAverages?.vocals} />
+          <ScoreCircle score={avgProduction} label="Production" icon={Zap} platformAvg={platformAverages?.production} tooltipContent="How polished and professional the overall mix sounds — clarity, balance, and technical execution. 4.0+ is strong." />
+          <ScoreCircle score={avgOriginality} label="Originality" icon={Sparkles} platformAvg={platformAverages?.originality} tooltipContent="How fresh and distinctive your sound feels. Higher scores mean reviewers found it unique and memorable." />
+          <ScoreCircle score={avgVocals} label="Vocals" icon={Music} platformAvg={platformAverages?.vocals} tooltipContent="How clearly your vocals cut through the mix. A low score means reviewers felt vocals were too buried. Not shown for instrumentals." />
         </div>
 
         {/* First Impressions */}
@@ -325,7 +350,10 @@ export function AggregateAnalytics({
         {/* Similar Artists */}
         {topArtists.length > 0 && (
           <div className="space-y-3">
-            <div className="text-sm font-bold text-neutral-700">Sounds Like...</div>
+            <div>
+              <div className="text-sm font-bold text-neutral-700">Sounds Like...</div>
+              <p className="text-xs text-neutral-400 mt-0.5">Artists your reviewers most commonly compared your sound to</p>
+            </div>
             <div className="flex flex-wrap gap-2">
               {topArtists.map((a) => (
                 <ArtistChip key={a.label} label={a.label} count={a.count} />

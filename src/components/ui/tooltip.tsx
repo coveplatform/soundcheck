@@ -3,7 +3,7 @@
 import * as React from "react";
 
 interface TooltipProps {
-  content: string;
+  content: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -70,7 +70,7 @@ export function Tooltip({ content, children }: TooltipProps) {
           className={`
             absolute z-50 px-3 py-2 text-xs font-semibold
             text-purple-900 bg-purple-50 border-2 border-purple-200
-            rounded-lg shadow-lg whitespace-nowrap pointer-events-none
+            rounded-lg shadow-lg whitespace-normal max-w-[220px] leading-snug text-center pointer-events-none
             ${
               position === "top"
                 ? "bottom-full left-1/2 -translate-x-1/2 mb-2"
