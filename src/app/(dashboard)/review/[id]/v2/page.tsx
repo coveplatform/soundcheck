@@ -593,8 +593,9 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
             </div>
           </div>
 
-          {/* Track + Player card */}
+          {/* Combined track + player + reaction — one cohesive dark card */}
           <Card variant="soft" elevated className="overflow-hidden">
+            {/* Track header — light */}
             <CardHeader className="border-b border-black/8 pb-5">
               <div className="flex items-start gap-4">
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl flex items-center justify-center shrink-0 border border-purple-200/50">
@@ -612,7 +613,6 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
                 </div>
               </div>
 
-              {/* Artist context */}
               {formConfig.hasContext && review.Track.feedbackFocus && (
                 <div className="mt-4 px-4 py-3 bg-purple-50 rounded-xl border border-purple-200/60">
                   <p className="text-sm text-purple-900">
@@ -629,6 +629,7 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
               )}
             </CardHeader>
 
+            {/* Audio player — dark */}
             <div className="bg-neutral-900 px-6 py-4">
               <AudioPlayer
                 sourceUrl={review.Track.sourceUrl}
@@ -645,83 +646,110 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
                 showListenTracker
               />
             </div>
-          </Card>
 
-          {/* Engagement card — the hero */}
-          <Card variant="soft" elevated>
-            <CardHeader className="pb-0">
-              <p className="text-lg font-black tracking-tight text-black mb-1">
-                How are you feeling right now?
-              </p>
-              <p className="text-sm text-neutral-500 mb-5">
-                Tap as you listen and change it any time — this is your live reaction.
-              </p>
+            {/* Reaction controls — dark, flows directly from player */}
+            <div className="bg-neutral-900 border-t border-white/[0.06] px-6 pt-5 pb-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-white font-black text-[15px] leading-tight">How is it landing?</p>
+                  <p className="text-white/35 text-xs mt-0.5">Tap to react — change it any time</p>
+                </div>
+                {currentLevelData && (
+                  <div
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full border shrink-0"
+                    style={{ backgroundColor: currentLevelData.color + '22', borderColor: currentLevelData.color + '55' }}
+                  >
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: currentLevelData.color }} />
+                    <span className="text-xs font-black text-white">{currentLevelData.label}</span>
+                  </div>
+                )}
+              </div>
 
-              {/* Big level buttons */}
-              <div className="flex gap-2">
+              {/* Level buttons */}
+              <div className="flex gap-2 mb-5">
                 {LEVELS.map((l) => (
                   <button
                     key={l.value}
                     type="button"
                     onClick={() => setLevel(l.value)}
                     className={cn(
-                      "flex-1 flex flex-col items-center justify-center py-5 rounded-xl border-2 font-black transition-all duration-150 select-none",
-                      engagementLevel === l.value ? l.active : l.inactive
+                      "flex-1 py-4 rounded-xl border-2 font-black text-[11px] sm:text-xs transition-all duration-150 select-none",
+                      engagementLevel === l.value
+                        ? "text-white"
+                        : "border-white/10 bg-white/5 text-white/35 hover:bg-white/10 hover:text-white/60"
                     )}
+                    style={engagementLevel === l.value ? {
+                      backgroundColor: l.color + '28',
+                      borderColor: l.color + '80',
+                    } : undefined}
                   >
-                    <span className="text-sm leading-none">{l.label}</span>
+                    {l.label}
                   </button>
                 ))}
               </div>
 
-              {/* Current level label */}
-              <div className="mt-3 h-7 flex items-center">
-                {currentLevelData ? (
-                  <p className={cn("text-sm font-bold px-3 py-1 rounded-lg border-2", currentLevelData.active)}>
-                    {currentLevelData.label}
-                  </p>
-                ) : (
-                  <p className="text-sm text-black/20 font-medium">Tap a level above to start tracking</p>
-                )}
-              </div>
-            </CardHeader>
-
-            {/* Curve */}
-            <CardContent className="border-t border-black/8 mt-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-3">
-                Your engagement curve
-              </p>
-              <EngagementChart curve={engagementCurve} duration={audioDuration} skipPoint={skipPoint} />
-            </CardContent>
-
-            {/* Skip detector + listen progress */}
-            <div className="px-4 sm:px-6 pb-5 flex items-center justify-between gap-4">
-              {skipPoint === null ? (
-                <button
-                  type="button"
-                  onClick={() => setSkipPoint(playerSeconds)}
-                  className="inline-flex items-center gap-2 text-xs font-bold text-neutral-400 hover:text-red-500 border border-black/8 hover:border-red-300 rounded-lg px-3 py-2 transition-colors"
-                >
-                  <SkipForward className="h-3.5 w-3.5" />
-                  I&apos;d skip here — {formatTimestamp(playerSeconds)}
-                </button>
+              {/* Reaction journey — color bar (left = start, right = now) */}
+              {engagementCurve.length > 1 ? (
+                <div className="mb-5">
+                  <div className="flex gap-px overflow-hidden rounded-full" style={{ height: 5 }}>
+                    {(() => {
+                      const maxSlices = 100;
+                      const step = Math.max(1, Math.floor(engagementCurve.length / maxSlices));
+                      return engagementCurve
+                        .filter((_, i) => i % step === 0)
+                        .map((point, i) => (
+                          <div
+                            key={i}
+                            className="flex-1 opacity-75"
+                            style={{ backgroundColor: LEVELS.find((lv) => lv.value === point.level)?.color ?? '#9333ea' }}
+                          />
+                        ));
+                    })()}
+                  </div>
+                  <div className="flex items-center justify-between mt-1.5">
+                    <span className="text-[10px] text-white/20 font-medium">Start</span>
+                    <span className="text-[10px] text-white/20 font-medium">Now</span>
+                  </div>
+                </div>
               ) : (
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-red-600 flex items-center gap-1.5">
-                    <SkipForward className="h-3.5 w-3.5" />
-                    Would skip at {formatTimestamp(skipPoint)}
-                  </span>
-                  <button type="button" onClick={() => setSkipPoint(null)}
-                    className="text-[11px] text-neutral-400 hover:text-black underline">clear</button>
+                <div className="mb-5">
+                  <div className="rounded-full bg-white/[0.06]" style={{ height: 5 }} />
+                  {!currentLevelData && (
+                    <p className="text-[10px] text-white/20 font-medium mt-1.5 text-center">Your reaction trail appears here as you tap</p>
+                  )}
                 </div>
               )}
-              <span className="text-xs font-mono text-neutral-400 shrink-0">
-                {formatTimestamp(Math.floor(listenTime))} listened
-              </span>
+
+              {/* Skip + listen timer */}
+              <div className="flex items-center justify-between pt-4 border-t border-white/8">
+                {skipPoint === null ? (
+                  <button
+                    type="button"
+                    onClick={() => setSkipPoint(playerSeconds)}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-white/25 hover:text-red-400 transition-colors"
+                  >
+                    <SkipForward className="h-3.5 w-3.5" />
+                    I&apos;d skip here — {formatTimestamp(playerSeconds)}
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-red-400 flex items-center gap-1.5">
+                      <SkipForward className="h-3.5 w-3.5" />
+                      Would skip at {formatTimestamp(skipPoint)}
+                    </span>
+                    <button type="button" onClick={() => setSkipPoint(null)}
+                      className="text-[11px] text-white/25 hover:text-white/50 underline">clear</button>
+                  </div>
+                )}
+                <span className="text-xs font-mono text-white/25 shrink-0">
+                  {formatTimestamp(Math.floor(listenTime))} listened
+                </span>
+              </div>
             </div>
           </Card>
 
-          {/* Continue card */}
+          {/* Continue / progress card */}
           <Card variant="soft" elevated className="p-6">
             {!canSubmit ? (
               <div>
@@ -745,13 +773,11 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="font-black text-black">
-                    {canSubmit && engagementCurve.length === 0
-                      ? "Ready to continue"
-                      : "Nice — you've listened enough"}
+                    {engagementCurve.length === 0 ? "Ready to continue" : "Nice — you've listened enough"}
                   </p>
                   <p className="text-sm text-neutral-500 mt-0.5">
                     {engagementCurve.length > 0
-                      ? `${engagementCurve.length} data points captured on your curve`
+                      ? "Reaction captured — head to step 2"
                       : "Head to step 2 to leave your written feedback"}
                   </p>
                 </div>

@@ -298,19 +298,22 @@ export default function RequestReviewsPage() {
 
           {/* Out of credits — show pack + earn options */}
           {needsCredits && (
-            <div className="border-t-2 border-black/8 pt-5 space-y-2.5">
-              <p className="text-sm text-black/50 font-medium text-center mb-2">
-                You need <span className="font-black text-black">{desiredReviews - reviewTokens} more {desiredReviews - reviewTokens === 1 ? "credit" : "credits"}</span> to submit
-              </p>
+            <div className="border-t-2 border-black/8 pt-5 space-y-3">
+              <div className="flex items-baseline justify-between">
+                <p className="text-base font-black text-black">
+                  {desiredReviews - reviewTokens} more {desiredReviews - reviewTokens === 1 ? "credit" : "credits"} needed
+                </p>
+                <span className="text-xs text-black/30 font-medium">to submit</span>
+              </div>
               <BuyCreditsButton
-                variant="card"
-                className="bg-lime-400 hover:bg-lime-300 text-black"
+                variant="primary"
+                className="w-full h-12 font-black text-sm rounded-xl"
                 label="Buy 10 credits — $9.95"
               />
               <Link href="/review" className="block">
-                <Button className="w-full border-2 border-black/10 bg-white hover:bg-purple-50 text-black font-black h-10 rounded-xl text-sm">
-                  <Sparkles className="h-4 w-4 mr-1.5 text-purple-600" />
-                  Or earn credits by reviewing
+                <Button className="w-full border-2 border-black bg-white hover:bg-neutral-50 text-black font-black h-12 rounded-xl text-sm">
+                  <Sparkles className="h-4 w-4 mr-2 text-purple-600" />
+                  Earn credits by reviewing
                 </Button>
               </Link>
             </div>
@@ -319,17 +322,19 @@ export default function RequestReviewsPage() {
           {/* Pro upsell — always visible for free users */}
           {!isPro && (
             <div className="border-t-2 border-black/8 pt-5">
-              <div className="bg-neutral-900 border-2 border-black rounded-2xl px-5 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-start gap-3 mb-3">
-                  <Crown className="h-5 w-5 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-black text-white">Submitting often? Go Pro.</p>
-                    <p className="text-xs text-white/40 font-medium mt-0.5">30 credits every month + priority placement. Cheaper than 3 packs.</p>
-                  </div>
+              <div className="bg-neutral-900 rounded-2xl px-6 py-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Crown className="h-4 w-4 text-purple-400" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">Pro Plan</span>
                 </div>
+                <p className="text-2xl font-black text-white leading-tight">Submitting often?</p>
+                <p className="text-2xl font-black text-purple-400 leading-tight mb-3">Go Pro.</p>
+                <p className="text-sm text-white/40 font-medium leading-relaxed mb-6">
+                  30 credits every month + priority placement. Cheaper than buying 3 credit packs.
+                </p>
                 <Link href="/pro" className="block">
-                  <Button className="w-full h-9 bg-purple-600 text-white hover:bg-purple-500 font-black border-2 border-purple-400/30 rounded-xl text-sm">
-                    See Pro plan <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                  <Button className="w-full h-12 bg-purple-600 text-white hover:bg-purple-500 font-black rounded-xl text-base">
+                    See Pro plan <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </Link>
               </div>
