@@ -122,192 +122,151 @@ export default function RequestReviewsPage() {
     <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
-      <div className="bg-white border-b-2 border-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div className="bg-neutral-900 border-b-2 border-black">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           <Link
             href={trackId ? `/tracks/${trackId}` : "/tracks"}
-            className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors mb-3"
+            className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-white/30 hover:text-white transition-colors mb-4"
           >
             ← Back to track
           </Link>
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-[0.95]">
-            Request Reviews.
-          </h1>
-          <p className="text-sm text-black/40 font-medium mt-3">
-            Get honest feedback from fellow artists.
-          </p>
+
+          {/* Track info inline with hero */}
+          {trackInfo ? (
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 border-white/10">
+                {trackInfo.artworkUrl ? (
+                  <Image
+                    src={trackInfo.artworkUrl}
+                    alt={trackInfo.title}
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-white/5">
+                    <Music className="h-6 w-6 text-white/30" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black uppercase tracking-widest text-white/30 mb-1">Requesting reviews for</p>
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white leading-tight truncate">{trackInfo.title}</h1>
+                {trackInfo.genres.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {trackInfo.genres.slice(0, 3).map((g: any) => (
+                      <span key={g.id} className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-white/10 text-white/40">
+                        {g.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-white leading-[0.95]">
+              Request Reviews.
+            </h1>
+          )}
         </div>
       </div>
 
       {/* ── CONTENT ────────────────────────────────────────────── */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-5">
-
-        {/* Track info */}
-        {trackInfo && (
-          <div className="flex items-center gap-4 rounded-2xl border-2 border-black/8 bg-white px-4 py-4">
-            <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border border-black/5">
-              {trackInfo.artworkUrl ? (
-                <Image
-                  src={trackInfo.artworkUrl}
-                  alt={trackInfo.title}
-                  width={56}
-                  height={56}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-neutral-200 to-neutral-300">
-                  <Music className="h-5 w-5 text-neutral-400" />
-                </div>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-base font-black text-black truncate">{trackInfo.title}</p>
-              {trackInfo.genres.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  {trackInfo.genres.slice(0, 3).map((g: any) => (
-                    <span key={g.id} className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-black/5 text-black/40">
-                      {g.name}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-4">
 
         {/* Error */}
         {error && (
-          <div className="bg-red-500 text-white text-sm px-4 py-3 font-bold rounded-2xl">
+          <div className="bg-red-500 text-white text-sm px-4 py-3 font-bold rounded-xl border-2 border-black">
             {error}
           </div>
         )}
 
-        {/* What happens next — dark block */}
-        <div className="bg-neutral-900 rounded-2xl px-6 py-6">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-1">Process</p>
-          <h3 className="text-xl font-black text-white mb-4">What happens next?</h3>
-          <ul className="space-y-3">
-            {[
-              "Your track enters the listening queue",
-              "Each reviewer listens for 3+ minutes and leaves structured feedback",
-              "You get notified as reviews come in",
-            ].map((item, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className="flex-shrink-0 h-5 w-5 rounded-full bg-purple-600 text-white text-[10px] font-black flex items-center justify-center mt-0.5">{i + 1}</span>
-                <span className="text-sm text-white/60 font-medium">{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
         {/* Review count selector */}
-        <div className="bg-white rounded-2xl border-2 border-black/8 p-6 space-y-6">
-          {/* Big number */}
-          <div className="text-center">
-            <div className="inline-flex items-baseline gap-2">
-              <span className="text-6xl font-black text-black tabular-nums">{desiredReviews}</span>
-              <span className="text-xl text-black/40 font-black">{desiredReviews === 1 ? "review" : "reviews"}</span>
+        <div className="bg-white rounded-2xl border-2 border-black p-6 space-y-6">
+
+          {/* Big count display */}
+          <div className="text-center pb-6 border-b-2 border-black/8">
+            <span className="text-7xl sm:text-8xl font-black text-black tabular-nums leading-none">{desiredReviews}</span>
+            <p className="text-base font-black text-black/30 mt-2 uppercase tracking-widest">
+              {desiredReviews === 1 ? "review" : "reviews"}
+            </p>
+          </div>
+
+          {/* Count picker — blocky buttons for Pro, locked note for free */}
+          {isPro ? (
+            <div className="grid grid-cols-5 gap-2">
+              {[1, 3, 5, 7, 10].map((count) => (
+                <button
+                  key={count}
+                  type="button"
+                  onClick={() => setDesiredReviews(count)}
+                  className={cn(
+                    "py-5 rounded-xl border-2 font-black text-xl transition-all",
+                    desiredReviews === count
+                      ? "border-purple-600 bg-purple-600 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                      : "border-black/10 bg-white text-black/40 hover:border-black/30 hover:text-black"
+                  )}
+                >
+                  {count}
+                </button>
+              ))}
             </div>
-            {!isPro && (
-              <p className="text-sm text-black/40 font-medium mt-1">
-                {desiredReviews} {desiredReviews === 1 ? "credit" : "credits"} required
-              </p>
-            )}
-          </div>
+          ) : (
+            <div className="flex items-center gap-3 px-4 py-4 bg-black/[0.03] rounded-xl border-2 border-black/8">
+              <Lock className="h-4 w-4 text-black/25 flex-shrink-0" />
+              <p className="text-sm text-black/40 font-bold">Free plan: 1 review per track.</p>
+            </div>
+          )}
 
-          {/* Slider */}
-          <div>
-            <input
-              type="range"
-              min="1"
-              max={isPro ? 10 : 1}
-              value={desiredReviews}
-              onChange={(e) => setDesiredReviews(parseInt(e.target.value))}
-              disabled={!isPro}
-              className="w-full h-3 rounded-full appearance-none cursor-pointer disabled:cursor-default [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-600 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-purple-600 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:cursor-pointer"
-              style={{
-                background: isPro
-                  ? `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${((desiredReviews - 1) / 9) * 100}%, rgb(229 231 235) ${((desiredReviews - 1) / 9) * 100}%, rgb(229 231 235) 100%)`
-                  : "rgb(147 51 234)"
-              }}
-            />
-            {isPro ? (
-              <div className="flex justify-between mt-2">
-                {[1, 3, 5, 7, 10].map((mark) => (
-                  <button
-                    key={mark}
-                    type="button"
-                    onClick={() => setDesiredReviews(mark)}
-                    className={cn(
-                      "text-xs font-black transition-colors",
-                      desiredReviews === mark ? "text-purple-600" : "text-black/25 hover:text-purple-600"
-                    )}
-                  >
-                    {mark}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center justify-center gap-1.5 mt-2">
-                <Lock className="h-3 w-3 text-black/25" />
-                <p className="text-[11px] text-black/30 font-black uppercase tracking-wider">Free plan: 1 review per track</p>
-              </div>
-            )}
-          </div>
-
-          {/* Insight level */}
+          {/* Insight level bar */}
           <div className="border-t-2 border-black/8 pt-5">
-            <div className="flex items-center gap-1.5 mb-2">
+            <div className="flex gap-1.5 mb-3">
               {REVIEW_BENEFITS.map((benefit) => (
                 <div
                   key={benefit.label}
                   className={cn(
-                    "h-2 flex-1 rounded-full transition-all duration-300",
+                    "h-2.5 flex-1 rounded-sm transition-all duration-300",
                     desiredReviews >= benefit.minReviews ? "bg-purple-600" : "bg-black/8"
                   )}
                 />
               ))}
             </div>
-            <p className="text-sm font-black text-black">
-              {REVIEW_BENEFITS.filter((b) => desiredReviews >= b.minReviews).slice(-1)[0]?.icon}{" "}
+            <p className="text-base font-black text-black">
               {REVIEW_BENEFITS.filter((b) => desiredReviews >= b.minReviews).slice(-1)[0]?.label || "Select reviews"}
             </p>
-            <p className="text-[11px] text-black/30 font-medium mt-0.5">Current insight level</p>
+            <p className="text-xs text-black/30 font-bold uppercase tracking-wider mt-0.5">Insight level</p>
           </div>
 
-          {/* Credit balance — hidden for Pro */}
+          {/* Credit balance */}
           {isPro ? (
             <div className="border-t-2 border-black/8 pt-5 flex items-center gap-3">
-              <Crown className="w-4 h-4 text-purple-500 flex-shrink-0" />
-              <p className="text-sm font-black text-purple-700">Pro — submit without spending credits</p>
+              <Crown className="w-5 h-5 text-purple-500 flex-shrink-0" />
+              <p className="text-base font-black text-purple-700">Pro — no credits needed</p>
             </div>
           ) : (
-            <div className="border-t-2 border-black/8 pt-5 flex items-center justify-between">
-              <div>
-                <p className="text-[11px] font-black uppercase tracking-wider text-black/30">Available</p>
-                <p className="text-3xl font-black text-black tabular-nums">{isLoadingProfile ? "…" : reviewTokens}</p>
-                <p className="text-[11px] text-black/30 font-medium">credits</p>
+            <div className="border-t-2 border-black/8 pt-5 grid grid-cols-2 gap-4">
+              <div className="bg-black/[0.03] rounded-xl px-4 py-4">
+                <p className="text-[10px] font-black uppercase tracking-wider text-black/30 mb-1">You have</p>
+                <p className="text-4xl font-black text-black tabular-nums leading-none">{isLoadingProfile ? "…" : reviewTokens}</p>
+                <p className="text-xs text-black/30 font-bold mt-1">credits</p>
               </div>
-              <div className="text-right">
-                <p className="text-[11px] font-black uppercase tracking-wider text-black/30">Will use</p>
-                <p className={`text-3xl font-black tabular-nums ${needsCredits ? "text-red-500" : "text-purple-600"}`}>{desiredReviews}</p>
-                <p className="text-[11px] text-black/30 font-medium">credits</p>
+              <div className={cn("rounded-xl px-4 py-4", needsCredits ? "bg-red-50" : "bg-purple-50")}>
+                <p className="text-[10px] font-black uppercase tracking-wider text-black/30 mb-1">Will use</p>
+                <p className={cn("text-4xl font-black tabular-nums leading-none", needsCredits ? "text-red-500" : "text-purple-600")}>{desiredReviews}</p>
+                <p className="text-xs text-black/30 font-bold mt-1">credits</p>
               </div>
             </div>
           )}
 
-          {/* Out of credits — show pack + earn options */}
+          {/* Out of credits */}
           {needsCredits && (
             <div className="border-t-2 border-black/8 pt-5 space-y-3">
-              <div className="flex items-baseline justify-between">
-                <p className="text-base font-black text-black">
-                  {desiredReviews - reviewTokens} more {desiredReviews - reviewTokens === 1 ? "credit" : "credits"} needed
-                </p>
-                <span className="text-xs text-black/30 font-medium">to submit</span>
-              </div>
+              <p className="text-base font-black text-black">
+                Need <span className="text-red-500">{desiredReviews - reviewTokens} more</span> {desiredReviews - reviewTokens === 1 ? "credit" : "credits"} to submit
+              </p>
               <BuyCreditsButton
                 variant="primary"
-                className="w-full h-12 font-black text-sm rounded-xl"
+                className="w-full h-13 font-black text-sm rounded-xl"
                 label="Buy 10 credits — $9.95"
               />
               <Link href="/review" className="block">
@@ -319,7 +278,7 @@ export default function RequestReviewsPage() {
             </div>
           )}
 
-          {/* Pro upsell — always visible for free users */}
+          {/* Pro upsell */}
           {!isPro && (
             <div className="border-t-2 border-black/8 pt-5">
               <div className="bg-neutral-900 rounded-2xl px-6 py-6">
@@ -347,11 +306,11 @@ export default function RequestReviewsPage() {
           onClick={requestReviews}
           isLoading={isSubmitting}
           variant="primary"
-          className="w-full h-12 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all rounded-xl"
+          className="w-full h-14 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all rounded-xl"
           disabled={!trackId || isSubmitting || (!isPro && needsCredits)}
         >
           Request {desiredReviews} {desiredReviews === 1 ? "review" : "reviews"}
-          <ArrowRight className="h-4 w-4 ml-2" />
+          <ArrowRight className="h-5 w-5 ml-2" />
         </Button>
       </div>
     </div>
