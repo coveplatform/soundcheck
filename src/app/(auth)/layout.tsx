@@ -65,15 +65,6 @@ export default function AuthLayout({
             </div>
           </div>
 
-          {/* Testimonial */}
-          <div className="bg-purple-700/60 rounded-xl p-5">
-            <p className="text-sm leading-relaxed text-white/90 italic">
-              &ldquo;4 of 5 reviewers said my intro was too long. Cut it down, and it&apos;s now my best performing release.&rdquo;
-            </p>
-            <p className="mt-3 text-xs text-purple-100 font-semibold">
-              Marcus T. · Electronic Producer
-            </p>
-          </div>
         </div>
 
         {/* Bottom tagline */}

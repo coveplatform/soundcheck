@@ -335,17 +335,6 @@ export default function Home() {
         </div>
       </section>
 
-
-      {/* Social Proof */}
-      <section className="py-16  bg-[#faf8f5]">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <p className="text-xl sm:text-2xl text-neutral-700 leading-relaxed">
-            &ldquo;4 of 5 reviewers mentioned the intro was too long. Cut it down, and it&apos;s now my best performing release.&rdquo;
-          </p>
-          <p className="mt-4 text-sm text-neutral-500">Marcus T. · Electronic Producer</p>
-        </div>
-      </section>
-
       {/* Pricing */}
       <section id="pricing" className="py-16 bg-neutral-900 text-neutral-50">
         <div className="max-w-4xl mx-auto px-4">

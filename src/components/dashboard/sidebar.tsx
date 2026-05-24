@@ -17,7 +17,6 @@ import {
   X,
   LifeBuoy,
   BarChart3,
-  Crown,
   ArrowRight,
   Compass,
 } from "lucide-react";
@@ -148,7 +147,6 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
         {isPro ? (
           <div className="border-t border-black/10 px-4 py-3">
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-neutral-900 border-2 border-black">
-              <Crown className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
               <span className="text-xs font-black text-white">Pro — active</span>
             </div>
           </div>
@@ -156,17 +154,14 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
           <Link href="/pro" className="block group border-t-2 border-black">
             <div className="bg-black px-5 py-6 group-hover:bg-neutral-900 transition-colors">
               <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Crown className="w-4 h-4 text-purple-400" />
-                  <span className="text-base font-black text-purple-400">Need more credits?</span>
-                </div>
+                <span className="text-base font-black text-purple-400">Need more credits?</span>
                 <ArrowRight className="w-4 h-4 text-purple-400/50 group-hover:text-purple-400 transition-colors flex-shrink-0 mt-0.5" />
               </div>
               <p className="text-xs text-white/40 font-medium leading-snug mb-3">
                 Buy a 10-credit pack for $9.95, or<br />get 30 credits/month with Pro.
               </p>
-              <div className="inline-flex items-center gap-1.5 bg-purple-600 text-white text-[11px] font-black px-3 py-1.5 rounded-lg">
-                See plans <ArrowRight className="w-3 h-3" />
+              <div className="inline-flex items-center gap-1.5 bg-purple-600 text-white text-sm font-black px-4 py-2 rounded-lg">
+                See plans <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </div>
           </Link>

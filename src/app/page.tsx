@@ -58,7 +58,7 @@ export default function Home() {
           </h1>
 
           <p className="mt-8 text-neutral-700 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto font-medium">
-            Upload your track, review others in your genre, and get honest structured feedback from fellow producers. Genre-matched, artist-to-artist.
+            Upload your track, review others in your genre, and get honest structured feedback from fellow producers.
           </p>
 
           <HeroCTA />
@@ -216,13 +216,13 @@ export default function Home() {
 
               {/* Feature badges */}
               <div className="mt-10 flex flex-wrap justify-center gap-3">
-                <span className="bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 text-xs font-bold px-3 py-1.5 rounded-full">
+                <span className="bg-cyan-400 text-neutral-950 text-xs font-bold px-3 py-1.5 rounded-md">
                   3D space exploration
                 </span>
-                <span className="bg-purple-500/10 border border-purple-400/20 text-purple-300 text-xs font-bold px-3 py-1.5 rounded-full">
+                <span className="bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-md">
                   Click to listen
                 </span>
-                <span className="bg-pink-500/10 border border-pink-400/20 text-pink-300 text-xs font-bold px-3 py-1.5 rounded-full">
+                <span className="bg-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-md">
                   Upload → appear instantly
                 </span>
               </div>
@@ -274,17 +274,6 @@ export default function Home() {
               <TrackPageMockup />
             </BrowserMockup>
           </AnimatedSection>
-        </div>
-      </section>
-
-
-      {/* Social Proof */}
-      <section className="py-16  bg-[#faf8f5]">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <p className="text-xl sm:text-2xl text-neutral-700 leading-relaxed">
-            &ldquo;4 of 5 reviewers mentioned the intro was too long. Cut it down, and it&apos;s now my best performing release.&rdquo;
-          </p>
-          <p className="mt-4 text-sm text-neutral-500">Marcus T. · Electronic Producer</p>
         </div>
       </section>
 
