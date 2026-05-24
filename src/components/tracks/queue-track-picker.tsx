@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Music, Plus, Minus, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
+import { Music, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -166,12 +166,12 @@ export function QueueTrackPicker({ tracks, credits, open, onClose, initialTrackI
         </div>
       ) : (
         /* Review request form */
-        <div className="p-4">
+        <div className="p-5">
           {/* Selected track preview */}
-          <div className="flex items-center gap-3 mb-5">
-            <div className="w-12 h-12 rounded-lg bg-neutral-100 flex-shrink-0 overflow-hidden relative">
+          <div className="flex items-center gap-3 mb-6 pb-5 border-b-2 border-black/8">
+            <div className="w-14 h-14 rounded-xl bg-neutral-100 flex-shrink-0 overflow-hidden relative border border-black/5">
               {selectedTrack.artworkUrl ? (
-                <Image src={selectedTrack.artworkUrl} alt={selectedTrack.title} fill className="object-cover" sizes="48px" />
+                <Image src={selectedTrack.artworkUrl} alt={selectedTrack.title} fill className="object-cover" sizes="56px" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <Music className="h-5 w-5 text-black/15" />
@@ -179,73 +179,88 @@ export function QueueTrackPicker({ tracks, credits, open, onClose, initialTrackI
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-black truncate">{selectedTrack.title}</p>
-              {selectedTrack.genreName && <p className="text-[11px] text-black/30">{selectedTrack.genreName}</p>}
+              <p className="text-base font-black text-black truncate">{selectedTrack.title}</p>
+              {selectedTrack.genreName && <p className="text-xs text-black/30 font-medium">{selectedTrack.genreName}</p>}
             </div>
             <button
               onClick={() => setSelectedTrackId(null)}
-              className="text-xs text-purple-600 hover:text-purple-700 font-medium flex-shrink-0"
+              className="text-xs text-purple-600 hover:text-purple-700 font-black flex-shrink-0"
             >
               Change
             </button>
           </div>
 
-          {/* Review count selector */}
-          <div className="flex items-center justify-between rounded-lg bg-neutral-50 border border-black/5 px-4 py-3 mb-4">
-            <span className="text-sm text-black/60">Reviews</span>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setReviewCount(Math.max(1, reviewCount - 1))}
-                disabled={reviewCount <= 1}
-                className="h-7 w-7 rounded-full bg-white border border-black/10 flex items-center justify-center hover:bg-black/5 disabled:opacity-30 transition-colors"
-              >
-                <Minus className="h-3 w-3" />
-              </button>
-              <span className="text-lg font-black text-black w-6 text-center tabular-nums">{reviewCount}</span>
-              <button
-                onClick={() => setReviewCount(Math.min(10, reviewCount + 1))}
-                disabled={reviewCount >= 10}
-                className="h-7 w-7 rounded-full bg-white border border-black/10 flex items-center justify-center hover:bg-black/5 disabled:opacity-30 transition-colors"
-              >
-                <Plus className="h-3 w-3" />
-              </button>
+          {/* Review count — big number + blocky quick-select */}
+          <div className="mb-5">
+            <div className="text-center mb-4">
+              <span className="text-7xl font-black text-black tabular-nums leading-none">{reviewCount}</span>
+              <p className="text-sm font-black text-black/30 mt-1 uppercase tracking-widest">
+                {reviewCount === 1 ? "review" : "reviews"}
+              </p>
+            </div>
+            <div className="grid grid-cols-5 gap-2">
+              {[1, 3, 5, 7, 10].map((count) => (
+                <button
+                  key={count}
+                  type="button"
+                  onClick={() => setReviewCount(count)}
+                  className={cn(
+                    "py-4 rounded-xl border-2 font-black text-lg transition-all",
+                    reviewCount === count
+                      ? "border-purple-600 bg-purple-600 text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                      : "border-black/10 bg-white text-black/40 hover:border-black/30 hover:text-black"
+                  )}
+                >
+                  {count}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Cost display */}
-          <div className="flex items-center justify-between text-sm mb-5">
-            <span className="text-black/40">Cost</span>
-            <span className={cn("font-bold", canAfford ? "text-black" : "text-red-500")}>
+          {/* Cost row */}
+          <div className="flex items-center justify-between px-4 py-3 bg-black/[0.03] rounded-xl border border-black/5 mb-4">
+            <span className="text-sm font-bold text-black/40">Cost</span>
+            <span className={cn("text-sm font-black", canAfford ? "text-black" : "text-red-500")}>
               {reviewCount} {reviewCount === 1 ? "credit" : "credits"}
-              <span className="font-normal text-black/30 ml-1.5">({credits} available)</span>
+              <span className="font-normal text-black/30 ml-2">({credits} available)</span>
             </span>
           </div>
 
+          {/* Not enough credits */}
           {!canAfford && (
-            <div className="rounded-lg bg-red-50 border border-red-100 px-3 py-3 mb-4 space-y-2">
-              <p className="text-xs font-bold text-red-700">Not enough credits</p>
-              <BuyCreditsButton variant="card" className="h-9 text-[10px]" />
-              <div className="flex items-center justify-between text-[11px] text-red-600/80">
-                <Link href="/review" className="font-bold hover:underline">
-                  Earn by reviewing →
+            <div className="mb-4 space-y-2.5">
+              <p className="text-sm font-black text-red-600">
+                Need {reviewCount - credits} more {reviewCount - credits === 1 ? "credit" : "credits"}
+              </p>
+              <BuyCreditsButton
+                variant="primary"
+                className="w-full h-11 font-black text-sm rounded-xl"
+              />
+              <div className="flex gap-2">
+                <Link href="/review" className="flex-1">
+                  <Button className="w-full h-10 border-2 border-black bg-white hover:bg-neutral-50 text-black font-black text-xs rounded-xl">
+                    Earn by reviewing
+                  </Button>
                 </Link>
-                <Link href="/pro" className="font-bold hover:underline">
-                  Go Pro →
+                <Link href="/pro" className="flex-1">
+                  <Button className="w-full h-10 border-2 border-black bg-white hover:bg-neutral-50 text-black font-black text-xs rounded-xl">
+                    Go Pro
+                  </Button>
                 </Link>
               </div>
             </div>
           )}
 
-          {/* Submit button */}
+          {/* Submit */}
           <Button
             onClick={handleSubmit}
             disabled={!canAfford || loading}
-            className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold text-sm h-10 rounded-xl disabled:opacity-40"
+            className="w-full bg-purple-600 text-white hover:bg-purple-700 font-black text-base h-12 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-40 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
           >
             {loading ? (
               <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Queuing…</>
             ) : (
-              <>Add to queue · {reviewCount} {reviewCount === 1 ? "review" : "reviews"}</>
+              <>Request {reviewCount} {reviewCount === 1 ? "review" : "reviews"}</>
             )}
           </Button>
         </div>
