@@ -216,13 +216,13 @@ export default function Home() {
 
               {/* Feature badges */}
               <div className="mt-10 flex flex-wrap justify-center gap-3">
-                <span className="bg-cyan-400 text-neutral-950 text-xs font-bold px-3 py-1.5 rounded-md">
+                <span className="bg-cyan-400 text-neutral-950 text-sm font-black px-5 py-2.5 rounded-lg border-2 border-black shadow-[3px_3px_0_#000]">
                   3D space exploration
                 </span>
-                <span className="bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-md">
+                <span className="bg-purple-500 text-white text-sm font-black px-5 py-2.5 rounded-lg border-2 border-black shadow-[3px_3px_0_#000]">
                   Click to listen
                 </span>
-                <span className="bg-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-md">
+                <span className="bg-pink-500 text-white text-sm font-black px-5 py-2.5 rounded-lg border-2 border-black shadow-[3px_3px_0_#000]">
                   Upload → appear instantly
                 </span>
               </div>
