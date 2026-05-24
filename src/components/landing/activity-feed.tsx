@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 
 interface Activity {
   id: number;
-  type: "review" | "sale";
   title: string;
   ArtistProfile: string;
   timeAgo: string;
@@ -15,18 +14,18 @@ interface Activity {
 }
 
 const ACTIVITIES: Activity[] = [
-  { id: 1, type: "review", title: "Neon Pulse", ArtistProfile: "Maya Kim", timeAgo: "just now", metric: "2 reviews", artwork: 1, color: "bg-gradient-to-br from-purple-500 to-blue-600" },
-  { id: 2, type: "sale", title: "Late Night Taxi", ArtistProfile: "Marcus T.", timeAgo: "1m ago", metric: "$0.50 sale", artwork: 2, color: "bg-gradient-to-br from-orange-500 to-red-600" },
-  { id: 3, type: "review", title: "Golden Hour", ArtistProfile: "James Cole", timeAgo: "2m ago", metric: "8 reviews", artwork: 3, color: "bg-gradient-to-br from-green-500 to-teal-600" },
-  { id: 4, type: "review", title: "Street Lights", ArtistProfile: "DJ Nova", timeAgo: "3m ago", metric: "4 reviews", artwork: 4, color: "bg-gradient-to-br from-pink-500 to-rose-600" },
-  { id: 5, type: "sale", title: "City Rain", ArtistProfile: "Tom West", timeAgo: "5m ago", metric: "$0.50 sale", artwork: 5, color: "bg-gradient-to-br from-amber-500 to-orange-600" },
-  { id: 6, type: "review", title: "Echoes", ArtistProfile: "Sarah Moon", timeAgo: "6m ago", metric: "6 reviews", artwork: 6, color: "bg-gradient-to-br from-violet-500 to-purple-600" },
-  { id: 7, type: "review", title: "Drift Away", ArtistProfile: "Luna Park", timeAgo: "8m ago", metric: "7 reviews", artwork: 7, color: "bg-gradient-to-br from-cyan-500 to-blue-600" },
-  { id: 8, type: "sale", title: "After Hours", ArtistProfile: "Kira Lane", timeAgo: "10m ago", metric: "$0.50 sale", artwork: 8, color: "bg-gradient-to-br from-lime-500 to-green-600" },
-  { id: 9, type: "review", title: "Soft Focus", ArtistProfile: "Aiden Grey", timeAgo: "12m ago", metric: "9 reviews", artwork: 9, color: "bg-gradient-to-br from-red-500 to-pink-600" },
-  { id: 10, type: "review", title: "Static Bloom", ArtistProfile: "Rae Winter", timeAgo: "14m ago", metric: "3 reviews", artwork: 10, color: "bg-gradient-to-br from-indigo-500 to-violet-600" },
-  { id: 11, type: "sale", title: "Low Tide", ArtistProfile: "Niko Vale", timeAgo: "16m ago", metric: "$0.50 sale", artwork: 11, color: "bg-gradient-to-br from-yellow-500 to-amber-600" },
-  { id: 12, type: "review", title: "Night Garden", ArtistProfile: "Ivy Stone", timeAgo: "18m ago", metric: "6 reviews", artwork: 12, color: "bg-gradient-to-br from-teal-500 to-cyan-600" },
+  { id: 1, title: "Neon Pulse", ArtistProfile: "Maya Kim", timeAgo: "just now", metric: "2 reviews", artwork: 1, color: "bg-gradient-to-br from-purple-500 to-blue-600" },
+  { id: 2, title: "Late Night Taxi", ArtistProfile: "Marcus T.", timeAgo: "1m ago", metric: "5 reviews", artwork: 2, color: "bg-gradient-to-br from-orange-500 to-red-600" },
+  { id: 3, title: "Golden Hour", ArtistProfile: "James Cole", timeAgo: "2m ago", metric: "8 reviews", artwork: 3, color: "bg-gradient-to-br from-green-500 to-teal-600" },
+  { id: 4, title: "Street Lights", ArtistProfile: "DJ Nova", timeAgo: "3m ago", metric: "4 reviews", artwork: 4, color: "bg-gradient-to-br from-pink-500 to-rose-600" },
+  { id: 5, title: "City Rain", ArtistProfile: "Tom West", timeAgo: "5m ago", metric: "3 reviews", artwork: 5, color: "bg-gradient-to-br from-amber-500 to-orange-600" },
+  { id: 6, title: "Echoes", ArtistProfile: "Sarah Moon", timeAgo: "6m ago", metric: "6 reviews", artwork: 6, color: "bg-gradient-to-br from-violet-500 to-purple-600" },
+  { id: 7, title: "Drift Away", ArtistProfile: "Luna Park", timeAgo: "8m ago", metric: "7 reviews", artwork: 7, color: "bg-gradient-to-br from-cyan-500 to-blue-600" },
+  { id: 8, title: "After Hours", ArtistProfile: "Kira Lane", timeAgo: "10m ago", metric: "4 reviews", artwork: 8, color: "bg-gradient-to-br from-lime-500 to-green-600" },
+  { id: 9, title: "Soft Focus", ArtistProfile: "Aiden Grey", timeAgo: "12m ago", metric: "9 reviews", artwork: 9, color: "bg-gradient-to-br from-red-500 to-pink-600" },
+  { id: 10, title: "Static Bloom", ArtistProfile: "Rae Winter", timeAgo: "14m ago", metric: "3 reviews", artwork: 10, color: "bg-gradient-to-br from-indigo-500 to-violet-600" },
+  { id: 11, title: "Low Tide", ArtistProfile: "Niko Vale", timeAgo: "16m ago", metric: "2 reviews", artwork: 11, color: "bg-gradient-to-br from-yellow-500 to-amber-600" },
+  { id: 12, title: "Night Garden", ArtistProfile: "Ivy Stone", timeAgo: "18m ago", metric: "6 reviews", artwork: 12, color: "bg-gradient-to-br from-teal-500 to-cyan-600" },
 ];
 
 export function ActivityFeed() {
@@ -295,23 +294,16 @@ export function ActivityFeed() {
             }}
           />
         ) : null}
-        <span className="absolute top-2 right-2 text-[11px] font-semibold bg-white/95 text-neutral-950 px-2.5 py-0.5 rounded-full shadow-sm backdrop-blur-sm">
-          {activity.type === "sale" ? "$0.50" : activity.metric.split(" ")[0]}
-        </span>
       </div>
 
       {/* Text underneath */}
       <div className="mt-3" style={{ width: `${layout.cardSizePx}px` }}>
         <p className={`${isCompact ? "text-[13px]" : "text-sm"} font-semibold text-neutral-950 truncate`}>{activity.title}</p>
         <p className={`${isCompact ? "text-[12px]" : "text-[13px]"} font-semibold text-neutral-700 truncate`}>{activity.ArtistProfile}</p>
-        <p
-          className={`${isCompact ? "text-[12px]" : "text-[13px]"} font-semibold leading-tight ${
-            activity.type === "sale" ? "text-purple-700" : "text-neutral-700"
-          }`}
-        >
+        <p className={`${isCompact ? "text-[12px]" : "text-[13px]"} font-semibold leading-tight text-neutral-500`}>
           {activity.metric}
         </p>
-        <p className={`${isCompact ? "text-[11px]" : "text-xs"} text-neutral-500`}>{activity.timeAgo}</p>
+        <p className={`${isCompact ? "text-[11px]" : "text-xs"} font-semibold text-purple-600`}>{activity.timeAgo}</p>
       </div>
     </button>
       );
