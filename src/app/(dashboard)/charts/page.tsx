@@ -136,62 +136,14 @@ export default function ChartsPage() {
           </div>
         ) : featured ? (
           <>
-            {/* True 50/50 split — equal height both sides */}
             <div
-              className="max-w-4xl mx-auto px-6 sm:px-10 pb-12"
+              className="max-w-6xl mx-auto px-6 sm:px-12 pb-16"
               style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, alignItems: "start" }}
             >
-              {/* LEFT — artwork fills full column height */}
-              {(() => {
-                const src = resolveArtwork(featured.artworkUrl, featured.sourceType, featured.sourceUrl);
-                return (
-                  <div
-                    className="artwork-wrap relative hidden sm:block"
-                    style={{ borderRadius: "20px 0 0 20px", overflow: "hidden", background: "linear-gradient(135deg, #3d2a8a 0%, #1a0f3d 100%)" }}
-                  >
-                    {src && !artworkFailed ? (
-                      <Image src={src} alt={featured.title} fill className="object-cover" sizes="50vw" onError={() => setArtworkFailed(true)} />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center gap-4">
-                        <Music style={{ width: 52, height: 52, color: "rgba(196,179,247,0.2)" }} />
-                        <p style={{ fontSize: "11px", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(196,179,247,0.2)", textAlign: "center", padding: "0 24px" }}>
-                          {featured.title}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-
-              {/* Mobile-only artwork (stacked) */}
-              {(() => {
-                const src = resolveArtwork(featured.artworkUrl, featured.sourceType, featured.sourceUrl);
-                return (
-                  <div
-                    className="relative w-full sm:hidden col-span-2"
-                    style={{ aspectRatio: "1 / 1", borderRadius: 16, overflow: "hidden", background: "linear-gradient(135deg, #3d2a8a 0%, #1a0f3d 100%)", marginBottom: 24 }}
-                  >
-                    {src && !artworkFailed ? (
-                      <Image src={src} alt={featured.title} fill className="object-cover" sizes="100vw" onError={() => setArtworkFailed(true)} />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                        <Music style={{ width: 40, height: 40, color: "rgba(196,179,247,0.2)" }} />
-                        <p style={{ fontSize: "11px", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(196,179,247,0.2)", textAlign: "center", padding: "0 20px" }}>
-                          {featured.title}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-
-              {/* RIGHT — content, vertically centered */}
+              {/* LEFT — content */}
               <div
                 className="flex flex-col justify-center col-span-2 sm:col-span-1"
-                style={{
-                  padding: "36px 36px 36px 40px",
-                  borderRadius: "0 20px 20px 0",
-                }}
+                style={{ padding: "40px 48px 40px 0" }}
               >
                 <h2
                   className="font-black"
@@ -243,6 +195,47 @@ export default function ChartsPage() {
                   </a>
                 </div>
               </div>
+
+              {/* RIGHT — artwork */}
+              {(() => {
+                const src = resolveArtwork(featured.artworkUrl, featured.sourceType, featured.sourceUrl);
+                return (
+                  <div
+                    className="artwork-wrap relative hidden sm:block"
+                    style={{ aspectRatio: "1 / 1", borderRadius: 20, overflow: "hidden", background: "linear-gradient(135deg, #3d2a8a 0%, #1a0f3d 100%)" }}
+                  >
+                    {src && !artworkFailed ? (
+                      <Image src={src} alt={featured.title} fill className="object-cover" sizes="50vw" onError={() => setArtworkFailed(true)} />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                        <Music style={{ width: 52, height: 52, color: "rgba(196,179,247,0.2)" }} />
+                        <p style={{ fontSize: "11px", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(196,179,247,0.2)", textAlign: "center", padding: "0 24px" }}>
+                          {featured.title}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Mobile artwork */}
+              {(() => {
+                const src = resolveArtwork(featured.artworkUrl, featured.sourceType, featured.sourceUrl);
+                return (
+                  <div
+                    className="relative w-full sm:hidden col-span-2"
+                    style={{ aspectRatio: "1 / 1", borderRadius: 16, overflow: "hidden", background: "linear-gradient(135deg, #3d2a8a 0%, #1a0f3d 100%)", marginBottom: 24 }}
+                  >
+                    {src && !artworkFailed ? (
+                      <Image src={src} alt={featured.title} fill className="object-cover" sizes="100vw" onError={() => setArtworkFailed(true)} />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                        <Music style={{ width: 40, height: 40, color: "rgba(196,179,247,0.2)" }} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </>
         ) : (
