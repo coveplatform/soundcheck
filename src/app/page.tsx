@@ -99,7 +99,9 @@ export default function Home() {
             <Squiggle className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-40 w-16 h-16 sm:w-28 sm:h-28 text-orange-300 opacity-70 rotate-12" />
             <Dots className="pointer-events-none absolute -bottom-10 right-2 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 text-purple-400 opacity-80 rotate-6" />
 
-            <TrackReportDemo />
+            <div className="relative w-full rounded-2xl overflow-hidden shadow-xl" style={{ aspectRatio: "16/9" }}>
+              <Image src="/whats-working.jpg" alt="See what's working" fill className="object-cover" sizes="100vw" />
+            </div>
           </AnimatedSection>
         </div>
       </section>
