@@ -62,6 +62,39 @@ export default function ChartsPage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "#f9f7ff" }}>
+      <style>{`
+        .listen-btn {
+          transition: transform 0.13s ease, box-shadow 0.13s ease, background-color 0.13s ease;
+        }
+        .listen-btn:hover {
+          background-color: #d4c7ff !important;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(196,179,247,0.45);
+        }
+        .listen-btn:active {
+          transform: translateY(0px);
+          box-shadow: none;
+        }
+        .recent-pick {
+          transition: transform 0.13s ease, box-shadow 0.13s ease, border-color 0.13s ease;
+          cursor: pointer;
+        }
+        .recent-pick:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 24px rgba(139,92,246,0.12);
+          border-color: rgba(196,179,247,0.55) !important;
+        }
+        .recent-pick:active {
+          transform: translateY(-1px);
+        }
+        .artwork-wrap {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .artwork-wrap:hover {
+          transform: scale(1.015);
+          box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+        }
+      `}</style>
 
       {/* ══ HERO IMAGE ══════════════════════════════════════════════ */}
       <div
@@ -93,29 +126,30 @@ export default function ChartsPage() {
               Track of the Day &nbsp;·&nbsp; {formatDate(featured.chartDate)}
             </p>
 
-            {/* Main content */}
-            <div className="flex flex-col sm:flex-row gap-8 sm:gap-10">
+            {/* 2-col: artwork left, content right */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-12 items-start">
 
-              {/* Artwork */}
+              {/* Artwork — big square */}
               <div
-                className="flex-shrink-0 relative self-start"
-                style={{ width: 160, height: 160, borderRadius: 16, overflow: "hidden", backgroundColor: "#1a0f3d" }}
+                className="artwork-wrap relative w-full"
+                style={{ aspectRatio: "1 / 1", borderRadius: 20, overflow: "hidden", backgroundColor: "#1a0f3d" }}
               >
                 {featured.artworkUrl ? (
-                  <Image src={featured.artworkUrl} alt={featured.title} fill className="object-cover" sizes="160px" />
+                  <Image src={featured.artworkUrl} alt={featured.title} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <Music style={{ width: 32, height: 32, color: "rgba(196,179,247,0.25)" }} />
+                    <Music style={{ width: 48, height: 48, color: "rgba(196,179,247,0.2)" }} />
                   </div>
                 )}
               </div>
 
-              {/* Text */}
-              <div className="flex-1 min-w-0">
+              {/* Content */}
+              <div className="flex flex-col justify-center">
                 {featured.genre && (
                   <span
                     style={{
                       display: "inline-block",
+                      alignSelf: "flex-start",
                       fontSize: "10px",
                       fontWeight: 900,
                       letterSpacing: "0.25em",
@@ -123,8 +157,8 @@ export default function ChartsPage() {
                       color: "#c4b3f7",
                       backgroundColor: "rgba(196,179,247,0.12)",
                       borderRadius: 999,
-                      padding: "3px 10px",
-                      marginBottom: 12,
+                      padding: "4px 12px",
+                      marginBottom: 16,
                     }}
                   >
                     {featured.genre}
@@ -132,37 +166,35 @@ export default function ChartsPage() {
                 )}
 
                 <h2
-                  className="font-black leading-none"
-                  style={{ fontSize: "clamp(1.6rem, 5vw, 2.8rem)", color: "#fff", letterSpacing: "-0.025em", marginBottom: 8 }}
+                  className="font-black"
+                  style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", color: "#fff", letterSpacing: "-0.025em", lineHeight: 1.05, marginBottom: 8 }}
                 >
                   {featured.title}
                 </h2>
 
-                <p style={{ fontSize: "14px", color: "rgba(196,179,247,0.6)", fontWeight: 600, marginBottom: 20 }}>
+                <p style={{ fontSize: "14px", color: "rgba(196,179,247,0.55)", fontWeight: 600, marginBottom: 24 }}>
                   {featured.artistName}
                 </p>
 
-                {/* Editor's note */}
                 {featured.editorNote && (
                   <p
                     style={{
                       fontSize: "15px",
-                      lineHeight: 1.7,
-                      color: "rgba(255,255,255,0.75)",
+                      lineHeight: 1.75,
+                      color: "rgba(255,255,255,0.72)",
                       fontStyle: "italic",
-                      marginBottom: 24,
+                      marginBottom: 28,
                       borderLeft: "3px solid rgba(196,179,247,0.3)",
-                      paddingLeft: 16,
+                      paddingLeft: 18,
                     }}
                   >
                     {featured.editorNote}
                   </p>
                 )}
 
-                {/* Byline + listen */}
                 <div className="flex items-center gap-4 flex-wrap">
                   {featured.editorNoteByline && (
-                    <p style={{ fontSize: "11px", color: "rgba(196,179,247,0.35)", fontWeight: 700, letterSpacing: "0.1em" }}>
+                    <p style={{ fontSize: "11px", color: "rgba(196,179,247,0.3)", fontWeight: 700, letterSpacing: "0.1em" }}>
                       — {featured.editorNoteByline}
                     </p>
                   )}
@@ -170,14 +202,15 @@ export default function ChartsPage() {
                     href={featured.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 font-black uppercase transition-all"
+                    className="listen-btn flex items-center gap-2 font-black uppercase"
                     style={{
                       fontSize: "10px",
                       letterSpacing: "0.25em",
-                      padding: "8px 18px",
+                      padding: "10px 22px",
                       borderRadius: 999,
                       backgroundColor: "#c4b3f7",
                       color: "#2d1b69",
+                      textDecoration: "none",
                     }}
                   >
                     <Play style={{ width: 10, height: 10 }} />
@@ -219,13 +252,14 @@ export default function ChartsPage() {
                   href={pick.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 group transition-all"
+                  className="recent-pick flex items-center gap-4 group"
                   style={{
                     backgroundColor: "#fff",
                     borderRadius: 16,
                     padding: "14px 16px",
                     border: "1px solid rgba(196,179,247,0.25)",
                     textDecoration: "none",
+                    display: "flex",
                   }}
                 >
                   {/* Artwork */}
