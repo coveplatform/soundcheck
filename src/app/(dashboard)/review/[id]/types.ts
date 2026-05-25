@@ -25,6 +25,7 @@ export interface Review {
     packageType: string;
     feedbackFocus: string | null;
     feedbackAreas: string[];
+    artworkUrl?: string | null;
     Genre: { id: string; name: string }[];
     allowPurchase: boolean;
     ArtistProfile?: {

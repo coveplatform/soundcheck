@@ -598,8 +598,11 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
             {/* Track header — light */}
             <CardHeader className="border-b border-black/8 pb-5">
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl flex items-center justify-center shrink-0 border border-purple-200/50">
-                  <Music className="h-7 w-7 text-purple-600" />
+                <div className="w-14 h-14 rounded-xl shrink-0 overflow-hidden border border-purple-200/50">
+                  {review.Track.artworkUrl
+                    ? <img src={review.Track.artworkUrl} alt={review.Track.title} className="w-full h-full object-cover" />
+                    : <div className="w-full h-full bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center"><Music className="h-7 w-7 text-purple-600" /></div>
+                  }
                 </div>
                 <div className="flex-1 min-w-0">
                   <h1 className="text-xl font-black tracking-tight leading-tight">{review.Track.title}</h1>
@@ -826,8 +829,11 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
         <Card variant="soft" elevated>
           <CardContent className="pt-5">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl flex items-center justify-center shrink-0 border border-purple-200/50">
-                <Music className="h-5 w-5 text-purple-600" />
+              <div className="w-10 h-10 rounded-xl shrink-0 overflow-hidden border border-purple-200/50">
+                {review.Track.artworkUrl
+                  ? <img src={review.Track.artworkUrl} alt={review.Track.title} className="w-full h-full object-cover" />
+                  : <div className="w-full h-full bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center"><Music className="h-5 w-5 text-purple-600" /></div>
+                }
               </div>
               <div>
                 <p className="font-black text-sm">{review.Track.title}</p>
