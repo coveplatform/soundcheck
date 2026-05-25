@@ -109,8 +109,8 @@ export function PeerModelSection() {
 
           <div className="relative rounded-2xl overflow-hidden shadow-xl" style={{ aspectRatio: "16/9" }}>
             <Image
-              src="/charts-hero.jpg"
-              alt="Breakthrough"
+              src="/Community-landing-page.jpg"
+              alt="Community"
               fill
               className="object-cover"
               sizes="50vw"
