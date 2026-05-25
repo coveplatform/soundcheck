@@ -139,7 +139,7 @@ export default function ChartsPage() {
             {/* True 50/50 split — equal height both sides */}
             <div
               className="max-w-4xl mx-auto px-6 sm:px-10 pb-12"
-              style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, minHeight: 400 }}
+              style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, alignItems: "start" }}
             >
               {/* LEFT — artwork fills full column height */}
               {(() => {
