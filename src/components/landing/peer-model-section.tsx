@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { Upload, Headphones, MessageSquare, Star } from "lucide-react";
 import { Caveat } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -85,24 +86,36 @@ export function PeerModelSection() {
   return (
     <section ref={ref} className="relative py-16 sm:py-24 bg-[#faf8f5] overflow-visible">
       <div className="max-w-5xl mx-auto px-4">
-        {/* Heading — original text restored */}
+        {/* Heading */}
         <div
           className={cn(
-            "max-w-2xl transition-all duration-700 ease-out",
+            "grid sm:grid-cols-2 gap-10 sm:gap-16 items-center mb-0 transition-all duration-700 ease-out",
             v ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           )}
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">
-            Not a marketplace.<br />
-            A community that{" "}
-            <span className="relative inline-block">
-              <span className="relative z-10">actually works</span>
-              <span className="absolute bottom-1 left-0 right-0 h-3 bg-purple-200/60 -rotate-[0.5deg] z-0" />
-            </span>
-          </h2>
-          <p className="mt-5 text-neutral-600 text-lg max-w-xl">
-            No hired reviewers. No bots. Just artists in your genre — listening, scoring, and writing real feedback. You do the same for them.
-          </p>
+          <div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">
+              Not a marketplace.<br />
+              A community that{" "}
+              <span className="relative inline-block">
+                <span className="relative z-10">actually works</span>
+                <span className="absolute bottom-1 left-0 right-0 h-3 bg-purple-200/60 -rotate-[0.5deg] z-0" />
+              </span>
+            </h2>
+            <p className="mt-5 text-neutral-600 text-lg max-w-xl">
+              No hired reviewers. No bots. Just artists in your genre — listening, scoring, and writing real feedback. You do the same for them.
+            </p>
+          </div>
+
+          <div className="relative rounded-2xl overflow-hidden shadow-xl" style={{ aspectRatio: "16/9" }}>
+            <Image
+              src="/charts-hero.jpg"
+              alt="Breakthrough"
+              fill
+              className="object-cover"
+              sizes="50vw"
+            />
+          </div>
         </div>
 
         {/* The diagram — hand-drawn style flow */}
