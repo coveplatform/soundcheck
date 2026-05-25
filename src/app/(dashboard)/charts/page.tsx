@@ -12,7 +12,6 @@ import {
   Play,
   RefreshCw,
   BarChart3,
-  ImageIcon,
 } from "lucide-react";
 import { ChartEntry } from "@/components/charts/chart-entry";
 import { FeaturedWinner } from "@/components/charts/featured-winner";
@@ -225,30 +224,7 @@ export default function ChartsPage() {
             backgroundColor: "#1a0f3d",
           }}
         >
-          {/* ↓↓ REPLACE THIS BLOCK WITH YOUR IMAGE ↓↓
-              Example:
-              <Image src="/your-image.jpg" alt="Track of the Day" fill className="object-cover" />
-          */}
-          <div
-            className="flex flex-col items-center gap-3"
-            style={{
-              border: "2px dashed rgba(196,179,247,0.2)",
-              borderRadius: "16px",
-              padding: "40px 64px",
-            }}
-          >
-            <ImageIcon style={{ width: 32, height: 32, color: "rgba(196,179,247,0.25)" }} />
-            <p
-              className="font-black uppercase"
-              style={{
-                fontSize: "10px",
-                letterSpacing: "0.35em",
-                color: "rgba(196,179,247,0.25)",
-              }}
-            >
-              Your image here
-            </p>
-          </div>
+          <Image src="/charts-hero.jpg" alt="Track of the Day" fill className="object-cover" />
         </div>
 
         {/* ── Title + countdown ── */}
