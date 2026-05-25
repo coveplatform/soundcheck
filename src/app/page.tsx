@@ -309,7 +309,7 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-16" style={{ backgroundColor: "#f0ebff" }}>
+      <section id="pricing" className="py-16" style={{ backgroundColor: "#e4d9ff" }}>
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-4 text-neutral-950">Simple Pricing</h2>
           <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: "#7c5cbf" }}>
