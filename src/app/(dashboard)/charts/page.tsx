@@ -117,25 +117,28 @@ export default function ChartsPage() {
             </p>
           </div>
         ) : featured ? (
-          <div className="max-w-3xl mx-auto px-6 sm:px-10 py-12 sm:py-16">
+          <>
+            {/* Label + date — above the split */}
+            <div className="max-w-4xl mx-auto px-6 sm:px-10 pt-10 pb-6">
+              <p
+                style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(196,179,247,0.4)" }}
+              >
+                Track of the Day &nbsp;·&nbsp; {formatDate(featured.chartDate)}
+              </p>
+            </div>
 
-            {/* Label + date */}
-            <p
-              style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(196,179,247,0.4)", marginBottom: 32 }}
+            {/* True 50/50 split — equal height both sides */}
+            <div
+              className="max-w-4xl mx-auto px-6 sm:px-10 pb-12"
+              style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, minHeight: 400 }}
             >
-              Track of the Day &nbsp;·&nbsp; {formatDate(featured.chartDate)}
-            </p>
-
-            {/* 2-col: artwork left, content right */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-12 items-start">
-
-              {/* Artwork — big square */}
+              {/* LEFT — artwork fills full column height */}
               <div
-                className="artwork-wrap relative w-full"
-                style={{ aspectRatio: "1 / 1", borderRadius: 20, overflow: "hidden", backgroundColor: "#1a0f3d" }}
+                className="artwork-wrap relative hidden sm:block"
+                style={{ borderRadius: "20px 0 0 20px", overflow: "hidden", backgroundColor: "#1a0f3d" }}
               >
                 {featured.artworkUrl ? (
-                  <Image src={featured.artworkUrl} alt={featured.title} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+                  <Image src={featured.artworkUrl} alt={featured.title} fill className="object-cover" sizes="50vw" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <Music style={{ width: 48, height: 48, color: "rgba(196,179,247,0.2)" }} />
@@ -143,31 +146,29 @@ export default function ChartsPage() {
                 )}
               </div>
 
-              {/* Content */}
-              <div className="flex flex-col justify-center">
-                {featured.genre && (
-                  <span
-                    style={{
-                      display: "inline-block",
-                      alignSelf: "flex-start",
-                      fontSize: "10px",
-                      fontWeight: 900,
-                      letterSpacing: "0.25em",
-                      textTransform: "uppercase",
-                      color: "#c4b3f7",
-                      backgroundColor: "rgba(196,179,247,0.12)",
-                      borderRadius: 999,
-                      padding: "4px 12px",
-                      marginBottom: 16,
-                    }}
-                  >
-                    {featured.genre}
-                  </span>
+              {/* Mobile-only artwork (stacked) */}
+              <div
+                className="relative w-full sm:hidden col-span-2"
+                style={{ aspectRatio: "1 / 1", borderRadius: 16, overflow: "hidden", backgroundColor: "#1a0f3d", marginBottom: 24 }}
+              >
+                {featured.artworkUrl && (
+                  <Image src={featured.artworkUrl} alt={featured.title} fill className="object-cover" sizes="100vw" />
                 )}
+              </div>
 
+              {/* RIGHT — content, vertically centered */}
+              <div
+                className="flex flex-col justify-center col-span-2 sm:col-span-1"
+                style={{
+                  padding: "36px 36px 36px 40px",
+                  backgroundColor: "rgba(255,255,255,0.04)",
+                  borderRadius: "0 20px 20px 0",
+                  borderLeft: "1px solid rgba(196,179,247,0.1)",
+                }}
+              >
                 <h2
                   className="font-black"
-                  style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", color: "#fff", letterSpacing: "-0.025em", lineHeight: 1.05, marginBottom: 8 }}
+                  style={{ fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", color: "#fff", letterSpacing: "-0.025em", lineHeight: 1.05, marginBottom: 6 }}
                 >
                   {featured.title}
                 </h2>
@@ -219,7 +220,7 @@ export default function ChartsPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </>
         ) : (
           <div className="max-w-3xl mx-auto px-6 sm:px-10 py-16 text-center">
             <p style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(196,179,247,0.3)", marginBottom: 12 }}>
