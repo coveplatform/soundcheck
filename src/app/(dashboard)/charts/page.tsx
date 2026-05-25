@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Music, ExternalLink, Play } from "lucide-react";
+import { Music, ExternalLink, Play, Share2, Check } from "lucide-react";
 
 function getYouTubeId(url: string): string | null {
   try {
@@ -66,6 +66,19 @@ export default function ChartsPage() {
   const [data, setData] = useState<ChartsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [artworkFailed, setArtworkFailed] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async (title: string, artist: string) => {
+    const url = "https://www.mixreflect.com/charts";
+    const text = `"${title}" by ${artist} is today's Track of the Day on MixReflect 🎵`;
+    if (navigator.share) {
+      try { await navigator.share({ title: `Track of the Day · MixReflect`, text, url }); } catch { /* dismissed */ }
+    } else {
+      await navigator.clipboard.writeText(`${text}\n${url}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   useEffect(() => {
     fetch("/api/charts")
@@ -169,12 +182,13 @@ export default function ChartsPage() {
                   </p>
                 )}
 
-                <div className="flex items-center gap-4 flex-wrap">
-                  {featured.editorNoteByline && (
-                    <p style={{ fontSize: "11px", color: "rgba(196,179,247,0.3)", fontWeight: 700, letterSpacing: "0.1em" }}>
-                      — {featured.editorNoteByline}
-                    </p>
-                  )}
+                {featured.editorNoteByline && (
+                  <p style={{ fontSize: "11px", color: "rgba(196,179,247,0.3)", fontWeight: 700, letterSpacing: "0.1em", marginBottom: 20 }}>
+                    — {featured.editorNoteByline}
+                  </p>
+                )}
+
+                <div className="flex items-center gap-3 flex-wrap">
                   <a
                     href={featured.sourceUrl}
                     target="_blank"
@@ -193,6 +207,23 @@ export default function ChartsPage() {
                     <Play style={{ width: 10, height: 10 }} />
                     Listen
                   </a>
+                  <button
+                    onClick={() => handleShare(featured.title, featured.artistName)}
+                    className="listen-btn flex items-center gap-2 font-black uppercase"
+                    style={{
+                      fontSize: "10px",
+                      letterSpacing: "0.25em",
+                      padding: "10px 22px",
+                      borderRadius: 999,
+                      backgroundColor: "rgba(196,179,247,0.12)",
+                      color: "#c4b3f7",
+                      border: "1px solid rgba(196,179,247,0.25)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {copied ? <Check style={{ width: 10, height: 10 }} /> : <Share2 style={{ width: 10, height: 10 }} />}
+                    {copied ? "Copied!" : "Share"}
+                  </button>
                 </div>
               </div>
 
