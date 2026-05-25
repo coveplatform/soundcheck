@@ -51,7 +51,31 @@ async function main() {
   const track = eligible[Math.floor(Math.random() * eligible.length)];
   console.log(`\nPicked: "${track.title}" by ${track.ArtistProfile.artistName}`);
   console.log(`Source: ${track.sourceUrl}`);
-  console.log(`Artwork: ${track.artworkUrl ?? "(none)"}`);
+
+  // Resolve artwork — use stored value, or fetch via oEmbed if missing
+  let artworkUrl: string | null = track.artworkUrl ?? null;
+  if (!artworkUrl && track.sourceUrl) {
+    try {
+      const hostname = new URL(track.sourceUrl).hostname.toLowerCase();
+      let oembedUrl: string | null = null;
+      if (hostname.includes("soundcloud.com")) {
+        oembedUrl = `https://soundcloud.com/oembed?url=${encodeURIComponent(track.sourceUrl)}&format=json`;
+      } else if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) {
+        oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(track.sourceUrl)}&format=json`;
+      } else if (hostname.includes("bandcamp.com")) {
+        oembedUrl = `https://bandcamp.com/oembed?url=${encodeURIComponent(track.sourceUrl)}&format=json`;
+      }
+      if (oembedUrl) {
+        const res = await fetch(oembedUrl);
+        if (res.ok) {
+          const data = await res.json() as { thumbnail_url?: string };
+          artworkUrl = data.thumbnail_url ?? null;
+          if (artworkUrl) console.log(`Fetched artwork via oEmbed: ${artworkUrl}`);
+        }
+      }
+    } catch { /* leave artworkUrl null */ }
+  }
+  console.log(`Artwork: ${artworkUrl ?? "(none)"}`);
 
   await (prisma as any).chartSubmission.create({
     data: {
@@ -59,7 +83,7 @@ async function main() {
       artistId: track.ArtistProfile.id,
       chartDate: today,
       title: track.title,
-      artworkUrl: track.artworkUrl ?? null,
+      artworkUrl,
       sourceUrl: track.sourceUrl,
       sourceType: track.sourceType ?? "SOUNDCLOUD",
       genre: track.Genre?.[0]?.name ?? null,

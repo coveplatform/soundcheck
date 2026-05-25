@@ -79,7 +79,7 @@ export default function ChartsPage() {
   const recent = data?.today ? data.recent : data?.recent?.slice(1) ?? [];
 
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "#f9f7ff" }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "#ede8ff" }}>
       <style>{`
         .listen-btn {
           transition: transform 0.13s ease, box-shadow 0.13s ease, background-color 0.13s ease;
@@ -123,7 +123,7 @@ export default function ChartsPage() {
       </div>
 
       {/* ══ TODAY'S PICK ══ deep indigo ════════════════════════════ */}
-      <div style={{ backgroundColor: "#2d1b69" }}>
+      <div style={{ backgroundColor: "#2d1b69", paddingTop: 48 }}>
         {isLoading ? (
           <div className="max-w-3xl mx-auto px-6 sm:px-10 py-16 flex items-center gap-3">
             <div
@@ -195,10 +195,6 @@ export default function ChartsPage() {
                   borderLeft: "1px solid rgba(196,179,247,0.1)",
                 }}
               >
-                <p style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(196,179,247,0.3)", marginBottom: 14 }}>
-                  {formatDate(featured.chartDate)}
-                </p>
-
                 <h2
                   className="font-black"
                   style={{ fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", color: "#fff", letterSpacing: "-0.025em", lineHeight: 1.05, marginBottom: 6 }}
@@ -216,10 +212,7 @@ export default function ChartsPage() {
                       fontSize: "15px",
                       lineHeight: 1.75,
                       color: "rgba(255,255,255,0.72)",
-                      fontStyle: "italic",
                       marginBottom: 28,
-                      borderLeft: "3px solid rgba(196,179,247,0.3)",
-                      paddingLeft: 18,
                     }}
                   >
                     {featured.editorNote}
@@ -271,7 +264,7 @@ export default function ChartsPage() {
 
       {/* ══ RECENT PICKS ══ soft lavender ══════════════════════════ */}
       {recent.length > 0 && (
-        <div style={{ backgroundColor: "#ede8ff" }} className="py-12">
+        <div style={{ backgroundColor: "#e2d9ff" }} className="py-12">
           <div className="max-w-3xl mx-auto px-6 sm:px-10">
             <p
               style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "#9d7fd4", marginBottom: 24 }}
@@ -351,7 +344,7 @@ export default function ChartsPage() {
       )}
 
       {/* ══ BOTTOM SPACER ══════════════════════════════════════════ */}
-      <div style={{ backgroundColor: "#f9f7ff", paddingBottom: 96 }} />
+      <div style={{ backgroundColor: "#ede8ff", paddingBottom: 96 }} />
     </div>
   );
 }
