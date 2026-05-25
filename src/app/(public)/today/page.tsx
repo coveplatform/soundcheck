@@ -5,7 +5,7 @@ import { Caveat } from "next/font/google";
 import { prisma } from "@/lib/prisma";
 import { Logo } from "@/components/ui/logo";
 import { SignupLink } from "@/components/landing/signup-link";
-import { Sparkle, Squiggle, Dots } from "@/components/landing/doodles";
+import { Squiggle } from "@/components/landing/doodles";
 import { ArrowRight, ExternalLink, Music, Headphones } from "lucide-react";
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
@@ -109,21 +109,34 @@ export default async function TrackOfTheDayPage() {
 
       <div className="pt-14">
 
-        {/* ── Date + masthead ──────────────────────────────────────── */}
-        <div className="border-b-2 border-black bg-[#faf8f5] relative overflow-hidden">
-          <Sparkle className="pointer-events-none absolute top-6 right-[12%] w-10 h-10 text-purple-400 opacity-50 -rotate-12 hidden md:block" />
-          <Dots className="pointer-events-none absolute bottom-8 left-[8%] w-10 h-10 text-lime-500 opacity-50 hidden md:block" />
+        {/* ── Hero illustration banner ─────────────────────────────── */}
+        <div className="relative bg-black border-b-2 border-black overflow-hidden">
+          <div className="max-w-5xl mx-auto">
+            <div className="relative aspect-[1135/834] sm:aspect-[1135/700] md:aspect-[1135/600] w-full">
+              <Image
+                src="/today-hero.png"
+                alt="MixReflect Track of the Day"
+                fill
+                priority
+                className="object-cover object-center"
+                sizes="(max-width: 1024px) 100vw, 1024px"
+              />
+              {/* Bottom gradient for masthead readability */}
+              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black/80 to-transparent" />
 
-          <div className="max-w-3xl mx-auto px-4 py-10 sm:py-16 text-center relative">
-            <p className={`${caveat.className} text-xl sm:text-2xl text-purple-600 mb-2`}>
-              today on mixreflect
-            </p>
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-black leading-[1.05]">
-              Track of the Day
-            </h1>
-            <p className="mt-3 text-xs sm:text-sm font-black uppercase tracking-[0.25em] text-black/40">
-              {formatDate(new Date(submission.chartDate))}
-            </p>
+              {/* Masthead text overlay */}
+              <div className="absolute inset-x-0 bottom-0 px-4 sm:px-8 pb-8 sm:pb-12 text-center">
+                <p className={`${caveat.className} text-xl sm:text-2xl text-lime-300 mb-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]`}>
+                  today on mixreflect
+                </p>
+                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1] drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]">
+                  Track of the Day
+                </h1>
+                <p className="mt-4 text-[11px] sm:text-xs font-black uppercase tracking-[0.3em] text-white/60">
+                  {formatDate(new Date(submission.chartDate))}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
