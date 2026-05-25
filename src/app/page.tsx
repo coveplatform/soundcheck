@@ -81,11 +81,18 @@ export default function Home() {
       {/* Track Report - "See what's working" */}
       <section id="examples" className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
         <div className="max-w-6xl mx-auto px-4">
-          <AnimatedSection className="max-w-2xl mb-12">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">See what&apos;s working</h2>
-            <p className="mt-5 text-neutral-600 text-lg max-w-xl">
-              Get multiple reviews on your track. We show you patterns. When 4 out of 5 people say the same thing, that&apos;s not taste -- that&apos;s signal.
-            </p>
+          <AnimatedSection className="mb-12">
+            <div className="grid sm:grid-cols-2 gap-10 sm:gap-16 items-center">
+              <div>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">See what&apos;s working</h2>
+                <p className="mt-5 text-neutral-600 text-lg max-w-xl">
+                  Get multiple reviews on your track. We show you patterns. When 4 out of 5 people say the same thing, that&apos;s not taste -- that&apos;s signal.
+                </p>
+              </div>
+              <div className="relative rounded-2xl overflow-hidden shadow-xl" style={{ aspectRatio: "16/9" }}>
+                <Image src="/whats-working.jpg" alt="See what's working" fill className="object-cover" sizes="50vw" />
+              </div>
+            </div>
           </AnimatedSection>
 
           <AnimatedSection className="relative">
@@ -99,9 +106,7 @@ export default function Home() {
             <Squiggle className="pointer-events-none absolute -top-10 -right-10 sm:-right-24 lg:-right-40 w-16 h-16 sm:w-28 sm:h-28 text-orange-300 opacity-70 rotate-12" />
             <Dots className="pointer-events-none absolute -bottom-10 right-2 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 text-purple-400 opacity-80 rotate-6" />
 
-            <div className="relative w-full rounded-2xl overflow-hidden shadow-xl" style={{ aspectRatio: "16/9" }}>
-              <Image src="/whats-working.jpg" alt="See what's working" fill className="object-cover" sizes="100vw" />
-            </div>
+            <TrackReportDemo />
           </AnimatedSection>
         </div>
       </section>
