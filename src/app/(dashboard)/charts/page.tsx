@@ -190,9 +190,7 @@ export default function ChartsPage() {
                 className="flex flex-col justify-center col-span-2 sm:col-span-1"
                 style={{
                   padding: "36px 36px 36px 40px",
-                  backgroundColor: "rgba(255,255,255,0.04)",
                   borderRadius: "0 20px 20px 0",
-                  borderLeft: "1px solid rgba(196,179,247,0.1)",
                 }}
               >
                 <h2
