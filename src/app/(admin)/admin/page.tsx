@@ -195,6 +195,14 @@ export default async function AdminPage() {
         </Link>
         <WelcomeEmailTestCard />
         <Link
+          href="/admin/track-of-the-day"
+          className="block rounded-xl border border-purple-200 bg-purple-50 p-5 hover:border-purple-400 transition-colors"
+        >
+          <div className="text-xs font-semibold text-purple-600 uppercase tracking-wider">Editorial</div>
+          <div className="mt-2 text-base font-bold text-neutral-950">Track of the Day</div>
+          <div className="text-xs text-neutral-400 mt-1">Edit the daily editor&rsquo;s note &amp; pick winner</div>
+        </Link>
+        <Link
           href="/score"
           className="block rounded-xl border border-emerald-200 bg-emerald-50 p-5 hover:border-emerald-400 transition-colors"
         >

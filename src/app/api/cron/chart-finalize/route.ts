@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { generateEditorNoteForSubmission } from "@/lib/track-of-the-day/generate-editor-note";
 
 function isAuthorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
@@ -56,14 +57,34 @@ async function handler(request: Request) {
 
     await (prisma as any).$transaction(updates);
 
+    // Generate AI editor's note for the winner (Bandcamp Daily-style blurb)
+    const winner = submissions[0];
+    let editorNoteStatus: "generated" | "skipped" | "failed" = "skipped";
+    try {
+      const note = await generateEditorNoteForSubmission(winner.id);
+      await (prisma as any).chartSubmission.update({
+        where: { id: winner.id },
+        data: {
+          editorNote: note,
+          editorNoteByline: "MixReflect",
+          editorNoteGeneratedAt: new Date(),
+        },
+      });
+      editorNoteStatus = "generated";
+    } catch (err) {
+      console.error("[chart-finalize] Editor note generation failed:", err);
+      editorNoteStatus = "failed";
+    }
+
     return NextResponse.json({
       success: true,
       ranked: submissions.length,
       winner: {
-        id: submissions[0].id,
-        title: submissions[0].title,
-        voteCount: submissions[0].voteCount,
+        id: winner.id,
+        title: winner.title,
+        voteCount: winner.voteCount,
       },
+      editorNote: editorNoteStatus,
     });
   } catch (error) {
     console.error("Chart finalize error:", error);

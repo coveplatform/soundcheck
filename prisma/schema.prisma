@@ -793,20 +793,24 @@ enum ExperienceLevel {
 
 // ── Daily Chart ─────────────────────────────────────────────────
 model ChartSubmission {
-  id            String        @id @default(cuid())
-  trackId       String
-  artistId      String
-  chartDate     DateTime      @db.Date
-  title         String
-  artworkUrl    String?
-  sourceUrl     String
-  sourceType    TrackSource
-  genre         String?
-  voteCount     Int           @default(0)
-  playCount     Int           @default(0)
-  rank          Int?
-  isFeatured    Boolean       @default(false)
-  createdAt     DateTime      @default(now())
+  id                    String        @id @default(cuid())
+  trackId               String
+  artistId              String
+  chartDate             DateTime      @db.Date
+  title                 String
+  artworkUrl            String?
+  sourceUrl             String
+  sourceType            TrackSource
+  genre                 String?
+  voteCount             Int           @default(0)
+  playCount             Int           @default(0)
+  rank                  Int?
+  isFeatured            Boolean       @default(false)
+  editorNote            String?
+  editorNoteByline      String?
+  editorNoteGeneratedAt DateTime?
+  editorNoteEditedAt    DateTime?
+  createdAt             DateTime      @default(now())
 
   Track         Track         @relation(fields: [trackId], references: [id], onDelete: Cascade)
   ArtistProfile ArtistProfile @relation(fields: [artistId], references: [id], onDelete: Cascade)
