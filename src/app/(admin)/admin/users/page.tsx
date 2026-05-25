@@ -164,6 +164,13 @@ export default async function AdminUsersPage({
   } else if (filter === "inactive") {
     whereClause.isArtist = false;
     whereClause.isReviewer = false;
+  } else if (filter === "paid") {
+    whereClause.ArtistProfile = {
+      OR: [
+        { subscriptionId: { not: null } },
+        { totalSpent: { gt: 0 } },
+      ],
+    };
   }
 
   if (!showDemo) {
@@ -200,6 +207,11 @@ export default async function AdminUsersPage({
           completedOnboarding: true,
           totalPeerReviews: true,
           reviewCredits: true,
+          subscriptionId: true,
+          subscriptionStatus: true,
+          subscriptionTier: true,
+          subscriptionCanceledAt: true,
+          totalSpent: true,
           Track: {
             select: {
               reviewsRequested: true,
@@ -289,6 +301,14 @@ export default async function AdminUsersPage({
           >
             Inactive
           </Link>
+          <Link
+            href={buildUrl({ filter: "paid", page: 1 })}
+            className={`h-9 px-3 rounded-md text-sm font-medium flex items-center ${
+              filter === "paid" ? "bg-green-700 text-white" : "bg-green-50 text-green-700 hover:bg-green-100"
+            }`}
+          >
+            Paid
+          </Link>
           <span className="w-px h-6 bg-neutral-200 mx-1" />
           <Link
             href={buildUrl({ demo: showDemo ? "" : "show", page: 1 })}
@@ -308,6 +328,8 @@ export default async function AdminUsersPage({
               <tr>
                 <th className="text-left font-medium px-3 py-2">Email</th>
                 <th className="text-left font-medium px-3 py-2">Artist Name</th>
+                <th className="text-left font-medium px-3 py-2">Plan</th>
+                <th className="text-right font-medium px-3 py-2">Spent</th>
                 <th className="text-right font-medium px-3 py-2">Uploaded</th>
                 <th className="text-right font-medium px-3 py-2">In Queue</th>
                 <th className="text-right font-medium px-3 py-2">Reviews</th>
@@ -338,6 +360,26 @@ export default async function AdminUsersPage({
                     </Link>
                   </td>
                   <td className="px-3 py-2 text-neutral-500">{u.ArtistProfile?.artistName ?? u.name ?? ""}</td>
+                  <td className="px-3 py-2">
+                    {u.ArtistProfile?.subscriptionId ? (
+                      u.ArtistProfile.subscriptionStatus === "active" ? (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">Pro</span>
+                      ) : (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-neutral-100 text-neutral-500">Pro (cancelled)</span>
+                      )
+                    ) : (u.ArtistProfile?.totalSpent ?? 0) > 0 ? (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-600">Paid</span>
+                    ) : (
+                      <span className="text-neutral-300">—</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2 text-right">
+                    {(u.ArtistProfile?.totalSpent ?? 0) > 0 ? (
+                      <span className="font-medium tabular-nums">${((u.ArtistProfile!.totalSpent!) / 100).toFixed(2)}</span>
+                    ) : (
+                      <span className="text-neutral-300">—</span>
+                    )}
+                  </td>
                   <td className="px-3 py-2 text-right">
                     {tracksPosted > 0 ? (
                       <span className={`font-medium tabular-nums ${tracksPosted >= 5 ? 'text-green-600' : tracksPosted >= 3 ? 'text-blue-600' : ''}`}>
@@ -407,7 +449,7 @@ export default async function AdminUsersPage({
               })}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-3 py-8 text-center text-neutral-500">
+                  <td colSpan={12} className="px-3 py-8 text-center text-neutral-500">
                     No users found
                   </td>
                 </tr>
