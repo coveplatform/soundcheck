@@ -11,9 +11,9 @@ interface WinnerData {
   artworkUrl: string | null;
   sourceUrl: string;
   sourceType: string;
-  voteCount: number;
   artistName: string;
   artistImage: string | null;
+  editorNote: string | null;
 }
 
 function getYouTubeId(url: string): string | null {
@@ -49,30 +49,19 @@ export function DashboardWinner() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
   const stopTimer = useCallback(() => {}, []);
 
   useEffect(() => {
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-    const dateStr = today.toISOString().split("T")[0];
-
-    fetch(`/api/charts?date=${dateStr}&period=daily`)
+    fetch("/api/charts")
       .then((res) => res.json())
       .then((data) => {
-        if (data.featuredWinner) {
-          setWinner(data.featuredWinner);
-        }
+        if (data.featuredWinner) setWinner(data.featuredWinner);
       })
       .catch(() => {});
   }, []);
 
   useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-    };
+    return () => { if (audioRef.current) audioRef.current.pause(); };
   }, [stopTimer]);
 
   if (!winner) return null;
@@ -83,22 +72,16 @@ export function DashboardWinner() {
   const handlePlay = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
     if (isPlaying) {
       setIsPlaying(false);
       setIsExpanded(false);
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
+      if (audioRef.current) audioRef.current.pause();
     } else {
       setIsPlaying(true);
-
       if (winner.sourceType === "UPLOAD" && winner.sourceUrl) {
         if (!audioRef.current) {
           audioRef.current = new Audio(winner.sourceUrl);
-          audioRef.current.addEventListener("ended", () => {
-            setIsPlaying(false);
-          });
+          audioRef.current.addEventListener("ended", () => setIsPlaying(false));
         }
         audioRef.current.play().catch(() => {});
       } else if (canEmbed) {
@@ -115,41 +98,27 @@ export function DashboardWinner() {
     e.stopPropagation();
     setIsPlaying(false);
     setIsExpanded(false);
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
+    if (audioRef.current) audioRef.current.pause();
   };
 
   return (
     <div className="bg-black">
-      {/* Main strip */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3 sm:gap-4">
         <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />
 
-        {/* Artwork + play button */}
         <button
           onClick={handlePlay}
           className="flex-shrink-0 relative w-8 h-8 rounded-md overflow-hidden group/play"
         >
           {winner.artworkUrl ? (
-            <Image
-              src={winner.artworkUrl}
-              alt={winner.title}
-              fill
-              className="object-cover"
-              sizes="32px"
-            />
+            <Image src={winner.artworkUrl} alt={winner.title} fill className="object-cover" sizes="32px" />
           ) : (
             <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
               <Music className="w-3 h-3 text-neutral-600" />
             </div>
           )}
           <div className="absolute inset-0 bg-black/40 group-hover/play:bg-black/60 transition-colors flex items-center justify-center">
-            {isPlaying ? (
-              <Pause className="w-2.5 h-2.5 text-white" />
-            ) : (
-              <Play className="w-2.5 h-2.5 text-white ml-px" />
-            )}
+            {isPlaying ? <Pause className="w-2.5 h-2.5 text-white" /> : <Play className="w-2.5 h-2.5 text-white ml-px" />}
           </div>
         </button>
 
@@ -164,45 +133,24 @@ export function DashboardWinner() {
         </div>
 
         {isExpanded && (
-          <button
-            onClick={handleClose}
-            className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors"
-          >
+          <button onClick={handleClose} className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors">
             <X className="w-3 h-3 text-white/40" />
           </button>
         )}
 
-        <Link
-          href="/charts"
-          onClick={(e) => e.stopPropagation()}
-          className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors"
-        >
+        <Link href="/charts" onClick={(e) => e.stopPropagation()} className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors">
           <ArrowRight className="w-3.5 h-3.5 text-white/30" />
         </Link>
       </div>
 
-      {/* Inline embed */}
       {isExpanded && embedUrl && (
         <div className="border-t border-white/10">
           {winner.sourceType === "SOUNDCLOUD" && (
-            <iframe
-              src={embedUrl}
-              height="120"
-              width="100%"
-              allow="autoplay"
-              className="block"
-              style={{ border: "none" }}
-            />
+            <iframe src={embedUrl} height="120" width="100%" allow="autoplay" className="block" style={{ border: "none" }} />
           )}
           {winner.sourceType === "YOUTUBE" && (
             <div className="relative w-full max-w-4xl mx-auto" style={{ paddingBottom: "40%" }}>
-              <iframe
-                src={embedUrl}
-                className="absolute inset-0 w-full h-full"
-                allow="autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-                style={{ border: "none" }}
-              />
+              <iframe src={embedUrl} className="absolute inset-0 w-full h-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen style={{ border: "none" }} />
             </div>
           )}
         </div>

@@ -4,25 +4,19 @@ import { generateEditorNoteForSubmission } from "@/lib/track-of-the-day/generate
 
 function isAuthorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
-  if (!secret) {
-    return process.env.NODE_ENV !== "production";
-  }
-
+  if (!secret) return process.env.NODE_ENV !== "production";
   const headerSecret = request.headers.get("x-cron-secret");
   if (headerSecret && headerSecret === secret) return true;
-
   const auth = request.headers.get("authorization");
   if (auth && auth === `Bearer ${secret}`) return true;
-
   return false;
 }
 
 /**
  * POST /api/cron/chart-finalize
- * Run at midnight UTC to finalize yesterday's chart:
- * - Set rank on all submissions
- * - Mark #1 as isFeatured
- * Should be called by Vercel cron or manually.
+ * Runs at 00:01 UTC daily.
+ * Picks the best-reviewed track from yesterday's completed reviews
+ * and marks it as Track of the Day. No voting — the review pipeline decides.
  */
 async function handler(request: Request) {
   if (!isAuthorized(request)) {
@@ -30,60 +24,111 @@ async function handler(request: Request) {
   }
 
   try {
-    // Yesterday's date
     const yesterday = new Date();
     yesterday.setUTCDate(yesterday.getUTCDate() - 1);
     yesterday.setUTCHours(0, 0, 0, 0);
 
-    const submissions = await (prisma as any).chartSubmission.findMany({
-      where: { chartDate: yesterday },
-      orderBy: [{ voteCount: "desc" }, { playCount: "desc" }, { createdAt: "asc" }],
+    const yesterdayEnd = new Date(yesterday);
+    yesterdayEnd.setUTCHours(23, 59, 59, 999);
+
+    // Find all reviews completed yesterday
+    const reviews = await (prisma as any).review.findMany({
+      where: {
+        status: "COMPLETED",
+        updatedAt: { gte: yesterday, lte: yesterdayEnd },
+        countsTowardAnalytics: true,
+      },
+      include: {
+        Track: {
+          include: {
+            ArtistProfile: { select: { id: true, artistName: true } },
+            Genre: { select: { name: true } },
+          },
+        },
+      },
     });
 
-    if (submissions.length === 0) {
-      return NextResponse.json({ success: true, message: "No submissions yesterday", ranked: 0 });
+    if (reviews.length === 0) {
+      return NextResponse.json({ success: true, message: "No reviewed tracks yesterday", winner: null });
     }
 
-    // Update ranks and mark winner
-    const updates = submissions.map((sub: any, index: number) =>
-      (prisma as any).chartSubmission.update({
-        where: { id: sub.id },
+    // Group by track, score by reviewCount + avg scores
+    const trackMap = new Map<string, any>();
+    for (const review of reviews) {
+      if (!review.Track || !review.Track.ArtistProfile) continue;
+      const existing = trackMap.get(review.trackId) ?? {
+        track: review.Track,
+        reviewCount: 0,
+        totalProduction: 0,
+        totalOriginality: 0,
+        reviews: [],
+      };
+      existing.reviewCount += 1;
+      existing.totalProduction += review.productionScore ?? 3;
+      existing.totalOriginality += review.originalityScore ?? 3;
+      existing.reviews.push(review);
+      trackMap.set(review.trackId, existing);
+    }
+
+    // Sort: most reviews first, then avg score as tiebreaker
+    const ranked = Array.from(trackMap.values()).sort((a, b) => {
+      const scoreA = a.reviewCount * 3 + (a.totalProduction / a.reviewCount) + (a.totalOriginality / a.reviewCount);
+      const scoreB = b.reviewCount * 3 + (b.totalProduction / b.reviewCount) + (b.totalOriginality / b.reviewCount);
+      return scoreB - scoreA;
+    });
+
+    const winner = ranked[0];
+    const track = winner.track;
+
+    // Create or update the ChartSubmission for yesterday
+    let submission: any;
+    const existing = await (prisma as any).chartSubmission.findFirst({
+      where: { trackId: track.id, chartDate: yesterday },
+    });
+
+    if (existing) {
+      submission = await (prisma as any).chartSubmission.update({
+        where: { id: existing.id },
+        data: { isFeatured: true, rank: 1, voteCount: winner.reviewCount },
+      });
+    } else {
+      submission = await (prisma as any).chartSubmission.create({
         data: {
-          rank: index + 1,
-          isFeatured: index === 0,
+          trackId: track.id,
+          artistId: track.ArtistProfile.id,
+          chartDate: yesterday,
+          title: track.title,
+          artworkUrl: track.artworkUrl ?? null,
+          sourceUrl: track.sourceUrl,
+          sourceType: track.sourceType,
+          genre: track.Genre?.[0]?.name ?? null,
+          isFeatured: true,
+          rank: 1,
+          voteCount: winner.reviewCount,
         },
-      })
-    );
+      });
+    }
 
-    await (prisma as any).$transaction(updates);
-
-    // Generate AI editor's note for the winner (Bandcamp Daily-style blurb)
-    const winner = submissions[0];
-    let editorNoteStatus: "generated" | "skipped" | "failed" = "skipped";
+    // Generate AI editor's note
+    let editorNoteStatus: "generated" | "failed" = "generated";
     try {
-      const note = await generateEditorNoteForSubmission(winner.id);
+      const note = await generateEditorNoteForSubmission(submission.id);
       await (prisma as any).chartSubmission.update({
-        where: { id: winner.id },
+        where: { id: submission.id },
         data: {
           editorNote: note,
           editorNoteByline: "MixReflect",
           editorNoteGeneratedAt: new Date(),
         },
       });
-      editorNoteStatus = "generated";
     } catch (err) {
-      console.error("[chart-finalize] Editor note generation failed:", err);
+      console.error("[chart-finalize] Editor note failed:", err);
       editorNoteStatus = "failed";
     }
 
     return NextResponse.json({
       success: true,
-      ranked: submissions.length,
-      winner: {
-        id: winner.id,
-        title: winner.title,
-        voteCount: winner.voteCount,
-      },
+      winner: { id: submission.id, title: track.title, reviewCount: winner.reviewCount },
       editorNote: editorNoteStatus,
     });
   } catch (error) {
@@ -92,10 +137,5 @@ async function handler(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
-  return handler(request);
-}
-
-export async function POST(request: Request) {
-  return handler(request);
-}
+export async function GET(request: Request) { return handler(request); }
+export async function POST(request: Request) { return handler(request); }
