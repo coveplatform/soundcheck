@@ -48,6 +48,7 @@ function formatDateShort(dateStr: string) {
 export default function ChartsPage() {
   const [data, setData] = useState<ChartsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [artworkFailed, setArtworkFailed] = useState(false);
 
   useEffect(() => {
     fetch("/api/charts")
@@ -126,13 +127,23 @@ export default function ChartsPage() {
               {/* LEFT — artwork fills full column height */}
               <div
                 className="artwork-wrap relative hidden sm:block"
-                style={{ borderRadius: "20px 0 0 20px", overflow: "hidden", backgroundColor: "#1a0f3d" }}
+                style={{ borderRadius: "20px 0 0 20px", overflow: "hidden", background: "linear-gradient(135deg, #3d2a8a 0%, #1a0f3d 100%)" }}
               >
-                {featured.artworkUrl ? (
-                  <Image src={featured.artworkUrl} alt={featured.title} fill className="object-cover" sizes="50vw" />
+                {featured.artworkUrl && !artworkFailed ? (
+                  <Image
+                    src={featured.artworkUrl}
+                    alt={featured.title}
+                    fill
+                    className="object-cover"
+                    sizes="50vw"
+                    onError={() => setArtworkFailed(true)}
+                  />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Music style={{ width: 48, height: 48, color: "rgba(196,179,247,0.2)" }} />
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                    <Music style={{ width: 52, height: 52, color: "rgba(196,179,247,0.2)" }} />
+                    <p style={{ fontSize: "11px", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(196,179,247,0.2)", textAlign: "center", padding: "0 24px" }}>
+                      {featured.title}
+                    </p>
                   </div>
                 )}
               </div>
@@ -140,10 +151,24 @@ export default function ChartsPage() {
               {/* Mobile-only artwork (stacked) */}
               <div
                 className="relative w-full sm:hidden col-span-2"
-                style={{ aspectRatio: "1 / 1", borderRadius: 16, overflow: "hidden", backgroundColor: "#1a0f3d", marginBottom: 24 }}
+                style={{ aspectRatio: "1 / 1", borderRadius: 16, overflow: "hidden", background: "linear-gradient(135deg, #3d2a8a 0%, #1a0f3d 100%)", marginBottom: 24 }}
               >
-                {featured.artworkUrl && (
-                  <Image src={featured.artworkUrl} alt={featured.title} fill className="object-cover" sizes="100vw" />
+                {featured.artworkUrl && !artworkFailed ? (
+                  <Image
+                    src={featured.artworkUrl}
+                    alt={featured.title}
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
+                    onError={() => setArtworkFailed(true)}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                    <Music style={{ width: 40, height: 40, color: "rgba(196,179,247,0.2)" }} />
+                    <p style={{ fontSize: "11px", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(196,179,247,0.2)", textAlign: "center", padding: "0 20px" }}>
+                      {featured.title}
+                    </p>
+                  </div>
                 )}
               </div>
 
@@ -264,10 +289,18 @@ export default function ChartsPage() {
                     style={{ width: 52, height: 52, borderRadius: 10, backgroundColor: "#ede8ff" }}
                   >
                     {pick.artworkUrl ? (
-                      <Image src={pick.artworkUrl} alt={pick.title} fill className="object-cover" sizes="52px" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Music style={{ width: 18, height: 18, color: "#c4b3f7" }} />
+                      <Image
+                        src={pick.artworkUrl}
+                        alt={pick.title}
+                        fill
+                        className="object-cover"
+                        sizes="52px"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                      />
+                    ) : null}
+                    {!pick.artworkUrl && (
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #3d2a8a, #1a0f3d)" }}>
+                        <Music style={{ width: 16, height: 16, color: "rgba(196,179,247,0.4)" }} />
                       </div>
                     )}
                   </div>
