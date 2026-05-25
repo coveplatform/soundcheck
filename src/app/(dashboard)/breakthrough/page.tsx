@@ -72,7 +72,7 @@ export default function ChartsPage() {
   const shareUrl = "https://www.mixreflect.com/breakthrough";
 
   const handleCopy = async (title: string, artist: string) => {
-    const text = `"${title}" by ${artist} is today's Track of the Day on MixReflect 🎵\n${shareUrl}`;
+    const text = `"${title}" by ${artist} is today's Breakthrough on MixReflect 🎵\n${shareUrl}`;
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -130,7 +130,7 @@ export default function ChartsPage() {
         className="w-full relative"
         style={{ aspectRatio: "21 / 9", minHeight: "240px", maxHeight: "500px", backgroundColor: "#1a0f3d" }}
       >
-        <Image src="/charts-hero.jpg" alt="Track of the Day" fill className="object-cover" />
+        <Image src="/charts-hero.jpg" alt="Breakthrough · Track of the Day" fill className="object-cover" />
       </div>
 
       {/* ══ TODAY'S PICK ══ deep indigo ════════════════════════════ */}
@@ -242,7 +242,7 @@ export default function ChartsPage() {
                       {/* Mini track info */}
                       <div style={{ marginBottom: 14, paddingBottom: 14, borderBottom: "1px solid rgba(196,179,247,0.1)" }}>
                         <p style={{ fontSize: "9px", fontWeight: 900, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(196,179,247,0.35)", marginBottom: 4 }}>
-                          Track of the Day
+                          Breakthrough · Track of the Day
                         </p>
                         <p style={{ fontSize: "13px", fontWeight: 900, color: "#fff", lineHeight: 1.2, marginBottom: 2 }}>
                           {featured.title}
@@ -256,7 +256,7 @@ export default function ChartsPage() {
                       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
                         {/* Twitter/X */}
                         <a
-                          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`"${featured.title}" by ${featured.artistName} is today's Track of the Day on MixReflect 🎵`)}&url=${encodeURIComponent(shareUrl)}`}
+                          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`"${featured.title}" by ${featured.artistName} is today's Breakthrough on MixReflect 🎵`)}&url=${encodeURIComponent(shareUrl)}`}
                           target="_blank" rel="noopener noreferrer" title="Post on 𝕏"
                           style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "#000", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
                         >
@@ -264,7 +264,7 @@ export default function ChartsPage() {
                         </a>
                         {/* Reddit */}
                         <a
-                          href={`https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(`"${featured.title}" by ${featured.artistName} — Track of the Day on MixReflect`)}`}
+                          href={`https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(`"${featured.title}" by ${featured.artistName} — Breakthrough · Track of the Day on MixReflect`)}`}
                           target="_blank" rel="noopener noreferrer" title="Share on Reddit"
                           style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "#ff4500", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
                         >
@@ -358,7 +358,7 @@ export default function ChartsPage() {
         ) : (
           <div className="max-w-3xl mx-auto px-6 sm:px-10 py-16 text-center">
             <p style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(196,179,247,0.3)", marginBottom: 12 }}>
-              Track of the Day
+              Breakthrough · Track of the Day
             </p>
             <p style={{ fontSize: "1.1rem", fontWeight: 900, color: "rgba(255,255,255,0.4)" }}>
               No pick yet today
