@@ -118,15 +118,6 @@ export default function ChartsPage() {
           </div>
         ) : featured ? (
           <>
-            {/* Label + date — above the split */}
-            <div className="max-w-4xl mx-auto px-6 sm:px-10 pt-10 pb-6">
-              <p
-                style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(196,179,247,0.4)" }}
-              >
-                Track of the Day &nbsp;·&nbsp; {formatDate(featured.chartDate)}
-              </p>
-            </div>
-
             {/* True 50/50 split — equal height both sides */}
             <div
               className="max-w-4xl mx-auto px-6 sm:px-10 pb-12"
@@ -166,6 +157,10 @@ export default function ChartsPage() {
                   borderLeft: "1px solid rgba(196,179,247,0.1)",
                 }}
               >
+                <p style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(196,179,247,0.3)", marginBottom: 14 }}>
+                  {formatDate(featured.chartDate)}
+                </p>
+
                 <h2
                   className="font-black"
                   style={{ fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", color: "#fff", letterSpacing: "-0.025em", lineHeight: 1.05, marginBottom: 6 }}
