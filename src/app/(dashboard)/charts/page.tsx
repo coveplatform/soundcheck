@@ -191,18 +191,7 @@ export default function ChartsPage() {
     return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
   };
 
-  const getTimeUntilReset = () => {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-    tomorrow.setUTCHours(0, 0, 0, 0);
-    const diff = tomorrow.getTime() - now.getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
-  };
-
-  const todaySubmissions = activity?.todaySubmissions ?? [];
+const todaySubmissions = activity?.todaySubmissions ?? [];
   const hasEntries = todaySubmissions.length > 0;
   const canSubmitMore = activity ? activity.canSubmit : false;
   const isPro = activity?.isPro ?? false;
@@ -227,68 +216,23 @@ export default function ChartsPage() {
           <Image src="/charts-hero.jpg" alt="Track of the Day" fill className="object-cover" />
         </div>
 
-        {/* ── Title + countdown ── */}
+        {/* ── Title ── */}
         <div className="max-w-4xl mx-auto px-6 sm:px-10 py-10 sm:py-12">
-          <div className="flex items-end justify-between gap-8 flex-wrap">
-            <div>
-              <div className="flex items-center gap-2 mb-5">
-                <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: "#a3e635" }} />
-                <span
-                  className="font-black uppercase"
-                  style={{ fontSize: "10px", letterSpacing: "0.3em", color: "rgba(196,179,247,0.45)" }}
-                >
-                  Live now · Every genre
-                </span>
-              </div>
-              <h1
-                className="font-black leading-none"
-                style={{
-                  fontSize: "clamp(2.8rem, 8vw, 5.5rem)",
-                  letterSpacing: "-0.03em",
-                  color: "#fff",
-                  lineHeight: 0.95,
-                }}
-              >
-                Track of<br />
-                <span style={{ color: "#c4b3f7" }}>the Day.</span>
-              </h1>
-            </div>
-
-            <div className="text-right" style={{ paddingBottom: "4px" }}>
-              {isToday && (
-                <>
-                  <p
-                    className="font-black tabular-nums font-mono leading-none"
-                    style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: "#fff" }}
-                  >
-                    {getTimeUntilReset()}
-                  </p>
-                  <p
-                    className="font-black uppercase mt-2"
-                    style={{ fontSize: "10px", letterSpacing: "0.2em", color: "rgba(196,179,247,0.4)" }}
-                  >
-                    until reset
-                  </p>
-                </>
-              )}
-              {!isToday && chartData && (
-                <>
-                  <p
-                    className="font-black tabular-nums leading-none"
-                    style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: "#fff" }}
-                  >
-                    {chartData.totalSubmissions}
-                  </p>
-                  <p
-                    className="font-black uppercase mt-2"
-                    style={{ fontSize: "10px", letterSpacing: "0.2em", color: "rgba(196,179,247,0.4)" }}
-                  >
-                    tracks
-                  </p>
-                </>
-              )}
-            </div>
+          <div>
+            <h1
+              className="font-black leading-none"
+              style={{
+                fontSize: "clamp(3.5rem, 12vw, 8rem)",
+                letterSpacing: "-0.03em",
+                color: "#fff",
+                lineHeight: 0.92,
+              }}
+            >
+              Track of<br />
+              <span style={{ color: "#c4b3f7" }}>the Day.</span>
+            </h1>
           </div>
+
         </div>
       </div>
 
