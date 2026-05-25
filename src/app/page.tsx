@@ -270,16 +270,7 @@ export default function Home() {
           <div className="grid sm:grid-cols-2 gap-12 sm:gap-20 items-center">
             {/* Left — editorial text */}
             <div>
-              <h2
-                style={{
-                  fontSize: "clamp(2.5rem, 6vw, 4rem)",
-                  fontWeight: 900,
-                  color: "#fff",
-                  letterSpacing: "-0.03em",
-                  lineHeight: 1.0,
-                  marginBottom: 24,
-                }}
-              >
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-[1.1] mb-6">
                 Break<br />through.
               </h2>
               <p style={{ fontSize: "16px", color: "rgba(196,179,247,0.55)", lineHeight: 1.8, marginBottom: 32, maxWidth: 380 }}>
