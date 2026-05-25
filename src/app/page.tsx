@@ -107,25 +107,6 @@ export default function Home() {
       {/* Peer Model — why it works */}
       <PeerModelSection />
 
-      {/* Social Proof Stats */}
-      <section className="py-14 sm:py-20 bg-[#faf8f5]">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="grid grid-cols-3 gap-4 sm:gap-12">
-            <div className="text-center">
-              <p className="text-4xl sm:text-6xl lg:text-7xl font-black text-neutral-950 tracking-tight">2,847</p>
-              <p className="text-xs sm:text-sm font-semibold text-neutral-500 mt-2">Tracks reviewed</p>
-            </div>
-            <div className="text-center">
-              <p className="text-4xl sm:text-6xl lg:text-7xl font-black text-purple-600 tracking-tight">&lt;4hrs</p>
-              <p className="text-xs sm:text-sm font-semibold text-neutral-500 mt-2">Avg turnaround</p>
-            </div>
-            <div className="text-center">
-              <p className="text-4xl sm:text-6xl lg:text-7xl font-black text-neutral-950 tracking-tight">1,200+</p>
-              <p className="text-xs sm:text-sm font-semibold text-neutral-500 mt-2">Artists in the community</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Weekly Discover — immersive dark section */}
       <section className="pb-16 sm:pb-24 pt-0 bg-black text-neutral-50 overflow-visible font-sans relative">
