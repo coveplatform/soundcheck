@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Music, ExternalLink, Play, Share2, Check } from "lucide-react";
+import { Music, ExternalLink, Play, Share2, Check, Download } from "lucide-react";
 
 function getYouTubeId(url: string): string | null {
   try {
@@ -66,18 +66,16 @@ export default function ChartsPage() {
   const [data, setData] = useState<ChartsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [artworkFailed, setArtworkFailed] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const handleShare = async (title: string, artist: string) => {
-    const url = "https://www.mixreflect.com/charts";
-    const text = `"${title}" by ${artist} is today's Track of the Day on MixReflect 🎵`;
-    if (navigator.share) {
-      try { await navigator.share({ title: `Track of the Day · MixReflect`, text, url }); } catch { /* dismissed */ }
-    } else {
-      await navigator.clipboard.writeText(`${text}\n${url}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+  const shareUrl = "https://www.mixreflect.com/charts";
+
+  const handleCopy = async (title: string, artist: string) => {
+    const text = `"${title}" by ${artist} is today's Track of the Day on MixReflect 🎵\n${shareUrl}`;
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   useEffect(() => {
@@ -188,7 +186,7 @@ export default function ChartsPage() {
                   </p>
                 )}
 
-                <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-3 flex-wrap" style={{ marginBottom: shareOpen ? 20 : 0 }}>
                   <a
                     href={featured.sourceUrl}
                     target="_blank"
@@ -208,23 +206,108 @@ export default function ChartsPage() {
                     Listen
                   </a>
                   <button
-                    onClick={() => handleShare(featured.title, featured.artistName)}
+                    onClick={() => setShareOpen((v) => !v)}
                     className="listen-btn flex items-center gap-2 font-black uppercase"
                     style={{
                       fontSize: "10px",
                       letterSpacing: "0.25em",
                       padding: "10px 22px",
                       borderRadius: 999,
-                      backgroundColor: "rgba(196,179,247,0.12)",
+                      backgroundColor: shareOpen ? "rgba(196,179,247,0.2)" : "rgba(196,179,247,0.1)",
                       color: "#c4b3f7",
                       border: "1px solid rgba(196,179,247,0.25)",
                       cursor: "pointer",
                     }}
                   >
-                    {copied ? <Check style={{ width: 10, height: 10 }} /> : <Share2 style={{ width: 10, height: 10 }} />}
-                    {copied ? "Copied!" : "Share"}
+                    <Share2 style={{ width: 10, height: 10 }} />
+                    Share
                   </button>
                 </div>
+
+                {shareOpen && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                    {/* Twitter/X */}
+                    <a
+                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`"${featured.title}" by ${featured.artistName} is today's Track of the Day on MixReflect 🎵`)}&url=${encodeURIComponent(shareUrl)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        padding: "9px 18px", borderRadius: 999,
+                        backgroundColor: "#000", color: "#fff",
+                        fontSize: "11px", fontWeight: 800, letterSpacing: "0.05em",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.738-8.835L1.254 2.25H8.08l4.261 5.638 5.902-5.638zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                      Post
+                    </a>
+                    {/* Reddit */}
+                    <a
+                      href={`https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(`"${featured.title}" by ${featured.artistName} — Track of the Day on MixReflect`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        padding: "9px 18px", borderRadius: 999,
+                        backgroundColor: "#ff4500", color: "#fff",
+                        fontSize: "11px", fontWeight: 800, letterSpacing: "0.05em",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+                      Reddit
+                    </a>
+                    {/* Facebook */}
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        padding: "9px 18px", borderRadius: 999,
+                        backgroundColor: "#1877f2", color: "#fff",
+                        fontSize: "11px", fontWeight: 800, letterSpacing: "0.05em",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                      Facebook
+                    </a>
+                    {/* Instagram — download card */}
+                    <a
+                      href="/api/og/charts"
+                      download="mixreflect-track-of-the-day.png"
+                      style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        padding: "9px 18px", borderRadius: 999,
+                        background: "linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)",
+                        color: "#fff",
+                        fontSize: "11px", fontWeight: 800, letterSpacing: "0.05em",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <Download style={{ width: 11, height: 11 }} />
+                      Instagram
+                    </a>
+                    {/* Copy link */}
+                    <button
+                      onClick={() => handleCopy(featured.title, featured.artistName)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        padding: "9px 18px", borderRadius: 999,
+                        backgroundColor: "rgba(196,179,247,0.1)",
+                        color: copied ? "#a8f0a8" : "rgba(196,179,247,0.6)",
+                        border: "1px solid rgba(196,179,247,0.2)",
+                        fontSize: "11px", fontWeight: 800, letterSpacing: "0.05em",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {copied ? <Check style={{ width: 11, height: 11 }} /> : <Share2 style={{ width: 11, height: 11 }} />}
+                      {copied ? "Copied!" : "Copy link"}
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* RIGHT — artwork */}
@@ -365,8 +448,117 @@ export default function ChartsPage() {
         </div>
       )}
 
-      {/* ══ BOTTOM SPACER ══════════════════════════════════════════ */}
-      <div style={{ backgroundColor: "#ede8ff", paddingBottom: 96 }} />
+      {/* ══ HOW IT WORKS ══════════════════════════════════════════ */}
+      <div style={{ backgroundColor: "#0f0a24" }}>
+        <style>{`
+          .hiw-step {
+            border-top: 1px solid rgba(196,179,247,0.08);
+            transition: background-color 0.2s ease;
+          }
+          .hiw-step:hover {
+            background-color: rgba(196,179,247,0.03);
+          }
+          .hiw-cta {
+            transition: background-color 0.15s ease, transform 0.15s ease;
+          }
+          .hiw-cta:hover {
+            background-color: #d4c7ff !important;
+            transform: translateY(-2px);
+          }
+        `}</style>
+
+        <div className="max-w-4xl mx-auto px-6 sm:px-12" style={{ paddingTop: 96, paddingBottom: 80 }}>
+          <p style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(196,179,247,0.3)", marginBottom: 48 }}>
+            How it works
+          </p>
+
+          {[
+            {
+              n: "01",
+              heading: "Submit your track.",
+              body: "Drop a SoundCloud, YouTube, or Bandcamp link. Real musicians — not algorithms — get assigned to your queue.",
+            },
+            {
+              n: "02",
+              heading: "Get honest feedback.",
+              body: "Independent artists listen and write structured reviews. What's landing. What isn't. What to fix first.",
+            },
+            {
+              n: "03",
+              heading: "The best track wins the day.",
+              body: "Every morning, the highest-scoring track from the previous day's reviews gets featured right here. No votes. No campaigns. Just the music.",
+            },
+          ].map((step) => (
+            <div
+              key={step.n}
+              className="hiw-step"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "80px 1fr",
+                gap: "0 48px",
+                padding: "48px 0",
+                alignItems: "start",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "clamp(2.5rem, 5vw, 4rem)",
+                  fontWeight: 900,
+                  color: "rgba(196,179,247,0.08)",
+                  lineHeight: 1,
+                  letterSpacing: "-0.04em",
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {step.n}
+              </p>
+              <div>
+                <p
+                  style={{
+                    fontSize: "clamp(1.3rem, 2.5vw, 1.75rem)",
+                    fontWeight: 900,
+                    color: "#fff",
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.1,
+                    marginBottom: 14,
+                  }}
+                >
+                  {step.heading}
+                </p>
+                <p style={{ fontSize: "15px", color: "rgba(196,179,247,0.5)", lineHeight: 1.8, maxWidth: 520 }}>
+                  {step.body}
+                </p>
+              </div>
+            </div>
+          ))}
+
+          <div style={{ borderTop: "1px solid rgba(196,179,247,0.08)", paddingTop: 64, paddingBottom: 96, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
+            <p style={{ fontSize: "clamp(1.1rem, 2vw, 1.4rem)", fontWeight: 900, color: "rgba(255,255,255,0.9)", letterSpacing: "-0.02em" }}>
+              Your track could be next.
+            </p>
+            <a
+              href="/artist/submit"
+              className="hiw-cta"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "14px 32px",
+                borderRadius: 999,
+                backgroundColor: "#c4b3f7",
+                color: "#0f0a24",
+                fontSize: "11px",
+                fontWeight: 900,
+                letterSpacing: "0.25em",
+                textTransform: "uppercase",
+                textDecoration: "none",
+              }}
+            >
+              Submit a track
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
