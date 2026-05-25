@@ -3,12 +3,12 @@ import type { Metadata } from "next";
 const baseUrl = process.env.NEXTAUTH_URL ?? "https://www.mixreflect.com";
 
 export const metadata: Metadata = {
-  title: "Track of the Day · MixReflect",
+  title: "Breakthrough · MixReflect",
   description: "The best-reviewed independent track from today's peer review pipeline.",
   openGraph: {
-    title: "Track of the Day · MixReflect",
+    title: "Breakthrough · MixReflect",
     description: "The best-reviewed independent track from today's peer review pipeline.",
-    url: `${baseUrl}/charts`,
+    url: `${baseUrl}/breakthrough`,
     siteName: "MixReflect",
     images: [
       {
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Track of the Day · MixReflect",
+    title: "Breakthrough · MixReflect",
     description: "The best-reviewed independent track from today's peer review pipeline.",
     images: [`${baseUrl}/api/og/charts`],
   },

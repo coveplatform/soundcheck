@@ -138,7 +138,7 @@ export function DashboardWinner() {
           </button>
         )}
 
-        <Link href="/charts" onClick={(e) => e.stopPropagation()} className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors">
+        <Link href="/breakthrough" onClick={(e) => e.stopPropagation()} className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors">
           <ArrowRight className="w-3.5 h-3.5 text-white/30" />
         </Link>
       </div>

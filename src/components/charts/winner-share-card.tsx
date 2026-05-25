@@ -2,18 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import {
-  Trophy,
-  Music,
-  Copy,
-  Check,
-  Twitter,
-  Lock,
-  Crown,
-  ChevronUp,
-} from "lucide-react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { Music, Copy, Check, Download } from "lucide-react";
 
 interface WinnerShareCardProps {
   title: string;
@@ -30,11 +19,9 @@ export function WinnerShareCard({
   title,
   artistName,
   artworkUrl,
-  voteCount,
   date,
   shareText,
   canShare,
-  isPro,
 }: WinnerShareCardProps) {
   const [copied, setCopied] = useState(false);
 
@@ -46,149 +33,159 @@ export function WinnerShareCard({
   };
 
   const handleShareTwitter = () => {
-    const url = encodeURIComponent(window.location.origin + "/charts");
+    const url = encodeURIComponent(window.location.origin + "/breakthrough");
     const text = encodeURIComponent(shareText);
-    window.open(
-      `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
-      "_blank"
-    );
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+  };
+
+  const handleReddit = () => {
+    const url = encodeURIComponent(window.location.origin + "/breakthrough");
+    const t = encodeURIComponent(`"${title}" by ${artistName} — Breakthrough Track of the Day on MixReflect`);
+    window.open(`https://www.reddit.com/submit?url=${url}&title=${t}`, "_blank");
   };
 
   return (
     <div className="space-y-3">
-      {/* ── VISUAL CARD ─────────────────────────────────────── */}
-      <div className="rounded-2xl overflow-hidden border-2 border-black/10">
+      {/* ── CARD ───────────────────────────────────────────── */}
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{
+          background: "#0f0a24",
+          border: "1px solid rgba(196,179,247,0.15)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+        }}
+      >
+        {/* Artwork strip — full width, fixed height */}
+        <div className="relative w-full" style={{ height: 180 }}>
+          {artworkUrl ? (
+            <>
+              <Image src={artworkUrl} alt={title} fill className="object-cover" sizes="400px" />
+              {/* gradient overlay */}
+              <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(15,10,36,0.2) 0%, rgba(15,10,36,0.85) 100%)" }} />
+            </>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #3d2a8a, #1a0f3d)" }}>
+              <Music style={{ width: 40, height: 40, color: "rgba(196,179,247,0.2)" }} />
+            </div>
+          )}
 
-        {/* Top bar — MixReflect brand */}
-        <div className="bg-black px-5 py-3 flex items-center justify-between">
-          {/* Logo mark — waveform bars */}
-          <div className="flex items-center gap-2.5">
-            <svg viewBox="0 0 200 200" className="w-6 h-6 flex-shrink-0" aria-hidden="true">
-              <rect x="10" y="10" width="180" height="180" rx="40" ry="40" fill="#9333ea" />
-              <g fill="white">
-                <rect x="42" y="78" width="16" height="44" rx="3" />
-                <rect x="68" y="55" width="16" height="90" rx="3" />
-                <rect x="94" y="38" width="16" height="124" rx="3" />
-                <rect x="120" y="62" width="16" height="76" rx="3" />
-                <rect x="146" y="82" width="16" height="36" rx="3" />
-              </g>
-            </svg>
-            <span className="text-[13px] leading-none">
-              <span className="font-extrabold text-white">Mix</span>
-              <span className="font-normal text-white/40">Reflect</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Trophy className="w-3 h-3 text-amber-400" />
-            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400">
-              Track of the Day
+          {/* Breakthrough label — top left */}
+          <div className="absolute top-3 left-4 flex items-center gap-2">
+            <span
+              style={{
+                fontSize: "9px",
+                fontWeight: 900,
+                letterSpacing: "0.3em",
+                textTransform: "uppercase",
+                color: "#c4b3f7",
+                backgroundColor: "rgba(15,10,36,0.7)",
+                padding: "4px 10px",
+                borderRadius: 999,
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(196,179,247,0.2)",
+              }}
+            >
+              Breakthrough · Track of the Day
             </span>
           </div>
         </div>
 
-        {/* Main artwork + info section */}
-        <div className="bg-white">
-          <div className="flex">
-            {/* Artwork — full height left column */}
-            <div className="flex-shrink-0 relative w-32 sm:w-40 aspect-square">
-              {artworkUrl ? (
-                <Image
-                  src={artworkUrl}
-                  alt={title}
-                  fill
-                  className="object-cover"
-                  sizes="160px"
-                />
-              ) : (
-                <div className="w-full h-full bg-neutral-100 flex items-center justify-center">
-                  <Music className="w-8 h-8 text-neutral-300" />
-                </div>
-              )}
-            </div>
+        {/* Text content */}
+        <div style={{ padding: "20px 20px 16px" }}>
+          <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(196,179,247,0.35)", marginBottom: 6 }}>
+            {date}
+          </p>
+          <h3
+            style={{
+              fontSize: "clamp(1.1rem, 3vw, 1.4rem)",
+              fontWeight: 900,
+              color: "#fff",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.1,
+              marginBottom: 4,
+            }}
+          >
+            {title}
+          </h3>
+          <p style={{ fontSize: "13px", color: "rgba(196,179,247,0.55)", fontWeight: 600 }}>
+            {artistName}
+          </p>
 
-            {/* Right column */}
-            <div className="flex-1 min-w-0 p-4 sm:p-5 flex flex-col justify-between">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-black/30 mb-2">
-                  Winner · {date}
-                </p>
-                <h3 className="text-lg sm:text-xl font-black text-black leading-tight tracking-tight truncate">
-                  {title}
-                </h3>
-                <p className="text-[13px] text-black/50 mt-1 truncate font-medium">
-                  {artistName}
-                </p>
-              </div>
-
-              {/* Vote count */}
-              <div className="flex items-center gap-1.5 mt-4">
-                <div className="flex items-center gap-1 bg-purple-600 text-white px-2.5 py-1.5 rounded-lg">
-                  <ChevronUp className="w-3 h-3" />
-                  <span className="text-[13px] font-black tabular-nums">{voteCount}</span>
-                </div>
-                <span className="text-[11px] text-black/40 font-medium">
-                  {voteCount === 1 ? "vote" : "votes"}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom brand strip */}
-          <div className="border-t border-black/5 px-4 py-2.5 flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/20">
-              mixreflect.com/charts
-            </span>
-            <span className="text-[10px] font-black text-purple-400 uppercase tracking-wider">
-              #1
-            </span>
-          </div>
+          {/* MixReflect URL */}
+          <p style={{ fontSize: "9px", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(196,179,247,0.2)", marginTop: 14 }}>
+            mixreflect.com/breakthrough
+          </p>
         </div>
       </div>
 
-      {/* ── SHARE ACTIONS ───────────────────────────────────── */}
-      {canShare ? (
-        <div className="flex items-center gap-2">
+      {/* ── SHARE ACTIONS ─────────────────────────────────── */}
+      {canShare && (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {/* Twitter */}
           <button
             onClick={handleShareTwitter}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl text-[11px] font-black hover:bg-neutral-800 transition-colors"
+            style={{
+              flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              padding: "10px 16px", borderRadius: 10,
+              backgroundColor: "#000", color: "#fff",
+              fontSize: "11px", fontWeight: 800, letterSpacing: "0.05em",
+              cursor: "pointer", border: "none",
+            }}
           >
-            <Twitter className="w-3.5 h-3.5" />
-            Share on X
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.738-8.835L1.254 2.25H8.08l4.261 5.638 5.902-5.638zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            Post on 𝕏
           </button>
+
+          {/* Reddit */}
+          <button
+            onClick={handleReddit}
+            style={{
+              flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              padding: "10px 16px", borderRadius: 10,
+              backgroundColor: "#ff4500", color: "#fff",
+              fontSize: "11px", fontWeight: 800, letterSpacing: "0.05em",
+              cursor: "pointer", border: "none",
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+            Reddit
+          </button>
+
+          {/* Download */}
+          <a
+            href="/api/og/charts"
+            download="breakthrough-track-of-the-day.png"
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              padding: "10px 14px", borderRadius: 10,
+              backgroundColor: "rgba(196,179,247,0.1)",
+              border: "1px solid rgba(196,179,247,0.2)",
+              color: "rgba(196,179,247,0.6)",
+              fontSize: "11px", fontWeight: 800,
+              textDecoration: "none",
+            }}
+          >
+            <Download style={{ width: 12, height: 12 }} />
+          </a>
+
+          {/* Copy */}
           <button
             onClick={handleCopyText}
-            className={cn(
-              "flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[11px] font-black transition-all border-2",
-              copied
-                ? "bg-green-50 border-green-200 text-green-700"
-                : "bg-white border-black/10 text-black/60 hover:border-black/20"
-            )}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              padding: "10px 14px", borderRadius: 10,
+              backgroundColor: copied ? "rgba(168,240,168,0.1)" : "rgba(196,179,247,0.1)",
+              border: `1px solid ${copied ? "rgba(168,240,168,0.25)" : "rgba(196,179,247,0.2)"}`,
+              color: copied ? "#a8f0a8" : "rgba(196,179,247,0.6)",
+              fontSize: "11px", fontWeight: 800,
+              cursor: "pointer",
+              transition: "all 0.15s",
+            }}
           >
-            {copied ? (
-              <>
-                <Check className="w-3.5 h-3.5" />
-                Copied!
-              </>
-            ) : (
-              <>
-                <Copy className="w-3.5 h-3.5" />
-                Copy text
-              </>
-            )}
+            {copied ? <Check style={{ width: 12, height: 12 }} /> : <Copy style={{ width: 12, height: 12 }} />}
           </button>
         </div>
-      ) : !isPro ? (
-        <Link
-          href="/pro"
-          className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-purple-200 bg-purple-50 hover:bg-purple-100 transition-colors"
-        >
-          <Lock className="w-3.5 h-3.5 text-purple-500" />
-          <span className="text-[11px] font-black text-purple-700">
-            Upgrade to Pro to share your winner card
-          </span>
-          <Crown className="w-3.5 h-3.5 text-purple-400" />
-        </Link>
-      ) : null}
+      )}
     </div>
   );
 }

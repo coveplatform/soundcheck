@@ -277,6 +277,105 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Breakthrough */}
+      <section className="bg-[#0f0a24] text-neutral-50 overflow-hidden">
+        <div className="max-w-5xl mx-auto px-4 py-20 sm:py-28">
+          <div className="grid sm:grid-cols-2 gap-12 sm:gap-20 items-center">
+            {/* Left — editorial text */}
+            <div>
+              <p style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(196,179,247,0.35)", marginBottom: 20 }}>
+                Daily feature
+              </p>
+              <h2
+                style={{
+                  fontSize: "clamp(2.5rem, 6vw, 4rem)",
+                  fontWeight: 900,
+                  color: "#fff",
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.0,
+                  marginBottom: 24,
+                }}
+              >
+                Break<br />through.
+              </h2>
+              <p style={{ fontSize: "16px", color: "rgba(196,179,247,0.55)", lineHeight: 1.8, marginBottom: 32, maxWidth: 380 }}>
+                Every day, the highest-scored track from the community&apos;s peer reviews gets featured. No votes. No campaigns. Just the music that earned it.
+              </p>
+              <Link
+                href="/breakthrough"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "12px 28px",
+                  borderRadius: 999,
+                  backgroundColor: "#c4b3f7",
+                  color: "#0f0a24",
+                  fontSize: "11px",
+                  fontWeight: 900,
+                  letterSpacing: "0.25em",
+                  textTransform: "uppercase",
+                  textDecoration: "none",
+                }}
+              >
+                Today&apos;s pick
+              </Link>
+            </div>
+
+            {/* Right — mock card */}
+            <div
+              style={{
+                borderRadius: 20,
+                overflow: "hidden",
+                border: "1px solid rgba(196,179,247,0.12)",
+                boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
+                background: "#1a1040",
+              }}
+            >
+              {/* Artwork placeholder */}
+              <div
+                style={{
+                  width: "100%",
+                  aspectRatio: "16/9",
+                  background: "linear-gradient(135deg, #3d2a8a 0%, #1a0f3d 100%)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-end",
+                  padding: "20px 24px",
+                  position: "relative",
+                }}
+              >
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, rgba(26,16,64,0.9) 100%)" }} />
+                <div style={{ position: "relative", zIndex: 1 }}>
+                  <p style={{ fontSize: "9px", fontWeight: 900, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(196,179,247,0.5)", marginBottom: 6 }}>
+                    Track of the Day · MixReflect
+                  </p>
+                  <p style={{ fontSize: "1.3rem", fontWeight: 900, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: 4 }}>
+                    Your Track Title
+                  </p>
+                  <p style={{ fontSize: "12px", color: "rgba(196,179,247,0.5)", fontWeight: 600 }}>
+                    Artist Name
+                  </p>
+                </div>
+              </div>
+
+              {/* Bottom strip */}
+              <div style={{ padding: "16px 24px", borderTop: "1px solid rgba(196,179,247,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <p style={{ fontSize: "9px", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(196,179,247,0.2)" }}>
+                  mixreflect.com/breakthrough
+                </p>
+                <div style={{ display: "flex", gap: 6 }}>
+                  {["#000", "#ff4500", "#1877f2"].map((bg) => (
+                    <div key={bg} style={{ width: 22, height: 22, borderRadius: 6, backgroundColor: bg, opacity: 0.6 }} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing */}
       <section id="pricing" className="py-16 bg-neutral-900 text-neutral-50">
         <div className="max-w-4xl mx-auto px-4">
