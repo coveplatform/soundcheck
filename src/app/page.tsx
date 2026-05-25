@@ -309,48 +309,48 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-16" style={{ backgroundColor: "#e4d9ff" }}>
+      <section id="pricing" className="py-16 bg-neutral-900 text-neutral-50">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-4 text-neutral-950">Simple Pricing</h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: "#7c5cbf" }}>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-4">Simple Pricing</h2>
+          <p className="text-center text-neutral-400 mb-12 max-w-2xl mx-auto">
             Start free. Earn credits by reviewing others. Upgrade to Pro when you&apos;re ready to move faster.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {/* Free tier */}
-            <div className="bg-white border border-purple-100 rounded-2xl p-8 shadow-sm">
+            <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-8">
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-purple-600 mb-1">Free</h3>
-                <p className="text-sm text-neutral-7000">For getting started</p>
+                <h3 className="text-2xl font-bold text-purple-400 mb-1">Free</h3>
+                <p className="text-sm text-neutral-400">For getting started</p>
               </div>
 
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-neutral-950">$0</span>
-                  <span className="text-neutral-400 text-sm">/forever</span>
+                  <span className="text-4xl font-bold text-white">$0</span>
+                  <span className="text-neutral-500 text-sm">/forever</span>
                 </div>
               </div>
 
               <div className="space-y-3 text-left mb-8">
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-500 flex-shrink-0" />
-                  <span className="text-sm text-neutral-700"><span className="font-bold">1 track</span> in review at a time</span>
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm text-neutral-50"><span className="font-bold">1 track</span> in review at a time</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-500 flex-shrink-0" />
-                  <span className="text-sm text-neutral-700"><span className="font-bold">Earn credits</span> by reviewing others</span>
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm text-neutral-50"><span className="font-bold">Earn credits</span> by reviewing others</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-500 flex-shrink-0" />
-                  <span className="text-sm text-neutral-700">Structured peer feedback</span>
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm text-neutral-50">Structured peer feedback</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-500 flex-shrink-0" />
-                  <span className="text-sm text-neutral-700">Full analytics dashboard</span>
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm text-neutral-50">Full analytics dashboard</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-purple-500 flex-shrink-0" />
-                  <span className="text-sm text-neutral-700">Public track sharing page</span>
+                  <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  <span className="text-sm text-neutral-50">Public track sharing page</span>
                 </div>
               </div>
 
@@ -365,7 +365,7 @@ export default function Home() {
             </div>
 
             {/* Pro tier */}
-            <div className="bg-white border-2 border-purple-400 rounded-2xl p-8 relative shadow-lg shadow-purple-200/50">
+            <div className="bg-neutral-800 border-2 border-purple-500 rounded-2xl p-8 relative shadow-lg shadow-purple-500/10">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">
                   RECOMMENDED
@@ -373,13 +373,13 @@ export default function Home() {
               </div>
 
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-purple-600 mb-1">Pro</h3>
-                <p className="text-sm text-neutral-7000">For serious artists</p>
+                <h3 className="text-2xl font-bold text-purple-400 mb-1">Pro</h3>
+                <p className="text-sm text-neutral-400">For serious artists</p>
               </div>
 
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-neutral-950">$24.95</span>
+                  <span className="text-4xl font-bold text-white">$24.95</span>
                   <span className="text-neutral-500 text-sm">/month</span>
                 </div>
                 <p className="text-xs text-neutral-500 mt-1">30 credits/month · cancel anytime</p>
@@ -388,23 +388,23 @@ export default function Home() {
               <div className="space-y-3 text-left mb-8">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-700"><span className="font-bold">30 credits</span> every month</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">30 credits</span> every month</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-700"><span className="font-bold">Up to 10 reviews</span> per track</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">Up to 10 reviews</span> per track</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-700"><span className="font-bold">3 tracks</span> in review at once</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">3 tracks</span> in review at once</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-700"><span className="font-bold">Priority</span> placement</span>
+                  <span className="text-sm text-neutral-50"><span className="font-bold">Priority</span> placement</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-700">Top up anytime with $9.95 credit packs</span>
+                  <span className="text-sm text-neutral-50">Top up anytime with $9.95 credit packs</span>
                 </div>
               </div>
 
