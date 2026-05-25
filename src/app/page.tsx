@@ -283,9 +283,6 @@ export default function Home() {
           <div className="grid sm:grid-cols-2 gap-12 sm:gap-20 items-center">
             {/* Left — editorial text */}
             <div>
-              <p style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(196,179,247,0.35)", marginBottom: 20 }}>
-                Daily feature
-              </p>
               <h2
                 style={{
                   fontSize: "clamp(2.5rem, 6vw, 4rem)",
@@ -308,7 +305,7 @@ export default function Home() {
                   alignItems: "center",
                   gap: 10,
                   padding: "12px 28px",
-                  borderRadius: 999,
+                  borderRadius: 8,
                   backgroundColor: "#c4b3f7",
                   color: "#0f0a24",
                   fontSize: "11px",
@@ -322,55 +319,24 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Right — mock card */}
+            {/* Right — hero image */}
             <div
               style={{
                 borderRadius: 20,
                 overflow: "hidden",
                 border: "1px solid rgba(196,179,247,0.12)",
                 boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
-                background: "#1a1040",
+                aspectRatio: "16/9",
+                position: "relative",
               }}
             >
-              {/* Artwork placeholder */}
-              <div
-                style={{
-                  width: "100%",
-                  aspectRatio: "16/9",
-                  background: "linear-gradient(135deg, #3d2a8a 0%, #1a0f3d 100%)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-end",
-                  padding: "20px 24px",
-                  position: "relative",
-                }}
-              >
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, rgba(26,16,64,0.9) 100%)" }} />
-                <div style={{ position: "relative", zIndex: 1 }}>
-                  <p style={{ fontSize: "9px", fontWeight: 900, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(196,179,247,0.5)", marginBottom: 6 }}>
-                    Track of the Day · MixReflect
-                  </p>
-                  <p style={{ fontSize: "1.3rem", fontWeight: 900, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: 4 }}>
-                    Your Track Title
-                  </p>
-                  <p style={{ fontSize: "12px", color: "rgba(196,179,247,0.5)", fontWeight: 600 }}>
-                    Artist Name
-                  </p>
-                </div>
-              </div>
-
-              {/* Bottom strip */}
-              <div style={{ padding: "16px 24px", borderTop: "1px solid rgba(196,179,247,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <p style={{ fontSize: "9px", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(196,179,247,0.2)" }}>
-                  mixreflect.com/breakthrough
-                </p>
-                <div style={{ display: "flex", gap: 6 }}>
-                  {["#000", "#ff4500", "#1877f2"].map((bg) => (
-                    <div key={bg} style={{ width: 22, height: 22, borderRadius: 6, backgroundColor: bg, opacity: 0.6 }} />
-                  ))}
-                </div>
-              </div>
+              <Image
+                src="/charts-hero.jpg"
+                alt="Breakthrough"
+                fill
+                className="object-cover"
+                sizes="50vw"
+              />
             </div>
           </div>
         </div>
