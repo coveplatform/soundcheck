@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Zap, Music, ArrowRight } from "lucide-react";
+import { Music } from "lucide-react";
 
 interface WinnerData {
   id: string;
@@ -16,7 +16,7 @@ interface WinnerData {
   editorNote: string | null;
 }
 
-const NOTE_TRUNCATE = 160;
+const NOTE_TRUNCATE = 180;
 
 export function DashboardWinner() {
   const [winner, setWinner] = useState<WinnerData | null>(null);
@@ -36,27 +36,31 @@ export function DashboardWinner() {
 
   const note = winner.editorNote ?? "";
   const isTruncatable = note.length > NOTE_TRUNCATE;
-  const displayNote = isTruncatable && !noteExpanded ? note.slice(0, NOTE_TRUNCATE).trimEnd() + "…" : note;
+  const displayNote = isTruncatable && !noteExpanded
+    ? note.slice(0, NOTE_TRUNCATE).trimEnd() + "…"
+    : note;
 
   return (
     <div style={{ backgroundColor: "#2d1b69" }}>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
-        {/* Label */}
-        <div className="flex items-center gap-2 mb-5">
-          <Zap className="w-3.5 h-3.5" style={{ color: "#c4b3f7" }} />
-          <p className="text-[10px] font-black uppercase tracking-[0.35em]" style={{ color: "#c4b3f7" }}>
-            Breakthrough Track of the Day
-          </p>
-        </div>
+      {/* Content — padded */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-7">
 
-        {/* Main layout */}
-        <div className="flex items-start gap-5 sm:gap-7">
+        {/* Overline */}
+        <p
+          className="mb-6"
+          style={{ fontSize: 13, color: "rgba(196,179,247,0.45)", fontWeight: 500 }}
+        >
+          Breakthrough Track of the Day
+        </p>
+
+        {/* Content row */}
+        <div className="flex items-start gap-6 sm:gap-8">
 
           {/* Artwork */}
           <div
-            className="relative flex-shrink-0 rounded-xl overflow-hidden"
-            style={{ width: 110, height: 110 }}
+            className="relative flex-shrink-0 rounded-lg overflow-hidden"
+            style={{ width: 140, height: 140 }}
           >
             {winner.artworkUrl && !artworkFailed ? (
               <Image
@@ -64,37 +68,40 @@ export function DashboardWinner() {
                 alt={winner.title}
                 fill
                 className="object-cover"
-                sizes="110px"
+                sizes="140px"
                 onError={() => setArtworkFailed(true)}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #3d2a8a, #1a0f3d)" }}>
-                <Music className="w-8 h-8" style={{ color: "rgba(196,179,247,0.3)" }} />
+                <Music className="w-10 h-10" style={{ color: "rgba(196,179,247,0.25)" }} />
               </div>
             )}
           </div>
 
-          {/* Info */}
+          {/* Text */}
           <div className="flex-1 min-w-0">
             <h2
-              className="font-black leading-tight mb-1"
-              style={{ fontSize: "clamp(1.25rem, 3vw, 1.75rem)", color: "#fff", letterSpacing: "-0.025em" }}
+              className="font-black leading-[1.05] mb-2"
+              style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.1rem)", color: "#fff", letterSpacing: "-0.03em" }}
             >
               {winner.title}
             </h2>
-            <p className="font-semibold mb-3" style={{ fontSize: 13, color: "rgba(196,179,247,0.55)" }}>
+            <p
+              className="mb-4"
+              style={{ fontSize: 13, color: "rgba(196,179,247,0.5)", fontWeight: 600 }}
+            >
               {winner.artistName}
             </p>
 
             {note && (
-              <div className="mb-4">
-                <p className="leading-relaxed" style={{ fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
+              <div>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.8 }}>
                   {displayNote}
                 </p>
                 {isTruncatable && (
                   <button
                     onClick={() => setNoteExpanded((v) => !v)}
-                    className="mt-1 font-bold transition-opacity hover:opacity-70"
+                    className="mt-1.5 font-semibold transition-opacity hover:opacity-60"
                     style={{ fontSize: 12, color: "#c4b3f7" }}
                   >
                     {noteExpanded ? "Show less" : "Read more"}
@@ -102,18 +109,25 @@ export function DashboardWinner() {
                 )}
               </div>
             )}
-
-            <Link
-              href="/breakthrough"
-              className="inline-flex items-center gap-1.5 font-black uppercase transition-opacity hover:opacity-70"
-              style={{ fontSize: 10, letterSpacing: "0.2em", color: "#c4b3f7" }}
-            >
-              See full page <ArrowRight style={{ width: 11, height: 11 }} />
-            </Link>
           </div>
         </div>
-
       </div>
+
+      {/* CTA — full-bleed solid rectangle */}
+      <Link
+        href="/breakthrough"
+        className="block text-center font-black transition-opacity hover:opacity-90 active:opacity-75"
+        style={{
+          backgroundColor: "#c4b3f7",
+          color: "#1a0f3d",
+          fontSize: 13,
+          letterSpacing: "0.05em",
+          padding: "15px 24px",
+        }}
+      >
+        See full page
+      </Link>
+
     </div>
   );
 }
