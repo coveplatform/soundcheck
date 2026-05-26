@@ -325,9 +325,6 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         </div>
       )}
 
-      {/* ── TRACK OF THE DAY WINNER ─────────────────────────────── */}
-      <DashboardWinner />
-
       {/* ── YOUR QUEUE ───────────────────────────────────────── */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex items-end justify-between mb-5">
@@ -478,6 +475,9 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
           )}
         </div>
       </div>
+
+      {/* ── TRACK OF THE DAY — compact card ─────────────────── */}
+      <DashboardWinner compact />
 
       {/* ── YOUR NEXT MOVE — color-blocked CTA strip ────────── */}
       {whatsNext && (

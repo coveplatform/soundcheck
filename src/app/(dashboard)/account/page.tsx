@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AccountSettingsClient } from "@/components/account/account-settings-client";
@@ -37,11 +38,14 @@ export default async function AccountPage() {
     select: {
       artistName: true,
       reviewCredits: true,
+      subscriptionStatus: true,
     },
   });
 
   const initialGenreIds = (reviewerProfile?.Genre ?? []).map((g) => g.id);
   const isReviewer = Boolean(reviewerProfile);
+  const isPro = artistProfile?.subscriptionStatus === "active";
+  const credits = artistProfile?.reviewCredits ?? 0;
 
   return (
     <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
@@ -88,6 +92,35 @@ export default async function AccountPage() {
           <span className="text-[11px] font-bold text-white/55">
             {artistProfile?.artistName ?? dbUser.name ?? dbUser.email}
           </span>
+        </div>
+      </div>
+
+      {/* ── PLAN & CREDITS ──────────────────────────────────────── */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-8">
+        <div className="border-2 border-black rounded-2xl overflow-hidden bg-white">
+          <div className="px-5 py-4 border-b border-black/8 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-black/30 mb-1">Current plan</p>
+              <p className="text-lg font-black text-black leading-none">{isPro ? "Pro" : "Free"}</p>
+              <p className="text-xs text-black/40 font-medium mt-0.5">{isPro ? "Active subscription" : "Pay per credit"}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-4xl font-black text-black tabular-nums leading-none">{credits}</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mt-1">credits</p>
+              <Link href="/review" className="text-[11px] font-bold text-purple-600 hover:text-purple-800 mt-1.5 block transition-colors">
+                Earn more →
+              </Link>
+            </div>
+          </div>
+          {!isPro && (
+            <Link href="/pro" className="flex items-center gap-3 px-5 py-4 bg-black hover:bg-neutral-900 transition-colors">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-black text-purple-400 leading-none">Upgrade to Pro</p>
+                <p className="text-xs text-white/40 font-medium mt-0.5">30 credits/mo · no credit limits · up to 10 reviews per track</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-purple-400/50 flex-shrink-0" />
+            </Link>
+          )}
         </div>
       </div>
 

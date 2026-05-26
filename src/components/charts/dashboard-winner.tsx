@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Music } from "lucide-react";
+import { Music, ArrowRight } from "lucide-react";
 
 interface WinnerData {
   id: string;
@@ -18,7 +18,7 @@ interface WinnerData {
 
 const NOTE_TRUNCATE = 180;
 
-export function DashboardWinner() {
+export function DashboardWinner({ compact = false }: { compact?: boolean }) {
   const [winner, setWinner] = useState<WinnerData | null>(null);
   const [artworkFailed, setArtworkFailed] = useState(false);
   const [noteExpanded, setNoteExpanded] = useState(false);
@@ -39,6 +39,34 @@ export function DashboardWinner() {
   const displayNote = isTruncatable && !noteExpanded
     ? note.slice(0, NOTE_TRUNCATE).trimEnd() + "…"
     : note;
+
+  if (compact) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-3">Track of the Day</p>
+        <Link
+          href="/breakthrough"
+          className="flex items-center gap-4 rounded-2xl p-4 hover:opacity-90 transition-opacity"
+          style={{ backgroundColor: "#2d1b69" }}
+        >
+          <div className="relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden">
+            {winner.artworkUrl && !artworkFailed ? (
+              <Image src={winner.artworkUrl} alt={winner.title} fill className="object-cover" sizes="56px" onError={() => setArtworkFailed(true)} />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #3d2a8a, #1a0f3d)" }}>
+                <Music className="w-5 h-5" style={{ color: "rgba(196,179,247,0.25)" }} />
+              </div>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-white font-black text-base leading-tight truncate">{winner.title}</p>
+            <p className="text-xs font-medium mt-0.5" style={{ color: "rgba(196,179,247,0.5)" }}>{winner.artistName}</p>
+          </div>
+          <ArrowRight className="w-4 h-4 flex-shrink-0" style={{ color: "rgba(196,179,247,0.4)" }} />
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div style={{ backgroundColor: "#2d1b69" }}>
