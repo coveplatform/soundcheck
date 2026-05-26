@@ -53,12 +53,12 @@ export default function Home() {
       <section className="overflow-visible bg-gradient-to-b from-purple-50 to-[#faf8f5]">
         <div className="max-w-4xl mx-auto px-4 py-16 sm:py-24 text-center relative">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-neutral-950 leading-[1.05]">
-            Upload tonight.<br />
-            <span className="text-purple-600">Know by morning.</span>
+            Find out what&apos;s working<br />
+            <span className="text-purple-600">in your track.</span>
           </h1>
 
           <p className="mt-8 text-neutral-700 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto font-medium">
-            Genre-matched artists listen to your track and tell you exactly what&apos;s landing — and what to fix before you release. Usually within 4 hours.
+            Real artists in your genre listen and tell you exactly what&apos;s landing — and what to change before you release.
           </p>
 
           <HeroCTA />
