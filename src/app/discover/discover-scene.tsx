@@ -53,46 +53,10 @@ const GLOW_COLORS = [
   "#818cf8",
 ];
 
-const GENRE_CLUSTER_COLORS: Record<string, string> = {};
-const GENRE_CLUSTER_PALETTE = [
-  "#00f0ff", "#a855f7", "#ff2d9b", "#22d3ee", "#f472b6",
-  "#818cf8", "#10b981", "#fbbf24", "#f97316", "#ef4444",
-  "#06b6d4", "#8b5cf6", "#ec4899", "#14b8a6", "#eab308",
-];
-
-function getGenreColor(genre: string, genreList: string[]): string {
-  if (!GENRE_CLUSTER_COLORS[genre]) {
-    const idx = genreList.indexOf(genre);
-    GENRE_CLUSTER_COLORS[genre] = GENRE_CLUSTER_PALETTE[idx % GENRE_CLUSTER_PALETTE.length];
-  }
-  return GENRE_CLUSTER_COLORS[genre];
-}
-
 function generateLayout(tracks: DiscoverTrackData[]) {
   const count = tracks.length;
-  // Group tracks by genre
-  const genreMap = new Map<string, number[]>();
-  tracks.forEach((t, i) => {
-    const g = t.genre ?? "Other";
-    if (!genreMap.has(g)) genreMap.set(g, []);
-    genreMap.get(g)!.push(i);
-  });
+  const golden = Math.PI * (3 - Math.sqrt(5));
 
-  const genres = Array.from(genreMap.keys());
-  const genreCount = genres.length;
-
-  // Place each genre cluster at a point on a large ring
-  const clusterRadius = Math.max(14, 6 + genreCount * 2.5);
-  const genreCenters = new Map<string, [number, number, number]>();
-  genres.forEach((g, gi) => {
-    const angle = (gi / genreCount) * Math.PI * 2;
-    const cx = Math.cos(angle) * clusterRadius;
-    const cy = (seededRandom(gi * 71) - 0.5) * 4;
-    const cz = Math.sin(angle) * clusterRadius;
-    genreCenters.set(g, [cx, cy, cz]);
-  });
-
-  // Place each track near its genre center
   const result = new Array<{
     position: [number, number, number];
     rotation: [number, number, number];
@@ -100,36 +64,29 @@ function generateLayout(tracks: DiscoverTrackData[]) {
     glowColor: string;
   }>(count);
 
-  genreMap.forEach((indices, genre) => {
-    const center = genreCenters.get(genre)!;
-    const n = indices.length;
-    const color = getGenreColor(genre, genres);
-    indices.forEach((trackIdx, localIdx) => {
-      // Spread tracks within cluster using golden angle
-      const golden = Math.PI * (3 - Math.sqrt(5));
-      const theta = golden * localIdx;
-      const y = n > 1 ? 1 - (localIdx / (n - 1)) * 2 : 0;
-      const rAtY = Math.sqrt(Math.max(0, 1 - y * y));
-      const spread = Math.min(5, 2.5 + n * 0.3);
-      const jitter = 1.2;
-      result[trackIdx] = {
-        position: [
-          center[0] + Math.cos(theta) * rAtY * spread + (seededRandom(trackIdx * 41) - 0.5) * jitter,
-          center[1] + y * spread * 0.5 + (seededRandom(trackIdx * 43) - 0.5) * jitter,
-          center[2] + Math.sin(theta) * rAtY * spread + (seededRandom(trackIdx * 47) - 0.5) * jitter,
-        ] as [number, number, number],
-        rotation: [
-          (seededRandom(trackIdx * 23) - 0.5) * 0.15,
-          (seededRandom(trackIdx * 29) - 0.5) * 0.3,
-          (seededRandom(trackIdx * 31) - 0.5) * 0.1,
-        ] as [number, number, number],
-        scale: 1.8 + seededRandom(trackIdx * 37) * 1.0,
-        glowColor: color,
-      };
-    });
+  tracks.forEach((_, trackIdx) => {
+    const y = count > 1 ? 1 - (trackIdx / (count - 1)) * 2 : 0;
+    const rAtY = Math.sqrt(Math.max(0, 1 - y * y));
+    const theta = golden * trackIdx;
+    const radius = 18 + seededRandom(trackIdx * 13) * 8;
+
+    result[trackIdx] = {
+      position: [
+        Math.cos(theta) * rAtY * radius + (seededRandom(trackIdx * 41) - 0.5) * 3,
+        y * radius * 0.5 + (seededRandom(trackIdx * 43) - 0.5) * 2,
+        Math.sin(theta) * rAtY * radius + (seededRandom(trackIdx * 47) - 0.5) * 3,
+      ] as [number, number, number],
+      rotation: [
+        (seededRandom(trackIdx * 23) - 0.5) * 0.15,
+        (seededRandom(trackIdx * 29) - 0.5) * 0.3,
+        (seededRandom(trackIdx * 31) - 0.5) * 0.1,
+      ] as [number, number, number],
+      scale: 1.8 + seededRandom(trackIdx * 37) * 1.0,
+      glowColor: GLOW_COLORS[trackIdx % GLOW_COLORS.length],
+    };
   });
 
-  return { layout: result, genreCenters, genres };
+  return { layout: result };
 }
 
 /* ------------------------------------------------------------------ */
@@ -515,18 +472,16 @@ function Scene({
   onSelectTrack,
   selectedTrackId,
   hasInteracted,
-  activeGenre,
 }: {
   tracks: DiscoverTrackData[];
   onHoverTrack: (t: DiscoverTrackData | null) => void;
   onSelectTrack: (t: DiscoverTrackData) => void;
   selectedTrackId: string | null;
   hasInteracted: boolean;
-  activeGenre: string | null;
 }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const controlsRef = useRef<any>(null);
-  const { layout, genreCenters, genres } = useMemo(() => generateLayout(tracks), [tracks]);
+  const { layout } = useMemo(() => generateLayout(tracks), [tracks]);
   const isTouchDevice = useMemo(() => typeof window !== "undefined" && "ontouchstart" in window, []);
 
   // Scene-level tap detection for touch devices.
@@ -581,19 +536,11 @@ function Scene({
   const returnPos = useRef(new THREE.Vector3(0, 0, 35));
   const returnTarget = useRef(new THREE.Vector3(0, 0, 0));
 
-  // Genre focus state
-  const wasGenreFocused = useRef(false);
-  const genreReturnPos = useRef(new THREE.Vector3(0, 0, 35));
-  const genreReturnTarget = useRef(new THREE.Vector3(0, 0, 0));
-
   const selectedIdx = selectedTrackId
     ? tracks.findIndex((t) => t.id === selectedTrackId)
     : -1;
   const selectedPosition =
     selectedIdx >= 0 ? layout[selectedIdx].position : null;
-
-  // Get genre cluster center for camera focus
-  const genreFocusCenter = activeGenre ? genreCenters.get(activeGenre) ?? null : null;
 
   useFrame((state, delta) => {
     const controls = controlsRef.current;
@@ -601,7 +548,6 @@ function Scene({
     const d = Math.min(delta, 0.1);
 
     if (selectedPosition) {
-      // Save return position on first frame of selection
       if (!wasSelected.current) {
         returnPos.current.copy(state.camera.position);
         returnTarget.current.copy(controls.target);
@@ -621,7 +567,6 @@ function Scene({
       controls.enableZoom = false;
       controls.autoRotate = false;
     } else if (wasSelected.current) {
-      // Animate back to previous position
       state.camera.position.lerp(returnPos.current, d * 3);
       controls.target.lerp(returnTarget.current, d * 3);
 
@@ -630,31 +575,6 @@ function Scene({
         controls.enableRotate = true;
         controls.enablePan = true;
         controls.enableZoom = true;
-        controls.autoRotate = true;
-      }
-    } else if (genreFocusCenter && !selectedPosition) {
-      // Genre filter: fly camera to face the selected genre cluster
-      if (!wasGenreFocused.current) {
-        genreReturnPos.current.copy(state.camera.position);
-        genreReturnTarget.current.copy(controls.target);
-        wasGenreFocused.current = true;
-      }
-
-      const clusterPos = new THREE.Vector3(...genreFocusCenter);
-      const dir = clusterPos.clone().normalize();
-      if (dir.lengthSq() < 0.001) dir.set(0, 0, 1);
-      const camPos = clusterPos.clone().add(dir.multiplyScalar(12));
-
-      controls.target.lerp(clusterPos, d * 3);
-      state.camera.position.lerp(camPos, d * 3);
-      controls.autoRotate = false;
-    } else if (wasGenreFocused.current && !genreFocusCenter) {
-      // Animate back from genre focus
-      state.camera.position.lerp(genreReturnPos.current, d * 2.5);
-      controls.target.lerp(genreReturnTarget.current, d * 2.5);
-
-      if (state.camera.position.distanceTo(genreReturnPos.current) < 0.5) {
-        wasGenreFocused.current = false;
         controls.autoRotate = true;
       }
     }
@@ -707,43 +627,22 @@ function Scene({
       <ShootingStars />
       <HoloGrid />
 
-      {/* --- Floating 3D genre labels above each cluster --- */}
-      {genres.map((genre) => {
-        const center = genreCenters.get(genre);
-        if (!center) return null;
-        const color = getGenreColor(genre, genres);
-        const isActive = !activeGenre || activeGenre === genre;
-        return (
-          <Billboard key={`label-${genre}`} position={[center[0], center[1] + 5, center[2]]}>
-            <mesh>
-              <planeGeometry args={[0.01, 0.01]} />
-              <meshBasicMaterial transparent opacity={0} />
-            </mesh>
-            <GenreLabel3D text={genre} color={color} dimmed={!isActive} />
-          </Billboard>
-        );
-      })}
-
-      {tracks.map((track, i) => {
-        const trackGenre = track.genre ?? "Other";
-        const isDimmed = activeGenre != null && trackGenre !== activeGenre;
-        return (
-          <TrackCard
-            key={track.id}
-            track={track}
-            index={i}
-            position={layout[i].position}
-            cardScale={track.isFeatured ? layout[i].scale * 1.15 : layout[i].scale}
-            glowColor={track.isFeatured ? "#fbbf24" : layout[i].glowColor}
-            onHover={() => onHoverTrack(track)}
-            onLeave={() => onHoverTrack(null)}
-            onClick={() => onSelectTrack(track)}
-            interactive={hasInteracted}
-            isTouchDevice={isTouchDevice}
-            dimmed={isDimmed}
-          />
-        );
-      })}
+      {tracks.map((track, i) => (
+        <TrackCard
+          key={track.id}
+          track={track}
+          index={i}
+          position={layout[i].position}
+          cardScale={track.isFeatured ? layout[i].scale * 1.15 : layout[i].scale}
+          glowColor={track.isFeatured ? "#fbbf24" : layout[i].glowColor}
+          onHover={() => onHoverTrack(track)}
+          onLeave={() => onHoverTrack(null)}
+          onClick={() => onSelectTrack(track)}
+          interactive={hasInteracted}
+          isTouchDevice={isTouchDevice}
+          dimmed={false}
+        />
+      ))}
     </>
   );
 }
@@ -1016,8 +915,6 @@ function HUD({
   onDeselect,
   clickCount,
   tracks,
-  activeGenre,
-  onSetActiveGenre,
 }: {
   hoveredTrack: DiscoverTrackData | null;
   selectedTrack: DiscoverTrackData | null;
@@ -1026,26 +923,12 @@ function HUD({
   onDeselect: () => void;
   clickCount: number;
   tracks: DiscoverTrackData[];
-  activeGenre: string | null;
-  onSetActiveGenre: (genre: string | null) => void;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     setIsMobile(window.innerWidth < 640 || "ontouchstart" in window);
   }, []);
 
-  // Genre data for filter bar
-  const genreData = useMemo(() => {
-    const counts = new Map<string, number>();
-    tracks.forEach((t) => {
-      const g = t.genre ?? "Other";
-      counts.set(g, (counts.get(g) ?? 0) + 1);
-    });
-    // Sort by count desc
-    return Array.from(counts.entries())
-      .sort((a, b) => b[1] - a[1])
-      .map(([genre, count]) => ({ genre, count }));
-  }, [tracks]);
   const totalPlays = useMemo(
     () => tracks.reduce((s, t) => s + (t.playCount ?? 0), 0),
     [tracks],
@@ -1423,51 +1306,6 @@ function HUD({
         );
       })()}
 
-      {/* ---- Genre filter bar ---- */}
-      <div
-        className={`fixed top-[88px] sm:top-[100px] left-1/2 -translate-x-1/2 z-20 transition-all duration-1000 ${
-          hasInteracted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
-        }`}
-      >
-        <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-black/60 backdrop-blur-xl border border-white/[0.08] rounded-full max-w-[calc(100vw-2rem)] overflow-x-auto scrollbar-hide">
-          <button
-            onClick={() => onSetActiveGenre(null)}
-            className={`shrink-0 px-3 sm:px-4 py-1.5 rounded-full text-[10px] sm:text-[11px] font-semibold tracking-wide uppercase transition-all duration-300 whitespace-nowrap ${
-              activeGenre === null
-                ? "bg-white/15 text-white border border-white/25 shadow-[0_0_12px_rgba(255,255,255,0.1)]"
-                : "text-white/40 hover:text-white/70 border border-transparent hover:border-white/10"
-            }`}
-          >
-            All
-            <span className="ml-1 text-white/30">{tracks.length}</span>
-          </button>
-          {genreData.map(({ genre, count }) => {
-            const color = getGenreColor(genre, genreData.map(g => g.genre));
-            const isActive = activeGenre === genre;
-            return (
-              <button
-                key={genre}
-                onClick={() => onSetActiveGenre(isActive ? null : genre)}
-                className={`shrink-0 px-3 sm:px-4 py-1.5 rounded-full text-[10px] sm:text-[11px] font-semibold tracking-wide transition-all duration-300 whitespace-nowrap ${
-                  isActive
-                    ? "border shadow-[0_0_12px_rgba(0,0,0,0.3)]"
-                    : "text-white/40 hover:text-white/70 border border-transparent hover:border-white/10"
-                }`}
-                style={isActive ? {
-                  backgroundColor: `${color}25`,
-                  borderColor: `${color}50`,
-                  color: color,
-                  textShadow: `0 0 10px ${color}40`,
-                } : undefined}
-              >
-                {genre}
-                <span className={`ml-1 ${isActive ? "opacity-60" : "text-white/25"}`}>{count}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       {/* ---- Activity feed ---- */}
       <ActivityFeed />
 
@@ -1519,7 +1357,6 @@ export function DiscoverScene({
   const [loaded, setLoaded] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [clickCount, setClickCount] = useState(0);
-  const [activeGenre, setActiveGenre] = useState<string | null>(null);
 
   const handleInteraction = useCallback(() => {
     if (!hasInteracted) setHasInteracted(true);
@@ -1581,7 +1418,6 @@ export function DiscoverScene({
             onSelectTrack={handleSelectTrack}
             selectedTrackId={selectedTrack?.id ?? null}
             hasInteracted={hasInteracted}
-            activeGenre={activeGenre}
           />
         </Suspense>
         <EffectComposer>
@@ -1602,8 +1438,6 @@ export function DiscoverScene({
         onDeselect={handleDeselect}
         clickCount={clickCount}
         tracks={tracks}
-        activeGenre={activeGenre}
-        onSetActiveGenre={setActiveGenre}
       />
     </div>
   );
