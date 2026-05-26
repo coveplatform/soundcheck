@@ -218,6 +218,14 @@ export default async function AdminPage() {
           <div className="mt-2 text-base font-bold text-neutral-950">Submit Score Form</div>
           <div className="text-xs text-neutral-400 mt-1">View the track submission + checkout page</div>
         </Link>
+        <Link
+          href="/admin/reviewer-profile-demo"
+          className="block rounded-xl border border-purple-200 bg-purple-50 p-5 hover:border-purple-400 transition-colors"
+        >
+          <div className="text-xs font-semibold text-purple-600 uppercase tracking-wider">Preview</div>
+          <div className="mt-2 text-base font-bold text-neutral-950">Reviewer Profile</div>
+          <div className="text-xs text-neutral-400 mt-1">What artists see when they view a reviewer</div>
+        </Link>
       </div>
 
       {/* Primary stats */}
