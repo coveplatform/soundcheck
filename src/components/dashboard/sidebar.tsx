@@ -375,13 +375,8 @@ function MobileBottomNav({
           {/* Popover menu */}
           {moreOpen && (
             <div className="absolute bottom-full right-0 mb-2 w-56 bg-white rounded-xl border border-neutral-200 shadow-lg py-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
-              {/* Pro CTA */}
-              {isPro ? (
-                <div className="mx-2 mb-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-900">
-                  <Zap className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
-                  <span className="text-xs font-black text-white">Pro — active</span>
-                </div>
-              ) : (
+              {/* Pro CTA — only for free users */}
+              {!isPro && (
                 <Link
                   href="/pro"
                   onClick={() => setMoreOpen(false)}
@@ -395,6 +390,7 @@ function MobileBottomNav({
                   <ArrowRight className="w-3.5 h-3.5 text-purple-400/50 flex-shrink-0" />
                 </Link>
               )}
+
               {moreLinks.map((link) => {
                 const Icon = link.icon;
                 return (

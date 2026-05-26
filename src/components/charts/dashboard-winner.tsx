@@ -86,14 +86,14 @@ export function DashboardWinner() {
               {winner.title}
             </h2>
             <p
-              className="mb-4"
+              className="mb-1 sm:mb-4"
               style={{ fontSize: 13, color: "rgba(196,179,247,0.5)", fontWeight: 600 }}
             >
               {winner.artistName}
             </p>
 
             {note && (
-              <div>
+              <div className="hidden sm:block">
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.8 }}>
                   {displayNote}
                 </p>

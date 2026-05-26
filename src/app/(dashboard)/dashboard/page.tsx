@@ -252,6 +252,19 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         </div>
       </div>
 
+      {/* ── MOBILE PRO CTA ─────────────────────────────────────── */}
+      {!isPro && (
+        <Link href="/pro" className="block md:hidden bg-black border-b border-white/5 hover:bg-neutral-900 transition-colors">
+          <div className="max-w-4xl mx-auto px-4 py-3.5 flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-black text-purple-400 leading-none">Upgrade to Pro</p>
+              <p className="text-xs text-white/40 font-medium mt-0.5">30 credits/mo · no credit limits</p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-purple-400/50 flex-shrink-0" />
+          </div>
+        </Link>
+      )}
+
       {/* ── ALERT STRIPS ───────────────────────────────────────── */}
       {tracksWithFeedback.length > 0 && (
         <Link
