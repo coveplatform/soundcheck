@@ -19,6 +19,7 @@ import {
   BarChart3,
   ArrowRight,
   Compass,
+  Zap,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -127,6 +128,25 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
             {mainLinks.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
+          </div>
+
+          {/* Breakthrough — bold standalone row */}
+          <div className="mt-2">
+            <Link
+              href="/breakthrough"
+              className={cn(
+                "flex items-center gap-3 px-4 py-2.5 text-[13px] font-black rounded-lg transition-all",
+                isActive("/breakthrough")
+                  ? "bg-amber-400 text-amber-950 shadow-[inset_0_0_0_2px_rgba(0,0,0,0.12)]"
+                  : "bg-amber-400 text-amber-950 hover:bg-amber-300"
+              )}
+            >
+              <Zap className="w-4 h-4" />
+              <span className="flex-1">Breakthrough</span>
+              <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-amber-950/15 uppercase tracking-wider">
+                New
+              </span>
+            </Link>
           </div>
 
           <div className="my-4 border-t border-black/8" />
@@ -293,6 +313,7 @@ function MobileBottomNav({
   ];
 
   const moreLinks = [
+    { href: "/breakthrough", label: "Breakthrough", icon: Zap },
     { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
     { href: "/review/history", label: "Review History", icon: History },
     { href: "/support", label: "Support", icon: LifeBuoy },
