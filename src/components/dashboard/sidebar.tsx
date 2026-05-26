@@ -130,20 +130,20 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
             ))}
           </div>
 
-          {/* Breakthrough — bold standalone row */}
-          <div className="mt-2">
+          {/* Breakthrough — full-width purple strip */}
+          <div className="mt-2 -mx-4">
             <Link
               href="/breakthrough"
               className={cn(
-                "flex items-center gap-3 px-4 py-2.5 text-[13px] font-black rounded-lg transition-all",
+                "flex items-center gap-3 px-4 py-2.5 text-[13px] font-black transition-colors",
                 isActive("/breakthrough")
-                  ? "bg-amber-400 text-amber-950 shadow-[inset_0_0_0_2px_rgba(0,0,0,0.12)]"
-                  : "bg-amber-400 text-amber-950 hover:bg-amber-300"
+                  ? "bg-purple-700 text-white"
+                  : "bg-purple-600 text-white hover:bg-purple-700"
               )}
             >
               <Zap className="w-4 h-4" />
               <span className="flex-1">Breakthrough</span>
-              <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-amber-950/15 uppercase tracking-wider">
+              <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-white/20 uppercase tracking-wider">
                 New
               </span>
             </Link>

@@ -133,18 +133,20 @@ export default function ChartsPage() {
         <Image src="/charts-hero.jpg" alt="Breakthrough · Track of the Day" fill className="object-cover" />
       </div>
 
-      {/* ══ TODAY'S PICK ══ deep indigo ════════════════════════════ */}
-      <div style={{ backgroundColor: "#2d1b69", paddingTop: 48 }}>
-
-        {/* Page intro */}
-        <div className="max-w-6xl mx-auto px-6 sm:px-12 pb-10">
-          <p style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(196,179,247,0.4)", marginBottom: 10 }}>
+      {/* ══ INTRO BAND ══════════════════════════════════════════════ */}
+      <div style={{ backgroundColor: "#e9e0ff", borderBottom: "1px solid rgba(109,40,217,0.12)" }}>
+        <div className="max-w-6xl mx-auto px-6 sm:px-12 py-8">
+          <p style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "#7c3aed", marginBottom: 8 }}>
             Breakthrough · Track of the Day
           </p>
-          <p style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, maxWidth: 560 }}>
+          <p style={{ fontSize: "clamp(0.9rem, 1.6vw, 1.05rem)", color: "#3b0764", lineHeight: 1.75, maxWidth: 540, fontWeight: 500 }}>
             Every morning, the highest-scoring track from the previous day&apos;s peer reviews gets featured here. No votes, no campaigns — just the music that real artists said was worth your time.
           </p>
         </div>
+      </div>
+
+      {/* ══ TODAY'S PICK ══ deep indigo ════════════════════════════ */}
+      <div style={{ backgroundColor: "#2d1b69", paddingTop: 48 }}>
 
         {isLoading ? (
           <div className="max-w-3xl mx-auto px-6 sm:px-10 py-16 flex items-center gap-3">
