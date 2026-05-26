@@ -275,6 +275,7 @@ export type ReviewData = {
     averageRating: number;
     gemCount: number;
     isIndustryExpert: boolean;
+    isRestricted: boolean;
     User: { name: string | null };
     Genre: { id: string; name: string }[];
   } | null;
@@ -301,8 +302,9 @@ export function ReviewDisplay({
     review.ReviewerProfile?.User?.name ??
     review.ArtistProfile?.User?.name ??
     "Reviewer";
+  const isRestricted = review.ReviewerProfile?.isRestricted ?? false;
   const reviewerProfileId =
-    review.ReviewerProfile?.id ?? review.ArtistProfile?.id;
+    !isRestricted ? (review.ReviewerProfile?.id ?? review.ArtistProfile?.id) : null;
   const reviewerTitle = review.ReviewerProfile
     ? getReviewerTitle(review.ReviewerProfile)
     : null;
