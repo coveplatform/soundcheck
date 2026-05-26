@@ -153,7 +153,7 @@ export default async function ReviewHistoryPage() {
             {reviews.map((review) => (
               <Link
                 key={review.id}
-                href={`/listener/review/${review.id}`}
+                href={`/review/${review.id}`}
                 className="flex items-stretch rounded-2xl border-2 border-black/8 bg-white overflow-hidden hover:border-black/15 hover:-translate-y-[1px] hover:shadow-[0_3px_12px_rgba(0,0,0,0.07)] active:translate-y-0 active:shadow-none transition-all duration-150 group"
               >
                 <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 relative">
