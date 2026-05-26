@@ -49,7 +49,7 @@ export function DashboardWinner() {
         {/* Overline */}
         <p
           className="mb-6"
-          style={{ fontSize: 13, color: "rgba(196,179,247,0.45)", fontWeight: 500 }}
+          style={{ fontSize: 17, color: "rgba(196,179,247,0.7)", fontWeight: 800, letterSpacing: "-0.01em" }}
         >
           Breakthrough Track of the Day
         </p>
@@ -120,9 +120,9 @@ export function DashboardWinner() {
         style={{
           backgroundColor: "#c4b3f7",
           color: "#1a0f3d",
-          fontSize: 13,
-          letterSpacing: "0.05em",
-          padding: "15px 24px",
+          fontSize: 15,
+          letterSpacing: "0.03em",
+          padding: "16px 24px",
         }}
       >
         See full page
