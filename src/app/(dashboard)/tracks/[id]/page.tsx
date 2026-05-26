@@ -51,6 +51,7 @@ export default async function TrackDetailPage({
             ReviewerProfile: {
               include: {
                 User: { select: { name: true } },
+                Genre: { select: { id: true, name: true } },
               },
             },
             ArtistProfile: {

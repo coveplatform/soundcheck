@@ -28,6 +28,21 @@ function getInitial(name: string) {
   return (name.trim()[0] || "?").toUpperCase();
 }
 
+function getReviewerTitle(p: {
+  isIndustryExpert: boolean;
+  gemCount: number;
+  averageRating: number;
+  totalReviews: number;
+}): string | null {
+  if (p.isIndustryExpert) return "Industry Expert";
+  if (p.gemCount >= 10) return "Gem Listener";
+  if (p.averageRating >= 4.5 && p.totalReviews >= 30) return "Top Reviewer";
+  if (p.averageRating >= 4.0 && p.totalReviews >= 15) return "Trusted Ear";
+  if (p.totalReviews >= 50) return "Veteran Listener";
+  if (p.totalReviews >= 20) return "Active Reviewer";
+  return null;
+}
+
 function formatEnum(value: string): string {
   return value
     .split("_")
@@ -256,9 +271,12 @@ export type ReviewData = {
   tooRepetitive?: boolean | null;
   ReviewerProfile: {
     id: string;
-    User: {
-      name: string | null;
-    };
+    totalReviews: number;
+    averageRating: number;
+    gemCount: number;
+    isIndustryExpert: boolean;
+    User: { name: string | null };
+    Genre: { id: string; name: string }[];
   } | null;
   ArtistProfile?: {
     id: string;
@@ -285,6 +303,11 @@ export function ReviewDisplay({
     "Reviewer";
   const reviewerProfileId =
     review.ReviewerProfile?.id ?? review.ArtistProfile?.id;
+  const reviewerTitle = review.ReviewerProfile
+    ? getReviewerTitle(review.ReviewerProfile)
+    : null;
+  const reviewerGenres = review.ReviewerProfile?.Genre?.slice(0, 2) ?? [];
+  const reviewerCount = review.ReviewerProfile?.totalReviews ?? 0;
 
   const quality = review.qualityLevel
     ? qualityConfig[review.qualityLevel as string]
@@ -302,59 +325,67 @@ export function ReviewDisplay({
 
   return (
     <article className="px-5 sm:px-6 py-5">
-      {/* Header: Reviewer + Actions */}
-      <header className="mb-4">
-        <div className="flex items-center gap-3">
+      {/* Header: Reviewer identity card */}
+      <header className="mb-5 pb-4 border-b border-black/6">
+        <div className="flex items-start gap-3">
           {/* Avatar */}
           {showControls && reviewerProfileId ? (
             <Link
               href={`/reviewers/${reviewerProfileId}`}
-              className="h-9 w-9 min-w-[2.25rem] flex-shrink-0 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-xs font-black text-purple-700 hover:from-purple-200 hover:to-purple-300 transition-colors duration-150 ease-out motion-reduce:transition-none"
+              className="h-11 w-11 min-w-[2.75rem] flex-shrink-0 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-black text-white hover:opacity-80 transition-opacity"
             >
               {getInitial(reviewerName)}
             </Link>
           ) : (
-            <span className="h-9 w-9 min-w-[2.25rem] flex-shrink-0 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-xs font-black text-purple-700">
+            <span className="h-11 w-11 min-w-[2.75rem] flex-shrink-0 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-black text-white">
               {getInitial(reviewerName)}
             </span>
           )}
 
-          {/* Name + Date + Impression */}
           <div className="flex-1 min-w-0">
+            {/* Name row */}
             <div className="flex items-center gap-2 flex-wrap">
               {showControls && reviewerProfileId ? (
-                <Link
-                  href={`/reviewers/${reviewerProfileId}`}
-                  className="font-bold text-sm text-black hover:underline truncate"
-                >
+                <Link href={`/reviewers/${reviewerProfileId}`} className="font-black text-sm text-black hover:underline">
                   {getFirstName(reviewerName)}
                 </Link>
               ) : (
-                <span className="font-bold text-sm text-black truncate">
-                  {getFirstName(reviewerName)}
+                <span className="font-black text-sm text-black">{getFirstName(reviewerName)}</span>
+              )}
+              {reviewerTitle && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                  {reviewerTitle}
                 </span>
               )}
               {review.firstImpression && (
-                <span
-                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                    review.firstImpression === "STRONG_HOOK"
-                      ? "bg-purple-100 text-purple-700"
-                      : review.firstImpression === "DECENT"
-                      ? "bg-amber-50 text-amber-700"
-                      : "bg-black/5 text-black/50"
-                  }`}
-                >
-                  {review.firstImpression === "STRONG_HOOK"
-                    ? "Hooked"
-                    : review.firstImpression === "DECENT"
-                    ? "Solid"
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                  review.firstImpression === "STRONG_HOOK" ? "bg-purple-100 text-purple-700"
+                  : review.firstImpression === "DECENT" ? "bg-amber-50 text-amber-700"
+                  : "bg-black/5 text-black/50"
+                }`}>
+                  {review.firstImpression === "STRONG_HOOK" ? "Hooked"
+                    : review.firstImpression === "DECENT" ? "Solid"
                     : "Lost Interest"}
                 </span>
               )}
             </div>
-            <time className="text-xs text-black/40">
-              {review.createdAt.toLocaleDateString()}
-            </time>
+
+            {/* Meta row: genres · count · date */}
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              {reviewerGenres.map((g) => (
+                <span key={g.id} className="text-[11px] font-semibold text-neutral-500">{g.name}</span>
+              ))}
+              {reviewerGenres.length > 0 && reviewerCount > 0 && (
+                <span className="text-black/15 text-[10px]">·</span>
+              )}
+              {reviewerCount > 0 && (
+                <span className="text-[11px] text-neutral-400">{reviewerCount} reviews</span>
+              )}
+              <span className="text-black/15 text-[10px]">·</span>
+              <time className="text-[11px] text-neutral-400">
+                {review.createdAt.toLocaleDateString()}
+              </time>
+            </div>
           </div>
         </div>
       </header>
