@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
@@ -31,6 +31,7 @@ interface SidebarProps {
 
 export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const mainLinks = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
@@ -50,8 +51,18 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
   ];
 
 
-  const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = (href: string) => {
+    const [hrefPath, hrefQuery] = href.split("?");
+    if (hrefQuery) {
+      if (pathname !== hrefPath) return false;
+      const hrefParams = new URLSearchParams(hrefQuery);
+      for (const [k, v] of hrefParams) {
+        if (searchParams.get(k) !== v) return false;
+      }
+      return true;
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   const NavLink = ({
     href,
@@ -310,14 +321,14 @@ function MobileBottomNav({
 
   const primaryLinks = [
     { href: "/dashboard", label: "Home", icon: Home },
-    { href: "/discover", label: "Discover", icon: Compass },
+    { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
     { href: "/tracks", label: "Tracks", icon: Music },
     { href: "/review", label: "Listen", icon: Headphones },
   ];
 
   const moreLinks = [
     { href: "/breakthrough", label: "Breakthrough", icon: Zap },
-    { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
+    { href: "/discover", label: "Discover", icon: Compass },
     { href: "/review/history", label: "Review History", icon: History },
     { href: "/support", label: "Support", icon: LifeBuoy },
     { href: "/account", label: "Settings", icon: Settings },
