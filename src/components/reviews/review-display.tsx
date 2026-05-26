@@ -386,6 +386,19 @@ export function ReviewDisplay({
                 {review.createdAt.toLocaleDateString()}
               </time>
             </div>
+
+            {/* View reviewer link */}
+            {showControls && reviewerProfileId && (
+              <Link
+                href={`/reviewers/${reviewerProfileId}`}
+                className="inline-flex items-center gap-1 mt-2 text-[11px] font-bold text-purple-600 hover:text-purple-800 transition-colors"
+              >
+                View reviewer
+                <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 6h8M6 2l4 4-4 4" />
+                </svg>
+              </Link>
+            )}
           </div>
         </div>
       </header>
