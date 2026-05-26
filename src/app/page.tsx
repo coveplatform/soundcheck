@@ -41,6 +41,12 @@ export default function Home() {
               <Link href="/" className="flex items-center gap-2">
                 <Logo />
               </Link>
+              <Link
+                href="/blog"
+                className="hidden sm:block text-sm font-bold text-black/40 hover:text-black transition-colors"
+              >
+                Journal
+              </Link>
             </div>
             <div className="flex items-center gap-3">
               <AuthButtons theme="light" />
