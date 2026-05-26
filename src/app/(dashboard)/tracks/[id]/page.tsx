@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
+import { isAdminEmail } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { SparklesDoodle } from "@/components/dashboard/doodles";
@@ -81,8 +82,9 @@ export default async function TrackDetailPage({
     notFound();
   }
 
-  // Verify ownership
-  if (track.ArtistProfile.userId !== session.user.id) {
+  // Verify ownership (admins can view any track)
+  const isAdmin = isAdminEmail(session.user.email);
+  if (!isAdmin && track.ArtistProfile.userId !== session.user.id) {
     notFound();
   }
 
