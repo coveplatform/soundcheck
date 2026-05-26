@@ -53,18 +53,18 @@ export default function Home() {
       <section className="overflow-visible bg-gradient-to-b from-purple-50 to-[#faf8f5]">
         <div className="max-w-4xl mx-auto px-4 py-16 sm:py-24 text-center relative">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-neutral-950 leading-[1.05]">
-            Get real feedback.<br />
-            <span className="text-purple-600">From real artists.</span>
+            Upload tonight.<br />
+            <span className="text-purple-600">Know by morning.</span>
           </h1>
 
           <p className="mt-8 text-neutral-700 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto font-medium">
-            Upload your track, review others in your genre, and get honest structured feedback from fellow producers.
+            Genre-matched artists listen to your track and tell you exactly what&apos;s landing — and what to fix before you release. Usually within 4 hours.
           </p>
 
           <HeroCTA />
 
           <p className="mt-6 text-sm text-neutral-7000">
-            Start with <span className="font-bold text-purple-600">1 free credit</span> • Earn more by reviewing • No credit card required
+            Free to start • Earn credits by reviewing others • No credit card required
           </p>
 
         </div>
@@ -86,7 +86,7 @@ export default function Home() {
               <div>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">See what&apos;s working</h2>
                 <p className="mt-5 text-neutral-600 text-lg max-w-xl">
-                  Get multiple reviews on your track. We show you patterns. When 4 out of 5 people say the same thing, that&apos;s not taste -- that&apos;s signal.
+                  Get multiple reviews on your track and we surface the patterns. When 4 out of 5 people flag the same thing, that&apos;s not opinion — that&apos;s something worth fixing.
                 </p>
               </div>
               <div className="relative rounded-2xl overflow-hidden shadow-xl" style={{ aspectRatio: "16/9" }}>
@@ -433,7 +433,7 @@ export default function Home() {
               },
               {
                 q: "What is MixReflect?",
-                a: "A peer-to-peer feedback platform for music creators. Upload your tracks, review other artists in your genre, and earn credits you can spend to get feedback on your own music. It's artists helping artists — no middlemen, no gatekeepers.",
+                a: "MixReflect is the fastest way to find out what's actually working in your track before you release it. Upload your music, get honest structured feedback from genre-matched artists within hours, and see the patterns across multiple listens. Artists help each other improve — no middlemen, no gatekeepers.",
               },
               {
                 q: "How do credits work?",
