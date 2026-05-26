@@ -11,155 +11,133 @@ export const metadata: Metadata = {
 };
 
 const categoryColor: Record<string, string> = {
-  GUIDE: "bg-purple-600",
-  INDUSTRY: "bg-black",
+  GUIDE: "text-purple-600",
+  INDUSTRY: "text-black",
 };
 
 export default function BlogIndexPage() {
   const [featured, ...rest] = posts;
 
   return (
-    <div>
-      {/* ── MASTHEAD ─────────────────────────────────────────────── */}
-      <div className="bg-[#0d0d0d]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-16 sm:py-24">
-          <h1
-            className="font-black text-white leading-[0.9] tracking-tighter"
-            style={{ fontSize: "clamp(3.5rem, 10vw, 8rem)" }}
-          >
-            Resources<br />
-            <span className="text-purple-400">for artists.</span>
-          </h1>
-          <div className="mt-8 h-px bg-white/10 max-w-sm" />
-          <p className="mt-6 text-white/50 text-sm font-medium max-w-md leading-relaxed">
-            Practical guides on getting better feedback, improving your sound, and releasing with confidence.
-          </p>
-        </div>
-      </div>
+    <div className="bg-[#faf8f5] min-h-screen">
 
-      {/* ── FEATURED POST ────────────────────────────────────────── */}
-      <div className="border-b-4 border-black">
+      {/* ── FEATURED ─────────────────────────────────────────────── */}
+      <div className="border-b border-black/8">
         <Link href={`/blog/${featured.slug}`} className="group block">
-          {/* Cover image */}
-          {featured.coverImage && (
-            <div className="relative w-full h-64 sm:h-96 overflow-hidden bg-neutral-200">
+
+          {/* Big image */}
+          <div className="relative w-full overflow-hidden bg-neutral-200" style={{ height: "clamp(260px, 50vw, 560px)" }}>
+            {featured.coverImage ? (
               <Image
                 src={featured.coverImage}
                 alt={featured.title}
                 fill
-                className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
                 sizes="100vw"
                 priority
               />
-            </div>
-          )}
-          <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 sm:py-14 grid sm:grid-cols-[1fr_auto] gap-8 items-end">
-            <div>
-              <span
-                className={`inline-block text-[10px] font-black uppercase tracking-[0.3em] text-white px-3 py-1.5 mb-5 ${categoryColor[featured.category] ?? "bg-black"}`}
-              >
+            ) : (
+              <div className="w-full h-full bg-neutral-200" />
+            )}
+          </div>
+
+          {/* Text below */}
+          <div className="max-w-5xl mx-auto px-5 sm:px-10 py-8 sm:py-10">
+            <div className="flex items-center gap-2 mb-3">
+              <span className={`text-[11px] font-black uppercase tracking-[0.25em] ${categoryColor[featured.category] ?? "text-black"}`}>
                 {featured.category}
               </span>
-              <h2
-                className="font-black text-black tracking-tighter leading-[0.95] group-hover:text-purple-700 transition-colors"
-                style={{ fontSize: "clamp(2rem, 5vw, 3.75rem)" }}
-              >
-                {featured.title}
-              </h2>
-              <p className="mt-4 text-black/50 text-base font-medium leading-relaxed max-w-2xl">
-                {featured.excerpt}
-              </p>
-              <div className="mt-6 flex items-center gap-4 text-[11px] font-bold uppercase tracking-widest text-black/30">
-                <span>{featured.date}</span>
-                <span>·</span>
-                <span>{featured.readTime}</span>
-              </div>
+              <span className="text-black/20 text-xs">·</span>
+              <span className="text-[11px] text-black/40 font-medium">{featured.date}</span>
             </div>
-            <div className="flex-shrink-0">
-              <div className="inline-flex items-center gap-2 border-2 border-black px-6 py-3 font-black text-sm text-black group-hover:bg-black group-hover:text-white transition-colors">
-                Read
-                <ArrowRight className="h-4 w-4" />
-              </div>
-            </div>
+            <h2
+              className="font-black text-black tracking-tight leading-[1] group-hover:text-purple-700 transition-colors mb-4"
+              style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.25rem)" }}
+            >
+              {featured.title}
+            </h2>
+            <p className="text-black/55 text-base font-medium leading-relaxed max-w-2xl mb-6">
+              {featured.excerpt}
+            </p>
+            <span className="inline-flex items-center gap-1.5 text-sm font-black text-black group-hover:text-purple-700 transition-colors">
+              Read
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            </span>
           </div>
         </Link>
       </div>
 
-      {/* ── POST GRID ────────────────────────────────────────────── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 py-12 sm:py-16">
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-8">
-          More articles
-        </p>
-        <div className="grid sm:grid-cols-2 gap-px bg-black border border-black">
+      {/* ── GRID ─────────────────────────────────────────────────── */}
+      <div className="max-w-5xl mx-auto px-5 sm:px-10 py-12 sm:py-16">
+        <div className="grid sm:grid-cols-2 gap-10 sm:gap-12">
           {rest.map((post) => (
-            <Link
-              key={post.slug}
-              href={`/blog/${post.slug}`}
-              className="group bg-[#faf8f5] hover:bg-white transition-colors flex flex-col"
-            >
-              {/* Card image */}
-              {post.coverImage ? (
-                <div className="relative w-full h-48 overflow-hidden bg-neutral-200">
+            <Link key={post.slug} href={`/blog/${post.slug}`} className="group flex flex-col">
+
+              {/* Image */}
+              <div className="relative w-full overflow-hidden bg-neutral-200 rounded-sm mb-5" style={{ aspectRatio: "16/10" }}>
+                {post.coverImage ? (
                   <Image
                     src={post.coverImage}
                     alt={post.title}
                     fill
-                    className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                    className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
                     sizes="(max-width: 640px) 100vw, 50vw"
                   />
-                </div>
-              ) : (
-                <div className="w-full h-48 bg-neutral-100" />
-              )}
-              <div className="p-8 sm:p-10 flex flex-col flex-1">
-                <span
-                  className={`self-start text-[10px] font-black uppercase tracking-[0.3em] text-white px-2.5 py-1 mb-5 ${categoryColor[post.category] ?? "bg-black"}`}
-                >
+                ) : (
+                  <div className="w-full h-full bg-neutral-100" />
+                )}
+              </div>
+
+              {/* Meta */}
+              <div className="flex items-center gap-2 mb-2.5">
+                <span className={`text-[11px] font-black uppercase tracking-[0.25em] ${categoryColor[post.category] ?? "text-black"}`}>
                   {post.category}
                 </span>
-                <h3
-                  className="font-black text-black tracking-tight leading-[1.05] group-hover:text-purple-700 transition-colors flex-1"
-                  style={{ fontSize: "clamp(1.4rem, 3vw, 1.9rem)" }}
-                >
-                  {post.title}
-                </h3>
-                <p className="mt-3 text-black/45 text-sm leading-relaxed line-clamp-2">
-                  {post.excerpt}
-                </p>
-                <div className="mt-6 flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-black/25">
-                    <span>{post.date}</span>
-                    <span>·</span>
-                    <span>{post.readTime}</span>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-black/30 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
-                </div>
+                <span className="text-black/20 text-xs">·</span>
+                <span className="text-[11px] text-black/40 font-medium">{post.date}</span>
               </div>
+
+              {/* Title */}
+              <h3
+                className="font-black text-black tracking-tight leading-[1.1] group-hover:text-purple-700 transition-colors mb-3"
+                style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)" }}
+              >
+                {post.title}
+              </h3>
+
+              {/* Excerpt */}
+              <p className="text-black/50 text-sm font-medium leading-relaxed line-clamp-2">
+                {post.excerpt}
+              </p>
+
+              <span className="mt-4 inline-flex items-center gap-1 text-xs font-black text-black/30 group-hover:text-purple-600 transition-colors">
+                {post.readTime}
+                <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+              </span>
             </Link>
           ))}
         </div>
       </div>
 
-      {/* ── BOTTOM CTA ───────────────────────────────────────────── */}
-      <div className="bg-purple-600 border-t-4 border-black">
-        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-14 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      {/* ── CTA ──────────────────────────────────────────────────── */}
+      <div className="border-t border-black/8 bg-white">
+        <div className="max-w-5xl mx-auto px-5 sm:px-10 py-14 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 mb-2">
-              MixReflect
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-2">MixReflect</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight leading-tight">
               Find out what&apos;s working<br />in your track.
             </h2>
           </div>
           <Link
             href="/signup"
-            className="flex-shrink-0 inline-flex items-center gap-2 bg-white text-black font-black px-8 py-4 text-sm hover:bg-black hover:text-white transition-colors border-2 border-white"
+            className="flex-shrink-0 inline-flex items-center gap-2 bg-purple-600 text-white font-black px-8 py-4 text-sm hover:bg-purple-700 transition-colors rounded-xl"
           >
             Start free
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>
+
     </div>
   );
 }
