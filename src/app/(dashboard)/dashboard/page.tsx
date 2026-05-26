@@ -10,9 +10,6 @@ import {
   MessageCircle,
   Music,
   Headphones,
-  ChevronUp,
-  Play,
-  Trophy,
 } from "lucide-react";
 import { ClaimCard } from "@/components/dashboard/claim-card";
 import { MobileStickyCTA } from "@/components/dashboard/mobile-sticky-cta";
@@ -39,23 +36,6 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   if (!session?.user?.id) {
     redirect("/login");
   }
-
-  // Fire discoverTracks immediately — it's independent of artistProfile
-  const discoverTracksPromise = prisma.track.findMany({
-    where: {
-      isPublic: true,
-      artworkUrl: { not: null },
-      status: { in: ["UPLOADED", "QUEUED", "IN_PROGRESS", "COMPLETED"] },
-    },
-    select: {
-      id: true,
-      title: true,
-      artworkUrl: true,
-      ArtistProfile: { select: { artistName: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 8,
-  }).catch(() => [] as { id: string; title: string; artworkUrl: string | null; ArtistProfile: { artistName: string } | null }[]);
 
   let artistProfile: DashboardArtistProfile | MinimalArtistProfile | null =
     null;
@@ -154,17 +134,13 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
     );
   });
 
-  // Phase 2: run discoverTracks (already in-flight) and excludeTrackIds in parallel
-  const [discoverTracks, excludeTrackIds] = await Promise.all([
-    discoverTracksPromise,
-    prisma.review
-      .findMany({
-        where: { peerReviewerArtistId: artistProfile.id },
-        select: { trackId: true },
-      })
-      .then((r: { trackId: string }[]) => r.map((x) => x.trackId))
-      .catch(() => [] as string[]),
-  ]);
+  const excludeTrackIds = await prisma.review
+    .findMany({
+      where: { peerReviewerArtistId: artistProfile.id },
+      select: { trackId: true },
+    })
+    .then((r: { trackId: string }[]) => r.map((x) => x.trackId))
+    .catch(() => [] as string[]);
 
   const availableTracksRaw = await prisma.track.findMany({
     where: {
@@ -338,62 +314,6 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
 
       {/* ── TRACK OF THE DAY WINNER ─────────────────────────────── */}
       <DashboardWinner />
-
-      {/* ── WEEKLY DISCOVER — compact banner ────────────────── */}
-      {discoverTracks.length > 0 && (
-        <Link href="/discover" className="block group">
-          <div className="relative overflow-hidden bg-black">
-            <div className="absolute inset-0 opacity-50 pointer-events-none" style={{
-              background: "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,240,255,0.10) 0%, rgba(168,85,247,0.04) 40%, transparent 70%)",
-            }} />
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 relative">
-              <div className="flex items-center gap-5 sm:gap-8">
-                {/* Small artwork cluster */}
-                <div className="relative w-[120px] h-[80px] flex-shrink-0 hidden sm:block">
-                  {discoverTracks.slice(0, 3).map((dt, i) => {
-                    const t = [
-                      { x: 0, y: 8, rot: -5, scale: 0.9, z: 10 },
-                      { x: 35, y: 0, rot: 3, scale: 1, z: 20 },
-                      { x: 70, y: 10, rot: -3, scale: 0.85, z: 15 },
-                    ][i];
-                    const glows = ["#00f0ff", "#a855f7", "#ff2d9b"];
-                    return dt.artworkUrl ? (
-                      <div
-                        key={dt.id}
-                        className="absolute rounded-lg overflow-hidden transition-transform duration-500 group-hover:scale-105"
-                        style={{
-                          left: t.x, top: t.y,
-                          width: 52 * t.scale, height: 52 * t.scale,
-                          transform: `rotate(${t.rot}deg)`, zIndex: t.z,
-                          boxShadow: `0 0 20px ${glows[i]}15, 0 4px 16px rgba(0,0,0,0.5)`,
-                          border: `1px solid ${glows[i]}30`,
-                        }}
-                      >
-                        <Image src={dt.artworkUrl} alt={dt.title} fill className="object-cover" sizes="60px" />
-                      </div>
-                    ) : null;
-                  })}
-                </div>
-
-                {/* Text */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-[9px] font-black uppercase tracking-[0.4em] text-cyan-400/50 mb-0.5">Weekly Discover</p>
-                  <p className="text-base sm:text-lg font-black text-white leading-tight">
-                    Explore music in 3D.{" "}
-                    <span className="text-white/40 font-medium text-sm">Submit your tracks to appear instantly.</span>
-                  </p>
-                </div>
-
-                {/* CTA */}
-                <div className="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.08] border border-white/[0.12] text-white/80 text-xs font-bold group-hover:bg-white/[0.14] group-hover:border-white/[0.2] transition-all">
-                  Enter
-                  <ArrowRight className="h-3.5 w-3.5 text-cyan-400 group-hover:translate-x-0.5 transition-transform" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Link>
-      )}
 
       {/* ── YOUR QUEUE ───────────────────────────────────────── */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">

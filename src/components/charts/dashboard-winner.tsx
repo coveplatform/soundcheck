@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Trophy, Music, ArrowRight, Play, Pause, X } from "lucide-react";
+import { Zap, Music, Play, Pause, X, ArrowRight } from "lucide-react";
 
 interface WinnerData {
   id: string;
@@ -48,6 +48,7 @@ export function DashboardWinner() {
   const [winner, setWinner] = useState<WinnerData | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [artworkFailed, setArtworkFailed] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stopTimer = useCallback(() => {}, []);
 
@@ -102,59 +103,116 @@ export function DashboardWinner() {
   };
 
   return (
-    <div className="bg-black">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3 sm:gap-4">
-        <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />
+    <div style={{ backgroundColor: "#2d1b69" }}>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
-        <button
-          onClick={handlePlay}
-          className="flex-shrink-0 relative w-8 h-8 rounded-md overflow-hidden group/play"
-        >
-          {winner.artworkUrl ? (
-            <Image src={winner.artworkUrl} alt={winner.title} fill className="object-cover" sizes="32px" />
-          ) : (
-            <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
-              <Music className="w-3 h-3 text-neutral-600" />
-            </div>
-          )}
-          <div className="absolute inset-0 bg-black/40 group-hover/play:bg-black/60 transition-colors flex items-center justify-center">
-            {isPlaying ? <Pause className="w-2.5 h-2.5 text-white" /> : <Play className="w-2.5 h-2.5 text-white ml-px" />}
-          </div>
-        </button>
-
-        <div className="flex-1 min-w-0">
-          <p className="text-[11px] text-white/40">
-            <span className="font-black text-amber-400">Track of the Day</span>
-            {" — "}
-            <span className="font-bold text-white truncate">{winner.title}</span>
-            {" by "}
-            <span className="text-white/60">{winner.artistName}</span>
+        {/* Label */}
+        <div className="flex items-center gap-2 mb-5">
+          <Zap className="w-3.5 h-3.5 text-amber-400" />
+          <p className="text-[10px] font-black uppercase tracking-[0.35em] text-amber-400">
+            Breakthrough · Track of the Day
           </p>
         </div>
 
-        {isExpanded && (
-          <button onClick={handleClose} className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors">
-            <X className="w-3 h-3 text-white/40" />
+        {/* Main card */}
+        <div className="flex items-start gap-5 sm:gap-7">
+
+          {/* Artwork */}
+          <button
+            onClick={handlePlay}
+            className="relative flex-shrink-0 rounded-xl overflow-hidden group/play"
+            style={{ width: 100, height: 100 }}
+          >
+            {winner.artworkUrl && !artworkFailed ? (
+              <Image
+                src={winner.artworkUrl}
+                alt={winner.title}
+                fill
+                className="object-cover"
+                sizes="100px"
+                onError={() => setArtworkFailed(true)}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #3d2a8a, #1a0f3d)" }}>
+                <Music className="w-8 h-8" style={{ color: "rgba(196,179,247,0.3)" }} />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-black/30 group-hover/play:bg-black/50 transition-colors flex items-center justify-center">
+              {isPlaying
+                ? <Pause className="w-7 h-7 text-white drop-shadow-md" />
+                : <Play className="w-7 h-7 text-white drop-shadow-md ml-0.5" />
+              }
+            </div>
           </button>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0 pt-1">
+            <h2
+              className="font-black leading-tight mb-1"
+              style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)", color: "#fff", letterSpacing: "-0.02em" }}
+            >
+              {winner.title}
+            </h2>
+            <p className="font-semibold mb-3" style={{ fontSize: 13, color: "rgba(196,179,247,0.6)" }}>
+              {winner.artistName}
+            </p>
+            {winner.editorNote && (
+              <p className="hidden sm:block mb-4 leading-relaxed" style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", maxWidth: 440 }}>
+                {winner.editorNote}
+              </p>
+            )}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handlePlay}
+                className="inline-flex items-center gap-2 font-black uppercase transition-all"
+                style={{
+                  fontSize: 10,
+                  letterSpacing: "0.2em",
+                  padding: "8px 18px",
+                  borderRadius: 999,
+                  backgroundColor: isPlaying ? "rgba(196,179,247,0.2)" : "#c4b3f7",
+                  color: isPlaying ? "#c4b3f7" : "#2d1b69",
+                  border: isPlaying ? "1px solid rgba(196,179,247,0.3)" : "none",
+                }}
+              >
+                {isPlaying ? <Pause style={{ width: 9, height: 9 }} /> : <Play style={{ width: 9, height: 9 }} />}
+                {isPlaying ? "Pause" : "Play"}
+              </button>
+              {isPlaying && (
+                <button
+                  onClick={handleClose}
+                  className="inline-flex items-center gap-1.5 font-bold transition-colors"
+                  style={{ fontSize: 11, color: "rgba(196,179,247,0.35)", letterSpacing: "0.05em" }}
+                >
+                  <X style={{ width: 11, height: 11 }} /> Close
+                </button>
+              )}
+              <Link
+                href="/breakthrough"
+                className="inline-flex items-center gap-1.5 font-bold transition-colors hover:opacity-80"
+                style={{ fontSize: 11, color: "rgba(196,179,247,0.45)", letterSpacing: "0.05em" }}
+              >
+                Full page <ArrowRight style={{ width: 11, height: 11 }} />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Expanded embed */}
+        {isExpanded && embedUrl && (
+          <div className="mt-5 rounded-xl overflow-hidden" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+            {winner.sourceType === "SOUNDCLOUD" && (
+              <iframe src={embedUrl} height="120" width="100%" allow="autoplay" className="block" style={{ border: "none" }} />
+            )}
+            {winner.sourceType === "YOUTUBE" && (
+              <div className="relative w-full" style={{ paddingBottom: "45%" }}>
+                <iframe src={embedUrl} className="absolute inset-0 w-full h-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen style={{ border: "none" }} />
+              </div>
+            )}
+          </div>
         )}
 
-        <Link href="/breakthrough" onClick={(e) => e.stopPropagation()} className="flex-shrink-0 p-1 rounded hover:bg-white/10 transition-colors">
-          <ArrowRight className="w-3.5 h-3.5 text-white/30" />
-        </Link>
       </div>
-
-      {isExpanded && embedUrl && (
-        <div className="border-t border-white/10">
-          {winner.sourceType === "SOUNDCLOUD" && (
-            <iframe src={embedUrl} height="120" width="100%" allow="autoplay" className="block" style={{ border: "none" }} />
-          )}
-          {winner.sourceType === "YOUTUBE" && (
-            <div className="relative w-full max-w-4xl mx-auto" style={{ paddingBottom: "40%" }}>
-              <iframe src={embedUrl} className="absolute inset-0 w-full h-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen style={{ border: "none" }} />
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
