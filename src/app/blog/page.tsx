@@ -22,9 +22,6 @@ export default function BlogIndexPage() {
       {/* ── MASTHEAD ─────────────────────────────────────────────── */}
       <div className="bg-[#0d0d0d]">
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-16 sm:py-24">
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 mb-6">
-            The MixReflect Journal
-          </p>
           <h1
             className="font-black text-white leading-[0.9] tracking-tighter"
             style={{ fontSize: "clamp(3.5rem, 10vw, 8rem)" }}
