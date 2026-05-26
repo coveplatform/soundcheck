@@ -16,7 +16,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
                 href="/blog"
                 className="text-sm font-bold text-black/50 hover:text-black transition-colors tracking-wide"
               >
-                Journal
+                The Drop
               </Link>
             </div>
             <div className="flex items-center gap-3">

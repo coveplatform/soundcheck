@@ -5,7 +5,7 @@ import { posts } from "@/lib/blog-posts";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "MixReflect Blog — Music Feedback & Artist Resources",
+  title: "The Drop — MixReflect",
   description:
     "Guides, industry insight and practical advice for independent artists. How to get better feedback, improve faster, and release with confidence.",
 };
