@@ -44,23 +44,22 @@ export function DashboardWinner() {
     <div style={{ backgroundColor: "#2d1b69" }}>
 
       {/* Content — padded */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-7">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-5 sm:pt-10 pb-5 sm:pb-7">
 
         {/* Overline */}
         <p
-          className="mb-6"
-          style={{ fontSize: 17, color: "rgba(196,179,247,0.7)", fontWeight: 800, letterSpacing: "-0.01em" }}
+          className="mb-3 sm:mb-6"
+          style={{ fontSize: 13, color: "rgba(196,179,247,0.7)", fontWeight: 800, letterSpacing: "-0.01em" }}
         >
           Breakthrough Track of the Day
         </p>
 
         {/* Content row */}
-        <div className="flex items-start gap-6 sm:gap-8">
+        <div className="flex items-start gap-4 sm:gap-8">
 
           {/* Artwork */}
           <div
-            className="relative flex-shrink-0 rounded-lg overflow-hidden"
-            style={{ width: 140, height: 140 }}
+            className="relative flex-shrink-0 rounded-lg overflow-hidden w-20 h-20 sm:w-[140px] sm:h-[140px]"
           >
             {winner.artworkUrl && !artworkFailed ? (
               <Image
@@ -68,7 +67,7 @@ export function DashboardWinner() {
                 alt={winner.title}
                 fill
                 className="object-cover"
-                sizes="140px"
+                sizes="(max-width: 640px) 80px, 140px"
                 onError={() => setArtworkFailed(true)}
               />
             ) : (
@@ -81,8 +80,8 @@ export function DashboardWinner() {
           {/* Text */}
           <div className="flex-1 min-w-0">
             <h2
-              className="font-black leading-[1.05] mb-2"
-              style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.1rem)", color: "#fff", letterSpacing: "-0.03em" }}
+              className="font-black leading-[1.05] mb-1 sm:mb-2"
+              style={{ fontSize: "clamp(1.1rem, 4vw, 2.1rem)", color: "#fff", letterSpacing: "-0.03em" }}
             >
               {winner.title}
             </h2>

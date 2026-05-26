@@ -237,6 +237,7 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
       <MobileBottomNav
         isActive={isActive}
         pendingReviews={pendingReviews}
+        isPro={isPro}
       />
     </>
   );
@@ -280,9 +281,11 @@ function ComingSoonNavItem({ inner }: { inner: React.ReactNode }) {
 function MobileBottomNav({
   isActive,
   pendingReviews,
+  isPro,
 }: {
   isActive: (href: string) => boolean;
   pendingReviews: number;
+  isPro?: boolean;
 }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
@@ -372,6 +375,26 @@ function MobileBottomNav({
           {/* Popover menu */}
           {moreOpen && (
             <div className="absolute bottom-full right-0 mb-2 w-56 bg-white rounded-xl border border-neutral-200 shadow-lg py-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
+              {/* Pro CTA */}
+              {isPro ? (
+                <div className="mx-2 mb-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-900">
+                  <Zap className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
+                  <span className="text-xs font-black text-white">Pro — active</span>
+                </div>
+              ) : (
+                <Link
+                  href="/pro"
+                  onClick={() => setMoreOpen(false)}
+                  className="mx-2 mb-2 flex items-center gap-3 px-3 py-2.5 rounded-lg bg-black hover:bg-neutral-900 transition-colors"
+                >
+                  <Zap className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-black text-purple-400 leading-none">Go Pro</p>
+                    <p className="text-[10px] text-white/40 font-medium mt-0.5">30 credits/mo · unlimited slots</p>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-purple-400/50 flex-shrink-0" />
+                </Link>
+              )}
               {moreLinks.map((link) => {
                 const Icon = link.icon;
                 return (
