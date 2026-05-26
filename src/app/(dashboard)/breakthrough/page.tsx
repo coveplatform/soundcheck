@@ -135,6 +135,17 @@ export default function ChartsPage() {
 
       {/* ══ TODAY'S PICK ══ deep indigo ════════════════════════════ */}
       <div style={{ backgroundColor: "#2d1b69", paddingTop: 48 }}>
+
+        {/* Page intro */}
+        <div className="max-w-6xl mx-auto px-6 sm:px-12 pb-10">
+          <p style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(196,179,247,0.4)", marginBottom: 10 }}>
+            Breakthrough · Track of the Day
+          </p>
+          <p style={{ fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, maxWidth: 560 }}>
+            Every morning, the highest-scoring track from the previous day&apos;s peer reviews gets featured here. No votes, no campaigns — just the music that real artists said was worth your time.
+          </p>
+        </div>
+
         {isLoading ? (
           <div className="max-w-3xl mx-auto px-6 sm:px-10 py-16 flex items-center gap-3">
             <div
