@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { posts, getPost } from "@/lib/blog-posts";
@@ -71,6 +72,20 @@ export default async function BlogPostPage({
         </div>
       </div>
 
+      {/* ── COVER IMAGE ──────────────────────────────────────────── */}
+      {post.coverImage && (
+        <div className="relative w-full h-64 sm:h-[480px] overflow-hidden bg-neutral-200">
+          <Image
+            src={post.coverImage}
+            alt={post.title}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+        </div>
+      )}
+
       {/* ── CONTENT ──────────────────────────────────────────────── */}
       <div className="bg-[#faf8f5]">
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-14 sm:py-20">
@@ -124,6 +139,27 @@ export default async function BlogPostPage({
                     </li>
                   ))}
                 </ul>
+              );
+            }
+
+            if (block.type === "image") {
+              return (
+                <figure key={i} className="my-10 -mx-4 sm:-mx-8">
+                  <div className="relative w-full h-56 sm:h-80 overflow-hidden bg-neutral-200">
+                    <Image
+                      src={block.src}
+                      alt={block.alt}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 672px"
+                    />
+                  </div>
+                  {block.caption && (
+                    <figcaption className="mt-3 px-4 sm:px-8 text-xs text-black/40 font-medium italic">
+                      {block.caption}
+                    </figcaption>
+                  )}
+                </figure>
               );
             }
 

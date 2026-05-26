@@ -3,6 +3,7 @@ export type ContentBlock =
   | { type: "h2"; text: string }
   | { type: "quote"; text: string }
   | { type: "list"; items: string[] }
+  | { type: "image"; src: string; alt: string; caption?: string }
   | { type: "cta" };
 
 export type BlogPost = {
@@ -12,6 +13,7 @@ export type BlogPost = {
   category: string;
   date: string;
   readTime: string;
+  coverImage?: string;
   content: ContentBlock[];
 };
 
@@ -19,6 +21,7 @@ export const posts: BlogPost[] = [
   {
     slug: "how-to-get-feedback-on-music-before-releasing",
     title: "How to Get Feedback on Your Music Before Releasing",
+    coverImage: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&q=80",
     excerpt:
       "Most artists release into a void and wonder why nothing sticks. Here's how to get real feedback before you hit publish.",
     category: "GUIDE",
@@ -100,6 +103,7 @@ export const posts: BlogPost[] = [
   {
     slug: "best-way-to-get-honest-feedback-on-a-beat",
     title: "The Best Way to Get Honest Feedback on a Beat",
+    coverImage: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=1200&q=80",
     excerpt:
       "Honest feedback is rare. Here's why most feedback you get is useless — and what to look for instead.",
     category: "GUIDE",
@@ -176,6 +180,7 @@ export const posts: BlogPost[] = [
   {
     slug: "how-music-producers-get-their-tracks-reviewed",
     title: "How Music Producers Get Their Tracks Reviewed",
+    coverImage: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80",
     excerpt:
       "From blog submissions to peer platforms — the different ways producers get ears on their work, and what each one is actually good for.",
     category: "INDUSTRY",

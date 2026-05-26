@@ -1,10 +1,11 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { posts } from "@/lib/blog-posts";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "The MixReflect Journal — Music Feedback & Artist Resources",
+  title: "MixReflect Blog — Music Feedback & Artist Resources",
   description:
     "Guides, industry insight and practical advice for independent artists. How to get better feedback, improve faster, and release with confidence.",
 };
@@ -39,10 +40,23 @@ export default function BlogIndexPage() {
       {/* ── FEATURED POST ────────────────────────────────────────── */}
       <div className="border-b-4 border-black">
         <Link href={`/blog/${featured.slug}`} className="group block">
-          <div className="max-w-6xl mx-auto px-4 sm:px-8 py-12 sm:py-16 grid sm:grid-cols-[1fr_auto] gap-8 items-end">
+          {/* Cover image */}
+          {featured.coverImage && (
+            <div className="relative w-full h-64 sm:h-96 overflow-hidden bg-neutral-200">
+              <Image
+                src={featured.coverImage}
+                alt={featured.title}
+                fill
+                className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                sizes="100vw"
+                priority
+              />
+            </div>
+          )}
+          <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 sm:py-14 grid sm:grid-cols-[1fr_auto] gap-8 items-end">
             <div>
               <span
-                className={`inline-block text-[10px] font-black uppercase tracking-[0.3em] text-white px-3 py-1.5 mb-6 ${categoryColor[featured.category] ?? "bg-black"}`}
+                className={`inline-block text-[10px] font-black uppercase tracking-[0.3em] text-white px-3 py-1.5 mb-5 ${categoryColor[featured.category] ?? "bg-black"}`}
               >
                 {featured.category}
               </span>
@@ -81,29 +95,45 @@ export default function BlogIndexPage() {
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="group bg-[#faf8f5] p-8 sm:p-10 hover:bg-white transition-colors flex flex-col"
+              className="group bg-[#faf8f5] hover:bg-white transition-colors flex flex-col"
             >
-              <span
-                className={`self-start text-[10px] font-black uppercase tracking-[0.3em] text-white px-2.5 py-1 mb-6 ${categoryColor[post.category] ?? "bg-black"}`}
-              >
-                {post.category}
-              </span>
-              <h3
-                className="font-black text-black tracking-tight leading-[1.05] group-hover:text-purple-700 transition-colors flex-1"
-                style={{ fontSize: "clamp(1.4rem, 3vw, 1.9rem)" }}
-              >
-                {post.title}
-              </h3>
-              <p className="mt-3 text-black/45 text-sm leading-relaxed line-clamp-2">
-                {post.excerpt}
-              </p>
-              <div className="mt-6 flex items-center justify-between">
-                <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-black/25">
-                  <span>{post.date}</span>
-                  <span>·</span>
-                  <span>{post.readTime}</span>
+              {/* Card image */}
+              {post.coverImage ? (
+                <div className="relative w-full h-48 overflow-hidden bg-neutral-200">
+                  <Image
+                    src={post.coverImage}
+                    alt={post.title}
+                    fill
+                    className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                  />
                 </div>
-                <ArrowRight className="h-4 w-4 text-black/30 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
+              ) : (
+                <div className="w-full h-48 bg-neutral-100" />
+              )}
+              <div className="p-8 sm:p-10 flex flex-col flex-1">
+                <span
+                  className={`self-start text-[10px] font-black uppercase tracking-[0.3em] text-white px-2.5 py-1 mb-5 ${categoryColor[post.category] ?? "bg-black"}`}
+                >
+                  {post.category}
+                </span>
+                <h3
+                  className="font-black text-black tracking-tight leading-[1.05] group-hover:text-purple-700 transition-colors flex-1"
+                  style={{ fontSize: "clamp(1.4rem, 3vw, 1.9rem)" }}
+                >
+                  {post.title}
+                </h3>
+                <p className="mt-3 text-black/45 text-sm leading-relaxed line-clamp-2">
+                  {post.excerpt}
+                </p>
+                <div className="mt-6 flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-black/25">
+                    <span>{post.date}</span>
+                    <span>·</span>
+                    <span>{post.readTime}</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-black/30 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
+                </div>
               </div>
             </Link>
           ))}
@@ -118,7 +148,7 @@ export default function BlogIndexPage() {
               MixReflect
             </p>
             <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
-              Find out what's working<br />in your track.
+              Find out what&apos;s working<br />in your track.
             </h2>
           </div>
           <Link
