@@ -262,7 +262,7 @@ export default function RequestReviewsPage() {
               </div>
             </div>
             {/* Credit pack upsell for users who have enough credits */}
-            {!needsCredits && !isPro && (
+            {!needsCredits && (
               <div className="flex items-center justify-between pt-1">
                 <div>
                   <p className="text-xs font-black text-black">Stock up for next time</p>
