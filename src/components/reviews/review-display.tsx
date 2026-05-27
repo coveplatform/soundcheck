@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Prisma } from "@prisma/client";
 import { ReviewRating } from "@/components/artist/review-rating";
 import { ReviewFlag } from "@/components/artist/review-flag";
@@ -236,28 +235,13 @@ export function ReviewDisplay({ review, index: _index, showControls = true }: Re
       <header className="flex items-start justify-between gap-4 pb-5 mb-6 border-b border-black/8">
         <div className="flex items-center gap-3 min-w-0">
           {/* Avatar — soft circle */}
-          {showControls && reviewerProfileId ? (
-            <Link
-              href={`/reviewers/${reviewerProfileId}`}
-              className="h-9 w-9 min-w-[2.25rem] rounded-full bg-purple-100 flex items-center justify-center text-sm font-bold text-purple-600 hover:bg-purple-200 transition-colors flex-shrink-0"
-            >
-              {getInitial(reviewerName)}
-            </Link>
-          ) : (
-            <span className="h-9 w-9 min-w-[2.25rem] rounded-full bg-black/8 flex items-center justify-center text-sm font-bold text-black/50 flex-shrink-0">
-              {getInitial(reviewerName)}
-            </span>
-          )}
+          <span className="h-9 w-9 min-w-[2.25rem] rounded-full bg-black/8 flex items-center justify-center text-sm font-bold text-black/50 flex-shrink-0">
+            {getInitial(reviewerName)}
+          </span>
 
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              {showControls && reviewerProfileId ? (
-                <Link href={`/reviewers/${reviewerProfileId}`} className="font-semibold text-sm text-black hover:text-purple-600 transition-colors">
-                  {getFirstName(reviewerName)}
-                </Link>
-              ) : (
-                <span className="font-semibold text-sm text-black">{getFirstName(reviewerName)}</span>
-              )}
+              <span className="font-semibold text-sm text-black">{getFirstName(reviewerName)}</span>
               {reviewerTitle && (
                 <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-black/6 text-black/40">
                   {reviewerTitle}
