@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
 import { WelcomeEmailTestCard } from "./welcome-email-test";
+import { UserGrowthChart, type GrowthPoint } from "@/components/admin/user-growth-chart";
 
 export const dynamic = 'force-dynamic';
 
@@ -41,6 +42,7 @@ export default async function AdminPage() {
     pendingQueue,
     revenueAgg,
     recentUsers,
+    signupDates,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.artistProfile.count({ where: { subscriptionStatus: "active" } }),
@@ -94,9 +96,71 @@ export default async function AdminPage() {
         },
       },
     }),
+    prisma.user.findMany({
+      where: {
+        AND: [
+          { email: { not: { contains: "@seed.mixreflect.com" } } },
+          { email: { not: { contains: "@mixreflect.com" } } },
+          { email: { not: { contains: "@example.com" } } },
+          { email: { not: { contains: "@soundcheck.com" } } },
+          { email: { notIn: [
+            "testlink@gmail.com", "testlink2@gmail.com", "testyjoe@gmail.com",
+            "steveking1@gmail.com", "bobthewizard1@gmail.com", "bigdog1@bigdogco.com",
+            "bigdogman2@gmail.com", "gogo45@gmail.com", "bogushogus@gmail.com",
+            "hot23@gmail.com", "bigbadbozo@gmail.com",
+            "daniel.basshead@gmail.com", "alexkimbeats@gmail.com",
+            "poopdogwe@google.com", "poopdogger@poop.com",
+            "soord@fksss.com", "soord@fk.com", "kris@kris.com", "poop@poop.com",
+            "steve2@steve.com", "stevejob@job.com", "cove.platform@proton.me",
+            "test@test.com", "tether.platform@proton.me", "jones@jones.com",
+            "steveo23@gmail.com", "james.producer.uk@outlook.com", "sean@spdafy.com",
+            "qairulothman@gmail.com", "imogengravina@gmail.com",
+            "bjorn@bjornengelhardt.com", "a.engelhardt101@gmail.com",
+            "simlimsd3@gmail.com", "kris.engelhardt4@gmail.com",
+            "millersport98@gmail.com", "illy81095@gmail.com",
+            "poop1@poop.com", "testthedog23@pooper.com", "testman1@testman1.com",
+            "bigman1@poop.com", "bigdog1@gmail.com", "pash.tzaikos@gmail.com",
+            "steve@steve.com",
+          ] } },
+        ],
+      },
+      orderBy: { createdAt: "asc" },
+      select: { createdAt: true },
+    }),
   ]);
 
   const revenueCents = revenueAgg._sum.amount ?? 0;
+
+  // Build weekly growth data
+  const weeklyMap = new Map<string, number>();
+  for (const { createdAt } of signupDates) {
+    const d = new Date(createdAt);
+    // ISO week: Monday-based, label as "Mon DD MMM"
+    const day = d.getDay(); // 0=Sun
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(d);
+    monday.setDate(diff);
+    const key = monday.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "2-digit" });
+    weeklyMap.set(key, (weeklyMap.get(key) ?? 0) + 1);
+  }
+  let runningWeekly = 0;
+  const weeklyGrowth: GrowthPoint[] = Array.from(weeklyMap.entries()).map(([period, newUsers]) => {
+    runningWeekly += newUsers;
+    return { period, newUsers, total: runningWeekly };
+  });
+
+  // Build monthly growth data
+  const monthlyMap = new Map<string, number>();
+  for (const { createdAt } of signupDates) {
+    const d = new Date(createdAt);
+    const key = d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+    monthlyMap.set(key, (monthlyMap.get(key) ?? 0) + 1);
+  }
+  let runningMonthly = 0;
+  const monthlyGrowth: GrowthPoint[] = Array.from(monthlyMap.entries()).map(([period, newUsers]) => {
+    runningMonthly += newUsers;
+    return { period, newUsers, total: runningMonthly };
+  });
 
   return (
     <div className="space-y-8">
@@ -243,6 +307,9 @@ export default async function AdminPage() {
         <StatCard title="Flagged Reviews" value={String(flaggedReviews)} href="/admin/reviews" accent={flaggedReviews > 0} />
         <StatCard title="Pending Queue" value={String(pendingQueue)} href="/admin/tracks" />
       </div>
+
+      {/* User growth chart */}
+      <UserGrowthChart weekly={weeklyGrowth} monthly={monthlyGrowth} />
 
       {/* Recent signups */}
       <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden">
