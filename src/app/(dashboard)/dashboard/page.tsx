@@ -1,19 +1,18 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
   MessageCircle,
-  Music,
   Headphones,
 } from "lucide-react";
 import { ClaimCard } from "@/components/dashboard/claim-card";
 import { MobileStickyCTA } from "@/components/dashboard/mobile-sticky-cta";
 import { DashboardWinner } from "@/components/charts/dashboard-winner";
+import { DashboardQueue } from "@/components/dashboard/dashboard-queue";
 import {
   SparklesDoodle,
   SquiggleDoodle,
@@ -341,67 +340,30 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
           </Link>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 sm:gap-4">
-          {Array.from({ length: maxSlots }, (_, slotIndex) => {
-            const track = activeTracks[slotIndex];
-
-            if (track) {
-              const completedReviews = track.Review.filter((r) => r.status === "COMPLETED").length;
-              const hasReviews = track.reviewsRequested > 0;
-              const reviewProgress = hasReviews ? completedReviews / track.reviewsRequested : 0;
-              const isDone = reviewProgress >= 1;
-
-              return (
-                <Link key={track.id} href={`/tracks/${track.id}`} className="group block">
-                  <div className="relative aspect-square rounded-2xl overflow-hidden border-2 border-black/8 group-hover:border-black/20 transition-all duration-150 shadow-sm">
-                    {track.artworkUrl ? (
-                      <Image src={track.artworkUrl} alt={track.title} fill className="object-cover group-hover:scale-[1.03] transition-transform duration-200" sizes="(max-width: 640px) 33vw, 220px" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center">
-                        <Music className="h-8 w-8 text-black/20" />
-                      </div>
-                    )}
-                    <div className="absolute top-2 left-2">
-                      <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full backdrop-blur-sm ${
-                        track.status === "QUEUED" ? "bg-purple-600 text-white"
-                          : track.status === "IN_PROGRESS" ? "bg-lime-400 text-black"
-                          : "bg-white/90 text-black"
-                      }`}>
-                        {track.status === "QUEUED" ? "Queued" : track.status === "IN_PROGRESS" ? "Reviewing" : track.status}
-                      </span>
-                    </div>
-                    {hasReviews && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-2.5 pt-4 pb-2">
-                        <div className="flex items-baseline justify-between mb-1">
-                          <span className="text-xs font-black text-white leading-none">{completedReviews}/{track.reviewsRequested}</span>
-                          <span className="text-[9px] text-white/50">reviews</span>
-                        </div>
-                        <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${isDone ? "bg-lime-400" : "bg-white"}`} style={{ width: `${reviewProgress * 100}%` }} />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs font-black text-black mt-2 truncate leading-tight">{track.title}</p>
-                </Link>
-              );
-            }
-
-            return (
-              <Link key={`empty-${slotIndex}`} href="/submit" className="group block">
-                <div className="aspect-square rounded-2xl border-2 border-dashed border-black/10 bg-white/40 hover:border-purple-400 hover:bg-purple-50/50 flex flex-col items-center justify-center gap-2 transition-all duration-150">
-                  <div className="h-10 w-10 rounded-full bg-black/[0.04] group-hover:bg-purple-100 flex items-center justify-center transition-colors border-2 border-black/[0.06] group-hover:border-purple-200">
-                    <ArrowRight className="h-5 w-5 text-black/20 group-hover:text-purple-600 transition-colors" />
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-black/20 group-hover:text-purple-600 transition-colors">
-                    Add track
-                  </span>
-                </div>
-                <p className="text-[11px] font-medium text-center text-black/20 mt-2">Open slot</p>
-              </Link>
-            );
-          })}
-        </div>
+        <DashboardQueue
+          activeTracks={activeTracks.map((t) => ({
+            id: t.id,
+            title: t.title,
+            artworkUrl: t.artworkUrl,
+            status: t.status,
+            reviewsRequested: t.reviewsRequested ?? 0,
+            reviewsCompleted: (t.Review ?? []).filter((r) => r.status === "COMPLETED").length,
+          }))}
+          eligibleTracks={tracks
+            .filter((t) => !(ACTIVE_TRACK_STATUSES as readonly string[]).includes(t.status))
+            .map((t) => ({
+              id: t.id,
+              title: t.title,
+              artworkUrl: t.artworkUrl,
+              status: t.status,
+              genreName: (t as any).Genre?.[0]?.name ?? null,
+              reviewsCompleted: (t.Review ?? []).filter((r: any) => r.status === "COMPLETED").length,
+              reviewsRequested: t.reviewsRequested ?? 0,
+            }))}
+          maxSlots={maxSlots}
+          isPro={isPro}
+          credits={credits}
+        />
       </div>
 
       {/* First-time user CTA */}
