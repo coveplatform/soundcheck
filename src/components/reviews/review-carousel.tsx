@@ -56,8 +56,8 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
 
   if (totalReviews === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-sm font-black text-black/20 uppercase tracking-widest">No reviews yet</p>
+      <div className="text-center py-16">
+        <p className="text-sm font-medium text-black/30">No reviews yet</p>
         <p className="text-xs text-black/20 mt-1">Check back soon</p>
       </div>
     );
@@ -67,38 +67,38 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
 
   return (
     <div>
-      {/* Minimal nav strip */}
+      {/* Nav strip */}
       {totalReviews > 1 && (
-        <div className="flex items-center justify-between mb-4 pb-4 border-b border-black/8">
-          <span className="text-[11px] font-mono text-black/25 tabular-nums">
-            {currentIndex + 1} / {totalReviews}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-black/6">
+          <span className="text-xs font-medium text-black/40 tabular-nums">
+            Review {currentIndex + 1} of {totalReviews}
           </span>
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-1">
             <button
               onClick={goToPrev}
               disabled={currentIndex === 0}
               className={cn(
-                "h-7 w-7 flex items-center justify-center transition-colors duration-150",
+                "h-7 w-7 rounded-lg flex items-center justify-center transition-colors duration-150",
                 currentIndex === 0
                   ? "text-black/15 cursor-not-allowed"
-                  : "text-black/30 hover:text-black"
+                  : "text-black/40 hover:text-black hover:bg-black/5"
               )}
               aria-label="Previous review"
             >
-              <ChevronLeft className="h-3.5 w-3.5" />
+              <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={goToNext}
               disabled={currentIndex === totalReviews - 1}
               className={cn(
-                "h-7 w-7 flex items-center justify-center transition-colors duration-150",
+                "h-7 w-7 rounded-lg flex items-center justify-center transition-colors duration-150",
                 currentIndex === totalReviews - 1
                   ? "text-black/15 cursor-not-allowed"
-                  : "text-black/30 hover:text-black"
+                  : "text-black/40 hover:text-black hover:bg-black/5"
               )}
               aria-label="Next review"
             >
-              <ChevronRight className="h-3.5 w-3.5" />
+              <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -120,14 +120,14 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
 
       {/* Dot indicators */}
       {totalReviews > 1 && (
-        <div className="flex items-center gap-1.5 pt-4 mt-4 border-t border-black/8">
+        <div className="flex items-center justify-center gap-1.5 py-3 border-t border-black/6">
           {reviews.map((_, index) => (
             <button
               key={index}
               onClick={() => goToIndex(index)}
               className={cn(
-                "h-1 rounded-full transition-[width,background-color] duration-150 ease-out",
-                index === currentIndex ? "w-4 bg-black" : "w-1 bg-black/15 hover:bg-black/30"
+                "h-1.5 rounded-full transition-[width,background-color] duration-150 ease-out",
+                index === currentIndex ? "w-4 bg-purple-500" : "w-1.5 bg-black/15 hover:bg-black/30"
               )}
               aria-label={`Go to review ${index + 1}`}
             />

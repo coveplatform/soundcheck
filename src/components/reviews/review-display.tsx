@@ -233,18 +233,18 @@ export function ReviewDisplay({ review, index: _index, showControls = true }: Re
     <article className="px-5 sm:px-6 py-6">
 
       {/* ── BYLINE ──────────────────────────────────────────────── */}
-      <header className="flex items-start justify-between gap-4 pb-5 mb-6 border-b-2 border-black">
+      <header className="flex items-start justify-between gap-4 pb-5 mb-6 border-b border-black/8">
         <div className="flex items-center gap-3 min-w-0">
-          {/* Avatar — solid black square */}
+          {/* Avatar — soft circle */}
           {showControls && reviewerProfileId ? (
             <Link
               href={`/reviewers/${reviewerProfileId}`}
-              className="h-9 w-9 min-w-[2.25rem] bg-black flex items-center justify-center text-xs font-black text-white hover:opacity-70 transition-opacity flex-shrink-0"
+              className="h-9 w-9 min-w-[2.25rem] rounded-full bg-purple-100 flex items-center justify-center text-sm font-bold text-purple-600 hover:bg-purple-200 transition-colors flex-shrink-0"
             >
               {getInitial(reviewerName)}
             </Link>
           ) : (
-            <span className="h-9 w-9 min-w-[2.25rem] bg-black flex items-center justify-center text-xs font-black text-white flex-shrink-0">
+            <span className="h-9 w-9 min-w-[2.25rem] rounded-full bg-black/8 flex items-center justify-center text-sm font-bold text-black/50 flex-shrink-0">
               {getInitial(reviewerName)}
             </span>
           )}
@@ -252,59 +252,61 @@ export function ReviewDisplay({ review, index: _index, showControls = true }: Re
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               {showControls && reviewerProfileId ? (
-                <Link href={`/reviewers/${reviewerProfileId}`} className="font-black text-sm text-black hover:underline">
+                <Link href={`/reviewers/${reviewerProfileId}`} className="font-semibold text-sm text-black hover:text-purple-600 transition-colors">
                   {getFirstName(reviewerName)}
                 </Link>
               ) : (
-                <span className="font-black text-sm text-black">{getFirstName(reviewerName)}</span>
+                <span className="font-semibold text-sm text-black">{getFirstName(reviewerName)}</span>
               )}
               {reviewerTitle && (
-                <span className="text-[10px] font-black uppercase tracking-wider border border-black/20 px-1.5 py-0.5 text-black/40">
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-black/6 text-black/40">
                   {reviewerTitle}
                 </span>
               )}
               {reviewerGenres.map((g) => (
-                <span key={g.id} className="text-[11px] font-bold text-black/35">{g.name}</span>
+                <span key={g.id} className="text-xs text-black/35">{g.name}</span>
               ))}
             </div>
-            <div className="flex items-center gap-2 mt-0.5">
-              {reviewerCount > 0 && (
-                <span className="text-[11px] text-black/30 font-mono">{reviewerCount} reviews</span>
-              )}
-            </div>
+            {reviewerCount > 0 && (
+              <p className="text-xs text-black/30 mt-0.5">{reviewerCount} reviews</p>
+            )}
           </div>
         </div>
 
         {/* Right: impression + date */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {review.firstImpression && (
-            <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-1 border-2 border-black ${
-              review.firstImpression === "STRONG_HOOK" ? "bg-black text-white"
-              : review.firstImpression === "DECENT" ? "bg-amber-400 text-black"
-              : "bg-white text-black/40"
+            <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+              review.firstImpression === "STRONG_HOOK"
+                ? "bg-purple-100 text-purple-700"
+                : review.firstImpression === "DECENT"
+                ? "bg-amber-100 text-amber-700"
+                : "bg-black/6 text-black/40"
             }`}>
               {review.firstImpression === "STRONG_HOOK" ? "Hooked"
                 : review.firstImpression === "DECENT" ? "Solid"
                 : "Lost Interest"}
             </span>
           )}
-          <time className="text-[11px] text-black/25 font-mono tabular-nums">
+          <time className="text-xs text-black/30 tabular-nums">
             {review.createdAt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" })}
           </time>
         </div>
       </header>
 
-      {/* ── VERDICT STAMP ───────────────────────────────────────── */}
+      {/* ── VERDICT ─────────────────────────────────────────────── */}
       {(quality || review.wouldListenAgain !== null) && (
         <div className="flex flex-wrap items-center gap-2 mb-6">
           {quality && (
-            <span className={`text-base font-black uppercase tracking-wide px-4 py-2 border-2 border-black ${quality.bg} ${quality.text}`}>
+            <span className={`text-sm font-bold px-3 py-1.5 rounded-xl ${quality.bg} ${quality.text}`}>
               {quality.label}
             </span>
           )}
           {review.wouldListenAgain !== null && (
-            <span className={`text-xs font-black uppercase tracking-wide px-3 py-2 border-2 border-black ${
-              review.wouldListenAgain ? "bg-black text-white" : "bg-white text-black/40"
+            <span className={`text-xs font-medium px-3 py-1.5 rounded-xl ${
+              review.wouldListenAgain
+                ? "bg-purple-100 text-purple-700"
+                : "bg-black/6 text-black/40"
             }`}>
               {review.wouldListenAgain ? "↺ Would replay" : "✕ Wouldn't replay"}
             </span>
@@ -314,77 +316,76 @@ export function ReviewDisplay({ review, index: _index, showControls = true }: Re
 
       {/* ── ARTIST NOTE CALLOUT ─────────────────────────────────── */}
       {review.addressedArtistNote && (
-        <p className="text-xs text-black/35 font-mono mb-5">
-          re: your note — <strong className="text-black/55">{review.addressedArtistNote}</strong>
+        <p className="text-xs text-black/40 italic mb-5">
+          re: your note — <strong className="not-italic text-black/55">{review.addressedArtistNote}</strong>
         </p>
       )}
 
       {/* ── ENGAGEMENT CURVE ────────────────────────────────────── */}
       {hasCurve && (
-        <div className="mb-6">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-1">Listener Engagement</p>
-          <div className="flex gap-3 mb-2">
+        <div className="mb-6 rounded-xl bg-black/[0.02] border border-black/6 p-4">
+          <p className="text-xs font-semibold text-black/40 mb-2">Listener Engagement</p>
+          <div className="flex gap-3 mb-2 flex-wrap">
             {CURVE_LEVELS.map((l) => (
-              <span key={l.value} className="flex items-center gap-1 text-[9px] font-bold text-black/30">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: l.color }} />
+              <span key={l.value} className="flex items-center gap-1 text-[10px] text-black/40">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: l.color }} />
                 {l.label}
               </span>
             ))}
           </div>
           <MiniEngagementChart curve={curve} />
           {curveSummary && (
-            <p className="text-xs text-black/50 mt-2 leading-snug">{curveSummary}</p>
+            <p className="text-xs text-black/50 mt-2 leading-relaxed">{curveSummary}</p>
           )}
           {curveInsights.length > 0 && (
             <ul className="mt-2 space-y-1">
               {curveInsights.map((insight, i) => (
                 <li key={i} className="text-xs text-black/40 flex items-start gap-2">
-                  <span className="mt-1.5 w-1 h-1 bg-black/30 rounded-full flex-shrink-0" />
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-black/20 flex-shrink-0" />
                   {insight}
                 </li>
               ))}
             </ul>
           )}
-          <div className="mt-5 border-t border-black/8" />
         </div>
       )}
 
-      {/* ── WRITTEN FEEDBACK — hero prose ───────────────────────── */}
+      {/* ── WRITTEN FEEDBACK ────────────────────────────────────── */}
       <div className="space-y-5">
         {review.bestPart && (
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-2">What Worked</p>
-            <p className="text-[15px] leading-relaxed text-black/80">{review.bestPart}</p>
+            <p className="text-xs font-semibold text-black/40 mb-2">What Worked</p>
+            <p className="text-sm leading-relaxed text-black/80">{review.bestPart}</p>
           </div>
         )}
 
         {review.quickWin && (
           <>
-            <div className="border-t border-black/8" />
+            <div className="border-t border-black/6" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-2">Quick Win</p>
-              <p className="text-[15px] leading-relaxed text-black/80">{review.quickWin}</p>
+              <p className="text-xs font-semibold text-black/40 mb-2">Quick Win</p>
+              <p className="text-sm leading-relaxed text-black/80">{review.quickWin}</p>
             </div>
           </>
         )}
 
         {mainFeedback && (
           <>
-            <div className="border-t border-black/8" />
+            <div className="border-t border-black/6" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-2">
+              <p className="text-xs font-semibold text-black/40 mb-2">
                 {review.quickWin ? "Biggest Weakness" : "Main Feedback"}
               </p>
-              <p className="text-[15px] leading-relaxed text-black/80">{mainFeedback}</p>
+              <p className="text-sm leading-relaxed text-black/80">{mainFeedback}</p>
             </div>
           </>
         )}
 
         {review.additionalNotes && (
           <>
-            <div className="border-t border-black/8" />
+            <div className="border-t border-black/6" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-2">Additional Notes</p>
+              <p className="text-xs font-semibold text-black/40 mb-2">Additional Notes</p>
               <p className="text-sm leading-relaxed text-black/60">{review.additionalNotes}</p>
             </div>
           </>
@@ -392,9 +393,9 @@ export function ReviewDisplay({ review, index: _index, showControls = true }: Re
 
         {review.nextActions && (
           <>
-            <div className="border-t border-black/8" />
+            <div className="border-t border-black/6" />
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-2">Next Actions</p>
+              <p className="text-xs font-semibold text-black/40 mb-2">Next Actions</p>
               <p className="text-sm leading-relaxed text-black/70 whitespace-pre-wrap">{review.nextActions}</p>
             </div>
           </>
@@ -403,15 +404,15 @@ export function ReviewDisplay({ review, index: _index, showControls = true }: Re
 
       {/* ── TIMESTAMPS ──────────────────────────────────────────── */}
       {Array.isArray(review.timestamps) && review.timestamps.filter(isTimestampNote).length > 0 && (
-        <div className="mt-6 pt-5 border-t border-black/8">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-3">Timestamps</p>
-          <div className="space-y-3">
+        <div className="mt-6 pt-5 border-t border-black/6">
+          <p className="text-xs font-semibold text-black/40 mb-3">Timestamps</p>
+          <div className="space-y-2.5">
             {review.timestamps.filter(isTimestampNote).map((t, i) => (
-              <div key={`${t.seconds}-${i}`} className="flex gap-4">
-                <span className="text-xs font-mono text-black/30 flex-shrink-0 pt-0.5">
+              <div key={`${t.seconds}-${i}`} className="flex gap-3">
+                <span className="text-xs font-mono text-black/30 flex-shrink-0 bg-black/[0.03] px-2 py-0.5 rounded">
                   {`${Math.floor(t.seconds / 60)}:${String(Math.floor(t.seconds % 60)).padStart(2, "0")}`}
                 </span>
-                <p className="text-sm text-black/70 leading-snug">{t.note}</p>
+                <p className="text-sm text-black/60 leading-snug">{t.note}</p>
               </div>
             ))}
           </div>
@@ -419,26 +420,26 @@ export function ReviewDisplay({ review, index: _index, showControls = true }: Re
       )}
 
       {/* ── DATA ROW — scores, tags, genre ──────────────────────── */}
-      <div className="mt-6 pt-5 border-t-2 border-black/10 space-y-3">
+      <div className="mt-6 pt-5 border-t border-black/8 space-y-3">
         {/* Scores */}
         {(review.productionScore != null || review.vocalScore != null || review.originalityScore != null) && (
           <div className="flex flex-wrap gap-4">
             {review.productionScore != null && (
               <div>
-                <span className="text-[9px] font-black uppercase tracking-widest text-black/30 block">Production</span>
-                <span className="text-lg font-black text-black tabular-nums leading-tight">{review.productionScore}<span className="text-xs text-black/30 font-bold">/5</span></span>
+                <span className="text-[10px] font-medium text-black/35 block mb-0.5">Production</span>
+                <span className="text-xl font-black text-black tabular-nums leading-none">{review.productionScore}<span className="text-xs text-black/30 font-medium ml-0.5">/5</span></span>
               </div>
             )}
             {review.originalityScore != null && (
               <div>
-                <span className="text-[9px] font-black uppercase tracking-widest text-black/30 block">Originality</span>
-                <span className="text-lg font-black text-black tabular-nums leading-tight">{review.originalityScore}<span className="text-xs text-black/30 font-bold">/5</span></span>
+                <span className="text-[10px] font-medium text-black/35 block mb-0.5">Originality</span>
+                <span className="text-xl font-black text-black tabular-nums leading-none">{review.originalityScore}<span className="text-xs text-black/30 font-medium ml-0.5">/5</span></span>
               </div>
             )}
             {review.vocalScore != null && (
               <div>
-                <span className="text-[9px] font-black uppercase tracking-widest text-black/30 block">Vocals</span>
-                <span className="text-lg font-black text-black tabular-nums leading-tight">{review.vocalScore}<span className="text-xs text-black/30 font-bold">/5</span></span>
+                <span className="text-[10px] font-medium text-black/35 block mb-0.5">Vocals</span>
+                <span className="text-xl font-black text-black tabular-nums leading-none">{review.vocalScore}<span className="text-xs text-black/30 font-medium ml-0.5">/5</span></span>
               </div>
             )}
           </div>
@@ -448,7 +449,7 @@ export function ReviewDisplay({ review, index: _index, showControls = true }: Re
         {issueChips.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {issueChips.map((chip) => (
-              <span key={chip} className="px-2.5 py-1 border-2 border-black bg-amber-400 text-xs font-black text-black">
+              <span key={chip} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-xs font-medium text-amber-700">
                 ⚠ {chip}
               </span>
             ))}
@@ -459,12 +460,12 @@ export function ReviewDisplay({ review, index: _index, showControls = true }: Re
         {(review.nextFocus || review.expectedPlacement) && (
           <div className="flex flex-wrap gap-2">
             {review.nextFocus && (
-              <span className="px-2.5 py-1 border-2 border-black bg-white text-xs font-black text-black">
+              <span className="px-2.5 py-1 rounded-full bg-black/[0.04] text-xs font-medium text-black/60">
                 Focus: {formatEnum(review.nextFocus)}
               </span>
             )}
             {review.expectedPlacement && (
-              <span className="px-2.5 py-1 border-2 border-black bg-white text-xs font-black text-black">
+              <span className="px-2.5 py-1 rounded-full bg-black/[0.04] text-xs font-medium text-black/60">
                 {formatEnum(review.expectedPlacement)}
               </span>
             )}
@@ -473,40 +474,31 @@ export function ReviewDisplay({ review, index: _index, showControls = true }: Re
 
         {/* Genre / similar artists */}
         {(review.perceivedGenre || review.similarArtists) && (
-          <p className="text-xs text-black/30 font-mono">
-            {review.perceivedGenre && <span>Sounds like <strong className="text-black/50">{review.perceivedGenre}</strong></span>}
-            {review.perceivedGenre && review.similarArtists && <span className="mx-2">·</span>}
-            {review.similarArtists && <span>Similar to <strong className="text-black/50">{review.similarArtists}</strong></span>}
+          <p className="text-xs text-black/35">
+            {review.perceivedGenre && <span>Sounds like <strong className="text-black/50 font-medium">{review.perceivedGenre}</strong></span>}
+            {review.perceivedGenre && review.similarArtists && <span className="mx-1.5 text-black/20">·</span>}
+            {review.similarArtists && <span>Similar to <strong className="text-black/50 font-medium">{review.similarArtists}</strong></span>}
           </p>
         )}
       </div>
 
       {/* ── RATE THIS FEEDBACK ──────────────────────────────────── */}
       {showControls && (
-        <footer className="mt-6 pt-5 border-t-2 border-black/10">
-          <div className="border-2 border-black overflow-hidden">
-            <div className="bg-black px-4 py-2.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/50">Rate this feedback</p>
-            </div>
-            <div className="bg-white p-4 space-y-4">
-              <div className="flex items-center gap-2">
-                <ReviewRating reviewId={review.id} initialRating={review.artistRating ?? null} />
-                <span className="text-xs text-black/40 font-bold">Rate this review</span>
-              </div>
-              <div className="flex items-start gap-3 border-2 border-black p-3">
-                <ReviewGem reviewId={review.id} initialIsGem={review.isGem ?? false} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-black text-black">Award a Gem for exceptional feedback</p>
-                  <p className="text-[11px] text-black/50 mt-0.5 leading-snug">
-                    Gems reward reviewers who go above and beyond. They&apos;ll earn recognition and priority in future reviews.
-                  </p>
-                </div>
-              </div>
+        <footer className="mt-6 pt-5 border-t border-black/8 space-y-4">
+          <div className="flex items-center gap-3">
+            <ReviewRating reviewId={review.id} initialRating={review.artistRating ?? null} />
+            <span className="text-xs text-black/40">Rate this review</span>
+          </div>
+          <div className="flex items-start gap-3 rounded-xl bg-black/[0.02] border border-black/6 p-4">
+            <ReviewGem reviewId={review.id} initialIsGem={review.isGem ?? false} />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-black">Award a Gem for exceptional feedback</p>
+              <p className="text-xs text-black/40 mt-0.5 leading-relaxed">
+                Gems reward reviewers who go above and beyond. They&apos;ll earn recognition and priority in future reviews.
+              </p>
             </div>
           </div>
-          <div className="mt-3">
-            <ReviewFlag reviewId={review.id} wasFlagged={review.wasFlagged} flagReason={review.flagReason} />
-          </div>
+          <ReviewFlag reviewId={review.id} wasFlagged={review.wasFlagged} flagReason={review.flagReason} />
         </footer>
       )}
     </article>
