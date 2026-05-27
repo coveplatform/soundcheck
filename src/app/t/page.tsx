@@ -464,7 +464,7 @@ export default function Home() {
               },
               {
                 q: "What does Pro get me?",
-                a: "Pro gives you 30 fresh credits every month — enough to submit several tracks with multiple reviews each. Up to 3 tracks in review at once, up to 10 reviews per track, plus priority placement. $24.95/month, cancel anytime. Need more in a busy month? Top up with a $9.95 credit pack any time.",
+                a: "Pro gives you 30 fresh credits every month — enough to submit several tracks with multiple reviews each. Up to 3 tracks in review at once, up to 10 reviews per track, plus priority placement and unlimited reviews per day. $24.95/month, cancel anytime. Need more in a busy month? Top up with a $9.95 credit pack any time.",
               },
               {
                 q: "Is it really free?",

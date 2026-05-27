@@ -131,7 +131,7 @@ export async function POST(request: Request) {
       }),
       prisma.artistProfile.findUnique({
         where: { userId: session.user.id },
-        select: { id: true, completedOnboarding: true },
+        select: { id: true, completedOnboarding: true, subscriptionStatus: true },
       }),
     ]);
 
@@ -283,9 +283,13 @@ export async function POST(request: Request) {
     startOfToday.setHours(0, 0, 0, 0);
     const heartbeatCutoff = new Date(now.getTime() - 10 * 60 * 1000);
 
-    // Daily review cap: 2/day for all users (bypass for admin emails only)
+    // Daily review cap: 2/day for free users (bypass for admin emails and Pro users)
     const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
-    const bypassLimit = BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
+    const isReviewerPro = isPeerReview
+      ? peerReviewerProfile?.subscriptionStatus === "active"
+      : artistProfile?.subscriptionStatus === "active";
+    const bypassLimit =
+      BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase()) || isReviewerPro;
 
     if (!bypassLimit) {
       const MAX_REVIEWS_PER_DAY = 2;

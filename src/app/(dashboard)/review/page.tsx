@@ -43,7 +43,8 @@ export default async function ListenPage({
   if (!artistProfile) redirect("/onboarding");
 
   const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
-  const bypassLimit = BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
+  const isPro = artistProfile.subscriptionStatus === "active";
+  const bypassLimit = isPro || BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
 
   const MAX_REVIEWS_PER_DAY = 5;
   const startOfToday = new Date();

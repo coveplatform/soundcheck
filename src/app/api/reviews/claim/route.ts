@@ -35,9 +35,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Complete onboarding first" }, { status: 403 });
   }
 
-  // Daily review limit check (bypass for admin emails only)
+  // Daily review limit check (bypass for admin emails and Pro users)
   const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
-  const bypassLimit = BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
+  const bypassLimit =
+    BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase()) ||
+    artistProfile.subscriptionStatus === "active";
 
   if (!bypassLimit) {
     const MAX_REVIEWS_PER_DAY = 2;

@@ -52,6 +52,7 @@ const PRO_FEATURES = [
   { text: `Up to ${PRO_MAX_REVIEWS_PER_TRACK} reviews per track`, included: true, highlight: true },
   { text: `${PRO_ACTIVE_SLOTS} tracks in review at a time`, included: true, highlight: true },
   { text: "Priority placement", included: true, highlight: true },
+  { text: "Unlimited reviews per day", included: true, highlight: true },
   { text: "Earn extra credits by reviewing others", included: true },
   { text: "Structured feedback on every review", included: true },
   { text: "Early access to new features", included: true },
