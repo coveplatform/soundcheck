@@ -288,8 +288,8 @@ export default function RequestReviewsPage() {
                 label="Buy 10 credits — $9.95"
               />
               <Link href="/review" className="block">
-                <Button className="w-full border-2 border-black bg-white hover:bg-neutral-50 text-black font-black h-12 rounded-xl text-sm">
-                  <Sparkles className="h-4 w-4 mr-2 text-purple-600" />
+                <Button className="w-full bg-black hover:bg-neutral-800 text-white font-black h-12 rounded-none text-sm">
+                  <Sparkles className="h-4 w-4 mr-2 text-purple-400" />
                   Earn credits by reviewing
                 </Button>
               </Link>
@@ -299,17 +299,34 @@ export default function RequestReviewsPage() {
           {/* Pro upsell */}
           {!isPro && (
             <div className="border-t-2 border-black/8 pt-5">
-              <div className="bg-neutral-900 rounded-2xl px-6 py-6">
-                <p className="text-[10px] font-black uppercase tracking-widest text-purple-400 mb-4">Pro Plan</p>
-                <p className="text-2xl font-black text-white leading-tight">Submitting often?</p>
-                <p className="text-2xl font-black text-purple-400 leading-tight mb-3">Go Pro.</p>
-                <p className="text-sm text-white/40 font-medium leading-relaxed mb-6">
-                  30 credits every month + priority placement. Cheaper than buying 3 credit packs.
-                </p>
+              <div className="bg-neutral-900 overflow-hidden">
+                <div className="px-6 pt-6 pb-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-purple-400">Pro Plan</p>
+                    <p className="text-[11px] font-black text-white/30">$24.95 / month</p>
+                  </div>
+                  <p className="text-xl font-black text-white leading-tight mb-1">
+                    30 credits monthly.
+                  </p>
+                  <p className="text-xl font-black text-purple-400 leading-tight mb-4">
+                    Front of the queue.
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {[
+                      "⚡ Priority placement",
+                      "3 tracks at once",
+                      "Up to 10 reviews/track",
+                    ].map((f) => (
+                      <span key={f} className="text-[11px] font-black text-white/50 bg-white/6 px-2.5 py-1">
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                </div>
                 <Link href="/pro" className="block">
-                  <Button className="w-full h-12 bg-purple-600 text-white hover:bg-purple-500 font-black rounded-xl text-base">
-                    See Pro plan <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
+                  <button className="w-full bg-purple-600 hover:bg-purple-500 text-white font-black text-sm py-3.5 transition-colors">
+                    Upgrade to Pro — $24.95/mo
+                  </button>
                 </Link>
               </div>
             </div>

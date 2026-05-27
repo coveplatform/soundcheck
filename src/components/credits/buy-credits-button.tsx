@@ -71,7 +71,7 @@ export function BuyCreditsButton({
       onClick={handleClick}
       isLoading={isLoading}
       className={cn(
-        "bg-lime-400 hover:bg-lime-300 text-black font-black border-2 border-black",
+        "bg-purple-600 hover:bg-purple-500 text-white font-black rounded-xl",
         className
       )}
     >

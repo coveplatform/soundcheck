@@ -62,7 +62,7 @@ export function DashboardWinner({ compact = false }: { compact?: boolean }) {
             <p className="text-white font-black text-base leading-tight truncate">{winner.title}</p>
             <p className="text-xs font-medium mt-0.5" style={{ color: "rgba(196,179,247,0.5)" }}>{winner.artistName}</p>
           </div>
-          <span className="flex-shrink-0 bg-purple-500 text-white text-[11px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg whitespace-nowrap">
+          <span className="flex-shrink-0 bg-purple-500 text-white text-[11px] font-black uppercase tracking-wider px-3 py-1.5 whitespace-nowrap">
             Listen Now
           </span>
         </Link>
