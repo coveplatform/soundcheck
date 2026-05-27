@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Music, ArrowRight } from "lucide-react";
+import { Music } from "lucide-react";
 
 interface WinnerData {
   id: string;
@@ -62,7 +62,9 @@ export function DashboardWinner({ compact = false }: { compact?: boolean }) {
             <p className="text-white font-black text-base leading-tight truncate">{winner.title}</p>
             <p className="text-xs font-medium mt-0.5" style={{ color: "rgba(196,179,247,0.5)" }}>{winner.artistName}</p>
           </div>
-          <ArrowRight className="w-4 h-4 flex-shrink-0" style={{ color: "rgba(196,179,247,0.4)" }} />
+          <span className="flex-shrink-0 bg-purple-500 text-white text-[11px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg whitespace-nowrap">
+            Listen Now
+          </span>
         </Link>
       </div>
     );
