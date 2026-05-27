@@ -41,12 +41,6 @@ export default function Home() {
               <Link href="/" className="flex items-center gap-2">
                 <Logo />
               </Link>
-              <Link
-                href="/blog"
-                className="hidden sm:block text-sm font-bold text-black/40 hover:text-black transition-colors"
-              >
-                The Drop
-              </Link>
             </div>
             <div className="flex items-center gap-3">
               <AuthButtons theme="light" />
@@ -499,6 +493,9 @@ export default function Home() {
               &copy; {new Date().getFullYear()} MixReflect
             </p>
             <div className="flex items-center gap-4 text-neutral-300">
+              <Link href="/blog" className="hover:text-white font-medium transition-colors">
+                The Drop
+              </Link>
               <Link href="/terms" className="hover:text-white font-medium transition-colors">
                 Terms
               </Link>

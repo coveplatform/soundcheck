@@ -185,6 +185,7 @@ export const posts: BlogPost[] = [
   {
     slug: "how-music-producers-get-their-tracks-reviewed",
     title: "How Music Producers Get Their Tracks Reviewed",
+    coverImage: "/blog/blog2.jpg",
     excerpt:
       "From blog submissions to peer platforms — the different ways producers get ears on their work, and what each one is actually good for.",
     category: "INDUSTRY",
@@ -274,6 +275,100 @@ export const posts: BlogPost[] = [
       {
         type: "paragraph",
         text: "Most producers only use the last category. Adding structured feedback earlier in the process is the fastest way to close the gap between where you are and release-ready — and it means that when you do send your track to a blog or curator, it's already as strong as it can be.",
+      },
+      { type: "cta" },
+    ],
+  },
+  {
+    slug: "what-multiple-listeners-tell-you-that-one-person-cant",
+    title: "What 5 People Hearing Your Track Tells You That 1 Person Can't",
+    coverImage: "/blog/blog3.jpg",
+    excerpt:
+      "One listener's opinion is just their taste. Five listeners saying the same thing is something you can actually act on. Here's the difference.",
+    category: "GUIDE",
+    date: "May 27, 2026",
+    readTime: "4 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "One person tells you the intro's too long. Do you cut it? Probably not — it might just be their taste. But what if four out of five people say the same thing, independently, without hearing each other's responses? Now it's not taste. It's a pattern. And patterns are the only feedback worth acting on before you release.",
+      },
+      {
+        type: "h2",
+        text: "Why single opinions are almost useless",
+      },
+      {
+        type: "paragraph",
+        text: "Every listener brings their own baggage. Their mood that day. Their genre preferences. What they had for breakfast. One person saying 'the drop doesn't hit' might be completely wrong for your target audience. Or they might be the only one telling you the truth. You have no way to know from a single data point.",
+      },
+      {
+        type: "paragraph",
+        text: "This is why most pre-release feedback fails artists. You send the track to a friend, they say it's great, you release it, nothing happens. Or you send it to one producer you respect, they give you a note, you change the whole arrangement, and it turns out that note was just personal preference. Single opinions move you in random directions.",
+      },
+      {
+        type: "quote",
+        text: "One person's feedback is a guess. Five people's feedback is a signal.",
+      },
+      {
+        type: "h2",
+        text: "What patterns actually look like",
+      },
+      {
+        type: "paragraph",
+        text: "When multiple independent listeners flag the same thing, the math starts working in your favour. If two people mention the vocals feel a bit quiet — worth noting. If four people say it without prompting, it's real. The thing they're flagging isn't a matter of taste anymore. It's something about the track that consistently pulls people out of the experience.",
+      },
+      {
+        type: "paragraph",
+        text: "The most common patterns we see: the intro runs too long before anything interesting happens, the energy dips in the mid-section and doesn't recover cleanly, the vocals sit under the mix instead of on top of it, and the ending feels abrupt or unresolved. None of these are hard to fix. But most artists never hear them because they only get one or two opinions before releasing.",
+      },
+      {
+        type: "list",
+        items: [
+          "1 person flags something → ask someone else specifically about it",
+          "2 people flag the same thing → it's probably real, start paying attention",
+          "3+ people flag the same thing independently → fix it before you release",
+          "Everyone says something different → the track is fine, trust yourself",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What a single reviewer genuinely can't tell you",
+      },
+      {
+        type: "paragraph",
+        text: "A single reviewer can't tell you whether their note is taste or truth. They don't know either. They can tell you what they felt, but they have no way to know if it's a them problem or a track problem. That distinction only emerges when you have multiple independent listeners — and it emerges fast.",
+      },
+      {
+        type: "paragraph",
+        text: "Five people who don't know each other, listening separately, and landing on the same note? The odds of that being coincidence or shared bias drop to almost zero. You now know something real about your track. That's a completely different thing to having an opinion about it.",
+      },
+      {
+        type: "h2",
+        text: "The release trap most artists fall into",
+      },
+      {
+        type: "paragraph",
+        text: "Most artists release first and find out what's wrong after. The streams come in slow, a couple of comments mention something feels off, and by then the first impression is burned. On Spotify, on playlists, with the algorithm — the first few days of a release carry disproportionate weight. A track that starts cold rarely recovers.",
+      },
+      {
+        type: "paragraph",
+        text: "Getting five structured listens before you release costs you maybe a week. It can save you from putting out a version of a track that's 80% of what it could be. The fix is usually small — a vocal level, a transition, trimming 16 bars from an intro. Small things that you've gone completely deaf to because you've heard the track 300 times.",
+      },
+      {
+        type: "quote",
+        text: "The fix is almost always smaller than you think. The problem is you can't hear it anymore.",
+      },
+      {
+        type: "h2",
+        text: "How to actually collect pattern feedback",
+      },
+      {
+        type: "paragraph",
+        text: "The feedback needs to be structured and independent. Structured means every listener is responding to the same questions — first impression, what's working, what to fix — so you can compare responses directly. Independent means they aren't reading each other's notes before they write their own. Group chats and Discord servers break the independence. Everyone anchors on the first opinion posted.",
+      },
+      {
+        type: "paragraph",
+        text: "MixReflect is built around this exact model. You upload a track, genre-matched artists listen and fill out a structured review independently, and then you get to see where the responses converge. When four reviewers flag the same moment in your track, it shows up clearly. That's the signal. That's what you fix.",
       },
       { type: "cta" },
     ],
