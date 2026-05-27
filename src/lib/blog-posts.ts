@@ -17,7 +17,7 @@ export type BlogPost = {
   content: ContentBlock[];
 };
 
-export const posts: BlogPost[] = [
+const _posts: BlogPost[] = [
   {
     slug: "how-to-get-feedback-on-music-before-releasing",
     title: "How to Get Feedback on Your Music Before Releasing",
@@ -374,6 +374,10 @@ export const posts: BlogPost[] = [
     ],
   },
 ];
+
+export const posts = _posts.sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+);
 
 export function getPost(slug: string): BlogPost | undefined {
   return posts.find((p) => p.slug === slug);

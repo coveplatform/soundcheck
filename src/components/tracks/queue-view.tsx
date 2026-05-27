@@ -215,29 +215,31 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
                   i > 0 && "border-t border-black/5"
                 )}
               >
-                <div className="w-10 h-10 rounded-xl bg-neutral-100 flex-shrink-0 overflow-hidden relative border border-black/5">
-                  {track.artworkUrl ? (
-                    <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="40px" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Music className="h-4 w-4 text-black/15" />
-                    </div>
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[13px] font-black text-black truncate">{track.title}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    {track.genreName && (
-                      <span className="text-[10px] text-black/30 font-medium">{track.genreName}</span>
+                <Link href={`/tracks/${track.id}`} className="flex items-center gap-3 min-w-0 flex-1 group">
+                  <div className="w-10 h-10 rounded-xl bg-neutral-100 flex-shrink-0 overflow-hidden relative border border-black/5">
+                    {track.artworkUrl ? (
+                      <Image src={track.artworkUrl} alt={track.title} fill className="object-cover" sizes="40px" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Music className="h-4 w-4 text-black/15" />
+                      </div>
                     )}
-                    <span className={cn(
-                      "text-[10px] font-black uppercase tracking-wider",
-                      track.status === "COMPLETED" ? "text-purple-500" : "text-black/25"
-                    )}>
-                      {track.status === "COMPLETED" ? `${track.reviewsCompleted} reviews` : "Uploaded"}
-                    </span>
                   </div>
-                </div>
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-black text-black truncate group-hover:text-purple-700 transition-colors">{track.title}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {track.genreName && (
+                        <span className="text-[10px] text-black/30 font-medium">{track.genreName}</span>
+                      )}
+                      <span className={cn(
+                        "text-[10px] font-black uppercase tracking-wider",
+                        track.status === "COMPLETED" ? "text-purple-500" : "text-black/25"
+                      )}>
+                        {track.status === "COMPLETED" ? `${track.reviewsCompleted} reviews` : "Uploaded"}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
                 <button
                   onClick={() => openPickerFor(track.id)}
                   className="flex items-center gap-1.5 text-[11px] font-black text-purple-600 hover:text-purple-800 transition-colors flex-shrink-0"
