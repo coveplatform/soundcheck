@@ -366,6 +366,27 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         />
       </div>
 
+      {/* No tracks, no credits — reviewer-first entry path */}
+      {tracks.length === 0 && credits === 0 && (
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
+          <div className="border-2 border-black bg-neutral-900 rounded-2xl px-5 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1 min-w-0">
+              <p className="text-base font-black text-white">
+                Review a track to earn your first credit.
+              </p>
+              <p className="text-sm text-white/40 mt-0.5">
+                Takes ~3 mins. Once you&apos;ve got a credit, submit your own track and get real feedback back.
+              </p>
+            </div>
+            <Link href="/review" className="flex-shrink-0">
+              <Button className="w-full sm:w-auto bg-white hover:bg-neutral-100 text-black font-black border-2 border-black shadow-[3px_3px_0_rgba(255,255,255,0.15)] hover:shadow-[1px_1px_0_rgba(255,255,255,0.15)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-sm h-10 px-5 rounded-xl">
+                Start reviewing →
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* First-time user CTA */}
       {tracks.length === 0 && credits >= 1 && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
