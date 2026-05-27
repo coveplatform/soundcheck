@@ -116,7 +116,7 @@ export default function RequestReviewsPage() {
     }
   };
 
-  const needsCredits = !isLoadingProfile && !isPro && desiredReviews > reviewTokens;
+  const needsCredits = !isLoadingProfile && desiredReviews > reviewTokens;
 
   return (
     <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
@@ -242,39 +242,39 @@ export default function RequestReviewsPage() {
           </div>
 
           {/* Credit balance */}
-          {isPro ? (
-            <div className="border-t-2 border-black/8 pt-5">
-              <p className="text-base font-black text-purple-700">Pro · unlimited credits</p>
-            </div>
-          ) : (
-            <div className="border-t-2 border-black/8 pt-5 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-black/[0.03] rounded-xl px-4 py-4">
-                  <p className="text-[10px] font-black uppercase tracking-wider text-black/30 mb-1">You have</p>
-                  <p className="text-4xl font-black text-black tabular-nums leading-none">{isLoadingProfile ? "…" : reviewTokens}</p>
-                  <p className="text-xs text-black/30 font-bold mt-1">credits</p>
-                </div>
-                <div className={cn("rounded-xl px-4 py-4", needsCredits ? "bg-red-50" : "bg-purple-50")}>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-black/30 mb-1">Will use</p>
-                  <p className={cn("text-4xl font-black tabular-nums leading-none", needsCredits ? "text-red-500" : "text-purple-600")}>{desiredReviews}</p>
-                  <p className="text-xs text-black/30 font-bold mt-1">credits</p>
-                </div>
+          <div className="border-t-2 border-black/8 pt-5 space-y-4">
+            {isPro && (
+              <div className="flex items-center gap-2 bg-purple-50 rounded-xl px-4 py-3 border border-purple-200">
+                <Sparkles className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                <p className="text-sm font-black text-purple-700">Pro — your track gets priority placement in the queue</p>
               </div>
-              {/* Credit pack upsell for users who have credits */}
-              {!needsCredits && (
-                <div className="flex items-center justify-between pt-1">
-                  <div>
-                    <p className="text-xs font-black text-black">Stock up for next time</p>
-                    <p className="text-[11px] text-black/40">10 credits, use across any track</p>
-                  </div>
-                  <BuyCreditsButton
-                    label="Buy 10 — $9.95"
-                    className="h-9 text-xs rounded-xl font-black ml-4"
-                  />
-                </div>
-              )}
+            )}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-black/[0.03] rounded-xl px-4 py-4">
+                <p className="text-[10px] font-black uppercase tracking-wider text-black/30 mb-1">You have</p>
+                <p className="text-4xl font-black text-black tabular-nums leading-none">{isLoadingProfile ? "…" : reviewTokens}</p>
+                <p className="text-xs text-black/30 font-bold mt-1">credits</p>
+              </div>
+              <div className={cn("rounded-xl px-4 py-4", needsCredits ? "bg-red-50" : "bg-purple-50")}>
+                <p className="text-[10px] font-black uppercase tracking-wider text-black/30 mb-1">Will use</p>
+                <p className={cn("text-4xl font-black tabular-nums leading-none", needsCredits ? "text-red-500" : "text-purple-600")}>{desiredReviews}</p>
+                <p className="text-xs text-black/30 font-bold mt-1">credits</p>
+              </div>
             </div>
-          )}
+            {/* Credit pack upsell for users who have enough credits */}
+            {!needsCredits && !isPro && (
+              <div className="flex items-center justify-between pt-1">
+                <div>
+                  <p className="text-xs font-black text-black">Stock up for next time</p>
+                  <p className="text-[11px] text-black/40">10 credits, use across any track</p>
+                </div>
+                <BuyCreditsButton
+                  label="Buy 10 — $9.95"
+                  className="h-9 text-xs rounded-xl font-black ml-4"
+                />
+              </div>
+            )}
+          </div>
 
           {/* Out of credits */}
           {needsCredits && (
@@ -322,7 +322,7 @@ export default function RequestReviewsPage() {
           isLoading={isSubmitting}
           variant="primary"
           className="w-full h-14 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all rounded-xl"
-          disabled={!trackId || isSubmitting || (!isPro && needsCredits)}
+          disabled={!trackId || isSubmitting || needsCredits}
         >
           Request {desiredReviews} {desiredReviews === 1 ? "review" : "reviews"}
           <ArrowRight className="h-5 w-5 ml-2" />

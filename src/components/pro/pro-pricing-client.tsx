@@ -297,8 +297,8 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
         <h2 className="text-2xl font-black text-white tracking-tight mb-6">Why artists go Pro.</h2>
         <div className="grid sm:grid-cols-3 gap-5">
           {[
-            { icon: <Zap className="h-5 w-5 text-black" />, title: "No grinding", body: `${PRO_MONTHLY_CREDITS} credits delivered every month. Skip the review-to-earn loop entirely.` },
-            { icon: <MessageSquare className="h-5 w-5 text-black" />, title: "Get heard first", body: "Priority placement means reviewers see your tracks before free-tier submissions." },
+            { icon: <Zap className="h-5 w-5 text-black" />, title: "Credits included", body: `${PRO_MONTHLY_CREDITS} credits land in your account every month — no reviewing required to earn them.` },
+            { icon: <MessageSquare className="h-5 w-5 text-black" />, title: "Get heard first", body: "Your tracks appear at the top of the reviewer queue with a Priority badge — free submissions go behind you." },
             { icon: <Shield className="h-5 w-5 text-black" />, title: "Support the community", body: "Your subscription keeps MixReflect running and free for everyone." },
           ].map((item) => (
             <div key={item.title} className="bg-white/5 rounded-xl p-5">
@@ -336,7 +336,7 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
             },
             {
               q: "Is there a free trial?",
-              a: "MixReflect itself is free forever. You can submit tracks, get reviews, and earn credits without paying anything. Pro and packs are for artists who want to skip the grind.",
+              a: "MixReflect itself is free forever. You can submit tracks, earn credits by reviewing others, and get feedback without paying anything. Pro and packs are for artists who want credits without having to review, or who want priority placement in the queue.",
             },
           ].map(({ q, a }) => (
             <div key={q} className="bg-white border-2 border-black/8 rounded-2xl p-5">

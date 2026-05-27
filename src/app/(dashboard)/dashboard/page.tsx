@@ -242,10 +242,10 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
                 {isPro ? "credits" : credits === 1 ? "credit to spend" : credits > 0 ? "credits to spend" : "credits"}
               </p>
               <Link
-                href={isPro || credits > 0 ? "/submit" : "/review"}
+                href={credits > 0 ? "/submit" : "/review"}
                 className="text-[11px] font-bold text-purple-600 hover:text-purple-800 mt-2 block transition-colors"
               >
-                {isPro ? "Submit →" : credits > 0 ? "Spend →" : "Earn more →"}
+                {credits > 0 ? "Spend →" : "Earn more →"}
               </Link>
             </div>
           </div>

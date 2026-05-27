@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Music, Loader2 } from "lucide-react";
+import { Music, Loader2, Zap } from "lucide-react";
 
 interface ListenTileProps {
   trackId: string;
@@ -11,9 +11,10 @@ interface ListenTileProps {
   artistName: string;
   artworkUrl: string | null;
   reviewsRemaining: number | null;
+  isPriority?: boolean;
 }
 
-export function ListenTile({ trackId, title, artistName, artworkUrl, reviewsRemaining }: ListenTileProps) {
+export function ListenTile({ trackId, title, artistName, artworkUrl, reviewsRemaining, isPriority }: ListenTileProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -62,6 +63,14 @@ export function ListenTile({ trackId, title, artistName, artworkUrl, reviewsRema
       ) : (
         <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
           <Music className="h-8 w-8 text-white/20" />
+        </div>
+      )}
+
+      {/* Priority badge */}
+      {isPriority && (
+        <div className="absolute top-2 left-2 z-10 flex items-center gap-1 bg-purple-600 text-white px-2 py-0.5 rounded-full">
+          <Zap className="h-2.5 w-2.5" />
+          <span className="text-[9px] font-black uppercase tracking-wider">Priority</span>
         </div>
       )}
 

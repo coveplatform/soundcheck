@@ -104,6 +104,7 @@ export default async function ListenPage({
       artworkUrl: true,
       reviewsRequested: true,
       createdAt: true,
+      paidAt: true,
       ArtistProfile: {
         select: {
           artistName: true,
@@ -128,7 +129,10 @@ export default async function ListenPage({
       const aIsSeed = a.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       const bIsSeed = b.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       if (aIsSeed !== bIsSeed) return aIsSeed ? 1 : -1;
-      return 0;
+      // Within same tier, older submissions go first (fairness)
+      const aTime = a.paidAt?.getTime() ?? a.createdAt.getTime();
+      const bTime = b.paidAt?.getTime() ?? b.createdAt.getTime();
+      return aTime - bTime;
     });
 
   const credits = artistProfile.reviewCredits ?? 0;
@@ -254,6 +258,7 @@ export default async function ListenPage({
                 artistName={track.ArtistProfile.artistName}
                 artworkUrl={track.artworkUrl}
                 reviewsRemaining={reviewsRemaining}
+                isPriority={track.ArtistProfile?.subscriptionStatus === "active"}
               />
             ))}
           </div>

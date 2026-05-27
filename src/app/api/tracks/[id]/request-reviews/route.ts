@@ -84,10 +84,9 @@ export async function POST(
     }
 
     const desired = data.desiredReviews;
-    // Pro users submit for free — no credit deduction
-    const cost = isPro ? 0 : desired;
+    const cost = desired;
 
-    if (!isPro && (track.ArtistProfile.reviewCredits ?? 0) < cost) {
+    if ((track.ArtistProfile.reviewCredits ?? 0) < cost) {
       return NextResponse.json(
         { error: "Not enough credits. Earn more by reviewing tracks or upgrade to Pro." },
         { status: 403 }
