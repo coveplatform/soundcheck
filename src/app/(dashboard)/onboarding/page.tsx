@@ -209,19 +209,28 @@ export default function OnboardingPage() {
 
         {/* CTA footer */}
         <div className="bg-white border-t-2 border-black">
-          <div className="max-w-md mx-auto px-4 sm:px-6 py-5 flex gap-3 items-center">
-            <button
-              onClick={() => setStep(1)}
-              className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors flex-shrink-0"
-            >
-              <ArrowLeft className="h-3 w-3" /> Back
-            </button>
+          <div className="max-w-md mx-auto px-4 sm:px-6 py-5 space-y-3">
             <Button
-              className="flex-1 h-13 bg-black text-white hover:bg-neutral-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl text-base py-3.5"
+              className="w-full h-13 bg-black text-white hover:bg-neutral-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl text-base py-3.5"
               onClick={() => { setError(""); setStep(3); }}
             >
               Submit your first track <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setStep(1)}
+                className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors"
+              >
+                <ArrowLeft className="h-3 w-3" /> Back
+              </button>
+              <button
+                onClick={handleComplete}
+                disabled={isLoading}
+                className="text-xs text-black/40 hover:text-black font-bold transition-colors"
+              >
+                {isLoading ? "Setting up..." : "No track yet — skip →"}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -317,19 +326,19 @@ export default function OnboardingPage() {
           >
             Submit &amp; Get Reviewed <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
-          <div className="flex items-center justify-between">
+          <button
+            onClick={handleComplete}
+            disabled={isLoading}
+            className="w-full h-11 rounded-xl border-2 border-black/15 hover:border-black/40 text-sm font-bold text-black/50 hover:text-black transition-all"
+          >
+            {isLoading ? "Setting up..." : "No track yet — I'll review first"}
+          </button>
+          <div className="flex justify-start">
             <button
               onClick={() => setStep(2)}
               className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors"
             >
               <ArrowLeft className="h-3 w-3" /> Back
-            </button>
-            <button
-              onClick={handleComplete}
-              disabled={isLoading}
-              className="text-xs text-black/25 hover:text-black/50 font-medium transition-colors"
-            >
-              {isLoading ? "Setting up..." : "I'll do this later"}
             </button>
           </div>
         </div>
