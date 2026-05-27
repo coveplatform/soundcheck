@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Music, MessageSquare, ChevronDown, ThumbsUp, ThumbsDown, Star, User } from "lucide-react";
+import { Music, MessageSquare, ChevronDown, ThumbsUp, ThumbsDown, Star, User, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+type SortKey = "title" | "status" | "reviews" | "production" | "originality" | "vocal" | "listenAgain";
 
 interface ReviewDetail {
   id: string;
@@ -98,11 +100,76 @@ function formatDate(iso: string | null) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+const STATUS_ORDER: Record<string, number> = {
+  IN_PROGRESS: 0, QUEUED: 1, UPLOADED: 2, COMPLETED: 3, PENDING_PAYMENT: 4, CANCELLED: 5,
+};
+
+function SortHeader({
+  label, icon, sortKey, activeSortKey, sortAsc, onSort, className,
+}: {
+  label?: string; icon?: React.ReactNode; sortKey: SortKey;
+  activeSortKey: SortKey | null; sortAsc: boolean;
+  onSort: (k: SortKey) => void; className?: string;
+}) {
+  const isActive = activeSortKey === sortKey;
+  return (
+    <button
+      onClick={() => onSort(sortKey)}
+      className={cn(
+        "flex items-center gap-1 group transition-colors",
+        isActive ? "text-purple-600" : "text-black/30 hover:text-black/60",
+        className,
+      )}
+    >
+      {label && <span>{label}</span>}
+      {icon}
+      {isActive ? (
+        sortAsc ? <ArrowUp className="h-3 w-3 flex-shrink-0" /> : <ArrowDown className="h-3 w-3 flex-shrink-0" />
+      ) : (
+        <ArrowUpDown className="h-3 w-3 flex-shrink-0 opacity-0 group-hover:opacity-60 transition-opacity" />
+      )}
+    </button>
+  );
+}
+
 export function TrackStatsView({ tracks }: TrackStatsViewProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortAsc, setSortAsc] = useState(false);
+
+  function handleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortAsc((a) => !a);
+    } else {
+      setSortKey(key);
+      setSortAsc(false); // default descending (best/highest first)
+    }
+  }
+
   const tracksWithReviews = tracks.filter((t) => t.reviewsCompleted > 0);
-  const tracksWithoutReviews = tracks.filter((t) => t.reviewsCompleted === 0);
-  const sorted = [...tracksWithReviews, ...tracksWithoutReviews];
+
+  const sorted = [...tracks].sort((a, b) => {
+    if (!sortKey) {
+      // default: reviewed tracks first
+      if (a.reviewsCompleted > 0 && b.reviewsCompleted === 0) return -1;
+      if (a.reviewsCompleted === 0 && b.reviewsCompleted > 0) return 1;
+      return 0;
+    }
+    let aVal: string | number, bVal: string | number;
+    switch (sortKey) {
+      case "title":       aVal = a.title.toLowerCase();          bVal = b.title.toLowerCase();          break;
+      case "status":      aVal = STATUS_ORDER[a.status] ?? 99;   bVal = STATUS_ORDER[b.status] ?? 99;   break;
+      case "reviews":     aVal = a.reviewsCompleted;             bVal = b.reviewsCompleted;             break;
+      case "production":  aVal = a.avgProduction  ?? -1;         bVal = b.avgProduction  ?? -1;         break;
+      case "originality": aVal = a.avgOriginality ?? -1;         bVal = b.avgOriginality ?? -1;         break;
+      case "vocal":       aVal = a.avgVocal       ?? -1;         bVal = b.avgVocal       ?? -1;         break;
+      case "listenAgain": aVal = a.wouldListenAgainPct ?? -1;    bVal = b.wouldListenAgainPct ?? -1;    break;
+      default:            return 0;
+    }
+    if (aVal < bVal) return sortAsc ? -1 : 1;
+    if (aVal > bVal) return sortAsc ? 1 : -1;
+    return 0;
+  });
 
   if (tracks.length === 0) {
     return (
@@ -152,14 +219,14 @@ export function TrackStatsView({ tracks }: TrackStatsViewProps) {
       {/* Track stats table */}
       <div className="bg-white rounded-xl border border-black/5 overflow-hidden">
         {/* Header */}
-        <div className="hidden sm:grid sm:grid-cols-[1fr_80px_60px_100px_100px_100px_80px] gap-3 px-4 py-2.5 bg-neutral-50 border-b border-black/5 text-[10px] font-bold uppercase tracking-[0.15em] text-black/30">
-          <span>Track</span>
-          <span>Status</span>
-          <span className="flex items-center gap-1"><MessageSquare className="h-3 w-3" /></span>
-          <span>Production</span>
-          <span>Originality</span>
-          <span>Vocal</span>
-          <span className="flex items-center gap-1"><ThumbsUp className="h-3 w-3" /></span>
+        <div className="hidden sm:grid sm:grid-cols-[1fr_80px_60px_100px_100px_100px_80px] gap-3 px-4 py-2.5 bg-neutral-50 border-b border-black/5 text-[10px] font-bold uppercase tracking-[0.15em]">
+          <SortHeader label="Track"      sortKey="title"       activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
+          <SortHeader label="Status"     sortKey="status"      activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
+          <SortHeader icon={<MessageSquare className="h-3 w-3" />} sortKey="reviews"    activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
+          <SortHeader label="Production" sortKey="production"  activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
+          <SortHeader label="Originality" sortKey="originality" activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
+          <SortHeader label="Vocal"      sortKey="vocal"       activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
+          <SortHeader icon={<ThumbsUp className="h-3 w-3" />} sortKey="listenAgain" activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
         </div>
 
         {/* Rows */}
