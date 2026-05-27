@@ -260,6 +260,7 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
           <QueueTrackPicker
             tracks={eligibleTracks}
             credits={credits}
+            isPro={isPro}
             open={pickerOpen}
             onClose={() => setPickerOpen(false)}
             initialTrackId={initialTrackId}
