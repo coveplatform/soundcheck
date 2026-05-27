@@ -187,7 +187,7 @@ export default async function TrackDetailPage({
                     {track.title}
                   </h1>
                   {track.status === "COMPLETED" && (
-                    <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-lime-400 text-black">
+                    <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-purple-500 text-white">
                       <CheckCircle2 className="h-3 w-3" />
                       Done
                     </span>
@@ -219,7 +219,7 @@ export default async function TrackDetailPage({
                     </div>
                     <div className="w-24 h-2 bg-black/10 rounded-full overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all duration-300 ${progress >= 100 ? "bg-lime-400" : "bg-purple-500"}`}
+                        className={`h-full rounded-full transition-all duration-300 ${progress >= 100 ? "bg-purple-500" : "bg-purple-500"}`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>

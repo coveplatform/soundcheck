@@ -43,8 +43,8 @@ function formatEnum(value: string): string {
 }
 
 const qualityConfig: Record<string, { label: string; bg: string; text: string }> = {
-  PROFESSIONAL:  { label: "Professional",   bg: "bg-lime-400",   text: "text-black" },
-  RELEASE_READY: { label: "Release Ready",  bg: "bg-lime-400",   text: "text-black" },
+  PROFESSIONAL:  { label: "Professional",   bg: "bg-purple-500",   text: "text-white" },
+  RELEASE_READY: { label: "Release Ready",  bg: "bg-purple-500",   text: "text-white" },
   ALMOST_THERE:  { label: "Almost There",   bg: "bg-amber-400",  text: "text-black" },
   DEMO_STAGE:    { label: "Demo Stage",     bg: "bg-orange-400", text: "text-black" },
   NOT_READY:     { label: "Not Ready Yet",  bg: "bg-red-500",    text: "text-white" },

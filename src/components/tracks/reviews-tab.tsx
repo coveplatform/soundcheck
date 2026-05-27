@@ -12,8 +12,8 @@ const qualityLabels: Record<string, string> = {
 };
 
 const qualityColor: Record<string, string> = {
-  PROFESSIONAL: "text-lime-600",
-  RELEASE_READY: "text-lime-600",
+  PROFESSIONAL: "text-purple-600",
+  RELEASE_READY: "text-purple-600",
   ALMOST_THERE: "text-amber-600",
   DEMO_STAGE: "text-orange-500",
   NOT_READY: "text-red-500",

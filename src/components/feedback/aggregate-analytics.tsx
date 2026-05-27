@@ -58,8 +58,8 @@ function topFrequencies(items: string[], limit: number) {
 }
 
 function getScoreLabel(score: number): { label: string; color: string } {
-  if (score >= 4.5) return { label: "Exceptional", color: "text-lime-600" };
-  if (score >= 4.0) return { label: "Strong", color: "text-lime-600" };
+  if (score >= 4.5) return { label: "Exceptional", color: "text-purple-600" };
+  if (score >= 4.0) return { label: "Strong", color: "text-purple-600" };
   if (score >= 3.5) return { label: "Solid", color: "text-black/40" };
   if (score >= 3.0) return { label: "Average", color: "text-black/40" };
   if (score >= 2.5) return { label: "Developing", color: "text-amber-600" };
@@ -76,7 +76,7 @@ function ComparisonIndicator({ score, platformAvg }: { score: number; platformAv
   const { label } = getScoreLabel(score);
   if (diff > 0.2) {
     return (
-      <div className="flex items-center justify-center gap-1 text-[9px] font-black text-lime-600 mt-1">
+      <div className="flex items-center justify-center gap-1 text-[9px] font-black text-purple-600 mt-1">
         <TrendingUp className="h-2.5 w-2.5" />
         <span>{label} +{absDiff}</span>
       </div>
@@ -136,13 +136,13 @@ function ImpressionsBar({ impressions, total }: { impressions: { hook: number; d
     <div>
       <p className="text-[9px] font-black uppercase tracking-[0.25em] text-black/30 mb-3">First Impressions</p>
       <div className="h-4 w-full flex overflow-hidden mb-3" style={{ outline: "1px solid rgba(0,0,0,0.08)" }}>
-        {hookPct > 0 && <div className="h-full bg-lime-400" style={{ width: `${hookPct}%` }} title={`Strong Hook: ${hookPct}%`} />}
+        {hookPct > 0 && <div className="h-full bg-purple-500" style={{ width: `${hookPct}%` }} title={`Strong Hook: ${hookPct}%`} />}
         {decentPct > 0 && <div className="h-full bg-amber-400" style={{ width: `${decentPct}%` }} title={`Decent: ${decentPct}%`} />}
         {lostPct > 0 && <div className="h-full bg-black/10" style={{ width: `${lostPct}%` }} title={`Lost Interest: ${lostPct}%`} />}
       </div>
       <div className="flex gap-4 text-[10px] font-black mb-3">
         <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 bg-lime-400 flex-shrink-0" />
+          <span className="h-2 w-2 bg-purple-500 flex-shrink-0" />
           Strong Hook {hookPct}%
         </div>
         <div className="flex items-center gap-1.5">
@@ -182,8 +182,8 @@ function TechMetricRow({
 }) {
   if (totalCount === 0) return null;
   const issuePct = Math.round((issueCount / totalCount) * 100);
-  const barColor = issuePct === 0 ? "bg-lime-400" : issuePct < 40 ? "bg-amber-400" : "bg-red-400";
-  const textColor = issuePct === 0 ? "text-lime-600" : issuePct < 40 ? "text-amber-600" : "text-red-500";
+  const barColor = issuePct === 0 ? "bg-purple-500" : issuePct < 40 ? "bg-amber-400" : "bg-red-400";
+  const textColor = issuePct === 0 ? "text-purple-600" : issuePct < 40 ? "text-amber-600" : "text-red-500";
 
   return (
     <div className="flex items-center gap-3">
