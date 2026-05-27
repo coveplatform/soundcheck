@@ -10,12 +10,13 @@ export const ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || "kris.engelha
 
 // Resolve app URL with fallback chain (NEXT_PUBLIC_APP_URL is undefined on server)
 export function getAppUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.NEXTAUTH_URL ||
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://www.mixreflect.com"
-  );
+  const candidates = [
+    process.env.NEXT_PUBLIC_APP_URL,
+    process.env.NEXTAUTH_URL,
+    process.env.NEXT_PUBLIC_SITE_URL,
+  ];
+  const prod = candidates.find((u) => u && !u.includes("localhost"));
+  return prod ?? "https://www.mixreflect.com";
 }
 
 // Brand colors - match current MixReflect UI

@@ -146,12 +146,15 @@ export async function sendReviewProgressEmail(
   artistEmail: string,
   trackTitle: string,
   reviewCount: number,
-  totalReviews: number
+  totalReviews: number,
+  trackId?: string
 ) {
   if (!artistEmail) return;
 
   const pct = Math.round((reviewCount / Math.max(1, totalReviews)) * 100);
   const isComplete = reviewCount >= totalReviews;
+  const trackUrl = trackId ? `${getAppUrl()}/tracks/${trackId}` : `${getAppUrl()}/dashboard`;
+  const moreReviewsUrl = trackId ? `${getAppUrl()}/tracks/${trackId}/request-reviews` : null;
 
   const progressBar = `
     <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 4px; margin-bottom: 24px;">
@@ -180,7 +183,13 @@ export async function sendReviewProgressEmail(
       <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
         Your feedback is ready! Log in to read all reviews and rate them.
       </p>
-      ${emailButton("View Your Reviews", `${getAppUrl()}/dashboard`)}
+      ${emailButton("View Your Reviews", trackUrl)}
+      ${moreReviewsUrl ? `
+      <p style="margin: 24px 0 8px; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
+        Want even more perspectives on your track?
+      </p>
+      ${emailButton("Get More Reviews", moreReviewsUrl, "secondary")}
+      ` : ""}
     `
     : `
       <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
@@ -197,7 +206,7 @@ export async function sendReviewProgressEmail(
       <p style="margin: 0; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
         Reviews are coming in! You can already view completed reviews in your dashboard.
       </p>
-      ${emailButton("View Progress", `${getAppUrl()}/dashboard`, "secondary")}
+      ${emailButton("View Progress", trackUrl, "secondary")}
     `;
 
   await sendEmail({

@@ -628,7 +628,8 @@ export async function POST(request: Request) {
         result.Track.artistEmail,
         result.Track.title,
         result.completedReviews,
-        result.Track.reviewsRequested
+        result.Track.reviewsRequested,
+        result.trackId
       );
     }
 

@@ -284,39 +284,61 @@ export default async function TrackDetailPage({
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
 
         {completedReviews > 0 ? (
-          <TrackDashboardTabs
-            defaultTab="reviews"
-            trackTitle={track.title}
-            statsTab={
-              <StatsTab
-                reviews={track.Review}
-                platformAverages={{
-                  production: platformStats._avg.productionScore ?? 0,
-                  originality: platformStats._avg.originalityScore ?? 0,
-                  vocals: platformStats._avg.vocalScore ?? 0,
-                }}
-              />
-            }
-            reviewsTab={
-              <ReviewsTab reviews={track.Review} trackId={track.id} />
-            }
-            settingsTab={
-              <SettingsTab
-                track={{
-                  id: track.id,
-                  title: track.title,
-                  sourceUrl: track.sourceUrl,
-                  sourceType: track.sourceType,
-                  status: track.status,
-                  linkIssueNotifiedAt: track.linkIssueNotifiedAt,
-                  feedbackFocus: track.feedbackFocus,
-                }}
-                payment={track.Payment}
-                canUpdateSource={canUpdateSource}
-                completedReviewCount={track.Review?.length || 0}
-              />
-            }
-          />
+          <>
+            <TrackDashboardTabs
+              defaultTab="reviews"
+              trackTitle={track.title}
+              statsTab={
+                <StatsTab
+                  reviews={track.Review}
+                  platformAverages={{
+                    production: platformStats._avg.productionScore ?? 0,
+                    originality: platformStats._avg.originalityScore ?? 0,
+                    vocals: platformStats._avg.vocalScore ?? 0,
+                  }}
+                />
+              }
+              reviewsTab={
+                <ReviewsTab reviews={track.Review} trackId={track.id} />
+              }
+              settingsTab={
+                <SettingsTab
+                  track={{
+                    id: track.id,
+                    title: track.title,
+                    sourceUrl: track.sourceUrl,
+                    sourceType: track.sourceType,
+                    status: track.status,
+                    linkIssueNotifiedAt: track.linkIssueNotifiedAt,
+                    feedbackFocus: track.feedbackFocus,
+                  }}
+                  payment={track.Payment}
+                  canUpdateSource={canUpdateSource}
+                  completedReviewCount={track.Review?.length || 0}
+                />
+              }
+            />
+
+            {track.status === "COMPLETED" && hasAvailableSlot && (
+              <div className="mt-8 rounded-2xl border-2 border-black bg-white overflow-hidden shadow-[4px_4px_0_rgba(0,0,0,1)]">
+                <div className="bg-purple-600 px-6 py-4 flex items-center gap-3">
+                  <Crown className="h-5 w-5 text-yellow-300 flex-shrink-0" />
+                  <p className="text-white font-black text-sm uppercase tracking-wider">Want more feedback?</p>
+                </div>
+                <div className="px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                  <p className="text-sm text-black/60 leading-relaxed flex-1">
+                    You&apos;ve got your first round of reviews. Getting more ears on this track means more perspectives, more confidence, and a clearer picture of what&apos;s landing.
+                  </p>
+                  <Link href={`/tracks/${track.id}/request-reviews`} className="flex-shrink-0">
+                    <Button className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-11 px-6 text-sm rounded-xl">
+                      Get another round
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <div className="rounded-2xl px-8 py-20 text-center bg-white border-2 border-black/6">
             <Music className="h-14 w-14 text-black/10 mx-auto mb-5" />

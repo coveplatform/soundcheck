@@ -50,45 +50,12 @@ function formatEnum(value: string): string {
     .join(" ");
 }
 
-const qualityConfig: Record<
-  string,
-  { label: string; bg: string; border: string; text: string; dot: string }
-> = {
-  PROFESSIONAL: {
-    label: "Professional",
-    bg: "bg-lime-50",
-    border: "border-lime-300",
-    text: "text-lime-800",
-    dot: "bg-lime-500",
-  },
-  RELEASE_READY: {
-    label: "Release Ready",
-    bg: "bg-lime-50",
-    border: "border-lime-300",
-    text: "text-lime-800",
-    dot: "bg-lime-500",
-  },
-  ALMOST_THERE: {
-    label: "Almost There",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    text: "text-amber-800",
-    dot: "bg-amber-400",
-  },
-  DEMO_STAGE: {
-    label: "Demo Stage",
-    bg: "bg-orange-50",
-    border: "border-orange-200",
-    text: "text-orange-800",
-    dot: "bg-orange-400",
-  },
-  NOT_READY: {
-    label: "Not Ready Yet",
-    bg: "bg-red-50",
-    border: "border-red-200",
-    text: "text-red-700",
-    dot: "bg-red-400",
-  },
+const qualityConfig: Record<string, { label: string; bg: string; text: string }> = {
+  PROFESSIONAL:  { label: "Professional",   bg: "bg-lime-400",   text: "text-black" },
+  RELEASE_READY: { label: "Release Ready",  bg: "bg-lime-400",   text: "text-black" },
+  ALMOST_THERE:  { label: "Almost There",   bg: "bg-amber-400",  text: "text-black" },
+  DEMO_STAGE:    { label: "Demo Stage",     bg: "bg-orange-400", text: "text-black" },
+  NOT_READY:     { label: "Not Ready Yet",  bg: "bg-red-500",    text: "text-white" },
 };
 
 // ---------------------------------------------------------------------------
@@ -447,25 +414,18 @@ export function ReviewDisplay({
         );
       })()}
 
-      {/* Quality verdict + replay — prominent badges */}
+      {/* Quality verdict + replay */}
       {(quality || review.wouldListenAgain !== null) && (
         <div className="flex flex-wrap items-center gap-2 mb-5">
           {quality && (
-            <span
-              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold border ${quality.bg} ${quality.border} ${quality.text}`}
-            >
-              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${quality.dot}`} />
+            <span className={`inline-flex items-center px-3 py-1 text-xs font-black border-2 border-black ${quality.bg} ${quality.text}`}>
               {quality.label}
             </span>
           )}
           {review.wouldListenAgain !== null && (
-            <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border ${
-                review.wouldListenAgain
-                  ? "bg-purple-50 border-purple-200 text-purple-700"
-                  : "bg-black/5 border-black/10 text-black/40"
-              }`}
-            >
+            <span className={`inline-flex items-center px-3 py-1 text-xs font-black border-2 border-black ${
+              review.wouldListenAgain ? "bg-black text-white" : "bg-white text-black/50"
+            }`}>
               {review.wouldListenAgain ? "↺ Would replay" : "✕ Wouldn't replay"}
             </span>
           )}
@@ -482,43 +442,51 @@ export function ReviewDisplay({
         )}
 
         {review.bestPart && (
-          <div className="rounded-xl bg-purple-50 border border-purple-200 p-4">
-            <p className="text-[10px] font-bold text-purple-700 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-              <CheckCircle2 className="h-3 w-3" />
-              What worked
-            </p>
-            <p className="text-sm text-black/80 leading-relaxed">{review.bestPart}</p>
+          <div className="border-2 border-black overflow-hidden">
+            <div className="bg-lime-400 px-4 py-2 flex items-center gap-1.5">
+              <CheckCircle2 className="h-3 w-3 text-black" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-black">What worked</p>
+            </div>
+            <div className="bg-white p-4">
+              <p className="text-sm text-black/80 leading-relaxed">{review.bestPart}</p>
+            </div>
           </div>
         )}
 
         {/* Legacy: quickWin */}
         {review.quickWin && (
-          <div className="rounded-xl bg-lime-50 border-2 border-lime-300 p-4">
-            <p className="text-[10px] font-bold text-lime-800 uppercase tracking-widest mb-2">
-              🎯 Quick Win
-            </p>
-            <p className="text-sm text-lime-900 font-medium leading-relaxed">{review.quickWin}</p>
+          <div className="border-2 border-black overflow-hidden">
+            <div className="bg-black px-4 py-2">
+              <p className="text-[10px] font-black uppercase tracking-widest text-white">🎯 Quick Win</p>
+            </div>
+            <div className="bg-white p-4">
+              <p className="text-sm text-black/80 font-medium leading-relaxed">{review.quickWin}</p>
+            </div>
           </div>
         )}
 
         {/* Main feedback — v3 (biggestWeaknessSpecific) or legacy (weakestPart only) */}
         {review.biggestWeaknessSpecific ? (
-          <div className="rounded-xl bg-amber-50 border border-amber-200 p-4">
-            <p className="text-[10px] font-bold text-amber-700 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-              <AlertCircle className="h-3 w-3" />
-              {review.quickWin ? "Biggest weakness" : "Main feedback"}
-            </p>
-            <p className="text-sm text-black/80 leading-relaxed">
-              {review.biggestWeaknessSpecific}
-            </p>
+          <div className="border-2 border-black overflow-hidden">
+            <div className="bg-amber-400 px-4 py-2 flex items-center gap-1.5">
+              <AlertCircle className="h-3 w-3 text-black" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-black">
+                {review.quickWin ? "Biggest weakness" : "Main feedback"}
+              </p>
+            </div>
+            <div className="bg-white p-4">
+              <p className="text-sm text-black/80 leading-relaxed">{review.biggestWeaknessSpecific}</p>
+            </div>
           </div>
         ) : review.weakestPart ? (
-          <div className="rounded-xl bg-amber-50 border border-amber-200 p-4">
-            <p className="text-[10px] font-bold text-amber-700 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-              <AlertCircle className="h-3 w-3" />
-              To improve
-            </p>
-            <p className="text-sm text-black/80 leading-relaxed">{review.weakestPart}</p>
+          <div className="border-2 border-black overflow-hidden">
+            <div className="bg-amber-400 px-4 py-2 flex items-center gap-1.5">
+              <AlertCircle className="h-3 w-3 text-black" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-black">To improve</p>
+            </div>
+            <div className="bg-white p-4">
+              <p className="text-sm text-black/80 leading-relaxed">{review.weakestPart}</p>
+            </div>
           </div>
         ) : null}
 
@@ -545,13 +513,13 @@ export function ReviewDisplay({
         )}
       </div>
 
-      {/* Technical issue chips — amber, only problems */}
+      {/* Technical issue chips */}
       {issueChips.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-4">
           {issueChips.map((chip) => (
             <span
               key={chip}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800"
+              className="inline-flex items-center gap-1 px-2.5 py-1 border-2 border-black bg-amber-400 text-xs font-black text-black"
             >
               ⚠ {chip}
             </span>
@@ -649,43 +617,32 @@ export function ReviewDisplay({
 
       {/* Rate this feedback + Gem */}
       {showControls && (
-        <footer className="mt-6 pt-5 border-t border-black/10">
-          <div className="rounded-xl bg-black/[0.03] border border-black/10 p-4">
-            <p className="text-xs font-bold text-black/70 mb-3">
-              What did you think of this feedback?
-            </p>
-
-            {/* Star rating */}
-            <div className="flex items-center gap-2 mb-4">
-              <ReviewRating
-                reviewId={review.id}
-                initialRating={review.artistRating ?? null}
-              />
-              <span className="text-xs text-black/50">Rate this review</span>
+        <footer className="mt-6 pt-5 border-t-2 border-black/10">
+          <div className="border-2 border-black overflow-hidden">
+            <div className="bg-black px-4 py-2.5">
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/50">
+                Rate this feedback
+              </p>
             </div>
-
-            {/* Gem */}
-            <div className="flex items-start gap-3 rounded-lg bg-white border border-black/10 p-3">
-              <ReviewGem reviewId={review.id} initialIsGem={review.isGem ?? false} />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-black/80">
-                  Award a Gem for exceptional feedback
-                </p>
-                <p className="text-[11px] text-black/50 mt-0.5">
-                  Gems reward reviewers who go above and beyond. They&apos;ll earn recognition and
-                  priority in future reviews.
-                </p>
+            <div className="bg-white p-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <ReviewRating reviewId={review.id} initialRating={review.artistRating ?? null} />
+                <span className="text-xs text-black/40 font-bold">Rate this review</span>
+              </div>
+              <div className="flex items-start gap-3 border-2 border-black p-3">
+                <ReviewGem reviewId={review.id} initialIsGem={review.isGem ?? false} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-black text-black">Award a Gem for exceptional feedback</p>
+                  <p className="text-[11px] text-black/50 mt-0.5 leading-snug">
+                    Gems reward reviewers who go above and beyond. They&apos;ll earn recognition and
+                    priority in future reviews.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-
-          {/* Flag */}
           <div className="mt-3">
-            <ReviewFlag
-              reviewId={review.id}
-              wasFlagged={review.wasFlagged}
-              flagReason={review.flagReason}
-            />
+            <ReviewFlag reviewId={review.id} wasFlagged={review.wasFlagged} flagReason={review.flagReason} />
           </div>
         </footer>
       )}

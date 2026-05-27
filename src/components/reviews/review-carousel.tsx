@@ -38,7 +38,6 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
     setCurrentIndex(index);
   }, [isAnimating, currentIndex]);
 
-  // Reset animation state
   useEffect(() => {
     if (isAnimating) {
       const timer = setTimeout(() => setIsAnimating(false), 300);
@@ -46,18 +45,11 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
     }
   }, [isAnimating]);
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        goToPrev();
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        goToNext();
-      }
+      if (e.key === "ArrowLeft") { e.preventDefault(); goToPrev(); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); goToNext(); }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [goToNext, goToPrev]);
@@ -65,11 +57,11 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
   if (totalReviews === 0) {
     return (
       <div className="text-center py-12 px-6">
-        <div className="mx-auto w-12 h-12 bg-neutral-100 border-2 border-black flex items-center justify-center mb-4">
-          <span className="text-xl">0</span>
+        <div className="mx-auto w-12 h-12 bg-black/5 border-2 border-black flex items-center justify-center mb-4">
+          <span className="text-xl font-black">0</span>
         </div>
-        <h3 className="font-bold text-black">No reviews yet</h3>
-        <p className="text-sm text-neutral-600 mt-1">Check back soon!</p>
+        <h3 className="font-black text-black">No reviews yet</h3>
+        <p className="text-sm text-black/40 mt-1">Check back soon!</p>
       </div>
     );
   }
@@ -77,28 +69,26 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
   const currentReview = reviews[currentIndex];
 
   return (
-    <div className="relative">
-      {/* Header with counter and navigation */}
-      <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b border-black/10">
+    <div>
+      {/* Header — solid black bar */}
+      <div className="flex items-center justify-between bg-black px-5 py-3">
         <div className="flex items-center gap-2.5">
-          <span className="text-xs font-mono tracking-widest uppercase text-black/40">Review</span>
-          <span className="text-sm font-bold tabular-nums text-black">
+          <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Review</span>
+          <span className="text-sm font-black tabular-nums text-white">
             {currentIndex + 1}
-            <span className="text-black/30 mx-0.5">/</span>
+            <span className="text-white/30 mx-1">/</span>
             {totalReviews}
           </span>
         </div>
-
-        {/* Navigation arrows */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <button
             onClick={goToPrev}
             disabled={currentIndex === 0}
             className={cn(
-              "h-8 w-8 flex items-center justify-center rounded-full transition-colors duration-150 ease-out motion-reduce:transition-none",
+              "h-8 w-8 flex items-center justify-center transition-colors duration-150",
               currentIndex === 0
-                ? "text-black/20 cursor-not-allowed"
-                : "text-black/60 hover:bg-black/5 active:bg-black/10"
+                ? "text-white/20 cursor-not-allowed"
+                : "text-white/70 hover:text-white hover:bg-white/10 active:bg-white/20"
             )}
             aria-label="Previous review"
           >
@@ -108,10 +98,10 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
             onClick={goToNext}
             disabled={currentIndex === totalReviews - 1}
             className={cn(
-              "h-8 w-8 flex items-center justify-center rounded-full transition-colors duration-150 ease-out motion-reduce:transition-none",
+              "h-8 w-8 flex items-center justify-center transition-colors duration-150",
               currentIndex === totalReviews - 1
-                ? "text-black/20 cursor-not-allowed"
-                : "text-black/60 hover:bg-black/5 active:bg-black/10"
+                ? "text-white/20 cursor-not-allowed"
+                : "text-white/70 hover:text-white hover:bg-white/10 active:bg-white/20"
             )}
             aria-label="Next review"
           >
@@ -120,8 +110,8 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
         </div>
       </div>
 
-      {/* Review content with animation */}
-      <div className="relative overflow-hidden">
+      {/* Review content */}
+      <div className="relative overflow-hidden bg-white">
         <div
           className={cn(
             "transition-transform duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none",
@@ -130,26 +120,20 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
           )}
           key={currentIndex}
         >
-          <ReviewDisplay
-            review={currentReview}
-            index={currentIndex}
-            showControls={showControls}
-          />
+          <ReviewDisplay review={currentReview} index={currentIndex} showControls={showControls} />
         </div>
       </div>
 
       {/* Dot indicators */}
       {totalReviews > 1 && (
-        <div className="flex items-center justify-center gap-1.5 py-3 border-t border-black/5">
+        <div className="flex items-center justify-center gap-1.5 py-3 border-t-2 border-black/8 bg-white">
           {reviews.map((_, index) => (
             <button
               key={index}
               onClick={() => goToIndex(index)}
               className={cn(
-                "h-1.5 rounded-full transition-[width,background-color] duration-150 ease-out motion-reduce:transition-none",
-                index === currentIndex
-                  ? "w-5 bg-purple-500"
-                  : "w-1.5 bg-black/15 hover:bg-black/25"
+                "h-1.5 rounded-full transition-[width,background-color] duration-150 ease-out",
+                index === currentIndex ? "w-5 bg-black" : "w-1.5 bg-black/20 hover:bg-black/40"
               )}
               aria-label={`Go to review ${index + 1}`}
             />
