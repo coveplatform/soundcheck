@@ -16,9 +16,10 @@ MixReflect is a two-sided marketplace where music producers and artists exchange
 ## Pricing
 
 - **Free (forever)**: 1 track in review queue at a time, earn unlimited credits by reviewing others, full analytics dashboard, public track sharing page. No credit card required.
-- **Pro — $9.99/month**: 3 tracks in review queue at once, 20 credits added to your account monthly, priority queue placement, Pro badge. Cancel anytime.
+- **Credit pack — $9.95 (one-time)**: 10 review credits, never expire.
+- **Pro — $24.95/month**: 30 credits every month, 3 tracks in review queue at once, up to 10 reviews per track, priority queue placement. Cancel anytime.
 
-There is no $12 plan. There are no paid-per-review tiers for artists.
+There are no other paid tiers.
 
 ## Key Features
 
@@ -52,9 +53,18 @@ Music producers, beatmakers, and independent artists who want honest, structured
 ## Key Pages
 
 - Homepage: https://mixreflect.com
+- Blog (The Drop): https://mixreflect.com/blog
 - Review queue: https://mixreflect.com/review
 - Discover (3D music space): https://mixreflect.com/discover
+- Breakthrough (daily featured track): https://mixreflect.com/breakthrough
 - Pricing: https://mixreflect.com/#pricing
 - Support: https://mixreflect.com/support
 - Terms: https://mixreflect.com/terms
 - Privacy: https://mixreflect.com/privacy
+
+## Blog posts (The Drop)
+
+- https://mixreflect.com/blog/what-multiple-listeners-tell-you-that-one-person-cant
+- https://mixreflect.com/blog/how-to-get-feedback-on-music-before-releasing
+- https://mixreflect.com/blog/best-way-to-get-honest-feedback-on-a-beat
+- https://mixreflect.com/blog/how-music-producers-get-their-tracks-reviewed

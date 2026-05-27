@@ -10,12 +10,26 @@ import { PeerModelSection } from "@/components/landing/peer-model-section";
 import { ActivityFeed } from "@/components/landing/activity-feed";
 import { BrowserMockup } from "@/components/landing/browser-mockup";
 import { TrackPageMockup } from "@/components/landing/track-page-mockup";
+import type { Metadata } from "next";
 
 import { Sparkle, Star, Squiggle, Dots } from "@/components/landing/doodles";
 import { AnimatedSection } from "@/components/landing/animated-section";
 import { OnlineListeners } from "@/components/landing/online-listeners";
 import { HeroCTA } from "@/components/landing/hero-cta";
 import { SignupLink } from "@/components/landing/signup-link";
+
+export const metadata: Metadata = {
+  title: "MixReflect — Get Real Feedback on Your Music Before You Release",
+  description:
+    "Upload your track and get honest, structured feedback from genre-matched artists within hours. Free to start. No credit card required.",
+  openGraph: {
+    title: "MixReflect — Get Real Feedback on Your Music Before You Release",
+    description:
+      "Upload your track and get honest, structured feedback from genre-matched artists within hours. Free to start. No credit card required.",
+    url: "https://mixreflect.com",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "MixReflect" }],
+  },
+};
 
 const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
 
@@ -30,9 +44,36 @@ const discoverArtwork = [
   "/activity-artwork/31.jpg",
 ];
 
+const faqItems = [
+  { q: "Where can I get honest feedback on my music?", a: "MixReflect is built for exactly that. Upload your track and genre-matched artists review it with structured, honest feedback. You start with one free credit — no credit card required." },
+  { q: "What is MixReflect?", a: "MixReflect is the fastest way to find out what's actually working in your track before you release it. Upload your music, get honest structured feedback from genre-matched artists within hours, and see the patterns across multiple listens. Artists help each other improve — no middlemen, no gatekeepers." },
+  { q: "How do credits work?", a: "Every time you review another artist's track, you earn a credit. Spend that credit to get a review on one of your own tracks. It's a simple give-one-get-one system that keeps quality feedback flowing." },
+  { q: "Do I need to pay to get music feedback?", a: "No. MixReflect is free to use. You earn credits by reviewing other artists' tracks, then spend those credits to get reviews on your own music. No upfront cost, no credit card required. If you'd rather not grind, grab a 10-credit pack for $9.95, or go Pro ($24.95/month) for 30 credits every month plus perks." },
+  { q: "Is it really free?", a: "Yes. You can upload tracks, earn credits by reviewing, and access full analytics — all for free, forever. Pro is for artists who want to move faster with more tracks in review at once." },
+  { q: "What does Pro get me?", a: "Pro gives you 30 fresh credits every month — enough to submit several tracks with multiple reviews each. Up to 3 tracks in review at once, up to 10 reviews per track, plus priority placement. $24.95/month, cancel anytime. Need more in a busy month? Top up with a $9.95 credit pack any time." },
+  { q: "Who reviews my tracks?", a: "Other artists on the platform who share your genre. Everyone is both an artist and a reviewer. After each review, you rate the quality — low-rated reviewers lose access, so the feedback stays useful and honest." },
+  { q: "Why do I need multiple reviews?", a: "One person's feedback is just their taste. With multiple reviews, patterns emerge. If one person says your intro is too long, maybe they're wrong. If most reviewers say it, that's signal worth acting on." },
+  { q: "How do I know if my track is ready to release?", a: "When multiple people who don't know each other say the same thing — that's your signal. MixReflect shows you patterns across your reviews. If four out of five reviewers flag the same issue, it's not taste, it's something worth fixing before you put it out." },
+  { q: "Is my music safe?", a: "Yes. Your unreleased tracks are only heard by genre-matched artists reviewing your work. We never share, publish, or leak anything. You can choose to allow your music to be public and discoverable." },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqItems.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+};
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#faf8f5] text-neutral-950" style={{ paddingTop: "56px" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#faf8f5]/90 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4">
@@ -426,48 +467,7 @@ export default function Home() {
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-extrabold mb-10 text-neutral-950">Questions</h2>
           <div className="space-y-0 rounded-2xl bg-white shadow-md overflow-hidden">
-            {[
-              {
-                q: "Where can I get honest feedback on my music?",
-                a: "MixReflect is built for exactly that. Upload your track and genre-matched artists review it with structured, honest feedback. You start with one free credit — no credit card required.",
-              },
-              {
-                q: "What is MixReflect?",
-                a: "MixReflect is the fastest way to find out what's actually working in your track before you release it. Upload your music, get honest structured feedback from genre-matched artists within hours, and see the patterns across multiple listens. Artists help each other improve — no middlemen, no gatekeepers.",
-              },
-              {
-                q: "How do credits work?",
-                a: "Every time you review another artist's track, you earn a credit. Spend that credit to get a review on one of your own tracks. It's a simple give-one-get-one system that keeps quality feedback flowing.",
-              },
-              {
-                q: "Do I need to pay to get music feedback?",
-                a: "No. MixReflect is free to use. You earn credits by reviewing other artists' tracks, then spend those credits to get reviews on your own music. No upfront cost, no credit card required. If you'd rather not grind, grab a 10-credit pack for $9.95, or go Pro ($24.95/month) for 30 credits every month plus perks.",
-              },
-              {
-                q: "Is it really free?",
-                a: "Yes. You can upload tracks, earn credits by reviewing, and access full analytics — all for free, forever. Pro is for artists who want to move faster with more tracks in review at once.",
-              },
-              {
-                q: "What does Pro get me?",
-                a: "Pro gives you 30 fresh credits every month — enough to submit several tracks with multiple reviews each. Up to 3 tracks in review at once, up to 10 reviews per track, plus priority placement. $24.95/month, cancel anytime. Need more in a busy month? Top up with a $9.95 credit pack any time.",
-              },
-              {
-                q: "Who reviews my tracks?",
-                a: "Other artists on the platform who share your genre. Everyone is both an artist and a reviewer. After each review, you rate the quality — low-rated reviewers lose access, so the feedback stays useful and honest.",
-              },
-              {
-                q: "Why do I need multiple reviews?",
-                a: "One person's feedback is just their taste. With multiple reviews, patterns emerge. If one person says your intro is too long, maybe they're wrong. If most reviewers say it, that's signal worth acting on.",
-              },
-              {
-                q: "How do I know if my track is ready to release?",
-                a: "When multiple people who don't know each other say the same thing — that's your signal. MixReflect shows you patterns across your reviews. If four out of five reviewers flag the same issue, it's not taste, it's something worth fixing before you put it out.",
-              },
-              {
-                q: "Is my music safe?",
-                a: "Yes. Your unreleased tracks are only heard by genre-matched artists reviewing your work. We never share, publish, or leak anything. You can choose to allow your music to be public and discoverable.",
-              },
-            ].map((item, i, arr) => (
+            {faqItems.map((item, i, arr) => (
               <details
                 key={item.q}
                 className={`p-4 ${i < arr.length - 1 ? "" : ""}`}
