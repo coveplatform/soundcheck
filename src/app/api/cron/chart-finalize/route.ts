@@ -31,8 +31,19 @@ async function handler(request: Request) {
     const yesterdayEnd = new Date(yesterday);
     yesterdayEnd.setUTCHours(23, 59, 59, 999);
 
-    // Find all reviews completed yesterday
-    const reviews = await (prisma as any).review.findMany({
+    // Look back up to 7 days so low-activity days still produce a winner
+    const sevenDaysAgo = new Date(yesterday);
+    sevenDaysAgo.setUTCDate(sevenDaysAgo.getUTCDate() - 6);
+
+    // Find tracks already featured in the past 7 days so we don't repeat them
+    const recentlyFeatured = await (prisma as any).chartSubmission.findMany({
+      where: { isFeatured: true, chartDate: { gte: sevenDaysAgo } },
+      select: { trackId: true },
+    });
+    const recentlyFeaturedTrackIds = new Set(recentlyFeatured.map((s: any) => s.trackId));
+
+    // Find all reviews completed in the past 7 days
+    let reviews = await (prisma as any).review.findMany({
       where: {
         status: "COMPLETED",
         updatedAt: { gte: yesterday, lte: yesterdayEnd },
@@ -48,8 +59,27 @@ async function handler(request: Request) {
       },
     });
 
+    // If nothing from yesterday, widen to 7 days
     if (reviews.length === 0) {
-      return NextResponse.json({ success: true, message: "No reviewed tracks yesterday", winner: null });
+      reviews = await (prisma as any).review.findMany({
+        where: {
+          status: "COMPLETED",
+          updatedAt: { gte: sevenDaysAgo, lte: yesterdayEnd },
+          countsTowardAnalytics: true,
+        },
+        include: {
+          Track: {
+            include: {
+              ArtistProfile: { select: { id: true, artistName: true } },
+              Genre: { select: { name: true } },
+            },
+          },
+        },
+      });
+    }
+
+    if (reviews.length === 0) {
+      return NextResponse.json({ success: true, message: "No reviewed tracks in the past 7 days", winner: null });
     }
 
     // Group by track, score by reviewCount + avg scores
@@ -77,7 +107,8 @@ async function handler(request: Request) {
       return scoreB - scoreA;
     });
 
-    const winner = ranked[0];
+    // Prefer a track not featured in the past 7 days; fall back to top overall if all have been featured
+    const winner = ranked.find((r) => !recentlyFeaturedTrackIds.has(r.track.id)) ?? ranked[0];
     const track = winner.track;
 
     // Create or update the ChartSubmission for yesterday
