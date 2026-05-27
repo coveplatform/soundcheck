@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@mixreflect.com";
 
-export default function PublicSupportPage() {
+export default function SupportPage() {
   return (
     <div className="min-h-screen bg-[#faf8f5] pt-[64px]">
 
@@ -131,7 +131,7 @@ export default function PublicSupportPage() {
               },
               {
                 q: "Can I get a refund on credits?",
-                a: "If your track didn't receive the reviews you paid for, reach out and we'll make it right. Email us at support@mixreflect.com.",
+                a: `If your track didn't receive the reviews you paid for, reach out and we'll make it right. Email us at ${supportEmail}.`,
               },
               {
                 q: "Is my unreleased music safe?",
