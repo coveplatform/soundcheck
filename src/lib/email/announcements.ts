@@ -364,7 +364,19 @@ export function buildRecaptureEmail(params: { userName?: string }): { subject: s
   const dashboardUrl = `${appUrl}/dashboard`;
   const submitUrl = `${appUrl}/submit`;
 
+  const heroImageUrl = "https://www.mixreflect.com/blog/blog1.jpg";
+
   const content = `
+    <!-- Hero image -->
+    <div style="margin: -36px -36px 28px -36px;">
+      <img
+        src="${heroImageUrl}"
+        alt=""
+        width="520"
+        style="display: block; width: 100%; max-width: 520px; height: auto; border-radius: 0;"
+      />
+    </div>
+
     <p style="margin: 0 0 16px; font-size: 15px; color: ${COLORS.black}; line-height: 1.7;">
       ${name ? `Hey ${name},` : "Hey,"}
     </p>
