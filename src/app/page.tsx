@@ -503,7 +503,7 @@ export default function Home() {
                 Privacy
               </Link>
               <Link href="/support" className="hover:text-white font-medium transition-colors">
-                Support
+                Contact
               </Link>
             </div>
           </div>
