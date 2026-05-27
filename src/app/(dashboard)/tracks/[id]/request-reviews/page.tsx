@@ -271,7 +271,7 @@ export default function RequestReviewsPage() {
                   <p className="text-base font-black text-white leading-tight mb-0.5">30 credits monthly.</p>
                   <p className="text-base font-black text-purple-400 leading-tight mb-3">Front of the queue.</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {["⚡ Priority", "3 tracks at once", "10 reviews/track"].map((f) => (
+                    {["⚡ Priority", "3 tracks at once", "10 reviews/track", "Unlimited reviews/day"].map((f) => (
                       <span key={f} className="text-[10px] font-black text-white/40 bg-white/5 px-2 py-1">
                         {f}
                       </span>

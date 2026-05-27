@@ -52,7 +52,7 @@ export async function sendWelcomeEmail(params: { to: string; name?: string | nul
     <div style="background-color: #f3e8ff; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
       <p style="margin: 0 0 6px; font-size: 12px; font-weight: 700; color: ${COLORS.purple}; text-transform: uppercase; letter-spacing: 0.5px;">Need credits without the grind?</p>
       <p style="margin: 0; font-size: 14px; color: ${COLORS.gray}; line-height: 1.6;">
-        Grab a <strong style="color: ${COLORS.black};">10-credit pack for $9.95</strong> — they never expire. Or go <strong style="color: ${COLORS.black};">Pro at $24.95/month</strong> for 30 credits every billing period, priority queue placement, and up to 3 tracks in review at once.
+        Grab a <strong style="color: ${COLORS.black};">10-credit pack for $9.95</strong> — they never expire. Or go <strong style="color: ${COLORS.black};">Pro at $24.95/month</strong> for 30 credits every billing period, priority queue placement, up to 3 tracks in review at once, and unlimited reviews per day.
       </p>
     </div>
 

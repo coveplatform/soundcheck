@@ -128,7 +128,7 @@ const jsonLd = {
           price: "24.95",
           priceCurrency: "USD",
           name: "Pro",
-          description: "30 credits every month, up to 10 reviews per track, 3 active slots, priority placement.",
+          description: "30 credits every month, up to 10 reviews per track, 3 active slots, priority placement, unlimited reviews per day.",
         },
       ],
     },
