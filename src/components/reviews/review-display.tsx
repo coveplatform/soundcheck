@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
-import { CheckCircle2, AlertCircle } from "lucide-react";
 import { ReviewRating } from "@/components/artist/review-rating";
 import { ReviewFlag } from "@/components/artist/review-flag";
 import { ReviewGem } from "@/components/artist/review-gem";
@@ -13,11 +12,7 @@ function isTimestampNote(
   if (!value || typeof value !== "object") return false;
   if (Array.isArray(value)) return false;
   const v = value as Record<string, unknown>;
-  return (
-    typeof v.seconds === "number" &&
-    typeof v.note === "string" &&
-    v.note.length > 0
-  );
+  return typeof v.seconds === "number" && typeof v.note === "string" && v.note.length > 0;
 }
 
 function getFirstName(name: string) {
@@ -44,10 +39,7 @@ function getReviewerTitle(p: {
 }
 
 function formatEnum(value: string): string {
-  return value
-    .split("_")
-    .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
-    .join(" ");
+  return value.split("_").map((w) => w.charAt(0) + w.slice(1).toLowerCase()).join(" ");
 }
 
 const qualityConfig: Record<string, { label: string; bg: string; text: string }> = {
@@ -58,9 +50,7 @@ const qualityConfig: Record<string, { label: string; bg: string; text: string }>
   NOT_READY:     { label: "Not Ready Yet",  bg: "bg-red-500",    text: "text-white" },
 };
 
-// ---------------------------------------------------------------------------
-// Engagement curve helpers
-// ---------------------------------------------------------------------------
+// ── Engagement curve ──────────────────────────────────────────────────────────
 
 type CurvePoint = { seconds: number; level: number };
 
@@ -75,11 +65,9 @@ const CURVE_LEVELS = [
 function curveColor(level: number) {
   return CURVE_LEVELS.find((l) => l.value === level)?.color ?? "#9333ea";
 }
-
 function curveLabel(level: number) {
   return CURVE_LEVELS.find((l) => l.value === level)?.label ?? "";
 }
-
 function fmtTime(s: number) {
   return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 }
@@ -94,106 +82,62 @@ function parseCurve(raw: Prisma.JsonValue): CurvePoint[] {
 
 function analyzeCurve(curve: CurvePoint[]): { summary: string; insights: string[] } {
   if (curve.length < 5) return { summary: "", insights: [] };
-
   const levels = curve.map((p) => p.level);
   const avg = levels.reduce((a, b) => a + b, 0) / levels.length;
-
   const peakIdx = levels.indexOf(Math.max(...levels));
   const peak = curve[peakIdx];
-
   const opening = curve.slice(0, Math.ceil(curve.length * 0.2));
   const openAvg = opening.reduce((a, b) => a + b.level, 0) / opening.length;
-
   const closing = curve.slice(Math.floor(curve.length * 0.8));
   const closeAvg = closing.reduce((a, b) => a + b.level, 0) / closing.length;
-
   const midSection = curve.slice(Math.floor(curve.length * 0.25), Math.floor(curve.length * 0.75));
   const midMin = midSection.length ? Math.min(...midSection.map((p) => p.level)) : 3;
   const midMinIdx = midSection.findIndex((p) => p.level === midMin);
   const midDip = midSection[midMinIdx];
-
   const trajectory = closeAvg - openAvg;
-
   const insights: string[] = [];
-
-  if (peak.level >= 4) {
-    insights.push(`Peaked at "${curveLabel(peak.level)}" around ${fmtTime(peak.seconds)}`);
-  }
-
-  if (openAvg >= 4) {
-    insights.push("Opening hook landed immediately — held from the first second");
-  } else if (openAvg <= 2) {
-    insights.push("Slow to grab attention — the opening didn't pull them in");
-  }
-
-  if (trajectory >= 1.5) {
-    insights.push("Engagement built consistently — the track improved as it went on");
-  } else if (trajectory <= -1.5) {
-    insights.push(`Dropped off in the final section — ended at "${curveLabel(Math.round(closeAvg))}"`);
-  }
-
-  if (midDip && midDip.level <= 2 && peak.level >= 4) {
-    insights.push(`Dipped to "${curveLabel(midDip.level)}" mid-track around ${fmtTime(midDip.seconds)} — a weak moment`);
-  }
-
+  if (peak.level >= 4) insights.push(`Peaked at "${curveLabel(peak.level)}" around ${fmtTime(peak.seconds)}`);
+  if (openAvg >= 4) insights.push("Opening hook landed immediately — held from the first second");
+  else if (openAvg <= 2) insights.push("Slow to grab attention — the opening didn't pull them in");
+  if (trajectory >= 1.5) insights.push("Engagement built consistently — the track improved as it went on");
+  else if (trajectory <= -1.5) insights.push(`Dropped off in the final section — ended at "${curveLabel(Math.round(closeAvg))}"`);
+  if (midDip && midDip.level <= 2 && peak.level >= 4) insights.push(`Dipped to "${curveLabel(midDip.level)}" mid-track around ${fmtTime(midDip.seconds)} — a weak moment`);
   let summary = "";
-  if (avg >= 4.2) {
-    summary = "This listener was hooked throughout — strong all-round engagement.";
-  } else if (avg >= 3.5) {
-    summary = trajectory > 0.5
-      ? "Good overall engagement with a positive arc — built well toward the end."
-      : trajectory < -0.5
-      ? "Started strong but lost momentum — the second half needs attention."
-      : "Solid, consistent engagement throughout with no major drops.";
-  } else if (avg >= 2.5) {
-    summary = trajectory > 0.5
-      ? "Started tentative but eventually found its footing."
-      : "Mixed engagement — moments of interest but also stretches that lost them.";
-  } else {
-    summary = "This listener struggled to stay engaged — the track didn't hold attention.";
-  }
-
+  if (avg >= 4.2) summary = "This listener was hooked throughout — strong all-round engagement.";
+  else if (avg >= 3.5) summary = trajectory > 0.5 ? "Good overall engagement with a positive arc — built well toward the end." : trajectory < -0.5 ? "Started strong but lost momentum — the second half needs attention." : "Solid, consistent engagement throughout with no major drops.";
+  else if (avg >= 2.5) summary = trajectory > 0.5 ? "Started tentative but eventually found its footing." : "Mixed engagement — moments of interest but also stretches that lost them.";
+  else summary = "This listener struggled to stay engaged — the track didn't hold attention.";
   return { summary, insights };
 }
 
 function MiniEngagementChart({ curve }: { curve: CurvePoint[] }) {
-  const W = 600;
-  const H = 52;
-  const PAD = 4;
-
+  const W = 600; const H = 52; const PAD = 4;
   const maxDur = Math.max(curve[curve.length - 1]?.seconds ?? 1, 1);
   const toX = (s: number) => PAD + (s / maxDur) * (W - PAD * 2);
   const toY = (l: number) => H - PAD - ((l - 1) / 4) * (H - PAD * 2);
   const pts = curve.map((p) => [toX(p.seconds), toY(p.level)] as [number, number]);
-
-  const segments = pts.length >= 2
-    ? pts.slice(0, -1).map((p0, i) => {
-        const p1 = pts[i + 1];
-        const cpx = (p0[0] + p1[0]) / 2;
-        const color = curveColor(curve[i].level);
-        return {
-          color,
-          line: `M ${p0[0]},${p0[1]} C ${cpx},${p0[1]} ${cpx},${p1[1]} ${p1[0]},${p1[1]}`,
-          fill: `M ${p0[0]},${H - PAD} L ${p0[0]},${p0[1]} C ${cpx},${p0[1]} ${cpx},${p1[1]} ${p1[0]},${p1[1]} L ${p1[0]},${H - PAD} Z`,
-        };
-      })
-    : [];
-
+  const segments = pts.length >= 2 ? pts.slice(0, -1).map((p0, i) => {
+    const p1 = pts[i + 1];
+    const cpx = (p0[0] + p1[0]) / 2;
+    const color = curveColor(curve[i].level);
+    return {
+      color,
+      line: `M ${p0[0]},${p0[1]} C ${cpx},${p0[1]} ${cpx},${p1[1]} ${p1[0]},${p1[1]}`,
+      fill: `M ${p0[0]},${H - PAD} L ${p0[0]},${p0[1]} C ${cpx},${p0[1]} ${cpx},${p1[1]} ${p1[0]},${p1[1]} L ${p1[0]},${H - PAD} Z`,
+    };
+  }) : [];
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 52 }} preserveAspectRatio="none">
-      {[1, 2, 3, 4, 5].map((i) => (
+      {[1,2,3,4,5].map((i) => (
         <line key={i} x1={0} y1={toY(i)} x2={W} y2={toY(i)} stroke="black" strokeOpacity="0.04" strokeWidth="1" />
       ))}
-      {segments.map((seg, i) => (
-        <path key={`f${i}`} d={seg.fill} fill={seg.color} fillOpacity="0.12" />
-      ))}
-      {segments.map((seg, i) => (
-        <path key={`l${i}`} d={seg.line} fill="none" stroke={seg.color} strokeWidth="2.5"
-          strokeLinecap="round" strokeLinejoin="round" />
-      ))}
+      {segments.map((seg, i) => <path key={`f${i}`} d={seg.fill} fill={seg.color} fillOpacity="0.12" />)}
+      {segments.map((seg, i) => <path key={`l${i}`} d={seg.line} fill="none" stroke={seg.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />)}
     </svg>
   );
 }
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 export type ReviewData = {
   id: string;
@@ -220,7 +164,6 @@ export type ReviewData = {
   wasFlagged: boolean;
   flagReason: string | null;
   engagementCurve?: Prisma.JsonValue;
-  // V2 fields
   lowEndClarity?: string | null;
   vocalClarity?: string | null;
   highEndQuality?: string | null;
@@ -248,9 +191,7 @@ export type ReviewData = {
   } | null;
   ArtistProfile?: {
     id: string;
-    User: {
-      name: string | null;
-    };
+    User: { name: string | null };
   } | null;
 };
 
@@ -260,29 +201,19 @@ type ReviewDisplayProps = {
   showControls?: boolean;
 };
 
-export function ReviewDisplay({
-  review,
-  index: _index,
-  showControls = true,
-}: ReviewDisplayProps) {
+// ── Main component ────────────────────────────────────────────────────────────
+
+export function ReviewDisplay({ review, index: _index, showControls = true }: ReviewDisplayProps) {
   const reviewerName =
-    review.ReviewerProfile?.User?.name ??
-    review.ArtistProfile?.User?.name ??
-    "Reviewer";
+    review.ReviewerProfile?.User?.name ?? review.ArtistProfile?.User?.name ?? "Reviewer";
   const isRestricted = review.ReviewerProfile?.isRestricted ?? false;
   const reviewerProfileId =
     !isRestricted ? (review.ReviewerProfile?.id ?? review.ArtistProfile?.id) : null;
-  const reviewerTitle = review.ReviewerProfile
-    ? getReviewerTitle(review.ReviewerProfile)
-    : null;
+  const reviewerTitle = review.ReviewerProfile ? getReviewerTitle(review.ReviewerProfile) : null;
   const reviewerGenres = review.ReviewerProfile?.Genre?.slice(0, 2) ?? [];
   const reviewerCount = review.ReviewerProfile?.totalReviews ?? 0;
+  const quality = review.qualityLevel ? qualityConfig[review.qualityLevel as string] : null;
 
-  const quality = review.qualityLevel
-    ? qualityConfig[review.qualityLevel as string]
-    : null;
-
-  // Issue chips — only show problems, not clean signals
   const issueChips: string[] = [];
   if (review.vocalClarity === "BURIED") issueChips.push("Vocals buried");
   if (review.lowEndClarity === "BOTH_MUDDY") issueChips.push("Low end muddy");
@@ -292,27 +223,33 @@ export function ReviewDisplay({
   if (review.tooRepetitive) issueChips.push("Too repetitive");
   if (review.trackLength === "WAY_TOO_LONG") issueChips.push("Too long");
 
+  const mainFeedback = review.biggestWeaknessSpecific || review.weakestPart;
+
+  const curve = parseCurve(review.engagementCurve ?? null);
+  const hasCurve = curve.length >= 5;
+  const { summary: curveSummary, insights: curveInsights } = hasCurve ? analyzeCurve(curve) : { summary: "", insights: [] };
+
   return (
-    <article className="px-5 sm:px-6 py-5">
-      {/* Header: Reviewer identity card */}
-      <header className="mb-5 pb-4 border-b border-black/6">
-        <div className="flex items-start gap-3">
-          {/* Avatar */}
+    <article className="px-5 sm:px-6 py-6">
+
+      {/* ── BYLINE ──────────────────────────────────────────────── */}
+      <header className="flex items-start justify-between gap-4 pb-5 mb-6 border-b-2 border-black">
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Avatar — solid black square */}
           {showControls && reviewerProfileId ? (
             <Link
               href={`/reviewers/${reviewerProfileId}`}
-              className="h-11 w-11 min-w-[2.75rem] flex-shrink-0 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-black text-white hover:opacity-80 transition-opacity"
+              className="h-9 w-9 min-w-[2.25rem] bg-black flex items-center justify-center text-xs font-black text-white hover:opacity-70 transition-opacity flex-shrink-0"
             >
               {getInitial(reviewerName)}
             </Link>
           ) : (
-            <span className="h-11 w-11 min-w-[2.75rem] flex-shrink-0 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-black text-white">
+            <span className="h-9 w-9 min-w-[2.25rem] bg-black flex items-center justify-center text-xs font-black text-white flex-shrink-0">
               {getInitial(reviewerName)}
             </span>
           )}
 
-          <div className="flex-1 min-w-0">
-            {/* Name row */}
+          <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               {showControls && reviewerProfileId ? (
                 <Link href={`/reviewers/${reviewerProfileId}`} className="font-black text-sm text-black hover:underline">
@@ -322,109 +259,52 @@ export function ReviewDisplay({
                 <span className="font-black text-sm text-black">{getFirstName(reviewerName)}</span>
               )}
               {reviewerTitle && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                <span className="text-[10px] font-black uppercase tracking-wider border border-black/20 px-1.5 py-0.5 text-black/40">
                   {reviewerTitle}
                 </span>
               )}
-              {review.firstImpression && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                  review.firstImpression === "STRONG_HOOK" ? "bg-purple-100 text-purple-700"
-                  : review.firstImpression === "DECENT" ? "bg-amber-50 text-amber-700"
-                  : "bg-black/5 text-black/50"
-                }`}>
-                  {review.firstImpression === "STRONG_HOOK" ? "Hooked"
-                    : review.firstImpression === "DECENT" ? "Solid"
-                    : "Lost Interest"}
-                </span>
-              )}
-            </div>
-
-            {/* Meta row: genres · count · date */}
-            <div className="flex items-center gap-2 mt-1 flex-wrap">
               {reviewerGenres.map((g) => (
-                <span key={g.id} className="text-[11px] font-semibold text-neutral-500">{g.name}</span>
+                <span key={g.id} className="text-[11px] font-bold text-black/35">{g.name}</span>
               ))}
-              {reviewerGenres.length > 0 && reviewerCount > 0 && (
-                <span className="text-black/15 text-[10px]">·</span>
-              )}
-              {reviewerCount > 0 && (
-                <span className="text-[11px] text-neutral-400">{reviewerCount} reviews</span>
-              )}
-              <span className="text-black/15 text-[10px]">·</span>
-              <time className="text-[11px] text-neutral-400">
-                {review.createdAt.toLocaleDateString()}
-              </time>
             </div>
-
-            {/* View reviewer link */}
-            {showControls && reviewerProfileId && (
-              <Link
-                href={`/reviewers/${reviewerProfileId}`}
-                className="inline-flex items-center gap-1 mt-2 text-[11px] font-bold text-purple-600 hover:text-purple-800 transition-colors"
-              >
-                View reviewer
-                <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M2 6h8M6 2l4 4-4 4" />
-                </svg>
-              </Link>
-            )}
+            <div className="flex items-center gap-2 mt-0.5">
+              {reviewerCount > 0 && (
+                <span className="text-[11px] text-black/30 font-mono">{reviewerCount} reviews</span>
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* Right: impression + date */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {review.firstImpression && (
+            <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-1 border-2 border-black ${
+              review.firstImpression === "STRONG_HOOK" ? "bg-black text-white"
+              : review.firstImpression === "DECENT" ? "bg-amber-400 text-black"
+              : "bg-white text-black/40"
+            }`}>
+              {review.firstImpression === "STRONG_HOOK" ? "Hooked"
+                : review.firstImpression === "DECENT" ? "Solid"
+                : "Lost Interest"}
+            </span>
+          )}
+          <time className="text-[11px] text-black/25 font-mono tabular-nums">
+            {review.createdAt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" })}
+          </time>
         </div>
       </header>
 
-      {/* Engagement curve + analysis */}
-      {(() => {
-        const curve = parseCurve(review.engagementCurve ?? null);
-        if (curve.length < 5) return null;
-        const { summary, insights } = analyzeCurve(curve);
-        const lastLevel = curve[curve.length - 1]?.level ?? 3;
-        const lastColor = curveColor(lastLevel);
-        return (
-          <div className="mb-5 rounded-xl border border-black/8 overflow-hidden">
-            <div className="px-4 pt-3 pb-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-1">
-                Listener engagement curve
-              </p>
-              <div className="flex items-center gap-2 mb-2">
-                {CURVE_LEVELS.map((l) => (
-                  <span key={l.value} className="flex items-center gap-1 text-[9px] font-semibold text-neutral-400">
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: l.color }} />
-                    {l.label}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <MiniEngagementChart curve={curve} />
-            <div className="px-4 pt-3 pb-4 bg-black/[0.02] border-t border-black/6">
-              {summary && (
-                <p className="text-sm font-semibold text-black/70 mb-3 leading-snug">{summary}</p>
-              )}
-              {insights.length > 0 && (
-                <ul className="space-y-1.5">
-                  {insights.map((insight, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs text-black/60">
-                      <span className="mt-0.5 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: lastColor }} />
-                      {insight}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* Quality verdict + replay */}
+      {/* ── VERDICT STAMP ───────────────────────────────────────── */}
       {(quality || review.wouldListenAgain !== null) && (
-        <div className="flex flex-wrap items-center gap-2 mb-5">
+        <div className="flex flex-wrap items-center gap-2 mb-6">
           {quality && (
-            <span className={`inline-flex items-center px-3 py-1 text-xs font-black border-2 border-black ${quality.bg} ${quality.text}`}>
+            <span className={`text-base font-black uppercase tracking-wide px-4 py-2 border-2 border-black ${quality.bg} ${quality.text}`}>
               {quality.label}
             </span>
           )}
           {review.wouldListenAgain !== null && (
-            <span className={`inline-flex items-center px-3 py-1 text-xs font-black border-2 border-black ${
-              review.wouldListenAgain ? "bg-black text-white" : "bg-white text-black/50"
+            <span className={`text-xs font-black uppercase tracking-wide px-3 py-2 border-2 border-black ${
+              review.wouldListenAgain ? "bg-black text-white" : "bg-white text-black/40"
             }`}>
               {review.wouldListenAgain ? "↺ Would replay" : "✕ Wouldn't replay"}
             </span>
@@ -432,197 +312,181 @@ export function ReviewDisplay({
         </div>
       )}
 
-      {/* Written feedback — the HERO */}
-      <div className="space-y-3 mb-5">
-        {review.addressedArtistNote && (
-          <p className="text-xs text-black/40 font-mono">
-            Re: your note —{" "}
-            <strong className="text-black/60">{review.addressedArtistNote}</strong>
-          </p>
-        )}
+      {/* ── ARTIST NOTE CALLOUT ─────────────────────────────────── */}
+      {review.addressedArtistNote && (
+        <p className="text-xs text-black/35 font-mono mb-5">
+          re: your note — <strong className="text-black/55">{review.addressedArtistNote}</strong>
+        </p>
+      )}
 
+      {/* ── ENGAGEMENT CURVE ────────────────────────────────────── */}
+      {hasCurve && (
+        <div className="mb-6">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-1">Listener Engagement</p>
+          <div className="flex gap-3 mb-2">
+            {CURVE_LEVELS.map((l) => (
+              <span key={l.value} className="flex items-center gap-1 text-[9px] font-bold text-black/30">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: l.color }} />
+                {l.label}
+              </span>
+            ))}
+          </div>
+          <MiniEngagementChart curve={curve} />
+          {curveSummary && (
+            <p className="text-xs text-black/50 mt-2 leading-snug">{curveSummary}</p>
+          )}
+          {curveInsights.length > 0 && (
+            <ul className="mt-2 space-y-1">
+              {curveInsights.map((insight, i) => (
+                <li key={i} className="text-xs text-black/40 flex items-start gap-2">
+                  <span className="mt-1.5 w-1 h-1 bg-black/30 rounded-full flex-shrink-0" />
+                  {insight}
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="mt-5 border-t border-black/8" />
+        </div>
+      )}
+
+      {/* ── WRITTEN FEEDBACK — hero prose ───────────────────────── */}
+      <div className="space-y-5">
         {review.bestPart && (
-          <div className="border-2 border-black overflow-hidden">
-            <div className="bg-lime-400 px-4 py-2 flex items-center gap-1.5">
-              <CheckCircle2 className="h-3 w-3 text-black" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-black">What worked</p>
-            </div>
-            <div className="bg-white p-4">
-              <p className="text-sm text-black/80 leading-relaxed">{review.bestPart}</p>
-            </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-2">What Worked</p>
+            <p className="text-[15px] leading-relaxed text-black/80">{review.bestPart}</p>
           </div>
         )}
 
-        {/* Legacy: quickWin */}
         {review.quickWin && (
-          <div className="border-2 border-black overflow-hidden">
-            <div className="bg-black px-4 py-2">
-              <p className="text-[10px] font-black uppercase tracking-widest text-white">🎯 Quick Win</p>
+          <>
+            <div className="border-t border-black/8" />
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-2">Quick Win</p>
+              <p className="text-[15px] leading-relaxed text-black/80">{review.quickWin}</p>
             </div>
-            <div className="bg-white p-4">
-              <p className="text-sm text-black/80 font-medium leading-relaxed">{review.quickWin}</p>
-            </div>
-          </div>
+          </>
         )}
 
-        {/* Main feedback — v3 (biggestWeaknessSpecific) or legacy (weakestPart only) */}
-        {review.biggestWeaknessSpecific ? (
-          <div className="border-2 border-black overflow-hidden">
-            <div className="bg-amber-400 px-4 py-2 flex items-center gap-1.5">
-              <AlertCircle className="h-3 w-3 text-black" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-black">
-                {review.quickWin ? "Biggest weakness" : "Main feedback"}
+        {mainFeedback && (
+          <>
+            <div className="border-t border-black/8" />
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-2">
+                {review.quickWin ? "Biggest Weakness" : "Main Feedback"}
               </p>
+              <p className="text-[15px] leading-relaxed text-black/80">{mainFeedback}</p>
             </div>
-            <div className="bg-white p-4">
-              <p className="text-sm text-black/80 leading-relaxed">{review.biggestWeaknessSpecific}</p>
-            </div>
-          </div>
-        ) : review.weakestPart ? (
-          <div className="border-2 border-black overflow-hidden">
-            <div className="bg-amber-400 px-4 py-2 flex items-center gap-1.5">
-              <AlertCircle className="h-3 w-3 text-black" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-black">To improve</p>
-            </div>
-            <div className="bg-white p-4">
-              <p className="text-sm text-black/80 leading-relaxed">{review.weakestPart}</p>
-            </div>
-          </div>
-        ) : null}
+          </>
+        )}
 
         {review.additionalNotes && (
-          <div>
-            <p className="text-[11px] font-bold text-black/40 uppercase tracking-widest mb-1.5">
-              Additional notes
-            </p>
-            <p className="text-sm text-black/70 leading-relaxed pl-3 border-l-2 border-black/10">
-              {review.additionalNotes}
-            </p>
-          </div>
+          <>
+            <div className="border-t border-black/8" />
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-2">Additional Notes</p>
+              <p className="text-sm leading-relaxed text-black/60">{review.additionalNotes}</p>
+            </div>
+          </>
         )}
 
         {review.nextActions && (
-          <div>
-            <p className="text-[11px] font-bold text-black/70 uppercase tracking-widest mb-1.5">
-              Next actions
-            </p>
-            <p className="text-sm text-black/80 leading-relaxed pl-3 border-l-2 border-black/30 whitespace-pre-wrap">
-              {review.nextActions}
-            </p>
-          </div>
+          <>
+            <div className="border-t border-black/8" />
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-2">Next Actions</p>
+              <p className="text-sm leading-relaxed text-black/70 whitespace-pre-wrap">{review.nextActions}</p>
+            </div>
+          </>
         )}
       </div>
 
-      {/* Technical issue chips */}
-      {issueChips.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {issueChips.map((chip) => (
-            <span
-              key={chip}
-              className="inline-flex items-center gap-1 px-2.5 py-1 border-2 border-black bg-amber-400 text-xs font-black text-black"
-            >
-              ⚠ {chip}
-            </span>
-          ))}
+      {/* ── TIMESTAMPS ──────────────────────────────────────────── */}
+      {Array.isArray(review.timestamps) && review.timestamps.filter(isTimestampNote).length > 0 && (
+        <div className="mt-6 pt-5 border-t border-black/8">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mb-3">Timestamps</p>
+          <div className="space-y-3">
+            {review.timestamps.filter(isTimestampNote).map((t, i) => (
+              <div key={`${t.seconds}-${i}`} className="flex gap-4">
+                <span className="text-xs font-mono text-black/30 flex-shrink-0 pt-0.5">
+                  {`${Math.floor(t.seconds / 60)}:${String(Math.floor(t.seconds % 60)).padStart(2, "0")}`}
+                </span>
+                <p className="text-sm text-black/70 leading-snug">{t.note}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Legacy: nextFocus / expectedPlacement */}
-      {(review.nextFocus || review.expectedPlacement) && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {review.nextFocus && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
-              📋 Focus: {formatEnum(review.nextFocus)}
-            </span>
-          )}
-          {review.expectedPlacement && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
-              📍 {formatEnum(review.expectedPlacement)}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Scores — compact row, moved to bottom */}
-      {(review.productionScore != null ||
-        review.vocalScore != null ||
-        review.originalityScore != null) && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {review.productionScore != null && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
-              <span className="text-black/50">Production</span>
-              <strong className="text-black">{review.productionScore}/5</strong>
-            </span>
-          )}
-          {review.vocalScore != null && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
-              <span className="text-black/50">Vocals</span>
-              <strong className="text-black">{review.vocalScore}/5</strong>
-            </span>
-          )}
-          {review.originalityScore != null && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 text-xs">
-              <span className="text-black/50">Originality</span>
-              <strong className="text-black">{review.originalityScore}/5</strong>
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Timestamps */}
-      {Array.isArray(review.timestamps) &&
-        review.timestamps.filter(isTimestampNote).length > 0 && (
-          <div className="mb-4">
-            <h4 className="text-[11px] font-bold text-purple-600 uppercase tracking-widest mb-1.5">
-              Timestamps
-            </h4>
-            <div className="space-y-2">
-              {review.timestamps.filter(isTimestampNote).map((t, i) => (
-                <div
-                  key={`${t.seconds}-${i}`}
-                  className="pl-3 border-l-2 border-purple-300"
-                >
-                  <p className="text-xs font-mono text-black/40">
-                    {`${Math.floor(t.seconds / 60)}:${String(
-                      Math.floor(t.seconds % 60)
-                    ).padStart(2, "0")}`}
-                  </p>
-                  <p className="text-sm text-black/80 leading-relaxed">{t.note}</p>
-                </div>
-              ))}
-            </div>
+      {/* ── DATA ROW — scores, tags, genre ──────────────────────── */}
+      <div className="mt-6 pt-5 border-t-2 border-black/10 space-y-3">
+        {/* Scores */}
+        {(review.productionScore != null || review.vocalScore != null || review.originalityScore != null) && (
+          <div className="flex flex-wrap gap-4">
+            {review.productionScore != null && (
+              <div>
+                <span className="text-[9px] font-black uppercase tracking-widest text-black/30 block">Production</span>
+                <span className="text-lg font-black text-black tabular-nums leading-tight">{review.productionScore}<span className="text-xs text-black/30 font-bold">/5</span></span>
+              </div>
+            )}
+            {review.originalityScore != null && (
+              <div>
+                <span className="text-[9px] font-black uppercase tracking-widest text-black/30 block">Originality</span>
+                <span className="text-lg font-black text-black tabular-nums leading-tight">{review.originalityScore}<span className="text-xs text-black/30 font-bold">/5</span></span>
+              </div>
+            )}
+            {review.vocalScore != null && (
+              <div>
+                <span className="text-[9px] font-black uppercase tracking-widest text-black/30 block">Vocals</span>
+                <span className="text-lg font-black text-black tabular-nums leading-tight">{review.vocalScore}<span className="text-xs text-black/30 font-bold">/5</span></span>
+              </div>
+            )}
           </div>
         )}
 
-      {/* Genre / similar artists */}
-      {(review.perceivedGenre || review.similarArtists) && (
-        <div className="text-xs text-black/40 mb-4">
-          {review.perceivedGenre && (
-            <span>
-              Sounds like{" "}
-              <strong className="text-black/60">{review.perceivedGenre}</strong>
-            </span>
-          )}
-          {review.perceivedGenre && review.similarArtists && (
-            <span className="mx-1.5">·</span>
-          )}
-          {review.similarArtists && (
-            <span>
-              Similar to{" "}
-              <strong className="text-black/60">{review.similarArtists}</strong>
-            </span>
-          )}
-        </div>
-      )}
+        {/* Issue chips */}
+        {issueChips.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {issueChips.map((chip) => (
+              <span key={chip} className="px-2.5 py-1 border-2 border-black bg-amber-400 text-xs font-black text-black">
+                ⚠ {chip}
+              </span>
+            ))}
+          </div>
+        )}
 
-      {/* Rate this feedback + Gem */}
+        {/* Next focus / expected placement */}
+        {(review.nextFocus || review.expectedPlacement) && (
+          <div className="flex flex-wrap gap-2">
+            {review.nextFocus && (
+              <span className="px-2.5 py-1 border-2 border-black bg-white text-xs font-black text-black">
+                Focus: {formatEnum(review.nextFocus)}
+              </span>
+            )}
+            {review.expectedPlacement && (
+              <span className="px-2.5 py-1 border-2 border-black bg-white text-xs font-black text-black">
+                {formatEnum(review.expectedPlacement)}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Genre / similar artists */}
+        {(review.perceivedGenre || review.similarArtists) && (
+          <p className="text-xs text-black/30 font-mono">
+            {review.perceivedGenre && <span>Sounds like <strong className="text-black/50">{review.perceivedGenre}</strong></span>}
+            {review.perceivedGenre && review.similarArtists && <span className="mx-2">·</span>}
+            {review.similarArtists && <span>Similar to <strong className="text-black/50">{review.similarArtists}</strong></span>}
+          </p>
+        )}
+      </div>
+
+      {/* ── RATE THIS FEEDBACK ──────────────────────────────────── */}
       {showControls && (
         <footer className="mt-6 pt-5 border-t-2 border-black/10">
           <div className="border-2 border-black overflow-hidden">
             <div className="bg-black px-4 py-2.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/50">
-                Rate this feedback
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/50">Rate this feedback</p>
             </div>
             <div className="bg-white p-4 space-y-4">
               <div className="flex items-center gap-2">
@@ -634,8 +498,7 @@ export function ReviewDisplay({
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-black text-black">Award a Gem for exceptional feedback</p>
                   <p className="text-[11px] text-black/50 mt-0.5 leading-snug">
-                    Gems reward reviewers who go above and beyond. They&apos;ll earn recognition and
-                    priority in future reviews.
+                    Gems reward reviewers who go above and beyond. They&apos;ll earn recognition and priority in future reviews.
                   </p>
                 </div>
               </div>
