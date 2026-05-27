@@ -50,6 +50,9 @@ export default async function AdminLayout({
               <Link href="/admin/support" className="px-2.5 sm:px-3 py-1.5 rounded-md text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 font-medium transition-colors whitespace-nowrap text-xs sm:text-sm">
                 Support
               </Link>
+              <Link href="/admin/fonts" className="px-2.5 sm:px-3 py-1.5 rounded-md text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 font-medium transition-colors whitespace-nowrap text-xs sm:text-sm">
+                Fonts
+              </Link>
             </nav>
           </div>
         </div>
