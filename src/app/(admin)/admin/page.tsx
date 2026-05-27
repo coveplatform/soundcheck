@@ -257,6 +257,14 @@ export default async function AdminPage() {
           <div className="mt-2 text-base font-bold text-neutral-950">Send Announcement</div>
           <div className="text-xs text-neutral-400 mt-1">Preview &amp; send feature update to all users</div>
         </Link>
+        <Link
+          href="/admin/recapture"
+          className="block rounded-xl border border-amber-200 bg-amber-50 p-5 hover:border-amber-400 transition-colors"
+        >
+          <div className="text-xs font-semibold text-amber-600 uppercase tracking-wider">Win-back</div>
+          <div className="mt-2 text-base font-bold text-neutral-950">Recapture Campaign</div>
+          <div className="text-xs text-neutral-400 mt-1">Email lapsed users + add 5 free credits</div>
+        </Link>
         <WelcomeEmailTestCard />
         <Link
           href="/admin/track-of-the-day"

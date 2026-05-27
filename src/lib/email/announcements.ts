@@ -356,3 +356,122 @@ export async function sendDiscoverAnnouncementEmail(params: { to: string; userNa
   const { subject, html } = buildDiscoverAnnouncementEmail({ userName: params.userName });
   return sendEmail({ to: params.to, subject, html });
 }
+
+// ── Recapture / Win-back Email ──────────────────────────────────────────────
+export function buildRecaptureEmail(params: { userName?: string }): { subject: string; html: string } {
+  const name = params.userName ? params.userName.split(" ")[0] : null;
+  const appUrl = getAppUrl();
+  const dashboardUrl = `${appUrl}/dashboard`;
+  const submitUrl = `${appUrl}/submit`;
+
+  const content = `
+    <p style="margin: 0 0 16px; font-size: 15px; color: ${COLORS.black}; line-height: 1.7;">
+      ${name ? `Hey ${name},` : "Hey,"}
+    </p>
+
+    <p style="margin: 0 0 16px; font-size: 15px; color: ${COLORS.gray}; line-height: 1.7;">
+      It's been a while since you've been on MixReflect — wanted to check in.
+    </p>
+
+    <p style="margin: 0 0 24px; font-size: 15px; color: ${COLORS.gray}; line-height: 1.7;">
+      If you've got a track you're sitting on, this is a good time to get ears on it. You submit it, producers in your genre actually listen, and you get back honest feedback on what's working and what to fix. No fluff.
+    </p>
+
+    <!-- What's waiting for you -->
+    <div style="background-color: #0a0a0a; border-radius: 14px; padding: 24px; margin-bottom: 24px;">
+      <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: ${COLORS.purple};">
+        What's waiting for you
+      </p>
+      <p style="margin: 0 0 20px; font-size: 16px; font-weight: 700; color: #ffffff; line-height: 1.4;">
+        Real feedback from real producers:
+      </p>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 8px;">
+        <tr>
+          <td style="background-color: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+              <tr>
+                <td style="width: 44px; vertical-align: middle;">
+                  <div style="font-size: 22px;">🎧</div>
+                </td>
+                <td style="vertical-align: middle;">
+                  <div style="font-size: 14px; font-weight: 700; color: #ffffff;">Peer reviews</div>
+                  <div style="font-size: 12px; color: #737373; margin-top: 2px;">Producers who actually make music in your genre listen and score your track</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 8px;">
+        <tr>
+          <td style="background-color: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+              <tr>
+                <td style="width: 44px; vertical-align: middle;">
+                  <div style="font-size: 22px;">📈</div>
+                </td>
+                <td style="vertical-align: middle;">
+                  <div style="font-size: 14px; font-weight: 700; color: #ffffff;">Track of the Day</div>
+                  <div style="font-size: 12px; color: #737373; margin-top: 2px;">Top-reviewed track gets featured every day — your shot at a spotlight</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 16px;">
+        <tr>
+          <td style="background-color: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+              <tr>
+                <td style="width: 44px; vertical-align: middle;">
+                  <div style="font-size: 22px;">✅</div>
+                </td>
+                <td style="vertical-align: middle;">
+                  <div style="font-size: 14px; font-weight: 700; color: #ffffff;">Release Decision</div>
+                  <div style="font-size: 12px; color: #737373; margin-top: 2px;">10–12 expert reviewers tell you if your track is ready to release — and exactly what to fix if not</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Free credits callout -->
+    <div style="background-color: ${COLORS.purpleLight}; border-radius: 12px; padding: 18px 20px; margin-bottom: 24px; border-left: 4px solid ${COLORS.purple};">
+      <p style="margin: 0 0 4px; font-size: 13px; font-weight: 800; color: ${COLORS.purple}; text-transform: uppercase; letter-spacing: 0.5px;">Gift for you</p>
+      <p style="margin: 0; font-size: 15px; color: ${COLORS.black}; line-height: 1.6;">
+        We've added <strong>5 free review credits</strong> to your account — already in there, no code needed. Use them to get feedback on your next track.
+      </p>
+    </div>
+
+    <p style="margin: 0 0 24px; font-size: 15px; color: ${COLORS.gray}; line-height: 1.7;">
+      Your account is still here. Come back and submit something — takes two minutes to get it in the queue.
+    </p>
+
+    ${emailButton("Submit a track", submitUrl)}
+
+    <p style="margin: 16px 0 0; font-size: 14px; color: ${COLORS.grayLight}; line-height: 1.7; text-align: center;">
+      Or <a href="${dashboardUrl}" style="color: ${COLORS.purple}; text-decoration: none;">head to your dashboard</a> to pick up where you left off.
+    </p>
+
+    <p style="margin: 24px 0 0; font-size: 14px; color: ${COLORS.gray}; line-height: 1.7;">
+      — The MixReflect team
+    </p>
+  `;
+
+  return {
+    subject: "5 free credits — and we want to hear your track",
+    html: emailWrapper(content),
+  };
+}
+
+export async function sendRecaptureEmail(params: { to: string; userName?: string }): Promise<boolean> {
+  if (!params.to) return false;
+  const { subject, html } = buildRecaptureEmail({ userName: params.userName });
+  return sendEmail({ to: params.to, subject, html });
+}
