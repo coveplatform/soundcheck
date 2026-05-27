@@ -3,21 +3,11 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-  BarChart3,
-  MessageSquare,
-  Settings
-} from "lucide-react";
-interface Tab {
-  id: "stats" | "reviews" | "settings";
-  label: string;
-  icon: React.ReactNode;
-}
 
-const tabs: Tab[] = [
-  { id: "stats", label: "Track Stats", icon: <BarChart3 className="h-4 w-4" /> },
-  { id: "reviews", label: "Reviews", icon: <MessageSquare className="h-4 w-4" /> },
-  { id: "settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+const tabs = [
+  { id: "stats" as const, label: "Stats" },
+  { id: "reviews" as const, label: "Reviews" },
+  { id: "settings" as const, label: "Settings" },
 ];
 
 interface TrackDashboardTabsProps {
@@ -35,7 +25,6 @@ export function TrackDashboardTabs({
   statsTab,
   reviewsTab,
   settingsTab,
-  trackTitle,
 }: TrackDashboardTabsProps) {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as "stats" | "reviews" | "settings" | null;
@@ -50,26 +39,25 @@ export function TrackDashboardTabs({
 
   return (
     <div>
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-8 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => handleTabChange(tab.id)}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-full font-black text-[11px] uppercase tracking-wider whitespace-nowrap transition-all duration-150 border-2",
-                activeTab === tab.id
-                  ? "bg-black text-white border-black"
-                  : "bg-white text-black/40 border-black/10 hover:border-black/25 hover:text-black/70"
-              )}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      {/* Editorial tab nav — underline style */}
+      <div className="flex items-end border-b border-black/15 mb-10 gap-1">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => handleTabChange(tab.id)}
+            className={cn(
+              "px-4 pb-3 pt-1 text-[11px] font-black uppercase tracking-[0.2em] transition-colors duration-150 border-b-2 -mb-px",
+              activeTab === tab.id
+                ? "text-black border-black"
+                : "text-black/25 border-transparent hover:text-black/50"
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-      {/* Tab Content */}
+      {/* Tab content */}
       <div>
         {activeTab === "stats" && statsTab}
         {activeTab === "reviews" && reviewsTab}

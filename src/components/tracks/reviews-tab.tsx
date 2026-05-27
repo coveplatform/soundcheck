@@ -1,7 +1,23 @@
-import { Button } from "@/components/ui/button";
 import { ReviewCarousel } from "@/components/reviews/review-carousel";
 import Link from "next/link";
-import { ArrowRight, BarChart3, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, BarChart3 } from "lucide-react";
+
+const qualityLabels: Record<string, string> = {
+  PROFESSIONAL: "Professional",
+  RELEASE_READY: "Release Ready",
+  ALMOST_THERE: "Almost There",
+  DEMO_STAGE: "Demo Stage",
+  NOT_READY: "Not Ready Yet",
+};
+
+const qualityColor: Record<string, string> = {
+  PROFESSIONAL: "text-lime-600",
+  RELEASE_READY: "text-lime-600",
+  ALMOST_THERE: "text-amber-600",
+  DEMO_STAGE: "text-orange-500",
+  NOT_READY: "text-red-500",
+};
 
 function FeedbackSummaryBanner({ reviews }: { reviews: any[] }) {
   const counted = reviews.filter((r) => r.countsTowardAnalytics !== false);
@@ -19,24 +35,6 @@ function FeedbackSummaryBanner({ reviews }: { reviews: any[] }) {
     return acc;
   }, {});
   const topQuality = Object.entries(qualityFreq).sort((a, b) => b[1] - a[1])[0]?.[0];
-
-  const qualityLabels: Record<string, string> = {
-    PROFESSIONAL: "Professional",
-    RELEASE_READY: "Release Ready",
-    ALMOST_THERE: "Almost There",
-    DEMO_STAGE: "Demo Stage",
-    NOT_READY: "Not Ready Yet",
-  };
-
-  const qualityAccent: Record<string, string> = {
-    PROFESSIONAL: "bg-lime-400",
-    RELEASE_READY: "bg-lime-400",
-    ALMOST_THERE: "bg-amber-400",
-    DEMO_STAGE: "bg-orange-400",
-    NOT_READY: "bg-red-500",
-  };
-
-  const accent = (topQuality && qualityAccent[topQuality]) || "bg-purple-500";
 
   const issues: { label: string; count: number }[] = [];
   const vocalBuried = counted.filter((r) => r.vocalClarity === "BURIED").length;
@@ -63,47 +61,36 @@ function FeedbackSummaryBanner({ reviews }: { reviews: any[] }) {
       ? total === 1 ? "Solid reception" : "Solid reception across the board"
       : `${total} listener${total !== 1 ? "s" : ""} reviewed`;
 
+  const color = (topQuality && qualityColor[topQuality]) || "text-black";
+
   return (
-    <div className="border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] overflow-hidden">
-      {/* Accent bar */}
-      <div className={`h-2 ${accent}`} />
-      {/* Header */}
-      <div className="bg-black px-5 py-3.5">
-        <p className="text-[10px] font-black uppercase tracking-widest text-white/40">
-          Listener Verdict · {total} review{total !== 1 ? "s" : ""}
-        </p>
-      </div>
-      {/* Body */}
-      <div className="bg-white px-5 py-5">
-        {topQuality && qualityLabels[topQuality] && (
-          <h2 className="text-4xl sm:text-5xl font-black text-black leading-none tracking-tight mb-2">
-            {qualityLabels[topQuality]}
-          </h2>
+    <div className="mb-10">
+      <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/25 mb-2">
+        Listener Verdict · {total} review{total !== 1 ? "s" : ""}
+      </p>
+      {topQuality && qualityLabels[topQuality] && (
+        <h2 className={`text-6xl sm:text-7xl font-black leading-none tracking-tighter mb-3 ${color}`}>
+          {qualityLabels[topQuality]}
+        </h2>
+      )}
+      <p className="text-sm text-black/40 mb-3">
+        {impressionLine}
+        {replayTotal > 0 && (
+          <span className="text-black/60 font-bold">
+            {" "}· {replayYes}/{replayTotal} would replay
+          </span>
         )}
-        <p className="text-sm text-black/50 mb-4">
-          {impressionLine}
-          {replayTotal > 0 && (
-            <span className="text-black font-bold">
-              {" "}· {replayYes}/{replayTotal} would replay
+      </p>
+      <div className="flex flex-wrap gap-3">
+        {issues.length === 0 ? (
+          <span className="text-[11px] font-black text-black/25 uppercase tracking-wide">✓ No major technical issues</span>
+        ) : (
+          issues.map(({ label, count }) => (
+            <span key={label} className="text-[11px] font-black text-amber-600 uppercase tracking-wide">
+              ⚠ {label}{count > 1 ? ` · ${count}/${total}` : ""}
             </span>
-          )}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {issues.map(({ label, count }) => (
-            <span
-              key={label}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 border-2 border-black bg-amber-400 text-xs font-black text-black"
-            >
-              ⚠ {label}
-              {count === total && total > 1 ? " · all" : count > 1 ? ` · ${count}/${total}` : ""}
-            </span>
-          ))}
-          {issues.length === 0 && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 border-2 border-black bg-lime-400 text-xs font-black text-black">
-              ✓ No major technical issues
-            </span>
-          )}
-        </div>
+          ))
+        )}
       </div>
     </div>
   );
@@ -118,35 +105,28 @@ export function ReviewsTab({ reviews, trackId }: ReviewsTabProps) {
   const totalReviews = reviews.length;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-0">
       <FeedbackSummaryBanner reviews={reviews} />
 
-      {/* Reviews Carousel */}
-      <div className="border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] overflow-hidden">
-        <ReviewCarousel reviews={reviews} showControls={true} />
-      </div>
+      {/* Reviews — no outer box */}
+      <ReviewCarousel reviews={reviews} showControls={true} />
 
       {/* Insights nudge */}
       {totalReviews >= 2 && (
-        <div className="border-2 border-black flex flex-col sm:flex-row sm:items-center gap-4 px-5 py-4">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="h-9 w-9 border-2 border-black bg-black flex items-center justify-center flex-shrink-0">
-              <BarChart3 className="h-4 w-4 text-white" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-black text-black">See your full analytics</p>
-              <p className="text-xs text-black/50 leading-snug">
-                Score trends, category breakdowns, and feedback patterns across all your tracks.
-              </p>
-            </div>
+        <div className="mt-10 pt-6 border-t border-black/10 flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <BarChart3 className="h-3.5 w-3.5 text-black/25 flex-shrink-0" />
+            <p className="text-xs text-black/40">
+              Score trends, category breakdowns, and feedback patterns across all your tracks.
+            </p>
           </div>
           <Link href="/tracks?view=insights" className="flex-shrink-0">
             <Button
               size="sm"
-              className="bg-black hover:bg-black/80 text-white font-black border-2 border-black shadow-[2px_2px_0_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs rounded-none h-9"
+              className="bg-black hover:bg-black/80 text-white font-black border-2 border-black shadow-[2px_2px_0_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs rounded-none h-8"
             >
-              View Insights
-              <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+              Full Insights
+              <ArrowRight className="h-3 w-3 ml-1.5" />
             </Button>
           </Link>
         </div>

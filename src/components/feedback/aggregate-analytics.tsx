@@ -60,7 +60,7 @@ function topFrequencies(items: string[], limit: number) {
 function getScoreLabel(score: number): { label: string; color: string } {
   if (score >= 4.5) return { label: "Exceptional", color: "text-lime-600" };
   if (score >= 4.0) return { label: "Strong", color: "text-lime-600" };
-  if (score >= 3.5) return { label: "Solid", color: "text-black/50" };
+  if (score >= 3.5) return { label: "Solid", color: "text-black/40" };
   if (score >= 3.0) return { label: "Average", color: "text-black/40" };
   if (score >= 2.5) return { label: "Developing", color: "text-amber-600" };
   return { label: "Needs work", color: "text-amber-600" };
@@ -69,29 +69,29 @@ function getScoreLabel(score: number): { label: string; color: string } {
 function ComparisonIndicator({ score, platformAvg }: { score: number; platformAvg?: number }) {
   if (!platformAvg || platformAvg === 0) {
     const { label, color } = getScoreLabel(score);
-    return <div className={`text-[10px] font-black uppercase tracking-wider mt-1 ${color}`}>{label}</div>;
+    return <div className={`text-[9px] font-black uppercase tracking-wider mt-1 ${color}`}>{label}</div>;
   }
   const diff = score - platformAvg;
   const absDiff = Math.abs(diff).toFixed(1);
   const { label } = getScoreLabel(score);
   if (diff > 0.2) {
     return (
-      <div className="flex items-center justify-center gap-1 text-[10px] font-black text-lime-600 mt-1">
-        <TrendingUp className="h-3 w-3" />
+      <div className="flex items-center justify-center gap-1 text-[9px] font-black text-lime-600 mt-1">
+        <TrendingUp className="h-2.5 w-2.5" />
         <span>{label} +{absDiff}</span>
       </div>
     );
   } else if (diff < -0.2) {
     return (
-      <div className="flex items-center justify-center gap-1 text-[10px] font-black text-amber-600 mt-1">
-        <TrendingDown className="h-3 w-3" />
+      <div className="flex items-center justify-center gap-1 text-[9px] font-black text-amber-600 mt-1">
+        <TrendingDown className="h-2.5 w-2.5" />
         <span>{label} -{absDiff}</span>
       </div>
     );
   }
   return (
-    <div className="flex items-center justify-center gap-1 text-[10px] font-black text-black/40 mt-1">
-      <Minus className="h-3 w-3" />
+    <div className="flex items-center justify-center gap-1 text-[9px] font-black text-black/30 mt-1">
+      <Minus className="h-2.5 w-2.5" />
       <span>{label}</span>
     </div>
   );
@@ -111,14 +111,14 @@ function ScoreBlock({
   tooltipContent: string;
 }) {
   return (
-    <div className="flex-1 border-r-2 border-black last:border-r-0 p-4 sm:p-6 text-center">
-      <div className="text-4xl sm:text-5xl font-black tabular-nums leading-none text-black">
+    <div className="flex-1 text-center px-3 sm:px-5 first:pl-0 last:pr-0">
+      <div className="text-5xl sm:text-6xl font-black tabular-nums leading-none text-black">
         {score.toFixed(1)}
       </div>
       <Tooltip content={tooltipContent}>
-        <div className="flex items-center justify-center gap-1.5 mt-2 cursor-help">
-          <Icon className="h-3.5 w-3.5 text-black/30" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-black/40">{label}</span>
+        <div className="flex items-center justify-center gap-1 mt-2 cursor-help">
+          <Icon className="h-3 w-3 text-black/20" />
+          <span className="text-[9px] font-black uppercase tracking-widest text-black/30">{label}</span>
         </div>
       </Tooltip>
       <ComparisonIndicator score={score} platformAvg={platformAvg} />
@@ -134,27 +134,27 @@ function ImpressionsBar({ impressions, total }: { impressions: { hook: number; d
 
   return (
     <div>
-      <p className="text-[10px] font-black uppercase tracking-widest text-black/40 mb-3">First Impressions</p>
-      <div className="h-5 w-full flex border-2 border-black overflow-hidden mb-3">
+      <p className="text-[9px] font-black uppercase tracking-[0.25em] text-black/30 mb-3">First Impressions</p>
+      <div className="h-4 w-full flex overflow-hidden mb-3" style={{ outline: "1px solid rgba(0,0,0,0.08)" }}>
         {hookPct > 0 && <div className="h-full bg-lime-400" style={{ width: `${hookPct}%` }} title={`Strong Hook: ${hookPct}%`} />}
         {decentPct > 0 && <div className="h-full bg-amber-400" style={{ width: `${decentPct}%` }} title={`Decent: ${decentPct}%`} />}
-        {lostPct > 0 && <div className="h-full bg-black/15" style={{ width: `${lostPct}%` }} title={`Lost Interest: ${lostPct}%`} />}
+        {lostPct > 0 && <div className="h-full bg-black/10" style={{ width: `${lostPct}%` }} title={`Lost Interest: ${lostPct}%`} />}
       </div>
-      <div className="flex gap-4 text-[11px] font-black mb-3">
+      <div className="flex gap-4 text-[10px] font-black mb-3">
         <div className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 bg-lime-400 border border-black/20 flex-shrink-0" />
+          <span className="h-2 w-2 bg-lime-400 flex-shrink-0" />
           Strong Hook {hookPct}%
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 bg-amber-400 border border-black/20 flex-shrink-0" />
+          <span className="h-2 w-2 bg-amber-400 flex-shrink-0" />
           Decent {decentPct}%
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 bg-black/15 border border-black/20 flex-shrink-0" />
+          <span className="h-2 w-2 bg-black/10 flex-shrink-0" />
           Lost {lostPct}%
         </div>
       </div>
-      <p className="text-xs text-black/50 leading-snug">
+      <p className="text-xs text-black/40 leading-snug">
         {hookPct >= 60
           ? `${hookPct}% of listeners were immediately hooked — that's a strong opening.`
           : hookPct >= 40
@@ -188,14 +188,14 @@ function TechMetricRow({
   return (
     <div className="flex items-center gap-3">
       <Tooltip content={tooltip}>
-        <span className="text-xs font-black text-black/50 w-28 flex-shrink-0 cursor-help uppercase tracking-wide">
+        <span className="text-[10px] font-black text-black/40 w-28 flex-shrink-0 cursor-help uppercase tracking-wide">
           {label}
         </span>
       </Tooltip>
-      <div className="flex-1 h-2 bg-black/8 border border-black/10 overflow-hidden">
+      <div className="flex-1 h-1.5 bg-black/6 overflow-hidden">
         <div className={`h-full ${barColor}`} style={{ width: `${Math.max(issuePct, issuePct === 0 ? 0 : 4)}%` }} />
       </div>
-      <span className={`text-[11px] font-black w-24 text-right flex-shrink-0 ${textColor}`}>
+      <span className={`text-[10px] font-black w-24 text-right flex-shrink-0 ${textColor}`}>
         {issuePct === 0 ? "All clear" : `${issuePct}% — ${issueLabel}`}
       </span>
     </div>
@@ -222,8 +222,8 @@ function TechnicalQualitySection({ reviews }: { reviews: ReviewLike[] }) {
 
   return (
     <div>
-      <p className="text-[10px] font-black uppercase tracking-widest text-black/40 mb-3">Technical Quality</p>
-      <p className="text-xs text-black/40 mb-4">Lower bars are better — shows how many reviewers flagged each issue</p>
+      <p className="text-[9px] font-black uppercase tracking-[0.25em] text-black/30 mb-1">Technical Quality</p>
+      <p className="text-[10px] text-black/30 mb-4">Lower bars are better</p>
       <div className="space-y-3">
         <TechMetricRow label="Low end" issueCount={lowEndIssues} totalCount={lowEndReviews.length} issueLabel="muddy" tooltip="How many reviewers felt the bass and low frequencies were muddy or overpowering." />
         <TechMetricRow label="Vocal presence" issueCount={vocalIssues} totalCount={vocalReviews.length} issueLabel="buried" tooltip="How many reviewers felt the vocals were too quiet or buried under the music." />
@@ -234,15 +234,6 @@ function TechnicalQualitySection({ reviews }: { reviews: ReviewLike[] }) {
         <TechMetricRow label="Repetitive" issueCount={repetitiveIssues} totalCount={repetitiveReviews.length} issueLabel="repetitive" tooltip="How many reviewers felt the track repeated itself too much without enough variation." />
       </div>
     </div>
-  );
-}
-
-function ArtistChip({ label, count }: { label: string; count: number }) {
-  return (
-    <span className="inline-flex items-center gap-2 px-3 py-1.5 border-2 border-black text-sm font-bold bg-white">
-      {label}
-      <span className="text-[10px] font-black bg-black text-white px-1.5 py-0.5 leading-none">{count}</span>
-    </span>
   );
 }
 
@@ -271,49 +262,55 @@ export function AggregateAnalytics({
     .filter(Boolean);
   const topArtists = topFrequencies(artistsItems, 6);
 
+  const hasScores = avgProduction > 0 || avgOriginality > 0 || avgVocals > 0;
+
   return (
-    <div className="border-2 border-black shadow-[4px_4px_0_rgba(0,0,0,1)] overflow-hidden">
+    <div className="space-y-0">
+
       {/* Header */}
-      <div className="bg-black px-5 py-3.5">
-        <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Pattern Analytics</p>
-        <p className="text-white font-black text-lg leading-tight mt-0.5">
-          Insights from {completed} review{completed === 1 ? "" : "s"}
-        </p>
+      <div className="flex items-baseline gap-2 pb-6 mb-6 border-b border-black/8">
+        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-black/30">Pattern Analytics</span>
+        <span className="text-[10px] text-black/20 font-mono">· {completed} review{completed !== 1 ? "s" : ""}</span>
       </div>
 
-      {/* Score blocks */}
-      <div className="flex divide-x-2 divide-black border-b-2 border-black">
-        {avgProduction > 0 && (
-          <ScoreBlock score={avgProduction} label="Production" icon={Zap} platformAvg={platformAverages?.production} tooltipContent="How polished and professional the overall mix sounds — clarity, balance, and technical execution. 4.0+ is strong." />
-        )}
-        {avgOriginality > 0 && (
-          <ScoreBlock score={avgOriginality} label="Originality" icon={Sparkles} platformAvg={platformAverages?.originality} tooltipContent="How fresh and distinctive your sound feels. Higher scores mean reviewers found it unique and memorable." />
-        )}
-        {avgVocals > 0 && (
-          <ScoreBlock score={avgVocals} label="Vocals" icon={Music} platformAvg={platformAverages?.vocals} tooltipContent="How clearly your vocals cut through the mix. A low score means reviewers felt vocals were too buried." />
-        )}
-      </div>
+      {/* Score blocks — open row, no dividers */}
+      {hasScores && (
+        <div className="flex pb-8 mb-8 border-b border-black/8">
+          {avgProduction > 0 && (
+            <ScoreBlock score={avgProduction} label="Production" icon={Zap} platformAvg={platformAverages?.production} tooltipContent="How polished and professional the overall mix sounds — clarity, balance, and technical execution. 4.0+ is strong." />
+          )}
+          {avgOriginality > 0 && (
+            <ScoreBlock score={avgOriginality} label="Originality" icon={Sparkles} platformAvg={platformAverages?.originality} tooltipContent="How fresh and distinctive your sound feels. Higher scores mean reviewers found it unique and memorable." />
+          )}
+          {avgVocals > 0 && (
+            <ScoreBlock score={avgVocals} label="Vocals" icon={Music} platformAvg={platformAverages?.vocals} tooltipContent="How clearly your vocals cut through the mix. A low score means reviewers felt vocals were too buried." />
+          )}
+        </div>
+      )}
 
       {/* First Impressions */}
       {impressionsTotal > 0 && (
-        <div className="p-5 border-b-2 border-black">
+        <div className="pb-8 mb-8 border-b border-black/8">
           <ImpressionsBar impressions={impressions} total={impressionsTotal} />
         </div>
       )}
 
       {/* Technical Quality */}
-      <div className="p-5 border-b-2 border-black last:border-b-0">
+      <div className={topArtists.length > 0 ? "pb-8 mb-8 border-b border-black/8" : ""}>
         <TechnicalQualitySection reviews={reviews} />
       </div>
 
       {/* Similar Artists */}
       {topArtists.length > 0 && (
-        <div className="p-5">
-          <p className="text-[10px] font-black uppercase tracking-widest text-black/40 mb-3">Sounds Like...</p>
-          <p className="text-xs text-black/40 mb-3">Artists your reviewers most commonly compared your sound to</p>
-          <div className="flex flex-wrap gap-2">
+        <div>
+          <p className="text-[9px] font-black uppercase tracking-[0.25em] text-black/30 mb-1">Sounds Like...</p>
+          <p className="text-[10px] text-black/30 mb-4">Artists your reviewers most commonly compared your sound to</p>
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
             {topArtists.map((a) => (
-              <ArtistChip key={a.label} label={a.label} count={a.count} />
+              <span key={a.label} className="text-sm font-bold text-black/60">
+                {a.label}
+                <span className="ml-1.5 text-[10px] font-black text-black/25 tabular-nums">×{a.count}</span>
+              </span>
             ))}
           </div>
         </div>

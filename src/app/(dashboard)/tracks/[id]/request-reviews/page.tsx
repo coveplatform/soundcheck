@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Crown, Lock, Music, Sparkles } from "lucide-react";
+import { ArrowRight, Music, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { BuyCreditsButton } from "@/components/credits/buy-credits-button";
@@ -192,7 +192,7 @@ export default function RequestReviewsPage() {
             </p>
           </div>
 
-          {/* Count picker — blocky buttons for Pro, locked note for free */}
+          {/* Count picker — blocky buttons for Pro, bold block for free */}
           {isPro ? (
             <div className="grid grid-cols-5 gap-2">
               {[1, 3, 5, 7, 10].map((count) => (
@@ -212,9 +212,13 @@ export default function RequestReviewsPage() {
               ))}
             </div>
           ) : (
-            <div className="flex items-center gap-3 px-4 py-4 bg-black/[0.03] rounded-xl border-2 border-black/8">
-              <Lock className="h-4 w-4 text-black/25 flex-shrink-0" />
-              <p className="text-sm text-black/40 font-bold">Free plan: 1 review per track.</p>
+            <div className="bg-black rounded-xl px-5 py-5">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 mb-1.5">Free Plan</p>
+              <p className="text-2xl font-black text-white leading-none">1 review / track</p>
+              <p className="text-xs text-white/40 mt-2">
+                <Link href="/pro" className="text-white/60 hover:text-white underline decoration-dotted">Upgrade to Pro</Link>
+                {" "}for up to 30 reviews / month
+              </p>
             </div>
           )}
 
@@ -239,22 +243,36 @@ export default function RequestReviewsPage() {
 
           {/* Credit balance */}
           {isPro ? (
-            <div className="border-t-2 border-black/8 pt-5 flex items-center gap-3">
-              <Crown className="w-5 h-5 text-purple-500 flex-shrink-0" />
-              <p className="text-base font-black text-purple-700">Pro — no credits needed</p>
+            <div className="border-t-2 border-black/8 pt-5">
+              <p className="text-base font-black text-purple-700">Pro · unlimited credits</p>
             </div>
           ) : (
-            <div className="border-t-2 border-black/8 pt-5 grid grid-cols-2 gap-4">
-              <div className="bg-black/[0.03] rounded-xl px-4 py-4">
-                <p className="text-[10px] font-black uppercase tracking-wider text-black/30 mb-1">You have</p>
-                <p className="text-4xl font-black text-black tabular-nums leading-none">{isLoadingProfile ? "…" : reviewTokens}</p>
-                <p className="text-xs text-black/30 font-bold mt-1">credits</p>
+            <div className="border-t-2 border-black/8 pt-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-black/[0.03] rounded-xl px-4 py-4">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-black/30 mb-1">You have</p>
+                  <p className="text-4xl font-black text-black tabular-nums leading-none">{isLoadingProfile ? "…" : reviewTokens}</p>
+                  <p className="text-xs text-black/30 font-bold mt-1">credits</p>
+                </div>
+                <div className={cn("rounded-xl px-4 py-4", needsCredits ? "bg-red-50" : "bg-purple-50")}>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-black/30 mb-1">Will use</p>
+                  <p className={cn("text-4xl font-black tabular-nums leading-none", needsCredits ? "text-red-500" : "text-purple-600")}>{desiredReviews}</p>
+                  <p className="text-xs text-black/30 font-bold mt-1">credits</p>
+                </div>
               </div>
-              <div className={cn("rounded-xl px-4 py-4", needsCredits ? "bg-red-50" : "bg-purple-50")}>
-                <p className="text-[10px] font-black uppercase tracking-wider text-black/30 mb-1">Will use</p>
-                <p className={cn("text-4xl font-black tabular-nums leading-none", needsCredits ? "text-red-500" : "text-purple-600")}>{desiredReviews}</p>
-                <p className="text-xs text-black/30 font-bold mt-1">credits</p>
-              </div>
+              {/* Credit pack upsell for users who have credits */}
+              {!needsCredits && (
+                <div className="flex items-center justify-between pt-1">
+                  <div>
+                    <p className="text-xs font-black text-black">Stock up for next time</p>
+                    <p className="text-[11px] text-black/40">10 credits, use across any track</p>
+                  </div>
+                  <BuyCreditsButton
+                    label="Buy 10 — $9.95"
+                    className="h-9 text-xs rounded-xl font-black ml-4"
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -282,10 +300,7 @@ export default function RequestReviewsPage() {
           {!isPro && (
             <div className="border-t-2 border-black/8 pt-5">
               <div className="bg-neutral-900 rounded-2xl px-6 py-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Crown className="h-4 w-4 text-purple-400" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">Pro Plan</span>
-                </div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-purple-400 mb-4">Pro Plan</p>
                 <p className="text-2xl font-black text-white leading-tight">Submitting often?</p>
                 <p className="text-2xl font-black text-purple-400 leading-tight mb-3">Go Pro.</p>
                 <p className="text-sm text-white/40 font-medium leading-relaxed mb-6">

@@ -17,7 +17,6 @@ import {
   ExternalLink,
   Music,
   CheckCircle2,
-  Crown,
   Play,
 } from "lucide-react";
 import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
@@ -320,22 +319,19 @@ export default async function TrackDetailPage({
             />
 
             {track.status === "COMPLETED" && hasAvailableSlot && (
-              <div className="mt-8 rounded-2xl border-2 border-black bg-white overflow-hidden shadow-[4px_4px_0_rgba(0,0,0,1)]">
-                <div className="bg-purple-600 px-6 py-4 flex items-center gap-3">
-                  <Crown className="h-5 w-5 text-yellow-300 flex-shrink-0" />
-                  <p className="text-white font-black text-sm uppercase tracking-wider">Want more feedback?</p>
-                </div>
-                <div className="px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
-                  <p className="text-sm text-black/60 leading-relaxed flex-1">
-                    You&apos;ve got your first round of reviews. Getting more ears on this track means more perspectives, more confidence, and a clearer picture of what&apos;s landing.
+              <div className="mt-10 pt-8 border-t border-black/10 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex-1">
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/25 mb-1">Want more feedback?</p>
+                  <p className="text-sm text-black/50 leading-relaxed">
+                    More ears, more perspectives. Get another round of structured feedback on this track.
                   </p>
-                  <Link href={`/tracks/${track.id}/request-reviews`} className="flex-shrink-0">
-                    <Button className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-11 px-6 text-sm rounded-xl">
-                      Get another round
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Button>
-                  </Link>
                 </div>
+                <Link href={`/tracks/${track.id}/request-reviews`} className="flex-shrink-0">
+                  <Button className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-10 px-5 text-xs rounded-xl">
+                    Get another round
+                    <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                  </Button>
+                </Link>
               </div>
             )}
           </>
