@@ -17,7 +17,7 @@ import {
 import { generateReleaseDecisionReport } from "@/lib/release-decision-report";
 import { sendWeeklyDigestEmail } from "@/lib/email/digest";
 import { sendCreditsNudgeEmail } from "@/lib/email/nudge";
-import { sendTotdWeeklyEmail } from "@/lib/email/totd-digest";
+import { sendTotdWeeklyEmail, sendTotdDailyEmail } from "@/lib/email/totd-digest";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "").split(",").map((e) => e.trim().toLowerCase());
 
@@ -286,30 +286,24 @@ function buildPreviewHtml(type: string): string {
       return emailWrapper(content);
     }
     case "totd-digest": {
-      const picks = [
-        { title: "Low Tide", artistName: "Niko Vale", genre: "Lo-fi", editorNote: "There's a stillness to this one that feels deliberate — the way the kick sits back in the mix instead of leading, letting the chords breathe. Niko Vale has been refining this sound for months and it shows: the arrangement is patient, the low-end warm without being muddy. Worth your full attention." },
-        { title: "Neon Pulse", artistName: "Maya Kim", genre: "Synthwave", editorNote: "Somewhere between John Carpenter and Kavinsky, but neither. The sequence that opens the track is deceptively simple — four notes doing a lot of work. Reviewers picked up on the production restraint: no element overstays its welcome. Press play in a dark room." },
-        { title: "Rough Draft", artistName: "Theo James", genre: "Indie", editorNote: "The title earns its name in the best way — a track that feels like it was caught mid-thought, with a rawness that the reverb-heavy production actually leans into rather than concealing. The hook is better than the artist probably knows." },
-      ];
-      const pickRows = picks.map((p, i) => `
-        <div style="margin-bottom: 28px; padding-bottom: 28px; ${i < picks.length - 1 ? `border-bottom: 1px solid ${COLORS.border};` : ""}">
-          <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${COLORS.grayLight}; text-transform: uppercase; letter-spacing: 1px;">${String(i + 1).padStart(2, "0")}</p>
-          <h2 style="margin: 0 0 2px; font-size: 20px; font-weight: 800; color: ${COLORS.black}; line-height: 1.2;">${p.title}</h2>
-          <p style="margin: 0 0 10px; font-size: 13px; color: ${COLORS.gray}; font-weight: 600;">${p.artistName} · <span style="background-color: ${COLORS.bg}; border-radius: 20px; padding: 2px 8px; font-size: 11px;">${p.genre}</span></p>
-          <p style="margin: 0; font-size: 14px; color: ${COLORS.gray}; line-height: 1.7; font-style: italic;">"${p.editorNote}"</p>
-        </div>
-      `).join("");
-      const headerImg = `<img src="${appUrl}/blog/blog3.jpg" alt="" width="520" style="display: block; width: 100%; max-width: 520px; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 24px;" />`;
+      const pick = { title: "Low Tide", artistName: "Niko Vale", genre: "Lo-fi", editorNote: "There's a stillness to this one that feels deliberate — the way the kick sits back in the mix instead of leading, letting the chords breathe. Niko Vale has been refining this sound for months and it shows: the arrangement is patient, the low-end warm without being muddy. Worth your full attention." };
+      const genrePill = pick.genre
+        ? `<span style="display: inline-block; background-color: ${COLORS.bg}; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700; color: ${COLORS.gray}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">${pick.genre}</span>`
+        : "";
       const content = `
-        ${headerImg}
-        <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${COLORS.purple}; text-transform: uppercase; letter-spacing: 1px;">Track of the Week</p>
-        <h1 style="margin: 0 0 6px; font-size: 26px; font-weight: 800; color: ${COLORS.black}; line-height: 1.2;">3 tracks worth your ears</h1>
-        <p style="margin: 0 0 28px; font-size: 14px; color: ${COLORS.gray};">May 19–25 · Voted to the top by the MixReflect community</p>
-        ${pickRows}
-        ${emailButton("Listen on MixReflect →", `${appUrl}/today`)}
-        <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 18px; margin-top: 24px; text-align: center;">
-          <p style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: ${COLORS.black};">Want your track featured?</p>
-          <p style="margin: 0 0 12px; font-size: 13px; color: ${COLORS.gray}; line-height: 1.6;">Submit your track to the daily chart. The top track each day earns the featured spot.</p>
+        <img src="${appUrl}/blog/blog3.jpg" alt="" width="520" style="display: block; width: 100%; max-width: 520px; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 24px;" />
+        <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${COLORS.purple}; text-transform: uppercase; letter-spacing: 1px;">Track of the Day</p>
+        <p style="margin: 0 0 20px; font-size: 13px; color: ${COLORS.grayLight};">Thursday, May 29</p>
+        <h1 style="margin: 0 0 4px; font-size: 28px; font-weight: 800; color: ${COLORS.black}; line-height: 1.15;">${pick.title}</h1>
+        <p style="margin: 0 0 16px; font-size: 15px; font-weight: 700; color: ${COLORS.gray};">${pick.artistName}</p>
+        ${genrePill}
+        <div style="background-color: ${COLORS.bg}; border-left: 3px solid ${COLORS.purple}; border-radius: 0 8px 8px 0; padding: 16px 20px; margin-bottom: 28px;">
+          <p style="margin: 0; font-size: 14px; color: ${COLORS.gray}; line-height: 1.8; font-style: italic;">"${pick.editorNote}"</p>
+        </div>
+        ${emailButton("Listen now →", `${appUrl}/breakthrough`)}
+        <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 18px 20px; margin-top: 28px;">
+          <p style="margin: 0 0 4px; font-size: 13px; font-weight: 700; color: ${COLORS.black};">Want your track here?</p>
+          <p style="margin: 0 0 12px; font-size: 13px; color: ${COLORS.gray}; line-height: 1.6;">Submit your track to the daily chart — artists vote, the top track each day wins the featured spot and gets sent to the whole community.</p>
           <a href="${appUrl}/submit" style="font-size: 13px; font-weight: 700; color: ${COLORS.purple}; text-decoration: none;">Submit a track →</a>
         </div>
         <p style="margin: 24px 0 0; font-size: 12px; color: ${COLORS.grayLight}; text-align: center;">— Kris &amp; the MixReflect team</p>
@@ -401,14 +395,10 @@ export async function POST(request: Request) {
         });
         break;
       case "totd-digest":
-        await sendTotdWeeklyEmail({
+        await sendTotdDailyEmail({
           to: recipientEmail,
-          weekLabel: "May 19–25",
-          picks: [
-            { title: "Low Tide", artistName: "Niko Vale", genre: "Lo-fi", editorNote: "There's a stillness to this one that feels deliberate — the way the kick sits back in the mix instead of leading, letting the chords breathe. Worth your full attention." },
-            { title: "Neon Pulse", artistName: "Maya Kim", genre: "Synthwave", editorNote: "Somewhere between John Carpenter and Kavinsky, but neither. The sequence that opens the track is deceptively simple — four notes doing a lot of work." },
-            { title: "Rough Draft", artistName: "Theo James", genre: "Indie", editorNote: "A track that feels like it was caught mid-thought, with a rawness that the production leans into rather than concealing. The hook is better than the artist probably knows." },
-          ],
+          dateLabel: "Thursday, May 29",
+          pick: { title: "Low Tide", artistName: "Niko Vale", genre: "Lo-fi", editorNote: "There's a stillness to this one that feels deliberate — the way the kick sits back in the mix instead of leading, letting the chords breathe. Worth your full attention." },
         });
         break;
       default:
