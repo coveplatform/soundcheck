@@ -15,6 +15,9 @@ import {
   sendWelcomeEmail,
 } from "@/lib/email";
 import { generateReleaseDecisionReport } from "@/lib/release-decision-report";
+import { sendWeeklyDigestEmail } from "@/lib/email/digest";
+import { sendCreditsNudgeEmail } from "@/lib/email/nudge";
+import { sendTotdWeeklyEmail } from "@/lib/email/totd-digest";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "").split(",").map((e) => e.trim().toLowerCase());
 
@@ -218,6 +221,95 @@ function buildPreviewHtml(type: string): string {
       `;
       return emailWrapper(content);
     }
+    case "weekly-digest": {
+      const content = `
+        <h1 style="margin: 0 0 6px; font-size: 24px; font-weight: 800; color: ${COLORS.black}; line-height: 1.2;">
+          Hey Kris — your week on MixReflect
+        </h1>
+        <p style="margin: 0 0 24px; font-size: 15px; color: ${COLORS.gray}; line-height: 1.6;">
+          Here's what happened this week.
+        </p>
+        <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 4px 20px; margin-bottom: 24px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            <tr><td style="padding: 14px 0; border-bottom: 1px solid ${COLORS.border};">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
+                <td><p style="margin: 0; font-size: 14px; color: ${COLORS.gray};">Credits earned this week</p></td>
+                <td style="text-align: right;"><p style="margin: 0; font-size: 18px; font-weight: 800; color: ${COLORS.purple};">+3</p></td>
+              </tr></table>
+            </td></tr>
+            <tr><td style="padding: 14px 0; border-bottom: 1px solid ${COLORS.border};">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
+                <td><p style="margin: 0; font-size: 14px; color: ${COLORS.gray};">New reviews on "Summer Nights"</p></td>
+                <td style="text-align: right;"><p style="margin: 0; font-size: 18px; font-weight: 800; color: ${COLORS.black};">2</p></td>
+              </tr></table>
+            </td></tr>
+            <tr><td style="padding: 14px 0;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
+                <td><p style="margin: 0; font-size: 14px; color: ${COLORS.gray};">Tracks in your genre needing ears</p></td>
+                <td style="text-align: right;"><p style="margin: 0; font-size: 18px; font-weight: 800; color: ${COLORS.black};">7</p></td>
+              </tr></table>
+            </td></tr>
+          </table>
+        </div>
+        ${emailButton("Read your reviews →", `${appUrl}/dashboard`)}
+        <p style="margin: 20px 0 8px; font-size: 14px; color: ${COLORS.gray}; text-align: center;">7 tracks waiting — each review earns +1 credit.</p>
+        ${emailButton("Review & earn →", `${appUrl}/review`, "secondary")}
+        <p style="margin: 20px 0 0; font-size: 12px; color: ${COLORS.grayLight}; text-align: center;">— Kris &amp; the MixReflect team</p>
+      `;
+      return emailWrapper(content);
+    }
+    case "credits-nudge": {
+      const content = `
+        <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 800; color: ${COLORS.black}; line-height: 1.2;">
+          Hey Kris, you've got 5 credits doing nothing.
+        </h1>
+        <p style="margin: 0 0 24px; font-size: 15px; color: ${COLORS.gray}; line-height: 1.6;">
+          You've got <strong style="color: ${COLORS.black};">5 credits</strong> sitting unused. Queue up "Summer Nights" and get real ears on it — each credit gets you one structured review back.
+        </p>
+        <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            <tr><td style="padding: 10px 0; border-bottom: 1px solid ${COLORS.border};"><p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ Production score</p></td></tr>
+            <tr><td style="padding: 10px 0; border-bottom: 1px solid ${COLORS.border};"><p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ Written feedback from a real artist</p></td></tr>
+            <tr><td style="padding: 10px 0; border-bottom: 1px solid ${COLORS.border};"><p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ Listener intent data (would they share it?)</p></td></tr>
+            <tr><td style="padding: 10px 0;"><p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ Release verdict</p></td></tr>
+          </table>
+        </div>
+        ${emailButton('Queue "Summer Nights" for review →', `${appUrl}/submit`)}
+        <p style="margin: 16px 0 0; font-size: 13px; color: ${COLORS.grayLight}; text-align: center;">
+          Or <a href="${appUrl}/review" style="color: ${COLORS.gray}; font-weight: 600;">review a track</a> to earn even more.
+        </p>
+      `;
+      return emailWrapper(content);
+    }
+    case "totd-digest": {
+      const picks = [
+        { title: "Low Tide", artistName: "Niko Vale", genre: "Lo-fi", editorNote: "There's a stillness to this one that feels deliberate — the way the kick sits back in the mix instead of leading, letting the chords breathe. Niko Vale has been refining this sound for months and it shows: the arrangement is patient, the low-end warm without being muddy. Worth your full attention." },
+        { title: "Neon Pulse", artistName: "Maya Kim", genre: "Synthwave", editorNote: "Somewhere between John Carpenter and Kavinsky, but neither. The sequence that opens the track is deceptively simple — four notes doing a lot of work. Reviewers picked up on the production restraint: no element overstays its welcome. Press play in a dark room." },
+        { title: "Rough Draft", artistName: "Theo James", genre: "Indie", editorNote: "The title earns its name in the best way — a track that feels like it was caught mid-thought, with a rawness that the reverb-heavy production actually leans into rather than concealing. The hook is better than the artist probably knows." },
+      ];
+      const pickRows = picks.map((p, i) => `
+        <div style="margin-bottom: 28px; padding-bottom: 28px; ${i < picks.length - 1 ? `border-bottom: 1px solid ${COLORS.border};` : ""}">
+          <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${COLORS.grayLight}; text-transform: uppercase; letter-spacing: 1px;">${String(i + 1).padStart(2, "0")}</p>
+          <h2 style="margin: 0 0 2px; font-size: 20px; font-weight: 800; color: ${COLORS.black}; line-height: 1.2;">${p.title}</h2>
+          <p style="margin: 0 0 10px; font-size: 13px; color: ${COLORS.gray}; font-weight: 600;">${p.artistName} · <span style="background-color: ${COLORS.bg}; border-radius: 20px; padding: 2px 8px; font-size: 11px;">${p.genre}</span></p>
+          <p style="margin: 0; font-size: 14px; color: ${COLORS.gray}; line-height: 1.7; font-style: italic;">"${p.editorNote}"</p>
+        </div>
+      `).join("");
+      const content = `
+        <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${COLORS.purple}; text-transform: uppercase; letter-spacing: 1px;">Track of the Week</p>
+        <h1 style="margin: 0 0 6px; font-size: 26px; font-weight: 800; color: ${COLORS.black}; line-height: 1.2;">3 tracks worth your ears</h1>
+        <p style="margin: 0 0 28px; font-size: 14px; color: ${COLORS.gray};">May 19–25 · Voted to the top by the MixReflect community</p>
+        ${pickRows}
+        ${emailButton("Listen on MixReflect →", `${appUrl}/today`)}
+        <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 18px; margin-top: 24px; text-align: center;">
+          <p style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: ${COLORS.black};">Want your track featured?</p>
+          <p style="margin: 0 0 12px; font-size: 13px; color: ${COLORS.gray}; line-height: 1.6;">Submit your track to the daily chart. The top track each day earns the featured spot.</p>
+          <a href="${appUrl}/submit" style="font-size: 13px; font-weight: 700; color: ${COLORS.purple}; text-decoration: none;">Submit a track →</a>
+        </div>
+        <p style="margin: 24px 0 0; font-size: 12px; color: ${COLORS.grayLight}; text-align: center;">— Kris &amp; the MixReflect team</p>
+      `;
+      return emailWrapper(content);
+    }
     default:
       return emailWrapper(`<p>Unknown email type: ${type}</p>`);
   }
@@ -281,6 +373,37 @@ export async function POST(request: Request) {
       }
       case "welcome":
         await sendWelcomeEmail({ to: recipientEmail, name: "Test Artist" });
+        break;
+      case "weekly-digest":
+        await sendWeeklyDigestEmail({
+          to: recipientEmail,
+          name: "Kris",
+          creditsEarned: 3,
+          reviewsReceived: 2,
+          genreTrackCount: 7,
+          trackTitle: "Summer Nights",
+          trackId: "test-id",
+        });
+        break;
+      case "credits-nudge":
+        await sendCreditsNudgeEmail({
+          to: recipientEmail,
+          name: "Kris",
+          credits: 5,
+          trackTitle: "Summer Nights",
+          trackId: "test-id",
+        });
+        break;
+      case "totd-digest":
+        await sendTotdWeeklyEmail({
+          to: recipientEmail,
+          weekLabel: "May 19–25",
+          picks: [
+            { title: "Low Tide", artistName: "Niko Vale", genre: "Lo-fi", editorNote: "There's a stillness to this one that feels deliberate — the way the kick sits back in the mix instead of leading, letting the chords breathe. Worth your full attention." },
+            { title: "Neon Pulse", artistName: "Maya Kim", genre: "Synthwave", editorNote: "Somewhere between John Carpenter and Kavinsky, but neither. The sequence that opens the track is deceptively simple — four notes doing a lot of work." },
+            { title: "Rough Draft", artistName: "Theo James", genre: "Indie", editorNote: "A track that feels like it was caught mid-thought, with a rawness that the production leans into rather than concealing. The hook is better than the artist probably knows." },
+          ],
+        });
         break;
       default:
         return NextResponse.json({ error: `Unknown type: ${type}` }, { status: 400 });

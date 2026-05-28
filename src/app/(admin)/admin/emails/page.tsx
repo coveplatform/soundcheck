@@ -9,19 +9,32 @@ const EMAIL_TYPES = [
   { id: "track-queued", name: "Track Queued", description: "Sent when artist's track enters the review queue", category: "Artist" },
   { id: "review-progress", name: "Review Progress (50%)", description: "Sent at 50% review completion", category: "Artist" },
   { id: "reviews-complete", name: "Reviews Complete (100%)", description: "Sent when all reviews are done", category: "Artist" },
-  { id: "release-decision-report", name: "Release Decision Report", description: "Full report with verdict, score, and fixes", category: "Artist" },
   { id: "invalid-track", name: "Invalid Track Link", description: "Sent when track URL is broken/private", category: "Artist" },
-  { id: "purchase-confirmation", name: "Purchase Confirmation", description: "Sent after track purchase with download link", category: "Artist" },
   { id: "welcome", name: "Welcome Email", description: "Sent to new users on sign-up", category: "Marketing" },
-  { id: "trial-reminder", name: "Trial Reminder", description: "Nudge to submit first track", category: "Marketing" },
-  { id: "lead-reminder", name: "Lead Reminder", description: "Nudge to finish signing up", category: "Marketing" },
-  { id: "finish-later", name: "Finish Later", description: "Resume link for mobile users", category: "Marketing" },
+  { id: "weekly-digest", name: "Weekly Digest", description: "Monday recap — credits, reviews, queue activity", category: "Marketing" },
+  { id: "credits-nudge", name: "Credits Nudge", description: "Wednesday nudge for free users with idle credits", category: "Marketing" },
+  { id: "totd-digest", name: "Track of the Week", description: "Friday roundup of featured tracks with editor notes", category: "Marketing" },
   { id: "tier-change", name: "Tier Change", description: "Reviewer promoted to new tier", category: "Reviewer" },
   { id: "password-reset", name: "Password Reset", description: "Password reset link", category: "Auth" },
   { id: "admin-new-track", name: "Admin: New Track", description: "Admin notification for new submission", category: "Admin" },
 ];
 
 const CATEGORIES = ["Artist", "Marketing", "Reviewer", "Auth", "Admin"];
+
+const EMAIL_OVERVIEW = [
+  { name: "Welcome", recipient: "New users on signup", trigger: "Automatic on account creation", frequency: "Once", status: "live" },
+  { name: "Track Queued", recipient: "Artist who submitted", trigger: "Track enters review queue", frequency: "Per submission", status: "live" },
+  { name: "Review Progress (50%)", recipient: "Track artist", trigger: "Half of requested reviews complete", frequency: "Per milestone", status: "live" },
+  { name: "Reviews Complete", recipient: "Track artist", trigger: "All requested reviews complete", frequency: "Per submission", status: "live" },
+  { name: "Listener Intent", recipient: "Track artist", trigger: "After reviews complete (with intent data)", frequency: "Per submission", status: "live" },
+  { name: "Invalid Track Link", recipient: "Track artist", trigger: "Track URL fails validation check", frequency: "As needed", status: "live" },
+  { name: "Password Reset", recipient: "Requesting user", trigger: "User requests password reset", frequency: "As needed", status: "live" },
+  { name: "Tier Change", recipient: "Reviewer", trigger: "Review quality threshold reached", frequency: "As needed", status: "live" },
+  { name: "Admin: New Track", recipient: "Admin (you)", trigger: "Any track submitted", frequency: "Per submission", status: "live" },
+  { name: "Weekly Digest", recipient: "Free users active in last 30 days", trigger: "Cron — every Monday 9am UTC", frequency: "Weekly", status: "live" },
+  { name: "Credits Nudge", recipient: "Free users with 3+ idle credits", trigger: "Cron — every Wednesday 10am UTC", frequency: "Weekly (max 1/month per user)", status: "live" },
+  { name: "Track of the Week", recipient: "All users", trigger: "Cron — every Friday 5pm UTC", frequency: "Weekly", status: "live" },
+];
 
 export default function AdminEmailsPage() {
   const [previewType, setPreviewType] = useState<string | null>(null);
@@ -178,6 +191,39 @@ export default function AdminEmailsPage() {
             <li>&bull; All emails use the shared MixReflect wrapper template with consistent branding</li>
             <li>&bull; URLs in test emails point to production (<code className="text-xs bg-neutral-200 px-1 py-0.5 rounded">www.mixreflect.com</code>)</li>
           </ul>
+        </div>
+
+        {/* Email overview */}
+        <div className="mt-10">
+          <h2 className="text-lg font-bold text-black mb-1">Email Overview</h2>
+          <p className="text-sm text-neutral-500 mb-4">Every email we send — who gets it, when, and how often.</p>
+          <div className="overflow-x-auto rounded-xl border border-neutral-200">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-neutral-50 border-b border-neutral-200">
+                  <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-neutral-500">Email</th>
+                  <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-neutral-500">Recipient</th>
+                  <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-neutral-500 hidden md:table-cell">Trigger</th>
+                  <th className="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-neutral-500">Frequency</th>
+                </tr>
+              </thead>
+              <tbody>
+                {EMAIL_OVERVIEW.map((row, i) => (
+                  <tr key={row.name} className={`border-b border-neutral-100 ${i % 2 === 0 ? "bg-white" : "bg-neutral-50/50"}`}>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-neutral-900">{row.name}</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase tracking-wide">live</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-neutral-600">{row.recipient}</td>
+                    <td className="px-4 py-3 text-neutral-500 hidden md:table-cell text-xs">{row.trigger}</td>
+                    <td className="px-4 py-3 text-neutral-600 text-xs whitespace-nowrap">{row.frequency}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

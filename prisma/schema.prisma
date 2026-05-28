@@ -45,6 +45,7 @@ model ArtistProfile {
   subscriptionTier             String?
   completedOnboarding          Boolean            @default(false)
   hasSeenCreditGuide           Boolean            @default(false)
+  lastCreditNudgeAt            DateTime?
   hasSeenWelcome               Boolean            @default(false)
   peerFlagCount                Int                @default(0)
   peerGemCount                 Int                @default(0)
