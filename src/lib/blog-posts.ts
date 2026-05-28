@@ -21,7 +21,7 @@ const _posts: BlogPost[] = [
   {
     slug: "how-to-know-if-your-song-is-ready-to-release",
     title: "How to Know If Your Song Is Ready to Release",
-    coverImage: "/blog/blog-hero.jpg",
+    coverImage: "/blog/blog4.jpg",
     excerpt:
       "Most artists release too early — or hold on too long. Here's how to actually tell when a track is ready, and the one check most people skip.",
     category: "GUIDE",
