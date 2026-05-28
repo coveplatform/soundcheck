@@ -64,7 +64,6 @@ async function handler(request: Request) {
     const users = await (prisma as any).user.findMany({
       where: {
         ArtistProfile: { completedOnboarding: true },
-        NOT: [{ email: null }],
       },
       select: { email: true },
     });

@@ -33,7 +33,6 @@ async function handler(request: Request) {
         reviewCredits: { gte: 3 },
         lastCreditNudgeAt: { OR: [{ equals: null }, { lte: nudgeCooldown }] },
       },
-      NOT: [{ email: null }],
     },
     select: {
       id: true,
