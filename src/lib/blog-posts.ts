@@ -19,6 +19,120 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "how-to-know-if-your-song-is-ready-to-release",
+    title: "How to Know If Your Song Is Ready to Release",
+    coverImage: "/blog/blog-hero.jpg",
+    excerpt:
+      "Most artists release too early — or hold on too long. Here's how to actually tell when a track is ready, and the one check most people skip.",
+    category: "GUIDE",
+    date: "May 28, 2026",
+    readTime: "5 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "There's no moment where a track tells you it's finished. You could keep tweaking it forever — another pass on the mix, a different drum sample, adjusting the intro length. At some point you just decide. The problem is most artists make that call at the wrong time, either before the track is genuinely ready or after holding it so long the window has passed.",
+      },
+      {
+        type: "paragraph",
+        text: "The artists who release consistently and improve fast aren't guessing. They have a standard — a set of things a track needs to clear before it goes out. Here's what that actually looks like.",
+      },
+      {
+        type: "h2",
+        text: "The two release traps",
+      },
+      {
+        type: "paragraph",
+        text: "The first trap is releasing too early. You're excited, the track feels fresh, it sounds good on your headphones after 10 listens. But 10 listens isn't the same as a fresh set of ears. You've already filled in the gaps — you're hearing the track as you intended it, not as a stranger would hear it for the first time.",
+      },
+      {
+        type: "paragraph",
+        text: "The second trap is holding forever. You've listened to it so many times that nothing sounds right anymore. You start second-guessing things that aren't actually problems. The track gets worse through overthinking, not better. Or you sit on it for six months and lose momentum entirely.",
+      },
+      {
+        type: "quote",
+        text: "The goal isn't a perfect track. It's a track with no obvious weak points a first-time listener would catch.",
+      },
+      {
+        type: "h2",
+        text: "What 'ready' actually means",
+      },
+      {
+        type: "paragraph",
+        text: "Ready doesn't mean perfect. Perfect doesn't exist, and chasing it is how good tracks die in hard drives. Ready means: a first-time listener can get through the track without being pulled out of it by something that feels unfinished, off, or unintentional.",
+      },
+      {
+        type: "paragraph",
+        text: "The threshold is lower than most artists think, and higher than their confidence lets them apply. A track with a strong opening, a sustained energy arc, and a clean resolution is ready — even if the mix isn't exactly where a professional engineer would land it. A track where the vocals disappear in the chorus, or the mid-section loses energy and doesn't recover, is not ready — even if every other element is technically polished.",
+      },
+      {
+        type: "h2",
+        text: "The pre-release checklist",
+      },
+      {
+        type: "list",
+        items: [
+          "First impression: does something interesting happen within the first 20 seconds?",
+          "Hook strength: is there a moment in the track that a listener would come back for?",
+          "Energy arc: does the track build and resolve with intention, or does it drift in the middle?",
+          "Vocal presence: if there are vocals, do they sit on top of the mix and cut through?",
+          "Endings: does the track end cleanly, or does it feel cut off or drag past its natural close?",
+          "Runtime: at what point would a casual listener stop? Is that before or after the natural end?",
+          "Fresh ears: has anyone who isn't trying to protect your feelings actually listened to it?",
+          "Pattern check: have multiple listeners independently flagged the same problem?",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "The last two items are the ones most artists skip — and they're the most important. Self-assessment breaks down because you've stopped hearing the track the way a new listener does. After 50 listens, you're not evaluating the music anymore. You're remembering how you feel about it.",
+      },
+      {
+        type: "h2",
+        text: "Why you can't hear your own track clearly anymore",
+      },
+      {
+        type: "paragraph",
+        text: "Listener fatigue is real, and it happens faster than people think. By the time you're 30-40 listens in during production, your brain has started filling in gaps and correcting small issues automatically. The vocal that's sitting slightly low in the mix? You've unconsciously compensated. The chorus that loses energy? You know what it should feel like, so you feel it.",
+      },
+      {
+        type: "paragraph",
+        text: "A first-time listener has none of that context. They hear exactly what's in the file — no more, no less. Which means they'll catch the buried vocal, notice the energy dip, feel the intro drag. Things you've been mentally editing out for weeks.",
+      },
+      {
+        type: "quote",
+        text: "After 40 listens you're not hearing the track. You're hearing your memory of it.",
+      },
+      {
+        type: "h2",
+        text: "The test most people skip: pattern feedback from fresh ears",
+      },
+      {
+        type: "paragraph",
+        text: "The most reliable signal that a track is ready — or not — is when multiple people who don't know each other listen independently and land on the same notes. One person flagging something might be taste. Three people flagging the same thing without hearing each other's responses is a pattern, and patterns mean something real.",
+      },
+      {
+        type: "paragraph",
+        text: "This is harder to arrange than it sounds. Your friends will soften their feedback. A single Discord post anchors everyone on the first reply. The feedback needs to be structured (everyone responding to the same questions) and independent (nobody seeing each other's answers). Most artists never achieve both at the same time.",
+      },
+      {
+        type: "h2",
+        text: "When to release even if it's not perfect",
+      },
+      {
+        type: "paragraph",
+        text: "There's a version of readiness-checking that turns into indefinite delay. If you've cleared the checklist above, got feedback from multiple listeners, and there's no consistent pattern pointing to a real problem — the track is ready. At that point, holding it is costing you more than releasing it.",
+      },
+      {
+        type: "paragraph",
+        text: "The artists who build momentum release regularly. Each release is practice. Each round of real-world feedback — stream data, comments, listener drop-off — teaches you things no amount of solo tweaking will. The goal is to release something you've done due diligence on, not something you've convinced yourself is perfect.",
+      },
+      {
+        type: "paragraph",
+        text: "MixReflect exists for exactly this stage. You upload a track before release, and genre-matched artists listen and fill out a structured review independently — covering first impression, what's working, what to fix, and production quality. When multiple reviewers flag the same thing, it shows up clearly. When they don't, you know the track is ready and you can release with confidence.",
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-to-get-feedback-on-music-before-releasing",
     title: "How to Get Feedback on Your Music Before Releasing",
     coverImage: "/blog/blog-hero.jpg",
