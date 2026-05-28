@@ -64,6 +64,64 @@ function ApologyAction() {
   );
 }
 
+const TEST_ACCOUNT_EMAILS = [
+  "stev2e@test.com.au",
+  "stevetest@steve.com",
+  "steve@test.com.au",
+  "kris.engelhardt5@gmail.con",
+];
+
+function DeleteTestAccountsAction() {
+  const [deleting, setDeleting] = useState(false);
+  const [done, setDone] = useState<{ email: string; status: string }[] | null>(null);
+
+  const run = async () => {
+    if (!confirm(`Permanently delete ${TEST_ACCOUNT_EMAILS.length} test accounts? This cannot be undone.`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/admin/delete-users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emails: TEST_ACCOUNT_EMAILS }),
+      });
+      const data = await res.json();
+      setDone(data.results);
+    } catch {
+      alert("Failed — check Vercel logs");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 rounded-xl border-2 border-red-200 bg-red-50 p-5">
+      <h3 className="text-sm font-bold text-red-900 mb-1">One-off: Delete test accounts</h3>
+      <p className="text-xs text-red-700 mb-1">Permanently deletes these 4 accounts and all associated data:</p>
+      <ul className="text-xs text-red-600 mb-4 space-y-0.5">
+        {TEST_ACCOUNT_EMAILS.map(e => <li key={e} className="font-mono">{e}</li>)}
+      </ul>
+      {done ? (
+        <div className="space-y-1">
+          {done.map(r => (
+            <p key={r.email} className={`text-xs font-mono ${r.status === "deleted" ? "text-emerald-700" : "text-red-700"}`}>
+              {r.status === "deleted" ? "✓" : "✗"} {r.email} — {r.status}
+            </p>
+          ))}
+        </div>
+      ) : (
+        <Button
+          size="sm"
+          onClick={run}
+          disabled={deleting}
+          className="bg-red-600 hover:bg-red-700 text-white text-xs h-8"
+        >
+          {deleting ? <><Loader2 className="h-3 w-3 mr-1.5 animate-spin" />Deleting…</> : "Delete test accounts →"}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 const EMAIL_OVERVIEW = [
   { name: "Welcome", recipient: "New users on signup", trigger: "Automatic on account creation", frequency: "Once", status: "live" },
   { name: "Track Queued", recipient: "Artist who submitted", trigger: "Track enters review queue", frequency: "Per submission", status: "live" },
@@ -226,8 +284,9 @@ export default function AdminEmailsPage() {
           })}
         </div>
 
-        {/* One-off apology send */}
+        {/* One-off admin actions */}
         <ApologyAction />
+        <DeleteTestAccountsAction />
 
         <div className="mt-8 rounded-xl bg-neutral-50 border border-neutral-200 p-5">
           <h3 className="text-sm font-bold text-neutral-800 mb-2">Notes</h3>
