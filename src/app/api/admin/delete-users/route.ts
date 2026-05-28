@@ -45,9 +45,7 @@ export async function POST(request: Request) {
         await prisma.session.deleteMany({ where: { userId: user.id } });
         await prisma.passwordResetToken.deleteMany({ where: { userId: user.id } });
         await prisma.emailVerificationToken.deleteMany({ where: { userId: user.id } });
-        await prisma.chartVote.deleteMany({ where: { userId: user.id } });
-
-        // Now delete the user (cascades ArtistProfile, ReviewerProfile, etc.)
+        // Now delete the user (cascades ArtistProfile, ReviewerProfile, ChartVotes, etc.)
         await prisma.user.delete({ where: { id: user.id } });
 
         results.push({ email, status: "deleted" });
