@@ -35,7 +35,7 @@ async function handler(request: Request) {
         subscriptionStatus: { not: "active" },
         updatedAt: { gte: activeThreshold },
       },
-      email: { not: null },
+      NOT: [{ email: null }],
     },
     select: {
       id: true,
