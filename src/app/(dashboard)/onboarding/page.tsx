@@ -42,6 +42,10 @@ export default function OnboardingPage() {
     setTrackUrlError("");
     setTrackSourceType(detectSource(value) as SourceType);
     if (!value.trim()) return;
+    if (value.toLowerCase().includes("spotify.com")) {
+      setTrackUrlError("Spotify links can’t be embedded for listening — paste your SoundCloud or YouTube link instead.");
+      return;
+    }
     const validation = validateTrackUrl(value);
     if (!validation.valid) { setTrackUrlError(validation.error || "Invalid URL"); return; }
     setIsLoadingTrackMeta(true);

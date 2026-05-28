@@ -14,7 +14,7 @@ const createTrackSchema = z.object({
   artworkUrl: z.string().url().optional().nullable(),
   duration: z.number().int().positive().max(60 * 60).optional(),
   bpm: z.number().int().min(1).max(999).optional(),
-  genreIds: z.array(z.string()).min(1, "Select at least one genre").max(3),
+  genreIds: z.array(z.string()).max(3).optional().default([]),
   feedbackFocus: z.string().max(1000).optional(),
   feedbackAreas: z.array(
     z.enum(["OVERALL_VIBE", "MIXING", "ARRANGEMENT", "SONGWRITING", "SOUND_DESIGN", "RELEASE_READINESS"])
@@ -123,9 +123,11 @@ export async function POST(request: Request) {
       status: TrackStatus.UPLOADED,
       // Only allow purchases for uploaded tracks AND Pro subscribers
       allowPurchase: sourceType === "UPLOAD" && isSubscribed ? (data.allowPurchase ?? false) : false,
-      Genre: {
-        connect: data.genreIds.map((id) => ({ id })),
-      },
+      ...(data.genreIds.length > 0 && {
+        Genre: {
+          connect: data.genreIds.map((id) => ({ id })),
+        },
+      }),
     };
 
     let track;

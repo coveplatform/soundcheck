@@ -109,13 +109,13 @@ export async function checkRateLimit(
     }
 
     return result;
-  } catch {
+  } catch (err) {
+    console.error("Rate limit check failed, failing open:", err);
     if (process.env.NODE_ENV === "production") {
       return {
-        success: false,
-        remaining: 0,
+        success: true,
+        remaining: 1,
         resetAt: resetAt.getTime(),
-        retryAfterSeconds: config.windowSeconds,
       };
     }
 
@@ -172,7 +172,7 @@ export function getClientIp(request: Request): string {
 // Pre-configured rate limits for different endpoints
 export const RATE_LIMITS = {
   // Auth endpoints - more restrictive
-  signup: { limit: 5, windowSeconds: 60 * 15 }, // 5 per 15 minutes
+  signup: { limit: 15, windowSeconds: 60 * 15 }, // 15 per 15 minutes
   login: { limit: 10, windowSeconds: 60 * 15 }, // 10 per 15 minutes
   forgotPassword: { limit: 3, windowSeconds: 60 * 15 }, // 3 per 15 minutes
   resetPassword: { limit: 5, windowSeconds: 60 * 15 }, // 5 per 15 minutes

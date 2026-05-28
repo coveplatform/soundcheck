@@ -25,13 +25,15 @@ function getRelativeTime(date: Date | null): string {
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string; filter?: string; demo?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; filter?: string; demo?: string; sort?: string; dir?: string }>;
 }) {
-  const { q: query, page: pageParam, filter: filterParam, demo: demoParam } = await searchParams;
+  const { q: query, page: pageParam, filter: filterParam, demo: demoParam, sort: sortParam, dir: dirParam } = await searchParams;
   const q = typeof query === "string" ? query.trim() : "";
   const page = Math.max(1, parseInt(pageParam || "1", 10) || 1);
   const filter = filterParam || "";
   const showDemo = demoParam === "show";
+  const sort = sortParam || "";
+  const dir = (dirParam === "asc" ? "asc" : "desc") as "asc" | "desc";
 
   // Patterns for seed/demo/test/internal accounts
   const DEMO_EMAIL_PATTERNS = [
@@ -175,58 +177,114 @@ export default async function AdminUsersPage({
     ];
   }
 
-  // Get total count
-  const totalUsers = await prisma.user.count({ where: whereClause });
-  const totalPages = Math.ceil(totalUsers / PAGE_SIZE);
-
-  const users = await prisma.user.findMany({
-    where: whereClause,
-    orderBy: { createdAt: "desc" },
-    skip: (page - 1) * PAGE_SIZE,
-    take: PAGE_SIZE,
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      isArtist: true,
-      isReviewer: true,
-      createdAt: true,
-      lastActiveAt: true,
-      referredByCode: true,
-      totalReferrals: true,
-      ArtistProfile: {
-        select: {
-          artistName: true,
-          completedOnboarding: true,
-          totalPeerReviews: true,
-          reviewCredits: true,
-          Track: {
-            select: {
-              reviewsRequested: true,
-              status: true,
-            },
+  const userSelect = {
+    id: true,
+    email: true,
+    name: true,
+    isArtist: true,
+    isReviewer: true,
+    createdAt: true,
+    lastActiveAt: true,
+    referredByCode: true,
+    totalReferrals: true,
+    ArtistProfile: {
+      select: {
+        artistName: true,
+        completedOnboarding: true,
+        totalPeerReviews: true,
+        reviewCredits: true,
+        Track: {
+          select: {
+            reviewsRequested: true,
+            status: true,
           },
         },
       },
-      ReviewerProfile: {
-        select: {
-          completedOnboarding: true,
-          onboardingQuizPassed: true,
-          totalReviews: true,
-        },
+    },
+    ReviewerProfile: {
+      select: {
+        completedOnboarding: true,
+        onboardingQuizPassed: true,
+        totalReviews: true,
       },
     },
-  });
+  };
+
+  // Computed sorts require fetching all users and sorting in JS
+  const isComputedSort = ["uploaded", "inqueue", "reviews"].includes(sort);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let users: any[];
+  let totalUsers: number;
+
+  if (isComputedSort) {
+    const allRaw = await prisma.user.findMany({ where: whereClause, select: userSelect });
+    const withComputed = allRaw.map((u) => ({
+      ...u,
+      _uploaded: u.ArtistProfile?.Track.filter(
+        (t) => t.status !== "UPLOADED" && t.status !== "PENDING_PAYMENT" && t.status !== "CANCELLED"
+      ).length ?? 0,
+      _inqueue: u.ArtistProfile?.Track.filter(
+        (t) => t.status === "QUEUED" || t.status === "IN_PROGRESS" || t.status === "PENDING_PAYMENT"
+      ).length ?? 0,
+      _reviews: (u.ArtistProfile?.totalPeerReviews ?? 0) + (u.ReviewerProfile?.totalReviews ?? 0),
+    }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    withComputed.sort((a: any, b: any) => {
+      const va = sort === "uploaded" ? a._uploaded : sort === "inqueue" ? a._inqueue : a._reviews;
+      const vb = sort === "uploaded" ? b._uploaded : sort === "inqueue" ? b._inqueue : b._reviews;
+      return dir === "desc" ? vb - va : va - vb;
+    });
+    totalUsers = withComputed.length;
+    users = withComputed.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let orderBy: any = { createdAt: "desc" };
+    if (sort === "credits") orderBy = { ArtistProfile: { reviewCredits: dir } };
+    else if (sort === "active") orderBy = { lastActiveAt: dir };
+    else if (sort === "joined") orderBy = { createdAt: dir };
+    [totalUsers, users] = await Promise.all([
+      prisma.user.count({ where: whereClause }),
+      prisma.user.findMany({
+        where: whereClause,
+        orderBy,
+        skip: (page - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+        select: userSelect,
+      }),
+    ]);
+  }
+
+  const totalPages = Math.ceil(totalUsers / PAGE_SIZE);
 
   // Build URL helper
-  const buildUrl = (params: { page?: number; q?: string; filter?: string; demo?: string }) => {
+  const buildUrl = (params: { page?: number; q?: string; filter?: string; demo?: string; sort?: string; dir?: string }) => {
     const url = new URLSearchParams();
     if (params.q ?? q) url.set("q", params.q ?? q);
     if (params.filter ?? filter) url.set("filter", params.filter ?? filter);
     if ((params.page ?? page) > 1) url.set("page", String(params.page ?? page));
     const demoVal = params.demo ?? (showDemo ? "show" : "");
     if (demoVal === "show") url.set("demo", "show");
+    const sortVal = "sort" in params ? params.sort : sort;
+    const dirVal = "dir" in params ? params.dir : String(dir);
+    if (sortVal) { url.set("sort", sortVal); url.set("dir", dirVal || "desc"); }
     return `/admin/users${url.toString() ? `?${url.toString()}` : ""}`;
+  };
+
+  // Sortable column header helper
+  const sortLink = (label: string, key: string, align: "left" | "right" = "right") => {
+    const isActive = sort === key;
+    const nextDir: "asc" | "desc" = isActive && dir === "desc" ? "asc" : "desc";
+    return (
+      <th className={`text-${align} font-medium px-3 py-2`}>
+        <Link
+          href={buildUrl({ sort: key, dir: nextDir, page: 1 })}
+          className={`inline-flex items-center gap-1 ${align === "right" ? "w-full justify-end" : ""} hover:text-black transition-colors select-none ${isActive ? "text-black" : ""}`}
+        >
+          {label}
+          <span className="text-[9px] opacity-50">{isActive ? (dir === "desc" ? "▼" : "▲") : "⇅"}</span>
+        </Link>
+      </th>
+    );
   };
 
   return (
@@ -308,22 +366,22 @@ export default async function AdminUsersPage({
               <tr>
                 <th className="text-left font-medium px-3 py-2">Email</th>
                 <th className="text-left font-medium px-3 py-2">Artist Name</th>
-                <th className="text-right font-medium px-3 py-2">Uploaded</th>
-                <th className="text-right font-medium px-3 py-2">In Queue</th>
-                <th className="text-right font-medium px-3 py-2">Reviews</th>
-                <th className="text-right font-medium px-3 py-2">Credits</th>
+                {sortLink("Uploaded", "uploaded")}
+                {sortLink("In Queue", "inqueue")}
+                {sortLink("Reviews", "reviews")}
+                {sortLink("Credits", "credits")}
                 <th className="text-right font-medium px-3 py-2">Refs</th>
                 <th className="text-left font-medium px-3 py-2">Ref By</th>
-                <th className="text-left font-medium px-3 py-2">Active</th>
-                <th className="text-left font-medium px-3 py-2">Joined</th>
+                {sortLink("Active", "active", "left")}
+                {sortLink("Joined", "joined", "left")}
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {users.map((u) => {
-                const tracksPosted = u.ArtistProfile?.Track?.filter(t =>
+                const tracksPosted = u.ArtistProfile?.Track?.filter((t: any) =>
                   t.status !== "UPLOADED" && t.status !== "PENDING_PAYMENT" && t.status !== "CANCELLED"
                 ).length ?? 0;
-                const tracksInQueue = u.ArtistProfile?.Track?.filter(t =>
+                const tracksInQueue = u.ArtistProfile?.Track?.filter((t: any) =>
                   t.status === "QUEUED" || t.status === "IN_PROGRESS" || t.status === "PENDING_PAYMENT"
                 ).length ?? 0;
                 const peerReviewsDone = u.ArtistProfile?.totalPeerReviews ?? 0;
