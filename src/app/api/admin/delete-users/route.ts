@@ -31,7 +31,7 @@ export async function POST(request: Request) {
           const apId = user.ArtistProfile.id;
 
           // Reviews the artist received
-          await prisma.review.deleteMany({ where: { track: { artistId: apId } } });
+          await prisma.review.deleteMany({ where: { Track: { artistId: apId } } });
           // Reviews the artist wrote
           await prisma.review.deleteMany({ where: { peerReviewerArtistId: apId } });
           // Tracks
