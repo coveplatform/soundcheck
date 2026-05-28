@@ -16,7 +16,7 @@ export function getAppUrl(): string {
     process.env.NEXT_PUBLIC_SITE_URL,
   ];
   const prod = candidates.find((u) => u && !u.includes("localhost"));
-  return prod ?? "https://www.mixreflect.com";
+  return prod ?? "https://mixreflect.com";
 }
 
 // Brand colors - match current MixReflect UI
@@ -37,7 +37,7 @@ export const COLORS = {
 };
 
 // Hardcoded production URL — logo must be publicly reachable in emails regardless of env vars
-const EMAIL_LOGO_URL = "https://www.mixreflect.com/email-logo.png";
+const EMAIL_LOGO_URL = "https://mixreflect.com/email-logo.png";
 
 // Base email wrapper template - exported for preview
 export function emailWrapper(content: string): string {

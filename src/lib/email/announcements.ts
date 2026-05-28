@@ -364,7 +364,7 @@ export function buildRecaptureEmail(params: { userName?: string }): { subject: s
   const dashboardUrl = `${appUrl}/dashboard`;
   const submitUrl = `${appUrl}/submit`;
 
-  const heroImageUrl = "https://www.mixreflect.com/blog/blog1.jpg";
+  const heroImageUrl = "https://mixreflect.com/blog/blog1.jpg";
 
   const content = `
     <!-- Hero image -->

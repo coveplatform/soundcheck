@@ -69,7 +69,7 @@ export default function ChartsPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const shareUrl = "https://www.mixreflect.com/breakthrough";
+  const shareUrl = "https://mixreflect.com/breakthrough";
 
   const handleCopy = async (title: string, artist: string) => {
     const text = `"${title}" by ${artist} is today's Breakthrough on MixReflect 🎵\n${shareUrl}`;
