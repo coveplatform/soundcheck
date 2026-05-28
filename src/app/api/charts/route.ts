@@ -1,23 +1,16 @@
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
-    const fourteenDaysAgo = new Date(today);
-    fourteenDaysAgo.setUTCDate(fourteenDaysAgo.getUTCDate() - 14);
-
     const yesterday = new Date(today);
     yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+
+    const fourteenDaysAgo = new Date(today);
+    fourteenDaysAgo.setUTCDate(fourteenDaysAgo.getUTCDate() - 14);
 
     const include = {
       ArtistProfile: {
@@ -44,14 +37,16 @@ export async function GET(request: NextRequest) {
         : s.chartDate,
     });
 
+    // chart-finalize stores the pick under yesterday's date (it runs at 00:01 UTC
+    // and picks the best track from the previous day's reviews)
     const [todayPick, recentPicks] = await Promise.all([
       (prisma as any).chartSubmission.findFirst({
-        where: { chartDate: today, isFeatured: true },
+        where: { chartDate: yesterday, isFeatured: true },
         include,
       }),
       (prisma as any).chartSubmission.findMany({
         where: {
-          chartDate: { gte: fourteenDaysAgo, lte: yesterday },
+          chartDate: { gte: fourteenDaysAgo, lt: yesterday },
           isFeatured: true,
         },
         orderBy: { chartDate: "desc" },
@@ -63,8 +58,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       today: todayPick ? formatPick(todayPick) : null,
       recent: recentPicks.map(formatPick),
-      // kept for the dashboard banner component
-      featuredWinner: recentPicks[0] ? formatPick(recentPicks[0]) : null,
+      featuredWinner: todayPick ? formatPick(todayPick) : (recentPicks[0] ? formatPick(recentPicks[0]) : null),
     });
   } catch (err) {
     console.error("Charts fetch error:", err);
