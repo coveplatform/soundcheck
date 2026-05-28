@@ -22,7 +22,7 @@
     },
     {
       "path": "/api/cron/totd-digest",
-      "schedule": "0 17 * * 5"
+      "schedule": "0 10 * * *"
     }
   ]
 }

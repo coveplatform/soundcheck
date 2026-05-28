@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Send, Eye, Loader2, CheckCircle2, AlertTriangle, Mail } from "lucide-react";
+import { ArrowLeft, Send, Eye, Loader2, CheckCircle2, AlertTriangle, Mail, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const EMAIL_TYPES = [
@@ -13,13 +13,56 @@ const EMAIL_TYPES = [
   { id: "welcome", name: "Welcome Email", description: "Sent to new users on sign-up", category: "Marketing" },
   { id: "weekly-digest", name: "Weekly Digest", description: "Monday recap — credits, reviews, queue activity", category: "Marketing" },
   { id: "credits-nudge", name: "Credits Nudge", description: "Wednesday nudge for free users with idle credits", category: "Marketing" },
-  { id: "totd-digest", name: "Track of the Week", description: "Friday roundup of featured tracks with editor notes", category: "Marketing" },
+  { id: "totd-digest", name: "Track of the Day", description: "Daily email announcing yesterday's featured track with editor note", category: "Marketing" },
   { id: "tier-change", name: "Tier Change", description: "Reviewer promoted to new tier", category: "Reviewer" },
   { id: "password-reset", name: "Password Reset", description: "Password reset link", category: "Auth" },
   { id: "admin-new-track", name: "Admin: New Track", description: "Admin notification for new submission", category: "Admin" },
 ];
 
 const CATEGORIES = ["Artist", "Marketing", "Reviewer", "Auth", "Admin"];
+
+function ApologyAction() {
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState<{ sent: number; failed: number; notFound: number } | null>(null);
+
+  const run = async () => {
+    if (!confirm("Send apology email + grant 3 credits to 14 users? This cannot be undone.")) return;
+    setSending(true);
+    try {
+      const res = await fetch("/api/admin/apology-credits", { method: "POST" });
+      const data = await res.json();
+      setDone({ sent: data.sent, failed: data.failed, notFound: data.notFound });
+    } catch {
+      alert("Failed — check console");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="mt-8 rounded-xl border-2 border-amber-200 bg-amber-50 p-5">
+      <h3 className="text-sm font-bold text-amber-900 mb-1">One-off: Apology email + 3 free credits</h3>
+      <p className="text-xs text-amber-700 mb-4">
+        Sends apology email and grants 3 credits to 14 users who may have hit the sign-up server error.
+        Excludes Sachari and Baium (already have activity). Run once only.
+      </p>
+      {done ? (
+        <p className="text-sm font-bold text-emerald-700">
+          Done — {done.sent} sent, {done.failed} failed, {done.notFound} not found
+        </p>
+      ) : (
+        <Button
+          size="sm"
+          onClick={run}
+          disabled={sending}
+          className="bg-amber-600 hover:bg-amber-700 text-white text-xs h-8"
+        >
+          {sending ? <><Loader2 className="h-3 w-3 mr-1.5 animate-spin" />Sending…</> : "Send apology emails →"}
+        </Button>
+      )}
+    </div>
+  );
+}
 
 const EMAIL_OVERVIEW = [
   { name: "Welcome", recipient: "New users on signup", trigger: "Automatic on account creation", frequency: "Once", status: "live" },
@@ -33,7 +76,7 @@ const EMAIL_OVERVIEW = [
   { name: "Admin: New Track", recipient: "Admin (you)", trigger: "Any track submitted", frequency: "Per submission", status: "live" },
   { name: "Weekly Digest", recipient: "Free users active in last 30 days", trigger: "Cron — every Monday 9am UTC", frequency: "Weekly", status: "live" },
   { name: "Credits Nudge", recipient: "Free users with 3+ idle credits", trigger: "Cron — every Wednesday 10am UTC", frequency: "Weekly (max 1/month per user)", status: "live" },
-  { name: "Track of the Week", recipient: "All users", trigger: "Cron — every Friday 5pm UTC", frequency: "Weekly", status: "live" },
+  { name: "Track of the Day", recipient: "All users", trigger: "Cron — daily 10am UTC", frequency: "Daily", status: "live" },
 ];
 
 export default function AdminEmailsPage() {
@@ -182,6 +225,9 @@ export default function AdminEmailsPage() {
             );
           })}
         </div>
+
+        {/* One-off apology send */}
+        <ApologyAction />
 
         <div className="mt-8 rounded-xl bg-neutral-50 border border-neutral-200 p-5">
           <h3 className="text-sm font-bold text-neutral-800 mb-2">Notes</h3>
