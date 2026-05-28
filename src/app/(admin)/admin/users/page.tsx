@@ -207,10 +207,10 @@ export default async function AdminUsersPage({
         onboardingQuizPassed: true,
         totalReviews: true,
       },
-      Account: {
-        select: { provider: true },
-        take: 1,
-      },
+    },
+    Account: {
+      select: { provider: true },
+      take: 1,
     },
   };
 
