@@ -42,7 +42,10 @@ export async function sendTotdWeeklyEmail(params: {
     `;
   }).join("");
 
+  const headerImageUrl = `${appUrl}/blog/blog3.jpg`;
+
   const content = `
+    <img src="${headerImageUrl}" alt="" width="520" style="display: block; width: 100%; max-width: 520px; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 24px;" />
     <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${COLORS.purple}; text-transform: uppercase; letter-spacing: 1px;">
       Track of the Week
     </p>

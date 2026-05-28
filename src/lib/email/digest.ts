@@ -80,7 +80,10 @@ export async function sendWeeklyDigestEmail(params: {
     ${emailButton("Review & earn →", `${appUrl}/review`, "secondary")}
   ` : "";
 
+  const headerImageUrl = `${appUrl}/blog/blog1.jpg`;
+
   const content = `
+    <img src="${headerImageUrl}" alt="" width="520" style="display: block; width: 100%; max-width: 520px; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 24px;" />
     <h1 style="margin: 0 0 6px; font-size: 24px; font-weight: 800; color: ${COLORS.black}; line-height: 1.2;">
       Hey ${firstName} — your week on MixReflect
     </h1>

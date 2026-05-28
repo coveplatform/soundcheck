@@ -129,7 +129,6 @@ export default function OnboardingPage() {
               This is how you&apos;ll appear to other artists.
             </p>
 
-            {/* Borderless clean input */}
             <input
               type="text"
               placeholder="Your artist or project name"
@@ -210,25 +209,35 @@ export default function OnboardingPage() {
         {/* CTA footer */}
         <div className="bg-white border-t-2 border-black">
           <div className="max-w-md mx-auto px-4 sm:px-6 py-5 space-y-3">
+            {error && <div className="bg-red-500 text-white text-sm px-4 py-3 font-bold rounded-xl">{error}</div>}
             <Button
               className="w-full h-13 bg-black text-white hover:bg-neutral-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl text-base py-3.5"
               onClick={() => { setError(""); setStep(3); }}
             >
               Submit your first track <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
-            <div className="flex items-center justify-between">
+            <button
+              onClick={handleComplete}
+              disabled={isLoading}
+              className={`w-full h-11 rounded-xl border-2 text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+                isLoading
+                  ? "border-purple-300 bg-purple-50 text-purple-700 cursor-not-allowed"
+                  : "border-black/20 hover:border-black/50 text-black/60 hover:text-black"
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Setting up your account…
+                </>
+              ) : "No track yet — skip for now →"}
+            </button>
+            <div className="flex justify-start">
               <button
                 onClick={() => setStep(1)}
                 className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors"
               >
                 <ArrowLeft className="h-3 w-3" /> Back
-              </button>
-              <button
-                onClick={handleComplete}
-                disabled={isLoading}
-                className="text-xs text-black/40 hover:text-black font-bold transition-colors"
-              >
-                {isLoading ? "Setting up..." : "No track yet — skip →"}
               </button>
             </div>
           </div>
@@ -262,7 +271,6 @@ export default function OnboardingPage() {
       <div className="flex-1 bg-[#faf7f2]">
         <div className="max-w-md mx-auto px-4 sm:px-6 py-10">
 
-          {/* Borderless input — same treatment as artist name */}
           <div className="flex items-center gap-3 mb-2">
             <Link2 className="h-4 w-4 text-black/30 flex-shrink-0" />
             <input
@@ -319,7 +327,7 @@ export default function OnboardingPage() {
       <div className="bg-white border-t-2 border-black">
         <div className="max-w-md mx-auto px-4 sm:px-6 py-5 space-y-3">
           <Button
-            className="w-full bg-black text-white hover:bg-neutral-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl text-base py-3.5 h-13"
+            className="w-full bg-purple-600 text-white hover:bg-purple-700 font-black border-2 border-purple-600 shadow-[4px_4px_0px_0px_rgba(109,40,217,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(109,40,217,0.3)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-xl text-base py-3.5 h-13"
             disabled={!hasValidTrackUrl || isSubmittingTrack}
             isLoading={isSubmittingTrack}
             onClick={handleCompleteWithTrack}
@@ -329,7 +337,7 @@ export default function OnboardingPage() {
           <button
             onClick={handleComplete}
             disabled={isLoading}
-            className="w-full h-11 rounded-xl border-2 border-black/15 hover:border-black/40 text-sm font-bold text-black/50 hover:text-black transition-all"
+            className="w-full h-11 rounded-xl border-2 border-black/20 hover:border-black/50 text-sm font-bold text-black/60 hover:text-black transition-all"
           >
             {isLoading ? "Setting up..." : "No track yet — I'll review first"}
           </button>
