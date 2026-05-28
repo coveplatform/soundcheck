@@ -222,7 +222,9 @@ function buildPreviewHtml(type: string): string {
       return emailWrapper(content);
     }
     case "weekly-digest": {
+      const headerImg = `<img src="${appUrl}/blog/blog1.jpg" alt="" width="520" style="display: block; width: 100%; max-width: 520px; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 24px;" />`;
       const content = `
+        ${headerImg}
         <h1 style="margin: 0 0 6px; font-size: 24px; font-weight: 800; color: ${COLORS.black}; line-height: 1.2;">
           Hey Kris — your week on MixReflect
         </h1>
@@ -259,7 +261,9 @@ function buildPreviewHtml(type: string): string {
       return emailWrapper(content);
     }
     case "credits-nudge": {
+      const headerImg = `<img src="${appUrl}/blog/blog2.jpg" alt="" width="520" style="display: block; width: 100%; max-width: 520px; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 24px;" />`;
       const content = `
+        ${headerImg}
         <h1 style="margin: 0 0 8px; font-size: 24px; font-weight: 800; color: ${COLORS.black}; line-height: 1.2;">
           Hey Kris, you've got 5 credits doing nothing.
         </h1>
@@ -295,7 +299,9 @@ function buildPreviewHtml(type: string): string {
           <p style="margin: 0; font-size: 14px; color: ${COLORS.gray}; line-height: 1.7; font-style: italic;">"${p.editorNote}"</p>
         </div>
       `).join("");
+      const headerImg = `<img src="${appUrl}/blog/blog3.jpg" alt="" width="520" style="display: block; width: 100%; max-width: 520px; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 24px;" />`;
       const content = `
+        ${headerImg}
         <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${COLORS.purple}; text-transform: uppercase; letter-spacing: 1px;">Track of the Week</p>
         <h1 style="margin: 0 0 6px; font-size: 26px; font-weight: 800; color: ${COLORS.black}; line-height: 1.2;">3 tracks worth your ears</h1>
         <p style="margin: 0 0 28px; font-size: 14px; color: ${COLORS.gray};">May 19–25 · Voted to the top by the MixReflect community</p>
