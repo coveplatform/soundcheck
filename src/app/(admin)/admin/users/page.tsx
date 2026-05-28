@@ -207,6 +207,10 @@ export default async function AdminUsersPage({
         onboardingQuizPassed: true,
         totalReviews: true,
       },
+      Account: {
+        select: { provider: true },
+        take: 1,
+      },
     },
   };
 
@@ -394,6 +398,9 @@ export default async function AdminUsersPage({
                     <Link className="underline hover:text-purple-600" href={`/admin/users/${u.id}`}>
                       {u.email}
                     </Link>
+                    {u.Account?.[0]?.provider === "google" && (
+                      <span className="ml-1.5 inline-block text-[9px] font-bold uppercase tracking-wide text-blue-700 bg-blue-50 px-1 py-0.5 rounded">G</span>
+                    )}
                   </td>
                   <td className="px-3 py-2 text-neutral-500">{u.ArtistProfile?.artistName ?? u.name ?? ""}</td>
                   <td className="px-3 py-2 text-right">
