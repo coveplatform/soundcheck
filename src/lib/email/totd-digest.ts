@@ -43,7 +43,7 @@ export async function sendTotdDailyEmail(params: {
       </p>
     </div>
 
-    ${emailButton("Listen now →", `${appUrl}/today`)}
+    ${emailButton("Listen now →", `${appUrl}/breakthrough`)}
 
     <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 18px 20px; margin-top: 28px;">
       <p style="margin: 0 0 4px; font-size: 13px; font-weight: 700; color: ${COLORS.black};">
@@ -118,7 +118,7 @@ export async function sendTotdWeeklyEmail(params: {
 
     ${pickRows}
 
-    ${emailButton("Listen on MixReflect →", `${appUrl}/today`)}
+    ${emailButton("Listen on MixReflect →", `${appUrl}/breakthrough`)}
 
     <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 18px; margin-top: 24px; text-align: center;">
       <p style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: ${COLORS.black};">
