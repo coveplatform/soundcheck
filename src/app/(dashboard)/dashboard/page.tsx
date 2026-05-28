@@ -476,23 +476,22 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
 
       {/* First-time user CTA */}
       {tracks.length === 0 && credits >= 1 && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
-          <div className="border-2 border-lime-500 bg-lime-50 rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex-1 min-w-0">
-              <p className="text-base font-black text-black">
+        <Link href="/submit" className="block bg-purple-600 hover:bg-purple-700 transition-colors">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-base font-black text-white leading-tight">
                 {credits === 1 ? "You've got 1 free credit." : `You've got ${credits} credits.`}
               </p>
-              <p className="text-sm text-black/50 mt-0.5">
+              <p className="text-sm text-white/60 font-medium mt-0.5">
                 Drop your first track and get real ears on it.
               </p>
             </div>
-            <Link href="/submit" className="flex-shrink-0">
-              <Button className="w-full sm:w-auto bg-lime-500 hover:bg-lime-600 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-sm h-10 px-5 rounded-xl">
-                Submit track <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="text-sm font-black text-white whitespace-nowrap">Submit track</span>
+              <ArrowRight className="h-4 w-4 text-white/70" />
+            </div>
           </div>
-        </div>
+        </Link>
       )}
 
       {/* ── REVIEW & EARN — full-bleed dark section ─────────── */}

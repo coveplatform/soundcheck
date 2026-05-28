@@ -219,9 +219,18 @@ export default function OnboardingPage() {
             <button
               onClick={handleComplete}
               disabled={isLoading}
-              className="w-full h-11 rounded-xl border-2 border-black/20 hover:border-black/50 text-sm font-bold text-black/60 hover:text-black transition-all"
+              className={`w-full h-11 rounded-xl border-2 text-sm font-bold transition-all flex items-center justify-center gap-2 ${
+                isLoading
+                  ? "border-purple-300 bg-purple-50 text-purple-700 cursor-not-allowed"
+                  : "border-black/20 hover:border-black/50 text-black/60 hover:text-black"
+              }`}
             >
-              {isLoading ? "Setting up..." : "No track yet — skip for now →"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Setting up your account…
+                </>
+              ) : "No track yet — skip for now →"}
             </button>
             <div className="flex justify-start">
               <button
