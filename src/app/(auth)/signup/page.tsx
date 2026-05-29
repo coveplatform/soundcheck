@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { redditEvents, trackTikTokEvent } from "@/components/providers";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import { validatePassword } from "@/lib/password";
@@ -47,6 +47,10 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
+  // Email/password is collapsed by default — most users sign up with Google.
+  const [showEmailForm, setShowEmailForm] = useState(
+    Boolean(searchParams.get("email"))
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -168,7 +172,14 @@ export default function SignupPage() {
         <p className="mt-2 text-neutral-500">1 free credit to start • No credit card required</p>
       </div>
 
-      {/* Google */}
+      {/* Error (shown even when form is collapsed, e.g. OAuth errors) */}
+      {error && (
+        <div className="text-red-400 text-sm py-3 px-4 bg-red-500/10 border-l-2 border-red-500 mb-6">
+          {error}
+        </div>
+      )}
+
+      {/* Google — primary path */}
       <Button
         type="button"
         variant="outline"
@@ -179,89 +190,107 @@ export default function SignupPage() {
         Continue with Google
       </Button>
 
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-neutral-300" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-[#f7f7f5] px-4 text-neutral-500">or</span>
-        </div>
-      </div>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {error && (
-          <div className="text-red-400 text-sm py-3 px-4 bg-red-500/10 border-l-2 border-red-500">
-            {error}
-          </div>
-        )}
-
-        <div>
-          <label htmlFor="email" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="password" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            placeholder="Create a strong password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
-          />
-          <div className="mt-3">
-            <PasswordStrength password={password} />
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3 pt-2">
-          <input
-            id="terms"
-            type="checkbox"
-            checked={acceptedTerms}
-            onChange={(e) => setAcceptedTerms(e.target.checked)}
-            className="mt-1 h-4 w-4 bg-transparent border-2 border-neutral-400 accent-purple-600 cursor-pointer"
-          />
-          <label htmlFor="terms" className="text-sm text-neutral-600 cursor-pointer">
-            I agree to the{" "}
-            <Link href="/terms" className="text-neutral-950 hover:text-purple-700 transition-colors">
+      {!showEmailForm ? (
+        <>
+          <p className="mt-4 text-xs text-neutral-500 text-center leading-relaxed">
+            By continuing you agree to our{" "}
+            <Link href="/terms" className="text-neutral-700 hover:text-purple-700 transition-colors underline">
               Terms
             </Link>
             {" "}and{" "}
-            <Link href="/privacy" className="text-neutral-950 hover:text-purple-700 transition-colors">
+            <Link href="/privacy" className="text-neutral-700 hover:text-purple-700 transition-colors underline">
               Privacy Policy
             </Link>
-          </label>
-        </div>
-
-        <div className="pt-4">
-          <Button
-            type="submit"
-            className="w-full h-12 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
-            isLoading={isLoading}
-            disabled={!acceptedTerms || !validatePassword(password).valid}
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowEmailForm(true)}
+            className="mt-5 w-full text-center text-sm text-neutral-500 hover:text-neutral-950 transition-colors"
           >
-            Create account
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
+            Sign up with email instead
+          </button>
+        </>
+      ) : (
+        <>
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-neutral-300" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[#f7f7f5] px-4 text-neutral-500">or with email</span>
+            </div>
+          </div>
 
-      </form>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+                className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="Create a strong password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
+              />
+              <div className="mt-3">
+                <PasswordStrength password={password} />
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 pt-2">
+              <input
+                id="terms"
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className="mt-1 h-4 w-4 bg-transparent border-2 border-neutral-400 accent-purple-600 cursor-pointer"
+              />
+              <label htmlFor="terms" className="text-sm text-neutral-600 cursor-pointer">
+                I agree to the{" "}
+                <Link href="/terms" className="text-neutral-950 hover:text-purple-700 transition-colors">
+                  Terms
+                </Link>
+                {" "}and{" "}
+                <Link href="/privacy" className="text-neutral-950 hover:text-purple-700 transition-colors">
+                  Privacy Policy
+                </Link>
+              </label>
+            </div>
+
+            <div className="pt-4">
+              <Button
+                type="submit"
+                className="w-full h-12 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+                isLoading={isLoading}
+                disabled={!acceptedTerms || !validatePassword(password).valid}
+              >
+                Create account
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </form>
+        </>
+      )}
 
       <p className="text-sm text-neutral-600 text-center mt-8">
         Already have an account?{" "}

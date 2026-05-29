@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getSession, signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -42,6 +42,11 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
+  // Email/password is collapsed by default — 95% use Google.
+  // Auto-expand if we arrived with a prefilled email or a credentials error.
+  const [showEmailForm, setShowEmailForm] = useState(
+    Boolean(searchParams.get("email")) || authError === "CredentialsSignin"
+  );
 
   // Preserve referral code when linking to signup
   const signupUrl = ref ? `/signup?ref=${ref}` : "/signup";
@@ -73,11 +78,13 @@ export default function LoginPage() {
 
     if (authError === "CredentialsSignin") {
       setError("Invalid email or password");
+      setShowEmailForm(true);
       return;
     }
 
     if (authError.startsWith("TooManyAttempts")) {
       setError("Too many login attempts. Please try again later.");
+      setShowEmailForm(true);
       return;
     }
 
@@ -142,7 +149,14 @@ export default function LoginPage() {
         <p className="mt-2 text-neutral-500">Sign in to your account</p>
       </div>
 
-      {/* Google */}
+      {/* Error (shown even when form is collapsed, e.g. OAuth errors) */}
+      {error && (
+        <div className="text-red-400 text-sm py-3 px-4 bg-red-500/10 border-l-2 border-red-500 mb-6">
+          {error}
+        </div>
+      )}
+
+      {/* Google — primary path */}
       <Button
         type="button"
         variant="outline"
@@ -153,75 +167,82 @@ export default function LoginPage() {
         Continue with Google
       </Button>
 
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-neutral-300" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-[#f7f7f5] px-4 text-neutral-500">or</span>
-        </div>
-      </div>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {error && (
-          <div className="text-red-400 text-sm py-3 px-4 bg-red-500/10 border-l-2 border-red-500">
-            {error}
+      {!showEmailForm ? (
+        <button
+          type="button"
+          onClick={() => setShowEmailForm(true)}
+          className="mt-5 w-full text-center text-sm text-neutral-500 hover:text-neutral-950 transition-colors"
+        >
+          Use email and password instead
+        </button>
+      ) : (
+        <>
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-neutral-300" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[#f7f7f5] px-4 text-neutral-500">or with email</span>
+            </div>
           </div>
-        )}
 
-        <div>
-          <label htmlFor="email" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
-          />
-        </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+                className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
+              />
+            </div>
 
-        <div>
-          <label htmlFor="password" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
-          />
-        </div>
+            <div>
+              <label htmlFor="password" className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full rounded-none border-0 border-b-2 border-neutral-300 px-0 py-3 text-neutral-950 text-lg placeholder:text-neutral-400 focus:border-purple-600 focus:ring-0 outline-none focus-visible:outline-none transition-[border-color] duration-200 bg-transparent [-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(247,247,245)] [-webkit-autofill]:[-webkit-text-fill-color:rgb(10,10,10)]"
+              />
+            </div>
 
-        <div className="flex justify-end">
-          <Link
-            href="/forgot-password"
-            className="text-sm text-neutral-500 hover:text-neutral-950 transition-colors"
-          >
-            Forgot password?
-          </Link>
-        </div>
+            <div className="flex justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-neutral-500 hover:text-neutral-950 transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
 
-        <div className="pt-2">
-          <Button
-            type="submit"
-            className="w-full h-12 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
-            isLoading={isLoading}
-          >
-            Sign in
-            {callbackUrl && callbackUrl !== "/" ? (
-              <span className="ml-2 text-xs font-mono opacity-70">→ redirect</span>
-            ) : null}
-          </Button>
-        </div>
-      </form>
+            <div className="pt-2">
+              <Button
+                type="submit"
+                className="w-full h-12 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-base border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-colors transition-shadow transition-transform duration-150 ease-out active:transition-none motion-reduce:transition-none motion-reduce:transform-none"
+                isLoading={isLoading}
+              >
+                Sign in
+                {callbackUrl && callbackUrl !== "/" ? (
+                  <span className="ml-2 text-xs font-mono opacity-70">→ redirect</span>
+                ) : null}
+              </Button>
+            </div>
+          </form>
+        </>
+      )}
 
       <p className="text-sm text-neutral-600 text-center mt-8">
         Don&apos;t have an account?{" "}
