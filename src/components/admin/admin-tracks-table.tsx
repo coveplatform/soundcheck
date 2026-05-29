@@ -22,6 +22,7 @@ export type AdminTrackRow = {
   promoCode: string | null;
   createdAt: Date;
   reviewsRequested: number;
+  reviewsCompleted: number;
   creditsSpent: number;
   isPublic: boolean;
   ArtistProfile: {
@@ -153,6 +154,7 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
               </th>
               <th className="text-left font-medium px-4 py-3">Title</th>
               <th className="text-left font-medium px-4 py-3">Status</th>
+              <th className="text-left font-medium px-4 py-3">Reviews</th>
               <th className="text-left font-medium px-4 py-3">Package</th>
               <th className="text-left font-medium px-4 py-3">Credits</th>
               <th className="text-left font-medium px-4 py-3">Artist</th>
@@ -182,11 +184,6 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                     <Link className="underline" href={`/admin/tracks/${track.id}`}>
                       {track.title}
                     </Link>
-                    {track.reviewsRequested > 0 && (
-                      <span className="ml-2 text-xs text-neutral-400">
-                        ({track.reviewsRequested} reviews)
-                      </span>
-                    )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
@@ -201,6 +198,21 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                         </span>
                       )}
                     </div>
+                  </td>
+                  <td className="px-4 py-3 tabular-nums">
+                    {track.reviewsRequested > 0 ? (
+                      (() => {
+                        const remaining = track.reviewsRequested - track.reviewsCompleted;
+                        return (
+                          <span className={`font-medium text-sm ${remaining === 1 ? "text-amber-600" : remaining === 0 ? "text-green-600" : "text-neutral-700"}`}>
+                            {track.reviewsCompleted}/{track.reviewsRequested}
+                            {remaining === 1 && <span className="ml-1 text-xs text-amber-500">(1 left)</span>}
+                          </span>
+                        );
+                      })()
+                    ) : (
+                      <span className="text-neutral-300">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     {track.promoCode ? (
