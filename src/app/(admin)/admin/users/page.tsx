@@ -147,6 +147,16 @@ export default async function AdminUsersPage({
     "bigdog1@gmail.com",
     "pash.tzaikos@gmail.com",
     "steve@steve.com",
+    // seed real accounts (injected test users)
+    "cloudnyne@gmail.com",
+    "lowkeybeats@gmail.com",
+    "solarframe@gmail.com",
+    "prodbyflux@gmail.com",
+    "mrkrxn@gmail.com",
+    "lucidwavs@gmail.com",
+    "beatsbykova@gmail.com",
+    "djstonez@gmail.com",
+    "dsa@asdas.com",
   ];
 
   // Build where clause
