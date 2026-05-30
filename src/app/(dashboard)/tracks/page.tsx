@@ -105,6 +105,18 @@ export default async function TracksPage({
 
   const tracks = artistProfile.Track;
 
+  // Fetch secondary Compare artworks for split card display
+  const comparePrimaryIds = tracks.filter((t: any) => t.isAbTest).map((t: any) => t.id);
+  const secondaryTracks = comparePrimaryIds.length > 0
+    ? await prisma.track.findMany({
+        where: { abTestPrimaryTrackId: { in: comparePrimaryIds } },
+        select: { abTestPrimaryTrackId: true, artworkUrl: true, title: true },
+      })
+    : [];
+  const secondaryByPrimary = Object.fromEntries(
+    secondaryTracks.map(s => [s.abTestPrimaryTrackId!, s])
+  );
+
   // Slot computation
   const isPro = artistProfile.subscriptionStatus === "active";
   const maxSlots = getMaxSlots(isPro);
@@ -459,6 +471,8 @@ export default async function TracksPage({
                       id={track.id}
                       title={track.title}
                       artworkUrl={track.artworkUrl}
+                      artworkUrlB={secondaryByPrimary[track.id]?.artworkUrl ?? null}
+                      isCompare={!!(track as any).isAbTest && !!secondaryByPrimary[track.id]}
                       status={track.status}
                       hasReviews={hasReviews}
                       reviewProgress={reviewProgress}
@@ -491,6 +505,8 @@ function TrackCard({
   id,
   title,
   artworkUrl,
+  artworkUrlB,
+  isCompare,
   status,
   hasReviews,
   reviewProgress,
@@ -501,6 +517,8 @@ function TrackCard({
   id: string;
   title: string;
   artworkUrl: string | null;
+  artworkUrlB?: string | null;
+  isCompare?: boolean;
   status: string;
   hasReviews: boolean;
   reviewProgress: number;
@@ -517,7 +535,25 @@ function TrackCard({
   return (
     <Link href={`/tracks/${id}`} className="group block">
       <div className="relative aspect-square rounded-2xl overflow-hidden border-2 border-black/8 group-hover:border-black/20 transition-all duration-150 shadow-[2px_2px_0_rgba(0,0,0,0.06)] group-hover:shadow-[4px_4px_0_rgba(0,0,0,0.1)]">
-        {artworkUrl ? (
+
+        {/* Artwork — split for Compare, single otherwise */}
+        {isCompare ? (
+          <>
+            <div className="absolute inset-0 overflow-hidden" style={{ clipPath: "polygon(0 0, 55% 0, 45% 100%, 0 100%)" }}>
+              {artworkUrl
+                ? <Image src={artworkUrl} alt="Version A" fill className="object-cover group-hover:scale-[1.03] transition-transform duration-200" sizes="20vw" />
+                : <div className="w-full h-full bg-neutral-200" />}
+            </div>
+            <div className="absolute inset-0 overflow-hidden" style={{ clipPath: "polygon(55% 0, 100% 0, 100% 100%, 45% 100%)" }}>
+              {artworkUrlB
+                ? <Image src={artworkUrlB} alt="Version B" fill className="object-cover group-hover:scale-[1.03] transition-transform duration-200" sizes="20vw" />
+                : <div className="w-full h-full bg-neutral-300" />}
+            </div>
+            <div className="absolute inset-0 pointer-events-none" style={{
+              background: "linear-gradient(to bottom right, transparent calc(50% - 1px), rgba(255,255,255,0.4) calc(50% - 1px), rgba(255,255,255,0.4) calc(50% + 1px), transparent calc(50% + 1px))"
+            }} />
+          </>
+        ) : artworkUrl ? (
           <Image
             src={artworkUrl}
             alt={title}
@@ -531,8 +567,13 @@ function TrackCard({
           </div>
         )}
 
-        {/* Status badge */}
-        <div className="absolute top-2 left-2">
+        {/* Status badge — Compare gets its own style */}
+        <div className="absolute top-2 left-2 flex items-center gap-1">
+          {isCompare && (
+            <span className="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-lg backdrop-blur-sm bg-black/70 text-white">
+              Compare
+            </span>
+          )}
           <span className={cn(
             "text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-lg backdrop-blur-sm",
             isComplete ? "bg-lime-400 text-black" :

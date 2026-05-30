@@ -39,7 +39,8 @@ export function TrackDashboardTabs({
 
   const tabs: { id: TabId; label: string }[] = [
     ...(isABTest ? [{ id: "abtest" as TabId, label: "Compare" }] : []),
-    { id: "stats" as TabId, label: "Stats" },
+    // Stats tab hidden for Compare — scores are already in the Compare tab
+    ...(!isABTest ? [{ id: "stats" as TabId, label: "Stats" }] : []),
     { id: "reviews" as TabId, label: "Reviews" },
     { id: "settings" as TabId, label: "Settings" },
   ];

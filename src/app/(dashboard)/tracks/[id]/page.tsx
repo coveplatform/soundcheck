@@ -322,18 +322,28 @@ export default async function TrackDetailPage({
               defaultTab={track.isAbTest && track.other_Track ? "abtest" : "reviews"}
               trackTitle={track.title}
               isABTest={!!(track.isAbTest && track.other_Track)}
+              // For single tracks: show Stats tab. For Compare: Compare tab covers scores, skip Stats.
               statsTab={
-                <StatsTab
-                  reviews={track.Review}
-                  platformAverages={{
-                    production: platformStats._avg.productionScore ?? 0,
-                    originality: platformStats._avg.originalityScore ?? 0,
-                    vocals: platformStats._avg.vocalScore ?? 0,
-                  }}
-                />
+                !(track.isAbTest && track.other_Track) ? (
+                  <StatsTab
+                    reviews={track.Review}
+                    platformAverages={{
+                      production: platformStats._avg.productionScore ?? 0,
+                      originality: platformStats._avg.originalityScore ?? 0,
+                      vocals: platformStats._avg.vocalScore ?? 0,
+                    }}
+                  />
+                ) : undefined
               }
               reviewsTab={
-                <ReviewsTab reviews={track.Review} trackId={track.id} />
+                // Compare: pass both versions' reviews; single: just Track A
+                <ReviewsTab
+                  reviews={track.Review}
+                  reviewsB={track.isAbTest && track.other_Track ? (track.other_Track.Review as any) : undefined}
+                  titleA={track.isAbTest && track.other_Track ? track.title : undefined}
+                  titleB={track.isAbTest && track.other_Track ? track.other_Track.title : undefined}
+                  trackId={track.id}
+                />
               }
               settingsTab={
                 <SettingsTab

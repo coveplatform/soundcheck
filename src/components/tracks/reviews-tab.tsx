@@ -106,19 +106,45 @@ function FeedbackSummaryBanner({ reviews }: { reviews: any[] }) {
 interface ReviewsTabProps {
   reviews: any[];
   trackId: string;
+  reviewsB?: any[];
+  titleA?: string;
+  titleB?: string;
 }
 
-export function ReviewsTab({ reviews, trackId }: ReviewsTabProps) {
-  const totalReviews = reviews.length;
+export function ReviewsTab({ reviews, trackId, reviewsB, titleA, titleB }: ReviewsTabProps) {
+  const isCompare = !!reviewsB && reviewsB.length > 0;
+  const totalReviews = reviews.length + (reviewsB?.length ?? 0);
 
   return (
     <div className="space-y-4">
-      <FeedbackSummaryBanner reviews={reviews} />
+      {!isCompare && <FeedbackSummaryBanner reviews={reviews} />}
 
-      {/* Reviews carousel */}
-      <div className="rounded-2xl border border-black/8 bg-white shadow-sm overflow-hidden">
-        <ReviewCarousel reviews={reviews} showControls={true} />
-      </div>
+      {isCompare ? (
+        // Compare: show both versions' reviews with labels
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-black/40 px-1">
+              Version A — {titleA ?? "Original"}
+            </p>
+            <div className="rounded-2xl border border-black/8 bg-white shadow-sm overflow-hidden">
+              <ReviewCarousel reviews={reviews} showControls={true} />
+            </div>
+          </div>
+          <div className="space-y-3">
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-500 px-1">
+              Version B — {titleB ?? "Alternate"}
+            </p>
+            <div className="rounded-2xl border border-purple-100 bg-white shadow-sm overflow-hidden">
+              <ReviewCarousel reviews={reviewsB!} showControls={true} />
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Single track: reviews carousel */
+        <div className="rounded-2xl border border-black/8 bg-white shadow-sm overflow-hidden">
+          <ReviewCarousel reviews={reviews} showControls={true} />
+        </div>
+      )}
 
       {/* Insights nudge */}
       {totalReviews >= 2 && (
