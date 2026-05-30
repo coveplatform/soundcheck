@@ -1,5 +1,5 @@
 {
-  "regions": ["iad1", "syd1", "sin1", "lhr1"],
+  "regions": ["iad1", "lhr1", "syd1"],
   "crons": [
     {
       "path": "/api/cron/expire-queue",
