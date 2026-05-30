@@ -121,11 +121,11 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   const maxSlots = getMaxSlots(isPro);
   const totalReviewsReceived = tracks.reduce((sum, t) => sum + (t.reviewsCompleted ?? 0), 0);
   const milestone = totalReviewsReceived >= 25
-    ? { label: "25+ reviews in", message: "Top tier — most artists never get here.", color: "purple" as const }
+    ? { label: `${totalReviewsReceived} reviews received`, message: "You’re in the top tier — most artists don’t reach this.", color: "purple" as const }
     : totalReviewsReceived >= 10
-    ? { label: "10+ reviews in", message: "One of the more active artists on MixReflect.", color: "purple" as const }
+    ? { label: `${totalReviewsReceived} reviews received`, message: "You’re one of the more active artists on MixReflect.", color: "purple" as const }
     : totalReviewsReceived >= 5
-    ? { label: "5 reviews in", message: "You’ve hit the pattern threshold — feedback is real at this point.", color: "lime" as const }
+    ? { label: `${totalReviewsReceived} reviews received`, message: "Enough data to spot real patterns in your feedback.", color: "lime" as const }
     : null;
   const activeTracks = tracks.filter((t) =>
     (ACTIVE_TRACK_STATUSES as readonly string[]).includes(t.status)
