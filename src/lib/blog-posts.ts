@@ -4,6 +4,7 @@ export type ContentBlock =
   | { type: "quote"; text: string }
   | { type: "list"; items: string[] }
   | { type: "image"; src: string; alt: string; caption?: string }
+  | { type: "faq"; items: { q: string; a: string }[] }
   | { type: "cta" };
 
 export type BlogPost = {
@@ -129,6 +130,23 @@ const _posts: BlogPost[] = [
         type: "paragraph",
         text: "MixReflect exists for exactly this stage. You upload a track before release, and genre-matched artists listen and fill out a structured review independently — covering first impression, what's working, what to fix, and production quality. When multiple reviewers flag the same thing, it shows up clearly. When they don't, you know the track is ready and you can release with confidence.",
       },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How do I know if my song is ready to release?",
+            a: "Your song is ready to release when multiple independent listeners — people who haven't heard your previous drafts — can get through it without flagging the same issue. If three or more reviewers independently note the same problem (vocals buried, energy drops in the mid-section, intro too long), that's a real signal to fix before release. If reviewers all flag different things, the track is likely ready.",
+          },
+          {
+            q: "What should I check before releasing a song?",
+            a: "Check the first 20 seconds (does something interesting happen?), the hook (is there a moment worth coming back for?), the energy arc (does it build and resolve without drifting?), vocal presence (do vocals cut through the mix?), and the ending (does it resolve cleanly?). Most importantly, get feedback from people who haven't heard the track before — listener fatigue means you can no longer hear it the way a first-time listener does.",
+          },
+          {
+            q: "How long should I wait before releasing a song?",
+            a: "There's no fixed timeline — the signal is feedback, not time. Get structured feedback from multiple independent listeners, act on any patterns (things multiple people flag without hearing each other), and release once no consistent weak point remains. Holding a track past that point costs momentum without improving the music.",
+          },
+        ],
+      },
       { type: "cta" },
     ],
   },
@@ -210,6 +228,23 @@ const _posts: BlogPost[] = [
       {
         type: "paragraph",
         text: "MixReflect was built around this. Artists upload a track and get structured feedback from other artists in their genre — covering the first impression, production quality, what's working, and the one thing to fix before release. The goal is feedback specific enough to actually change something while you still can.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How do I get feedback on my music before releasing it?",
+            a: "The most reliable method is structured peer review — submitting your track to other active musicians who fill out a structured format independently, without seeing each other's responses. This lets you identify patterns: if multiple reviewers flag the same issue, it's real and worth fixing. Platforms like MixReflect are built specifically for this. Reddit and Discord communities are also options, but the feedback is less structured and reviewers anchor on each other's opinions.",
+          },
+          {
+            q: "Is it worth getting feedback on music before releasing?",
+            a: "Yes — especially because after producing a track you've heard it hundreds of times and can no longer evaluate it the way a first-time listener can. Pre-release feedback catches the things you've gone deaf to: vocals sitting too low, energy dips in the mid-section, intros that run too long. These are usually quick fixes, but you can't hear them yourself after 200 listens.",
+          },
+          {
+            q: "Where can I get honest feedback on my music online?",
+            a: "MixReflect is designed specifically for honest pre-release feedback — genre-matched artists review your track using a structured format, independently, so you can see where multiple people converge on the same issue. Reddit communities (r/WeAreTheMusicMakers, r/makinghiphop) and genre-specific Discord servers are free alternatives, though feedback quality is inconsistent and not independent.",
+          },
+        ],
       },
       { type: "cta" },
     ],
@@ -483,6 +518,277 @@ const _posts: BlogPost[] = [
       {
         type: "paragraph",
         text: "MixReflect is built around this exact model. You upload a track, genre-matched artists listen and fill out a structured review independently, and then you get to see where the responses converge. When four reviewers flag the same moment in your track, it shows up clearly. That's the signal. That's what you fix.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "What is the best way to get honest feedback on a beat?",
+            a: "The best feedback on a beat comes from producers who don't know you personally and are responding to a structured format that requires them to address weaknesses, not just strengths. Platforms like MixReflect use genre-matched peer reviewers who fill out structured reviews independently — covering what works, the weakest element, and the one change to make before release. This format makes it harder to default to vague positivity.",
+          },
+          {
+            q: "How do I get producers to review my beats?",
+            a: "MixReflect's reciprocal model works well for this — you review other producers' tracks and earn credits to get your own reviewed. Because both parties are active producers, the feedback is musically informed. Reddit's r/makinghiphop has feedback threads, and genre-specific Discord servers often have dedicated critique channels, though the quality and depth varies significantly.",
+          },
+          {
+            q: "Should I trust feedback from one person on my beat?",
+            a: "Not as a basis for making changes. One person's feedback reflects their taste, their mood, and their genre biases — you have no way to know if it's a them problem or a track problem. Collect feedback from multiple independent listeners and only act on things that multiple people flag without having heard each other's responses. That's the difference between noise and signal.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
+    slug: "best-music-feedback-platforms-2026",
+    title: "Best Music Feedback Platforms in 2026",
+    coverImage: "/blog/blog5.jpg",
+    excerpt:
+      "From Reddit threads to peer review platforms — here's what every major option is actually good for, and when to use each one.",
+    category: "GUIDE",
+    date: "May 29, 2026",
+    readTime: "6 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "If you search for ways to get feedback on your music, you'll find the same names mentioned over and over — Reddit, SubmitHub, Discord, paid critique services. What most articles skip is what each option is actually useful for. They're not interchangeable. Using SubmitHub when you need development feedback is like using a playlist pitching tool as a mixing tool — it's designed for a completely different job.",
+      },
+      {
+        type: "paragraph",
+        text: "Here's a breakdown of every major platform artists use to get feedback on their music in 2026, what each one is genuinely good for, and which stage of production it actually serves.",
+      },
+      {
+        type: "h2",
+        text: "Reddit (r/WeAreTheMusicMakers, r/makinghiphop, r/edmproduction)",
+      },
+      {
+        type: "paragraph",
+        text: "Reddit has some of the most active music production communities online. r/WeAreTheMusicMakers, r/makinghiphop, and r/edmproduction all have regular feedback threads where you can post a track and get responses from other producers and musicians.",
+      },
+      {
+        type: "paragraph",
+        text: "The upside: it's free, there are a lot of people, and some of them know what they're talking about. The downside: there's no structure. You might get a detailed paragraph from someone who really listened, or a one-line reaction that tells you nothing. Quality is inconsistent, and once the first reply goes up, everyone else anchors on it — which means the feedback stops being independent the moment the thread gets going.",
+      },
+      {
+        type: "paragraph",
+        text: "Best for: early-stage drafts where you just want a quick gut check. Not reliable for pre-release feedback on a finished track.",
+      },
+      {
+        type: "h2",
+        text: "Discord music servers",
+      },
+      {
+        type: "paragraph",
+        text: "Genre-specific Discord servers — there are large ones for lo-fi, hip-hop, electronic, and bedroom pop — usually have dedicated feedback channels. The community tends to be more tight-knit than Reddit, and if you find a well-run server with active members, the feedback can be genuinely good.",
+      },
+      {
+        type: "paragraph",
+        text: "The same anchoring problem applies though. Feedback channels are public, so whoever responds first shapes what everyone else says. Real-time chat also means feedback is often short and reactive rather than considered. Good for community, less reliable for structured critique.",
+      },
+      {
+        type: "h2",
+        text: "SubmitHub",
+      },
+      {
+        type: "paragraph",
+        text: "SubmitHub is not a feedback platform — it's a placement platform. You pay credits to submit your track to blogs, playlist curators, labels, and influencers, who then accept or reject it. If they pass, some will leave a brief note explaining why.",
+      },
+      {
+        type: "paragraph",
+        text: "The notes you get from a rejection are useful context, but they're not the same as feedback designed to improve the track. Curators are evaluating fit — does this track work for my audience, my playlist, my brand. That's a different question than 'what should this artist fix before releasing.'",
+      },
+      {
+        type: "quote",
+        text: "SubmitHub tells you if a curator wants to feature your track. It doesn't tell you how to make it better.",
+      },
+      {
+        type: "paragraph",
+        text: "Use SubmitHub after your track is as strong as it can be. Using it earlier wastes credits and creates a first impression with curators who may remember your name the next time you submit.",
+      },
+      {
+        type: "h2",
+        text: "Paid critique services",
+      },
+      {
+        type: "paragraph",
+        text: "Some producers and mix engineers offer paid feedback — a video or written critique for anywhere from $20 to $150 depending on who you're working with. When you pick someone with a relevant background and a genuine track record, the quality is usually high. They'll catch things you've been deaf to for weeks and give you specific, actionable notes.",
+      },
+      {
+        type: "paragraph",
+        text: "The limitation is cost and scale. At $50 a session, getting feedback across five tracks costs $250. That's a real budget for most independent artists, and it's hard to justify for every track you're working on. Paid critique makes most sense for a nearly-finished track where you want one expert perspective before finalising the mix.",
+      },
+      {
+        type: "h2",
+        text: "MixReflect",
+      },
+      {
+        type: "paragraph",
+        text: "MixReflect is a structured peer review platform built specifically for pre-release feedback. You upload a track before you release it, and genre-matched artists — other musicians actively making music in your space — listen and fill out a structured review independently. The structured format covers first impression, what's working, the main weakness, and production quality.",
+      },
+      {
+        type: "paragraph",
+        text: "The key difference from other options is independence and pattern detection. Because every reviewer fills out the same format without seeing each other's responses, you can see where multiple people converge on the same note. When three reviewers flag the same thing — the intro runs too long, the vocals are sitting under the mix, the mid-section loses energy — it's no longer one person's taste. It's a real signal about the track.",
+      },
+      {
+        type: "paragraph",
+        text: "The model is reciprocal: you review other artists' tracks to earn credits for your own reviews. It scales in a way paid critique doesn't, and because the reviewers are other active musicians, the feedback has a relevant taste reference rather than just being a random listener's reaction.",
+      },
+      {
+        type: "h2",
+        text: "Which platform to use and when",
+      },
+      {
+        type: "list",
+        items: [
+          "Early draft, still arranging — Reddit feedback threads, genre Discord servers",
+          "Pre-release, finished track — MixReflect for structured peer review, paid critique if budget allows",
+          "Release-ready, seeking placement — SubmitHub for blogs and playlists, Spotify for Artists pitch tool for editorial",
+          "Post-release, building audience — social, SoundCloud reposts, playlist communities",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Most artists only use the last category. They skip the pre-release step entirely and go straight to pitching a track they've heard 300 times and can no longer evaluate honestly. The artists who close the gap fastest are the ones who build structured feedback into the process before release — when there's still time to change something.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "What is the best platform to get feedback on music in 2026?",
+            a: "For pre-release feedback from other musicians, MixReflect is the strongest option in 2026 — it's structured, genre-matched, and independent (reviewers don't see each other's responses before submitting). For placement with curators and blogs, SubmitHub is the most established. For free community feedback, Reddit and genre Discord servers work for early drafts. The right platform depends on what stage your track is at and what you actually need.",
+          },
+          {
+            q: "Is MixReflect free?",
+            a: "Yes. MixReflect has a free plan with no credit card required. You get one review credit on signup, and you earn more credits by reviewing other artists' tracks. The Pro plan ($24.95/month) gives you 30 credits per month, three active slots, and priority queue placement.",
+          },
+          {
+            q: "What is the difference between MixReflect and SubmitHub?",
+            a: "MixReflect is a development tool — you submit pre-release tracks to get structured feedback from genre-matched peers so you can improve the track before it goes public. SubmitHub is a distribution tool — you submit release-ready tracks to curators, blogs, and playlist owners to get placement and exposure. They serve different stages of the release process and work best when used in sequence.",
+          },
+          {
+            q: "How do music producers get feedback online?",
+            a: "The main options are Reddit communities (r/WeAreTheMusicMakers, r/makinghiphop), genre-specific Discord servers, structured peer review platforms like MixReflect, and paid critique services. Reddit and Discord are free but inconsistent. MixReflect uses a structured format and genre-matching to produce more reliable, actionable feedback. Paid critique is high quality but expensive for regular use.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
+    slug: "mixreflect-vs-submithub",
+    title: "MixReflect vs SubmitHub: What's the Difference",
+    coverImage: "/blog/blog6.jpg",
+    excerpt:
+      "Both platforms take music submissions from independent artists. They're solving completely different problems — and using the wrong one at the wrong stage is one of the most common mistakes artists make.",
+    category: "GUIDE",
+    date: "May 30, 2026",
+    readTime: "4 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "MixReflect and SubmitHub both accept music submissions from independent artists. That's roughly where the similarity ends. One is a development tool. One is a distribution tool. Using the wrong one at the wrong stage costs you time, money, and sometimes a first impression with curators you can't take back.",
+      },
+      {
+        type: "h2",
+        text: "What SubmitHub is",
+      },
+      {
+        type: "paragraph",
+        text: "SubmitHub is a platform for submitting music to curators — blogs, Spotify playlist owners, YouTube channels, labels, and influencers. You purchase credits and spend them submitting your track. Curators listen and either accept or decline. If they decline, most will leave a short note explaining why.",
+      },
+      {
+        type: "paragraph",
+        text: "The goal of SubmitHub is placement. You're trying to get your music featured in front of someone else's audience. Acceptance rates are typically under 10%, and the brief feedback you get on rejections is a byproduct of the process, not the core purpose. SubmitHub is designed for tracks that are already ready to release.",
+      },
+      {
+        type: "h2",
+        text: "What MixReflect is",
+      },
+      {
+        type: "paragraph",
+        text: "MixReflect is a structured peer review platform for pre-release tracks. You upload a track before it goes out, and genre-matched artists listen and fill out a detailed structured review — covering first impression, what's working, the main weakness, and production quality. Reviewers respond independently, without seeing each other's answers.",
+      },
+      {
+        type: "paragraph",
+        text: "The goal of MixReflect is improvement. You're trying to find out what to fix before anyone outside your inner circle hears the track. The structured format means you can identify patterns — if multiple reviewers flag the same moment in your track, it shows up clearly. That pattern is the signal.",
+      },
+      {
+        type: "quote",
+        text: "SubmitHub tells you if you got in. MixReflect tells you if you're ready.",
+      },
+      {
+        type: "h2",
+        text: "The difference in what you get back",
+      },
+      {
+        type: "paragraph",
+        text: "From SubmitHub: accepted or declined, and sometimes a sentence or two about why. Useful for knowing if a curator wanted to feature your track. Not useful for knowing what to change about the music.",
+      },
+      {
+        type: "paragraph",
+        text: "From MixReflect: multiple structured reviews covering specific elements — where the listener's attention dropped, what pulled them in, what felt off in the mix, how it compares to release-ready tracks in your genre. Enough to know exactly what to fix and whether the fix is worth making before you release.",
+      },
+      {
+        type: "h2",
+        text: "Why submitting to SubmitHub too early is expensive",
+      },
+      {
+        type: "paragraph",
+        text: "SubmitHub credits add up fast, especially if you're submitting to premium curators. Spending $30-50 on submissions for a track that isn't ready yet means burning budget on a bad first impression. Curators see thousands of submissions — if your track underperforms, you may be remembered the next time you submit under the same name.",
+      },
+      {
+        type: "paragraph",
+        text: "The more useful order: get structured feedback first, fix what comes up, then submit to curators once the track has cleared a real quality check. A track that's already been reviewed by five genre-matched listeners and had its weak points addressed is going to perform better on SubmitHub than one going out cold.",
+      },
+      {
+        type: "h2",
+        text: "How the pricing models compare",
+      },
+      {
+        type: "paragraph",
+        text: "SubmitHub charges per submission. Costs vary depending on whether you use basic or premium credits and which curators you target, but regular use adds up quickly — especially if you're releasing multiple tracks a year.",
+      },
+      {
+        type: "paragraph",
+        text: "MixReflect runs on a reciprocal model: you review other artists' tracks to earn credits for your own reviews. There's no per-submission fee for the core review loop. The cost is time, not money — which also means the feedback you receive comes from people with a genuine stake in the exchange, not a transactional curator interaction.",
+      },
+      {
+        type: "h2",
+        text: "Which one to use",
+      },
+      {
+        type: "list",
+        items: [
+          "Track is still in development or pre-release → MixReflect for structured peer feedback",
+          "Track is finished and you want to identify any remaining weak points → MixReflect before going anywhere else",
+          "Track has been through feedback, fixes are done, it's release-ready → SubmitHub for placement and distribution",
+          "Both at different stages → use MixReflect first, SubmitHub after",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "They're not competing products — they're sequential steps. MixReflect is the quality check before release. SubmitHub is the distribution push after. Using both in the right order gives your track the best possible version to pitch, and the best possible chance of placement when you do.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "What is the difference between MixReflect and SubmitHub?",
+            a: "MixReflect is for pre-release feedback — you submit a track to get structured critique from genre-matched peers so you can improve it before release. SubmitHub is for placement — you submit a finished track to curators, blogs, and playlist owners who accept or reject it for their audience. MixReflect is a development tool. SubmitHub is a distribution tool. They work best used in sequence: MixReflect first, SubmitHub after.",
+          },
+          {
+            q: "Should I use MixReflect or SubmitHub?",
+            a: "Use both, but in the right order. Use MixReflect before your track is released to get structured feedback from other artists and identify what to fix. Once the track has been through feedback and any patterns have been addressed, use SubmitHub to pitch it to curators for placement. Submitting an unfinished track to curators wastes credits and creates a poor first impression.",
+          },
+          {
+            q: "Is MixReflect free to use?",
+            a: "Yes. MixReflect is free to sign up — no credit card required. You receive one review credit on signup and earn more by reviewing other artists' tracks. The reciprocal model means there's no per-submission fee for the core review loop.",
+          },
+          {
+            q: "How much does SubmitHub cost compared to MixReflect?",
+            a: "SubmitHub charges per submission using a credit system — costs vary by curator type and volume, but regular use adds up quickly. MixReflect's core model is free and credit-based: you earn credits by reviewing others, so the main cost is time rather than money. MixReflect also offers a Pro plan at $24.95/month for artists who want more volume.",
+          },
+        ],
       },
       { type: "cta" },
     ],
