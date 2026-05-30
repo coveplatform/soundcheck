@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Music, Lock, Crown, ArrowRight, Coins } from "lucide-react";
+import { Plus, Music, ArrowRight, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DequeueButton } from "@/components/tracks/dequeue-button";
@@ -133,19 +133,12 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
             if (isLocked) {
               return (
                 <Link key={`locked-${slotIndex}`} href="/pro" className="group block">
-                  <div className="aspect-square rounded-2xl border-2 border-dashed border-black/10 bg-white hover:border-purple-200 hover:bg-purple-50/50 flex flex-col items-center justify-center gap-2.5 transition-all">
-                    <div className="h-10 w-10 rounded-xl bg-black/5 group-hover:bg-purple-100 flex items-center justify-center transition-colors">
-                      <Lock className="h-4 w-4 text-black/20 group-hover:text-purple-500 transition-colors" />
-                    </div>
-                    <div className="text-center px-3">
-                      <p className="text-[10px] font-black uppercase tracking-wider text-black/20 group-hover:text-purple-600 transition-colors">Pro slot</p>
-                      <div className="flex items-center justify-center gap-1 mt-1">
-                        <Crown className="h-3 w-3 text-purple-300 group-hover:text-purple-500 transition-colors" />
-                        <span className="text-[10px] font-black text-purple-300 group-hover:text-purple-500 transition-colors">Upgrade</span>
-                      </div>
-                    </div>
+                  <div className="aspect-square bg-purple-600 group-hover:bg-purple-700 transition-colors flex flex-col items-center justify-center gap-2 px-3">
+                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/60 text-center">Unlock slot</p>
+                    <p className="text-sm font-black text-white text-center leading-snug">Go Pro</p>
+                    <p className="text-[10px] text-white/50 text-center leading-snug">3 slots · unlimited credits</p>
                   </div>
-                  <p className="text-[11px] font-bold text-black/20 mt-2 text-center">Locked</p>
+                  <p className="text-[11px] font-bold text-purple-600 mt-2 text-center">Pro only</p>
                 </Link>
               );
             }
@@ -255,7 +248,7 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
 
       {/* Track picker modal */}
       <Dialog open={pickerOpen} onOpenChange={(o) => !o && setPickerOpen(false)}>
-        <DialogContent className="p-0 max-w-md gap-0 overflow-hidden">
+        <DialogContent className="p-0 max-w-xl gap-0 overflow-hidden rounded-none">
           <DialogTitle className="sr-only">Add track to queue</DialogTitle>
           <QueueTrackPicker
             tracks={eligibleTracks}
