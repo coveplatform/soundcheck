@@ -5,7 +5,6 @@ import { ArrowRight } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AccountSettingsClient } from "@/components/account/account-settings-client";
-import { ReviewerGenrePreferences } from "@/components/account/reviewer-genre-preferences";
 import { SparklesDoodle, StarDoodle } from "@/components/dashboard/doodles";
 
 export const dynamic = "force-dynamic";
@@ -26,10 +25,9 @@ export default async function AccountPage() {
     redirect("/login");
   }
 
-  // Get listener profile with genres (for reviewer genre preferences)
   const reviewerProfile = await prisma.reviewerProfile.findUnique({
     where: { userId: session.user.id },
-    select: { Genre: { select: { id: true } } },
+    select: { id: true },
   });
 
   // Get artist profile for credit balance
@@ -42,7 +40,6 @@ export default async function AccountPage() {
     },
   });
 
-  const initialGenreIds = (reviewerProfile?.Genre ?? []).map((g) => g.id);
   const isReviewer = Boolean(reviewerProfile);
   const isPro = artistProfile?.subscriptionStatus === "active";
   const credits = artistProfile?.reviewCredits ?? 0;
@@ -134,10 +131,6 @@ export default async function AccountPage() {
             hasPassword={Boolean(dbUser.password)}
             reviewCredits={artistProfile?.reviewCredits ?? 0}
           />
-
-          {isReviewer && (
-            <ReviewerGenrePreferences initialGenreIds={initialGenreIds} />
-          )}
 
         </div>
       </div>
