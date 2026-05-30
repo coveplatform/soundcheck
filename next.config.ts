@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
     viewTransition: true,
   },
   images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 31536000, // 1 year for static images
     remotePatterns: [
       {
         protocol: "https",

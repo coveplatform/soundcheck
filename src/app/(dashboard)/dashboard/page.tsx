@@ -133,50 +133,50 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
     );
   });
 
-  const excludeTrackIds = await prisma.review
-    .findMany({
-      where: { peerReviewerArtistId: artistProfile.id },
-      select: { trackId: true },
-    })
-    .then((r: { trackId: string }[]) => r.map((x) => x.trackId))
-    .catch(() => [] as string[]);
-
-  const availableTracksRaw = await prisma.track.findMany({
-    where: {
-      packageType: "PEER",
-      status: { in: ["QUEUED", "IN_PROGRESS"] },
-      artistId: { not: artistProfile.id },
-      id: { notIn: excludeTrackIds },
-    },
-    select: {
-      id: true,
-      title: true,
-      artworkUrl: true,
-      createdAt: true,
-      reviewsRequested: true,
-      Genre: true,
-      ArtistProfile: {
-        select: {
-          artistName: true,
-          subscriptionStatus: true,
-          User: { select: { email: true } },
-        },
+  const [reviewedTrackIdSet, availableTracksRaw] = await Promise.all([
+    prisma.review
+      .findMany({
+        where: { peerReviewerArtistId: artistProfile.id },
+        select: { trackId: true },
+      })
+      .then((r: { trackId: string }[]) => new Set(r.map((x) => x.trackId)))
+      .catch(() => new Set<string>()),
+    prisma.track.findMany({
+      where: {
+        packageType: "PEER",
+        status: { in: ["QUEUED", "IN_PROGRESS"] },
+        artistId: { not: artistProfile.id },
       },
-      _count: {
-        select: {
-          Review: {
-            where: {
-              status: { in: ["ASSIGNED", "IN_PROGRESS", "COMPLETED"] },
+      select: {
+        id: true,
+        title: true,
+        artworkUrl: true,
+        createdAt: true,
+        reviewsRequested: true,
+        Genre: true,
+        ArtistProfile: {
+          select: {
+            artistName: true,
+            subscriptionStatus: true,
+            User: { select: { email: true } },
+          },
+        },
+        _count: {
+          select: {
+            Review: {
+              where: {
+                status: { in: ["ASSIGNED", "IN_PROGRESS", "COMPLETED"] },
+              },
             },
           },
         },
       },
-    },
-    orderBy: { createdAt: "asc" },
-  });
+      orderBy: { createdAt: "asc" },
+    }),
+  ]);
 
   const availableQueueTracks = availableTracksRaw
-    .filter((t) => t._count.Review < t.reviewsRequested)
+    .filter((t) => !reviewedTrackIdSet.has(t.id) && t._count.Review < t.reviewsRequested)
     .sort((a, b) => {
       const aIsPro = a.ArtistProfile?.subscriptionStatus === "active";
       const bIsPro = b.ArtistProfile?.subscriptionStatus === "active";

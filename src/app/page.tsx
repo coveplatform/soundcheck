@@ -131,7 +131,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="relative rounded-2xl overflow-hidden shadow-xl" style={{ aspectRatio: "16/9" }}>
-                <Image src="/whats-working.jpg" alt="See what's working" fill className="object-cover" sizes="50vw" />
+                <Image src="/whats-working.jpg" alt="See what's working" fill className="object-cover" sizes="50vw" priority />
               </div>
             </div>
           </AnimatedSection>
@@ -343,6 +343,7 @@ export default function Home() {
                 fill
                 className="object-cover"
                 sizes="50vw"
+                priority
               />
             </div>
           </div>
