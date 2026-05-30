@@ -232,7 +232,7 @@ export function QueueTrackPicker({ tracks, credits, isPro = false, open, onClose
           {isPro ? (
             <div className="flex items-center gap-2.5">
               <Zap className="h-4 w-4 text-purple-600 flex-shrink-0" />
-              <p className="text-sm font-bold text-purple-700">Pro — no credits deducted · priority placement</p>
+              <p className="text-sm font-bold text-purple-700">Pro — 30 credits/month · priority placement</p>
             </div>
           ) : (
             <div className="flex items-center justify-between">

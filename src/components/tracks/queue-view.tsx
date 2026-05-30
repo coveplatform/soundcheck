@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Music, ArrowRight, Coins } from "lucide-react";
+import { Plus, Music, Lock, ArrowRight, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DequeueButton } from "@/components/tracks/dequeue-button";
@@ -133,12 +133,16 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
             if (isLocked) {
               return (
                 <Link key={`locked-${slotIndex}`} href="/pro" className="group block">
-                  <div className="aspect-square bg-purple-600 group-hover:bg-purple-700 transition-colors flex flex-col items-center justify-center gap-2 px-3">
-                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/60 text-center">Unlock slot</p>
-                    <p className="text-sm font-black text-white text-center leading-snug">Go Pro</p>
-                    <p className="text-[10px] text-white/50 text-center leading-snug">3 slots · unlimited credits</p>
+                  <div className="aspect-square rounded-2xl border-2 border-dashed border-purple-200 bg-white hover:border-purple-300 transition-all overflow-hidden flex flex-col">
+                    <div className="flex-1 flex items-center justify-center">
+                      <Lock className="h-5 w-5 text-black/15 group-hover:text-purple-300 transition-colors" />
+                    </div>
+                    <div className="bg-purple-600 group-hover:bg-purple-700 transition-colors px-3 py-2.5 text-center">
+                      <p className="text-[11px] font-black text-white leading-none">Go Pro →</p>
+                      <p className="text-[9px] text-white/60 mt-0.5">3 slots · 30 credits/mo</p>
+                    </div>
                   </div>
-                  <p className="text-[11px] font-bold text-purple-600 mt-2 text-center">Pro only</p>
+                  <p className="text-[11px] font-bold text-purple-500 mt-2 text-center">Pro only</p>
                 </Link>
               );
             }
