@@ -116,6 +116,11 @@ export default async function TrackDetailPage({
     notFound();
   }
 
+  // Secondary Compare tracks redirect to their primary — results live there
+  if (track.abTestPrimaryTrackId) {
+    redirect(`/tracks/${track.abTestPrimaryTrackId}`);
+  }
+
   // Mark feedback as viewed (fire-and-forget so it doesn't slow page load)
   if (track.Review.length > 0) {
     prisma.track.update({

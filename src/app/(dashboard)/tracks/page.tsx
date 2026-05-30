@@ -45,6 +45,7 @@ export default async function TracksPage({
     where: { userId: session.user.id },
     include: {
       Track: {
+        where: { abTestPrimaryTrackId: null }, // hide secondary Compare tracks from library
         include: {
           Genre: true,
           Review: {
