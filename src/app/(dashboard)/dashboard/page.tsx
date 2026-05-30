@@ -119,6 +119,14 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
   const tracks = artistProfile.Track ?? [];
   const isPro = artistProfile.subscriptionStatus === "active";
   const maxSlots = getMaxSlots(isPro);
+  const totalReviewsReceived = tracks.reduce((sum, t) => sum + (t.reviewsCompleted ?? 0), 0);
+  const milestone = totalReviewsReceived >= 25
+    ? { label: "25+ reviews in", message: "Top tier — most artists never get here.", color: "purple" as const }
+    : totalReviewsReceived >= 10
+    ? { label: "10+ reviews in", message: "One of the more active artists on MixReflect.", color: "purple" as const }
+    : totalReviewsReceived >= 5
+    ? { label: "5 reviews in", message: "You’ve hit the pattern threshold — feedback is real at this point.", color: "lime" as const }
+    : null;
   const activeTracks = tracks.filter((t) =>
     (ACTIVE_TRACK_STATUSES as readonly string[]).includes(t.status)
   );
@@ -301,18 +309,16 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         </div>
       )}
       {credits === 0 && !isWelcome && !isPro && (
-        <div className={tracks.some(t => ACTIVE_TRACK_STATUSES.includes(t.status as any)) ? "bg-neutral-100 border-b border-neutral-200" : "bg-amber-400 border-b border-amber-500"}>
+        <div className="bg-amber-400 border-b border-amber-500">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
             <p className="text-sm font-black text-black flex-1">
-              {tracks.some(t => ACTIVE_TRACK_STATUSES.includes(t.status as any))
-                ? "Reviews in progress · Review others to earn more credits"
-                : "You\u2019re out of credits"}
+              You&apos;re at 0 credits &mdash; complete 1 review below to earn 1 credit back
             </p>
             <Link
               href="/review"
               className="text-[11px] font-black text-black border-2 border-black px-3 py-1 rounded-full hover:bg-black hover:text-amber-400 transition-colors whitespace-nowrap"
             >
-              Review a track →
+              Review now →
             </Link>
             <Link
               href="/pro"
@@ -457,6 +463,20 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
           )}
         </div>
       </div>
+
+      {/* ── MILESTONE BADGE ──────────────────────────────────── */}
+      {milestone && (
+        <div className={milestone.color === "purple" ? "bg-purple-600" : "bg-lime-400"}>
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-4">
+            <div className={`text-xs font-black uppercase tracking-widest px-2.5 py-1 rounded-full border-2 whitespace-nowrap ${milestone.color === "purple" ? "border-white/30 text-white" : "border-black/30 text-black"}`}>
+              {milestone.label}
+            </div>
+            <p className={`text-sm font-bold flex-1 ${milestone.color === "purple" ? "text-white/80" : "text-black/70"}`}>
+              {milestone.message}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* ── TRACK OF THE DAY — compact card ─────────────────── */}
       <DashboardWinner compact />

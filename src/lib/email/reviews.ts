@@ -190,6 +190,15 @@ export async function sendReviewProgressEmail(
       </p>
       ${emailButton("Get More Reviews", moreReviewsUrl, "secondary")}
       ` : ""}
+      <div style="margin-top: 32px; padding-top: 32px; border-top: 2px solid ${COLORS.bg};">
+        <p style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: ${COLORS.black}; text-align: center; text-transform: uppercase; letter-spacing: 0.05em;">
+          Working on something new?
+        </p>
+        <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
+          Submit your next track while the feedback is fresh. Review one track to earn a credit — then you're in the queue.
+        </p>
+        ${emailButton("Submit Your Next Track", `${getAppUrl()}/submit`, "secondary")}
+      </div>
     `
     : `
       <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">

@@ -108,6 +108,7 @@ export async function POST(
         data: {
           reviewCredits: { decrement: cost },
           totalCreditsSpent: { increment: cost },
+          ...(!hasExistingReviews && { totalTracks: { increment: 1 } }),
         },
       }),
       prisma.track.update({
