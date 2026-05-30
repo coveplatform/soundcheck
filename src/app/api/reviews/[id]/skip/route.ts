@@ -27,7 +27,13 @@ export async function POST(
       include: {
         ReviewerProfile: { select: { userId: true, id: true, isRestricted: true } },
         ArtistProfile: { select: { userId: true, id: true } },
-        Track: { select: { id: true } },
+        Track: {
+          select: {
+            id: true,
+            isAbTest: true,
+            other_Track: { select: { id: true } },
+          },
+        },
       },
     });
 
@@ -80,21 +86,31 @@ export async function POST(
       );
     }
 
+    const reviewerFilter = isPeer
+      ? { artistReviewerId: review.peerReviewerArtistId }
+      : { reviewerId: review.reviewerId };
+
     await prisma.review.update({
       where: { id },
       data: { status: "SKIPPED" },
       select: { id: true },
     });
 
-    // Delete queue entry: peer uses artistReviewerId, legacy uses reviewerId
     await prisma.reviewQueue.deleteMany({
-      where: {
-        trackId: review.Track.id,
-        ...(isPeer
-          ? { artistReviewerId: review.peerReviewerArtistId }
-          : { reviewerId: review.reviewerId }),
-      },
+      where: { trackId: review.Track.id, ...reviewerFilter },
     });
+
+    // AB: also skip/expire the linked Track B review so it doesn't stay stuck
+    if (review.Track.isAbTest && review.Track.other_Track && review.peerReviewerArtistId) {
+      const secReview = await prisma.review.findFirst({
+        where: { trackId: review.Track.other_Track.id, peerReviewerArtistId: review.peerReviewerArtistId, status: { in: ["ASSIGNED", "IN_PROGRESS"] } },
+        select: { id: true },
+      });
+      if (secReview) {
+        await prisma.review.update({ where: { id: secReview.id }, data: { status: "SKIPPED" } });
+        await prisma.reviewQueue.deleteMany({ where: { trackId: review.Track.other_Track.id, ...reviewerFilter } });
+      }
+    }
 
     await assignReviewersToTrack(review.Track.id);
 

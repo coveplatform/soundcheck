@@ -113,6 +113,10 @@ export default async function TracksPage({
   const eligibleForQueue = tracks.filter((t) => t.status === "UPLOADED" || t.status === "COMPLETED");
   const hasOpenSlots = activeTracks.length < maxSlots;
 
+  // Upload cap
+  const uploadedCount = tracks.filter(t => ["UPLOADED", "QUEUED", "IN_PROGRESS", "COMPLETED"].includes(t.status)).length;
+  const atUploadCap = !isPro && uploadedCount >= 1;
+
   // Calculate portfolio analytics data
   const tracksWithReviews = tracks.filter(t => t.Review && t.Review.length > 0);
   const hasAnalyticsData = tracksWithReviews.length > 0;
@@ -368,7 +372,15 @@ export default async function TracksPage({
               {activeTracks.length}/{maxSlots}
             </span>
           </div>
-          {hasOpenSlots && tracks.length > 0 && (
+          {atUploadCap ? (
+            <Link
+              href="/pro"
+              className="flex items-center gap-1.5 text-[11px] font-black text-purple-400 hover:text-purple-300 transition-colors"
+            >
+              <Crown className="w-3 h-3" />
+              Go Pro for unlimited uploads
+            </Link>
+          ) : hasOpenSlots && tracks.length > 0 ? (
             <Link
               href="/submit"
               className="flex items-center gap-1.5 text-[11px] font-black text-white/60 hover:text-white transition-colors"
@@ -376,12 +388,11 @@ export default async function TracksPage({
               Add track
               <ArrowRight className="w-3 h-3" />
             </Link>
-          )}
-          {!hasOpenSlots && (
+          ) : !hasOpenSlots ? (
             <span className="text-[11px] font-black text-purple-400">
               All slots active
             </span>
-          )}
+          ) : null}
         </div>
       </div>
 

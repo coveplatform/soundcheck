@@ -30,6 +30,7 @@ async function handler(request: Request) {
   // Fetch free users with activity in last 30 days
   const users = await (prisma as any).user.findMany({
     where: {
+      NOT: { email: { endsWith: "@seed.mixreflect.com" } },
       ArtistProfile: {
         completedOnboarding: true,
         subscriptionStatus: { not: "active" },
@@ -93,7 +94,7 @@ async function handler(request: Request) {
     const genrePrefs: string[] = profile.genrePreferences ?? [];
     const genreTrackCount = await (prisma as any).track.count({
       where: {
-        status: "ACTIVE",
+        status: { in: ["QUEUED", "IN_PROGRESS"] },
         artistId: { not: profile.id },
         ...(genrePrefs.length > 0 ? {
           Genre: { some: { id: { in: genrePrefs } } },

@@ -227,6 +227,9 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
   const [honestFriend, setHonestFriend] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // A/B test state
+  const [abTestPreference, setAbTestPreference] = useState<"VERSION_A" | "VERSION_B" | "NO_PREFERENCE" | null>(null);
+
   // refs for phase 2 scroll
   const firstImpressionRef = useRef<HTMLDivElement>(null);
   const wouldListenRef = useRef<HTMLDivElement>(null);
@@ -372,6 +375,11 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
           trackLength: technicalIssues.includes("too-long") ? "WAY_TOO_LONG" : "PERFECT",
           qualityLevel, nextFocus: nextFocus ?? "MIXING",
           additionalNotes: honestFriend.trim() || undefined,
+          // A/B test fields
+          ...(review.linkedReviewId && abTestPreference ? {
+            abTestPreference,
+            linkedReviewId: review.linkedReviewId,
+          } : {}),
         }),
       });
 
@@ -641,6 +649,9 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
 
             {/* Audio player — dark */}
             <div className="bg-neutral-900 px-6 py-4">
+              {review.Track.isAbTest && review.Track.other_Track && (
+                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-400 mb-3">Version A</p>
+              )}
               <AudioPlayer
                 sourceUrl={review.Track.sourceUrl}
                 sourceType={review.Track.sourceType}
@@ -655,6 +666,53 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
                 onMinimumReached={() => setCanSubmit(true)}
                 showListenTracker
               />
+
+              {/* A/B: Track B player + preference picker */}
+              {review.Track.isAbTest && review.Track.other_Track && (
+                <div className="mt-5 space-y-4">
+                  <div className="border-t border-white/10 pt-5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-400 mb-1">Version B</p>
+                    <p className="text-xs text-white/30 mb-3">{review.Track.other_Track.title}</p>
+                    <AudioPlayer
+                      sourceUrl={review.Track.other_Track.sourceUrl}
+                      sourceType={review.Track.other_Track.sourceType}
+                      showWaveform={review.Track.other_Track.sourceType === "UPLOAD"}
+                      showListenTracker={false}
+                      minListenTime={0}
+                    />
+                  </div>
+
+                  {/* Preference picker */}
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+                    <p className="text-sm font-black text-white">Which version is stronger?</p>
+                    <p className="text-xs text-white/35">Listen to both before choosing — this is the most important part of a compare review.</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(["VERSION_A", "VERSION_B", "NO_PREFERENCE"] as const).map((val) => {
+                        const labels = { VERSION_A: "Version A", VERSION_B: "Version B", NO_PREFERENCE: "No preference" };
+                        const isSelected = abTestPreference === val;
+                        return (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => setAbTestPreference(val)}
+                            className={cn(
+                              "px-2 py-3 rounded-xl border text-xs font-black transition-all",
+                              isSelected
+                                ? val === "VERSION_B" ? "bg-purple-600 border-purple-500 text-white" : "bg-white border-white text-black"
+                                : "bg-white/5 border-white/10 text-white/40 hover:border-white/25 hover:text-white/70"
+                            )}
+                          >
+                            {labels[val]}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {!abTestPreference && (
+                      <p className="text-[11px] text-purple-400 font-bold">Required before submitting ↓</p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Reaction controls — dark, flows directly from player */}
@@ -1122,7 +1180,7 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
               <div className="mb-4 p-3 rounded-xl border border-red-200 bg-red-50 text-sm text-red-700 font-medium">{error}</div>
             )}
 
-            <Button onClick={handleSubmit} isLoading={isSubmitting} disabled={!canSubmit || !meetsText}
+            <Button onClick={handleSubmit} isLoading={isSubmitting} disabled={!canSubmit || !meetsText || (!!review?.linkedReviewId && !abTestPreference)}
               className={cn(
                 "w-full h-12 font-black text-base rounded-xl transition-all",
                 canSubmit && meetsText

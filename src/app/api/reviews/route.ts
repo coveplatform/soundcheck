@@ -113,6 +113,11 @@ const submitReviewSchema = z.object({
   strongestElement: z.string().optional().nullable(),
   biggestRisk: z.string().optional().nullable(),
   competitiveBenchmark: z.string().optional().nullable(),
+
+  // A/B test fields
+  abTestPreference: z.enum(["VERSION_A", "VERSION_B", "NO_PREFERENCE"]).optional().nullable(),
+  abTestComment: z.string().max(500).optional().nullable(),
+  linkedReviewId: z.string().optional().nullable(),
 });
 
 export async function POST(request: Request) {
@@ -182,6 +187,7 @@ export async function POST(request: Request) {
         Track: {
           include: {
             ArtistProfile: { include: { User: true } },
+            other_Track: { select: { id: true } },
           },
         },
       },
@@ -300,6 +306,8 @@ export async function POST(request: Request) {
           ...(isPeerReview && review.peerReviewerArtistId
             ? { peerReviewerArtistId: review.peerReviewerArtistId }
             : { reviewerId: review.reviewerId }),
+          // Secondary Compare tracks are auto-completed — count the session once, not twice
+          Track: { abTestPrimaryTrackId: null },
         },
       });
 
@@ -390,6 +398,10 @@ export async function POST(request: Request) {
               strongestElement: data.strongestElement,
               biggestRisk: data.biggestRisk,
               competitiveBenchmark: data.competitiveBenchmark,
+
+              // A/B test preference
+              abTestPreference: data.abTestPreference,
+              abTestComment: data.abTestComment,
             },
           });
           updatedCount = updated.count;
@@ -436,13 +448,16 @@ export async function POST(request: Request) {
         return { updated: false as const, reason: "UNKNOWN" as const };
       }
 
+      // A/B reviews earn 2 credits — reviewer listened to and evaluated both tracks
+      const reviewerCreditEarn = (review.Track.isAbTest && review.Track.other_Track) ? 2 : 1;
+
       // Update reviewer profile: peer reviewers get credits (+ cash if PRO tier), legacy reviewers get cash
       if (isPeerReview && artistProfile) {
         await tx.artistProfile.update({
           where: { id: artistProfile.id },
           data: {
-            reviewCredits: { increment: 1 },
-            totalCreditsEarned: { increment: 1 },
+            reviewCredits: { increment: reviewerCreditEarn },
+            totalCreditsEarned: { increment: reviewerCreditEarn },
             totalPeerReviews: { increment: 1 },
             ...(earnings > 0 ? {
               pendingBalance: { increment: earnings },
@@ -516,6 +531,57 @@ export async function POST(request: Request) {
             : { reviewerId: review.reviewerId }),
         },
       });
+
+      // A/B test: mark the linked secondary review (Track B) as completed too
+      if (data.linkedReviewId && data.abTestPreference && review.peerReviewerArtistId) {
+        const linkedReview = await tx.review.findUnique({
+          where: { id: data.linkedReviewId },
+          select: {
+            id: true, status: true, peerReviewerArtistId: true,
+            trackId: true,
+            Track: { select: { reviewsRequested: true } },
+          },
+        });
+
+        // Only proceed if this linked review actually belongs to the same reviewer and is still active
+        if (
+          linkedReview &&
+          linkedReview.peerReviewerArtistId === review.peerReviewerArtistId &&
+          (linkedReview.status === "ASSIGNED" || linkedReview.status === "IN_PROGRESS")
+        ) {
+          await tx.review.update({
+            where: { id: data.linkedReviewId },
+            data: {
+              status: "COMPLETED",
+              countsTowardCompletion: true,
+              countsTowardAnalytics: true,
+              abTestPreference: data.abTestPreference,
+              abTestComment: data.abTestComment,
+              shareId: generateShareId(),
+            },
+          });
+
+          await tx.reviewQueue.deleteMany({
+            where: { trackId: linkedReview.trackId, artistReviewerId: review.peerReviewerArtistId },
+          });
+
+          // Update Track B completion count
+          const secCompletedCount = await tx.review.count({
+            where: { trackId: linkedReview.trackId, status: "COMPLETED", countsTowardCompletion: true },
+          });
+          const secNextStatus = secCompletedCount >= (linkedReview.Track.reviewsRequested ?? 0)
+            ? ("COMPLETED" as const)
+            : ("IN_PROGRESS" as const);
+          await tx.track.update({
+            where: { id: linkedReview.trackId },
+            data: {
+              reviewsCompleted: secCompletedCount,
+              status: secNextStatus,
+              ...(secNextStatus === "COMPLETED" && { completedAt: new Date() }),
+            },
+          });
+        }
+      }
 
       const updatedReview = await tx.review.findUnique({
         where: { id: data.reviewId },

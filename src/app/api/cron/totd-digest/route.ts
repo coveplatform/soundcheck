@@ -63,6 +63,7 @@ async function handler(request: Request) {
     // Send to all users who've completed onboarding
     const users = await (prisma as any).user.findMany({
       where: {
+        NOT: { email: { endsWith: "@seed.mixreflect.com" } },
         ArtistProfile: { completedOnboarding: true },
       },
       select: { email: true },

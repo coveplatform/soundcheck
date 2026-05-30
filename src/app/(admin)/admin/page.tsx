@@ -186,7 +186,7 @@ export default async function AdminPage() {
             </div>
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-black text-white mb-1">A/B Test Results — Demo</h3>
+            <h3 className="text-xl font-black text-white mb-1">Compare Results — Demo</h3>
             <p className="text-sm text-white/60 font-medium">Preview how two-version comparisons would look for artists</p>
           </div>
           <div className="hidden sm:block text-white/40 group-hover:translate-x-1 transition-transform">

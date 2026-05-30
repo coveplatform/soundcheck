@@ -97,6 +97,8 @@ export default async function ListenPage({
       status: { in: ["QUEUED", "IN_PROGRESS"] },
       artistId: { not: artistProfile.id },
       id: { notIn: excludeTrackIds },
+      // Secondary AB tracks are claimed automatically — never shown directly to reviewers
+      abTestPrimaryTrackId: null,
     },
     select: {
       id: true,
@@ -105,6 +107,8 @@ export default async function ListenPage({
       reviewsRequested: true,
       createdAt: true,
       paidAt: true,
+      isAbTest: true,
+      other_Track: { select: { artworkUrl: true } },
       ArtistProfile: {
         select: {
           artistName: true,
@@ -159,7 +163,7 @@ export default async function ListenPage({
             {isPro ? (
               <div className="flex items-center gap-2 justify-end">
                 <Crown className="h-5 w-5 text-purple-400" />
-                <span className="text-2xl font-black text-purple-400">Unlimited</span>
+                <span className="text-2xl font-black text-purple-400 tabular-nums">{credits}</span>
               </div>
             ) : (
               <p className="text-5xl sm:text-6xl font-black text-white leading-none tabular-nums">
@@ -261,8 +265,10 @@ export default async function ListenPage({
                 title={track.title}
                 artistName={track.ArtistProfile.artistName}
                 artworkUrl={track.artworkUrl}
+                artworkUrlB={track.other_Track?.artworkUrl ?? null}
                 reviewsRemaining={reviewsRemaining}
-                isPriority={track.ArtistProfile?.subscriptionStatus === "active"}
+                isPriority={true}
+                isAbTest={track.isAbTest}
               />
             ))}
           </div>

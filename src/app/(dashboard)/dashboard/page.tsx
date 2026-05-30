@@ -154,6 +154,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
         packageType: "PEER",
         status: { in: ["QUEUED", "IN_PROGRESS"] },
         artistId: { not: artistProfile.id },
+        abTestPrimaryTrackId: null,
       },
       select: {
         id: true,

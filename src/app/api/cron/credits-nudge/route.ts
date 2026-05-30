@@ -27,6 +27,7 @@ async function handler(request: Request) {
 
   const users = await (prisma as any).user.findMany({
     where: {
+      NOT: { email: { endsWith: "@seed.mixreflect.com" } },
       ArtistProfile: {
         completedOnboarding: true,
         subscriptionStatus: { not: "active" },
@@ -65,7 +66,7 @@ async function handler(request: Request) {
     const activeSubmission = await (prisma as any).track.findFirst({
       where: {
         artistId: profile.id,
-        status: "ACTIVE",
+        status: { in: ["QUEUED", "IN_PROGRESS"] },
       },
     });
     if (activeSubmission) { skipped++; continue; }

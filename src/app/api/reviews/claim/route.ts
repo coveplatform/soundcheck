@@ -51,6 +51,8 @@ export async function POST(request: Request) {
         peerReviewerArtistId: artistProfile.id,
         status: "COMPLETED",
         updatedAt: { gte: startOfToday },
+        // Secondary Compare tracks are auto-completed alongside the primary — don't double-count
+        Track: { abTestPrimaryTrackId: null },
       },
     });
 
@@ -63,7 +65,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const reviewId = await prisma.$transaction(async (tx) => {
+    const claimResult = await prisma.$transaction(async (tx) => {
       // Advisory lock on the track to prevent race conditions
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${trackId}))`;
 
@@ -75,11 +77,27 @@ export async function POST(request: Request) {
           artistId: true,
           packageType: true,
           reviewsRequested: true,
+          isAbTest: true,
+          abTestPrimaryTrackId: true,
+          // Secondary AB track linked to this primary
+          other_Track: {
+            select: {
+              id: true,
+              status: true,
+              reviewsRequested: true,
+              artistId: true,
+            },
+          },
         },
       });
 
       if (!track) {
         throw new Error("Track not found");
+      }
+
+      // Prevent claiming Track B directly — always claim via Track A
+      if (track.isAbTest && track.abTestPrimaryTrackId) {
+        throw new Error("This track is part of an A/B test — claim the primary version instead");
       }
 
       if (track.status !== "QUEUED" && track.status !== "IN_PROGRESS") {
@@ -97,17 +115,20 @@ export async function POST(request: Request) {
 
       // Check if user already has a review for this track (any status)
       const existingReview = await tx.review.findFirst({
-        where: {
-          trackId,
-          peerReviewerArtistId: artistProfile.id,
-        },
+        where: { trackId, peerReviewerArtistId: artistProfile.id },
         select: { id: true, status: true },
       });
 
       if (existingReview) {
         if (existingReview.status === "ASSIGNED" || existingReview.status === "IN_PROGRESS") {
-          // Already claimed — return existing review
-          return existingReview.id;
+          // Already claimed — find secondary review too if AB
+          const secondaryReview = track.other_Track
+            ? await tx.review.findFirst({
+                where: { trackId: track.other_Track.id, peerReviewerArtistId: artistProfile.id },
+                select: { id: true },
+              })
+            : null;
+          return { reviewId: existingReview.id, secondaryReviewId: secondaryReview?.id ?? null };
         }
         throw new Error("You have already reviewed or skipped this track");
       }
@@ -122,7 +143,6 @@ export async function POST(request: Request) {
         throw new Error("This track already has enough reviewers");
       }
 
-      // Create the review and queue entry
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 48);
 
@@ -136,27 +156,53 @@ export async function POST(request: Request) {
       });
 
       await tx.reviewQueue.create({
-        data: {
-          trackId,
-          artistReviewerId: artistProfile.id,
-          expiresAt,
-          priority: 0,
-        },
+        data: { trackId, artistReviewerId: artistProfile.id, expiresAt, priority: 0 },
       });
 
-      // Update track status to IN_PROGRESS if it was QUEUED
       if (track.status === "QUEUED") {
-        await tx.track.update({
-          where: { id: trackId },
-          data: { status: "IN_PROGRESS" },
-        });
+        await tx.track.update({ where: { id: trackId }, data: { status: "IN_PROGRESS" } });
       }
 
-      return review.id;
+      // A/B: auto-create a linked review for Track B
+      let secondaryReviewId: string | null = null;
+      if (track.isAbTest && track.other_Track) {
+        const secTrack = track.other_Track;
+
+        // Only create if Track B is actually queued and needs reviews
+        if (
+          (secTrack.status === "QUEUED" || secTrack.status === "IN_PROGRESS") &&
+          secTrack.reviewsRequested > 0
+        ) {
+          const [secCompleted, secActive] = await Promise.all([
+            tx.review.count({ where: { trackId: secTrack.id, status: "COMPLETED", countsTowardCompletion: true } }),
+            tx.review.count({ where: { trackId: secTrack.id, status: { in: ["ASSIGNED", "IN_PROGRESS"] } } }),
+          ]);
+
+          if (secCompleted + secActive < secTrack.reviewsRequested) {
+            const secReview = await tx.review.create({
+              data: {
+                trackId: secTrack.id,
+                peerReviewerArtistId: artistProfile.id,
+                isPeerReview: true,
+                status: "ASSIGNED",
+              },
+            });
+            await tx.reviewQueue.create({
+              data: { trackId: secTrack.id, artistReviewerId: artistProfile.id, expiresAt, priority: 0 },
+            });
+            if (secTrack.status === "QUEUED") {
+              await tx.track.update({ where: { id: secTrack.id }, data: { status: "IN_PROGRESS" } });
+            }
+            secondaryReviewId = secReview.id;
+          }
+        }
+      }
+
+      return { reviewId: review.id, secondaryReviewId };
     });
 
     revalidateTag("sidebar", { expire: 0 });
-    return NextResponse.json({ reviewId });
+    return NextResponse.json({ reviewId: claimResult.reviewId, secondaryReviewId: claimResult.secondaryReviewId });
   } catch (err: any) {
     const message = err?.message || "Failed to claim track";
     // Unique constraint violation — already claimed

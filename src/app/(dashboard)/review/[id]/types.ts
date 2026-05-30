@@ -28,11 +28,22 @@ export interface Review {
     artworkUrl?: string | null;
     Genre: { id: string; name: string }[];
     allowPurchase: boolean;
+    isAbTest?: boolean;
+    // Present when this review is for the primary track (Track A) of an AB pair
+    other_Track?: {
+      id: string;
+      title: string;
+      sourceUrl: string;
+      sourceType: string;
+      artworkUrl?: string | null;
+    } | null;
     ArtistProfile?: {
       artistName: string;
       experienceLevel?: string | null;
     };
   };
+  // ID of this reviewer's linked review for Track B (populated by GET /api/reviews/[id])
+  linkedReviewId?: string | null;
   ReviewerProfile: {
     tier: string;
   } | null;

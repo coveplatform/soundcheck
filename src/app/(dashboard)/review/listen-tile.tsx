@@ -10,11 +10,13 @@ interface ListenTileProps {
   title: string;
   artistName: string;
   artworkUrl: string | null;
+  artworkUrlB?: string | null;
   reviewsRemaining: number | null;
   isPriority?: boolean;
+  isAbTest?: boolean;
 }
 
-export function ListenTile({ trackId, title, artistName, artworkUrl, reviewsRemaining, isPriority }: ListenTileProps) {
+export function ListenTile({ trackId, title, artistName, artworkUrl, artworkUrlB, reviewsRemaining, isPriority, isAbTest }: ListenTileProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -25,7 +27,6 @@ export function ListenTile({ trackId, title, artistName, artworkUrl, reviewsRema
     if (isLocked || loading) return;
     setLoading(true);
     setError(false);
-
     try {
       const res = await fetch("/api/reviews/claim", {
         method: "POST",
@@ -51,8 +52,27 @@ export function ListenTile({ trackId, title, artistName, artworkUrl, reviewsRema
       disabled={isLocked || loading}
       className="relative aspect-square overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 disabled:cursor-not-allowed w-full"
     >
-      {/* Artwork */}
-      {artworkUrl ? (
+      {/* Artwork — split diagonally for Compare, single for regular */}
+      {isAbTest ? (
+        <>
+          {/* Left half — Version A */}
+          <div className="absolute inset-0 overflow-hidden" style={{ clipPath: "polygon(0 0, 55% 0, 45% 100%, 0 100%)" }}>
+            {artworkUrl
+              ? <Image src={artworkUrl} alt="Version A" fill className="object-cover transition-transform duration-500 group-hover:scale-[1.04] group-disabled:opacity-40" sizes="25vw" />
+              : <div className="w-full h-full bg-[#1a0f2e]" />}
+          </div>
+          {/* Right half — Version B */}
+          <div className="absolute inset-0 overflow-hidden" style={{ clipPath: "polygon(55% 0, 100% 0, 100% 100%, 45% 100%)" }}>
+            {artworkUrlB
+              ? <Image src={artworkUrlB} alt="Version B" fill className="object-cover transition-transform duration-500 group-hover:scale-[1.04] group-disabled:opacity-40" sizes="25vw" />
+              : <div className="w-full h-full bg-[#0f0f18]" />}
+          </div>
+          {/* Diagonal divider line */}
+          <div className="absolute inset-0 pointer-events-none" style={{
+            background: "linear-gradient(to bottom right, transparent calc(50% - 1px), rgba(255,255,255,0.25) calc(50% - 1px), rgba(255,255,255,0.25) calc(50% + 1px), transparent calc(50% + 1px))"
+          }} />
+        </>
+      ) : artworkUrl ? (
         <Image
           src={artworkUrl}
           alt={title}
@@ -66,15 +86,19 @@ export function ListenTile({ trackId, title, artistName, artworkUrl, reviewsRema
         </div>
       )}
 
-      {/* Priority badge */}
-      {isPriority && (
+      {/* Badge */}
+      {isAbTest ? (
+        <div className="absolute top-2.5 left-2.5 z-10 bg-black/70 backdrop-blur-sm text-white px-2 py-0.5">
+          <span className="text-[9px] font-black uppercase tracking-wider">Compare</span>
+        </div>
+      ) : isPriority ? (
         <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 bg-purple-600 text-white px-2 py-0.5">
           <Zap className="h-2.5 w-2.5" />
           <span className="text-[9px] font-black uppercase tracking-wider">Priority</span>
         </div>
-      )}
+      ) : null}
 
-      {/* Bottom info — always visible, fades on hover */}
+      {/* Bottom info */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pt-8 pb-3 group-hover:opacity-0 transition-opacity duration-200">
         <p className="text-[12px] font-bold text-white leading-tight truncate">{title}</p>
         <p className="text-[10px] text-white/45 truncate mt-0.5">{artistName}</p>
@@ -90,14 +114,17 @@ export function ListenTile({ trackId, title, artistName, artworkUrl, reviewsRema
           <>
             <p className="text-sm font-bold text-white text-center leading-snug line-clamp-2">{title}</p>
             <p className="text-[11px] text-white/50 text-center">{artistName}</p>
+            {isAbTest && (
+              <p className="text-[10px] text-purple-300 font-black uppercase tracking-wider text-center">2 versions · earn +2 credits</p>
+            )}
             <span className="mt-1 bg-white text-black font-black text-[11px] uppercase tracking-wider px-5 py-2">
-              Review →
+              {isAbTest ? "Listen & Compare →" : "Review →"}
             </span>
           </>
         )}
       </div>
 
-      {/* Locked state */}
+      {/* Locked */}
       {isLocked && (
         <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
           <span className="text-white/30 text-[10px] font-black uppercase tracking-wider">Daily limit</span>

@@ -302,6 +302,8 @@ export async function assignReviewersToRecentTracks(limit = 20) {
   const tracks = await prisma.track.findMany({
     where: {
       status: { in: ["QUEUED", "IN_PROGRESS"] },
+      // Secondary AB tracks are assigned via claim on the primary — never independently
+      abTestPrimaryTrackId: null,
     },
     select: { id: true },
     orderBy: { createdAt: "desc" },

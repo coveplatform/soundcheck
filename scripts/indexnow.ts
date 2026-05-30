@@ -1,0 +1,39 @@
+import { posts } from "../src/lib/blog-posts";
+
+const KEY = "7e347151c740f1f4389aacc10a6f0b7b";
+const HOST = "mixreflect.com";
+const BASE_URL = `https://${HOST}`;
+
+const urls = [
+  BASE_URL,
+  `${BASE_URL}/blog`,
+  `${BASE_URL}/discover`,
+  `${BASE_URL}/breakthrough`,
+  ...posts.map((p) => `${BASE_URL}/blog/${p.slug}`),
+];
+
+async function submit() {
+  const res = await fetch("https://api.indexnow.org/indexnow", {
+    method: "POST",
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+    body: JSON.stringify({
+      host: HOST,
+      key: KEY,
+      keyLocation: `${BASE_URL}/${KEY}.txt`,
+      urlList: urls,
+    }),
+  });
+
+  console.log(`IndexNow → ${res.status} (${urls.length} URLs submitted)`);
+  urls.forEach((u) => console.log(`  ${u}`));
+
+  if (!res.ok && res.status !== 202) {
+    console.error("Unexpected response:", await res.text());
+    process.exit(1);
+  }
+}
+
+submit().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

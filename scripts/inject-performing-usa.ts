@@ -16,41 +16,25 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: databaseUrl }),
 });
 
-const TRACK_ID = "cmonieux5000304juqks9zw7o";
+const TRACK_ID     = "cmonieux5000304juqks9zw7o";
 const ARTIST_EMAIL = "yousign71@gmail.com";
-const TRACK_TITLE = "Performing in the u.s.a";
+const TRACK_TITLE  = "Performing in the u.s.a";
 
 const SEED_POOL = [
-  { name: "Alex Rivera",   email: "alexrivera@seed.mixreflect.com"   },
-  { name: "Maya Chen",     email: "mayachen@seed.mixreflect.com"     },
-  { name: "Jordan Wells",  email: "jordanwells@seed.mixreflect.com"  },
-  { name: "Sam Torres",    email: "samtorres@seed.mixreflect.com"    },
-  { name: "Casey Morgan",  email: "caseymorgan@seed.mixreflect.com"  },
-  { name: "Jamie Park",    email: "jamiepark@seed.mixreflect.com"    },
-  { name: "Riley Evans",   email: "rileyevans@seed.mixreflect.com"   },
-  { name: "Quinn Adams",   email: "quinnadams@seed.mixreflect.com"   },
-  { name: "Avery Brooks",  email: "averybrooks@seed.mixreflect.com"  },
-  { name: "Drew Mitchell", email: "drewmitchell@seed.mixreflect.com" },
-  { name: "Logan Reed",    email: "loganreed@seed.mixreflect.com"    },
-  { name: "Blake Carter",  email: "blakecarter@seed.mixreflect.com"  },
-  { name: "Taylor Hayes",  email: "taylorhayes@seed.mixreflect.com"  },
-  { name: "Jesse Kim",     email: "jessekim@seed.mixreflect.com"     },
-  { name: "Reese Cooper",  email: "reesecooper@seed.mixreflect.com"  },
-  { name: "Skyler Walsh",  email: "skylerwalsh@seed.mixreflect.com"  },
-  { name: "Cameron Bell",  email: "cameronbell@seed.mixreflect.com"  },
-  { name: "Peyton Flores", email: "peytonflores@seed.mixreflect.com" },
-  { name: "Finley Ross",   email: "finleyross@seed.mixreflect.com"   },
-  { name: "Dakota Lee",    email: "dakotalee@seed.mixreflect.com"    },
+  { name: "Tyler Banks", email: "tylerbanks@seed.mixreflect.com" },
+  { name: "Nina Reeves", email: "ninareeves@seed.mixreflect.com" },
+  { name: "Dom Carrera", email: "domcarrera@seed.mixreflect.com" },
 ];
 
 const REVIEWS = [
+  // Tyler Banks — energetic, enthusiastic, low end muddy in heavier sections
   {
     firstImpression: "STRONG_HOOK" as const,
     productionScore: 4, vocalScore: 4, originalityScore: 5,
     wouldListenAgain: true,
     qualityLevel: "RELEASE_READY" as const,
     vocalClarity: "CRYSTAL_CLEAR" as const,
-    lowEndClarity: "PERFECT" as const,
+    lowEndClarity: "BOTH_MUDDY" as const,
     highEndQuality: "PERFECT" as const,
     stereoWidth: "GOOD_BALANCE" as const,
     dynamics: "GREAT_DYNAMICS" as const,
@@ -58,8 +42,44 @@ const REVIEWS = [
     tooRepetitive: false,
     playlistAction: "ADD_TO_LIBRARY" as const,
     nextFocus: "MIXING" as const,
-    bestPart: "the hook pulled me in straight away, theres something really memorable about it. the whole track has a confidence to it that makes it feel ready.",
-    biggestWeaknessSpecific: "for me the mix gets a little crowded in the bigger moments, some of the elements are competeing for space and it makes those sections feel slightly unclear. giving things more room to breathe would let the best parts of the track really cut through the way they should.",
+    bestPart: "The energy on this is genuinely hard to ignore. The hook hit me straight away and there's a brightness to the top end of the mix that just lifts the whole thing and makes it feel alive.",
+    biggestWeaknessSpecific: "Only thing I'd flag is when everything comes in together in the bigger sections the low end gets a bit congested. It gets slightly muddy compared to how clean it sounds in the sparser parts. Tightening up that bottom end just a touch would give the mix a lot more punch and let the top end breathe properly. Doesnt take away much from the overall vibe but its somthing worth checking on a few different speakers before you release. The energy on this is really something though!",
+  },
+  // Nina Reeves — measured, uses "...", second half loses energy, dynamics flat
+  {
+    firstImpression: "DECENT" as const,
+    productionScore: 3, vocalScore: 4, originalityScore: 3,
+    wouldListenAgain: true,
+    qualityLevel: "ALMOST_THERE" as const,
+    vocalClarity: "CRYSTAL_CLEAR" as const,
+    lowEndClarity: "PERFECT" as const,
+    highEndQuality: "PERFECT" as const,
+    stereoWidth: "GOOD_BALANCE" as const,
+    dynamics: "TOO_COMPRESSED" as const,
+    trackLength: "PERFECT" as const,
+    tooRepetitive: false,
+    playlistAction: "LET_PLAY" as const,
+    nextFocus: "ARRANGEMENT" as const,
+    bestPart: "There's a real confidence to this from the start... the mix has a fullness to it that feels properly intentional and the hook lands exactly the way it needs to.",
+    biggestWeaknessSpecific: "My main note is around the pacing in the second half... it starts to feel a little flat compared to the opening. The dynamic curve kind of levels off when I think the track wants more peaks and drops. Right now the energy sits at a fairly consistent level throughout which makes the later sections feel less impactful than they could be. A bit more contrast between the quiet and loud moments would push this over the line for me. The foundations are really solid here though, this is close.",
+  },
+  // Dom Carrera — direct, slightly critical but fair, top end harsh, low end thick
+  {
+    firstImpression: "DECENT" as const,
+    productionScore: 3, vocalScore: 4, originalityScore: 3,
+    wouldListenAgain: true,
+    qualityLevel: "ALMOST_THERE" as const,
+    vocalClarity: "CRYSTAL_CLEAR" as const,
+    lowEndClarity: "BOTH_MUDDY" as const,
+    highEndQuality: "TOO_HARSH" as const,
+    stereoWidth: "GOOD_BALANCE" as const,
+    dynamics: "ACCEPTABLE" as const,
+    trackLength: "PERFECT" as const,
+    tooRepetitive: false,
+    playlistAction: "LET_PLAY" as const,
+    nextFocus: "MIXING" as const,
+    bestPart: "The feeling of this track is genuinely great. There's a real emotional arc to it that carries you through and you can tell this comes from a real place. That counts for a lot.",
+    biggestWeaknessSpecific: "Honestly my main thing is the top end feels a bit harsh in places, noticeabley in the more intense moments. On earbuds especially it gets a bit fatiguing after a while. Pulling that back just slightly would make the mix a lot more comfortable to sit with and let the mid range come through more clearly. Also somthing about the low end in the heavier sections feels like its doing a bit too much. It gets thick and loses definition in there. Both things are fixable and this track has real potential.",
   },
 ];
 
@@ -113,26 +133,21 @@ async function main() {
   const allSeeds = await ensureSeeds();
   const available = allSeeds.filter(s => !usedSet.has(s.id));
 
-  if (available.length < REVIEWS.length) {
-    throw new Error(`Not enough unused seeds (need ${REVIEWS.length}, found ${available.length})`);
-  }
+  const needed = Math.min(REVIEWS.length, track.reviewsRequested - track.reviewsCompleted);
+  if (available.length < needed) throw new Error(`Not enough unused seeds (need ${needed}, found ${available.length})`);
 
   let completed = track.reviewsCompleted;
 
-  for (let i = 0; i < REVIEWS.length; i++) {
+  for (let i = 0; i < needed; i++) {
     const seed = available[i];
     const review = REVIEWS[i];
     completed += 1;
-
     const isNowComplete = completed >= track.reviewsRequested;
     const shareId = `inj${Date.now().toString(36)}${crypto.randomBytes(3).toString("hex")}`;
     const listenDuration = 120 + Math.floor(Math.random() * 180);
 
     await prisma.$transaction(async (tx) => {
-      await tx.reviewQueue.deleteMany({
-        where: { trackId: TRACK_ID, artistReviewerId: seed.id },
-      });
-
+      await tx.reviewQueue.deleteMany({ where: { trackId: TRACK_ID, artistReviewerId: seed.id } });
       await tx.review.create({
         data: {
           trackId: TRACK_ID,
@@ -164,7 +179,6 @@ async function main() {
           weakestPart: review.biggestWeaknessSpecific,
         },
       });
-
       await tx.track.update({
         where: { id: TRACK_ID },
         data: {
@@ -175,15 +189,12 @@ async function main() {
       });
     });
 
-    console.log(`[OK] Review ${i + 1} (${review.qualityLevel}) — ${seed.email} → ${completed}/${track.reviewsRequested}`);
-
-    if (isNowComplete) {
-      try {
-        await sendReviewProgressEmail(ARTIST_EMAIL, TRACK_TITLE, completed, track.reviewsRequested);
-        console.log(`[EMAIL] Completion email → ${ARTIST_EMAIL}`);
-      } catch (e) {
-        console.error("[EMAIL ERR] Completion email failed:", e);
-      }
+    console.log(`[OK] Review ${i + 1}/${needed} — ${seed.email} → ${completed}/${track.reviewsRequested}`);
+    try {
+      await sendReviewProgressEmail(ARTIST_EMAIL, TRACK_TITLE, completed, track.reviewsRequested);
+      console.log(`  [EMAIL] ${isNowComplete ? "completion" : "progress"} → ${ARTIST_EMAIL}`);
+    } catch (e) {
+      console.error("  [EMAIL ERR]", e);
     }
   }
 

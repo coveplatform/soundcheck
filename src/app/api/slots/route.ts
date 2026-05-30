@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getMaxSlots, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
+import { getMaxSlots, ACTIVE_TRACK_STATUSES, hasAvailableUpload } from "@/lib/slots";
 
 export async function GET() {
   try {
@@ -45,12 +45,17 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
+    const uploadCheck = await hasAvailableUpload(artistProfile.id, isPro);
+
     return NextResponse.json({
       isPro,
       maxSlots,
       activeCount: activeTracks.length,
       activeTracks,
       credits: artistProfile.reviewCredits,
+      canUpload: uploadCheck.available,
+      uploadCount: uploadCheck.uploadCount,
+      maxUploads: uploadCheck.maxUploads,
     });
   } catch (error) {
     console.error("Error fetching slots:", error);

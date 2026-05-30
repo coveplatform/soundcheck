@@ -92,7 +92,7 @@ export default function ABTestDemoPage() {
           <ArrowLeft className="h-3.5 w-3.5" />
           Admin Overview
         </Link>
-        <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-400/60 mb-2">A/B Test Results — Demo</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-400/60 mb-2">Compare Results — Demo</p>
         <h1 className="text-4xl sm:text-5xl font-black text-white leading-none tracking-tight">{TRACK.artist}</h1>
         <p className="text-[15px] text-white/40 mt-2">{TRACK.genre} · {TRACK.reviewsOrdered} reviewers</p>
       </div>

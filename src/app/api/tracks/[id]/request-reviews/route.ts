@@ -38,6 +38,8 @@ export async function POST(
           }
         },
         Review: { select: { id: true } },
+        // Secondary AB track — queued alongside the primary at no extra credit cost
+        other_Track: { select: { id: true, status: true, reviewsRequested: true, Review: { select: { id: true } } } },
       },
     });
 
@@ -84,7 +86,9 @@ export async function POST(
     }
 
     const desired = data.desiredReviews;
-    const cost = desired;
+    const isABPrimary = track.isAbTest && !!track.other_Track;
+    // A/B test costs 2 credits per reviewer — each reviewer listens to both tracks
+    const cost = isABPrimary ? desired * 2 : desired;
 
     if ((track.ArtistProfile.reviewCredits ?? 0) < cost) {
       return NextResponse.json(
@@ -98,6 +102,8 @@ export async function POST(
     const currentReviewsRequested = track.reviewsRequested ?? 0;
     const newReviewsRequested = currentReviewsRequested + desired;
     const newStatus = hasExistingReviews ? "IN_PROGRESS" : "QUEUED";
+
+    const secondaryTrack = track.other_Track ?? null;
 
     await prisma.$transaction([
       prisma.artistProfile.updateMany({
@@ -122,9 +128,23 @@ export async function POST(
           completedAt: null,
         },
       }),
+      // Mirror reviewsRequested to Track B — no extra credits charged
+      ...(isABPrimary && secondaryTrack ? [
+        prisma.track.update({
+          where: { id: secondaryTrack.id },
+          data: {
+            packageType: "PEER",
+            reviewsRequested: (secondaryTrack.reviewsRequested ?? 0) + desired,
+            status: secondaryTrack.Review.length > 0 ? "IN_PROGRESS" : "QUEUED",
+            paidAt: track.paidAt ?? new Date(),
+            completedAt: null,
+          },
+        }),
+      ] : []),
     ]);
 
     await assignReviewersToTrack(track.id);
+    // Track B doesn't need independent assignment — reviewers are assigned via Track A claim
     revalidateTag("sidebar", { expire: 0 });
 
     return NextResponse.json({ success: true });

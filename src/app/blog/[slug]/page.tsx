@@ -47,6 +47,10 @@ export default async function BlogPostPage({
   const post = getPost(slug);
   if (!post) notFound();
 
+  const faqItems = post.content
+    .filter((b) => b.type === "faq")
+    .flatMap((b) => (b as { type: "faq"; items: { q: string; a: string }[] }).items);
+
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -65,12 +69,28 @@ export default async function BlogPostPage({
     ...(post.coverImage && { image: `https://mixreflect.com${post.coverImage}` }),
   };
 
+  const faqJsonLd = faqItems.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  } : null;
+
   return (
     <div>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       {/* ── HERO ─────────────────────────────────────────────────── */}
       <div className="bg-[#0d0d0d]">
         <div className="max-w-4xl mx-auto px-4 sm:px-8 pt-12 pb-16 sm:pt-16 sm:pb-20">
@@ -191,6 +211,28 @@ export default async function BlogPostPage({
                     </figcaption>
                   )}
                 </figure>
+              );
+            }
+
+            if (block.type === "faq") {
+              return (
+                <div key={i} className="mt-14 mb-6">
+                  <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight leading-tight mb-8">
+                    Frequently asked questions
+                  </h2>
+                  <div className="space-y-0 border-t border-black/10">
+                    {block.items.map((item, j) => (
+                      <div key={j} className="border-b border-black/10 py-6">
+                        <p className="font-black text-black text-base tracking-tight mb-3">
+                          {item.q}
+                        </p>
+                        <p className="text-[1.0rem] text-black/65 leading-[1.8] font-medium">
+                          {item.a}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               );
             }
 

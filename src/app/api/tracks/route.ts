@@ -5,7 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { TrackStatus } from "@prisma/client";
 import { z } from "zod";
 import { detectSource, resolveShortUrl, PackageType } from "@/lib/metadata";
-import { hasAvailableSlot } from "@/lib/slots";
+import { hasAvailableSlot, hasAvailableUpload } from "@/lib/slots";
+
+const trackSourceSchema = z.object({
+  sourceUrl: z.string().min(1, "Track source is required"),
+  sourceType: z.enum(["SOUNDCLOUD", "BANDCAMP", "YOUTUBE", "UPLOAD"]).optional(),
+  title: z.string().min(1, "Title is required").max(200),
+  artworkUrl: z.string().url().optional().nullable(),
+});
 
 const createTrackSchema = z.object({
   sourceUrl: z.string().min(1, "Track source is required"),
@@ -23,6 +30,8 @@ const createTrackSchema = z.object({
   reviewsRequested: z.number().int().min(1).max(50).optional(),
   allowPurchase: z.boolean().optional(),
   isPublic: z.boolean().optional(),
+  // Optional secondary track for A/B test pairs
+  abTestSecondary: trackSourceSchema.optional(),
 });
 
 export async function POST(request: Request) {
@@ -46,6 +55,20 @@ export async function POST(request: Request) {
     }
 
     const isSubscribed = artistProfile.subscriptionStatus === "active";
+
+    // Upload cap: free users limited to 1 track in library
+    const uploadCheck = await hasAvailableUpload(artistProfile.id, isSubscribed);
+    if (!uploadCheck.available) {
+      return NextResponse.json(
+        {
+          error: "You've used your 1 free track upload. Go Pro to upload unlimited tracks.",
+          uploadCount: uploadCheck.uploadCount,
+          maxUploads: uploadCheck.maxUploads,
+          upgradeRequired: true,
+        },
+        { status: 403 }
+      );
+    }
 
     // Slot enforcement: check if user has an available queue slot
     const slotCheck = await hasAvailableSlot(artistProfile.id, isSubscribed);
@@ -130,13 +153,72 @@ export async function POST(request: Request) {
       }),
     };
 
+    // If A/B test: validate and resolve the secondary track URL too
+    let secondarySourceType: string | null = null;
+    if (data.abTestSecondary) {
+      const sec = data.abTestSecondary;
+      let resolvedSecUrl = await resolveShortUrl(sec.sourceUrl);
+      sec.sourceUrl = resolvedSecUrl;
+
+      if (sec.sourceType === "UPLOAD") {
+        try {
+          const parsed = new URL(resolvedSecUrl);
+          if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+            return NextResponse.json({ error: "Invalid upload URL for Track B" }, { status: 400 });
+          }
+        } catch {
+          return NextResponse.json({ error: "Invalid upload URL for Track B" }, { status: 400 });
+        }
+        secondarySourceType = "UPLOAD";
+      } else {
+        secondarySourceType = sec.sourceType ?? detectSource(resolvedSecUrl);
+        if (!secondarySourceType) {
+          return NextResponse.json({ error: "Invalid Track B URL. Use SoundCloud, Bandcamp, or YouTube" }, { status: 400 });
+        }
+      }
+    }
+
     let track;
     try {
+      if (data.abTestSecondary && secondarySourceType) {
+        // Create both tracks atomically — Track A first, then Track B linked to it
+        const sec = data.abTestSecondary;
+        const result = await prisma.$transaction(async (tx) => {
+          const trackA = await tx.track.create({
+            data: { ...createData, isAbTest: true },
+            include: { Genre: true },
+          });
+          const trackB = await tx.track.create({
+            data: {
+              artistId: artistProfile.id,
+              sourceUrl: sec.sourceUrl,
+              sourceType: secondarySourceType as any,
+              title: sec.title,
+              artworkUrl: sec.artworkUrl,
+              feedbackFocus: createData.feedbackFocus,
+              feedbackAreas: createData.feedbackAreas,
+              isPublic: false,
+              packageType,
+              reviewsRequested: 0,
+              creditsSpent: 0,
+              status: TrackStatus.UPLOADED,
+              allowPurchase: false,
+              isAbTest: true,
+              abTestPrimaryTrackId: trackA.id,
+              ...(data.genreIds.length > 0 && {
+                Genre: { connect: data.genreIds.map((id) => ({ id })) },
+              }),
+            },
+            include: { Genre: true },
+          });
+          return { trackA, trackB };
+        });
+        return NextResponse.json(result, { status: 201 });
+      }
+
       track = await prisma.track.create({
         data: createData,
-        include: {
-          Genre: true,
-        },
+        include: { Genre: true },
       });
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
@@ -145,9 +227,7 @@ export async function POST(request: Request) {
         const { isPublic: _ignored, ...fallbackData } = createData;
         track = await prisma.track.create({
           data: fallbackData as any,
-          include: {
-            Genre: true,
-          },
+          include: { Genre: true },
         });
       } else {
         throw e;

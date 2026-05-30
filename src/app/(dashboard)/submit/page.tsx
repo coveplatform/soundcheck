@@ -88,7 +88,21 @@ export default function SubmitTrackPage() {
 
   const [reviewCount,       setReviewCount]       = useState(5);
   const [reviewCountInited, setReviewCountInited] = useState(false);
-  const [slotInfo, setSlotInfo] = useState<{ maxSlots: number; activeCount: number; isPro: boolean } | null>(null);
+  const [slotInfo, setSlotInfo] = useState<{ maxSlots: number; activeCount: number; isPro: boolean; canUpload: boolean; uploadCount: number; maxUploads: number | null } | null>(null);
+
+  // ── A/B test state ─────────────────────────────────────────────────────────
+  const [abTestMode,      setAbTestMode]      = useState(false);
+  const [urlB,            setUrlB]            = useState("");
+  const [urlErrorB,       setUrlErrorB]       = useState("");
+  const [sourceTypeB,     setSourceTypeB]     = useState<SourceType>(null);
+  const [isLoadingMetaB,  setIsLoadingMetaB]  = useState(false);
+  const [artworkUrlB,     setArtworkUrlB]     = useState<string | null>(null);
+  const [uploadedUrlB,    setUploadedUrlB]    = useState("");
+  const [uploadedFileNameB, setUploadedFileNameB] = useState("");
+  const [isUploadingB,    setIsUploadingB]    = useState(false);
+  const [isDraggingB,     setIsDraggingB]     = useState(false);
+  const [titleB,          setTitleB]          = useState("");
+  const fileInputRefB = useRef<HTMLInputElement>(null);
 
   const [error,        setError]        = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,7 +130,7 @@ export default function SubmitTrackPage() {
   useEffect(() => {
     fetch("/api/slots")
       .then(r => r.json())
-      .then(d => setSlotInfo({ maxSlots: d.maxSlots, activeCount: d.activeCount, isPro: d.isPro }))
+      .then(d => setSlotInfo({ maxSlots: d.maxSlots, activeCount: d.activeCount, isPro: d.isPro, canUpload: d.canUpload ?? true, uploadCount: d.uploadCount ?? 0, maxUploads: d.maxUploads ?? null }))
       .catch(console.error);
   }, []);
 
@@ -186,6 +200,49 @@ export default function SubmitTrackPage() {
     } catch { setError("Artwork upload failed"); } finally { setIsUploadingArt(false); }
   }, []);
 
+  const handleUrlChangeB = useCallback(async (value: string) => {
+    setUrlB(value); setUrlErrorB(""); setSourceTypeB(detectSource(value));
+    if (!value.trim()) return;
+    const v = validateTrackUrl(value);
+    if (!v.valid) { setUrlErrorB(v.error || "Invalid URL"); return; }
+    setIsLoadingMetaB(true);
+    try {
+      const m = await fetchTrackMetadata(value);
+      if (m?.title) setTitleB(m.title);
+      setArtworkUrlB(m?.artworkUrl ?? null);
+    } catch { /* best-effort */ } finally { setIsLoadingMetaB(false); }
+  }, []);
+
+  const handleFileUploadB = useCallback(async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) { setError("File too large. Max 25 MB."); return; }
+    if (!file.type.includes("audio") && !file.name.toLowerCase().endsWith(".mp3")) { setError("MP3 files only."); return; }
+    setError(""); setIsUploadingB(true); setUploadedUrlB(""); setUploadedFileNameB("");
+    try {
+      const pr = await fetch("/api/uploads/track/presign", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, contentType: file.type || "audio/mpeg", contentLength: file.size }),
+      });
+      if (!pr.ok) {
+        if (pr.status === 501) {
+          const fd = new FormData(); fd.append("file", file);
+          const r = await fetch("/api/uploads/track", { method: "POST", body: fd });
+          const d = await r.json();
+          if (!r.ok || !d.url) { setError(d.error || "Upload failed"); return; }
+          setUploadedUrlB(d.url); setUploadedFileNameB(file.name); setSourceTypeB("UPLOAD");
+          if (!titleB.trim()) setTitleB(file.name.replace(/\.mp3$/i, "").trim());
+          return;
+        }
+        const e = await pr.json().catch(() => null);
+        setError((e as any)?.error || "Upload failed"); return;
+      }
+      const pd = await pr.json();
+      const put = await fetch(pd.uploadUrl, { method: "PUT", headers: { "Content-Type": pd.contentType || "audio/mpeg" }, body: file });
+      if (!put.ok) { setError("Upload failed"); return; }
+      setUploadedUrlB(pd.fileUrl); setUploadedFileNameB(file.name); setSourceTypeB("UPLOAD");
+      if (!titleB.trim()) setTitleB(file.name.replace(/\.mp3$/i, "").trim());
+    } catch { setError("Upload failed"); } finally { setIsUploadingB(false); }
+  }, [titleB]);
+
   const toggleGenre = useCallback((id: string) => {
     setSelectedGenres(p => p.includes(id) ? p.filter(x => x !== id) : p.length >= 3 ? p : [...p, id]);
   }, []);
@@ -203,6 +260,15 @@ export default function SubmitTrackPage() {
     feedbackFocus: feedbackFocus.trim() || undefined,
     feedbackAreas: selectedAreas.length > 0 ? selectedAreas : undefined,
     isPublic,
+    // A/B test secondary track (same upload mode as primary)
+    ...(abTestMode && hasValidSourceB ? {
+      abTestSecondary: {
+        sourceUrl: uploadMode === "link" ? urlB : uploadedUrlB,
+        ...(uploadMode === "file" ? { sourceType: "UPLOAD" } : {}),
+        title: titleB.trim() || `${title.trim()} — Version B`,
+        artworkUrl: artworkUrlB || artworkUrl || undefined,
+      },
+    } : {}),
   });
 
   const saveExperience = async () => {
@@ -220,11 +286,13 @@ export default function SubmitTrackPage() {
       await saveExperience();
       const cd = await cr.json();
       if (!cr.ok) { setError(cd.error || "Failed to create track"); setIsSubmitting(false); return; }
-      const rr = await fetch(`/api/tracks/${cd.id}/request-reviews`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ desiredReviews: reviewCount }) });
+      // AB: response is { trackA, trackB }; single: response is the track directly
+      const primaryId = cd.trackA ? cd.trackA.id : cd.id;
+      const rr = await fetch(`/api/tracks/${primaryId}/request-reviews`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ desiredReviews: reviewCount }) });
       if (!rr.ok) { const e = await rr.json().catch(() => null); setError((e as any)?.error || "Failed to request reviews"); setIsSubmitting(false); return; }
-      router.push(`/submit/success?trackId=${cd.id}&reviews=${reviewCount}`);
+      router.push(`/submit/success?trackId=${primaryId}&reviews=${reviewCount}${abTestMode ? "&abTest=1" : ""}`);
     } catch { setError("Something went wrong. Please try again."); setIsSubmitting(false); }
-  }, [uploadMode, url, uploadedUrl, title, artworkUrl, selectedGenres, feedbackFocus, selectedAreas, isPublic, experienceDirty, experienceLevel, profile, reviewCount, router]);
+  }, [uploadMode, url, uploadedUrl, urlB, uploadedUrlB, titleB, artworkUrlB, abTestMode, title, artworkUrl, selectedGenres, feedbackFocus, selectedAreas, isPublic, experienceDirty, experienceLevel, profile, reviewCount, router]);
 
   const handleUploadOnly = useCallback(async () => {
     setError(""); setIsSubmitting(true);
@@ -241,13 +309,18 @@ export default function SubmitTrackPage() {
 
   const isPro            = slotInfo?.isPro ?? false;
   const creditBalance    = profile?.reviewCredits ?? 0;
-  const hasEnoughCredits = isPro || creditBalance >= reviewCount;
-  const creditDeficit    = reviewCount - creditBalance;
+  const creditCost       = abTestMode ? reviewCount * 2 : reviewCount;
+  const hasEnoughCredits = isPro || creditBalance >= creditCost;
+  const creditDeficit    = creditCost - creditBalance;
   const slotAvailable    = !slotInfo || slotInfo.activeCount < slotInfo.maxSlots;
-  const hasValidSource   = uploadMode === "link"
+  const hasValidSourceA  = uploadMode === "link"
     ? !!url.trim() && !urlError && !isLoadingMeta && !!sourceType
     : !!uploadedUrl && !isUploading;
-  const hasValidDetails  = title.trim().length > 0 && selectedGenres.length > 0;
+  const hasValidSourceB  = uploadMode === "link"
+    ? !!urlB.trim() && !urlErrorB && !isLoadingMetaB && !!sourceTypeB
+    : !!uploadedUrlB && !isUploadingB;
+  const hasValidSource   = abTestMode ? hasValidSourceA && hasValidSourceB : hasValidSourceA;
+  const hasValidDetails  = (abTestMode || title.trim().length > 0) && selectedGenres.length > 0;
 
   const goBack    = () => { setError(""); if (step === 2) setStep(1); if (step === 3) setStep(2); };
   const goForward = () => { setError(""); if (step === 1 && hasValidSource) setStep(2); if (step === 2 && hasValidDetails) setStep(3); };
@@ -262,10 +335,80 @@ export default function SubmitTrackPage() {
     </div>
   );
 
+  if (slotInfo && !slotInfo.isPro && !slotInfo.canUpload) return (
+    <div className="min-h-screen bg-[#faf7f2]">
+      {/* Progress bar — locked */}
+      <div className="sticky top-0 z-10 bg-white border-b border-black/8">
+        <div className="max-w-2xl mx-auto px-6 sm:px-10 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            {["Track", "Details", "Reviews"].map((label, i) => (
+              <div key={i} className="flex items-center gap-1.5">
+                <div className="h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-black bg-black/8 text-black/30">
+                  {i + 1}
+                </div>
+                <span className="text-sm font-semibold hidden sm:inline text-black/30">{label}</span>
+                {i < 2 && <span className="text-black/15 text-xs mx-1.5">›</span>}
+              </div>
+            ))}
+          </div>
+          <Link href="/tracks" className="text-xs font-bold text-black/35 hover:text-black transition-colors">
+            ← My tracks
+          </Link>
+        </div>
+      </div>
+
+      {/* Hero band */}
+      <div className="bg-[#1a0f2e] py-16">
+        <div className="max-w-2xl mx-auto px-6 sm:px-10">
+          <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1.5 mb-6">
+            <Lock className="h-3 w-3 text-white/60" />
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/60">Free plan</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight mb-4">
+            You&apos;ve used your<br />free upload.
+          </h1>
+          <p className="text-base text-white/40 font-medium leading-relaxed max-w-sm">
+            Free accounts include 1 track in your library. Go Pro to keep uploading and build your full catalogue.
+          </p>
+        </div>
+      </div>
+
+      {/* Upsell */}
+      <div className="bg-white py-12">
+        <div className="max-w-2xl mx-auto px-6 sm:px-10">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-6">What you get with Pro</p>
+          <ul className="space-y-4 mb-10">
+            {[
+              "Unlimited track uploads",
+              "3 tracks in the review queue at once",
+              "30 credits every month — no reviewing required",
+              "Priority placement in the reviewer queue",
+              "Up to 10 reviews per track",
+            ].map((f) => (
+              <li key={f} className="flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-500 flex-shrink-0" />
+                <span className="text-sm font-semibold text-black/70">{f}</span>
+              </li>
+            ))}
+          </ul>
+          <Link
+            href="/pro"
+            className="flex items-center justify-center gap-2 bg-purple-600 text-white font-black px-8 py-4 text-sm hover:bg-purple-500 transition-colors w-full"
+          >
+            <Crown className="h-4 w-4" />
+            Go Pro — $24.95/mo
+          </Link>
+          <p className="text-center text-xs text-black/30 font-medium mt-4">Cancel anytime</p>
+        </div>
+      </div>
+    </div>
+  );
+
   // ── shared styles ──────────────────────────────────────────────────────────
 
   // Full-bleed within the dashboard content area
-  const W = "max-w-2xl mx-auto px-6 sm:px-10";
+  const W  = "max-w-2xl mx-auto px-6 sm:px-10";
+  const WW = "max-w-4xl mx-auto px-6 sm:px-10"; // wider container for AB side-by-side
 
   // ── render ─────────────────────────────────────────────────────────────────
 
@@ -327,15 +470,58 @@ export default function SubmitTrackPage() {
       {step === 1 && (
         <>
           {/* Hero band */}
-          <div className="bg-[#1a0f2e] py-12">
+          <div className="bg-[#1a0f2e] py-10">
             <div className={W}>
               <p className="text-xs font-black uppercase tracking-[0.25em] text-purple-400/60 mb-3">Step 1 of 3</p>
               <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight">
-                Drop your track.
+                {abTestMode ? "Compare two versions." : "Drop your track."}
               </h1>
               <p className="text-base text-white/40 mt-3 font-medium">
-                Paste a link from SoundCloud, Bandcamp, or YouTube — or upload an MP3.
+                {abTestMode
+                  ? "Upload two versions — listeners hear both and pick the winner."
+                  : "Paste a link from SoundCloud, Bandcamp, or YouTube — or upload an MP3."}
               </p>
+
+              {/* Mode picker */}
+              <div className="mt-7 grid grid-cols-2 divide-x divide-white/10 border border-white/10 rounded-2xl overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setAbTestMode(false)}
+                  className={cn(
+                    "text-left px-6 py-6 transition-all",
+                    !abTestMode ? "bg-white" : "bg-white/5 hover:bg-white/8"
+                  )}
+                >
+                  <p className={cn("font-black text-base mb-1", !abTestMode ? "text-black" : "text-white/50")}>
+                    Single Track
+                  </p>
+                  <p className={cn("text-xs font-medium leading-relaxed", !abTestMode ? "text-black/45" : "text-white/20")}>
+                    One version, structured feedback
+                  </p>
+                  <p className={cn("text-[11px] font-black mt-4 uppercase tracking-wider", !abTestMode ? "text-purple-600" : "text-white/15")}>
+                    1 credit / review
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAbTestMode(true)}
+                  className={cn(
+                    "text-left px-6 py-6 transition-all",
+                    abTestMode ? "bg-purple-500" : "bg-white/5 hover:bg-white/8"
+                  )}
+                >
+                  <p className={cn("font-black text-base mb-1", abTestMode ? "text-white" : "text-white/50")}>
+                    Compare
+                  </p>
+                  <p className={cn("text-xs font-medium leading-relaxed", abTestMode ? "text-white/70" : "text-white/20")}>
+                    Two versions — listeners pick the winner
+                  </p>
+                  <p className={cn("text-[11px] font-black mt-4 uppercase tracking-wider", abTestMode ? "text-yellow-300" : "text-white/15")}>
+                    2 credits / reviewer
+                  </p>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -370,104 +556,160 @@ export default function SubmitTrackPage() {
 
           {/* Form band */}
           <div className="bg-white py-10">
-            <div className={cn(W, "space-y-6")}>
+            <div className={cn(abTestMode ? WW : W)}>
 
-              {uploadMode === "link" && (
-                <>
-                  <div>
-                    <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-2">Track URL</label>
-                    <input
-                      value={url}
-                      onChange={e => handleUrlChange(e.target.value)}
-                      placeholder="soundcloud.com/...  or  bandcamp.com/..."
-                      className={cn(
-                        "w-full bg-transparent border-b-2 text-black text-[15px] py-3 focus:outline-none transition-colors placeholder:text-black/20",
-                        urlError ? "border-red-400" : "border-black/10 focus:border-purple-500"
-                      )}
-                      autoFocus
-                    />
-                    {urlError && <p className="text-sm text-red-500 font-medium mt-2">{urlError}</p>}
-                  </div>
+              {/* Hidden file inputs */}
+              <input ref={fileInputRef} type="file" accept="audio/mpeg,audio/mp3,.mp3"
+                onChange={e => { const f = e.target.files?.[0]; if (f) void handleFileUpload(f); }} className="hidden" />
+              <input ref={fileInputRefB} type="file" accept="audio/mpeg,audio/mp3,.mp3"
+                onChange={e => { const f = e.target.files?.[0]; if (f) void handleFileUploadB(f); }} className="hidden" />
 
-                  <SupportedPlatforms activeSource={sourceType} variant="compact" />
-
-                  {isLoadingMeta && (
-                    <div className="flex items-center gap-2 text-sm text-black/40">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin text-purple-500" />
-                      Fetching track info...
-                    </div>
-                  )}
-
-                  {url && !urlError && !isLoadingMeta && title && (
-                    <div className="bg-[#faf7f2] rounded-2xl p-4 flex items-center gap-4">
-                      {artworkUrl
-                        ? <img src={artworkUrl} alt="" className="h-14 w-14 rounded-xl object-cover flex-shrink-0" />
-                        : <div className="h-14 w-14 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
-                            <Music className="h-5 w-5 text-purple-400" />
+              {/* Single track upload */}
+              {!abTestMode && (
+                <div className="space-y-5">
+                  {uploadMode === "link" && (
+                    <>
+                      <div>
+                        <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-2">Track URL</label>
+                        <input
+                          value={url}
+                          onChange={e => handleUrlChange(e.target.value)}
+                          placeholder="soundcloud.com / bandcamp.com / youtube.com"
+                          className={cn(
+                            "w-full bg-transparent border-b-2 text-black text-[15px] py-3 focus:outline-none transition-colors placeholder:text-black/20",
+                            urlError ? "border-red-400" : "border-black/10 focus:border-purple-500"
+                          )}
+                          autoFocus
+                        />
+                        {urlError && <p className="text-sm text-red-500 font-medium mt-2">{urlError}</p>}
+                      </div>
+                      <SupportedPlatforms activeSource={sourceType} variant="compact" />
+                      {isLoadingMeta && <p className="text-sm text-black/40 flex items-center gap-2"><Loader2 className="h-3.5 w-3.5 animate-spin text-purple-500" />Fetching info...</p>}
+                      {url && !urlError && !isLoadingMeta && title && (
+                        <div className="bg-[#faf7f2] rounded-2xl p-4 flex items-center gap-3">
+                          {artworkUrl ? <img src={artworkUrl} alt="" className="h-12 w-12 rounded-xl object-cover flex-shrink-0" />
+                            : <div className="h-12 w-12 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0"><Music className="h-4 w-4 text-purple-400" /></div>}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-black text-sm truncate">{title}</p>
+                            <p className="text-xs font-black uppercase tracking-wider text-purple-600 mt-0.5">{sourceType} — ready</p>
                           </div>
-                      }
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-black truncate">{title}</p>
-                        <p className="text-xs font-black uppercase tracking-wider text-purple-600 mt-1">{sourceType} — ready</p>
-                      </div>
-                      <div className="h-7 w-7 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                        <Check className="h-4 w-4 text-white" />
-                      </div>
+                          <div className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0"><Check className="h-3.5 w-3.5 text-white" /></div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {uploadMode === "file" && (
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+                      onDragLeave={() => setIsDragging(false)}
+                      onDrop={e => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files?.[0]; if (f && (f.type === "audio/mpeg" || f.name.endsWith(".mp3"))) void handleFileUpload(f); else setError("MP3 files only."); }}
+                      className={cn(
+                        "rounded-2xl border-2 border-dashed p-14 text-center cursor-pointer transition-all",
+                        isDragging ? "border-purple-400 bg-purple-50" :
+                        uploadedFileName && !isUploading ? "border-green-400 bg-green-50" :
+                        "border-black/10 hover:border-purple-300 hover:bg-purple-50/30"
+                      )}
+                    >
+                      {isUploading ? <div className="flex flex-col items-center gap-3"><Loader2 className="h-8 w-8 animate-spin text-purple-500" /><p className="text-sm font-semibold text-black/50">Uploading...</p></div>
+                        : uploadedFileName ? <div className="flex flex-col items-center gap-3"><div className="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center"><Check className="h-5 w-5 text-white" /></div><p className="font-bold text-black">{uploadedFileName}</p><p className="text-sm text-black/40">Click to change</p></div>
+                        : <div className="flex flex-col items-center gap-3"><div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center"><Upload className="h-5 w-5 text-purple-500" /></div><div><p className="font-bold text-black">Drop your MP3 here</p><p className="text-sm text-black/40 mt-1">or click to browse · max 25 MB</p></div></div>}
                     </div>
                   )}
-                </>
+                </div>
               )}
 
-              {uploadMode === "file" && (
-                <>
-                  <input ref={fileInputRef} type="file" accept="audio/mpeg,audio/mp3,.mp3"
-                    onChange={e => { const f = e.target.files?.[0]; if (f) void handleFileUpload(f); }}
-                    className="hidden"
-                  />
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
-                    onDragLeave={() => setIsDragging(false)}
-                    onDrop={e => {
-                      e.preventDefault(); setIsDragging(false);
-                      const f = e.dataTransfer.files?.[0];
-                      if (f && (f.type === "audio/mpeg" || f.name.endsWith(".mp3"))) void handleFileUpload(f);
-                      else setError("MP3 files only.");
-                    }}
-                    className={cn(
-                      "rounded-2xl border-2 border-dashed p-14 text-center cursor-pointer transition-all",
-                      isDragging                       ? "border-purple-400 bg-purple-50"    :
-                      uploadedFileName && !isUploading ? "border-green-400 bg-green-50"      :
-                                                         "border-black/10 hover:border-purple-300 hover:bg-purple-50/30"
-                    )}
-                  >
-                    {isUploading ? (
-                      <div className="flex flex-col items-center gap-3">
-                        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-                        <p className="text-sm font-semibold text-black/50">Uploading...</p>
+              {/* Compare mode — side by side, wider container */}
+              {abTestMode && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  {(["a", "b"] as const).map((ver) => {
+                    const isA = ver === "a";
+                    const vUrl = isA ? url : urlB;
+                    const vUrlError = isA ? urlError : urlErrorB;
+                    const vIsLoadingMeta = isA ? isLoadingMeta : isLoadingMetaB;
+                    const vTitle = isA ? title : titleB;
+                    const vArtwork = isA ? artworkUrl : artworkUrlB;
+                    const vSourceType = isA ? sourceType : sourceTypeB;
+                    const vFileName = isA ? uploadedFileName : uploadedFileNameB;
+                    const vIsUploading = isA ? isUploading : isUploadingB;
+                    const vIsDragging = isA ? isDragging : isDraggingB;
+                    const vFileInputRef = isA ? fileInputRef : fileInputRefB;
+                    const handleUrl = isA ? handleUrlChange : handleUrlChangeB;
+                    const handleFile = isA ? handleFileUpload : handleFileUploadB;
+                    const setDragging = isA ? setIsDragging : setIsDraggingB;
+
+                    return (
+                      <div key={ver} className="space-y-4">
+                        <p className={cn(
+                          "text-[10px] font-black uppercase tracking-[0.25em]",
+                          isA ? "text-black/30" : "text-purple-500"
+                        )}>
+                          Version {ver.toUpperCase()}
+                        </p>
+
+                        {uploadMode === "link" && (
+                          <div className="space-y-4">
+                            <input
+                              type="text"
+                              value={vUrl}
+                              onChange={e => handleUrl(e.target.value)}
+                              placeholder="soundcloud.com / bandcamp.com / youtube.com"
+                              autoFocus={isA}
+                              className={cn(
+                                "w-full bg-transparent border-b-2 text-black text-[15px] py-3 focus:outline-none transition-colors placeholder:text-black/20",
+                                vUrlError ? "border-red-400" :
+                                isA ? "border-black/10 focus:border-purple-500" : "border-purple-200 focus:border-purple-500"
+                              )}
+                            />
+                            {vUrlError && <p className="text-sm text-red-500 font-medium">{vUrlError}</p>}
+                            {vIsLoadingMeta && <p className="text-sm text-black/40 flex items-center gap-2"><Loader2 className="h-3.5 w-3.5 animate-spin text-purple-500" />Fetching info...</p>}
+                            {vUrl && !vUrlError && !vIsLoadingMeta && vTitle && (
+                              <div className={cn("rounded-xl p-4 flex items-center gap-3", isA ? "bg-[#faf7f2]" : "bg-purple-50 border border-purple-100")}>
+                                {vArtwork
+                                  ? <img src={vArtwork} alt="" className="h-12 w-12 rounded-xl object-cover flex-shrink-0" />
+                                  : <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0", isA ? "bg-purple-100" : "bg-purple-200")}><Music className="h-4 w-4 text-purple-500" /></div>}
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-bold text-black text-sm truncate">{vTitle}</p>
+                                  <p className="text-xs font-black uppercase tracking-wider text-purple-600 mt-0.5">{vSourceType} — ready</p>
+                                </div>
+                                <div className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0"><Check className="h-3.5 w-3.5 text-white" /></div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {uploadMode === "file" && (
+                          <div
+                            onClick={() => vFileInputRef.current?.click()}
+                            onDragOver={e => { e.preventDefault(); setDragging(true); }}
+                            onDragLeave={() => setDragging(false)}
+                            onDrop={e => {
+                              e.preventDefault(); setDragging(false);
+                              const f = e.dataTransfer.files?.[0];
+                              if (f && (f.type === "audio/mpeg" || f.name.endsWith(".mp3"))) void handleFile(f);
+                              else setError("MP3 files only.");
+                            }}
+                            className={cn(
+                              "rounded-2xl border-2 border-dashed p-12 text-center cursor-pointer transition-all",
+                              vIsDragging ? "border-purple-400 bg-purple-100" :
+                              vFileName && !vIsUploading ? "border-green-400 bg-green-50" :
+                              isA ? "border-black/10 hover:border-purple-300 hover:bg-purple-50/30"
+                                  : "border-purple-200 hover:border-purple-400 hover:bg-purple-50"
+                            )}
+                          >
+                            {vIsUploading
+                              ? <div className="flex flex-col items-center gap-3"><Loader2 className="h-8 w-8 animate-spin text-purple-500" /><p className="text-sm font-semibold text-black/50">Uploading...</p></div>
+                              : vFileName
+                                ? <div className="flex flex-col items-center gap-3"><div className="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center"><Check className="h-5 w-5 text-white" /></div><p className="font-bold text-black">{vFileName}</p><p className="text-sm text-black/40">Click to change</p></div>
+                                : <div className="flex flex-col items-center gap-3"><div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center"><Upload className="h-5 w-5 text-purple-500" /></div><div><p className="font-bold text-black">Drop Version {ver.toUpperCase()} here</p><p className="text-sm text-black/40 mt-1">or click to browse · max 25 MB</p></div></div>}
+                          </div>
+                        )}
                       </div>
-                    ) : uploadedFileName ? (
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="h-12 w-12 rounded-full bg-green-500 flex items-center justify-center">
-                          <Check className="h-6 w-6 text-white" />
-                        </div>
-                        <p className="font-bold text-black">{uploadedFileName}</p>
-                        <p className="text-sm text-black/40">Click to change</p>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
-                          <Upload className="h-5 w-5 text-purple-500" />
-                        </div>
-                        <div>
-                          <p className="font-bold text-black">Drop your MP3 here</p>
-                          <p className="text-sm text-black/40 mt-1">or click to browse · max 25 MB</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </>
+                    );
+                  })}
+                </div>
               )}
+
             </div>
           </div>
 
@@ -479,7 +721,7 @@ export default function SubmitTrackPage() {
                 disabled={!hasValidSource}
                 className="w-full py-5 text-white font-black text-[15px] tracking-wide disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {hasValidSource ? "Continue to Details →" : "Add a track link or file to continue"}
+                {hasValidSource ? "Continue to Details →" : abTestMode ? "Add both tracks to continue" : "Add a track link or file to continue"}
               </button>
             </div>
           </div>
@@ -499,10 +741,12 @@ export default function SubmitTrackPage() {
               </button>
               <p className="text-xs font-black uppercase tracking-[0.25em] text-green-400/60 mb-3">Step 2 of 3</p>
               <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight">
-                About your track.
+                {abTestMode ? "About your tracks." : "About your track."}
               </h1>
               <p className="text-base text-white/40 mt-3 font-medium">
-                Give reviewers context so feedback is actually useful.
+                {abTestMode
+                  ? "Genre, feedback focus, and visibility apply to both versions."
+                  : "Give reviewers context so feedback is actually useful."}
               </p>
             </div>
           </div>
@@ -511,38 +755,75 @@ export default function SubmitTrackPage() {
           <div className="bg-white py-10">
             <div className={cn(W, "space-y-10")}>
 
-              {/* Title */}
-              <div>
-                <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-2">Track Title</label>
-                <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0">
-                    <input ref={artworkInputRef} type="file" accept="image/*"
-                      onChange={e => { const f = e.target.files?.[0]; if (f) void handleArtworkUpload(f); }}
-                      className="hidden"
-                    />
-                    <button type="button" onClick={() => artworkInputRef.current?.click()} disabled={isUploadingArt}
-                      className="relative h-12 w-12 rounded-xl border-2 border-dashed border-black/10 hover:border-purple-400 bg-[#faf7f2] overflow-hidden transition-colors flex items-center justify-center group"
-                    >
-                      {isUploadingArt ? <Loader2 className="h-4 w-4 animate-spin text-purple-500" />
-                        : artworkUrl ? <>
-                            <img src={artworkUrl} alt="" className="h-full w-full object-cover" />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                              <ImagePlus className="h-3.5 w-3.5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </div>
-                          </>
-                        : <ImagePlus className="h-4 w-4 text-black/20 group-hover:text-purple-500 transition-colors" />
-                      }
-                    </button>
-                  </div>
-                  <input
-                    value={title}
-                    onChange={e => setTitle(e.target.value)}
-                    placeholder="What's this track called?"
-                    className="flex-1 bg-transparent border-b-2 border-black/10 focus:border-purple-500 text-black text-[15px] py-3 focus:outline-none transition-colors placeholder:text-black/20"
-                    autoFocus
-                  />
+              {/* Track confirmation strip */}
+              {abTestMode ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    { label: "Version A", t: title, artwork: artworkUrl, src: sourceType },
+                    { label: "Version B", t: titleB || (title ? `${title} — Version B` : ""), artwork: artworkUrlB, src: sourceTypeB },
+                  ].map(({ label, t, artwork, src }) => (
+                    <div key={label} className="flex items-center gap-3 bg-[#faf7f2] rounded-xl px-4 py-3">
+                      <div className="h-10 w-10 rounded-lg flex-shrink-0 overflow-hidden bg-purple-100 flex items-center justify-center">
+                        {artwork
+                          ? <img src={artwork} alt="" className="h-full w-full object-cover" />
+                          : <Music className="h-4 w-4 text-purple-400" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-500 mb-0.5">{label}</p>
+                        <p className="text-sm font-bold text-black truncate">{t || "Untitled"}</p>
+                        {src && <p className="text-[11px] text-black/30 font-medium capitalize">{src.toLowerCase()}</p>}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              ) : (artworkUrl || title) ? (
+                <div className="flex items-center gap-4 bg-[#faf7f2] rounded-xl px-4 py-3">
+                  <div className="h-12 w-12 rounded-xl flex-shrink-0 overflow-hidden bg-purple-100 flex items-center justify-center">
+                    {artworkUrl
+                      ? <img src={artworkUrl} alt="" className="h-full w-full object-cover" />
+                      : <Music className="h-5 w-5 text-purple-400" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-black truncate">{title || "Untitled"}</p>
+                    {sourceType && <p className="text-xs text-black/35 font-medium capitalize mt-0.5">{sourceType.toLowerCase()}</p>}
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Title — single track only; AB titles are set from URL metadata in step 1 */}
+              {!abTestMode && (
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-2">Track Title</label>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-shrink-0">
+                      <input ref={artworkInputRef} type="file" accept="image/*"
+                        onChange={e => { const f = e.target.files?.[0]; if (f) void handleArtworkUpload(f); }}
+                        className="hidden"
+                      />
+                      <button type="button" onClick={() => artworkInputRef.current?.click()} disabled={isUploadingArt}
+                        className="relative h-12 w-12 rounded-xl border-2 border-dashed border-black/10 hover:border-purple-400 bg-[#faf7f2] overflow-hidden transition-colors flex items-center justify-center group"
+                      >
+                        {isUploadingArt ? <Loader2 className="h-4 w-4 animate-spin text-purple-500" />
+                          : artworkUrl ? <>
+                              <img src={artworkUrl} alt="" className="h-full w-full object-cover" />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                                <ImagePlus className="h-3.5 w-3.5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                            </>
+                          : <ImagePlus className="h-4 w-4 text-black/20 group-hover:text-purple-500 transition-colors" />
+                        }
+                      </button>
+                    </div>
+                    <input
+                      value={title}
+                      onChange={e => setTitle(e.target.value)}
+                      placeholder="What's this track called?"
+                      className="flex-1 bg-transparent border-b-2 border-black/10 focus:border-purple-500 text-black text-[15px] py-3 focus:outline-none transition-colors placeholder:text-black/20"
+                      autoFocus
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Genre */}
               <div>
@@ -671,7 +952,7 @@ export default function SubmitTrackPage() {
                 How many reviews?
               </h1>
               <p className="text-base text-white/40 mt-3 font-medium">
-                Each review costs 1 credit. More reviews = stronger signal.
+                {abTestMode ? "Each reviewer hears both versions — 2 credits per reviewer." : "Each review costs 1 credit. More reviews = stronger signal."}
               </p>
             </div>
           </div>
@@ -744,8 +1025,8 @@ export default function SubmitTrackPage() {
                   </div>
                   <div className="bg-[#faf7f2] rounded-2xl p-5 text-right">
                     <p className="text-xs font-black uppercase tracking-[0.15em] text-black/40 mb-1">This costs</p>
-                    <p className={cn("text-4xl font-black tabular-nums", !hasEnoughCredits ? "text-red-500" : "text-purple-600")}>{reviewCount}</p>
-                    <p className="text-xs text-black/40 mt-0.5">credits</p>
+                    <p className={cn("text-4xl font-black tabular-nums", !hasEnoughCredits ? "text-red-500" : "text-purple-600")}>{creditCost}</p>
+                    <p className="text-xs text-black/40 mt-0.5">{abTestMode ? `credits (${reviewCount} × 2)` : "credits"}</p>
                   </div>
                 </div>
               )}

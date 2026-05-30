@@ -29,6 +29,16 @@ export async function GET(
                 experienceLevel: true,
               },
             },
+            // AB test: include the secondary track (Track B) so the form can render both players
+            other_Track: {
+              select: {
+                id: true,
+                title: true,
+                sourceUrl: true,
+                sourceType: true,
+                artworkUrl: true,
+              },
+            },
           },
         },
         ReviewerProfile: {
@@ -77,7 +87,21 @@ export async function GET(
       (session.user.email ?? "").toLowerCase()
     );
 
-    return NextResponse.json({ ...review, skipListenTimer });
+    // A/B test: find the reviewer's linked review for Track B (if this is a primary AB track)
+    let linkedReviewId: string | null = null;
+    if (review.Track.isAbTest && review.Track.other_Track && review.peerReviewerArtistId) {
+      const linkedReview = await prisma.review.findFirst({
+        where: {
+          trackId: review.Track.other_Track.id,
+          peerReviewerArtistId: review.peerReviewerArtistId,
+          status: { in: ["ASSIGNED", "IN_PROGRESS", "COMPLETED"] },
+        },
+        select: { id: true },
+      });
+      linkedReviewId = linkedReview?.id ?? null;
+    }
+
+    return NextResponse.json({ ...review, skipListenTimer, linkedReviewId });
   } catch (error) {
     console.error("Error fetching review:", error);
     return NextResponse.json(

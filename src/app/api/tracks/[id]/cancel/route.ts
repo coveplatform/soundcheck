@@ -24,6 +24,7 @@ export async function POST(
       include: {
         ArtistProfile: true,
         Payment: true,
+        other_Track: { select: { id: true, status: true } },
       },
     });
 
@@ -84,6 +85,8 @@ export async function POST(
       refunded = true;
     }
 
+    const secTrack = track.other_Track;
+
     await prisma.$transaction([
       prisma.track.update({
         where: { id: track.id },
@@ -96,6 +99,12 @@ export async function POST(
         where: { trackId: track.id, status: { in: ["ASSIGNED", "IN_PROGRESS"] } },
         data: { status: "EXPIRED" },
       }),
+      // Cascade cancel to Track B if it exists and hasn't progressed
+      ...(secTrack && secTrack.status !== "COMPLETED" && secTrack.status !== "CANCELLED" ? [
+        prisma.track.update({ where: { id: secTrack.id }, data: { status: "CANCELLED" } }),
+        prisma.reviewQueue.deleteMany({ where: { trackId: secTrack.id } }),
+        prisma.review.updateMany({ where: { trackId: secTrack.id, status: { in: ["ASSIGNED", "IN_PROGRESS"] } }, data: { status: "EXPIRED" } }),
+      ] : []),
       ...(track.Payment
         ? [
             prisma.payment.update({

@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 // Removed unused imports
 import { WordCounter, countWords } from "@/components/ui/word-counter";
 import { ErrorAlert } from "@/components/ui/error-alert";
-import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, Download, SkipForward, VolumeX } from "lucide-react";
+import { ArrowLeft, Check, Music, DollarSign, AlertTriangle, Download, SkipForward, VolumeX, ArrowRight, Crown } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -84,6 +84,9 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
   const [qualityLevel, setQualityLevel] = useState<string | null>(null);
 
   const [audioDuration, setAudioDuration] = useState(0);
+
+  // A/B test state
+  const [abTestPreference, setAbTestPreference] = useState<"VERSION_A" | "VERSION_B" | "NO_PREFERENCE" | null>(null);
 
   // Section refs for scroll-to functionality
   const firstImpressionRef = useRef<HTMLDivElement>(null);
@@ -473,6 +476,11 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           biggestWeaknessSpecific,
           nextFocus,
           qualityLevel,
+          // A/B test fields (only sent when this is an AB review)
+          ...(review.linkedReviewId && abTestPreference ? {
+            abTestPreference,
+            linkedReviewId: review.linkedReviewId,
+          } : {}),
         }),
       });
 
@@ -986,77 +994,43 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
     const reviewsUntilPro = Math.max(0, 25 - totalReviews);
 
     return (
-      <div className="max-w-md mx-auto px-4 sm:px-6 py-16">
-        {/* Success header */}
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-5 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-            <Check className="h-7 w-7 text-white" />
+      <div className="min-h-screen bg-[#faf7f2]">
+
+        {/* Hero band */}
+        <div className="bg-[#0f2318] py-16">
+          <div className="max-w-2xl mx-auto px-6 sm:px-10">
+            <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1.5 mb-6">
+              <Check className="h-3 w-3 text-white/60" />
+              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/60">Submitted</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight mb-4">
+              Review submitted.
+            </h1>
+            <p className="text-2xl font-black text-white/40">
+              {isPeer ? "+1 credit earned" : `+${formatCurrency(getTierEarningsCents(review.ReviewerProfile?.tier ?? "NORMAL"))} earned`}
+            </p>
           </div>
-          <h2 className="text-2xl font-black text-black mb-2">Review Submitted!</h2>
-          <div className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-100 border border-purple-200 rounded-full mb-3">
-            <span className="font-black text-lg text-purple-700">
-              {isPeer ? "+1 credit earned" : `+${formatCurrency(getTierEarningsCents(review.ReviewerProfile?.tier ?? "NORMAL"))}`}
-            </span>
-          </div>
-          <p className="text-sm text-black/50">
-            Your feedback helps artists improve their music.
-          </p>
         </div>
 
-        {/* PRO Reviewer promotion */}
-        {isPeer && !isProReviewer && (
-          <div className="rounded-xl border border-black/10 bg-[#faf8f5] p-5 mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <DollarSign className="h-4 w-4 text-amber-600" />
-              <p className="text-sm font-bold text-black">Earn $1.50 cash per review</p>
-            </div>
-            <p className="text-xs text-black/50 mb-3">
-              Become a PRO Reviewer and get paid for every review you complete:
-            </p>
-            <ul className="space-y-2 mb-4">
-              <li className="flex items-start gap-2">
-                <span className={`mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold shrink-0 ${totalReviews >= 25 ? 'bg-purple-600 text-white' : 'bg-black/10 text-black/40'}`}>
-                  {totalReviews >= 25 ? '✓' : '1'}
-                </span>
-                <span className="text-xs text-black/70">
-                  <span className="font-semibold">Complete 25 reviews</span>
-                  <span className="text-black/40"> — {reviewsUntilPro > 0 ? `${reviewsUntilPro} to go` : 'Done!'}</span>
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className={`mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold shrink-0 ${avgRating >= 4.5 ? 'bg-purple-600 text-white' : 'bg-black/10 text-black/40'}`}>
-                  {avgRating >= 4.5 ? '✓' : '2'}
-                </span>
-                <span className="text-xs text-black/70">
-                  <span className="font-semibold">Maintain a 4.5+ average rating</span>
-                  <span className="text-black/40"> — {avgRating > 0 ? `currently ${avgRating.toFixed(1)}` : 'no ratings yet'}</span>
-                </span>
-              </li>
-            </ul>
-            {totalReviews > 0 && (
-              <div className="h-1.5 bg-black/10 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-purple-500 transition-all duration-300 rounded-full"
-                  style={{ width: `${Math.min(100, (totalReviews / 25) * 100)}%` }}
-                />
-              </div>
-            )}
+        {/* CTAs */}
+        <div className="bg-[#faf7f2] py-10">
+          <div className="max-w-2xl mx-auto px-6 sm:px-10 space-y-3">
+            <Link
+              href="/review"
+              className="flex items-center justify-between bg-black text-white font-black px-6 py-4 text-sm hover:bg-purple-600 transition-colors w-full"
+            >
+              Review another track
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/submit"
+              className="flex items-center justify-between border-2 border-black text-black font-black px-6 py-4 text-sm hover:bg-black hover:text-white transition-colors w-full"
+            >
+              Got a track? Submit it
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-        )}
-
-        {/* Already PRO Reviewer */}
-        {isPeer && isProReviewer && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 mb-6 text-center">
-            <p className="text-sm font-bold text-amber-800">You&apos;re a PRO Reviewer</p>
-            <p className="text-xs text-amber-700/60 mt-0.5">You earn $1.50 cash for every review</p>
-          </div>
-        )}
-
-        <Link href="/review">
-          <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl">
-            Review another track
-          </Button>
-        </Link>
+        </div>
       </div>
     );
   }
@@ -1172,6 +1146,10 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           )}
         </CardHeader>
         <CardContent className="pt-6">
+          {/* Track A label for A/B tests */}
+          {review.Track.isAbTest && review.Track.other_Track && (
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-500 mb-2">Track A — Version 1</p>
+          )}
           <AudioPlayer
             sourceUrl={review.Track.sourceUrl}
             sourceType={review.Track.sourceType}
@@ -1194,6 +1172,52 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             }}
             showListenTracker
           />
+
+          {/* A/B test: Track B player + preference picker */}
+          {review.Track.isAbTest && review.Track.other_Track && (
+            <div className="mt-6 space-y-4">
+              <div className="border-t-2 border-dashed border-purple-200 pt-5">
+                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-500 mb-2">Track B — Version 2</p>
+                <p className="text-sm text-black/40 mb-3 font-medium">{review.Track.other_Track.title}</p>
+                <AudioPlayer
+                  sourceUrl={review.Track.other_Track.sourceUrl}
+                  sourceType={review.Track.other_Track.sourceType}
+                  showWaveform={review.Track.other_Track.sourceType === "UPLOAD"}
+                  showListenTracker={false}
+                  minListenTime={0}
+                />
+              </div>
+
+              {/* Preference picker */}
+              <div className="bg-purple-50 border-2 border-purple-200 rounded-2xl p-5 space-y-3">
+                <p className="text-sm font-black text-black">Which version did you prefer?</p>
+                <p className="text-xs text-black/40">Listen to both above before choosing. This is the most important part of an A/B test.</p>
+                <div className="grid grid-cols-3 gap-2 pt-1">
+                  {(["VERSION_A", "VERSION_B", "NO_PREFERENCE"] as const).map((val) => {
+                    const labels = { VERSION_A: "Track A", VERSION_B: "Track B", NO_PREFERENCE: "No preference" };
+                    const isSelected = abTestPreference === val;
+                    return (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => setAbTestPreference(val)}
+                        className={`px-3 py-3 rounded-xl border-2 text-xs font-black transition-all ${
+                          isSelected
+                            ? val === "VERSION_B" ? "bg-purple-600 border-purple-600 text-white" : "bg-black border-black text-white"
+                            : "bg-white border-black/10 text-black/50 hover:border-black/30"
+                        }`}
+                      >
+                        {labels[val]}
+                      </button>
+                    );
+                  })}
+                </div>
+                {!abTestPreference && (
+                  <p className="text-xs text-purple-600 font-bold">← Required before you can submit</p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Timestamp quick access - visible on mobile */}
           <div className="lg:hidden mt-4 pt-4 border-t border-black/10">
@@ -1850,7 +1874,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           <Button
             onClick={handleSubmit}
             isLoading={isSubmitting}
-            disabled={!canSubmit || !meetsTextMinimum}
+            disabled={!canSubmit || !meetsTextMinimum || (!!review.linkedReviewId && !abTestPreference)}
             variant="primary"
             className="w-full"
           >
