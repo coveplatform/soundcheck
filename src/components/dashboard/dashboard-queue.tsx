@@ -121,7 +121,7 @@ export function DashboardQueue({ activeTracks, eligibleTracks, maxSlots, isPro, 
       </div>
 
       <Dialog open={pickerOpen} onOpenChange={(o) => !o && setPickerOpen(false)}>
-        <DialogContent className="p-0 max-w-sm gap-0 overflow-hidden">
+        <DialogContent className="p-0 max-w-xl gap-0 overflow-hidden rounded-none">
           <DialogTitle className="sr-only">Add track to queue</DialogTitle>
           <QueueTrackPicker
             tracks={eligibleTracks}
