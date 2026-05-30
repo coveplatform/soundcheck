@@ -4,8 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Music, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Music, ArrowRight, Crown } from "lucide-react";
 import { ListenTile } from "./listen-tile";
 
 export const dynamic = "force-dynamic";
@@ -130,7 +129,6 @@ export default async function ListenPage({
       const aIsSeed = a.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       const bIsSeed = b.ArtistProfile?.User?.email?.endsWith("@seed.mixreflect.com") ?? false;
       if (aIsSeed !== bIsSeed) return aIsSeed ? 1 : -1;
-      // Within same tier, older submissions go first (fairness)
       const aTime = a.paidAt?.getTime() ?? a.createdAt.getTime();
       const bTime = b.paidAt?.getTime() ?? b.createdAt.getTime();
       return aTime - bTime;
@@ -143,47 +141,53 @@ export default async function ListenPage({
     <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
-      <div className="bg-white border-b-2 border-black">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-          <div className="flex items-start justify-between gap-6">
-            <div>
-              <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-[0.95]">
-                Listen.
-              </h1>
-              <p className="text-sm text-black/40 font-medium mt-2">
-                Pick whatever catches your eye. Leave honest feedback. Earn +1 credit.
-              </p>
-            </div>
-            <div className="flex-shrink-0 text-right pl-5 sm:pl-8 border-l-2 border-black/10">
-              <p className="text-5xl sm:text-6xl font-black text-black leading-none tabular-nums">
+      <div className="bg-[#0f0f18]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14 flex items-end justify-between gap-6">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.25em] text-white/25 mb-3">Review & Earn</p>
+            <h1 className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tight">
+              Listen.
+            </h1>
+            <p className="text-[15px] text-white/40 font-medium mt-3 max-w-sm leading-relaxed">
+              Pick a track, leave honest feedback, earn +1 credit.
+            </p>
+          </div>
+          <div className="flex-shrink-0 text-right">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/25 mb-1">
+              {isPro ? "Pro" : "Credits"}
+            </p>
+            {isPro ? (
+              <div className="flex items-center gap-2 justify-end">
+                <Crown className="h-5 w-5 text-purple-400" />
+                <span className="text-2xl font-black text-purple-400">Unlimited</span>
+              </div>
+            ) : (
+              <p className="text-5xl sm:text-6xl font-black text-white leading-none tabular-nums">
                 {credits}
               </p>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35 mt-1.5">
-                {credits === 1 ? "credit" : "credits"}
-              </p>
-            </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* ── NOTICES ────────────────────────────────────────────── */}
       {notice === "skipped" && (
-        <div className="bg-lime-400 border-b-2 border-black/10">
+        <div className="bg-[#f0f9e8] border-b border-black/8">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-            <p className="text-sm font-black text-black">Track skipped.</p>
-            <Link href="/review" className="text-[11px] font-black text-black border-2 border-black px-3 py-1 rounded-full hover:bg-black hover:text-lime-400 transition-colors">
+            <p className="text-sm font-semibold text-black/60">Track skipped.</p>
+            <Link href="/review" className="text-xs font-bold text-black/40 hover:text-black transition-colors">
               Dismiss
             </Link>
           </div>
         </div>
       )}
       {(notice === "expired" || notice === "unplayable") && (
-        <div className="bg-red-500 border-b-2 border-red-600">
+        <div className="bg-red-500">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-            <p className="text-sm font-black text-white">
+            <p className="text-sm font-semibold text-white">
               {notice === "expired" ? "Review expired." : "Audio issue reported — removed from your queue."}
             </p>
-            <Link href="/review" className="text-[11px] font-black text-white border-2 border-white px-3 py-1 rounded-full hover:bg-white hover:text-red-500 transition-colors">
+            <Link href="/review" className="text-xs font-bold text-white/70 hover:text-white transition-colors">
               Dismiss
             </Link>
           </div>
@@ -192,9 +196,9 @@ export default async function ListenPage({
 
       {/* ── IN PROGRESS ────────────────────────────────────────── */}
       {claimedReviews.length > 0 && (
-        <div className="bg-neutral-900 border-b-2 border-black">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 flex-shrink-0">
+        <div className="bg-[#1a1a2e] border-b border-white/5">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-4">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/25 flex-shrink-0">
               In progress
             </p>
             <div className="flex items-center gap-2 flex-1 min-w-0 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -202,19 +206,19 @@ export default async function ListenPage({
                 <Link
                   key={review.id}
                   href={`/review/${review.id}/v2`}
-                  className="flex items-center gap-2 flex-shrink-0 bg-white/8 hover:bg-white/14 border border-white/10 rounded-xl px-3 py-2 transition-colors group"
+                  className="flex items-center gap-2.5 flex-shrink-0 bg-white/6 hover:bg-white/10 border border-white/8 px-3 py-2 transition-colors group"
                 >
-                  <div className="w-7 h-7 rounded-md overflow-hidden flex-shrink-0 relative">
+                  <div className="w-7 h-7 overflow-hidden flex-shrink-0 relative bg-white/10">
                     {review.Track.artworkUrl ? (
                       <Image src={review.Track.artworkUrl} alt={review.Track.title} fill className="object-cover" sizes="28px" />
                     ) : (
-                      <div className="w-full h-full bg-white/10 flex items-center justify-center">
+                      <div className="w-full h-full flex items-center justify-center">
                         <Music className="h-3 w-3 text-white/30" />
                       </div>
                     )}
                   </div>
-                  <p className="text-[12px] font-black text-white truncate max-w-[120px]">{review.Track.title}</p>
-                  <ArrowRight className="h-3 w-3 text-white/30 group-hover:text-white/60 flex-shrink-0 transition-colors" />
+                  <p className="text-[12px] font-bold text-white/80 truncate max-w-[120px]">{review.Track.title}</p>
+                  <ArrowRight className="h-3 w-3 text-white/25 group-hover:text-white/50 flex-shrink-0 transition-colors" />
                 </Link>
               ))}
             </div>
@@ -222,30 +226,29 @@ export default async function ListenPage({
         </div>
       )}
 
-      {/* ── ARTWORK GRID ───────────────────────────────────────── */}
+      {/* ── GRID ───────────────────────────────────────────────── */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
 
+        {/* Daily limit */}
         {limitReached && (
-          <div className="mb-6 rounded-2xl bg-amber-50 border-2 border-amber-300 px-5 py-4 flex items-center justify-between gap-4">
+          <div className="mb-8 bg-amber-50 border border-amber-200 px-5 py-4 flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-black text-black">Daily limit reached</p>
-              <p className="text-xs text-black/50 mt-0.5">You can review up to {MAX_REVIEWS_PER_DAY} tracks per day. Come back tomorrow.</p>
+              <p className="text-sm font-bold text-black">Daily limit reached</p>
+              <p className="text-sm text-black/50 mt-0.5">
+                Up to {MAX_REVIEWS_PER_DAY} reviews per day on the free plan.{" "}
+                <Link href="/pro" className="font-bold text-purple-600 hover:underline">Go Pro</Link> for unlimited.
+              </p>
             </div>
-            <Link href="/pro">
-              <Button className="bg-purple-600 hover:bg-purple-700 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-9 px-4 text-xs rounded-xl whitespace-nowrap">
-                Go Pro
-              </Button>
-            </Link>
           </div>
         )}
 
         {available.length === 0 && !limitReached ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-black flex items-center justify-center mb-5">
-              <Music className="h-7 w-7 text-white/40" />
+          <div className="flex flex-col items-center justify-center py-28 text-center">
+            <div className="w-16 h-16 bg-[#0f0f18] flex items-center justify-center mb-5">
+              <Music className="h-7 w-7 text-white/30" />
             </div>
             <p className="text-xl font-black text-black">Nothing here right now</p>
-            <p className="text-sm text-black/40 mt-2 font-medium">
+            <p className="text-sm text-black/40 mt-2 font-medium max-w-xs leading-relaxed">
               The queue refreshes as artists submit tracks — check back soon.
             </p>
           </div>

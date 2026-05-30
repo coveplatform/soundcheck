@@ -196,13 +196,13 @@ export function GenreSelector({
   // Artist variant uses lime (onboarding), reviewer uses purple
   const limeStyles = {
     light: {
-      selected: "bg-lime-600 border-lime-600 text-white",
-      unselected: "bg-white/60 border-black/10 text-black hover:bg-lime-50 hover:border-lime-300",
-      chip: "bg-lime-600 border-lime-600 text-white",
-      parentSelected: "bg-lime-600 text-white",
-      parentUnselected: "bg-white/60 hover:bg-lime-50",
-      categoryBorder: "border-black/10 rounded-xl",
-      expandedBg: "bg-white/40",
+      selected: "bg-[#1a1a1a] border-[#1a1a1a] text-white",
+      unselected: "bg-white border-black/10 text-black hover:border-black/30 hover:bg-[#faf7f2]",
+      chip: "bg-[#1a1a1a] border-[#1a1a1a] text-white",
+      parentSelected: "bg-[#1a1a1a] text-white",
+      parentUnselected: "bg-white hover:bg-[#faf7f2]",
+      categoryBorder: "border-black/10",
+      expandedBg: "bg-[#faf7f2]",
       expandedBorder: "border-black/10",
       helperText: "text-black/40",
       counterText: "text-black/40",
@@ -272,7 +272,7 @@ export function GenreSelector({
               type="button"
               onClick={() => onToggle(genre.id)}
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold border rounded-lg transition-colors",
+                "inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold border transition-colors",
                 styles.chip
               )}
             >
@@ -323,7 +323,7 @@ export function GenreSelector({
                         "w-5 h-5 border rounded flex items-center justify-center flex-shrink-0",
                         isDark ? "border-neutral-500" : "border-black/20",
                         parentSelected
-                          ? (variant === "artist" ? "bg-lime-600 border-lime-600" : "bg-purple-600 border-purple-600")
+                          ? "bg-[#1a1a1a] border-[#1a1a1a]"
                           : (isDark ? "bg-neutral-800" : "bg-white")
                       )}
                     >
@@ -333,7 +333,7 @@ export function GenreSelector({
                     {childCount > 0 && !parentSelected && (
                       <span className={cn(
                         "text-xs font-mono px-1.5 py-0.5 rounded",
-                        variant === "artist" ? "bg-lime-100 text-lime-700" : "bg-purple-100 text-purple-700"
+                        variant === "artist" ? "bg-black/8 text-black/60" : "bg-purple-100 text-purple-700"
                       )}>
                         +{childCount} specific
                       </span>
@@ -383,7 +383,7 @@ export function GenreSelector({
                           onClick={() => !isDisabled && onToggle(genre.id)}
                           disabled={isDisabled}
                           className={cn(
-                            "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-semibold border rounded-lg transition-colors",
+                            "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-semibold border transition-colors",
                             isSelected
                               ? styles.selected
                               : isDisabled

@@ -4,1229 +4,805 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { GenreSelector } from "@/components/ui/genre-selector";
 import { SupportedPlatforms } from "@/components/ui/supported-platforms";
 import { cn } from "@/lib/utils";
 import { validateTrackUrl, fetchTrackMetadata, detectSource } from "@/lib/metadata";
 import { BuyCreditsButton } from "@/components/credits/buy-credits-button";
 import {
-  ArrowRight,
-  ArrowLeft,
-  Link2,
-  Upload,
-  Loader2,
-  Check,
-  Music,
-  Coins,
-  Crown,
-  Sparkles,
-  CheckCircle2,
-  ImagePlus,
-  Globe,
-  Lock,
-  AlertTriangle,
+  Link2, Upload, Loader2, Check, Music,
+  Crown, Sparkles, ImagePlus, Globe, Lock, AlertTriangle,
 } from "lucide-react";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+// ─── types ───────────────────────────────────────────────────────────────────
 
-type UploadMode = "link" | "file";
-type SourceType = "SOUNDCLOUD" | "BANDCAMP" | "YOUTUBE" | "UPLOAD" | null;
+type UploadMode      = "link" | "file";
+type SourceType      = "SOUNDCLOUD" | "BANDCAMP" | "YOUTUBE" | "UPLOAD" | null;
+type ExperienceLevel = "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "PROFESSIONAL";
+type FeedbackArea    = "OVERALL_VIBE" | "MIXING" | "ARRANGEMENT" | "SONGWRITING" | "SOUND_DESIGN" | "RELEASE_READINESS";
 
-interface Genre {
-  id: string;
-  name: string;
-  slug: string;
-}
+interface Genre         { id: string; name: string; slug: string }
+interface ArtistProfile { id: string; artistName: string; totalTracks: number; reviewCredits: number }
 
-interface ArtistProfile {
-  id: string;
-  artistName: string;
-  totalTracks: number;
-  reviewCredits: number;
-}
+// ─── constants ───────────────────────────────────────────────────────────────
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-// Benefits that unlock at different review counts
 const REVIEW_BENEFITS = [
-  { minReviews: 1, label: "Get initial feedback", icon: "💬" },
-  { minReviews: 3, label: "Start seeing patterns", icon: "📊" },
-  { minReviews: 5, label: "Reliable consensus", icon: "✓" },
-  { minReviews: 8, label: "Detailed insights", icon: "🔍" },
-  { minReviews: 10, label: "Comprehensive feedback", icon: "⭐" },
+  { min: 1,  label: "First signal"       },
+  { min: 3,  label: "Patterns forming"   },
+  { min: 5,  label: "Reliable consensus" },
+  { min: 8,  label: "Detailed picture"   },
+  { min: 10, label: "Full analysis"      },
 ] as const;
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+const MAX_FILE_SIZE = 25 * 1024 * 1024;
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+const EXPERIENCE_OPTIONS = [
+  { id: "BEGINNER"     as ExperienceLevel, label: "Just Starting",  desc: "Learning the basics"    },
+  { id: "INTERMEDIATE" as ExperienceLevel, label: "Getting Serious", desc: "Know the fundamentals"  },
+  { id: "ADVANCED"     as ExperienceLevel, label: "Experienced",     desc: "Been at this a while"   },
+  { id: "PROFESSIONAL" as ExperienceLevel, label: "Professional",    desc: "Releasing commercially" },
+] as const;
+
+const FEEDBACK_AREAS = [
+  { id: "OVERALL_VIBE"      as FeedbackArea, label: "Overall Vibe"  },
+  { id: "MIXING"            as FeedbackArea, label: "Mix & Sound"    },
+  { id: "ARRANGEMENT"       as FeedbackArea, label: "Arrangement"    },
+  { id: "SONGWRITING"       as FeedbackArea, label: "Songwriting"    },
+  { id: "SOUND_DESIGN"      as FeedbackArea, label: "Sound Design"   },
+  { id: "RELEASE_READINESS" as FeedbackArea, label: "Release Ready?" },
+] as const;
+
+// ─── component ───────────────────────────────────────────────────────────────
 
 export default function SubmitTrackPage() {
   const router = useRouter();
   const { data: session } = useSession();
 
-  // ---- step state ----------------------------------------------------------
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
-  // ---- profile / credit state ---------------------------------------------
-  const [profile, setProfile] = useState<ArtistProfile | null>(null);
+  const [profile,        setProfile]        = useState<ArtistProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
 
-  // ---- step 1: track source state -----------------------------------------
-  const [uploadMode, setUploadMode] = useState<UploadMode>("link");
-  const [url, setUrl] = useState("");
-  const [urlError, setUrlError] = useState("");
-  const [sourceType, setSourceType] = useState<SourceType>(null);
-  const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
-  const [artworkUrl, setArtworkUrl] = useState<string | null>(null);
-
-  const [uploadedUrl, setUploadedUrl] = useState("");
+  const [uploadMode,       setUploadMode]       = useState<UploadMode>("link");
+  const [url,              setUrl]              = useState("");
+  const [urlError,         setUrlError]         = useState("");
+  const [sourceType,       setSourceType]       = useState<SourceType>(null);
+  const [isLoadingMeta,    setIsLoadingMeta]    = useState(false);
+  const [artworkUrl,       setArtworkUrl]       = useState<string | null>(null);
+  const [uploadedUrl,      setUploadedUrl]      = useState("");
   const [uploadedFileName, setUploadedFileName] = useState("");
-  const [isUploading, setIsUploading] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading,      setIsUploading]      = useState(false);
+  const [isDragging,       setIsDragging]       = useState(false);
+  const fileInputRef    = useRef<HTMLInputElement>(null);
   const artworkInputRef = useRef<HTMLInputElement>(null);
-  const [isUploadingArtwork, setIsUploadingArtwork] = useState(false);
+  const [isUploadingArt, setIsUploadingArt] = useState(false);
 
-  // ---- step 2: details state ----------------------------------------------
-  const [title, setTitle] = useState("");
-  const [genres, setGenres] = useState<Genre[]>([]);
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [feedbackFocus, setFeedbackFocus] = useState("");
-  const [isPublic, setIsPublic] = useState(false);
-
-  // ---- experience level (from artist profile) + feedback areas (per-track) --
-  type ExperienceLevel = "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "PROFESSIONAL";
-  type FeedbackArea = "OVERALL_VIBE" | "MIXING" | "ARRANGEMENT" | "SONGWRITING" | "SOUND_DESIGN" | "RELEASE_READINESS";
+  const [title,           setTitle]           = useState("");
+  const [genres,          setGenres]          = useState<Genre[]>([]);
+  const [selectedGenres,  setSelectedGenres]  = useState<string[]>([]);
+  const [feedbackFocus,   setFeedbackFocus]   = useState("");
+  const [isPublic,        setIsPublic]        = useState(false);
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | null>(null);
-  const [selectedFeedbackAreas, setSelectedFeedbackAreas] = useState<FeedbackArea[]>([]);
-  const [experienceLevelDirty, setExperienceLevelDirty] = useState(false);
+  const [selectedAreas,   setSelectedAreas]   = useState<FeedbackArea[]>([]);
+  const [experienceDirty, setExperienceDirty] = useState(false);
 
-  // ---- step 3: review count state ----------------------------------------
-  const [reviewCount, setReviewCount] = useState<number>(5);
-  const [reviewCountInitialised, setReviewCountInitialised] = useState(false);
+  const [reviewCount,       setReviewCount]       = useState(5);
+  const [reviewCountInited, setReviewCountInited] = useState(false);
   const [slotInfo, setSlotInfo] = useState<{ maxSlots: number; activeCount: number; isPro: boolean } | null>(null);
 
-  // ---- shared UI state ----------------------------------------------------
-  const [error, setError] = useState("");
+  const [error,        setError]        = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ---- data fetching -------------------------------------------------------
+  // ── data loading ───────────────────────────────────────────────────────────
+
   useEffect(() => {
-    async function loadProfile() {
-      try {
-        const res = await fetch("/api/profile");
-        if (res.ok) {
-          const data = await res.json();
-          const balance = data.reviewCredits ?? 0;
-          const proStatus = data.subscriptionStatus === "active";
-          setProfile({
-            id: data.id,
-            artistName: data.artistName,
-            totalTracks: data.totalTracks ?? 0,
-            reviewCredits: balance,
-          });
-          if (data.experienceLevel) {
-            setExperienceLevel(data.experienceLevel as ExperienceLevel);
-          }
-          if (!reviewCountInitialised) {
-            setReviewCount(proStatus ? 10 : Math.min(5, Math.max(1, balance)));
-            setReviewCountInitialised(true);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load profile:", err);
-      } finally {
-        setProfileLoading(false);
-      }
-    }
-    loadProfile();
+    fetch("/api/profile")
+      .then(r => r.json())
+      .then(d => {
+        const bal = d.reviewCredits ?? 0;
+        const pro = d.subscriptionStatus === "active";
+        setProfile({ id: d.id, artistName: d.artistName, totalTracks: d.totalTracks ?? 0, reviewCredits: bal });
+        if (d.experienceLevel) setExperienceLevel(d.experienceLevel as ExperienceLevel);
+        if (!reviewCountInited) { setReviewCount(pro ? 10 : Math.min(5, Math.max(1, bal))); setReviewCountInited(true); }
+      })
+      .catch(console.error)
+      .finally(() => setProfileLoading(false));
   }, []);
 
   useEffect(() => {
-    async function loadGenres() {
-      try {
-        const res = await fetch("/api/genres");
-        if (res.ok) {
-          const data = await res.json();
-          setGenres(data);
-        }
-      } catch (err) {
-        console.error("Failed to load Genre:", err);
-      }
-    }
-    loadGenres();
+    fetch("/api/genres").then(r => r.json()).then(setGenres).catch(console.error);
   }, []);
 
-  // Fetch slot info
   useEffect(() => {
-    async function loadSlots() {
-      try {
-        const res = await fetch("/api/slots");
-        if (res.ok) {
-          const data = await res.json();
-          setSlotInfo({ maxSlots: data.maxSlots, activeCount: data.activeCount, isPro: data.isPro });
-        }
-      } catch (err) {
-        console.error("Failed to load slots:", err);
-      }
-    }
-    loadSlots();
+    fetch("/api/slots")
+      .then(r => r.json())
+      .then(d => setSlotInfo({ maxSlots: d.maxSlots, activeCount: d.activeCount, isPro: d.isPro }))
+      .catch(console.error);
   }, []);
 
-  // ---- step 1 handlers -----------------------------------------------------
+  // ── handlers ───────────────────────────────────────────────────────────────
 
-  const handleUrlChange = useCallback(
-    async (value: string) => {
-      setUrl(value);
-      setUrlError("");
-      setSourceType(detectSource(value));
-
-      if (!value.trim()) return;
-
-      const validation = validateTrackUrl(value);
-      if (!validation.valid) {
-        setUrlError(validation.error || "Invalid URL");
-        return;
-      }
-
-      setIsLoadingMetadata(true);
-      try {
-        const metadata = await fetchTrackMetadata(value);
-        if (metadata?.title) {
-          setTitle(metadata.title);
-        }
-        setArtworkUrl(metadata?.artworkUrl ?? null);
-      } catch {
-        // metadata fetch is best-effort
-      } finally {
-        setIsLoadingMetadata(false);
-      }
-    },
-    []
-  );
+  const handleUrlChange = useCallback(async (value: string) => {
+    setUrl(value); setUrlError(""); setSourceType(detectSource(value));
+    if (!value.trim()) return;
+    const v = validateTrackUrl(value);
+    if (!v.valid) { setUrlError(v.error || "Invalid URL"); return; }
+    setIsLoadingMeta(true);
+    try {
+      const m = await fetchTrackMetadata(value);
+      if (m?.title) setTitle(m.title);
+      setArtworkUrl(m?.artworkUrl ?? null);
+    } catch { /* best-effort */ } finally { setIsLoadingMeta(false); }
+  }, []);
 
   const handleFileUpload = useCallback(async (file: File) => {
-    if (file.size > MAX_FILE_SIZE) {
-      setError("File is too large. Maximum size is 25 MB.");
-      return;
-    }
-
-    if (!file.type.includes("audio") && !file.name.toLowerCase().endsWith(".mp3")) {
-      setError("Please upload an MP3 file.");
-      return;
-    }
-
-    setError("");
-    setIsUploading(true);
-    setUploadedUrl("");
-    setUploadedFileName("");
-
+    if (file.size > MAX_FILE_SIZE) { setError("File too large. Max 25 MB."); return; }
+    if (!file.type.includes("audio") && !file.name.toLowerCase().endsWith(".mp3")) { setError("MP3 files only."); return; }
+    setError(""); setIsUploading(true); setUploadedUrl(""); setUploadedFileName("");
     try {
-      // Get presigned URL
-      const presignRes = await fetch("/api/uploads/track/presign", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: file.name,
-          contentType: file.type || "audio/mpeg",
-          contentLength: file.size,
-        }),
+      const pr = await fetch("/api/uploads/track/presign", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, contentType: file.type || "audio/mpeg", contentLength: file.size }),
       });
-
-      if (!presignRes.ok) {
-        const presignErr = await presignRes.json().catch(() => null);
-
-        // Fallback to FormData upload for local dev (501 = not configured)
-        if (presignRes.status === 501) {
-          const formData = new FormData();
-          formData.append("file", file);
-          const fallbackRes = await fetch("/api/uploads/track", {
-            method: "POST",
-            body: formData,
-          });
-          const fallbackData = await fallbackRes.json();
-          if (!fallbackRes.ok || !fallbackData.url) {
-            setError(fallbackData.error || "Failed to upload MP3");
-            return;
-          }
-          setUploadedUrl(fallbackData.url);
-          setUploadedFileName(file.name);
-          setSourceType("UPLOAD");
-          if (!title.trim()) {
-            setTitle(file.name.replace(/\.mp3$/i, "").trim());
-          }
+      if (!pr.ok) {
+        const e = await pr.json().catch(() => null);
+        if (pr.status === 501) {
+          const fd = new FormData(); fd.append("file", file);
+          const r = await fetch("/api/uploads/track", { method: "POST", body: fd });
+          const d = await r.json();
+          if (!r.ok || !d.url) { setError(d.error || "Upload failed"); return; }
+          setUploadedUrl(d.url); setUploadedFileName(file.name); setSourceType("UPLOAD");
+          if (!title.trim()) setTitle(file.name.replace(/\.mp3$/i, "").trim());
           return;
         }
-
-        setError(
-          (presignErr as { error?: string })?.error || "Failed to prepare upload"
-        );
-        return;
+        setError((e as any)?.error || "Upload failed"); return;
       }
-
-      const presignData = await presignRes.json();
-      if (!presignData.uploadUrl || !presignData.fileUrl) {
-        setError("Failed to prepare upload");
-        return;
-      }
-
-      // Upload the file
-      const putRes = await fetch(presignData.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": presignData.contentType || "audio/mpeg" },
-        body: file,
-      });
-
-      if (!putRes.ok) {
-        setError("Failed to upload MP3");
-        return;
-      }
-
-      setUploadedUrl(presignData.fileUrl);
-      setUploadedFileName(file.name);
-      setSourceType("UPLOAD");
-
-      if (!title.trim()) {
-        setTitle(file.name.replace(/\.mp3$/i, "").trim());
-      }
-    } catch {
-      setError("Failed to upload MP3");
-    } finally {
-      setIsUploading(false);
-    }
+      const pd = await pr.json();
+      const put = await fetch(pd.uploadUrl, { method: "PUT", headers: { "Content-Type": pd.contentType || "audio/mpeg" }, body: file });
+      if (!put.ok) { setError("Upload failed"); return; }
+      setUploadedUrl(pd.fileUrl); setUploadedFileName(file.name); setSourceType("UPLOAD");
+      if (!title.trim()) setTitle(file.name.replace(/\.mp3$/i, "").trim());
+    } catch { setError("Upload failed"); } finally { setIsUploading(false); }
   }, [title]);
 
   const handleArtworkUpload = useCallback(async (file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Image is too large. Maximum size is 5 MB.");
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      setError("Please upload an image file (JPG, PNG, WebP).");
-      return;
-    }
-
-    setError("");
-    setIsUploadingArtwork(true);
-
+    if (file.size > 5 * 1024 * 1024) { setError("Image too large. Max 5 MB."); return; }
+    if (!file.type.startsWith("image/")) { setError("Images only (JPG, PNG, WebP)."); return; }
+    setError(""); setIsUploadingArt(true);
     try {
-      const presignRes = await fetch("/api/uploads/artwork/presign", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: file.name,
-          contentType: file.type,
-          contentLength: file.size,
-        }),
+      const pr = await fetch("/api/uploads/artwork/presign", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, contentType: file.type, contentLength: file.size }),
       });
-
-      if (!presignRes.ok) {
-        // If cloud uploads not configured, create a local object URL as fallback
-        if (presignRes.status === 501) {
-          const objectUrl = URL.createObjectURL(file);
-          setArtworkUrl(objectUrl);
-          return;
-        }
-        const err = await presignRes.json().catch(() => null);
-        setError((err as { error?: string })?.error || "Failed to upload artwork");
-        return;
+      if (!pr.ok) {
+        if (pr.status === 501) { setArtworkUrl(URL.createObjectURL(file)); return; }
+        const e = await pr.json().catch(() => null);
+        setError((e as any)?.error || "Artwork upload failed"); return;
       }
+      const pd = await pr.json();
+      const put = await fetch(pd.uploadUrl, { method: "PUT", headers: { "Content-Type": pd.contentType }, body: file });
+      if (!put.ok) { setError("Artwork upload failed"); return; }
+      setArtworkUrl(pd.fileUrl);
+    } catch { setError("Artwork upload failed"); } finally { setIsUploadingArt(false); }
+  }, []);
 
-      const presignData = await presignRes.json();
+  const toggleGenre = useCallback((id: string) => {
+    setSelectedGenres(p => p.includes(id) ? p.filter(x => x !== id) : p.length >= 3 ? p : [...p, id]);
+  }, []);
 
-      const putRes = await fetch(presignData.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": presignData.contentType },
-        body: file,
-      });
+  const toggleArea = useCallback((id: FeedbackArea) => {
+    setSelectedAreas(p => p.includes(id) ? p.filter(x => x !== id) : p.length >= 3 ? p : [...p, id]);
+  }, []);
 
-      if (!putRes.ok) {
-        setError("Failed to upload artwork");
-        return;
-      }
+  const buildBody = () => ({
+    sourceUrl: uploadMode === "link" ? url : uploadedUrl,
+    ...(uploadMode === "file" ? { sourceType: "UPLOAD" } : {}),
+    title: title.trim(),
+    artworkUrl: artworkUrl || undefined,
+    genreIds: selectedGenres,
+    feedbackFocus: feedbackFocus.trim() || undefined,
+    feedbackAreas: selectedAreas.length > 0 ? selectedAreas : undefined,
+    isPublic,
+  });
 
-      setArtworkUrl(presignData.fileUrl);
-    } catch {
-      setError("Failed to upload artwork");
-    } finally {
-      setIsUploadingArtwork(false);
+  const saveExperience = async () => {
+    if (experienceDirty && experienceLevel && profile) {
+      try {
+        await fetch("/api/profile", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ artistName: profile.artistName, experienceLevel }) });
+      } catch {}
     }
-  }, []);
-
-  // ---- step 2 handler ------------------------------------------------------
-
-  const toggleGenre = useCallback((genreId: string) => {
-    setSelectedGenres((prev) => {
-      if (prev.includes(genreId)) return prev.filter((id) => id !== genreId);
-      if (prev.length >= 3) return prev;
-      return [...prev, genreId];
-    });
-  }, []);
-
-  // ---- step 3 handlers -----------------------------------------------------
-
-  const isPro = slotInfo?.isPro ?? false;
-  const creditBalance = profile?.reviewCredits ?? 0;
-  const hasEnoughCredits = isPro || creditBalance >= reviewCount;
-  const creditDeficit = reviewCount - creditBalance;
-  const slotAvailable = !slotInfo || slotInfo.activeCount < slotInfo.maxSlots;
+  };
 
   const handleSubmit = useCallback(async () => {
-    setError("");
-    setIsSubmitting(true);
-
+    setError(""); setIsSubmitting(true);
     try {
-      // Build source info
-      const isLink = uploadMode === "link";
-      const trackSourceUrl = isLink ? url : uploadedUrl;
-      const trackSourceType = isLink ? undefined : "UPLOAD";
-
-      // 1. Create the track
-      const createRes = await fetch("/api/tracks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sourceUrl: trackSourceUrl,
-          ...(trackSourceType ? { sourceType: trackSourceType } : {}),
-          title: title.trim(),
-          artworkUrl: artworkUrl || undefined,
-          genreIds: selectedGenres,
-          feedbackFocus: feedbackFocus.trim() || undefined,
-          feedbackAreas: selectedFeedbackAreas.length > 0 ? selectedFeedbackAreas : undefined,
-          isPublic,
-        }),
-      });
-
-      // Save experience level to profile if changed
-      if (experienceLevelDirty && experienceLevel && profile) {
-        try {
-          await fetch("/api/profile", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ artistName: profile.artistName, experienceLevel }),
-          });
-        } catch {}
-      }
-
-      const trackData = await createRes.json();
-
-      if (!createRes.ok) {
-        setError(trackData.error || "Failed to create track");
-        setIsSubmitting(false);
-        return;
-      }
-
-      const trackId = trackData.id;
-
-      // 2. Request reviews using credits
-      const reviewRes = await fetch(`/api/tracks/${trackId}/request-reviews`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          desiredReviews: reviewCount,
-        }),
-      });
-
-      if (!reviewRes.ok) {
-        const reviewErr = await reviewRes.json().catch(() => null);
-        setError(
-          (reviewErr as { error?: string })?.error || "Failed to request reviews"
-        );
-        setIsSubmitting(false);
-        return;
-      }
-
-      router.push(`/submit/success?trackId=${trackId}&reviews=${reviewCount}`);
-    } catch {
-      setError("Something went wrong. Please try again.");
-      setIsSubmitting(false);
-    }
-  }, [
-    uploadMode,
-    url,
-    uploadedUrl,
-    title,
-    artworkUrl,
-    selectedGenres,
-    feedbackFocus,
-    selectedFeedbackAreas,
-    experienceLevel,
-    experienceLevelDirty,
-    profile,
-    isPublic,
-    reviewCount,
-    router,
-  ]);
+      const cr = await fetch("/api/tracks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(buildBody()) });
+      await saveExperience();
+      const cd = await cr.json();
+      if (!cr.ok) { setError(cd.error || "Failed to create track"); setIsSubmitting(false); return; }
+      const rr = await fetch(`/api/tracks/${cd.id}/request-reviews`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ desiredReviews: reviewCount }) });
+      if (!rr.ok) { const e = await rr.json().catch(() => null); setError((e as any)?.error || "Failed to request reviews"); setIsSubmitting(false); return; }
+      router.push(`/submit/success?trackId=${cd.id}&reviews=${reviewCount}`);
+    } catch { setError("Something went wrong. Please try again."); setIsSubmitting(false); }
+  }, [uploadMode, url, uploadedUrl, title, artworkUrl, selectedGenres, feedbackFocus, selectedAreas, isPublic, experienceDirty, experienceLevel, profile, reviewCount, router]);
 
   const handleUploadOnly = useCallback(async () => {
-    setError("");
-    setIsSubmitting(true);
-
+    setError(""); setIsSubmitting(true);
     try {
-      const isLink = uploadMode === "link";
-      const trackSourceUrl = isLink ? url : uploadedUrl;
-      const trackSourceType = isLink ? undefined : "UPLOAD";
+      const cr = await fetch("/api/tracks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(buildBody()) });
+      await saveExperience();
+      const cd = await cr.json();
+      if (!cr.ok) { setError(cd.error || "Failed to create track"); setIsSubmitting(false); return; }
+      router.push(`/submit/success?trackId=${cd.id}&reviews=0`);
+    } catch { setError("Something went wrong."); setIsSubmitting(false); }
+  }, [uploadMode, url, uploadedUrl, title, artworkUrl, selectedGenres, feedbackFocus, selectedAreas, isPublic, experienceDirty, experienceLevel, profile, router]);
 
-      const createRes = await fetch("/api/tracks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sourceUrl: trackSourceUrl,
-          ...(trackSourceType ? { sourceType: trackSourceType } : {}),
-          title: title.trim(),
-          artworkUrl: artworkUrl || undefined,
-          genreIds: selectedGenres,
-          feedbackFocus: feedbackFocus.trim() || undefined,
-          feedbackAreas: selectedFeedbackAreas.length > 0 ? selectedFeedbackAreas : undefined,
-          isPublic,
-        }),
-      });
+  // ── derived ────────────────────────────────────────────────────────────────
 
-      // Save experience level to profile if changed
-      if (experienceLevelDirty && experienceLevel && profile) {
-        try {
-          await fetch("/api/profile", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ artistName: profile.artistName, experienceLevel }),
-          });
-        } catch {}
-      }
+  const isPro            = slotInfo?.isPro ?? false;
+  const creditBalance    = profile?.reviewCredits ?? 0;
+  const hasEnoughCredits = isPro || creditBalance >= reviewCount;
+  const creditDeficit    = reviewCount - creditBalance;
+  const slotAvailable    = !slotInfo || slotInfo.activeCount < slotInfo.maxSlots;
+  const hasValidSource   = uploadMode === "link"
+    ? !!url.trim() && !urlError && !isLoadingMeta && !!sourceType
+    : !!uploadedUrl && !isUploading;
+  const hasValidDetails  = title.trim().length > 0 && selectedGenres.length > 0;
 
-      const trackData = await createRes.json();
+  const goBack    = () => { setError(""); if (step === 2) setStep(1); if (step === 3) setStep(2); };
+  const goForward = () => { setError(""); if (step === 1 && hasValidSource) setStep(2); if (step === 2 && hasValidDetails) setStep(3); };
 
-      if (!createRes.ok) {
-        setError(trackData.error || "Failed to create track");
-        setIsSubmitting(false);
-        return;
-      }
+  const currentBenefit = REVIEW_BENEFITS.filter(b => reviewCount >= b.min).slice(-1)[0];
 
-      router.push(`/submit/success?trackId=${trackData.id}&reviews=0`);
-    } catch {
-      setError("Something went wrong. Please try again.");
-      setIsSubmitting(false);
-    }
-  }, [uploadMode, url, uploadedUrl, title, artworkUrl, selectedGenres, feedbackFocus, router]);
+  // ── loading ────────────────────────────────────────────────────────────────
 
+  if (profileLoading) return (
+    <div className="min-h-screen bg-[#faf7f2] flex items-center justify-center">
+      <Loader2 className="h-5 w-5 animate-spin text-purple-600" />
+    </div>
+  );
 
+  // ── shared styles ──────────────────────────────────────────────────────────
 
-  // ---- derived values -------------------------------------------------------
+  // Full-bleed within the dashboard content area
+  const W = "max-w-2xl mx-auto px-6 sm:px-10";
 
-  const hasValidSource =
-    uploadMode === "link"
-      ? url.trim() !== "" && !urlError && !isLoadingMetadata && sourceType !== null
-      : !!uploadedUrl && !isUploading;
-
-  const hasValidDetails =
-    title.trim().length > 0 && selectedGenres.length > 0;
-
-  // ---- navigation -----------------------------------------------------------
-
-  const goBack = () => {
-    setError("");
-    if (step === 2) setStep(1);
-    if (step === 3) setStep(2);
-  };
-
-  const goForward = () => {
-    setError("");
-    if (step === 1 && hasValidSource) setStep(2);
-    if (step === 2 && hasValidDetails) setStep(3);
-  };
-
-  // ---- loading state --------------------------------------------------------
-
-  if (profileLoading) {
-    return (
-      <div className="min-h-screen bg-[#faf7f2] flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
-      </div>
-    );
-  }
-
-  // ---- render ---------------------------------------------------------------
-
-  const stepLabels = ["Track", "Details", "Reviews"];
+  // ── render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#faf7f2] pb-24 overflow-x-hidden">
+    <div className="min-h-screen bg-[#faf7f2]">
 
-      {/* ── HERO ───────────────────────────────────────────────── */}
-      <div className="bg-white border-b-2 border-black">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-          <div className="flex items-start justify-between gap-6">
-            <div className="min-w-0">
-              <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-black leading-[0.95]">
-                Submit.
-              </h1>
-              <p className="text-sm text-black/40 font-medium mt-2">
-                Get real feedback from fellow artists.
-              </p>
-              {!profileLoading && !isPro && (
-                <div className="flex items-center gap-1.5 mt-3">
-                  <Coins className="h-4 w-4 text-purple-600" />
-                  <span className={`text-sm font-black tabular-nums ${(profile?.reviewCredits ?? 0) === 0 ? "text-red-500" : "text-black"}`}>
-                    {profile?.reviewCredits ?? 0}
-                  </span>
-                  <span className="text-sm text-black/40 font-medium">credits available</span>
-                </div>
-              )}
-            </div>
-            {/* Step pills */}
-            <div className="flex-shrink-0 flex items-center gap-2">
-              {stepLabels.map((label, i) => {
-                const s = i + 1;
-                return (
-                  <div key={s} className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 text-[11px] font-black uppercase tracking-wider transition-all",
-                    s < step ? "bg-lime-400 border-lime-400 text-black" :
-                    s === step ? "bg-black border-black text-white" :
-                    "bg-white border-black/10 text-black/25"
+      {/* ── PROGRESS BAR — sticky top strip ──────────────────── */}
+      <div className="sticky top-0 z-10 bg-white border-b border-black/8">
+        <div className={cn(W, "py-4 flex items-center justify-between gap-4")}>
+          <div className="flex items-center gap-2">
+            {["Track", "Details", "Reviews"].map((label, i) => {
+              const s = i + 1;
+              const done = s < step;
+              const active = s === step;
+              return (
+                <div key={s} className="flex items-center gap-1.5">
+                  <div className={cn(
+                    "h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-black transition-all",
+                    done   ? "bg-purple-600 text-white" :
+                    active ? "bg-black text-white" :
+                             "bg-black/8 text-black/30"
                   )}>
-                    {s < step ? <CheckCircle2 className="h-3 w-3" /> : <span>{s}</span>}
-                    <span className="hidden sm:inline">{label}</span>
+                    {done ? "✓" : s}
                   </div>
-                );
-              })}
-            </div>
+                  <span className={cn(
+                    "text-sm font-semibold hidden sm:inline transition-colors",
+                    active ? "text-black" : done ? "text-purple-600" : "text-black/30"
+                  )}>{label}</span>
+                  {i < 2 && <div className="w-6 h-px bg-black/10 mx-1" />}
+                </div>
+              );
+            })}
           </div>
+          {!isPro && (
+            <p className="text-sm text-black/40 font-medium tabular-nums">
+              <span className={cn("font-black", creditBalance === 0 ? "text-red-500" : "text-black")}>{creditBalance}</span> credits
+            </p>
+          )}
+          {isPro && (
+            <div className="flex items-center gap-1.5 text-sm font-bold text-purple-600">
+              <Crown className="h-3.5 w-3.5" /> Pro
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-
-        {/* Error display */}
-        {error && (
-          <div className="mb-6 bg-red-500 text-white rounded-2xl px-4 py-3">
-            <p className="text-sm font-bold">{error}</p>
+      {/* ── ERROR ────────────────────────────────────────────── */}
+      {error && (
+        <div className="bg-red-500">
+          <div className={cn(W, "py-3")}>
+            <p className="text-sm font-semibold text-white">{error}</p>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* ================================================================= */}
-        {/* STEP 1: Upload your track                                         */}
-        {/* ================================================================= */}
-        {step === 1 && (
-          <div className="space-y-5">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">Step 1</p>
-              <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight leading-none">Upload your track</h2>
-              <p className="text-sm text-black/40 font-medium mt-1">Choose how you want to add your music</p>
+      {/* ══════════════════════════════════════════════════════ */}
+      {/* STEP 1                                                 */}
+      {/* ══════════════════════════════════════════════════════ */}
+      {step === 1 && (
+        <>
+          {/* Hero band */}
+          <div className="bg-[#1a0f2e] py-12">
+            <div className={W}>
+              <p className="text-xs font-black uppercase tracking-[0.25em] text-purple-400/60 mb-3">Step 1 of 3</p>
+              <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight">
+                Drop your track.
+              </h1>
+              <p className="text-base text-white/40 mt-3 font-medium">
+                Paste a link from SoundCloud, Bandcamp, or YouTube — or upload an MP3.
+              </p>
             </div>
-
-            {/* Upload mode toggle */}
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setUploadMode("link");
-                  setUploadedUrl("");
-                  setUploadedFileName("");
-                  setArtworkUrl(null);
-                  setError("");
-                }}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full border-2 font-black text-[11px] uppercase tracking-wider transition-all",
-                  uploadMode === "link"
-                    ? "bg-black border-black text-white"
-                    : "bg-white border-black/10 text-black/40 hover:border-black/25 hover:text-black/70"
-                )}
-              >
-                <Link2 className="h-3.5 w-3.5" />
-                Link
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setUploadMode("file");
-                  setUrl("");
-                  setUrlError("");
-                  setSourceType(null);
-                  setArtworkUrl(null);
-                  setError("");
-                }}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full border-2 font-black text-[11px] uppercase tracking-wider transition-all",
-                  uploadMode === "file"
-                    ? "bg-black border-black text-white"
-                    : "bg-white border-black/10 text-black/40 hover:border-black/25 hover:text-black/70"
-                )}
-              >
-                <Upload className="h-3.5 w-3.5" />
-                Upload MP3
-              </button>
-            </div>
-
-            {/* Link mode */}
-            {uploadMode === "link" && (
-              <div className="space-y-3">
-                <Input
-                  placeholder="Paste SoundCloud, Bandcamp, or YouTube link"
-                  value={url}
-                  onChange={(e) => handleUrlChange(e.target.value)}
-                  className={cn(
-                    "h-12 rounded-xl border-2 border-black/10 bg-white focus:border-purple-500",
-                    urlError && "border-red-500"
-                  )}
-                  autoFocus
-                />
-                <SupportedPlatforms activeSource={sourceType} variant="compact" />
-                {urlError && (
-                  <p className="text-sm text-red-600 font-medium">{urlError}</p>
-                )}
-                {isLoadingMetadata && (
-                  <div className="flex items-center gap-2 text-sm text-black/40">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Getting track info...
-                  </div>
-                )}
-                {url && !urlError && !isLoadingMetadata && title && (
-                  <div className="rounded-xl border-2 border-black/10 bg-white p-4 flex items-center gap-4 shadow-sm">
-                    {artworkUrl ? (
-                      <img
-                        src={artworkUrl}
-                        alt=""
-                        className="h-14 w-14 rounded-lg object-cover flex-shrink-0 border border-black/10"
-                      />
-                    ) : (
-                      <div className="h-14 w-14 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center flex-shrink-0">
-                        <Music className="h-6 w-6 text-white/70" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-black text-black truncate">
-                        {title}
-                      </p>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                        <span className="text-xs font-bold text-black/40">
-                          {sourceType === "SOUNDCLOUD" ? "SoundCloud" : sourceType === "BANDCAMP" ? "Bandcamp" : sourceType === "YOUTUBE" ? "YouTube" : "Ready"}
-                        </span>
-                      </div>
-                    </div>
-                    <Check className="h-5 w-5 text-emerald-500 flex-shrink-0" />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* File mode */}
-            {uploadMode === "file" && (
-              <div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="audio/mpeg,audio/mp3,.mp3"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void handleFileUpload(file);
-                  }}
-                  className="hidden"
-                />
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setIsDragging(true);
-                  }}
-                  onDragLeave={() => setIsDragging(false)}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    setIsDragging(false);
-                    const file = e.dataTransfer.files?.[0];
-                    if (
-                      file &&
-                      (file.type === "audio/mpeg" || file.name.endsWith(".mp3"))
-                    ) {
-                      void handleFileUpload(file);
-                    } else {
-                      setError("Please upload an MP3 file");
-                    }
-                  }}
-                  className={cn(
-                    "rounded-xl border-2 border-dashed p-12 text-center cursor-pointer transition-all",
-                    isDragging && "border-purple-400 bg-purple-50",
-                    !isDragging &&
-                      !uploadedFileName &&
-                      "border-black/10 hover:border-purple-400 hover:bg-purple-50/50",
-                    uploadedFileName &&
-                      !isUploading &&
-                      "border-emerald-400 bg-emerald-50"
-                  )}
-                >
-                  {isUploading ? (
-                    <div className="flex flex-col items-center gap-3">
-                      <Loader2 className="h-12 w-12 animate-spin text-purple-600" />
-                      <p className="font-medium text-neutral-600">Uploading...</p>
-                    </div>
-                  ) : uploadedFileName ? (
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="h-14 w-14 rounded-full bg-emerald-500 flex items-center justify-center">
-                        <Check className="h-7 w-7 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-black text-black">
-                          {uploadedFileName}
-                        </p>
-                        <p className="text-sm text-black/40 mt-1">Click to change</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="h-14 w-14 rounded-full bg-purple-100 flex items-center justify-center">
-                        <Upload className="h-7 w-7 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="font-black text-black">
-                          Drop your MP3 here
-                        </p>
-                        <p className="text-sm text-black/40 mt-1">
-                          or click to browse (max 25 MB)
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Continue button */}
-            <Button
-              onClick={goForward}
-              disabled={!hasValidSource}
-              className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl"
-            >
-              Continue
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
           </div>
-        )}
 
-        {/* ================================================================= */}
-        {/* STEP 2: Track details                                             */}
-        {/* ================================================================= */}
-        {step === 2 && (
-          <div className="space-y-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">Step 2</p>
-                <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight leading-none">Track details</h2>
-                <p className="text-sm text-black/40 font-medium mt-1">Add title and genres</p>
-              </div>
-              <button
-                onClick={goBack}
-                className="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors mt-1"
-              >
-                <ArrowLeft className="h-3 w-3" />
-                Back
-              </button>
-            </div>
-
-            {/* Title + Artwork */}
-            <div className="flex gap-4 items-start">
-              {/* Artwork thumbnail - clickable */}
-              <div className="flex-shrink-0">
-                <input
-                  ref={artworkInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void handleArtworkUpload(file);
-                  }}
-                  className="hidden"
-                />
+          {/* Mode toggle band */}
+          <div className="bg-[#241440]">
+            <div className={cn(W, "py-1 flex")}>
+              {([
+                { mode: "link" as UploadMode, Icon: Link2,  label: "Paste a link"  },
+                { mode: "file" as UploadMode, Icon: Upload, label: "Upload MP3"    },
+              ]).map(({ mode, Icon, label }) => (
                 <button
+                  key={mode}
                   type="button"
-                  onClick={() => artworkInputRef.current?.click()}
-                  disabled={isUploadingArtwork}
-                  className="group relative h-[72px] w-[72px] rounded-xl border-2 border-dashed border-black/10 hover:border-black/20 bg-white hover:bg-neutral-50 overflow-hidden transition-all duration-150 ease-out flex items-center justify-center"
+                  onClick={() => {
+                    setUploadMode(mode); setError("");
+                    if (mode === "link") { setUploadedUrl(""); setUploadedFileName(""); setArtworkUrl(null); }
+                    else { setUrl(""); setUrlError(""); setSourceType(null); setArtworkUrl(null); }
+                  }}
+                  className={cn(
+                    "flex items-center gap-2 px-5 py-4 text-sm font-bold transition-all border-b-2",
+                    uploadMode === mode
+                      ? "border-purple-400 text-white"
+                      : "border-transparent text-white/30 hover:text-white/60"
+                  )}
                 >
-                  {isUploadingArtwork ? (
-                    <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
-                  ) : artworkUrl ? (
-                    <>
-                      <img src={artworkUrl} alt="" className="h-full w-full object-cover" />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                        <ImagePlus className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </>
-                  ) : (
-                    <div className="flex flex-col items-center gap-0.5">
-                      <ImagePlus className="h-5 w-5 text-neutral-400 group-hover:text-purple-500 transition-colors" />
-                      <span className="text-[10px] font-medium text-neutral-400 group-hover:text-purple-500 transition-colors">Art</span>
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Form band */}
+          <div className="bg-white py-10">
+            <div className={cn(W, "space-y-6")}>
+
+              {uploadMode === "link" && (
+                <>
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-2">Track URL</label>
+                    <input
+                      value={url}
+                      onChange={e => handleUrlChange(e.target.value)}
+                      placeholder="soundcloud.com/...  or  bandcamp.com/..."
+                      className={cn(
+                        "w-full bg-transparent border-b-2 text-black text-[15px] py-3 focus:outline-none transition-colors placeholder:text-black/20",
+                        urlError ? "border-red-400" : "border-black/10 focus:border-purple-500"
+                      )}
+                      autoFocus
+                    />
+                    {urlError && <p className="text-sm text-red-500 font-medium mt-2">{urlError}</p>}
+                  </div>
+
+                  <SupportedPlatforms activeSource={sourceType} variant="compact" />
+
+                  {isLoadingMeta && (
+                    <div className="flex items-center gap-2 text-sm text-black/40">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-purple-500" />
+                      Fetching track info...
                     </div>
                   )}
-                </button>
-              </div>
-              <div className="flex-1">
-                <label
-                  htmlFor="track-title"
-                  className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-2"
-                >
-                  Title
-                </label>
-                <Input
-                  id="track-title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="What's your track called?"
-                  className="h-12 rounded-xl border-2 border-black/10 bg-white focus:border-purple-500"
-                  autoFocus
-                />
-              </div>
-            </div>
 
-            {/* Genres */}
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-2">
-                Genres <span className="text-neutral-400">(select 1-3)</span>
-              </label>
-              {genres.length === 0 ? (
-                <div className="flex items-center gap-2 text-sm text-black/40">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Loading genres...
-                </div>
-              ) : (
-                <GenreSelector
-                  genres={genres}
-                  selectedIds={selectedGenres}
-                  onToggle={toggleGenre}
-                  maxSelections={3}
-                  variant="artist"
-                />
+                  {url && !urlError && !isLoadingMeta && title && (
+                    <div className="bg-[#faf7f2] rounded-2xl p-4 flex items-center gap-4">
+                      {artworkUrl
+                        ? <img src={artworkUrl} alt="" className="h-14 w-14 rounded-xl object-cover flex-shrink-0" />
+                        : <div className="h-14 w-14 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                            <Music className="h-5 w-5 text-purple-400" />
+                          </div>
+                      }
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-black truncate">{title}</p>
+                        <p className="text-xs font-black uppercase tracking-wider text-purple-600 mt-1">{sourceType} — ready</p>
+                      </div>
+                      <div className="h-7 w-7 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                        <Check className="h-4 w-4 text-white" />
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
-            </div>
 
-            {/* Experience Level */}
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">
-                Your experience level
-              </label>
-              <p className="text-xs text-black/40 mb-3">Helps reviewers tailor their feedback to you</p>
-              <div className="grid gap-2">
-                {([
-                  { id: "BEGINNER" as ExperienceLevel, label: "Just Starting Out", desc: "I'm new to music production and learning the basics" },
-                  { id: "INTERMEDIATE" as ExperienceLevel, label: "Getting Serious", desc: "I know the fundamentals and want to level up" },
-                  { id: "ADVANCED" as ExperienceLevel, label: "Experienced Producer", desc: "I've been at this a while — give me the technical details" },
-                  { id: "PROFESSIONAL" as ExperienceLevel, label: "Professional", desc: "I release music commercially — hold nothing back" },
-                ] as const).map((level) => (
-                  <button
-                    key={level.id}
-                    type="button"
-                    onClick={() => {
-                      setExperienceLevel(level.id);
-                      setExperienceLevelDirty(true);
+              {uploadMode === "file" && (
+                <>
+                  <input ref={fileInputRef} type="file" accept="audio/mpeg,audio/mp3,.mp3"
+                    onChange={e => { const f = e.target.files?.[0]; if (f) void handleFileUpload(f); }}
+                    className="hidden"
+                  />
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDrop={e => {
+                      e.preventDefault(); setIsDragging(false);
+                      const f = e.dataTransfer.files?.[0];
+                      if (f && (f.type === "audio/mpeg" || f.name.endsWith(".mp3"))) void handleFileUpload(f);
+                      else setError("MP3 files only.");
                     }}
                     className={cn(
-                      "text-left px-4 py-3 rounded-xl border-2 transition-all duration-150 ease-out",
-                      experienceLevel === level.id
-                        ? "border-purple-500 bg-purple-50/60"
-                        : "border-black/10 bg-white hover:border-black/20"
+                      "rounded-2xl border-2 border-dashed p-14 text-center cursor-pointer transition-all",
+                      isDragging                       ? "border-purple-400 bg-purple-50"    :
+                      uploadedFileName && !isUploading ? "border-green-400 bg-green-50"      :
+                                                         "border-black/10 hover:border-purple-300 hover:bg-purple-50/30"
                     )}
                   >
-                    <div className={cn("text-sm font-bold", experienceLevel === level.id ? "text-purple-700" : "text-black")}>{level.label}</div>
-                    <div className="text-[11px] text-black/40 mt-0.5">{level.desc}</div>
-                  </button>
-                ))}
-              </div>
+                    {isUploading ? (
+                      <div className="flex flex-col items-center gap-3">
+                        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+                        <p className="text-sm font-semibold text-black/50">Uploading...</p>
+                      </div>
+                    ) : uploadedFileName ? (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="h-12 w-12 rounded-full bg-green-500 flex items-center justify-center">
+                          <Check className="h-6 w-6 text-white" />
+                        </div>
+                        <p className="font-bold text-black">{uploadedFileName}</p>
+                        <p className="text-sm text-black/40">Click to change</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                          <Upload className="h-5 w-5 text-purple-500" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-black">Drop your MP3 here</p>
+                          <p className="text-sm text-black/40 mt-1">or click to browse · max 25 MB</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
-
-            {/* Feedback Areas */}
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">
-                What feedback do you want? <span className="text-neutral-400">(pick 1–3)</span>
-              </label>
-              <p className="text-xs text-black/40 mb-3">Reviewers will focus on what matters to you</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {([
-                  { id: "OVERALL_VIBE" as FeedbackArea, emoji: "🎵", label: "Overall Vibe", desc: "Does it feel good?" },
-                  { id: "MIXING" as FeedbackArea, emoji: "🎚️", label: "Mixing & Sound", desc: "Mix quality & clarity" },
-                  { id: "ARRANGEMENT" as FeedbackArea, emoji: "🎼", label: "Arrangement", desc: "Structure & pacing" },
-                  { id: "SONGWRITING" as FeedbackArea, emoji: "✍️", label: "Songwriting", desc: "Melody, hooks, lyrics" },
-                  { id: "SOUND_DESIGN" as FeedbackArea, emoji: "🎛️", label: "Sound Design", desc: "Sounds & textures" },
-                  { id: "RELEASE_READINESS" as FeedbackArea, emoji: "🚀", label: "Release Readiness", desc: "Is it ready to ship?" },
-                ] as const).map((area) => {
-                  const isSelected = selectedFeedbackAreas.includes(area.id);
-                  return (
-                    <button
-                      key={area.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedFeedbackAreas((prev) => {
-                          if (prev.includes(area.id)) return prev.filter((a) => a !== area.id);
-                          if (prev.length >= 3) return prev;
-                          return [...prev, area.id];
-                        });
-                      }}
-                      className={cn(
-                        "flex flex-col items-center gap-1 rounded-xl border-2 p-3 transition-all duration-150 ease-out text-center",
-                        isSelected
-                          ? "border-purple-500 bg-purple-50/60"
-                          : "border-black/10 bg-white hover:border-black/20",
-                        !isSelected && selectedFeedbackAreas.length >= 3 && "opacity-40 cursor-not-allowed"
-                      )}
-                    >
-                      <span className="text-lg">{area.emoji}</span>
-                      <span className={cn("text-xs font-bold", isSelected ? "text-purple-700" : "text-black")}>{area.label}</span>
-                      <span className="text-[10px] text-black/40 leading-tight">{area.desc}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Anything specific (optional free-text) */}
-            <div>
-              <label
-                htmlFor="feedback-focus"
-                className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-2"
-              >
-                Anything specific? <span className="text-neutral-400">(optional)</span>
-              </label>
-              <textarea
-                id="feedback-focus"
-                value={feedbackFocus}
-                onChange={(e) => setFeedbackFocus(e.target.value)}
-                placeholder="e.g. 'I changed the bassline since last version — does it sit better now?'"
-                rows={2}
-                maxLength={1000}
-                className="w-full rounded-xl border-2 border-black/10 bg-white px-4 py-3 text-sm placeholder:text-black/25 focus:border-purple-500 focus:outline-none resize-none"
-              />
-            </div>
-
-            {/* Visibility */}
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-3">
-                Visibility
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsPublic(false)}
-                  className={cn(
-                    "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-150 ease-out",
-                    !isPublic
-                      ? "border-purple-500 bg-purple-50/60"
-                      : "border-black/10 bg-white hover:border-black/20"
-                  )}
-                >
-                  <Lock className={cn("h-5 w-5", !isPublic ? "text-purple-600" : "text-neutral-400")} />
-                  <span className={cn("text-sm font-semibold", !isPublic ? "text-purple-700" : "text-neutral-600")}>Private</span>
-                  <span className="text-[11px] text-black/40 text-center leading-snug">
-                    Only you and assigned reviewers can access this track
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsPublic(true)}
-                  className={cn(
-                    "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-150 ease-out",
-                    isPublic
-                      ? "border-purple-500 bg-purple-50/60"
-                      : "border-black/10 bg-white hover:border-black/20"
-                  )}
-                >
-                  <Globe className={cn("h-5 w-5", isPublic ? "text-purple-600" : "text-neutral-400")} />
-                  <span className={cn("text-sm font-semibold", isPublic ? "text-purple-700" : "text-neutral-600")}>Public</span>
-                  <span className="text-[11px] text-black/40 text-center leading-snug">
-                    Discoverable by the community, eligible for Top Rated charts, and shareable via link
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            {/* Continue button */}
-            <Button
-              onClick={goForward}
-              disabled={!hasValidDetails}
-              className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all duration-150 ease-out h-12 rounded-xl"
-            >
-              Continue
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
           </div>
-        )}
 
-        {/* ================================================================= */}
-        {/* STEP 3: Review count                                              */}
-        {/* ================================================================= */}
-        {step === 3 && (
-          <div className="space-y-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 mb-1">Step 3</p>
-                <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight leading-none">How many reviews?</h2>
-                <p className="text-sm text-black/40 font-medium mt-1">Each review costs 1 credit</p>
-              </div>
+          {/* CTA band */}
+          <div className="bg-purple-600 hover:bg-purple-700 transition-colors">
+            <div className={W}>
               <button
-                onClick={goBack}
-                className="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors mt-1"
+                onClick={goForward}
+                disabled={!hasValidSource}
+                className="w-full py-5 text-white font-black text-[15px] tracking-wide disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                <ArrowLeft className="h-3 w-3" />
-                Back
+                {hasValidSource ? "Continue to Details →" : "Add a track link or file to continue"}
               </button>
             </div>
+          </div>
+        </>
+      )}
 
-            {/* Queue full warning */}
-            {!slotAvailable && (
-              <div className="bg-amber-400 rounded-2xl px-5 py-4 flex items-start gap-3">
-                <AlertTriangle className="h-5 w-5 text-black flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-black text-black mb-1">Your review queue is full</p>
-                  <p className="text-sm text-black/70 font-medium">
-                    Free accounts can have {slotInfo?.maxSlots ?? 1} track{(slotInfo?.maxSlots ?? 1) > 1 ? "s" : ""} in review at a time. Wait for current reviews to complete, or{" "}
-                    <Link href="/pro" className="font-black underline underline-offset-2">upgrade to Pro</Link>{" "}for 3 concurrent tracks.
-                  </p>
-                </div>
-              </div>
-            )}
+      {/* ══════════════════════════════════════════════════════ */}
+      {/* STEP 2                                                 */}
+      {/* ══════════════════════════════════════════════════════ */}
+      {step === 2 && (
+        <>
+          {/* Hero band */}
+          <div className="bg-[#0f2318] py-12">
+            <div className={W}>
+              <button onClick={goBack} className="text-xs font-black uppercase tracking-[0.2em] text-white/30 hover:text-white/60 transition-colors mb-6 block">
+                ← Back
+              </button>
+              <p className="text-xs font-black uppercase tracking-[0.25em] text-green-400/60 mb-3">Step 2 of 3</p>
+              <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight">
+                About your track.
+              </h1>
+              <p className="text-base text-white/40 mt-3 font-medium">
+                Give reviewers context so feedback is actually useful.
+              </p>
+            </div>
+          </div>
 
-            {/* Review count card */}
-            <div className="bg-white rounded-2xl border-2 border-black/8 p-6 space-y-6">
-              {/* Big number */}
-              <div className="text-center">
-                <div className="inline-flex items-baseline gap-2">
-                  <span className="text-6xl font-black text-black tabular-nums">{reviewCount}</span>
-                  <span className="text-xl text-black/40 font-black">{reviewCount === 1 ? "review" : "reviews"}</span>
-                </div>
-                <p className="text-sm text-black/40 font-medium mt-1">
-                  {isPro ? "Pro — no credits required" : `${reviewCount} ${reviewCount === 1 ? "credit" : "credits"} required`}
-                </p>
-              </div>
+          {/* Form band */}
+          <div className="bg-white py-10">
+            <div className={cn(W, "space-y-10")}>
 
-              {/* Slider */}
+              {/* Title */}
               <div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={reviewCount}
-                  onChange={(e) => setReviewCount(parseInt(e.target.value))}
-                  className="w-full h-3 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-600 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:hover:scale-110 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-purple-600 [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:cursor-pointer"
-                  style={{
-                    background: `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${((reviewCount - 1) / 9) * 100}%, rgb(229 231 235) ${((reviewCount - 1) / 9) * 100}%, rgb(229 231 235) 100%)`
-                  }}
-                />
-                <div className="flex justify-between mt-2">
-                  {[1, 3, 5, 7, 10].map((mark) => (
-                    <button
-                      key={mark}
-                      type="button"
-                      onClick={() => setReviewCount(mark)}
+                <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-2">Track Title</label>
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0">
+                    <input ref={artworkInputRef} type="file" accept="image/*"
+                      onChange={e => { const f = e.target.files?.[0]; if (f) void handleArtworkUpload(f); }}
+                      className="hidden"
+                    />
+                    <button type="button" onClick={() => artworkInputRef.current?.click()} disabled={isUploadingArt}
+                      className="relative h-12 w-12 rounded-xl border-2 border-dashed border-black/10 hover:border-purple-400 bg-[#faf7f2] overflow-hidden transition-colors flex items-center justify-center group"
+                    >
+                      {isUploadingArt ? <Loader2 className="h-4 w-4 animate-spin text-purple-500" />
+                        : artworkUrl ? <>
+                            <img src={artworkUrl} alt="" className="h-full w-full object-cover" />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                              <ImagePlus className="h-3.5 w-3.5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                          </>
+                        : <ImagePlus className="h-4 w-4 text-black/20 group-hover:text-purple-500 transition-colors" />
+                      }
+                    </button>
+                  </div>
+                  <input
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                    placeholder="What's this track called?"
+                    className="flex-1 bg-transparent border-b-2 border-black/10 focus:border-purple-500 text-black text-[15px] py-3 focus:outline-none transition-colors placeholder:text-black/20"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* Genre */}
+              <div>
+                <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-1">Genre</label>
+                <p className="text-sm text-black/40 mb-4">Pick 1–3 that fit your track</p>
+                {genres.length === 0
+                  ? <div className="flex items-center gap-2 text-sm text-black/40"><Loader2 className="h-3.5 w-3.5 animate-spin text-purple-500" />Loading...</div>
+                  : <GenreSelector genres={genres} selectedIds={selectedGenres} onToggle={toggleGenre} maxSelections={3} variant="artist" />
+                }
+              </div>
+
+              {/* Experience */}
+              <div>
+                <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-1">Your Experience Level</label>
+                <p className="text-sm text-black/40 mb-4">Helps reviewers calibrate their feedback</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {EXPERIENCE_OPTIONS.map(opt => (
+                    <button key={opt.id} type="button"
+                      onClick={() => { setExperienceLevel(opt.id); setExperienceDirty(true); }}
                       className={cn(
-                        "text-xs font-black transition-colors",
-                        reviewCount === mark ? "text-purple-600" : "text-black/25 hover:text-purple-600"
+                        "text-left p-4 border transition-all",
+                        experienceLevel === opt.id
+                          ? "border-[#1a1a1a] bg-[#1a1a1a]"
+                          : "border-black/10 bg-[#faf7f2] hover:border-black/30"
                       )}
                     >
-                      {mark}
+                      <div className={cn("text-sm font-bold", experienceLevel === opt.id ? "text-white" : "text-black")}>{opt.label}</div>
+                      <div className={cn("text-[12px] mt-0.5", experienceLevel === opt.id ? "text-white/50" : "text-black/40")}>{opt.desc}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Insight level */}
-              <div className="border-t-2 border-black/8 pt-5">
-                <div className="flex items-center gap-1.5 mb-2">
-                  {REVIEW_BENEFITS.filter((b) => b.minReviews <= 10).map((benefit) => (
-                    <div
-                      key={benefit.label}
-                      className={cn(
-                        "h-2 flex-1 rounded-full transition-all duration-300",
-                        reviewCount >= benefit.minReviews ? "bg-purple-600" : "bg-black/8"
-                      )}
-                    />
-                  ))}
+              {/* Focus areas */}
+              <div>
+                <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-1">Focus Areas</label>
+                <p className="text-sm text-black/40 mb-4">Optional · up to 3 · reviewers will focus here</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {FEEDBACK_AREAS.map(area => {
+                    const on = selectedAreas.includes(area.id);
+                    const maxed = !on && selectedAreas.length >= 3;
+                    return (
+                      <button key={area.id} type="button" onClick={() => !maxed && toggleArea(area.id)}
+                        className={cn(
+                          "px-4 py-3 border text-sm font-semibold transition-all text-left",
+                          on    ? "border-[#1a1a1a] bg-[#1a1a1a] text-white" :
+                          maxed ? "border-black/5 text-black/15 cursor-not-allowed bg-white" :
+                                  "border-black/10 bg-[#faf7f2] hover:border-black/30 text-black"
+                        )}
+                      >{area.label}</button>
+                    );
+                  })}
                 </div>
-                <p className="text-sm font-black text-black">
-                  {REVIEW_BENEFITS.filter((b) => reviewCount >= b.minReviews).slice(-1)[0]?.icon}{" "}
-                  {REVIEW_BENEFITS.filter((b) => reviewCount >= b.minReviews).slice(-1)[0]?.label || "Select reviews"}
-                </p>
-                <p className="text-[11px] text-black/30 font-medium mt-0.5">Current insight level</p>
               </div>
 
-              {/* Credit balance — hidden for Pro */}
+              {/* Notes */}
+              <div>
+                <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-2">
+                  Anything Specific? <span className="normal-case font-medium text-black/25">optional</span>
+                </label>
+                <textarea
+                  value={feedbackFocus}
+                  onChange={e => setFeedbackFocus(e.target.value)}
+                  placeholder="e.g. Does the bridge hit? Is the bass sitting right? Changed the intro — does it work?"
+                  rows={3}
+                  maxLength={1000}
+                  className="w-full bg-[#faf7f2] border border-black/10 focus:border-black/40 text-black text-[14px] px-4 py-3 focus:outline-none resize-none transition-colors placeholder:text-black/20"
+                />
+              </div>
+
+              {/* Visibility */}
+              <div>
+                <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-4">Visibility</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    { val: false, Icon: Lock,  label: "Private", desc: "You and your reviewers only"     },
+                    { val: true,  Icon: Globe, label: "Public",  desc: "Discoverable and chart eligible" },
+                  ] as const).map(({ val, Icon, label, desc }) => (
+                    <button key={label} type="button" onClick={() => setIsPublic(val)}
+                      className={cn(
+                        "text-left p-4 border transition-all flex gap-3 items-start",
+                        isPublic === val ? "border-[#1a1a1a] bg-[#1a1a1a]" : "border-black/10 bg-[#faf7f2] hover:border-black/30"
+                      )}
+                    >
+                      <Icon className={cn("h-4 w-4 mt-0.5 flex-shrink-0", isPublic === val ? "text-white/60" : "text-black/30")} />
+                      <div>
+                        <div className={cn("text-sm font-bold", isPublic === val ? "text-white" : "text-black")}>{label}</div>
+                        <div className={cn("text-[12px] mt-0.5 leading-snug", isPublic === val ? "text-white/40" : "text-black/40")}>{desc}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* CTA band */}
+          <div className="bg-green-600 hover:bg-green-700 transition-colors">
+            <div className={W}>
+              <button
+                onClick={goForward}
+                disabled={!hasValidDetails}
+                className="w-full py-5 text-white font-black text-[15px] tracking-wide disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {hasValidDetails ? "Continue to Reviews →" : "Add a title and genre to continue"}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ══════════════════════════════════════════════════════ */}
+      {/* STEP 3                                                 */}
+      {/* ══════════════════════════════════════════════════════ */}
+      {step === 3 && (
+        <>
+          {/* Hero band */}
+          <div className="bg-[#1a0a2e] py-12">
+            <div className={W}>
+              <button onClick={goBack} className="text-xs font-black uppercase tracking-[0.2em] text-white/30 hover:text-white/60 transition-colors mb-6 block">
+                ← Back
+              </button>
+              <p className="text-xs font-black uppercase tracking-[0.25em] text-purple-400/60 mb-3">Step 3 of 3</p>
+              <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight">
+                How many reviews?
+              </h1>
+              <p className="text-base text-white/40 mt-3 font-medium">
+                Each review costs 1 credit. More reviews = stronger signal.
+              </p>
+            </div>
+          </div>
+
+          {/* Slot warning */}
+          {!slotAvailable && (
+            <div className="bg-amber-400">
+              <div className={cn(W, "py-4 flex items-center gap-3")}>
+                <AlertTriangle className="h-4 w-4 text-black flex-shrink-0" />
+                <p className="text-sm font-bold text-black">
+                  Your queue is full · Free accounts get {slotInfo?.maxSlots ?? 1} active slot ·{" "}
+                  <Link href="/pro" className="underline underline-offset-2">Go Pro</Link> for 3 slots
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Counter band */}
+          <div className="bg-white py-12">
+            <div className={W}>
+              {/* Big counter */}
+              <div className="flex items-center justify-center gap-8 mb-10">
+                <button type="button" onClick={() => setReviewCount(c => Math.max(1, c - 1))}
+                  className="h-14 w-14 rounded-full bg-black/5 hover:bg-black/10 text-black text-2xl font-light transition-colors flex items-center justify-center select-none"
+                >−</button>
+                <div className="text-center">
+                  <span className="text-[88px] font-black text-black leading-none tabular-nums">{reviewCount}</span>
+                  <p className="text-sm text-black/40 font-semibold mt-1">{reviewCount === 1 ? "review" : "reviews"}</p>
+                </div>
+                <button type="button" onClick={() => setReviewCount(c => Math.min(10, c + 1))}
+                  className="h-14 w-14 rounded-full bg-black/5 hover:bg-black/10 text-black text-2xl font-light transition-colors flex items-center justify-center select-none"
+                >+</button>
+              </div>
+
+              {/* Quick picks */}
+              <div className="flex justify-center gap-2 mb-10">
+                {[1, 3, 5, 8, 10].map(n => (
+                  <button key={n} type="button" onClick={() => setReviewCount(n)}
+                    className={cn(
+                      "h-9 w-9 rounded-full text-sm font-black transition-all",
+                      reviewCount === n ? "bg-purple-600 text-white" : "bg-black/5 text-black/40 hover:bg-black/10 hover:text-black"
+                    )}
+                  >{n}</button>
+                ))}
+              </div>
+
+              {/* Insight bar */}
+              <div className="bg-[#faf7f2] rounded-2xl p-5 mb-6">
+                <div className="flex gap-1 mb-3">
+                  {REVIEW_BENEFITS.map(b => (
+                    <div key={b.label} className={cn("h-1.5 flex-1 rounded-full transition-all duration-300", reviewCount >= b.min ? "bg-purple-600" : "bg-black/8")} />
+                  ))}
+                </div>
+                <p className="text-sm font-bold text-black">{currentBenefit?.label ?? "Select reviews"}</p>
+                <p className="text-xs text-black/40 mt-0.5">Current insight level</p>
+              </div>
+
+              {/* Credit balance */}
               {isPro ? (
-                <div className="border-t-2 border-black/8 pt-5 flex items-center gap-3">
-                  <Crown className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                  <p className="text-sm font-black text-purple-700">Pro — submit without spending credits</p>
+                <div className="flex items-center gap-2 text-sm font-bold text-purple-600">
+                  <Crown className="h-4 w-4" />
+                  Pro — credits not required
                 </div>
               ) : (
-                <div className="border-t-2 border-black/8 pt-5 flex items-center justify-between">
-                  <div>
-                    <p className="text-[11px] font-black uppercase tracking-wider text-black/30">Available</p>
-                    <p className={`text-3xl font-black tabular-nums ${creditBalance === 0 ? "text-red-500" : "text-black"}`}>{creditBalance}</p>
-                    <p className="text-[11px] text-black/30 font-medium">credits</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-[#faf7f2] rounded-2xl p-5">
+                    <p className="text-xs font-black uppercase tracking-[0.15em] text-black/40 mb-1">You have</p>
+                    <p className={cn("text-4xl font-black tabular-nums", creditBalance === 0 ? "text-red-500" : "text-black")}>{creditBalance}</p>
+                    <p className="text-xs text-black/40 mt-0.5">credits</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[11px] font-black uppercase tracking-wider text-black/30">Will use</p>
-                    <p className={`text-3xl font-black tabular-nums ${!hasEnoughCredits ? "text-red-500" : "text-purple-600"}`}>{reviewCount}</p>
-                    <p className="text-[11px] text-black/30 font-medium">credits</p>
+                  <div className="bg-[#faf7f2] rounded-2xl p-5 text-right">
+                    <p className="text-xs font-black uppercase tracking-[0.15em] text-black/40 mb-1">This costs</p>
+                    <p className={cn("text-4xl font-black tabular-nums", !hasEnoughCredits ? "text-red-500" : "text-purple-600")}>{reviewCount}</p>
+                    <p className="text-xs text-black/40 mt-0.5">credits</p>
                   </div>
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Not enough credits */}
-            {!isPro && !hasEnoughCredits && (
-              <div className="bg-neutral-900 rounded-2xl px-5 py-5 space-y-3">
-                <p className="text-base font-black text-white">
-                  You need {creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}
+          {/* Not enough credits band */}
+          {!isPro && !hasEnoughCredits && (
+            <div className="bg-[#faf7f2] border-t border-black/8 py-8">
+              <div className={cn(W, "space-y-3")}>
+                <p className="font-black text-black text-base">
+                  You need {creditDeficit} more {creditDeficit === 1 ? "credit" : "credits"}.
                 </p>
-                <p className="text-sm text-white/40 font-medium">Pick whichever works for you — earn credits, grab a quick pack, or go Pro for monthly credits + perks.</p>
-                <BuyCreditsButton
-                  variant="card"
-                  className="bg-lime-400 hover:bg-lime-300 text-black"
-                  label="Buy 10 credits — $9.95"
-                />
-                <Link
-                  href="/review"
-                  className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[11px] font-black uppercase tracking-wider border-2 border-white/20 transition-all"
+                <p className="text-sm text-black/50">Earn by reviewing, buy a pack, or go Pro for monthly credits.</p>
+                <BuyCreditsButton variant="card" className="bg-black text-white hover:bg-neutral-800" label="Buy 10 credits — $9.95" />
+                <Link href="/review"
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl border-2 border-black/10 text-black hover:border-purple-400 hover:text-purple-600 text-sm font-bold transition-all"
                 >
                   <Sparkles className="h-4 w-4" />
-                  Earn credits by reviewing
+                  Review a track to earn a credit
                 </Link>
-                <Link
-                  href="/pro"
-                  className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                <Link href="/pro"
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold transition-colors"
                 >
                   <Crown className="h-4 w-4" />
-                  Go Pro — 30 credits/month + priority
+                  Go Pro — 30 credits / month
                 </Link>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Submit */}
-            <Button
-              onClick={handleSubmit}
-              disabled={!hasEnoughCredits || !slotAvailable || isSubmitting}
-              isLoading={isSubmitting}
-              className="w-full bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all h-12 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0"
-            >
-              Submit for Review
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-
-            <div className="text-center">
+          {/* Submit band */}
+          <div className={cn(
+            "transition-colors",
+            hasEnoughCredits && slotAvailable ? "bg-purple-600 hover:bg-purple-700" : "bg-black/10"
+          )}>
+            <div className={W}>
               <button
-                onClick={handleUploadOnly}
-                disabled={isSubmitting}
-                className="text-sm text-black/30 hover:text-purple-600 font-bold underline underline-offset-2 transition-colors"
+                onClick={handleSubmit}
+                disabled={!hasEnoughCredits || !slotAvailable || isSubmitting}
+                className="w-full py-6 text-white font-black text-[16px] tracking-wide disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
               >
-                Upload without reviews
+                {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                {isSubmitting ? "Submitting..." : "Submit for Review →"}
               </button>
             </div>
           </div>
-        )}
-      </div>
+
+          <div className="bg-white py-4 text-center">
+            <button onClick={handleUploadOnly} disabled={isSubmitting}
+              className="text-sm text-black/30 hover:text-black/60 font-medium transition-colors disabled:opacity-40"
+            >
+              Upload without reviews
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

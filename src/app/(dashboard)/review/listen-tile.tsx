@@ -49,7 +49,7 @@ export function ListenTile({ trackId, title, artistName, artworkUrl, reviewsRema
     <button
       onClick={handleClaim}
       disabled={isLocked || loading}
-      className="relative aspect-square rounded-xl overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 disabled:cursor-not-allowed w-full"
+      className="relative aspect-square overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 disabled:cursor-not-allowed w-full"
     >
       {/* Artwork */}
       {artworkUrl ? (
@@ -57,41 +57,41 @@ export function ListenTile({ trackId, title, artistName, artworkUrl, reviewsRema
           src={artworkUrl}
           alt={title}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.06] group-disabled:opacity-40"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.04] group-disabled:opacity-40"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
       ) : (
-        <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
-          <Music className="h-8 w-8 text-white/20" />
+        <div className="w-full h-full bg-[#0f0f18] flex items-center justify-center">
+          <Music className="h-8 w-8 text-white/15" />
         </div>
       )}
 
       {/* Priority badge */}
       {isPriority && (
-        <div className="absolute top-2 left-2 z-10 flex items-center gap-1 bg-purple-600 text-white px-2 py-0.5 rounded-full">
+        <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 bg-purple-600 text-white px-2 py-0.5">
           <Zap className="h-2.5 w-2.5" />
           <span className="text-[9px] font-black uppercase tracking-wider">Priority</span>
         </div>
       )}
 
-      {/* Always-on bottom gradient + info */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent px-3 pt-10 pb-3 transition-opacity duration-200 group-hover:opacity-0">
-        <p className="text-[11px] font-black text-white leading-tight truncate">{title}</p>
-        <p className="text-[10px] text-white/50 truncate mt-0.5">{artistName}</p>
+      {/* Bottom info — always visible, fades on hover */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pt-8 pb-3 group-hover:opacity-0 transition-opacity duration-200">
+        <p className="text-[12px] font-bold text-white leading-tight truncate">{title}</p>
+        <p className="text-[10px] text-white/45 truncate mt-0.5">{artistName}</p>
       </div>
 
       {/* Hover overlay */}
-      <div className="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 group-disabled:opacity-0 transition-opacity duration-200 flex flex-col items-center justify-center gap-2">
+      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 group-disabled:opacity-0 transition-opacity duration-200 flex flex-col items-center justify-center gap-3 px-4">
         {loading ? (
-          <Loader2 className="h-7 w-7 text-white animate-spin" />
+          <Loader2 className="h-6 w-6 text-white animate-spin" />
         ) : error ? (
-          <span className="bg-red-500 text-white font-black text-xs px-4 py-2 rounded-full">Try again</span>
+          <span className="bg-red-500 text-white font-bold text-xs px-4 py-2">Try again</span>
         ) : (
           <>
-            <p className="text-sm font-black text-white text-center px-4 leading-tight">{title}</p>
-            <p className="text-[11px] text-white/60 text-center">{artistName}</p>
-            <span className="mt-1 bg-lime-400 text-black font-black text-[11px] uppercase tracking-wider px-5 py-2 rounded-full">
-              Review it
+            <p className="text-sm font-bold text-white text-center leading-snug line-clamp-2">{title}</p>
+            <p className="text-[11px] text-white/50 text-center">{artistName}</p>
+            <span className="mt-1 bg-white text-black font-black text-[11px] uppercase tracking-wider px-5 py-2">
+              Review →
             </span>
           </>
         )}
@@ -99,8 +99,8 @@ export function ListenTile({ trackId, title, artistName, artworkUrl, reviewsRema
 
       {/* Locked state */}
       {isLocked && (
-        <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-          <span className="text-white/40 text-[10px] font-black uppercase tracking-wider">Daily limit</span>
+        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+          <span className="text-white/30 text-[10px] font-black uppercase tracking-wider">Daily limit</span>
         </div>
       )}
     </button>
