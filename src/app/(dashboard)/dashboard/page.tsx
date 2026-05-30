@@ -481,6 +481,14 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
       {/* ── TRACK OF THE DAY — compact card ─────────────────── */}
       <DashboardWinner compact />
 
+      {/* ── DISCOVER LINK ────────────────────────────────────── */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+        <p className="text-xs text-black/30 font-medium">Want to explore what others are making?</p>
+        <Link href="/discover" className="text-xs font-black text-black/40 hover:text-black transition-colors">
+          Discover →
+        </Link>
+      </div>
+
       {/* ── YOUR NEXT MOVE — color-blocked CTA strip ────────── */}
       {whatsNext && (
         <div

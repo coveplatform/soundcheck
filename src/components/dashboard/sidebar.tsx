@@ -18,7 +18,6 @@ import {
   LifeBuoy,
   BarChart3,
   ArrowRight,
-  Compass,
   Zap,
 } from "lucide-react";
 
@@ -35,7 +34,6 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
 
   const mainLinks = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
-    { href: "/discover", label: "Discover", icon: Compass },
     { href: "/tracks", label: "My Tracks", icon: Music },
     { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
   ];
@@ -328,7 +326,6 @@ function MobileBottomNav({
 
   const moreLinks = [
     { href: "/breakthrough", label: "Breakthrough", icon: Zap },
-    { href: "/discover", label: "Discover", icon: Compass },
     { href: "/review/history", label: "Review History", icon: History },
     { href: "/support", label: "Support", icon: LifeBuoy },
     { href: "/account", label: "Settings", icon: Settings },
