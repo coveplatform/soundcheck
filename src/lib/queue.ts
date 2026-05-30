@@ -258,32 +258,21 @@ export async function getEligiblePeerReviewers(
   const track = await db.track.findUnique({
     where: { id: trackId },
     include: {
-      Genre: true,
       ArtistProfile: { select: { id: true, userId: true } },
     },
   });
 
   if (!track) return [];
 
-  const trackGenreIds = track.Genre.map((g) => g.id);
-  const genreIds = await expandGenresForMatchingWithDb(db, trackGenreIds);
-
   // Find artist profiles that:
   // 1. Have completed onboarding
-  // 2. Have matching review genres
-  // 3. Are NOT the track owner
-  // 4. Haven't already reviewed this track
+  // 2. Are NOT the track owner
+  // 3. Haven't already reviewed this track
   const peerReviewers = await db.artistProfile.findMany({
     where: {
       completedOnboarding: true,
       // Exclude the track owner
       id: { not: track.ArtistProfile.id },
-      // Must have matching review genres
-      Genre_ArtistReviewGenres: {
-        some: {
-          id: { in: genreIds },
-        },
-      },
       // Exclude if already assigned as peer reviewer for this track
       Review: {
         none: {
@@ -295,7 +284,6 @@ export async function getEligiblePeerReviewers(
           trackId: track.id,
         },
       },
-      User: {},
     },
     include: {
       Genre_ArtistReviewGenres: true,
