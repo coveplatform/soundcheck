@@ -169,6 +169,34 @@ export default async function AdminPage() {
         <p className="text-sm text-neutral-500 mt-1">Platform health at a glance</p>
       </div>
 
+      {/* A/B Test Demo Banner */}
+      <Link
+        href="/admin/ab-test-demo"
+        className="block rounded-xl border-2 border-black bg-gradient-to-br from-neutral-900 to-neutral-800 p-6 hover:shadow-lg transition-all relative overflow-hidden group"
+      >
+        <div className="absolute top-0 right-0 bg-yellow-300 text-black text-[10px] font-black px-3 py-1.5 rounded-bl-xl tracking-wider">
+          CONCEPT
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 rounded-xl bg-white/10 border-2 border-white/20 flex items-center justify-center flex-shrink-0">
+            <div className="flex items-center gap-1 font-black text-white text-lg">
+              <span>A</span>
+              <span className="text-white/30 text-sm">/</span>
+              <span className="text-purple-400">B</span>
+            </div>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-black text-white mb-1">A/B Test Results — Demo</h3>
+            <p className="text-sm text-white/60 font-medium">Preview how two-version comparisons would look for artists</p>
+          </div>
+          <div className="hidden sm:block text-white/40 group-hover:translate-x-1 transition-transform">
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </div>
+        </div>
+      </Link>
+
       {/* Release Decision Demo Banner */}
       <Link
         href="/admin/release-decision-demo"
