@@ -487,11 +487,18 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
             )}
           </div>
         )}
-        <Link href="/review">
-          <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-12 rounded-xl">
-            Review another track
-          </Button>
-        </Link>
+        <div className="space-y-3">
+          <Link href="/review">
+            <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-12 rounded-xl">
+              Review another track
+            </Button>
+          </Link>
+          {isPeer && (
+            <Link href="/submit" className="flex items-center justify-center gap-2 w-full h-11 rounded-xl border-2 border-black/10 bg-white hover:border-purple-300 hover:bg-purple-50 text-sm font-bold text-black/60 hover:text-purple-700 transition-all">
+              Got a track of your own? Submit it →
+            </Link>
+          )}
+        </div>
       </div>
     );
   }

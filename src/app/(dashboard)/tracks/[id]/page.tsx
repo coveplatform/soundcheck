@@ -11,6 +11,7 @@ import { TrackDashboardTabs } from "@/components/tracks/track-dashboard-tabs";
 import { StatsTab } from "@/components/tracks/stats-tab";
 import { ReviewsTab } from "@/components/tracks/reviews-tab";
 import { SettingsTab } from "@/components/tracks/settings-tab";
+import { ABTestTab } from "@/components/tracks/ab-test-tab";
 import {
   ArrowLeft,
   ArrowRight,
@@ -61,6 +62,34 @@ export default async function TrackDetailPage({
             },
           },
           orderBy: { createdAt: "asc" },
+        },
+        // AB test secondary track with its reviews
+        other_Track: {
+          include: {
+            Review: {
+              where: { status: "COMPLETED" },
+              select: {
+                id: true,
+                abTestPreference: true,
+                abTestComment: true,
+                productionScore: true,
+                originalityScore: true,
+                vocalScore: true,
+                firstImpression: true,
+                wouldListenAgain: true,
+                lowEndClarity: true,
+                vocalClarity: true,
+                highEndQuality: true,
+                stereoWidth: true,
+                dynamics: true,
+                tooRepetitive: true,
+                trackLength: true,
+                bestPart: true,
+                biggestWeaknessSpecific: true,
+                ArtistProfile: { include: { User: { select: { name: true } } } },
+              },
+            },
+          },
         },
       },
     }),
@@ -285,8 +314,9 @@ export default async function TrackDetailPage({
         {completedReviews > 0 ? (
           <>
             <TrackDashboardTabs
-              defaultTab="reviews"
+              defaultTab={track.isAbTest && track.other_Track ? "abtest" : "reviews"}
               trackTitle={track.title}
+              isABTest={!!(track.isAbTest && track.other_Track)}
               statsTab={
                 <StatsTab
                   reviews={track.Review}
@@ -316,22 +346,50 @@ export default async function TrackDetailPage({
                   completedReviewCount={track.Review?.length || 0}
                 />
               }
+              abTestTab={
+                track.isAbTest && track.other_Track ? (
+                  <ABTestTab
+                    titleA={track.title}
+                    titleB={track.other_Track.title}
+                    reviewsA={track.Review}
+                    reviewsB={track.other_Track.Review as any}
+                  />
+                ) : undefined
+              }
             />
 
-            {track.status === "COMPLETED" && hasAvailableSlot && (
-              <div className="mt-10 pt-8 border-t border-black/10 flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="flex-1">
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/25 mb-1">Want more feedback?</p>
-                  <p className="text-sm text-black/50 leading-relaxed">
-                    More ears, more perspectives. Get another round of structured feedback on this track.
-                  </p>
+            {track.status === "COMPLETED" && (
+              <div className="mt-10 pt-8 border-t border-black/10 space-y-4">
+                {hasAvailableSlot && (
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="flex-1">
+                      <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/25 mb-1">Want more feedback on this track?</p>
+                      <p className="text-sm text-black/50 leading-relaxed">
+                        More ears, more perspectives. Get another round of structured feedback.
+                      </p>
+                    </div>
+                    <Link href={`/tracks/${track.id}/request-reviews`} className="flex-shrink-0">
+                      <Button className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-10 px-5 text-xs rounded-xl">
+                        Get another round
+                        <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 py-4 px-5 bg-[#faf7f2] rounded-xl">
+                  <div className="flex-1">
+                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/25 mb-1">Working on something new?</p>
+                    <p className="text-sm text-black/50 leading-relaxed">
+                      Submit your next track and keep the feedback coming.
+                    </p>
+                  </div>
+                  <Link href="/submit" className="flex-shrink-0">
+                    <Button variant="outline" className="w-full sm:w-auto font-black h-10 px-5 text-xs rounded-xl border-2 border-black/15 hover:border-purple-400 hover:text-purple-700 transition-all">
+                      Submit a track
+                      <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                    </Button>
+                  </Link>
                 </div>
-                <Link href={`/tracks/${track.id}/request-reviews`} className="flex-shrink-0">
-                  <Button className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-black border-2 border-black shadow-[3px_3px_0_rgba(0,0,0,1)] hover:shadow-[1px_1px_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all h-10 px-5 text-xs rounded-xl">
-                    Get another round
-                    <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
-                  </Button>
-                </Link>
               </div>
             )}
           </>
