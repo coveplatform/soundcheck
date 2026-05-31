@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
+import { ThemeToggle } from "./theme-toggle";
 import {
   Home,
   Music,
@@ -230,6 +231,8 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
               Settings
             </Link>
 
+            <ThemeToggle />
+
             <button
               type="button"
               onClick={() => signOut({ callbackUrl: "/" })}
@@ -417,6 +420,8 @@ function MobileBottomNav({
                   </Link>
                 );
               })}
+              <div className="my-1 border-t border-neutral-100" />
+              <ThemeToggle className="px-4 py-2.5 text-sm border-l-0 hover:border-transparent hover:bg-neutral-50 hover:text-neutral-700" />
               <div className="my-1 border-t border-neutral-100" />
               <button
                 type="button"

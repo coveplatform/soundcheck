@@ -383,9 +383,9 @@ export default function ChartsPage() {
         )}
       </div>
 
-      {/* ══ RECENT PICKS ══ soft lavender ══════════════════════════ */}
+      {/* ══ RECENT PICKS ══ dark violet (bridges featured → how-it-works) ══ */}
       {recent.length > 0 && (
-        <div style={{ backgroundColor: "#e2d9ff" }} className="py-12">
+        <div style={{ backgroundColor: "#1a1040" }} className="py-12">
           <div className="max-w-3xl mx-auto px-6 sm:px-10">
             <p
               style={{ fontSize: "10px", fontWeight: 900, letterSpacing: "0.35em", textTransform: "uppercase", color: "#9d7fd4", marginBottom: 24 }}
@@ -402,10 +402,10 @@ export default function ChartsPage() {
                   rel="noopener noreferrer"
                   className="recent-pick flex items-center gap-4 group"
                   style={{
-                    backgroundColor: "#fff",
+                    backgroundColor: "rgba(196,179,247,0.06)",
                     borderRadius: 16,
                     padding: "14px 16px",
-                    border: "1px solid rgba(196,179,247,0.25)",
+                    border: "1px solid rgba(196,179,247,0.12)",
                     textDecoration: "none",
                     display: "flex",
                   }}
@@ -413,7 +413,7 @@ export default function ChartsPage() {
                   {/* Artwork */}
                   <div
                     className="flex-shrink-0 relative overflow-hidden"
-                    style={{ width: 52, height: 52, borderRadius: 10, backgroundColor: "#ede8ff" }}
+                    style={{ width: 52, height: 52, borderRadius: 10, backgroundColor: "rgba(196,179,247,0.08)" }}
                   >
                     {(() => {
                       const src = resolveArtwork(pick.artworkUrl, pick.sourceType, pick.sourceUrl);
@@ -430,7 +430,7 @@ export default function ChartsPage() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 flex-wrap">
-                      <p className="font-black truncate" style={{ fontSize: "14px", color: "#2d1b69" }}>
+                      <p className="font-black truncate" style={{ fontSize: "14px", color: "#f0ebff" }}>
                         {pick.title}
                       </p>
                       <p style={{ fontSize: "12px", color: "#9d7fd4", fontWeight: 600, flexShrink: 0 }}>

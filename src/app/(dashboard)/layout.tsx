@@ -1,9 +1,15 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { unstable_cache } from "next/cache";
+import { cookies } from "next/headers";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/dashboard/sidebar";
+import {
+  DashboardThemeProvider,
+  type DashboardTheme,
+} from "@/components/dashboard/theme-provider";
+import { DarkModeBanner } from "@/components/dashboard/dark-mode-banner";
 import { PurchaseSuccessBanner } from "@/components/credits/purchase-success-banner";
 
 // Cache sidebar data per user for 30s to avoid re-fetching on every navigation
@@ -77,6 +83,11 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const cookieStore = await cookies();
+  // Dark is the default now — users only get light if they explicitly chose it.
+  const theme: DashboardTheme =
+    cookieStore.get("mr-theme")?.value === "light" ? "light" : "dark";
+
   const artistProfile = await getSidebarData(session.user.id);
 
   // If no artist profile OR onboarding not completed, show simple layout (for /onboarding page)
@@ -84,9 +95,11 @@ export default async function DashboardLayout({
   // because the field was added after they already onboarded
   if (!artistProfile || (!artistProfile.completedOnboarding && !artistProfile.artistName)) {
     return (
-      <div className="min-h-screen bg-[#faf8f5]">
-        {children}
-      </div>
+      <DashboardThemeProvider initialTheme={theme}>
+        <div className="min-h-screen bg-[#faf8f5]">
+          {children}
+        </div>
+      </DashboardThemeProvider>
     );
   }
 
@@ -94,19 +107,22 @@ export default async function DashboardLayout({
   const credits: number = artistProfile.reviewCredits ?? 0;
 
   return (
-    <div className="min-h-screen bg-[#faf8f5]">
-      <PurchaseSuccessBanner />
-      <Sidebar
-        artistName={artistName}
-        credits={credits}
-        pendingReviews={artistProfile.pendingReviews}
-        isPro={artistProfile.subscriptionStatus === "active"}
-      />
+    <DashboardThemeProvider initialTheme={theme}>
+      <div className="min-h-screen bg-[#faf8f5]">
+        <PurchaseSuccessBanner />
+        <Sidebar
+          artistName={artistName}
+          credits={credits}
+          pendingReviews={artistProfile.pendingReviews}
+          isPro={artistProfile.subscriptionStatus === "active"}
+        />
 
-      {/* Main content with sidebar offset */}
-      <div className="md:pl-64">
-        <main className="pb-24 md:pb-8">{children}</main>
+        {/* Main content with sidebar offset */}
+        <div className="md:pl-64">
+          <DarkModeBanner />
+          <main className="pb-24 md:pb-8">{children}</main>
+        </div>
       </div>
-    </div>
+    </DashboardThemeProvider>
   );
 }

@@ -13,6 +13,12 @@
   --font-mono: var(--font-sans);
 }
 
+/* Dashboard dark mode is class-scoped (a `.dark` wrapper, not the system
+   preference), so re-point the `dark:` variant at that class. This lets us
+   hand-design key components (buttons, cards) with `dark:` utilities while the
+   override layer at the bottom of this file handles the long tail. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Force light mode regardless of system preferences */
 @media (prefers-color-scheme: dark) {
   :root {
@@ -206,4 +212,220 @@ details:not(.details-no-marker)[open] summary::before {
 @keyframes speaker-idle {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-5px); }
+}
+
+/* =========================================================================
+   Dashboard dark mode (scoped)
+   -------------------------------------------------------------------------
+   Applied via a `.dark` class on the dashboard wrapper only (see
+   DashboardThemeProvider). Marketing/auth pages share the same utility
+   classes but never get `.dark`, so they stay light.
+
+   This is a retrofit layer: instead of editing hundreds of hardcoded color
+   classes across 40+ dashboard files, we remap the colors that are actually
+   in use to a dark palette here. These rules are unlayered, so they win over
+   Tailwind's layered utilities by cascade-layer priority.
+
+   Palette (cool-violet-tinted neutrals to tie into the purple brand, with
+   wide tonal steps so stacked sections separate cleanly):
+     page      #0c0b11   surface   #16151d
+     raised    #1f1d28   raised+   #2a2734 / #353240
+     hi text   #f3f2f7   muted     #a3a1ad
+     border    #2b2836  (+ white-alpha hairlines via --color-black flip)
+   ========================================================================= */
+.dark {
+  color-scheme: dark;
+  /* Safety net: elements with no explicit text-color class inherit the body's
+     black --foreground and would be invisible. Default the scope to light. */
+  color: #e4e4e7;
+  /* Every `text/border/bg-black/<alpha>` utility compiles to
+     color-mix(in oklab, var(--color-black) <alpha>%, transparent). Flipping the
+     base to white converts all of them (faint labels, borders, hairlines) to
+     light at their exact opacity in one move — preserving the type hierarchy.
+     Solid `bg-black` CTAs and dark scrims are re-corrected explicitly below. */
+  --color-black: #ffffff;
+}
+
+/* Smooth the flip without animating chart redraws */
+.dark .bg-white,
+.dark [class*="bg-neutral-"],
+.dark [class*="bg-[#fa"] {
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+/* --- Page backgrounds (warm off-whites) --- */
+.dark .bg-\[\#faf8f5\],
+.dark .bg-\[\#faf7f2\],
+.dark .bg-\[\#f7f6f3\],
+.dark .bg-\[\#f7f7f5\] {
+  background-color: #0c0b11;
+}
+
+/* The main scroll container gets an ambient violet aura at the top so the page
+   reads as lit space rather than a flat black void. `min-h-screen` uniquely
+   identifies the page wrapper (the sidebar shares bg-[#faf8f5] but isn't
+   min-h-screen), and `fixed` attachment keeps the glow anchored to the view. */
+.dark .min-h-screen.bg-\[\#faf8f5\],
+.dark .min-h-screen.bg-\[\#faf7f2\] {
+  background-color: #0c0b11;
+  background-image:
+    radial-gradient(75rem 38rem at 50% -10rem, rgba(124, 58, 237, 0.12), transparent 70%),
+    radial-gradient(50rem 30rem at 100% 0%, rgba(168, 85, 247, 0.05), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* --- Surfaces / cards ---
+   Solid AND translucent whites both become opaque dark surfaces. The
+   translucent ones (bg-white/40..95) were card fills designed for a light page;
+   left alone they'd render as muddy grey washes over the dark background.
+   Low-alpha whites (<=/30) are intentional light overlays on already-dark
+   elements and are left untouched. */
+.dark .bg-white,
+.dark .bg-\[\#fff\],
+.dark .bg-\[\#ffffff\],
+.dark .bg-neutral-50,
+.dark .bg-white\/40,
+.dark .bg-white\/55,
+.dark .bg-white\/60,
+.dark .bg-white\/70,
+.dark .bg-white\/75,
+.dark .bg-white\/80,
+.dark .bg-white\/90,
+.dark .bg-white\/95 {
+  background-color: #17161f;
+}
+.dark .bg-neutral-100 { background-color: #1f1d28; }
+.dark .bg-neutral-200 { background-color: #2a2734; }
+.dark .bg-neutral-300 { background-color: #353240; }
+
+/* --- Elevation ---
+   The single biggest fix for "everything is flat": give rounded card surfaces a
+   lit-from-above top edge plus a soft drop shadow so they lift off the page.
+   Scoped to rounded surfaces (rounded-lg and up) to skip full-round pills. The
+   brutalist offset shadows from light mode are invisible on dark, so replacing
+   them here is a clean win. */
+.dark :is(.bg-white, .bg-neutral-50, .bg-white\/55, .bg-white\/60, .bg-white\/70, .bg-white\/80, .bg-white\/90):is(.rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl) {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 10px 28px -14px rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+/* Already-dark fills (black/near-black CTAs and the default button on light
+   pages): keep them dark but give them the violet undertone + a gradient and
+   accent ring so they read as premium, raised elements rather than a flat black
+   block. bg-neutral-800 is split out one step lighter because it's the default
+   button's hover state — it needs to visibly lift on hover. */
+.dark .bg-black,
+.dark .bg-neutral-950,
+.dark .bg-neutral-900,
+.dark .bg-\[\#1a1a1a\],
+.dark .bg-\[\#0d0d0d\] {
+  background-color: #211e2b;
+  background-image: linear-gradient(160deg, #272336 0%, #1c1928 100%);
+}
+.dark .bg-neutral-800 {
+  background-color: #312c42;
+  background-image: linear-gradient(160deg, #38324b 0%, #2a2638 100%);
+}
+.dark :is(.bg-black, .bg-neutral-900, .bg-neutral-950, .bg-\[\#1a1a1a\], .bg-\[\#0d0d0d\]):is(.rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl) {
+  box-shadow:
+    inset 0 1px 0 0 rgba(196, 181, 253, 0.1),
+    0 12px 32px -16px rgba(0, 0, 0, 0.8);
+}
+
+/* Light green "success" tint */
+.dark .bg-\[\#f0f9e8\] { background-color: #14241a; }
+
+/* --- Text (slightly cool to match the violet neutrals) --- */
+.dark .text-black,
+.dark .text-neutral-950,
+.dark .text-neutral-900 { color: #f3f2f7; }
+.dark .text-neutral-800,
+.dark .text-neutral-700 { color: #e3e1ea; }
+.dark .text-neutral-600 { color: #c3c1cd; }
+.dark .text-neutral-500 { color: #a3a1ad; }
+.dark .text-neutral-400 { color: #8c8a97; }
+.dark .text-neutral-300 { color: #777481; }
+
+/* --- Borders (violet-tinted hairlines for crisp section separation) --- */
+.dark .border-neutral-100,
+.dark .border-neutral-200 { border-color: #2b2836; }
+.dark .border-neutral-300 { border-color: #383442; }
+.dark .border-neutral-400,
+.dark .border-neutral-500,
+.dark .border-neutral-600,
+.dark .border-neutral-700,
+.dark .border-neutral-800 { border-color: #383442; }
+.dark .border-black,
+.dark .border-\[\#1a1a1a\] { border-color: rgba(255, 255, 255, 0.12); }
+
+/* --- Scrims: high-opacity black backgrounds are modal backdrops / image
+   overlays and must stay dark (the --color-black flip would make them white).
+   Low-opacity black fills (<=/15) correctly become light card tints. --- */
+.dark .bg-black\/20 { background-color: rgba(0, 0, 0, 0.2); }
+.dark .bg-black\/30 { background-color: rgba(0, 0, 0, 0.35); }
+.dark .bg-black\/40 { background-color: rgba(0, 0, 0, 0.45); }
+.dark .bg-black\/50 { background-color: rgba(0, 0, 0, 0.55); }
+.dark .bg-black\/60 { background-color: rgba(0, 0, 0, 0.6); }
+.dark .bg-black\/70 { background-color: rgba(0, 0, 0, 0.7); }
+.dark .bg-black\/80 { background-color: rgba(0, 0, 0, 0.8); }
+.dark .bg-black\/90 { background-color: rgba(0, 0, 0, 0.9); }
+
+/* --- Purple chips/tints that were designed for a light background --- */
+.dark .bg-purple-50 { background-color: rgba(168, 85, 247, 0.12); }
+.dark .bg-purple-100 { background-color: rgba(168, 85, 247, 0.18); }
+.dark .text-purple-700 { color: #c4b5fd; }
+.dark .text-purple-900 { color: #ddd0ff; }
+
+/* --- Lime accent: neon (#a3e635 / #84cc16) is too bright on dark, so mute
+   the solid fills and flip the dark-on-lime text to light-on-muted-lime. --- */
+.dark .bg-lime-300,
+.dark .bg-lime-400 { background-color: #869b46; }
+.dark .bg-lime-500,
+.dark .bg-lime-600 { background-color: #687d33; }
+.dark .bg-lime-50 { background-color: rgba(132, 204, 22, 0.12); }
+.dark .bg-lime-100 { background-color: rgba(132, 204, 22, 0.18); }
+
+/* Text that was dark green on a light lime tint -> light enough for dark bg */
+.dark .text-lime-700,
+.dark .text-lime-800,
+.dark .text-lime-900 { color: #c4e08a; }
+/* Bright lime text -> slightly softened so it stops glowing */
+.dark .text-lime-400,
+.dark .text-lime-500,
+.dark .text-lime-600 { color: #a8d65c; }
+
+.dark .border-lime-200,
+.dark .border-lime-300,
+.dark .border-lime-400,
+.dark .border-lime-500,
+.dark .border-lime-600 { border-color: rgba(132, 204, 22, 0.4); }
+
+/* Gradient stops (decorative lime fades) */
+.dark .from-lime-400,
+.dark .from-lime-500 {
+  --tw-gradient-from: #6f8f2a var(--tw-gradient-from-position);
+}
+.dark .to-lime-500 {
+  --tw-gradient-to: #6f8f2a var(--tw-gradient-to-position);
+}
+
+/* --- Hover states --- */
+.dark .hover\:bg-neutral-50:hover { background-color: #1e1e23; }
+.dark .hover\:bg-neutral-100:hover { background-color: #26262d; }
+.dark .hover\:bg-neutral-900:hover { background-color: #2a2a32; }
+.dark .hover\:text-black:hover { color: #f4f4f5; }
+
+/* --- Form controls --- */
+.dark input,
+.dark textarea,
+.dark select {
+  color: #f4f4f5;
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #76767f;
 }
