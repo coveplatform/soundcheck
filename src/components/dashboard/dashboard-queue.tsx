@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Music, ArrowRight } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { QueueTrackPicker } from "@/components/tracks/queue-track-picker";
+import { safeArtwork } from "@/lib/artwork";
 
 interface ActiveTrack {
   id: string;
@@ -60,12 +61,13 @@ export function DashboardQueue({ activeTracks, eligibleTracks, maxSlots, isPro, 
             const reviewProgress = hasReviews ? track.reviewsCompleted / track.reviewsRequested : 0;
             const isDone = reviewProgress >= 1;
 
+            const art = safeArtwork(track.artworkUrl);
             return (
               <Link key={track.id} href={`/tracks/${track.id}`} className="group block">
                 <div className="relative aspect-square rounded-2xl overflow-hidden border-2 border-black/8 group-hover:border-black/20 transition-all duration-150 shadow-sm">
-                  {track.artworkUrl ? (
+                  {art ? (
                     <Image
-                      src={track.artworkUrl}
+                      src={art}
                       alt={track.title}
                       fill
                       className="object-cover group-hover:scale-[1.03] transition-transform duration-200"

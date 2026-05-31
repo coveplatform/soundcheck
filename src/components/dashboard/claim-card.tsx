@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowRight, Loader2, Music } from "lucide-react";
+import { safeArtwork } from "@/lib/artwork";
 
 interface ClaimCardProps {
   trackId: string;
@@ -16,6 +17,7 @@ export function ClaimCard({ trackId, title, artistName, artworkUrl }: ClaimCardP
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const art = safeArtwork(artworkUrl);
 
   const handleClaim = async () => {
     if (loading) return;
@@ -54,9 +56,9 @@ export function ClaimCard({ trackId, title, artistName, artworkUrl }: ClaimCardP
       >
         {/* Square artwork */}
         <div className="relative aspect-square bg-neutral-100">
-          {artworkUrl ? (
+          {art ? (
             <Image
-              src={artworkUrl}
+              src={art}
               alt={title}
               fill
               className="object-cover"
@@ -65,6 +67,14 @@ export function ClaimCard({ trackId, title, artistName, artworkUrl }: ClaimCardP
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Music className="h-8 w-8 text-neutral-400" />
+            </div>
+          )}
+
+          {/* Claiming overlay — unmistakable feedback on click */}
+          {loading && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-purple-700/85 backdrop-blur-[2px]">
+              <Loader2 className="h-6 w-6 text-white animate-spin" />
+              <span className="text-[11px] font-black uppercase tracking-wider text-white">Claiming…</span>
             </div>
           )}
         </div>
