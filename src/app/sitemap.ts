@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { posts } from "@/lib/blog-posts";
 import { genrePages } from "@/lib/genre-pages";
+import { alternativePages } from "@/lib/alternatives";
 
 const BASE_URL = "https://mixreflect.com";
 
@@ -31,5 +32,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...blogRoutes, ...genreRoutes];
+  const alternativeRoutes: MetadataRoute.Sitemap = alternativePages.map((page) => ({
+    url: `${BASE_URL}/alternatives/${page.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...blogRoutes, ...genreRoutes, ...alternativeRoutes];
 }

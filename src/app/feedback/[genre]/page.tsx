@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight, CheckCircle2, Users, Zap, BarChart3 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Users, Zap, BarChart3, ListChecks, Lightbulb } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
 import { Button } from "@/components/ui/button";
 import { SignupLink } from "@/components/landing/signup-link";
 import { getGenrePage, genrePages } from "@/lib/genre-pages";
+import { getGenreDetail } from "@/lib/genre-pages-detail";
 
 export function generateStaticParams() {
   return genrePages.map((p) => ({ genre: p.slug }));
@@ -41,6 +42,8 @@ export default async function GenreFeedbackPage({
   const { genre } = await params;
   const page = getGenrePage(genre);
   if (!page) notFound();
+
+  const detail = getGenreDetail(genre);
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -82,6 +85,20 @@ export default async function GenreFeedbackPage({
     },
   };
 
+  const howToJsonLd = detail
+    ? {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name: `How to know if your ${page.name.toLowerCase()} track is ready to release`,
+        description: `A pre-release checklist for ${page.name.toLowerCase()} artists — the things to verify before you put a track out.`,
+        step: detail.releaseChecklist.map((item, i) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          name: item,
+        })),
+      }
+    : null;
+
   const steps = [
     {
       icon: <Zap className="h-5 w-5 text-purple-400" />,
@@ -117,6 +134,12 @@ export default async function GenreFeedbackPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppJsonLd) }}
       />
+      {howToJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+        />
+      )}
 
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#faf8f5]/90 backdrop-blur-sm border-b border-neutral-100">
@@ -222,6 +245,53 @@ export default async function GenreFeedbackPage({
           </div>
         </div>
       </section>
+
+      {/* Pre-release checklist + pro tip */}
+      {detail && (
+        <section className="py-14 sm:py-16 bg-white">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="grid lg:grid-cols-5 gap-10">
+              {/* Checklist */}
+              <div className="lg:col-span-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <ListChecks className="h-5 w-5 text-purple-500" />
+                  <h2 className="text-2xl sm:text-3xl font-black text-neutral-950">
+                    {page.name} pre-release checklist
+                  </h2>
+                </div>
+                <p className="text-neutral-500 mb-6 leading-relaxed">
+                  Before you release a {page.name.toLowerCase()} track, these are the things worth verifying. If you can&apos;t confidently check them yourself after dozens of listens, that&apos;s exactly what genre-matched feedback is for.
+                </p>
+                <ol className="space-y-3">
+                  {detail.releaseChecklist.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                        {i + 1}
+                      </span>
+                      <span className="text-neutral-700 leading-relaxed">{item}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              {/* Pro tip */}
+              <div className="lg:col-span-2">
+                <div className="bg-gradient-to-br from-purple-50 to-[#faf8f5] border border-purple-100 rounded-2xl p-6 h-full">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Lightbulb className="h-5 w-5 text-purple-500" />
+                    <h3 className="font-black text-neutral-950 uppercase text-xs tracking-widest">
+                      The one thing that helps most
+                    </h3>
+                  </div>
+                  <p className="text-neutral-700 leading-relaxed text-[15px]">
+                    {detail.proTip}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* The honest feedback problem */}
       <section className="py-14 sm:py-16 bg-neutral-950 text-white">
