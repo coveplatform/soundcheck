@@ -20,6 +20,135 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "what-playlist-curators-look-for",
+    title: "What Playlist Curators Actually Look For (And Why Most Tracks Get Rejected)",
+    coverImage: "/blog/blog7.jpg",
+    excerpt:
+      "Curators reject over 90% of submissions without explanation. Here's what they're actually evaluating — and what disqualifies most tracks before the second verse.",
+    category: "INDUSTRY",
+    date: "May 31, 2026",
+    readTime: "5 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "The rejection rate on SubmitHub hovers around 90% for most independent artists. What almost nobody tells you is the specific criteria being applied — because curators don't publish them. But the patterns are consistent enough that you can work backwards from rejections and figure out exactly what's happening.",
+      },
+      {
+        type: "paragraph",
+        text: "Knowing what curators look for doesn't guarantee placement. But it changes the calculus on when to submit — and what your track needs to clear before you spend credits on a pitch that was never going to land.",
+      },
+      {
+        type: "h2",
+        text: "The first 20 seconds",
+      },
+      {
+        type: "paragraph",
+        text: "Most playlist curators make their decision in the first 20 seconds. Not because they're lazy — because that's genuinely how fast a listener who doesn't know you decides whether to stay or skip. The intro needs to establish something: a mood, a hook, an energy level, a distinctive element. A 40-second ambient build before anything lands is a skip on a streaming platform, and curators know that.",
+      },
+      {
+        type: "paragraph",
+        text: "The threshold varies by genre. Electronic and hip-hop intros are judged harshly on speed-to-hook. Singer-songwriter and acoustic tracks have slightly more runway, but even then there's an invisible clock ticking on how long a curator will wait before moving on.",
+      },
+      {
+        type: "h2",
+        text: "Production quality relative to the playlist",
+      },
+      {
+        type: "quote",
+        text: "Curators are protecting a sound. Your track needs to fit into their playlist without the listener noticing the seam.",
+      },
+      {
+        type: "paragraph",
+        text: "Every playlist has a production standard — implicit, but consistent. An indie chill playlist featuring polished bedroom-pop isn't going to include a track where the low end is muddy, the vocals are buried, or the master sounds quiet compared to everything around it. The track needs to sound like it belongs, not like it's aspiring to belong.",
+      },
+      {
+        type: "paragraph",
+        text: "This isn't about needing a major-label budget. Many curators specifically prefer the lo-fi or DIY aesthetic. The standard is internal consistency with the playlist's existing sound — which means knowing which playlists actually match your production level before you start submitting.",
+      },
+      {
+        type: "h2",
+        text: "Genre fit and context",
+      },
+      {
+        type: "paragraph",
+        text: "The clearest disqualifier artists consistently underestimate is genre mismatch. Curators receive a high volume of submissions that are adjacent to their playlist's genre but don't actually fit. Submitting a cinematic hip-hop track to a straight-up trap playlist, or an indie folk track to an acoustic pop playlist, wastes credits and often earns you a permanent 'not a fit' from that curator.",
+      },
+      {
+        type: "paragraph",
+        text: "Do the work before submitting: listen to 5–10 tracks on the playlist and ask whether your track would sit naturally between them. Not adjacent to them — between them. If the energy, tempo, production style, or mood breaks the flow, it will break it for the curator too.",
+      },
+      {
+        type: "h2",
+        text: "The flow criterion most artists miss",
+      },
+      {
+        type: "paragraph",
+        text: "Even if your track passes on production quality and genre fit, there's a third check that's rarely discussed: how does it flow into and out of other tracks on the playlist? Curators building a cohesive listening experience are thinking about energy arc across the whole playlist, not just whether any individual track is good.",
+      },
+      {
+        type: "paragraph",
+        text: "A track that's excellent in isolation but shifts the energy too abruptly — too loud, too soft, too different in tempo — won't make the cut even if everything else is right. This is harder to control for without knowing the specific playlist intimately. But it explains why a track you think is perfectly positioned still doesn't land.",
+      },
+      {
+        type: "quote",
+        text: "The question isn't just 'is this a good track.' It's 'does this track belong in this specific playlist right now.'",
+      },
+      {
+        type: "h2",
+        text: "What gets you rejected before the second verse",
+      },
+      {
+        type: "list",
+        items: [
+          "Intro runs longer than 25–30 seconds before anything interesting happens",
+          "Vocals or lead element buried in the mix — doesn't cut through clearly",
+          "Production sounds demo-quality compared to the playlist's existing tracks",
+          "Track length is out of range for the genre (8-minute electronic track for a background chill playlist)",
+          "Obvious distortion, clipping, or technical issues anywhere in the audio",
+          "Link is dead, private, or requires a follow to listen",
+        ],
+      },
+      {
+        type: "h2",
+        text: "The prep that actually changes your odds",
+      },
+      {
+        type: "paragraph",
+        text: "The artists who consistently get placed don't submit cold. They run a quality check before pitching — making sure the track has cleared the production standard, the intro lands fast, and the mix sits where it needs to. That check is the step most artists skip because it requires honest feedback, not just a gut feeling after 300 listens.",
+      },
+      {
+        type: "paragraph",
+        text: "After producing a track you can no longer hear it the way a first-time listener does. You know what the intro is building to, so it doesn't feel slow. You know the vocals are there, so the burial in the mix doesn't register. A curator hears it cold. What they experience in the first 20 seconds is exactly what a new listener gets — no context, no forgiveness.",
+      },
+      {
+        type: "paragraph",
+        text: "MixReflect is built for this gap. Upload a track before you release it and genre-matched artists fill out a structured review independently — covering first impression, production quality, what's working, and what to fix. When multiple reviewers flag the same thing, you know it's real. When they don't, the track is ready to pitch.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "What do playlist curators look for?",
+            a: "Curators evaluate four main things: the first 20–30 seconds (does it hook them?), production quality relative to the playlist's existing sound, genre and mood fit, and whether the track flows naturally between other tracks on the playlist. Most rejections come down to one of these — often the intro taking too long to establish something interesting, or production that sounds under-polished compared to what's already on the playlist.",
+          },
+          {
+            q: "Why do playlist curators reject tracks?",
+            a: "The most common reasons are intro too long before the hook, production quality below the playlist's standard, genre mismatch, or the track not fitting the energy flow of the playlist. Many rejections have nothing to do with the quality of the song itself — they're about fit. A great track submitted to the wrong playlist will get rejected every time.",
+          },
+          {
+            q: "How do I get my music on a Spotify playlist?",
+            a: "For editorial playlists: use Spotify for Artists to pitch tracks at least 7 days before release. For independent playlists: use SubmitHub or direct outreach. Before either, make sure your track has cleared a quality check — listen to 5 tracks on the playlist and ask whether yours would sit naturally between them in terms of production quality, energy, and mood. Get structured feedback from other listeners first if you haven't already.",
+          },
+          {
+            q: "How can I improve my odds of playlist placement?",
+            a: "The single biggest lever is submitting a track that's already been through structured feedback and has no obvious weak points a first-time listener would catch. The intro needs to land within 20 seconds, the mix needs to match the playlist's production level, and the genre needs to actually fit — not just be adjacent. Using MixReflect before submitting gives you genre-matched listeners who'll flag any issues before you spend credits on a cold pitch.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-to-know-if-your-song-is-ready-to-release",
     title: "How to Know If Your Song Is Ready to Release",
     coverImage: "/blog/blog4.jpg",

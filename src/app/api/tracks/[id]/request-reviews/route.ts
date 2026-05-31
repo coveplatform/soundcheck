@@ -2,14 +2,23 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { revalidateTag } from "next/cache";
+import { TrackStatus } from "@prisma/client";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { assignReviewersToTrack } from "@/lib/queue";
 import { hasAvailableSlot, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
+import { detectSource } from "@/lib/metadata";
 
 const requestSchema = z.object({
   desiredReviews: z.number().int().min(1).max(10),
+  // Optional: attach a new secondary track to turn this into a Compare pair
+  compareSecondary: z.object({
+    sourceUrl: z.string().min(1),
+    sourceType: z.enum(["SOUNDCLOUD", "BANDCAMP", "YOUTUBE", "UPLOAD"]).optional(),
+    title: z.string().min(1).max(200),
+    artworkUrl: z.string().url().optional().nullable(),
+  }).optional(),
 });
 
 export async function POST(
@@ -38,6 +47,7 @@ export async function POST(
           }
         },
         Review: { select: { id: true } },
+        Genre: { select: { id: true } },
         // Secondary AB track — queued alongside the primary at no extra credit cost
         other_Track: { select: { id: true, status: true, reviewsRequested: true, Review: { select: { id: true } } } },
       },
@@ -86,7 +96,28 @@ export async function POST(
     }
 
     const desired = data.desiredReviews;
-    const isABPrimary = track.isAbTest && !!track.other_Track;
+
+    // Determine if this request is creating a new Compare pair from an existing single track
+    const isNewCompare = !!data.compareSecondary && !track.isAbTest;
+
+    // Validate Version B source type if creating a new compare pair
+    let secondarySourceType: string | null = null;
+    if (isNewCompare && data.compareSecondary) {
+      const sec = data.compareSecondary;
+      if (sec.sourceType === "UPLOAD") {
+        secondarySourceType = "UPLOAD";
+      } else {
+        secondarySourceType = sec.sourceType ?? detectSource(sec.sourceUrl);
+        if (!secondarySourceType) {
+          return NextResponse.json(
+            { error: "Invalid Version B URL. Use SoundCloud, Bandcamp, or YouTube" },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
+    const isABPrimary = (track.isAbTest && !!track.other_Track) || isNewCompare;
     // A/B test costs 2 credits per reviewer — each reviewer listens to both tracks
     const cost = isABPrimary ? desired * 2 : desired;
 
@@ -103,10 +134,11 @@ export async function POST(
     const newReviewsRequested = currentReviewsRequested + desired;
     const newStatus = hasExistingReviews ? "IN_PROGRESS" : "QUEUED";
 
-    const secondaryTrack = track.other_Track ?? null;
+    const existingSecondaryTrack = track.other_Track ?? null;
 
-    await prisma.$transaction([
-      prisma.artistProfile.updateMany({
+    await prisma.$transaction(async (tx) => {
+      // Decrement credits atomically
+      await tx.artistProfile.updateMany({
         where: {
           id: track.artistId,
           reviewCredits: { gte: cost },
@@ -116,8 +148,10 @@ export async function POST(
           totalCreditsSpent: { increment: cost },
           ...(!hasExistingReviews && { totalTracks: { increment: 1 } }),
         },
-      }),
-      prisma.track.update({
+      });
+
+      // Update Track A
+      await tx.track.update({
         where: { id: track.id },
         data: {
           packageType: hasExistingReviews ? track.packageType : "PEER",
@@ -126,22 +160,51 @@ export async function POST(
           status: newStatus,
           paidAt: track.paidAt ?? new Date(),
           completedAt: null,
+          // Mark as AB test when creating a new compare pair
+          ...(isNewCompare && { isAbTest: true }),
         },
-      }),
-      // Mirror reviewsRequested to Track B — no extra credits charged
-      ...(isABPrimary && secondaryTrack ? [
-        prisma.track.update({
-          where: { id: secondaryTrack.id },
+      });
+
+      if (isNewCompare && data.compareSecondary && secondarySourceType) {
+        // Create Track B linked to Track A
+        const sec = data.compareSecondary;
+        await tx.track.create({
+          data: {
+            artistId: track.artistId,
+            sourceUrl: sec.sourceUrl,
+            sourceType: secondarySourceType as any,
+            title: sec.title,
+            artworkUrl: sec.artworkUrl ?? null,
+            feedbackFocus: track.feedbackFocus,
+            feedbackAreas: track.feedbackAreas ?? [],
+            isPublic: false,
+            packageType: "PEER",
+            reviewsRequested: desired,
+            creditsSpent: 0,
+            status: TrackStatus.QUEUED,
+            allowPurchase: false,
+            isAbTest: true,
+            abTestPrimaryTrackId: track.id,
+            paidAt: new Date(),
+            ...(track.Genre?.length ? {
+              Genre: { connect: track.Genre.map((g: { id: string }) => ({ id: g.id })) },
+            } : {}),
+          },
+        });
+      } else if (isABPrimary && existingSecondaryTrack) {
+        // Mirror reviewsRequested to existing Track B — no extra credits charged
+        await tx.track.update({
+          where: { id: existingSecondaryTrack.id },
           data: {
             packageType: "PEER",
-            reviewsRequested: (secondaryTrack.reviewsRequested ?? 0) + desired,
-            status: secondaryTrack.Review.length > 0 ? "IN_PROGRESS" : "QUEUED",
+            reviewsRequested: (existingSecondaryTrack.reviewsRequested ?? 0) + desired,
+            status: existingSecondaryTrack.Review.length > 0 ? "IN_PROGRESS" : "QUEUED",
             paidAt: track.paidAt ?? new Date(),
             completedAt: null,
           },
-        }),
-      ] : []),
-    ]);
+        });
+      }
+    });
 
     await assignReviewersToTrack(track.id);
     // Track B doesn't need independent assignment — reviewers are assigned via Track A claim

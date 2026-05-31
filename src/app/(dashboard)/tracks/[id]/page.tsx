@@ -63,31 +63,23 @@ export default async function TrackDetailPage({
           },
           orderBy: { createdAt: "asc" },
         },
-        // AB test secondary track with its reviews
+        // AB test secondary track — full review include so ReviewCarousel works
         other_Track: {
           include: {
             Review: {
               where: { status: "COMPLETED" },
-              select: {
-                id: true,
-                abTestPreference: true,
-                abTestComment: true,
-                productionScore: true,
-                originalityScore: true,
-                vocalScore: true,
-                firstImpression: true,
-                wouldListenAgain: true,
-                lowEndClarity: true,
-                vocalClarity: true,
-                highEndQuality: true,
-                stereoWidth: true,
-                dynamics: true,
-                tooRepetitive: true,
-                trackLength: true,
-                bestPart: true,
-                biggestWeaknessSpecific: true,
-                ArtistProfile: { include: { User: { select: { name: true } } } },
+              include: {
+                ReviewerProfile: {
+                  include: {
+                    User: { select: { name: true } },
+                    Genre: { select: { id: true, name: true } },
+                  },
+                },
+                ArtistProfile: {
+                  include: { User: { select: { name: true } } },
+                },
               },
+              orderBy: { createdAt: "asc" },
             },
           },
         },

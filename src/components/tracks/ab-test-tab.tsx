@@ -121,7 +121,7 @@ export function ABTestTab({ titleA, titleB, reviewsA, reviewsB }: ABTestTabProps
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6 max-w-2xl mx-auto">
 
       {/* Winner hero */}
       {total > 0 && (

@@ -42,13 +42,13 @@ interface TrackStatsViewProps {
   tracks: TrackStat[];
 }
 
-function ScoreBar({ value, max = 10 }: { value: number | null; max?: number }) {
+function ScoreBar({ value, max = 5 }: { value: number | null; max?: number }) {
   if (value === null) return <span className="text-xs text-black/20">—</span>;
   const pct = (value / max) * 100;
   const color =
-    value >= 8 ? "bg-emerald-500" :
-    value >= 6 ? "bg-lime-500" :
-    value >= 4 ? "bg-amber-400" :
+    value >= 4.0 ? "bg-emerald-500" :
+    value >= 3.5 ? "bg-lime-500" :
+    value >= 3.0 ? "bg-amber-400" :
     "bg-red-400";
 
   return (
@@ -64,14 +64,14 @@ function ScoreBar({ value, max = 10 }: { value: number | null; max?: number }) {
 function ScorePill({ label, value }: { label: string; value: number | null }) {
   if (value === null) return null;
   const color =
-    value >= 8 ? "bg-emerald-100 text-emerald-700" :
-    value >= 6 ? "bg-lime-100 text-lime-700" :
-    value >= 4 ? "bg-amber-100 text-amber-700" :
+    value >= 4.0 ? "bg-emerald-100 text-emerald-700" :
+    value >= 3.5 ? "bg-lime-100 text-lime-700" :
+    value >= 3.0 ? "bg-amber-100 text-amber-700" :
     "bg-red-100 text-red-600";
   return (
     <div className={cn("inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-bold", color)}>
       <span className="text-[10px] font-medium opacity-70">{label}</span>
-      {value}/10
+      {value}/5
     </div>
   );
 }
@@ -136,6 +136,7 @@ export function TrackStatsView({ tracks }: TrackStatsViewProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortAsc, setSortAsc] = useState(false);
+  const hasVocalData = tracks.some((t) => t.avgVocal !== null);
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -219,13 +220,13 @@ export function TrackStatsView({ tracks }: TrackStatsViewProps) {
       {/* Track stats table */}
       <div className="bg-white rounded-xl border border-black/5 overflow-hidden">
         {/* Header */}
-        <div className="hidden sm:grid sm:grid-cols-[1fr_80px_60px_100px_100px_100px_80px] gap-3 px-4 py-2.5 bg-neutral-50 border-b border-black/5 text-[10px] font-bold uppercase tracking-[0.15em]">
+        <div className={cn("hidden sm:grid gap-3 px-4 py-2.5 bg-neutral-50 border-b border-black/5 text-[10px] font-bold uppercase tracking-[0.15em]", hasVocalData ? "sm:grid-cols-[1fr_80px_60px_100px_100px_100px_80px]" : "sm:grid-cols-[1fr_80px_60px_100px_100px_80px]")}>
           <SortHeader label="Track"      sortKey="title"       activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
           <SortHeader label="Status"     sortKey="status"      activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
           <SortHeader icon={<MessageSquare className="h-3 w-3" />} sortKey="reviews"    activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
           <SortHeader label="Production" sortKey="production"  activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
           <SortHeader label="Originality" sortKey="originality" activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
-          <SortHeader label="Vocal"      sortKey="vocal"       activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
+          {hasVocalData && <SortHeader label="Vocal" sortKey="vocal" activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />}
           <SortHeader icon={<ThumbsUp className="h-3 w-3" />} sortKey="listenAgain" activeSortKey={sortKey} sortAsc={sortAsc} onSort={handleSort} />
         </div>
 
@@ -240,7 +241,8 @@ export function TrackStatsView({ tracks }: TrackStatsViewProps) {
               <button
                 onClick={() => setExpandedId(isExpanded ? null : track.id)}
                 className={cn(
-                  "w-full text-left px-4 py-3 sm:grid sm:grid-cols-[1fr_80px_60px_100px_100px_100px_80px] gap-3 items-center transition-colors",
+                  "w-full text-left px-4 py-3 sm:grid gap-3 items-center transition-colors",
+                  hasVocalData ? "sm:grid-cols-[1fr_80px_60px_100px_100px_100px_80px]" : "sm:grid-cols-[1fr_80px_60px_100px_100px_80px]",
                   isExpanded ? "bg-purple-50/40" : "hover:bg-purple-50/20",
                   hasReviews && "cursor-pointer"
                 )}
@@ -292,7 +294,7 @@ export function TrackStatsView({ tracks }: TrackStatsViewProps) {
                 {/* Scores */}
                 <div className="hidden sm:block"><ScoreBar value={track.avgProduction} /></div>
                 <div className="hidden sm:block"><ScoreBar value={track.avgOriginality} /></div>
-                <div className="hidden sm:block"><ScoreBar value={track.avgVocal} /></div>
+                {hasVocalData && <div className="hidden sm:block"><ScoreBar value={track.avgVocal} /></div>}
 
                 {/* Would listen again */}
                 <div className="hidden sm:block">

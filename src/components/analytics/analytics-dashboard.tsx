@@ -69,7 +69,7 @@ export function AnalyticsDashboard({
 
       {/* ── HERO — dark, big numbers ───────────────────────── */}
       <div className="bg-[#0d0d0d] px-6 sm:px-8 pt-7 pb-8">
-        <p className="text-[9px] font-black uppercase tracking-[0.55em] text-white/20 mb-8">Insights</p>
+        <p className="text-[9px] font-black uppercase tracking-[0.55em] text-white/50 mb-8">Insights</p>
         <div className="grid grid-cols-3 gap-2">
           <div>
             <p className="text-5xl sm:text-6xl font-black text-white tabular-nums leading-none tracking-tighter">
@@ -77,7 +77,7 @@ export function AnalyticsDashboard({
             </p>
             <Tooltip content="Total number of reviews your tracks have received across all your submissions.">
               <div className="flex items-center gap-1.5 mt-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/25">Reviews</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/55">Reviews</p>
                 <Info className="h-3 w-3 text-white/20" />
               </div>
             </Tooltip>
@@ -92,7 +92,7 @@ export function AnalyticsDashboard({
             </div>
             <Tooltip content="Your average score across all reviews. 4.0+ is strong, 3.0 is about average on this platform.">
               <div className="flex items-center gap-1.5 mt-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/25">Avg Score</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/55">Avg Score</p>
                 <Info className="h-3 w-3 text-white/20" />
               </div>
             </Tooltip>
@@ -107,7 +107,7 @@ export function AnalyticsDashboard({
             </p>
             <Tooltip content="Compares your most recent track's score to your earlier tracks. Green means your music is scoring better over time.">
               <div className="flex items-center gap-1.5 mt-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/25">
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/55">
                   {trendPositive ? "Improving" : trendNegative ? "Dipping" : "Trend"}
                 </p>
                 <Info className="h-3 w-3 text-white/20" />
@@ -130,7 +130,7 @@ export function AnalyticsDashboard({
           </div>
           <Tooltip content="How polished your mix sounds — clarity, balance, and technical execution. 4.0+ is professional quality.">
             <div className="flex items-center gap-1.5 mt-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/40">Production</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-black/65">Production</p>
               <Info className="h-3 w-3 text-black/30" />
             </div>
           </Tooltip>
@@ -146,7 +146,7 @@ export function AnalyticsDashboard({
           </div>
           <Tooltip content="How fresh and distinctive your sound feels to listeners. Higher scores mean reviewers found it unique and memorable.">
             <div className="flex items-center gap-1.5 mt-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">Originality</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/55">Originality</p>
               <Info className="h-3 w-3 text-white/20" />
             </div>
           </Tooltip>
@@ -162,7 +162,7 @@ export function AnalyticsDashboard({
           </div>
           <Tooltip content="How clearly your vocals cut through the mix. A low score means reviewers felt they were too buried. Shown as 0 for instrumentals.">
             <div className="flex items-center gap-1.5 mt-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/50">Vocals</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/70">Vocals</p>
               <Info className="h-3 w-3 text-white/30" />
             </div>
           </Tooltip>
@@ -172,7 +172,7 @@ export function AnalyticsDashboard({
       {/* ── SCORE TREND — only with enough data ───────────── */}
       {trendData.length >= 2 && (
         <div className="bg-[#faf7f2] border-t-2 border-black px-5 sm:px-7 py-7">
-          <p className="text-[9px] font-black uppercase tracking-[0.45em] text-black/30 mb-6">Score Over Time</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.45em] text-black/55 mb-6">Score Over Time</p>
           <ScoreTrendChart data={trendData} />
         </div>
       )}
@@ -180,7 +180,7 @@ export function AnalyticsDashboard({
       {/* ── TRACK LIST ────────────────────────────────────── */}
       {sortedTracks.length > 0 && (
         <div className="bg-[#0d0d0d] border-t-2 border-black px-5 sm:px-7 py-6">
-          <p className="text-[9px] font-black uppercase tracking-[0.45em] text-white/20 mb-5">Tracks Ranked</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.45em] text-white/50 mb-5">Tracks Ranked</p>
           <div>
             {sortedTracks.map((track, i) => (
               <div
