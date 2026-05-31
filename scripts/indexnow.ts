@@ -14,7 +14,7 @@ const urls = [
   ...genrePages.map((p) => `${BASE_URL}/feedback/${p.slug}`),
 ];
 
-async function submit() {
+async function submitIndexNow() {
   const res = await fetch("https://api.indexnow.org/indexnow", {
     method: "POST",
     headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -26,7 +26,7 @@ async function submit() {
     }),
   });
 
-  console.log(`IndexNow → ${res.status} (${urls.length} URLs submitted)`);
+  console.log(`IndexNow (Bing/Yandex) → ${res.status} (${urls.length} URLs submitted)`);
   urls.forEach((u) => console.log(`  ${u}`));
 
   if (!res.ok && res.status !== 202) {
@@ -35,7 +35,11 @@ async function submit() {
   }
 }
 
-submit().catch((err) => {
+// Google deprecated their sitemap ping endpoint in Jan 2024.
+// For Google: submit sitemap.xml once in Search Console, and ensure
+// it's referenced in robots.txt — Google will re-crawl automatically.
+
+submitIndexNow().catch((err) => {
   console.error(err);
   process.exit(1);
 });
