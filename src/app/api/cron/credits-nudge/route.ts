@@ -12,27 +12,38 @@ function isAuthorized(request: Request): boolean {
   return false;
 }
 
-// Free users with 3+ credits and no active submission in 7+ days
+// Free users with any credits whose last login was 1+ days ago
 async function handler(request: Request) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Idle = not logged in for at least 1 day
   const idleThreshold = new Date();
-  idleThreshold.setUTCDate(idleThreshold.getUTCDate() - 7);
+  idleThreshold.setUTCDate(idleThreshold.getUTCDate() - 1);
 
-  // Max one nudge per user per 4 weeks (tracked by updatedAt on profile)
+  // Max one nudge per user per 4 weeks
   const nudgeCooldown = new Date();
   nudgeCooldown.setUTCDate(nudgeCooldown.getUTCDate() - 28);
 
-  const users = await (prisma as any).user.findMany({
+  const users = await prisma.user.findMany({
     where: {
       NOT: { email: { endsWith: "@seed.mixreflect.com" } },
+      // Not logged in for at least 1 day (null = never logged in after tracking started)
+      OR: [
+        { lastActiveAt: { lte: idleThreshold } },
+        { lastActiveAt: null },
+      ],
       ArtistProfile: {
-        completedOnboarding: true,
-        subscriptionStatus: { not: "active" },
-        reviewCredits: { gte: 3 },
-        lastCreditNudgeAt: { OR: [{ equals: null }, { lte: nudgeCooldown }] },
+        is: {
+          completedOnboarding: true,
+          subscriptionStatus: { not: "active" },
+          reviewCredits: { gte: 1 },
+          OR: [
+            { lastCreditNudgeAt: null },
+            { lastCreditNudgeAt: { lte: nudgeCooldown } },
+          ],
+        },
       },
     },
     select: {
@@ -62,23 +73,15 @@ async function handler(request: Request) {
     const profile = user.ArtistProfile;
     if (!profile || !user.email) { skipped++; continue; }
 
-    // Check if they have an active submission (skip if already in queue)
-    const activeSubmission = await (prisma as any).track.findFirst({
+    // Skip if they already have a track actively in the review queue —
+    // nudging someone who's already engaged with the product is unnecessary.
+    const activeSubmission = await prisma.track.findFirst({
       where: {
         artistId: profile.id,
         status: { in: ["QUEUED", "IN_PROGRESS"] },
       },
     });
     if (activeSubmission) { skipped++; continue; }
-
-    // Check idle — no review activity in last 7 days
-    const recentReview = await (prisma as any).review.findFirst({
-      where: {
-        peerReviewerArtistId: profile.id,
-        updatedAt: { gte: idleThreshold },
-      },
-    });
-    if (recentReview) { skipped++; continue; }
 
     const name = profile.artistName || user.name || "there";
     const latestTrack = profile.Track?.[0];
@@ -93,7 +96,7 @@ async function handler(request: Request) {
       });
 
       // Record nudge so we don't spam
-      await (prisma as any).artistProfile.update({
+      await prisma.artistProfile.update({
         where: { id: profile.id },
         data: { lastCreditNudgeAt: new Date() },
       });

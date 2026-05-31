@@ -36,10 +36,16 @@ export function ListenTile({ trackId, title, artistName, artworkUrl, artworkUrlB
       const data = await res.json();
       if (res.ok) {
         router.push(`/review/${data.reviewId}/v2`);
-      } else {
-        setError(true);
-        setLoading(false);
+        return;
       }
+      // Already have an active review — route straight to it rather than
+      // showing a confusing error. They want to review; send them there.
+      if (data.error === "active_review" && data.activeReviewId) {
+        router.push(`/review/${data.activeReviewId}/v2`);
+        return;
+      }
+      setError(true);
+      setLoading(false);
     } catch {
       setError(true);
       setLoading(false);
