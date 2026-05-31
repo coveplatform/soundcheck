@@ -37,11 +37,20 @@ async function handler(request: Request) {
       ArtistProfile: {
         is: {
           completedOnboarding: true,
-          subscriptionStatus: { not: "active" },
-          reviewCredits: { gte: 1 },
+          // null means free — Prisma's { not: "active" } excludes nulls, so
+          // we must check for both null and non-active explicitly.
           OR: [
-            { lastCreditNudgeAt: null },
-            { lastCreditNudgeAt: { lte: nudgeCooldown } },
+            { subscriptionStatus: null },
+            { subscriptionStatus: { not: "active" } },
+          ],
+          reviewCredits: { gte: 1 },
+          AND: [
+            {
+              OR: [
+                { lastCreditNudgeAt: null },
+                { lastCreditNudgeAt: { lte: nudgeCooldown } },
+              ],
+            },
           ],
         },
       },
