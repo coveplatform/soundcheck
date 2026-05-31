@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useState,
   type ReactNode,
 } from "react";
@@ -38,10 +39,22 @@ export function DashboardThemeProvider({
 }) {
   const [theme, setTheme] = useState<DashboardTheme>(initialTheme);
 
+  // Mirror the class to <html> so Radix portals (dialogs, tooltips, dropdowns)
+  // that render to document.body also inherit the dark scope. Clean up on
+  // unmount (e.g. navigating to a non-dashboard page).
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+    return () => root.classList.remove("dark");
+  }, [theme]);
+
   const toggle = useCallback(() => {
     setTheme((prev) => {
       const next = prev === "dark" ? "light" : "dark";
-      // Persist for SSR on subsequent loads (1 year).
       document.cookie = `mr-theme=${next}; path=/; max-age=31536000; samesite=lax`;
       return next;
     });
