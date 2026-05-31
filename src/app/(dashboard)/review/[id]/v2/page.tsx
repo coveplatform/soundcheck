@@ -25,65 +25,15 @@ function countWords(text: string): number {
   return (text.toLowerCase().match(/[a-z0-9']+/g) ?? []).length;
 }
 
-// ── Engagement levels ─────────────────────────────────────────────────────
+// ── Vibe options ──────────────────────────────────────────────────────────
 
-const LEVELS = [
-  { value: 1, label: "Lost it",  color: "#525252", activeBg: "bg-neutral-700", activeBorder: "border-neutral-700", activeText: "text-white" },
-  { value: 2, label: "Meh",      color: "#3b82f6", activeBg: "bg-blue-500",    activeBorder: "border-blue-500",    activeText: "text-white" },
-  { value: 3, label: "Okay",     color: "#f59e0b", activeBg: "bg-amber-400",   activeBorder: "border-amber-400",   activeText: "text-black" },
-  { value: 4, label: "Good",     color: "#10b981", activeBg: "bg-emerald-500", activeBorder: "border-emerald-500", activeText: "text-white" },
-  { value: 5, label: "Hooked",   color: "#9333ea", activeBg: "bg-purple-600",  activeBorder: "border-purple-600",  activeText: "text-white" },
+const VIBES = [
+  { value: 1, label: "Lost it",  sub: "Couldn't stay with it" },
+  { value: 2, label: "Meh",      sub: "Didn't really grab me"  },
+  { value: 3, label: "Decent",   sub: "Solid but not standout"  },
+  { value: 4, label: "Good",     sub: "I enjoyed this"          },
+  { value: 5, label: "Hooked",   sub: "Couldn't stop listening" },
 ] as const;
-
-// ── Engagement chart ──────────────────────────────────────────────────────
-
-function EngagementChart({ curve, duration, skipPoint, mini = false }: {
-  curve: Array<{ seconds: number; level: number }>;
-  duration: number; skipPoint: number | null; mini?: boolean;
-}) {
-  const W = 600; const H = mini ? 40 : 72; const PAD = 4;
-  const maxDur = Math.max(duration, curve[curve.length - 1]?.seconds ?? 1, 1);
-  const toX = (s: number) => PAD + (s / maxDur) * (W - PAD * 2);
-  const toY = (l: number) => H - PAD - ((l - 1) / 4) * (H - PAD * 2);
-  const pts = curve.map(p => [toX(p.seconds), toY(p.level)] as [number, number]);
-  const getColor = (level: number) => LEVELS.find(l => l.value === level)?.color ?? "#9333ea";
-  const segments = pts.length >= 2 ? pts.slice(0, -1).map((p0, i) => {
-    const p1 = pts[i + 1]; const cpx = (p0[0] + p1[0]) / 2;
-    const color = getColor(curve[i].level);
-    return {
-      color,
-      line: `M ${p0[0]},${p0[1]} C ${cpx},${p0[1]} ${cpx},${p1[1]} ${p1[0]},${p1[1]}`,
-      fill: `M ${p0[0]},${H - PAD} L ${p0[0]},${p0[1]} C ${cpx},${p0[1]} ${cpx},${p1[1]} ${p1[0]},${p1[1]} L ${p1[0]},${H - PAD} Z`,
-    };
-  }) : [];
-  const last = pts[pts.length - 1];
-  const currentColor = getColor(curve[curve.length - 1]?.level ?? 3);
-
-  return (
-    <div className="relative" style={{ height: mini ? 40 : 72 }}>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full" preserveAspectRatio="none">
-        {[1,2,3,4,5].map(i => (
-          <line key={i} x1={0} y1={toY(i)} x2={W} y2={toY(i)} stroke="black" strokeOpacity="0.05" strokeWidth="1" />
-        ))}
-        {skipPoint !== null && (
-          <line x1={toX(skipPoint)} y1={0} x2={toX(skipPoint)} y2={H} stroke="#ef4444" strokeWidth="1.5" strokeDasharray="3,2" strokeOpacity="0.6" />
-        )}
-        {segments.map((seg, i) => <path key={`f${i}`} d={seg.fill} fill={seg.color} fillOpacity="0.12" />)}
-        {segments.map((seg, i) => <path key={`l${i}`} d={seg.line} fill="none" stroke={seg.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />)}
-        {pts.length === 1 && last && <circle cx={last[0]} cy={last[1]} r="3" fill={currentColor} />}
-        {!mini && last && segments.length >= 1 && (
-          <>
-            <circle cx={last[0]} cy={last[1]} r="4" fill={currentColor} />
-            <circle cx={last[0]} cy={last[1]} r="4" fill={currentColor} fillOpacity="0.3">
-              <animate attributeName="r" values="4;8;4" dur="1.8s" repeatCount="indefinite" />
-              <animate attributeName="fill-opacity" values="0.3;0;0.3" dur="1.8s" repeatCount="indefinite" />
-            </circle>
-          </>
-        )}
-      </svg>
-    </div>
-  );
-}
 
 // ── Field error ───────────────────────────────────────────────────────────
 
@@ -138,11 +88,8 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
   const [playerSeconds, setPlayerSeconds] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
 
-  // engagement
-  const [engagementLevel, setEngagementLevel] = useState<number | null>(null);
-  const engagementLevelRef = useRef<number | null>(null);
-  const [engagementCurve, setEngagementCurve] = useState<Array<{ seconds: number; level: number }>>([]);
-  const lastSampledSecond = useRef(-2);
+  // vibe — single post-listen rating
+  const [vibeLevel, setVibeLevel] = useState<number | null>(null);
 
   // skip point
   const [skipPoint, setSkipPoint] = useState<number | null>(null);
@@ -219,18 +166,9 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
     finally { heartbeatInFlight.current = false; }
   }, [review, listenTime]);
 
-  const setLevel = useCallback((l: number) => {
-    engagementLevelRef.current = l; setEngagementLevel(l);
-  }, []);
-
   const handleTimeUpdate = useCallback((seconds: number) => {
     setPlayerSeconds(seconds);
     setAudioDuration(prev => Math.max(prev, seconds));
-    if (engagementLevelRef.current === null) return;
-    if (seconds - lastSampledSecond.current >= 0.5) {
-      lastSampledSecond.current = seconds;
-      setEngagementCurve(prev => [...prev, { seconds: Math.round(seconds * 10) / 10, level: engagementLevelRef.current! }]);
-    }
   }, []);
 
   // submit
@@ -280,7 +218,7 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           reviewId: review.id, firstImpression,
-          engagementCurve: engagementCurve.length > 0 ? engagementCurve : undefined,
+          engagementCurve: vibeLevel ? [{ seconds: Math.floor(audioDuration || listenTime), level: vibeLevel }] : undefined,
           productionScore: qualityToScore(qualityLevel),
           vocalScore: isInstrumental ? null : (hasVocalIssue ? 2 : 4),
           originalityScore: firstImpressionScore,
@@ -431,7 +369,6 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
   );
 
   const listenPct = Math.min(100, Math.round((listenTime / MIN_LISTEN_SECONDS) * 100));
-  const currentLevelData = LEVELS.find(l => l.value === engagementLevel) ?? null;
   const bestPartWords = countWords(bestPart);
   const mainFeedbackWords = countWords(biggestWeaknessSpecific);
   const meetsText = bestPartWords >= formConfig.bestMomentMinWords && mainFeedbackWords >= formConfig.mainFeedbackMinWords;
@@ -607,135 +544,89 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
           </div>
         </div>
 
-        {/* Reaction section — cream */}
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 space-y-4 mt-4">
+        {/* Below-player section — cream */}
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 space-y-3 mt-4">
 
-          {/* Engagement buttons */}
+          {/* Listen progress */}
           <div className="bg-white rounded-2xl border border-black/8 p-5">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-sm font-black text-black tracking-tight">How is it landing?</p>
-                <p className="text-xs text-black/40 mt-0.5">Tap to react — change it any time</p>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-black/30" />
+                <p className="text-sm font-bold text-black/50">
+                  {canSubmit ? "Listened enough — rate the overall vibe below" : "Listen for at least 3 minutes"}
+                </p>
               </div>
-              {currentLevelData && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border shrink-0"
-                  style={{ backgroundColor: currentLevelData.color + '18', borderColor: currentLevelData.color + '50' }}>
-                  <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: currentLevelData.color }} />
-                  <span className="text-xs font-black" style={{ color: currentLevelData.color }}>{currentLevelData.label}</span>
-                </div>
-              )}
+              <span className="text-sm font-black text-black/40 tabular-nums">{formatTimestamp(Math.floor(listenTime))} / 3:00</span>
+            </div>
+            <div className="h-2 bg-black/6 w-full rounded-full overflow-hidden">
+              <div className={cn("h-full rounded-full transition-all duration-1000", canSubmit ? "bg-emerald-500" : "bg-purple-500")}
+                style={{ width: `${listenPct}%` }} />
             </div>
 
-            {/* Hint — shown until first tap */}
-            {engagementLevel === null && (
-              <div className="flex items-center gap-2 mb-3 px-0.5">
-                <div className="flex gap-0.5">
-                  {[0, 1, 2].map(i => (
-                    <div key={i} className="w-1 h-1 rounded-full bg-purple-500 animate-bounce"
-                      style={{ animationDelay: `${i * 0.12}s`, animationDuration: "0.8s" }} />
-                  ))}
-                </div>
-                <p className="text-[11px] font-bold text-purple-600">Tap a level below while listening — your curve draws as you react</p>
-              </div>
-            )}
-
-            {/* Level buttons */}
-            <div className="grid grid-cols-5 gap-2">
-              {LEVELS.map(l => {
-                const selected = engagementLevel === l.value;
-                return (
-                  <button key={l.value} type="button" onClick={() => setLevel(l.value)}
-                    className={cn(
-                      "flex flex-col items-center gap-1.5 py-3.5 rounded-xl border-2 font-black text-xs transition-all duration-100 select-none",
-                      selected
-                        ? cn(l.activeBg, l.activeBorder, l.activeText)
-                        : "border-black/8 bg-black/[0.02] text-black/35 hover:border-black/20 hover:bg-black/5 hover:text-black/60"
-                    )}>
-                    <span className="text-base leading-none">{l.value}</span>
-                    <span className="text-[10px] leading-none font-bold">{l.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Reaction trail */}
-            <div className="mt-4">
-              {engagementCurve.length > 1 ? (
-                <>
-                  <div className="flex gap-px overflow-hidden rounded-full" style={{ height: 4 }}>
-                    {(() => {
-                      const step = Math.max(1, Math.floor(engagementCurve.length / 100));
-                      return engagementCurve.filter((_, i) => i % step === 0).map((point, i) => (
-                        <div key={i} className="flex-1 opacity-75"
-                          style={{ backgroundColor: LEVELS.find(lv => lv.value === point.level)?.color ?? '#9333ea' }} />
-                      ));
-                    })()}
-                  </div>
-                  <div className="flex items-center justify-between mt-1.5">
-                    <span className="text-[10px] text-black/25 font-medium">Start</span>
-                    <span className="text-[10px] text-black/25 font-medium">Now</span>
-                  </div>
-                </>
-              ) : (
-                <div className="rounded-full bg-black/6" style={{ height: 4 }} />
-              )}
-            </div>
-
-            {/* Skip point + listen timer */}
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-black/6">
-              {skipPoint === null ? (
-                <button type="button" onClick={() => setSkipPoint(playerSeconds)}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-black/25 hover:text-red-500 transition-colors">
-                  <SkipForward className="h-3.5 w-3.5" />
-                  I&apos;d skip here — {formatTimestamp(playerSeconds)}
-                </button>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-red-500 flex items-center gap-1.5">
+            {/* Skip point */}
+            {canSubmit && (
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-black/6">
+                {skipPoint === null ? (
+                  <button type="button" onClick={() => setSkipPoint(playerSeconds)}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-black/25 hover:text-red-500 transition-colors">
                     <SkipForward className="h-3.5 w-3.5" />
-                    Would skip at {formatTimestamp(skipPoint)}
-                  </span>
-                  <button type="button" onClick={() => setSkipPoint(null)}
-                    className="text-[11px] text-black/25 hover:text-black/50 underline">clear</button>
-                </div>
-              )}
-              <span className="text-xs font-mono text-black/30 shrink-0">{formatTimestamp(Math.floor(listenTime))} listened</span>
-            </div>
-          </div>
-
-          {/* Progress / continue */}
-          <div className="bg-white rounded-2xl border border-black/8 p-5">
-            {!canSubmit ? (
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-black/30" />
-                    <p className="text-sm font-bold text-black/50">Listen for at least 3 minutes to continue</p>
+                    Mark where you&apos;d skip — {formatTimestamp(playerSeconds)}
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-red-500 flex items-center gap-1.5">
+                      <SkipForward className="h-3.5 w-3.5" />
+                      Would skip at {formatTimestamp(skipPoint)}
+                    </span>
+                    <button type="button" onClick={() => setSkipPoint(null)}
+                      className="text-[11px] text-black/25 hover:text-black/50 underline">clear</button>
                   </div>
-                  <span className="text-sm font-black text-black/40 tabular-nums">{formatTimestamp(Math.floor(listenTime))} / 3:00</span>
-                </div>
-                <div className="h-2 bg-black/6 w-full rounded-full overflow-hidden">
-                  <div className="h-full bg-purple-500 rounded-full transition-all duration-1000" style={{ width: `${listenPct}%` }} />
-                </div>
-                <p className="text-xs text-black/30 mt-2 font-medium">{listenPct}% — keep listening</p>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-black text-black tracking-tight">
-                    {engagementCurve.length > 0 ? "Reaction captured" : "Ready to continue"}
-                  </p>
-                  <p className="text-sm text-black/40 mt-0.5">Head to step 2 — about 2 minutes</p>
-                </div>
-                <button type="button"
-                  onClick={() => { setPhase(2); setTimeout(() => window.scrollTo({ top: 0 }), 50); }}
-                  className="shrink-0 inline-flex items-center gap-2 px-6 py-3 bg-[#0d0d0d] text-white font-black rounded-xl hover:bg-black transition-colors text-sm shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]">
-                  Continue
-                  <ArrowRight className="h-4 w-4" />
-                </button>
+                )}
               </div>
             )}
           </div>
+
+          {/* Vibe check — appears after 3 min */}
+          {canSubmit && (
+            <div className="bg-white rounded-2xl border border-black/8 overflow-hidden">
+              <div className="px-5 pt-5 pb-4 border-b border-black/6">
+                <p className="text-sm font-black text-black tracking-tight">Overall, how did it land?</p>
+                <p className="text-xs text-black/40 mt-0.5">One tap — your honest reaction after listening</p>
+              </div>
+              <div className="divide-y divide-black/5">
+                {VIBES.map(v => (
+                  <button key={v.value} type="button" onClick={() => setVibeLevel(v.value)}
+                    className={cn(
+                      "w-full text-left px-5 py-4 flex items-center gap-4 transition-colors",
+                      vibeLevel === v.value ? "bg-[#0d0d0d]" : "hover:bg-black/[0.02]"
+                    )}>
+                    <span className={cn("text-2xl font-black tabular-nums w-6 shrink-0", vibeLevel === v.value ? "text-white" : "text-black/20")}>{v.value}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className={cn("text-sm font-bold", vibeLevel === v.value ? "text-white" : "text-black")}>{v.label}</p>
+                      <p className={cn("text-xs mt-0.5", vibeLevel === v.value ? "text-white/40" : "text-black/35")}>{v.sub}</p>
+                    </div>
+                    {vibeLevel === v.value && <Check className="h-4 w-4 text-white/50 shrink-0" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Continue */}
+          {canSubmit && (
+            <button type="button"
+              onClick={() => { setPhase(2); setTimeout(() => window.scrollTo({ top: 0 }), 50); }}
+              className={cn(
+                "w-full flex items-center justify-center gap-2 py-4 font-black text-sm rounded-2xl transition-all",
+                vibeLevel
+                  ? "bg-[#0d0d0d] text-white hover:bg-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                  : "bg-black/5 text-black/30 cursor-not-allowed"
+              )}
+              disabled={!vibeLevel}
+            >
+              {vibeLevel ? <>Continue to feedback <ArrowRight className="h-4 w-4" /></> : "Pick a vibe above to continue"}
+            </button>
+          )}
         </div>
 
         {Dialogs}
@@ -800,18 +691,21 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
             </div>
           </div>
 
-          {/* Mini curve */}
-          {engagementCurve.length >= 2 && (
-            <div className="mt-4">
-              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-2">Your reaction curve</p>
-              <EngagementChart curve={engagementCurve} duration={audioDuration} skipPoint={skipPoint} mini />
-              {skipPoint !== null && (
-                <p className="text-xs text-red-400 font-bold mt-2 flex items-center gap-1.5">
-                  <SkipForward className="h-3 w-3" /> Would have skipped at {formatTimestamp(skipPoint)}
-                </p>
-              )}
-            </div>
-          )}
+          {/* Vibe + skip summary */}
+          <div className="mt-5 flex items-center gap-4 flex-wrap">
+            {vibeLevel && (
+              <div className="flex items-center gap-2 bg-white/8 border border-white/10 rounded-xl px-4 py-2.5">
+                <span className="text-xl font-black text-white tabular-nums">{vibeLevel}</span>
+                <span className="text-sm font-bold text-white/60">{VIBES.find(v => v.value === vibeLevel)?.label}</span>
+              </div>
+            )}
+            {skipPoint !== null && (
+              <div className="flex items-center gap-1.5 text-xs font-bold text-red-400">
+                <SkipForward className="h-3.5 w-3.5" />
+                Would&apos;ve skipped at {formatTimestamp(skipPoint)}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
