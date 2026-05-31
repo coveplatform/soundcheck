@@ -744,347 +744,309 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
   }
 
   // =========================================================================
-  // PHASE 2 — Your Feedback (reordered)
+  // PHASE 2 — Your Feedback
   // =========================================================================
 
+  const earnedLabel = review.ReviewerProfile
+    ? formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier))
+    : "1 credit";
+
+  const allRequired = canSubmit && meetsText && !!qualityLevel && firstImpressionTouched && wouldListenAgain !== null;
+
+  const QUALITY_OPTIONS = [
+    { id: "PROFESSIONAL",  label: "Professional",  desc: "Ready for commercial release today", dot: "bg-purple-500" },
+    { id: "RELEASE_READY", label: "Release ready",  desc: "Good to go with minor tweaks",       dot: "bg-emerald-500" },
+    { id: "ALMOST_THERE",  label: "Almost there",   desc: "On the right track, needs some work", dot: "bg-amber-400" },
+    { id: "DEMO_STAGE",    label: "Demo stage",     desc: "Good ideas, not quite there yet",     dot: "bg-orange-400" },
+    { id: "NOT_READY",     label: "Needs work",     desc: "Needs significant rethinking",        dot: "bg-red-400" },
+  ];
+
+  const W2 = "max-w-2xl mx-auto px-6 sm:px-10";
+
   return (
-    <div className="min-h-screen bg-[#faf7f2] pb-24">
+    <div className="min-h-screen bg-[#faf7f2]">
       {StickyBar}
 
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-5 space-y-3">
+      {/* Error band */}
+      {error && (
+        <div className="bg-red-500">
+          <div className={cn(W2, "py-3")}>
+            <p className="text-sm font-semibold text-white">{error}</p>
+          </div>
+        </div>
+      )}
 
-        {/* Track recap + curve */}
-        <div className="bg-white rounded-2xl border border-black/8 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl shrink-0 overflow-hidden border border-black/8">
+      {/* ── Dark hero band ─────────────────────────────────── */}
+      <div className="bg-[#0d0d0d]">
+        <div className={cn(W2, "py-10")}>
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-white/30 mb-3">Step 2 of 2</p>
+          <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight tracking-tight">Your feedback.</h1>
+          <p className="text-base text-white/40 mt-3 font-medium">About 2 minutes — goes straight to the artist.</p>
+
+          {/* Track strip */}
+          <div className="mt-6 flex items-center gap-3 bg-white/6 border border-white/8 rounded-xl px-4 py-3">
+            <div className="h-11 w-11 rounded-lg shrink-0 overflow-hidden bg-white/5 flex items-center justify-center">
               {review.Track.artworkUrl
-                ? <img src={review.Track.artworkUrl} alt={review.Track.title} className="w-full h-full object-cover" />
-                : <div className="w-full h-full bg-black/5 flex items-center justify-center"><Music className="h-4 w-4 text-black/20" /></div>
-              }
+                ? <img src={review.Track.artworkUrl} alt={review.Track.title} className="h-full w-full object-cover" />
+                : <Music className="h-5 w-5 text-white/20" />}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-black text-sm text-black truncate tracking-tight">{review.Track.title}</p>
-              <p className="text-[11px] text-black/35">{review.Track.Genre.map(g => g.name).join(", ")}</p>
+              <p className="font-black text-white text-sm tracking-tight truncate">{review.Track.title}</p>
+              <p className="text-[11px] text-white/35">{review.Track.Genre.map(g => g.name).join(", ")}</p>
             </div>
             <div className="text-right shrink-0">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-black/30">Listened</p>
-              <p className="text-sm font-black text-black">{formatTimestamp(Math.floor(listenTime))}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-white/25">Listened</p>
+              <p className="text-sm font-black text-white">{formatTimestamp(Math.floor(listenTime))}</p>
             </div>
           </div>
 
+          {/* Mini curve */}
           {engagementCurve.length >= 2 && (
             <div className="mt-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-2">Your reaction curve</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-2">Your reaction curve</p>
               <EngagementChart curve={engagementCurve} duration={audioDuration} skipPoint={skipPoint} mini />
               {skipPoint !== null && (
-                <p className="text-xs text-red-500 font-bold mt-2 flex items-center gap-1.5">
+                <p className="text-xs text-red-400 font-bold mt-2 flex items-center gap-1.5">
                   <SkipForward className="h-3 w-3" /> Would have skipped at {formatTimestamp(skipPoint)}
                 </p>
               )}
             </div>
           )}
         </div>
+      </div>
 
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/25 px-1 pt-2">About 2 minutes to finish</p>
+      {/* ── White form band ────────────────────────────────── */}
+      <div className="bg-white">
+        <div className={cn(W2, "py-10 space-y-10")}>
 
-        {/* ── 1. Quality verdict — FIRST ─────────────────────────────────── */}
-        <div ref={qualityRef}>
-          <div className={cn("bg-white rounded-2xl border overflow-hidden", errors.qualityLevel ? "border-red-300" : "border-black/8")}>
-            <div className="px-5 pt-5 pb-4 border-b border-black/6">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/35">Quality Verdict</p>
-              <p className="text-sm font-bold text-black mt-1">Where is this track overall?</p>
-              <FieldError message={errors.qualityLevel} />
-            </div>
-            <div className="divide-y divide-black/5">
-              {[
-                { id: "PROFESSIONAL",  label: "Professional",   desc: "Ready for commercial release today", dot: "bg-purple-500" },
-                { id: "RELEASE_READY", label: "Release ready",  desc: "Good to go with minor tweaks",       dot: "bg-emerald-500" },
-                { id: "ALMOST_THERE",  label: "Almost there",   desc: "On the right track, needs some work",dot: "bg-amber-400" },
-                { id: "DEMO_STAGE",    label: "Demo stage",     desc: "Good ideas, not quite there yet",    dot: "bg-orange-400" },
-                { id: "NOT_READY",     label: "Needs work",     desc: "Needs significant rethinking",       dot: "bg-red-400" },
-              ].map(opt => (
-                <button key={opt.id} type="button" onClick={() => {
-                  setQualityLevel(opt.id);
-                  setErrors(p => { const n = { ...p }; delete n.qualityLevel; return n; });
-                }}
-                  className={cn(
-                    "w-full text-left px-5 py-4 flex items-center gap-4 transition-colors",
-                    qualityLevel === opt.id ? "bg-black/[0.03]" : "hover:bg-black/[0.02]"
-                  )}>
-                  <div className={cn("w-2.5 h-2.5 rounded-full shrink-0 transition-all", opt.dot, qualityLevel === opt.id ? "scale-125" : "opacity-40")} />
+          {/* 1 ── Quality verdict */}
+          <div ref={qualityRef}>
+            <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-1">Quality Verdict</label>
+            <p className="text-sm text-black/40 mb-4">Where is this track overall?</p>
+            <FieldError message={errors.qualityLevel} />
+            <div className="mt-3 space-y-2">
+              {QUALITY_OPTIONS.map(opt => (
+                <button key={opt.id} type="button"
+                  onClick={() => { setQualityLevel(opt.id); setErrors(p => { const n = { ...p }; delete n.qualityLevel; return n; }); }}
+                  className={cn("w-full text-left px-5 py-4 border transition-all flex items-center gap-4",
+                    qualityLevel === opt.id ? "border-[#1a1a1a] bg-[#1a1a1a]" : "border-black/10 bg-[#faf7f2] hover:border-black/30")}>
+                  <div className={cn("w-2 h-2 rounded-full shrink-0", opt.dot)} />
                   <div className="flex-1 min-w-0">
-                    <p className={cn("text-sm font-black tracking-tight", qualityLevel === opt.id ? "text-black" : "text-black/60")}>{opt.label}</p>
-                    <p className="text-xs text-black/35 mt-0.5">{opt.desc}</p>
+                    <p className={cn("text-sm font-bold", qualityLevel === opt.id ? "text-white" : "text-black")}>{opt.label}</p>
+                    <p className={cn("text-xs mt-0.5", qualityLevel === opt.id ? "text-white/40" : "text-black/35")}>{opt.desc}</p>
                   </div>
-                  {qualityLevel === opt.id && <Check className="h-4 w-4 text-black/50 shrink-0" />}
+                  {qualityLevel === opt.id && <Check className="h-4 w-4 text-white/50 shrink-0" />}
                 </button>
               ))}
             </div>
           </div>
-        </div>
 
-        {/* ── 2. Quick Take — First impression + Replay merged ───────────── */}
-        <div ref={quickTakeRef}>
-          <div className={cn("bg-white rounded-2xl border overflow-hidden", (errors.firstImpression || errors.wouldListenAgain) ? "border-red-300" : "border-black/8")}>
-            <div className="px-5 pt-5 pb-4 border-b border-black/6">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/35">Quick Take</p>
-              <p className="text-sm font-bold text-black mt-1">How did it land?</p>
-            </div>
+          <div className="border-t border-black/6" />
 
-            {/* First impression */}
-            <div className="px-5 pt-4 pb-5 border-b border-black/6">
-              <p className="text-xs font-bold text-black/50 mb-3">Opening 30 seconds</p>
-              <FieldError message={errors.firstImpression} />
-              <div className="grid grid-cols-5 gap-2 mt-2">
-                {([
-                  { score: 1, label: "Nah" }, { score: 2, label: "Meh" }, { score: 3, label: "Solid" },
-                  { score: 4, label: "Into it" }, { score: 5, label: "Hooked" },
-                ] as const).map(({ score, label }) => {
-                  const selected = firstImpressionTouched && firstImpressionScore === score;
-                  return (
-                    <button key={score} type="button"
-                      onClick={() => {
-                        setFirstImpressionScore(score); setFirstImpressionTouched(true);
-                        setFirstImpression(firstImpressionEnumFromScore(score));
-                        setErrors(p => { const n = { ...p }; delete n.firstImpression; return n; });
-                      }}
-                      className={cn(
-                        "flex flex-col items-center gap-1 py-3 rounded-xl border-2 transition-all duration-100",
-                        selected ? firstImpressionColor(score) : "border-black/8 bg-white text-black/35 hover:border-black/20 hover:text-black/60"
-                      )}>
-                      <span className="text-base font-black leading-none">{score}</span>
-                      <span className="text-[10px] font-bold leading-tight">{label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              {firstImpressionTouched && (
-                <p className={cn("mt-3 text-xs font-semibold px-3 py-2 rounded-lg border", firstImpressionColor(firstImpressionScore))}>
-                  {firstImpressionLabel(firstImpressionScore)}
-                </p>
-              )}
-            </div>
+          {/* 2 ── Quick Take */}
+          <div ref={quickTakeRef}>
+            <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-1">Quick Take</label>
+            <p className="text-sm text-black/40 mb-6">How did the opening hit, and would you replay it?</p>
 
-            {/* Would listen again */}
-            <div className="px-5 pt-4 pb-5">
-              <p className="text-xs font-bold text-black/50 mb-3">Would you come back and listen again?</p>
-              <FieldError message={errors.wouldListenAgain} />
-              <div className="flex gap-2 mt-2">
-                {[{ val: true, label: "Yes, I'd replay it" }, { val: false, label: "Once was enough" }].map(({ val, label }) => (
-                  <button key={String(val)} type="button"
-                    onClick={() => { setWouldListenAgain(val); setErrors(p => { const n = { ...p }; delete n.wouldListenAgain; return n; }); }}
-                    className={cn(
-                      "flex-1 py-3 text-sm font-bold rounded-xl border-2 transition-all duration-100",
-                      wouldListenAgain === val
-                        ? val ? "border-purple-400 bg-purple-50 text-purple-900" : "border-black/20 bg-black/5 text-black/70"
-                        : "border-black/8 bg-white text-black/50 hover:border-black/20"
-                    )}>
-                    {label}
+            <p className="text-xs font-black uppercase tracking-[0.15em] text-black/30 mb-3">Opening 30 seconds</p>
+            <FieldError message={errors.firstImpression} />
+            <div className="grid grid-cols-5 gap-2">
+              {([
+                { score: 1, label: "Nah" }, { score: 2, label: "Meh" }, { score: 3, label: "Solid" },
+                { score: 4, label: "Into it" }, { score: 5, label: "Hooked" },
+              ] as const).map(({ score, label }) => {
+                const sel = firstImpressionTouched && firstImpressionScore === score;
+                return (
+                  <button key={score} type="button"
+                    onClick={() => {
+                      setFirstImpressionScore(score); setFirstImpressionTouched(true);
+                      setFirstImpression(firstImpressionEnumFromScore(score));
+                      setErrors(p => { const n = { ...p }; delete n.firstImpression; return n; });
+                    }}
+                    className={cn("flex flex-col items-center gap-1.5 py-4 border transition-all",
+                      sel ? "border-[#1a1a1a] bg-[#1a1a1a] text-white" : "border-black/10 bg-[#faf7f2] text-black/40 hover:border-black/30 hover:text-black")}>
+                    <span className="text-lg font-black leading-none">{score}</span>
+                    <span className="text-[10px] font-bold leading-none">{label}</span>
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
-          </div>
-        </div>
+            {firstImpressionTouched && (
+              <p className="mt-3 text-sm font-semibold text-black/50">{firstImpressionLabel(firstImpressionScore)}</p>
+            )}
 
-        {/* ── 3. What worked? (Best moment) ──────────────────────────────── */}
-        <div ref={bestPartRef}>
-          <div className={cn("bg-white rounded-2xl border overflow-hidden", errors.bestPart ? "border-red-300" : "border-black/8")}>
-            <div className="px-5 pt-5 pb-4 border-b border-black/6">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/35">What worked?</p>
-              <p className="text-sm font-bold text-black mt-1">{formConfig.bestMomentPrompt}</p>
-              <FieldError message={errors.bestPart} />
-            </div>
-            <div className="px-5 pt-4 pb-5">
-              <textarea
-                value={bestPart}
-                onChange={e => { setBestPart(e.target.value); if (errors.bestPart) setErrors(p => { const n = { ...p }; delete n.bestPart; return n; }); }}
-                rows={4}
-                placeholder="E.g. 'The hook in the chorus hits really well — that melody is genuinely catchy and sits perfectly in the mix.'"
-                className="w-full px-4 py-3 border border-black/10 rounded-xl text-sm font-medium resize-none focus:outline-none focus:border-purple-400 placeholder:text-black/20 transition-colors bg-white"
-              />
-              <WordCount current={bestPartWords} min={formConfig.bestMomentMinWords} />
-            </div>
-          </div>
-        </div>
-
-        {/* ── 4. What's holding it back? (Main feedback) ─────────────────── */}
-        <div ref={mainFeedbackRef}>
-          <div className={cn("bg-white rounded-2xl border overflow-hidden", errors.mainFeedback ? "border-red-300" : "border-black/8")}>
-            <div className="px-5 pt-5 pb-4 border-b border-black/6">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/35">What&apos;s holding it back?</p>
-              <p className="text-sm font-bold text-black mt-1">Mention a moment, a section, or something you&apos;d change.</p>
-              <FieldError message={errors.mainFeedback} />
-            </div>
-            <div className="px-5 pt-4 pb-5">
-              <textarea
-                value={biggestWeaknessSpecific}
-                onChange={e => { setBiggestWeaknessSpecific(e.target.value); if (errors.mainFeedback) setErrors(p => { const n = { ...p }; delete n.mainFeedback; return n; }); }}
-                rows={5}
-                placeholder="E.g. 'The energy drops hard around the middle section and I found myself zoning out. The intro pulls you in well but then it kind of plateaus — maybe the bridge needs something new to bring it back.'"
-                className="w-full px-4 py-3 border border-black/10 rounded-xl text-sm font-medium resize-none focus:outline-none focus:border-purple-400 placeholder:text-black/20 transition-colors bg-white"
-              />
-              <WordCount current={mainFeedbackWords} min={formConfig.mainFeedbackMinWords} />
-            </div>
-          </div>
-        </div>
-
-        {/* ── 5. Technical issues (conditional) ─────────────────────────── */}
-        {formConfig.showTechnicalIssues && (
-          <div className="bg-white rounded-2xl border border-black/8 overflow-hidden">
-            <div className="px-5 pt-5 pb-4 border-b border-black/6">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/35">Technical Issues</p>
-              <p className="text-sm font-bold text-black mt-1">Flag anything — or leave blank if it sounded clean.</p>
-            </div>
-            <div className="px-5 pt-4 pb-5">
-              <div className="flex flex-wrap gap-2">
-                <button type="button"
-                  onClick={() => { setTechnicalIssues([]); setIsInstrumental(false); }}
-                  className={cn("px-3 py-2 text-xs font-bold rounded-xl border-2 transition-all",
-                    technicalIssues.length === 0 && !isInstrumental
-                      ? "border-emerald-400 bg-emerald-50 text-emerald-800"
-                      : "border-black/8 bg-white text-black/50 hover:border-black/20")}>
-                  ✓ All good
+            <p className="text-xs font-black uppercase tracking-[0.15em] text-black/30 mt-7 mb-3">Would you replay it?</p>
+            <FieldError message={errors.wouldListenAgain} />
+            <div className="grid grid-cols-2 gap-2">
+              {[{ val: true, label: "Yes, I'd replay it" }, { val: false, label: "Once was enough" }].map(({ val, label }) => (
+                <button key={String(val)} type="button"
+                  onClick={() => { setWouldListenAgain(val); setErrors(p => { const n = { ...p }; delete n.wouldListenAgain; return n; }); }}
+                  className={cn("py-4 text-sm font-bold border transition-all",
+                    wouldListenAgain === val ? "border-[#1a1a1a] bg-[#1a1a1a] text-white" : "border-black/10 bg-[#faf7f2] text-black/50 hover:border-black/30 hover:text-black")}>
+                  {label}
                 </button>
-                <button type="button"
-                  onClick={() => { setIsInstrumental(p => !p); setTechnicalIssues(p => p.filter(i => i !== "vocals-buried")); }}
-                  className={cn("px-3 py-2 text-xs font-bold rounded-xl border-2 transition-all",
-                    isInstrumental ? "border-blue-400 bg-blue-50 text-blue-800" : "border-black/8 bg-white text-black/50 hover:border-black/20")}>
-                  Instrumental
-                </button>
-                {formConfig.technicalIssueOptions
-                  .filter(issue => !(isInstrumental && issue.id === "vocals-buried"))
-                  .map(issue => (
-                    <button key={issue.id} type="button"
-                      onClick={() => setTechnicalIssues(p => p.includes(issue.id) ? p.filter(i => i !== issue.id) : [...p, issue.id])}
-                      className={cn("px-3 py-2 text-xs font-bold rounded-xl border-2 transition-all",
-                        technicalIssues.includes(issue.id)
-                          ? "border-amber-400 bg-amber-50 text-amber-800"
-                          : "border-black/8 bg-white text-black/50 hover:border-black/20")}>
-                      {issue.label}
-                    </button>
-                  ))}
-              </div>
+              ))}
             </div>
           </div>
-        )}
 
-        {/* ── 6. Next focus (optional) ──────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-black/8 overflow-hidden">
-          <div className="px-5 pt-5 pb-4 border-b border-black/6">
-            <div className="flex items-baseline gap-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/35">Next Focus</p>
-              <span className="text-[10px] font-medium text-black/25">optional</span>
-            </div>
-            <p className="text-sm font-bold text-black mt-1">The one area that would move this track forward most.</p>
+          <div className="border-t border-black/6" />
+
+          {/* 3 ── What worked? */}
+          <div ref={bestPartRef}>
+            <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-1">What Worked?</label>
+            <p className="text-sm text-black/40 mb-4">{formConfig.bestMomentPrompt}</p>
+            <FieldError message={errors.bestPart} />
+            <textarea
+              value={bestPart}
+              onChange={e => { setBestPart(e.target.value); if (errors.bestPart) setErrors(p => { const n = { ...p }; delete n.bestPart; return n; }); }}
+              rows={4}
+              placeholder="E.g. 'The hook in the chorus hits really well — that melody is genuinely catchy and sits perfectly in the mix.'"
+              className="w-full bg-[#faf7f2] border border-black/10 focus:border-black/40 text-black text-[14px] px-4 py-3 focus:outline-none resize-none transition-colors placeholder:text-black/20 mt-3"
+            />
+            <WordCount current={bestPartWords} min={formConfig.bestMomentMinWords} />
           </div>
-          <div className="px-5 pt-4 pb-5">
-            <div className="flex flex-wrap gap-2">
+
+          <div className="border-t border-black/6" />
+
+          {/* 4 ── What's holding it back? */}
+          <div ref={mainFeedbackRef}>
+            <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-1">What&apos;s Holding It Back?</label>
+            <p className="text-sm text-black/40 mb-4">Mention a moment, a section, or something you&apos;d change.</p>
+            <FieldError message={errors.mainFeedback} />
+            <textarea
+              value={biggestWeaknessSpecific}
+              onChange={e => { setBiggestWeaknessSpecific(e.target.value); if (errors.mainFeedback) setErrors(p => { const n = { ...p }; delete n.mainFeedback; return n; }); }}
+              rows={5}
+              placeholder="E.g. 'The energy drops hard around the middle section and I found myself zoning out. The intro pulls you in well but it kind of plateaus — maybe the bridge needs something new to bring it back.'"
+              className="w-full bg-[#faf7f2] border border-black/10 focus:border-black/40 text-black text-[14px] px-4 py-3 focus:outline-none resize-none transition-colors placeholder:text-black/20 mt-3"
+            />
+            <WordCount current={mainFeedbackWords} min={formConfig.mainFeedbackMinWords} />
+          </div>
+
+          {/* 5 ── Technical issues (conditional) */}
+          {formConfig.showTechnicalIssues && (
+            <>
+              <div className="border-t border-black/6" />
+              <div>
+                <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-1">Technical Issues</label>
+                <p className="text-sm text-black/40 mb-4">Flag anything — or leave blank if it sounded clean.</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { id: "__clean__", label: "✓ All good" },
+                    { id: "__instrumental__", label: "Instrumental" },
+                    ...formConfig.technicalIssueOptions.filter(i => !(isInstrumental && i.id === "vocals-buried")),
+                  ].map(issue => {
+                    const isClean = issue.id === "__clean__";
+                    const isInstrumentalBtn = issue.id === "__instrumental__";
+                    const active = isClean
+                      ? technicalIssues.length === 0 && !isInstrumental
+                      : isInstrumentalBtn
+                      ? isInstrumental
+                      : technicalIssues.includes(issue.id);
+                    return (
+                      <button key={issue.id} type="button"
+                        onClick={() => {
+                          if (isClean) { setTechnicalIssues([]); setIsInstrumental(false); }
+                          else if (isInstrumentalBtn) { setIsInstrumental(p => !p); setTechnicalIssues(p => p.filter(i => i !== "vocals-buried")); }
+                          else setTechnicalIssues(p => p.includes(issue.id) ? p.filter(i => i !== issue.id) : [...p, issue.id]);
+                        }}
+                        className={cn("px-4 py-2.5 text-sm font-bold border transition-all",
+                          active ? "border-[#1a1a1a] bg-[#1a1a1a] text-white" : "border-black/10 bg-[#faf7f2] text-black/50 hover:border-black/30 hover:text-black")}>
+                        {issue.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="border-t border-black/6" />
+
+          {/* 6 ── Next Focus */}
+          <div>
+            <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-1">
+              Next Focus <span className="normal-case font-medium text-black/25">optional</span>
+            </label>
+            <p className="text-sm text-black/40 mb-4">The one area that would move this track forward most.</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {[
                 { id: "MIXING", label: "Mixing" }, { id: "ARRANGEMENT", label: "Arrangement" },
                 { id: "SOUND_DESIGN", label: "Sound design" }, { id: "SONGWRITING", label: "Songwriting" },
                 { id: "PERFORMANCE", label: "Performance" }, { id: "READY_TO_RELEASE", label: "Ready to release" },
               ].map(opt => (
-                <button key={opt.id} type="button"
-                  onClick={() => setNextFocus(p => p === opt.id ? null : opt.id)}
-                  className={cn("px-4 py-2 text-sm font-bold rounded-xl border-2 transition-all",
-                    nextFocus === opt.id
-                      ? "border-black bg-black text-white"
-                      : "border-black/8 bg-white text-black/55 hover:border-black/20")}>
+                <button key={opt.id} type="button" onClick={() => setNextFocus(p => p === opt.id ? null : opt.id)}
+                  className={cn("px-4 py-3 text-sm font-bold border transition-all text-left",
+                    nextFocus === opt.id ? "border-[#1a1a1a] bg-[#1a1a1a] text-white" : "border-black/10 bg-[#faf7f2] text-black/50 hover:border-black/30 hover:text-black")}>
                   {opt.label}
                 </button>
               ))}
             </div>
           </div>
-        </div>
 
-        {/* ── 7. Honest friend (optional) ──────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-black/8 overflow-hidden">
-          <div className="px-5 pt-5 pb-4 border-b border-black/6">
-            <div className="flex items-baseline gap-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/35">The Honest Friend</p>
-              <span className="text-[10px] font-medium text-black/25">optional</span>
-            </div>
-            <p className="text-sm font-bold text-black mt-1">If this was your close friend — what&apos;s the one thing you&apos;d tell them?</p>
-          </div>
-          <div className="px-5 pt-4 pb-5">
+          <div className="border-t border-black/6" />
+
+          {/* 7 ── Honest Friend */}
+          <div>
+            <label className="block text-xs font-black uppercase tracking-[0.2em] text-black/40 mb-1">
+              The Honest Friend <span className="normal-case font-medium text-black/25">optional</span>
+            </label>
+            <p className="text-sm text-black/40 mb-4">If this was your close friend — what&apos;s the one thing you&apos;d tell them?</p>
             <textarea
               value={honestFriend}
               onChange={e => setHonestFriend(e.target.value)}
               rows={3}
               placeholder="No structure — just say it."
-              className="w-full px-4 py-3 border border-black/10 rounded-xl text-sm font-medium resize-none focus:outline-none focus:border-purple-400 placeholder:text-black/20 transition-colors bg-white"
+              className="w-full bg-[#faf7f2] border border-black/10 focus:border-black/40 text-black text-[14px] px-4 py-3 focus:outline-none resize-none transition-colors placeholder:text-black/20"
             />
           </div>
-        </div>
 
-        {/* ── Submit ────────────────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-black/8 overflow-hidden">
-          <div className="px-5 pt-5 pb-5">
-            {/* Checklist */}
-            <div className="flex items-center gap-5 mb-5 text-xs">
-              <div className={cn("flex items-center gap-1.5 font-bold", canSubmit ? "text-emerald-600" : "text-black/25")}>
-                <span className={cn("w-4 h-4 rounded-full flex items-center justify-center font-black text-[9px]",
-                  canSubmit ? "bg-emerald-500 text-white" : "bg-black/8 text-black/30")}>
-                  {canSubmit ? "✓" : "○"}
-                </span>
-                Listened 3 min
-              </div>
-              <div className={cn("flex items-center gap-1.5 font-bold", qualityLevel ? "text-emerald-600" : "text-black/25")}>
-                <span className={cn("w-4 h-4 rounded-full flex items-center justify-center font-black text-[9px]",
-                  qualityLevel ? "bg-emerald-500 text-white" : "bg-black/8 text-black/30")}>
-                  {qualityLevel ? "✓" : "○"}
-                </span>
-                Verdict given
-              </div>
-              <div className={cn("flex items-center gap-1.5 font-bold", meetsText ? "text-emerald-600" : "text-black/25")}>
-                <span className={cn("w-4 h-4 rounded-full flex items-center justify-center font-black text-[9px]",
-                  meetsText ? "bg-emerald-500 text-white" : "bg-black/8 text-black/30")}>
-                  {meetsText ? "✓" : "○"}
-                </span>
-                Feedback written
-              </div>
+          {/* Pre-submit summary */}
+          <div className="bg-[#faf7f2] rounded-2xl p-6">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-6">
+              {[
+                { done: canSubmit, label: "Listened 3 min" },
+                { done: !!qualityLevel, label: "Verdict given" },
+                { done: meetsText, label: "Feedback written" },
+              ].map(item => (
+                <div key={item.label} className={cn("flex items-center gap-1.5 text-xs font-bold", item.done ? "text-black" : "text-black/25")}>
+                  <span className={cn("w-4 h-4 rounded-full flex items-center justify-center font-black text-[9px]",
+                    item.done ? "bg-black text-white" : "bg-black/10 text-black/30")}>
+                    {item.done ? "✓" : "○"}
+                  </span>
+                  {item.label}
+                </div>
+              ))}
             </div>
-
-            {/* Earnings */}
-            <div className="flex items-baseline gap-2 mb-5">
-              <span className="text-4xl font-black leading-none text-black tracking-tighter">
-                {review.ReviewerProfile ? formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier)) : "1 credit"}
-              </span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-5xl font-black leading-none text-black tracking-tighter">{earnedLabel}</span>
               <span className="text-sm text-black/35 font-medium">you&apos;ll earn</span>
             </div>
-
-            {/* Errors summary */}
             {Object.keys(errors).length > 0 && (
-              <div className="mb-4 p-3 rounded-xl border border-red-200 bg-red-50 text-sm text-red-700 font-medium">
-                {Object.values(errors).filter(Boolean).join(" · ")}
-              </div>
+              <p className="mt-4 text-sm font-medium text-red-600">{Object.values(errors).filter(Boolean).join(" · ")}</p>
             )}
-            {error && (
-              <div className="mb-4 p-3 rounded-xl border border-red-200 bg-red-50 text-sm text-red-700 font-medium">{error}</div>
-            )}
-
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitting || !canSubmit || !meetsText || (!!review?.linkedReviewId && !abTestPreference)}
-              className={cn(
-                "w-full h-13 py-3.5 font-black text-sm rounded-xl transition-all border-2",
-                canSubmit && meetsText && !isSubmitting
-                  ? "bg-[#0d0d0d] text-white border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
-                  : "bg-black/5 text-black/25 border-black/8 cursor-not-allowed"
-              )}>
-              {isSubmitting ? (
-                <span className="flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Submitting…</span>
-              ) : canSubmit && meetsText ? (
-                `Submit & earn ${review.ReviewerProfile ? formatCurrency(getTierEarningsCents(review.ReviewerProfile.tier)) : "1 credit"}`
-              ) : (
-                "Complete the fields above"
-              )}
-            </button>
           </div>
-        </div>
 
+        </div>
       </div>
+
+      {/* ── Full-bleed submit ───────────────────────────────── */}
+      <div className={cn("transition-colors", allRequired ? "bg-[#0d0d0d] hover:bg-black" : "bg-black/8")}>
+        <div className={W2}>
+          <button
+            onClick={handleSubmit}
+            disabled={isSubmitting || !allRequired || (!!review?.linkedReviewId && !abTestPreference)}
+            className="w-full py-5 text-white font-black text-[15px] tracking-wide disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isSubmitting
+              ? <><Loader2 className="h-4 w-4 animate-spin" /> Submitting…</>
+              : allRequired
+              ? `Submit & earn ${earnedLabel}`
+              : "Complete the fields above"}
+          </button>
+        </div>
+      </div>
+
       {Dialogs}
     </div>
   );
