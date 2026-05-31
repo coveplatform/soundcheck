@@ -1,4 +1,5 @@
 import { posts } from "../src/lib/blog-posts";
+import { genrePages } from "../src/lib/genre-pages";
 
 const KEY = "7e347151c740f1f4389aacc10a6f0b7b";
 const HOST = "mixreflect.com";
@@ -10,6 +11,7 @@ const urls = [
   `${BASE_URL}/discover`,
   `${BASE_URL}/breakthrough`,
   ...posts.map((p) => `${BASE_URL}/blog/${p.slug}`),
+  ...genrePages.map((p) => `${BASE_URL}/feedback/${p.slug}`),
 ];
 
 async function submit() {
