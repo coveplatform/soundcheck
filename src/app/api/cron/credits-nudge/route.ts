@@ -66,8 +66,8 @@ async function handler(request: Request) {
           reviewCredits: true,
           Track: {
             where: { status: { not: "COMPLETED" } },
-            select: { id: true, title: true, updatedAt: true },
-            orderBy: { updatedAt: "desc" },
+            select: { id: true, title: true },
+            orderBy: { createdAt: "desc" },
             take: 1,
           },
         },
@@ -79,7 +79,7 @@ async function handler(request: Request) {
   let skipped = 0;
 
   for (const user of users) {
-    const profile = user.ArtistProfile;
+    const profile = user.ArtistProfile ?? null;
     if (!profile || !user.email) { skipped++; continue; }
 
     // Skip if they already have a track actively in the review queue —
