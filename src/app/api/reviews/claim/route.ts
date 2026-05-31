@@ -69,6 +69,18 @@ export async function POST(request: Request) {
       // Advisory lock on the track to prevent race conditions
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${trackId}))`;
 
+      // One active review at a time — prevent claiming while another is in-flight
+      const activeReview = await tx.review.findFirst({
+        where: {
+          peerReviewerArtistId: artistProfile.id,
+          status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+        },
+        select: { id: true },
+      });
+      if (activeReview) {
+        throw new Error(`ACTIVE_REVIEW:${activeReview.id}`);
+      }
+
       const track = await tx.track.findUnique({
         where: { id: trackId },
         select: {
@@ -208,6 +220,11 @@ export async function POST(request: Request) {
     // Unique constraint violation — already claimed
     if (err?.code === "P2002") {
       return NextResponse.json({ error: "You have already claimed this track" }, { status: 409 });
+    }
+    // Reviewer already has an active review in flight
+    if (typeof message === "string" && message.startsWith("ACTIVE_REVIEW:")) {
+      const activeReviewId = message.replace("ACTIVE_REVIEW:", "");
+      return NextResponse.json({ error: "active_review", activeReviewId }, { status: 409 });
     }
     return NextResponse.json({ error: message }, { status: 400 });
   }
