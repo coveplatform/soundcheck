@@ -593,17 +593,38 @@ export function QueueTrackPicker({ tracks, credits, isPro = false, open, onClose
 
         {/* ── Out of credits ─────────────────────────────────── */}
         {!isPro && !canAfford && (
-          <div className="border-t border-black/6 px-6 py-5 space-y-2.5 bg-[#faf7f2]">
-            <p className="text-sm font-bold text-black">
-              You need <span className="text-red-500 font-black">{creditCost - credits}</span> more {creditCost - credits === 1 ? "credit" : "credits"}.
-            </p>
-            <BuyCreditsButton variant="primary" className="w-full h-11 font-black text-sm rounded-none" label="Buy 10 credits — $9.95" />
-            <div className="grid grid-cols-2 gap-2">
-              <Link href="/review" onClick={onClose}>
-                <button className="w-full h-10 bg-[#0f0f18] hover:bg-black text-white font-bold text-xs uppercase tracking-wider transition-colors">Earn credits</button>
+          <div className="border-t border-black/6">
+            {/* Pro — primary path */}
+            <div className="bg-[#0f0f18] px-6 py-5">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-purple-400/70 mb-1">You need {creditCost - credits} more credit{creditCost - credits === 1 ? "" : "s"}</p>
+                  <p className="text-base font-black text-white leading-tight">Get 30 credits/month with Pro</p>
+                </div>
+                <div className="flex-shrink-0 text-right">
+                  <p className="text-xl font-black text-white">$24.95</p>
+                  <p className="text-[10px] text-white/30 font-bold">/ month</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 mb-4">
+                {["30 credits every month", "3 active slots", "Priority placement", "Unlimited reviews/day"].map(f => (
+                  <p key={f} className="text-[11px] text-white/40 font-medium flex items-center gap-1.5">
+                    <span className="text-purple-400">✓</span>{f}
+                  </p>
+                ))}
+              </div>
+              <Link href="/pro" onClick={onClose} className="block w-full bg-purple-600 hover:bg-purple-500 transition-colors text-white font-black text-sm py-3 text-center">
+                Upgrade to Pro →
               </Link>
-              <Link href="/pro" onClick={onClose}>
-                <button className="w-full h-10 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase tracking-wider transition-colors">Go Pro</button>
+            </div>
+            {/* Secondary paths */}
+            <div className="grid grid-cols-2 border-t border-black/6">
+              <BuyCreditsButton
+                className="h-11 text-[12px] font-bold text-black/50 hover:text-black hover:bg-black/3 transition-colors border-r border-black/6 rounded-none w-full bg-transparent border-0 shadow-none"
+                label="Buy 10 credits — $9.95"
+              />
+              <Link href="/review" onClick={onClose} className="flex items-center justify-center h-11 text-[12px] font-bold text-black/50 hover:text-black hover:bg-black/3 transition-colors">
+                Earn free credits
               </Link>
             </div>
           </div>

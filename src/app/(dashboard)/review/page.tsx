@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Music, ArrowRight, Crown } from "lucide-react";
+import { Music, ArrowRight, Crown, Zap } from "lucide-react";
 import { ListenTile } from "./listen-tile";
 
 export const dynamic = "force-dynamic";
@@ -235,12 +235,46 @@ export default async function ListenPage({
 
         {/* Daily limit */}
         {limitReached && (
-          <div className="mb-8 bg-amber-50 border border-amber-200 px-5 py-4 flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-bold text-black">Daily limit reached</p>
-              <p className="text-sm text-black/50 mt-0.5">
-                Up to {MAX_REVIEWS_PER_DAY} reviews per day on the free plan.{" "}
-                <Link href="/pro" className="font-bold text-purple-600 hover:underline">Go Pro</Link> for unlimited.
+          <div className="mb-8 rounded-2xl overflow-hidden border-2 border-purple-600/20">
+            {/* Dark header */}
+            <div className="bg-[#0f0f18] px-6 py-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Zap className="h-4 w-4 text-purple-400" />
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-purple-400/80">Daily limit reached</p>
+                  </div>
+                  <p className="text-lg font-black text-white leading-tight">
+                    You&apos;ve reviewed {MAX_REVIEWS_PER_DAY} tracks today
+                  </p>
+                  <p className="text-sm text-white/40 mt-1">
+                    Pro removes the limit — review as many as you want, earn unlimited credits.
+                  </p>
+                </div>
+                <div className="flex-shrink-0 text-right hidden sm:block">
+                  <p className="text-2xl font-black text-white">$24.95</p>
+                  <p className="text-[11px] text-white/30 font-bold">/ month</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-x-5 gap-y-1 mt-3">
+                {["Unlimited reviews/day", "30 credits every month", "3 active slots", "Priority placement"].map(f => (
+                  <p key={f} className="text-[11px] text-white/40 font-medium flex items-center gap-1.5">
+                    <span className="text-purple-400">✓</span>{f}
+                  </p>
+                ))}
+              </div>
+            </div>
+            {/* CTA row */}
+            <div className="grid grid-cols-2 bg-white border-t border-black/6">
+              <Link
+                href="/pro"
+                className="flex items-center justify-center gap-2 py-3.5 bg-purple-600 hover:bg-purple-700 transition-colors text-white font-black text-sm"
+              >
+                <Zap className="h-3.5 w-3.5" />
+                Upgrade to Pro
+              </Link>
+              <p className="flex items-center justify-center py-3.5 text-[12px] font-bold text-black/40 text-center px-3">
+                Check back tomorrow for {MAX_REVIEWS_PER_DAY} more free reviews
               </p>
             </div>
           </div>

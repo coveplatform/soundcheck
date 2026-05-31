@@ -133,13 +133,19 @@ export function QueueView({ activeTracks, eligibleTracks, maxSlots, isPro, credi
             if (isLocked) {
               return (
                 <Link key={`locked-${slotIndex}`} href="/pro" className="group block">
-                  <div className="aspect-square rounded-2xl border-2 border-dashed border-purple-200 bg-white hover:border-purple-300 transition-all overflow-hidden flex flex-col">
-                    <div className="flex-1 flex items-center justify-center">
-                      <Lock className="h-5 w-5 text-black/15 group-hover:text-purple-300 transition-colors" />
+                  <div className="aspect-square rounded-2xl overflow-hidden flex flex-col bg-[#0f0f18] border-2 border-purple-600/30 group-hover:border-purple-500/60 transition-all">
+                    <div className="flex-1 flex flex-col items-center justify-center gap-2 px-3">
+                      <div className="h-8 w-8 rounded-full bg-purple-600/15 flex items-center justify-center group-hover:bg-purple-600/25 transition-colors">
+                        <Lock className="h-3.5 w-3.5 text-purple-400" />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-[11px] font-black text-white/70 leading-tight">Slot locked</p>
+                        <p className="text-[9px] text-white/30 mt-0.5 leading-snug">Pro gets 3 active<br/>slots + 30 credits/mo</p>
+                      </div>
                     </div>
-                    <div className="bg-purple-600 group-hover:bg-purple-700 transition-colors px-3 py-2.5 text-center">
-                      <p className="text-[11px] font-black text-white leading-none">Go Pro →</p>
-                      <p className="text-[9px] text-white/60 mt-0.5">3 slots · 30 credits/mo</p>
+                    <div className="bg-purple-600 group-hover:bg-purple-500 transition-colors px-3 py-2.5 text-center">
+                      <p className="text-[11px] font-black text-white">Upgrade to Pro →</p>
+                      <p className="text-[9px] text-white/60 mt-0.5">$24.95 / month</p>
                     </div>
                   </div>
                   <p className="text-[11px] font-bold text-purple-500 mt-2 text-center">Pro only</p>
