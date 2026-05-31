@@ -108,8 +108,9 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
   const [honestFriend, setHonestFriend] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // A/B
+  // A/B — randomize play order per session to eliminate order bias
   const [abTestPreference, setAbTestPreference] = useState<"VERSION_A" | "VERSION_B" | "NO_PREFERENCE" | null>(null);
+  const [abSwapped] = useState(() => Math.random() < 0.5); // true = show Track B first
 
   // scroll refs — in new order
   const qualityRef = useRef<HTMLDivElement>(null);
@@ -488,59 +489,75 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
               </div>
             )}
 
-            {/* Audio player */}
+            {/* Audio player(s) — order randomised for A/B to eliminate order bias */}
             <div className="mt-5">
-              {review.Track.isAbTest && review.Track.other_Track && (
-                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-400 mb-3">Version A</p>
-              )}
-              <AudioPlayer
-                sourceUrl={review.Track.sourceUrl}
-                sourceType={review.Track.sourceType}
-                showWaveform={review.Track.sourceType === "UPLOAD"}
-                minListenTime={review.skipListenTimer ? 0 : MIN_LISTEN_SECONDS}
-                initialListenTime={listenTime}
-                onTimeUpdate={s => { void handleTimeUpdate(s); }}
-                onListenProgress={s => { setListenTime(p => Math.max(p, s)); void sendHeartbeat(); }}
-                onMinimumReached={() => setCanSubmit(true)}
-                showListenTracker
-              />
-            </div>
+              {review.Track.isAbTest && review.Track.other_Track ? (
+                <div className="space-y-5">
+                  {/* First track shown */}
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-3">First version</p>
+                    <AudioPlayer
+                      sourceUrl={abSwapped ? review.Track.other_Track.sourceUrl : review.Track.sourceUrl}
+                      sourceType={abSwapped ? review.Track.other_Track.sourceType : review.Track.sourceType}
+                      showWaveform={(abSwapped ? review.Track.other_Track.sourceType : review.Track.sourceType) === "UPLOAD"}
+                      minListenTime={review.skipListenTimer ? 0 : MIN_LISTEN_SECONDS}
+                      initialListenTime={listenTime}
+                      onTimeUpdate={s => { void handleTimeUpdate(s); }}
+                      onListenProgress={s => { setListenTime(p => Math.max(p, s)); void sendHeartbeat(); }}
+                      onMinimumReached={() => setCanSubmit(true)}
+                      showListenTracker
+                    />
+                  </div>
 
-            {/* A/B: Version B */}
-            {review.Track.isAbTest && review.Track.other_Track && (
-              <div className="mt-6 space-y-4">
-                <div className="border-t border-white/10 pt-5">
-                  <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-400 mb-1">Version B</p>
-                  <p className="text-xs text-white/30 mb-3">{review.Track.other_Track.title}</p>
-                  <AudioPlayer
-                    sourceUrl={review.Track.other_Track.sourceUrl}
-                    sourceType={review.Track.other_Track.sourceType}
-                    showWaveform={review.Track.other_Track.sourceType === "UPLOAD"}
-                    showListenTracker={false}
-                    minListenTime={0}
-                  />
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
-                  <p className="text-sm font-black text-white">Which version is stronger?</p>
-                  <p className="text-xs text-white/35">Listen to both before choosing.</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(["VERSION_A", "VERSION_B", "NO_PREFERENCE"] as const).map(val => {
-                      const labels = { VERSION_A: "Version A", VERSION_B: "Version B", NO_PREFERENCE: "No preference" };
-                      return (
-                        <button key={val} type="button" onClick={() => setAbTestPreference(val)}
+                  {/* Second track shown */}
+                  <div className="border-t border-white/10 pt-5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-3">Second version</p>
+                    <AudioPlayer
+                      sourceUrl={abSwapped ? review.Track.sourceUrl : review.Track.other_Track.sourceUrl}
+                      sourceType={abSwapped ? review.Track.sourceType : review.Track.other_Track.sourceType}
+                      showWaveform={(abSwapped ? review.Track.sourceType : review.Track.other_Track.sourceType) === "UPLOAD"}
+                      showListenTracker={false}
+                      minListenTime={0}
+                    />
+                  </div>
+
+                  {/* Preference picker — neutral labels, mapped to actual VERSION_A/B on pick */}
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+                    <p className="text-sm font-black text-white">Which version is stronger?</p>
+                    <p className="text-xs text-white/35">Listen to both before choosing.</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {([
+                        { display: "First version",  actual: abSwapped ? "VERSION_B" : "VERSION_A" },
+                        { display: "Second version", actual: abSwapped ? "VERSION_A" : "VERSION_B" },
+                        { display: "No preference",  actual: "NO_PREFERENCE" },
+                      ] as const).map(({ display, actual }) => (
+                        <button key={actual} type="button"
+                          onClick={() => setAbTestPreference(actual as "VERSION_A" | "VERSION_B" | "NO_PREFERENCE")}
                           className={cn("px-2 py-3 rounded-xl border text-xs font-black transition-all",
-                            abTestPreference === val
+                            abTestPreference === actual
                               ? "bg-white border-white text-black"
                               : "bg-white/5 border-white/10 text-white/40 hover:border-white/25 hover:text-white/70"
                           )}>
-                          {labels[val]}
+                          {display}
                         </button>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              ) : (
+                <AudioPlayer
+                  sourceUrl={review.Track.sourceUrl}
+                  sourceType={review.Track.sourceType}
+                  showWaveform={review.Track.sourceType === "UPLOAD"}
+                  minListenTime={review.skipListenTimer ? 0 : MIN_LISTEN_SECONDS}
+                  initialListenTime={listenTime}
+                  onTimeUpdate={s => { void handleTimeUpdate(s); }}
+                  onListenProgress={s => { setListenTime(p => Math.max(p, s)); void sendHeartbeat(); }}
+                  onMinimumReached={() => setCanSubmit(true)}
+                  showListenTracker
+                />
+              )}
+            </div>
           </div>
         </div>
 
