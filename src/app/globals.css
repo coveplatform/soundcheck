@@ -214,6 +214,17 @@ details:not(.details-no-marker)[open] summary::before {
   50% { transform: translateY(-5px); }
 }
 
+/* Ambient aurora glow for share pages */
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.55; }
+  50% { transform: translate(-46%, -54%) scale(1.18); opacity: 0.85; }
+}
+.animate-aurora { animation: aurora-drift 14s ease-in-out infinite; }
+.animate-aurora-slow { animation: aurora-drift 20s ease-in-out infinite reverse; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora, .animate-aurora-slow { animation: none; }
+}
+
 /* =========================================================================
    Dashboard dark mode (scoped)
    -------------------------------------------------------------------------
@@ -379,6 +390,38 @@ details:not(.details-no-marker)[open] summary::before {
 .dark .bg-purple-100 { background-color: rgba(168, 85, 247, 0.18); }
 .dark .text-purple-700 { color: #c4b5fd; }
 .dark .text-purple-900 { color: #ddd0ff; }
+
+/* --- Artwork / warm cream placeholder backgrounds --- */
+.dark .bg-\[\#f2ede4\] { background-color: #2a2734; }
+
+/* --- Emerald tints (success badges, quality verdicts) --- */
+.dark .bg-emerald-50  { background-color: rgba(16, 185, 129, 0.08); }
+.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, 0.15); }
+.dark .text-emerald-700,
+.dark .text-emerald-800 { color: #6ee7b7; }
+.dark .text-emerald-600 { color: #34d399; }
+
+/* --- Amber tints (warning badges) --- */
+.dark .bg-amber-50  { background-color: rgba(245, 158, 11, 0.08); }
+.dark .bg-amber-100 { background-color: rgba(245, 158, 11, 0.15); }
+.dark .text-amber-700,
+.dark .text-amber-800 { color: #fcd34d; }
+.dark .text-amber-600 { color: #fbbf24; }
+
+/* --- Orange tints (demo-stage badges) --- */
+.dark .bg-orange-100 { background-color: rgba(249, 115, 22, 0.15); }
+.dark .text-orange-700 { color: #fdba74; }
+
+/* --- Red tints (error/needs-work badges) --- */
+.dark .bg-red-50  { background-color: rgba(239, 68, 68, 0.08); }
+.dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.15); }
+.dark .text-red-600 { color: #f87171; }
+
+/* --- Translucent neutral/purple variants used in stats table rows --- */
+.dark .bg-neutral-50\/50 { background-color: rgba(31, 29, 40, 0.5); }
+.dark .bg-purple-50\/40  { background-color: rgba(168, 85, 247, 0.08); }
+.dark .bg-purple-50\/20  { background-color: rgba(168, 85, 247, 0.04); }
+.dark .hover\:bg-purple-50\/20:hover { background-color: rgba(168, 85, 247, 0.06); }
 
 /* --- Lime accent: neon (#a3e635 / #84cc16) is too bright on dark, so mute
    the solid fills and flip the dark-on-lime text to light-on-muted-lime. --- */

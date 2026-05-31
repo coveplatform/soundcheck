@@ -376,7 +376,7 @@ export default async function DashboardPage({ searchParams }: { searchParams?: P
       {/* No tracks, no credits — reviewer-first entry path */}
       {tracks.length === 0 && credits === 0 && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
-          <div className="border-2 border-black bg-neutral-900 rounded-2xl px-5 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="border-2 border-black dark:border-white/10 bg-neutral-900 rounded-2xl px-5 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex-1 min-w-0">
               <p className="text-base font-black text-white">
                 Review a track to earn your first credit.
