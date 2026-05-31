@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { posts } from "@/lib/blog-posts";
+import { genrePages } from "@/lib/genre-pages";
 
 const BASE_URL = "https://mixreflect.com";
 
@@ -23,5 +24,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [...staticRoutes, ...blogRoutes];
+  const genreRoutes: MetadataRoute.Sitemap = genrePages.map((page) => ({
+    url: `${BASE_URL}/feedback/${page.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...blogRoutes, ...genreRoutes];
 }
