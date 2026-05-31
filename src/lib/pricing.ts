@@ -15,3 +15,10 @@ export const CREDIT_PACK_PRICE_DISPLAY = "$9.95";
 export const CREDIT_PACK_CREDITS = 10;
 
 export const FREE_ACTIVE_SLOTS = 1;
+
+// Free users can complete up to this many peer reviews per day (each earns 1 credit).
+// Single source of truth — the API routes that enforce the cap and the /review page that
+// renders the "daily limit reached" Pro upsell all read this, so they can never drift apart.
+// Tunable lever: higher = more review supply + earned credits (better marketplace liquidity);
+// lower = more pressure toward Pro's "unlimited reviews/day". Pro/admins bypass it entirely.
+export const FREE_DAILY_REVIEW_LIMIT = 5;

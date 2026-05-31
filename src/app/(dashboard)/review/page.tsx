@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { FREE_DAILY_REVIEW_LIMIT } from "@/lib/pricing";
 import { Music, ArrowRight, Crown, Zap } from "lucide-react";
 import { ListenTile } from "./listen-tile";
 
@@ -41,11 +42,11 @@ export default async function ListenPage({
 
   if (!artistProfile) redirect("/onboarding");
 
-  const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
+  const BYPASS_LIMIT_EMAILS = ["synthqueen@mixreflect.com", "davo2@mixreflect.com"];
   const isPro = artistProfile.subscriptionStatus === "active";
   const bypassLimit = isPro || BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase());
 
-  const MAX_REVIEWS_PER_DAY = 5;
+  const MAX_REVIEWS_PER_DAY = FREE_DAILY_REVIEW_LIMIT;
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
 

@@ -396,7 +396,7 @@ function MobileBottomNav({
                   <Zap className="w-4 h-4 text-purple-400 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-black text-purple-400 leading-none">Go Pro</p>
-                    <p className="text-[10px] text-white/40 font-medium mt-0.5">30 credits/mo · unlimited slots</p>
+                    <p className="text-[10px] text-white/40 font-medium mt-0.5">30 credits/mo · 3 active slots</p>
                   </div>
                   <ArrowRight className="w-3.5 h-3.5 text-purple-400/50 flex-shrink-0" />
                 </Link>

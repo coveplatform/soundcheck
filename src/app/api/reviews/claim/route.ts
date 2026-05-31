@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { FREE_DAILY_REVIEW_LIMIT } from "@/lib/pricing";
 
 /**
  * POST /api/reviews/claim
@@ -35,14 +36,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Complete onboarding first" }, { status: 403 });
   }
 
-  // Daily review limit check (bypass for admin emails and Pro users)
-  const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
+  // Daily review limit check (bypass for internal test emails and Pro users)
+  const BYPASS_LIMIT_EMAILS = ["synthqueen@mixreflect.com", "davo2@mixreflect.com"];
   const bypassLimit =
     BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase()) ||
     artistProfile.subscriptionStatus === "active";
 
   if (!bypassLimit) {
-    const MAX_REVIEWS_PER_DAY = 2;
+    const MAX_REVIEWS_PER_DAY = FREE_DAILY_REVIEW_LIMIT;
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
 
     if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
       return NextResponse.json(
-        { error: "You've reached your daily limit of 2 reviews. Check back tomorrow!" },
+        { error: `You've reached your daily limit of ${MAX_REVIEWS_PER_DAY} reviews. Check back tomorrow!` },
         { status: 429 }
       );
     }

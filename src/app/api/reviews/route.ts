@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { updateReviewerTier, getTierRateCents, updateReviewerAverageRating, isPeerReviewerPro, TIER_RATES } from "@/lib/queue";
 import { sendReviewProgressEmail, sendListenerIntentEmail } from "@/lib/email";
+import { FREE_DAILY_REVIEW_LIMIT } from "@/lib/pricing";
 import { randomBytes } from "crypto";
 
 const MIN_LISTEN_SECONDS = 180;
@@ -289,8 +290,8 @@ export async function POST(request: Request) {
     startOfToday.setHours(0, 0, 0, 0);
     const heartbeatCutoff = new Date(now.getTime() - 10 * 60 * 1000);
 
-    // Daily review cap: 2/day for free users (bypass for admin emails and Pro users)
-    const BYPASS_LIMIT_EMAILS = ["kris.engelhardt4@gmail.com", "synthqueen@mixreflect.com", "davo2@mixreflect.com"];
+    // Daily review cap for free users (bypass for internal test emails and Pro users)
+    const BYPASS_LIMIT_EMAILS = ["synthqueen@mixreflect.com", "davo2@mixreflect.com"];
     const isReviewerPro = isPeerReview
       ? peerReviewerProfile?.subscriptionStatus === "active"
       : artistProfile?.subscriptionStatus === "active";
@@ -298,7 +299,7 @@ export async function POST(request: Request) {
       BYPASS_LIMIT_EMAILS.includes((session.user.email ?? "").toLowerCase()) || isReviewerPro;
 
     if (!bypassLimit) {
-      const MAX_REVIEWS_PER_DAY = 2;
+      const MAX_REVIEWS_PER_DAY = FREE_DAILY_REVIEW_LIMIT;
       const reviewsTodayCount = await prisma.review.count({
         where: {
           status: "COMPLETED",
@@ -313,7 +314,7 @@ export async function POST(request: Request) {
 
       if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
         return NextResponse.json(
-          { error: "You've reached the daily limit of 2 reviews. Check back tomorrow!" },
+          { error: `You've reached the daily limit of ${MAX_REVIEWS_PER_DAY} reviews. Check back tomorrow!` },
           { status: 429 }
         );
       }
