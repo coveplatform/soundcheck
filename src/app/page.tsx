@@ -120,17 +120,18 @@ export default function Home() {
       </section>
 
       {/* Track Report - "See what's working" */}
-      <section id="examples" className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
-        <div className="max-w-6xl mx-auto px-4">
+      <section id="examples" className="py-14 sm:py-20 bg-[#faf7f2] overflow-visible">
+        <div className="max-w-5xl mx-auto px-4">
           <AnimatedSection className="mb-12">
             <div className="grid sm:grid-cols-2 gap-10 sm:gap-16 items-center">
               <div>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">See what&apos;s working</h2>
-                <p className="mt-5 text-neutral-600 text-lg max-w-xl">
+                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-500 mb-3">Feedback that makes sense</p>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.05]">See what&apos;s working</h2>
+                <p className="mt-5 text-neutral-500 text-base sm:text-lg max-w-xl leading-relaxed">
                   Get multiple reviews on your track and we surface the patterns. When 4 out of 5 people flag the same thing, that&apos;s not opinion — that&apos;s something worth fixing.
                 </p>
               </div>
-              <div className="relative rounded-2xl overflow-hidden shadow-xl" style={{ aspectRatio: "16/9" }}>
+              <div className="relative rounded-2xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.12)]" style={{ aspectRatio: "16/9" }}>
                 <Image src="/whats-working.jpg" alt="See what's working" fill className="object-cover" sizes="50vw" priority />
               </div>
             </div>
@@ -156,146 +157,19 @@ export default function Home() {
       <PeerModelSection />
 
 
-      {/* Weekly Discover — immersive dark section */}
-      <section className="pb-16 sm:pb-24 pt-0 bg-black text-neutral-50 overflow-visible font-sans relative">
-        {/* Radial glow background */}
-        <div className="absolute inset-0 opacity-60 pointer-events-none" style={{
-          background: "radial-gradient(ellipse 80% 50% at 50% 30%, rgba(0,240,255,0.10) 0%, rgba(168,85,247,0.05) 40%, transparent 70%)",
-        }} />
-
-        <div className="w-full overflow-hidden bg-cyan-400/5">
-          <div className="h-12 flex items-center">
-            <div
-              className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-cyan-400/40 text-3xl font-bold leading-none`}
-            >
-              {Array.from({ length: 60 }).map((_, i) => (
-                <span key={i}>discover</span>
+      {/* Breakthrough */}
+      <section className="bg-[#0f0a24] text-neutral-50 overflow-hidden pt-0">
+        <div className="w-full overflow-hidden bg-purple-400/5">
+          <div className="h-10 flex items-center">
+            <div className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-purple-400/30 text-2xl font-bold leading-none`}>
+              {Array.from({ length: 40 }).map((_, i) => (
+                <span key={i}>breakthrough</span>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 pt-12 sm:pt-16 relative">
-          {/* Heading */}
-          <AnimatedSection className="max-w-2xl mb-14 sm:mb-20">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.1]">
-              Explore music{" "}
-              <span className="relative inline-block">
-                <span className="relative z-10">in 3D</span>
-                <span className="absolute bottom-1 left-0 right-0 h-3 bg-cyan-400/30 -rotate-[0.5deg] z-0" />
-              </span>
-            </h2>
-            <p className="mt-5 text-neutral-400 text-lg max-w-xl">
-              Upload a track and it appears in the Discover space instantly. Float through a galaxy of independent music, click any album to listen.
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection className="relative">
-            <div className="relative max-w-3xl mx-auto">
-              {/* Floating album artwork grid — simulating the 3D space */}
-              <div className="relative h-[320px] sm:h-[380px] flex items-center justify-center">
-                {/* Glow orb behind */}
-                <div className="absolute w-64 h-64 rounded-full opacity-20 blur-3xl" style={{
-                  background: "radial-gradient(circle, rgba(0,240,255,0.4) 0%, rgba(168,85,247,0.2) 50%, transparent 70%)",
-                  top: "50%", left: "50%", transform: "translate(-50%, -50%)",
-                }} />
-
-                {/* Album cards floating at different depths — real artwork */}
-                {[
-                  { x: "8%", y: "15%", rot: -8, size: 90, glow: "#00f0ff", z: 10 },
-                  { x: "28%", y: "5%", rot: 4, size: 110, glow: "#a855f7", z: 30 },
-                  { x: "52%", y: "12%", rot: -3, size: 100, glow: "#ff2d9b", z: 20 },
-                  { x: "75%", y: "8%", rot: 6, size: 85, glow: "#fbbf24", z: 15 },
-                  { x: "15%", y: "55%", rot: 5, size: 80, glow: "#10b981", z: 12 },
-                  { x: "38%", y: "48%", rot: -6, size: 120, glow: "#00f0ff", z: 35 },
-                  { x: "62%", y: "52%", rot: 3, size: 95, glow: "#a855f7", z: 25 },
-                  { x: "82%", y: "45%", rot: -4, size: 75, glow: "#ff2d9b", z: 8 },
-                ].map((card, i) => (
-                  <div
-                    key={i}
-                    className="absolute rounded-xl overflow-hidden"
-                    style={{
-                      left: card.x,
-                      top: card.y,
-                      width: card.size,
-                      height: card.size,
-                      transform: `rotate(${card.rot}deg)`,
-                      zIndex: card.z,
-                      boxShadow: `0 0 25px ${card.glow}20, 0 8px 32px rgba(0,0,0,0.6)`,
-                      border: `1px solid ${card.glow}30`,
-                    }}
-                  >
-                    <Image
-                      src={discoverArtwork[i]}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes={`${card.size}px`}
-                    />
-                  </div>
-                ))}
-
-                {/* Faint grid lines — holographic floor effect */}
-                <div className="absolute bottom-0 left-0 right-0 h-24 opacity-10" style={{
-                  background: "repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,240,255,0.3) 39px, rgba(0,240,255,0.3) 40px), repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,240,255,0.3) 39px, rgba(0,240,255,0.3) 40px)",
-                  maskImage: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%)",
-                  WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%)",
-                }} />
-              </div>
-
-              {/* CTA */}
-              <div className="mt-8 text-center">
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Link href="/discover">
-                    <Button
-                      size="lg"
-                      className="bg-white/[0.08] text-white hover:bg-white/[0.14] font-black border border-white/[0.12] hover:border-white/[0.2] transition-all"
-                    >
-                      Enter the space <ArrowRight className="ml-2 h-4 w-4 text-cyan-400" />
-                    </Button>
-                  </Link>
-                  <SignupLink>
-                    <Button
-                      size="lg"
-                      className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all"
-                    >
-                      Get started free
-                    </Button>
-                  </SignupLink>
-                </div>
-                <p className="mt-4 text-sm text-neutral-7000">No account needed to explore • Upload a track to appear instantly</p>
-              </div>
-            </div>
-          </AnimatedSection>
-        </div>
-      </section>
-
-      {/* Your Music Has a Home */}
-      <section className="py-12 sm:py-16  bg-[#faf8f5] overflow-visible">
-        <div className="max-w-5xl mx-auto px-4">
-          <AnimatedSection className="max-w-2xl mb-12">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.1]">Your music has a home</h2>
-            <p className="mt-5 text-neutral-600 text-lg max-w-xl">
-              Every track you upload gets its own page. Listeners can discover it, listen, and share it with their audience.
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection className="relative">
-            {/* Decorative doodles */}
-            <Sparkle className="pointer-events-none absolute -top-10 -left-10 sm:-left-24 lg:-left-40 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-90 rotate-12" />
-            <Star className="pointer-events-none absolute top-6 -left-6 sm:-left-16 lg:-left-24 w-12 h-12 sm:w-14 sm:h-14 text-purple-400 opacity-90 -rotate-12" />
-            <Squiggle className="pointer-events-none absolute -bottom-10 -right-10 sm:-right-28 lg:-right-44 w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 text-orange-300 opacity-60 rotate-6" />
-
-            <BrowserMockup url="mixreflect.com/track/midnight-drive">
-              <TrackPageMockup />
-            </BrowserMockup>
-          </AnimatedSection>
-        </div>
-      </section>
-
-      {/* Breakthrough */}
-      <section className="bg-[#0f0a24] text-neutral-50 overflow-hidden">
-        <div className="max-w-5xl mx-auto px-4 py-20 sm:py-28">
+        <div className="max-w-5xl mx-auto px-4 py-14 sm:py-20">
           <div className="grid sm:grid-cols-2 gap-12 sm:gap-20 items-center">
             {/* Left — editorial text */}
             <div>
@@ -347,6 +221,142 @@ export default function Home() {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Your Music Has a Home */}
+      <section className="py-14 sm:py-20 bg-[#faf7f2] overflow-visible">
+        <div className="max-w-5xl mx-auto px-4">
+          <AnimatedSection className="max-w-2xl mb-12">
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-500 mb-3">Public track page</p>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-neutral-950 leading-[1.05]">Your music has a home</h2>
+            <p className="mt-5 text-neutral-500 text-base sm:text-lg max-w-xl leading-relaxed">
+              Every track you upload gets its own page. Listeners can discover it, listen, and share it with their audience.
+            </p>
+          </AnimatedSection>
+
+          <AnimatedSection className="relative">
+            {/* Decorative doodles */}
+            <Sparkle className="pointer-events-none absolute -top-10 -left-10 sm:-left-24 lg:-left-40 w-16 h-16 sm:w-24 sm:h-24 text-neutral-950 opacity-90 rotate-12" />
+            <Star className="pointer-events-none absolute top-6 -left-6 sm:-left-16 lg:-left-24 w-12 h-12 sm:w-14 sm:h-14 text-purple-400 opacity-90 -rotate-12" />
+            <Squiggle className="pointer-events-none absolute -bottom-10 -right-10 sm:-right-28 lg:-right-44 w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 text-orange-300 opacity-60 rotate-6" />
+
+            <BrowserMockup url="mixreflect.com/track/midnight-drive">
+              <TrackPageMockup />
+            </BrowserMockup>
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* Weekly Discover — immersive dark section */}
+      <section className="pb-10 sm:pb-14 pt-0 bg-black text-neutral-50 overflow-visible font-sans relative">
+        {/* Radial glow background */}
+        <div className="absolute inset-0 opacity-60 pointer-events-none" style={{
+          background: "radial-gradient(ellipse 80% 50% at 50% 30%, rgba(0,240,255,0.10) 0%, rgba(168,85,247,0.05) 40%, transparent 70%)",
+        }} />
+
+        <div className="w-full overflow-hidden bg-cyan-400/5">
+          <div className="h-10 flex items-center">
+            <div
+              className={`${caveat.className} w-full flex gap-6 whitespace-nowrap text-cyan-400/40 text-2xl font-bold leading-none`}
+            >
+              {Array.from({ length: 60 }).map((_, i) => (
+                <span key={i}>discover</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-4 pt-8 sm:pt-10 relative">
+          {/* Heading */}
+          <AnimatedSection className="max-w-2xl mb-8 sm:mb-10">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-[1.1]">
+              Explore music{" "}
+              <span className="relative inline-block">
+                <span className="relative z-10">in 3D</span>
+                <span className="absolute bottom-1 left-0 right-0 h-2.5 bg-cyan-400/30 -rotate-[0.5deg] z-0" />
+              </span>
+            </h2>
+            <p className="mt-3 text-neutral-400 text-sm sm:text-base max-w-xl">
+              Upload a track and it appears in the Discover space instantly. Float through a galaxy of independent music, click any album to listen.
+            </p>
+          </AnimatedSection>
+
+          <AnimatedSection className="relative">
+            <div className="relative max-w-3xl mx-auto">
+              {/* Floating album artwork grid — simulating the 3D space */}
+              <div className="relative h-[220px] sm:h-[260px] flex items-center justify-center">
+                {/* Glow orb behind */}
+                <div className="absolute w-48 h-48 rounded-full opacity-20 blur-3xl" style={{
+                  background: "radial-gradient(circle, rgba(0,240,255,0.4) 0%, rgba(168,85,247,0.2) 50%, transparent 70%)",
+                  top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+                }} />
+
+                {/* Album cards floating at different depths — real artwork */}
+                {[
+                  { x: "8%",  y: "12%", rot: -8, size: 68,  glow: "#00f0ff", z: 10 },
+                  { x: "28%", y: "4%",  rot: 4,  size: 84,  glow: "#a855f7", z: 30 },
+                  { x: "52%", y: "10%", rot: -3, size: 76,  glow: "#ff2d9b", z: 20 },
+                  { x: "75%", y: "6%",  rot: 6,  size: 64,  glow: "#fbbf24", z: 15 },
+                  { x: "15%", y: "52%", rot: 5,  size: 60,  glow: "#10b981", z: 12 },
+                  { x: "38%", y: "46%", rot: -6, size: 92,  glow: "#00f0ff", z: 35 },
+                  { x: "62%", y: "50%", rot: 3,  size: 72,  glow: "#a855f7", z: 25 },
+                  { x: "82%", y: "42%", rot: -4, size: 58,  glow: "#ff2d9b", z: 8  },
+                ].map((card, i) => (
+                  <div
+                    key={i}
+                    className="absolute rounded-xl overflow-hidden"
+                    style={{
+                      left: card.x,
+                      top: card.y,
+                      width: card.size,
+                      height: card.size,
+                      transform: `rotate(${card.rot}deg)`,
+                      zIndex: card.z,
+                      boxShadow: `0 0 20px ${card.glow}20, 0 6px 24px rgba(0,0,0,0.6)`,
+                      border: `1px solid ${card.glow}30`,
+                    }}
+                  >
+                    <Image
+                      src={discoverArtwork[i]}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes={`${card.size}px`}
+                    />
+                  </div>
+                ))}
+
+                {/* Faint grid lines — holographic floor effect */}
+                <div className="absolute bottom-0 left-0 right-0 h-16 opacity-10" style={{
+                  background: "repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,240,255,0.3) 39px, rgba(0,240,255,0.3) 40px), repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,240,255,0.3) 39px, rgba(0,240,255,0.3) 40px)",
+                  maskImage: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%)",
+                  WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%)",
+                }} />
+              </div>
+
+              {/* CTA */}
+              <div className="mt-6 text-center">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link href="/discover">
+                    <Button
+                      className="bg-white/[0.08] text-white hover:bg-white/[0.14] font-black border border-white/[0.12] hover:border-white/[0.2] transition-all"
+                    >
+                      Enter the space <ArrowRight className="ml-2 h-4 w-4 text-cyan-400" />
+                    </Button>
+                  </Link>
+                  <SignupLink>
+                    <Button
+                      className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all"
+                    >
+                      Get started free
+                    </Button>
+                  </SignupLink>
+                </div>
+                <p className="mt-3 text-xs text-neutral-500">No account needed to explore • Upload a track to appear instantly</p>
+              </div>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
