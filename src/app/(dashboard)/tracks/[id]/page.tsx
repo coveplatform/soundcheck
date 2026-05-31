@@ -269,13 +269,6 @@ export default async function TrackDetailPage({
                       {track.sourceType === "UPLOAD" ? "Download" : "Open"}
                     </Button>
                   </a>
-                  {track.trackShareId && completedReviews > 0 && (
-                    <a href={`/t/${track.trackShareId}`} target="_blank" rel="noopener noreferrer">
-                      <Button variant="outline" className="h-9 px-3 text-xs rounded-xl font-bold">
-                        Share
-                      </Button>
-                    </a>
-                  )}
                 </div>
               </div>
             </div>
@@ -335,6 +328,7 @@ export default async function TrackDetailPage({
                   titleA={track.isAbTest && track.other_Track ? track.title : undefined}
                   titleB={track.isAbTest && track.other_Track ? track.other_Track.title : undefined}
                   trackId={track.id}
+                  trackTitle={track.title}
                 />
               }
               settingsTab={

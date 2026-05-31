@@ -306,7 +306,8 @@ export function AudioPlayer({
 
     const run = async () => {
       try {
-        const res = await fetch(sourceUrl);
+        const fetchUrl = `/api/audio-proxy?url=${encodeURIComponent(sourceUrl)}`;
+        const res = await fetch(fetchUrl);
         if (!res.ok) {
           if (!cancelled) {
             setIsWaveformLoading(false);

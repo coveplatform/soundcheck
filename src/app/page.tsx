@@ -402,7 +402,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                  <span className="text-sm text-neutral-50">Public track sharing page</span>
+                  <span className="text-sm text-neutral-50">Shareable feedback pages</span>
                 </div>
               </div>
 

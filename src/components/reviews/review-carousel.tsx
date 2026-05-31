@@ -8,9 +8,10 @@ import { cn } from "@/lib/utils";
 type ReviewCarouselProps = {
   reviews: ReviewData[];
   showControls?: boolean;
+  trackTitle?: string;
 };
 
-export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselProps) {
+export function ReviewCarousel({ reviews, showControls = true, trackTitle }: ReviewCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [direction, setDirection] = useState<"left" | "right">("right");
@@ -114,7 +115,7 @@ export function ReviewCarousel({ reviews, showControls = true }: ReviewCarouselP
           )}
           key={currentIndex}
         >
-          <ReviewDisplay review={currentReview} index={currentIndex} showControls={showControls} />
+          <ReviewDisplay review={currentReview} index={currentIndex} showControls={showControls} trackTitle={trackTitle} />
         </div>
       </div>
 

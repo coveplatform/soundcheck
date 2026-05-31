@@ -109,9 +109,10 @@ interface ReviewsTabProps {
   reviewsB?: any[];
   titleA?: string;
   titleB?: string;
+  trackTitle?: string;
 }
 
-export function ReviewsTab({ reviews, trackId, reviewsB, titleA, titleB }: ReviewsTabProps) {
+export function ReviewsTab({ reviews, trackId, reviewsB, titleA, titleB, trackTitle }: ReviewsTabProps) {
   const isCompare = !!reviewsB && reviewsB.length > 0;
   const totalReviews = reviews.length + (reviewsB?.length ?? 0);
 
@@ -127,7 +128,7 @@ export function ReviewsTab({ reviews, trackId, reviewsB, titleA, titleB }: Revie
               Version A — {titleA ?? "Original"}
             </p>
             <div className="rounded-2xl border border-black/8 bg-white shadow-sm overflow-hidden">
-              <ReviewCarousel reviews={reviews} showControls={true} />
+              <ReviewCarousel reviews={reviews} showControls={true} trackTitle={trackTitle ?? titleA} />
             </div>
           </div>
           <div className="space-y-3">
@@ -135,14 +136,14 @@ export function ReviewsTab({ reviews, trackId, reviewsB, titleA, titleB }: Revie
               Version B — {titleB ?? "Alternate"}
             </p>
             <div className="rounded-2xl border border-purple-100 bg-white shadow-sm overflow-hidden">
-              <ReviewCarousel reviews={reviewsB!} showControls={true} />
+              <ReviewCarousel reviews={reviewsB!} showControls={true} trackTitle={titleB} />
             </div>
           </div>
         </div>
       ) : (
         /* Single track: reviews carousel */
         <div className="rounded-2xl border border-black/8 bg-white shadow-sm overflow-hidden">
-          <ReviewCarousel reviews={reviews} showControls={true} />
+          <ReviewCarousel reviews={reviews} showControls={true} trackTitle={trackTitle} />
         </div>
       )}
 

@@ -1,9 +1,11 @@
 "use client";
 
 import { Prisma } from "@prisma/client";
+import { Sparkles } from "lucide-react";
 import { ReviewRating } from "@/components/artist/review-rating";
 import { ReviewFlag } from "@/components/artist/review-flag";
 import { ReviewGem } from "@/components/artist/review-gem";
+import { ShareReviewButton } from "@/components/reviews/share-review-button";
 
 function isTimestampNote(
   value: Prisma.JsonValue
@@ -198,11 +200,12 @@ type ReviewDisplayProps = {
   review: ReviewData;
   index: number;
   showControls?: boolean;
+  trackTitle?: string;
 };
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function ReviewDisplay({ review, index: _index, showControls = true }: ReviewDisplayProps) {
+export function ReviewDisplay({ review, index: _index, showControls = true, trackTitle }: ReviewDisplayProps) {
   const reviewerName =
     review.ReviewerProfile?.User?.name ?? review.ArtistProfile?.User?.name ?? "Reviewer";
   const isRestricted = review.ReviewerProfile?.isRestricted ?? false;
@@ -484,6 +487,31 @@ export function ReviewDisplay({ review, index: _index, showControls = true }: Re
           </div>
           <ReviewFlag reviewId={review.id} wasFlagged={review.wasFlagged} flagReason={review.flagReason} />
         </footer>
+      )}
+
+      {/* Share callout — prominent, only on strong positive reviews */}
+      {trackTitle && review.bestPart && review.bestPart.length >= 20 &&
+        (review.productionScore !== null && review.productionScore >= 4 ||
+         review.firstImpression === "STRONG_HOOK") && (
+        <div className="px-5 sm:px-6 pb-5 pt-4 border-t border-black/5">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl border border-purple-200 bg-purple-50 px-4 py-3.5 dark:border-purple-500/30 dark:bg-purple-500/10">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="h-9 w-9 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0 dark:bg-purple-500/20">
+                <Sparkles className="h-4.5 w-4.5 text-purple-600 dark:text-purple-300" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-purple-900 leading-tight dark:text-purple-100">Proud of this feedback?</p>
+                <p className="text-xs text-purple-700/70 mt-0.5 leading-tight dark:text-purple-200/60">Share it as a card or a link anyone can play</p>
+              </div>
+            </div>
+            <ShareReviewButton
+              reviewId={review.id}
+              trackTitle={trackTitle}
+              variant="button"
+              label="Share this feedback"
+            />
+          </div>
+        </div>
       )}
     </article>
   );

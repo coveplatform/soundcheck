@@ -33,7 +33,7 @@ const FREE_FEATURES = [
   { text: "1 track in review at a time", included: true },
   { text: "Earn credits by reviewing others", included: true },
   { text: "Structured feedback on every review", included: true },
-  { text: "Public track sharing page", included: true },
+  { text: "Shareable feedback pages", included: true },
   { text: "No grind — credits included", included: false },
   { text: "Priority placement", included: false },
 ];
