@@ -71,6 +71,8 @@ export default async function TracksPage({
                   User: { select: { name: true } },
                 },
               },
+              qualityLevel: true,
+              nextFocus: true,
               ...(isInsightsView ? {
                 wouldAddToPlaylist: true,
                 wouldShare: true,
@@ -85,8 +87,6 @@ export default async function TracksPage({
                 trackLength: true,
                 emotionalImpact: true,
                 playlistAction: true,
-                qualityLevel: true,
-                nextFocus: true,
                 expectedPlacement: true,
                 quickWin: true,
                 biggestWeaknessSpecific: true,
@@ -298,6 +298,20 @@ export default async function TracksPage({
       ? (listenAgain.filter((r: any) => r.wouldListenAgain === true).length / listenAgain.length) * 100
       : null;
 
+    // Hook rate — % of reviewers who got a strong first impression
+    const impressions = completed.filter((r: any) => r.firstImpression != null);
+    const hookRate = impressions.length > 0
+      ? Math.round(impressions.filter((r: any) => r.firstImpression === "STRONG_HOOK").length / impressions.length * 100)
+      : null;
+
+    // Quality consensus — most common qualityLevel verdict
+    const qualityValues = completed.map((r: any) => r.qualityLevel).filter(Boolean) as string[];
+    const qualityConsensus = getMostCommon(qualityValues);
+
+    // nextFocus consensus — most common next focus across reviews
+    const nextFocusValues = completed.map((r: any) => r.nextFocus).filter(Boolean) as string[];
+    const nextFocusConsensus = getMostCommon(nextFocusValues);
+
     return {
       id: track.id,
       title: track.title,
@@ -311,22 +325,42 @@ export default async function TracksPage({
       avgVocal,
       overallAvg,
       wouldListenAgainPct,
+      hookRate,
+      qualityConsensus,
+      nextFocusConsensus,
       createdAt: track.createdAt,
       reviews: completed.map((r: any) => ({
         id: r.id,
         productionScore: r.productionScore as number | null,
-        originalityScore: r.originalityScore as number | null,
-        vocalScore: r.vocalScore as number | null,
         wouldListenAgain: r.wouldListenAgain as boolean | null,
         firstImpression: (r.firstImpression as string) ?? null,
+        qualityLevel: (r.qualityLevel as string) ?? null,
+        nextFocus: (r.nextFocus as string) ?? null,
         bestPart: (r.bestPart as string) ?? null,
         weakestPart: (r.weakestPart as string) ?? null,
-        additionalNotes: (r.additionalNotes as string) ?? null,
         reviewerName: r.ReviewerProfile?.User?.name ?? r.ArtistProfile?.User?.name ?? "Anonymous",
         createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : null,
       })),
     };
   });
+
+  // Career-level stats for the progress banner
+  const careerStats = (() => {
+    const withReviews = trackStats.filter(t => t.reviewsCompleted > 0);
+    if (withReviews.length === 0) return null;
+    const totalReviews = withReviews.reduce((sum, t) => sum + t.reviewsCompleted, 0);
+    const trajectory = [...withReviews]
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      .filter(t => t.avgProduction !== null)
+      .map(t => ({ title: t.title, score: t.avgProduction as number }));
+    const allNextFocuses = withReviews.flatMap(t => t.reviews.map((r: any) => r.nextFocus)).filter(Boolean) as string[];
+    const topNextFocus = getMostCommon(allNextFocuses);
+    const allListenAgain = withReviews.flatMap(t => t.reviews.map((r: any) => r.wouldListenAgain)).filter(v => v !== null) as boolean[];
+    const overallListenAgain = allListenAgain.length > 0
+      ? Math.round(allListenAgain.filter(v => v).length / allListenAgain.length * 100)
+      : null;
+    return { trajectory, topNextFocus, overallListenAgain, totalReviews };
+  })();
 
   const credits = artistProfile.reviewCredits ?? 0;
 
@@ -486,7 +520,7 @@ export default async function TracksPage({
             )
           }
           statsView={
-            <TrackStatsView tracks={trackStats} />
+            <TrackStatsView tracks={trackStats} career={careerStats} />
           }
           insightsView={
             <PortfolioView
@@ -641,6 +675,13 @@ function EmptyState() {
       </div>
     </div>
   );
+}
+
+function getMostCommon<T extends string>(arr: T[]): T | null {
+  if (arr.length === 0) return null;
+  const map = new Map<T, number>();
+  for (const v of arr) map.set(v, (map.get(v) ?? 0) + 1);
+  return [...map.entries()].sort((a, b) => b[1] - a[1])[0][0];
 }
 
 // Helper function to generate trend data grouped by month
