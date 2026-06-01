@@ -62,7 +62,9 @@ export async function POST(request: Request) {
       return NextResponse.json(profile);
     }
 
-    const startingCredits = 1;
+    // New artists start with enough credits for a first batch (3 = "see patterns"
+    // tier) so they reach the aha moment before hitting the credit grind or any wall.
+    const startingCredits = 3;
 
     const profile = await prisma.artistProfile.create({
       data: {

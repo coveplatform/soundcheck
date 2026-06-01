@@ -19,6 +19,7 @@ export const FREE_ACTIVE_SLOTS = 1;
 // Free users can complete up to this many peer reviews per day (each earns 1 credit).
 // Single source of truth — the API routes that enforce the cap and the /review page that
 // renders the "daily limit reached" Pro upsell all read this, so they can never drift apart.
-// Tunable lever: higher = more review supply + earned credits (better marketplace liquidity);
-// lower = more pressure toward Pro's "unlimited reviews/day". Pro/admins bypass it entirely.
-export const FREE_DAILY_REVIEW_LIMIT = 1;
+// Kept generous on purpose: this protects review quality/supply (anti-spam) and lets the
+// queue stay liquid. It is NOT the monetization lever — that's the 1-track upload cap plus
+// Pro's priority/outcomes. Pro/admins bypass it entirely.
+export const FREE_DAILY_REVIEW_LIMIT = 5;
