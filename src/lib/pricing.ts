@@ -22,4 +22,6 @@ export const FREE_ACTIVE_SLOTS = 1;
 // Kept generous on purpose: this protects review quality/supply (anti-spam) and lets the
 // queue stay liquid. It is NOT the monetization lever — that's the 1-track upload cap plus
 // Pro's priority/outcomes. Pro/admins bypass it entirely.
-export const FREE_DAILY_REVIEW_LIMIT = 5;
+// Typed as `number` (not the literal `5`) so the pluralization guards that compare
+// against it (`=== 1`) stay valid when this value is tuned.
+export const FREE_DAILY_REVIEW_LIMIT: number = 5;
