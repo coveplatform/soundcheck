@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
     if (reviewsTodayCount >= MAX_REVIEWS_PER_DAY) {
       return NextResponse.json(
-        { error: `You've reached your daily limit of ${MAX_REVIEWS_PER_DAY} reviews. Check back tomorrow!` },
+        { error: `You've reached your daily limit of ${MAX_REVIEWS_PER_DAY} review${MAX_REVIEWS_PER_DAY === 1 ? "" : "s"}. Check back tomorrow!` },
         { status: 429 }
       );
     }

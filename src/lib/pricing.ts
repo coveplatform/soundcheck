@@ -21,4 +21,4 @@ export const FREE_ACTIVE_SLOTS = 1;
 // renders the "daily limit reached" Pro upsell all read this, so they can never drift apart.
 // Tunable lever: higher = more review supply + earned credits (better marketplace liquidity);
 // lower = more pressure toward Pro's "unlimited reviews/day". Pro/admins bypass it entirely.
-export const FREE_DAILY_REVIEW_LIMIT = 5;
+export const FREE_DAILY_REVIEW_LIMIT = 1;

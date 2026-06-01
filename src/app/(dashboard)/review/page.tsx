@@ -246,7 +246,7 @@ export default async function ListenPage({
                     <p className="text-xs font-black uppercase tracking-[0.2em] text-purple-400/80">Daily limit reached</p>
                   </div>
                   <p className="text-lg font-black text-white leading-tight">
-                    You&apos;ve reviewed {MAX_REVIEWS_PER_DAY} tracks today
+                    You&apos;ve reviewed {MAX_REVIEWS_PER_DAY} track{MAX_REVIEWS_PER_DAY === 1 ? "" : "s"} today
                   </p>
                   <p className="text-sm text-white/40 mt-1">
                     Pro removes the limit — review as many as you want, earn unlimited credits.
@@ -275,7 +275,7 @@ export default async function ListenPage({
                 Upgrade to Pro
               </Link>
               <p className="flex items-center justify-center py-3.5 text-[12px] font-bold text-black/40 text-center px-3">
-                Check back tomorrow for {MAX_REVIEWS_PER_DAY} more free reviews
+                Check back tomorrow for {MAX_REVIEWS_PER_DAY} more free review{MAX_REVIEWS_PER_DAY === 1 ? "" : "s"}
               </p>
             </div>
           </div>
