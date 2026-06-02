@@ -439,6 +439,11 @@ model Track {
   Track                      Track?               @relation("TrackToTrack", fields: [abTestPrimaryTrackId], references: [id])
   other_Track                Track?               @relation("TrackToTrack")
   ArtistProfile              ArtistProfile        @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  aiFeedbackPoints           Json?
+  aiFeedbackGeneratedAt      DateTime?
+  resultsUnlockedAt          DateTime?
+  unlockStripeSessionId      String?              @unique
+  unlockStripePaymentId      String?
   TrackAffiliateLink         TrackAffiliateLink[]
   TrackStem                  TrackStem[]
   Genre                      Genre[]              @relation("TrackGenres")
