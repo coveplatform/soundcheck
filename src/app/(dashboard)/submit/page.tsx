@@ -11,7 +11,7 @@ import { validateTrackUrl, fetchTrackMetadata, detectSource } from "@/lib/metada
 import { BuyCreditsButton } from "@/components/credits/buy-credits-button";
 import {
   Link2, Upload, Loader2, Check, Music,
-  Crown, Sparkles, ImagePlus, Globe, Lock, AlertTriangle,
+  Crown, Sparkles, ImagePlus, Globe, Lock, AlertTriangle, Clock, Zap,
 } from "lucide-react";
 
 // ─── types ───────────────────────────────────────────────────────────────────
@@ -1008,6 +1008,41 @@ export default function SubmitTrackPage() {
                 </div>
                 <p className="text-sm font-bold text-black">{currentBenefit?.label ?? "Select reviews"}</p>
                 <p className="text-xs text-black/40 mt-0.5">Current insight level</p>
+              </div>
+
+              {/* Estimated wait */}
+              <div className="bg-[#faf7f2] rounded-2xl p-5 mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock className="h-3.5 w-3.5 text-black/40" />
+                  <p className="text-xs font-black uppercase tracking-[0.15em] text-black/40">Estimated wait</p>
+                </div>
+                {isPro ? (
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1 bg-purple-600 text-white text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full">
+                      <Zap className="h-3 w-3" /> Priority
+                    </span>
+                    <p className="text-sm font-bold text-black">Under 20 minutes</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-black/50">Free</span>
+                      <span className="text-sm font-bold text-black tabular-nums">4–8 hours</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1.5 text-sm font-bold text-purple-600">
+                        <Crown className="h-3.5 w-3.5" /> Pro
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="text-sm font-black text-purple-600 tabular-nums">&lt; 20 min</span>
+                        <span className="bg-purple-600 text-white text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full">Priority</span>
+                      </span>
+                    </div>
+                    <Link href="/pro" className="block pt-0.5 text-xs font-bold text-purple-600 hover:text-purple-700 transition-colors">
+                      Go Pro to skip the line →
+                    </Link>
+                  </div>
+                )}
               </div>
 
               {/* Credit balance */}
