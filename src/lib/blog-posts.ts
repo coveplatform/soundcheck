@@ -20,6 +20,118 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "why-your-vocals-sound-buried-in-the-mix",
+    title: "Why Your Vocals Sound Buried in the Mix (And How to Fix It)",
+    coverImage: "/blog/blog8.jpg",
+    excerpt:
+      "Buried vocals are the single most common issue listeners flag on a finished track. Here's why it happens, why you can't hear it yourself, and how to actually fix it.",
+    category: "GUIDE",
+    date: "June 4, 2026",
+    readTime: "5 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "If you ask a room full of strangers to listen to an unreleased track and tell you the one thing they'd change, the answer comes back more often than any other: I can't hear the words. The vocals are sitting under the mix instead of on top of it. It's the most common note independent artists get — and the one they're least likely to catch on their own.",
+      },
+      {
+        type: "paragraph",
+        text: "The frustrating part is that buried vocals are almost always a quick fix. It's rarely a fundamental problem with the song. It's a balance issue, a frequency issue, or an arrangement issue that you've stopped being able to hear because you already know every word by heart.",
+      },
+      {
+        type: "h2",
+        text: "Why you can't hear it yourself",
+      },
+      {
+        type: "paragraph",
+        text: "By the time you're mixing, you've heard the vocal take hundreds of times. You know exactly what every line says. So your brain fills it in — even when the actual audio is masking it. You're not hearing the mix a first-time listener hears. You're hearing your memory of the vocal sitting on top of it.",
+      },
+      {
+        type: "paragraph",
+        text: "This is the same reason you stop noticing the intro is too long or the mid-section drifts. Familiarity edits the track for you. A fresh listener has none of that context — they hear exactly what's in the file, and if the vocal is two decibels too low or fighting the guitars for the same frequency space, they notice immediately.",
+      },
+      {
+        type: "quote",
+        text: "You know every word, so your brain fills them in. A first-time listener only hears what's actually in the file.",
+      },
+      {
+        type: "h2",
+        text: "The real reasons vocals get buried",
+      },
+      {
+        type: "paragraph",
+        text: "Buried vocals usually come down to one of a handful of causes, and it helps to know which one you're dealing with before you start moving faders.",
+      },
+      {
+        type: "list",
+        items: [
+          "Level — the simplest case: the vocal is just too quiet relative to the instrumental. Often the fix is nothing more than turning it up a couple of dB.",
+          "Frequency masking — the vocal and another element (synths, guitars, a busy pad) are crowding the same midrange. Even at the right level, they smear into each other.",
+          "Too much low-end or reverb — a muddy low-mid buildup or a wash of reverb pushes the vocal back and softens its edges.",
+          "Lack of dynamic control — the vocal jumps from too quiet to too loud, so it ducks under the mix on the quieter words and never sits consistently.",
+          "Arrangement density — too much happening at once. The vocal isn't given any space to breathe in the frequency spectrum.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "How to actually fix it",
+      },
+      {
+        type: "paragraph",
+        text: "Start with the cheapest fix and work up. Before reaching for EQ or compression, just turn the vocal up. A surprising number of buried-vocal problems are solved by a 1.5–3 dB level bump. If that makes the vocal too loud on the choruses but still buried on the verses, the issue is dynamics — gentle compression or volume automation will even it out so the vocal sits in the same place throughout.",
+      },
+      {
+        type: "paragraph",
+        text: "If level isn't enough, the problem is usually masking. Carve a little space in the competing element — a small dip in the guitars or synths around the vocal's core frequencies (often somewhere in the 1–4 kHz range, where consonants and intelligibility live) lets the voice cut through without you having to crank it. Clearing low-mid mud around 200–500 Hz on the busier instruments often does as much for vocal clarity as anything you do to the vocal itself.",
+      },
+      {
+        type: "paragraph",
+        text: "Reverb is the silent culprit people forget. A lush vocal reverb feels great in solo, but in the full mix it can smear the vocal backwards and rob it of presence. Pull the reverb down, or use a shorter, drier setting, and the vocal often snaps back to the front.",
+      },
+      {
+        type: "quote",
+        text: "Try the cheapest fix first. Most buried vocals are solved by a couple of dB, not a plugin chain.",
+      },
+      {
+        type: "h2",
+        text: "The check that tells you if it worked",
+      },
+      {
+        type: "paragraph",
+        text: "Here's the trap: you'll fix the vocal, listen back, and — because you already know the words — it'll sound fine to you. You have no reliable way to judge your own vocal balance after you've heard the track this many times. The only real test is a set of ears that has never heard the song before.",
+      },
+      {
+        type: "paragraph",
+        text: "And not just one set. One person saying the vocal is buried might be their headphones or their taste. But when several listeners independently flag the same thing — without hearing each other's responses — that's not preference anymore. That's a pattern, and patterns are the only feedback worth acting on before you release.",
+      },
+      {
+        type: "paragraph",
+        text: "This is exactly what MixReflect is built for. You upload a track before release and genre-matched artists fill out a structured review independently — including whether the vocals cut through or sit under the mix. When multiple reviewers flag the same buried vocal, you know it's real and worth fixing. When they don't, you know your balance is landing and you can release with confidence.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "Why do my vocals sound buried in the mix?",
+            a: "Buried vocals usually come down to one of a few causes: the vocal level is simply too low, the vocal is competing with another instrument for the same midrange frequencies (masking), too much reverb or low-end mud is pushing it back, or the vocal's dynamics are uneven so it ducks under the mix on quieter words. Start by checking the level — often a 1.5–3 dB bump is all it takes — before reaching for EQ or compression.",
+          },
+          {
+            q: "How do I make my vocals cut through the mix?",
+            a: "Work cheapest fix first: turn the vocal up a couple of dB, then even out its dynamics with compression or automation so it sits consistently. If it's still buried, carve a small dip in competing instruments around the vocal's core frequencies (roughly 1–4 kHz for intelligibility) and clear low-mid mud around 200–500 Hz on busier elements. Finally, check your reverb — too much smears the vocal backwards.",
+          },
+          {
+            q: "Why can't I tell if my own vocals are too quiet?",
+            a: "Because you've heard the vocal take hundreds of times and already know every word, your brain fills the lyrics in even when the audio is masking them. You're hearing your memory of the vocal, not the actual balance a first-time listener gets. The only reliable test is fresh ears — ideally several independent listeners, since a pattern of multiple people flagging the same thing is far more trustworthy than one opinion.",
+          },
+          {
+            q: "How do I get feedback on whether my vocals are buried?",
+            a: "Get structured feedback from multiple independent listeners before you release. Platforms like MixReflect have genre-matched artists fill out a structured review that specifically covers whether the vocals cut through or sit under the mix. Because reviewers respond independently, you can see where multiple people converge — if several flag buried vocals without hearing each other, it's a real issue to fix before release.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "what-playlist-curators-look-for",
     title: "What Playlist Curators Actually Look For (And Why Most Tracks Get Rejected)",
     coverImage: "/blog/blog7.jpg",
