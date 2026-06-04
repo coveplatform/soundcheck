@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Music, Plus, ArrowRight, Loader2, Check, X, Zap,
+  Music, Plus, ArrowRight, Loader2, Check, X, Zap, Clock,
   Link2, Upload, GitCompareArrows,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -182,7 +182,7 @@ export function QueueTrackPicker({ tracks, credits, isPro = false, open, onClose
     : !!versionBUploadedUrl && !versionBIsUploading;
 
   const creditCost = compareMode ? reviewCount * 2 : reviewCount;
-  const canAfford = isPro || credits >= creditCost;
+  const canAfford = credits >= creditCost;
   const currentBenefit = REVIEW_BENEFITS.filter(b => reviewCount >= b.min).slice(-1)[0];
 
   const handleSubmit = async () => {
@@ -564,30 +564,52 @@ export function QueueTrackPicker({ tracks, credits, isPro = false, open, onClose
             <p className="text-sm font-bold text-black">{currentBenefit?.label ?? "Select"}</p>
             <p className="text-[10px] text-black/35 mt-0.5 uppercase tracking-wider font-bold">Insight level</p>
           </div>
+
+          {/* Estimated wait */}
+          <div className="bg-[#faf7f2] px-4 py-3.5 mt-3">
+            <div className="flex items-center gap-1.5 mb-2">
+              <Clock className="h-3 w-3 text-black/30" />
+              <p className="text-[10px] font-black uppercase tracking-wider text-black/30">Estimated wait</p>
+            </div>
+            {isPro ? (
+              <div className="flex items-center gap-1.5">
+                <span className="inline-flex items-center gap-1 bg-purple-600 text-white text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5">
+                  <Zap className="h-2.5 w-2.5" /> Priority
+                </span>
+                <p className="text-xs font-bold text-black">Under 20 minutes</p>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-black/45">Free <span className="text-black font-bold ml-1">4–8 hours</span></span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="text-xs font-black text-purple-600 tabular-nums">&lt; 20 min</span>
+                  <span className="bg-purple-600 text-white text-[8px] font-black uppercase tracking-wider px-1 py-0.5">Pro</span>
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ── Credits ─────────────────────────────────────────── */}
         <div className="border-t border-black/6 px-6 py-5">
-          {isPro ? (
-            <div className="flex items-center gap-2.5">
-              <Zap className="h-4 w-4 text-purple-600 flex-shrink-0" />
-              <p className="text-sm font-bold text-purple-700">Pro — 30 credits/month · priority placement</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-black/30 mb-1">You have</p>
+              <p className={cn("text-4xl font-black tabular-nums leading-none", credits === 0 ? "text-red-500" : "text-black")}>{credits}</p>
+              <p className="text-[10px] text-black/30 mt-0.5 font-bold">credits</p>
             </div>
-          ) : (
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.15em] text-black/30 mb-1">You have</p>
-                <p className={cn("text-4xl font-black tabular-nums leading-none", credits === 0 ? "text-red-500" : "text-black")}>{credits}</p>
-                <p className="text-[10px] text-black/30 mt-0.5 font-bold">credits</p>
-              </div>
-              <div className="text-right">
-                <p className="text-[10px] font-black uppercase tracking-[0.15em] text-black/30 mb-1">This costs</p>
-                <p className={cn("text-4xl font-black tabular-nums leading-none", !canAfford ? "text-red-500" : "text-purple-600")}>{creditCost}</p>
-                <p className="text-[10px] text-black/30 mt-0.5 font-bold">
-                  {compareMode ? `credits (${reviewCount} × 2)` : "credits"}
-                </p>
-              </div>
+            <div className="text-right">
+              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-black/30 mb-1">This costs</p>
+              <p className={cn("text-4xl font-black tabular-nums leading-none", !canAfford ? "text-red-500" : "text-purple-600")}>{creditCost}</p>
+              <p className="text-[10px] text-black/30 mt-0.5 font-bold">
+                {compareMode ? `credits (${reviewCount} × 2)` : "credits"}
+              </p>
             </div>
+          </div>
+          {isPro && (
+            <p className="text-[11px] text-black/40 mt-3 flex items-center gap-1.5">
+              <Zap className="h-3 w-3 text-purple-600" /> Pro includes 30 credits every month · priority placement
+            </p>
           )}
         </div>
 
@@ -624,6 +646,27 @@ export function QueueTrackPicker({ tracks, credits, isPro = false, open, onClose
                 label="Buy 10 credits — $9.95"
               />
               <Link href="/review" onClick={onClose} className="flex items-center justify-center h-11 text-[12px] font-bold text-black/50 hover:text-black hover:bg-black/3 transition-colors">
+                Earn free credits
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* ── Out of credits (Pro) ───────────────────────────── */}
+        {isPro && !canAfford && (
+          <div className="border-t border-black/6 bg-[#0f0f18] px-6 py-5">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-purple-400/70 mb-1">
+              You need {creditCost - credits} more credit{creditCost - credits === 1 ? "" : "s"}
+            </p>
+            <p className="text-sm font-medium text-white/60 mb-4">
+              You&apos;ve used this month&apos;s Pro credits. Buy a pack or earn more by reviewing.
+            </p>
+            <div className="grid grid-cols-2 border-t border-white/10">
+              <BuyCreditsButton
+                className="h-11 text-[12px] font-bold text-white/60 hover:text-white hover:bg-white/5 transition-colors border-r border-white/10 rounded-none w-full bg-transparent border-0 shadow-none"
+                label="Buy 10 credits — $9.95"
+              />
+              <Link href="/review" onClick={onClose} className="flex items-center justify-center h-11 text-[12px] font-bold text-white/60 hover:text-white hover:bg-white/5 transition-colors">
                 Earn free credits
               </Link>
             </div>

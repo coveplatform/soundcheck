@@ -117,7 +117,7 @@ export default function SubmitTrackPage() {
         const pro = d.subscriptionStatus === "active";
         setProfile({ id: d.id, artistName: d.artistName, totalTracks: d.totalTracks ?? 0, reviewCredits: bal });
         if (d.experienceLevel) setExperienceLevel(d.experienceLevel as ExperienceLevel);
-        if (!reviewCountInited) { setReviewCount(pro ? 10 : Math.min(5, Math.max(1, bal))); setReviewCountInited(true); }
+        if (!reviewCountInited) { setReviewCount(pro ? Math.min(10, Math.max(1, bal)) : Math.min(5, Math.max(1, bal))); setReviewCountInited(true); }
       })
       .catch(console.error)
       .finally(() => setProfileLoading(false));
@@ -310,7 +310,7 @@ export default function SubmitTrackPage() {
   const isPro            = slotInfo?.isPro ?? false;
   const creditBalance    = profile?.reviewCredits ?? 0;
   const creditCost       = abTestMode ? reviewCount * 2 : reviewCount;
-  const hasEnoughCredits = isPro || creditBalance >= creditCost;
+  const hasEnoughCredits = creditBalance >= creditCost;
   const creditDeficit    = creditCost - creditBalance;
   const slotAvailable    = !slotInfo || slotInfo.activeCount < slotInfo.maxSlots;
   const hasValidSourceA  = uploadMode === "link"
@@ -442,16 +442,16 @@ export default function SubmitTrackPage() {
               );
             })}
           </div>
-          {!isPro && (
+          <div className="flex items-center gap-3">
+            {isPro && (
+              <span className="flex items-center gap-1.5 text-sm font-bold text-purple-600">
+                <Crown className="h-3.5 w-3.5" /> Pro
+              </span>
+            )}
             <p className="text-sm text-black/40 font-medium tabular-nums">
               <span className={cn("font-black", creditBalance === 0 ? "text-red-500" : "text-black")}>{creditBalance}</span> credits
             </p>
-          )}
-          {isPro && (
-            <div className="flex items-center gap-1.5 text-sm font-bold text-purple-600">
-              <Crown className="h-3.5 w-3.5" /> Pro
-            </div>
-          )}
+          </div>
         </div>
       </div>
 
@@ -1046,30 +1046,28 @@ export default function SubmitTrackPage() {
               </div>
 
               {/* Credit balance */}
-              {isPro ? (
-                <div className="flex items-center gap-2 text-sm font-bold text-purple-600">
-                  <Crown className="h-4 w-4" />
-                  Pro — credits not required
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-[#faf7f2] rounded-2xl p-5">
+                  <p className="text-xs font-black uppercase tracking-[0.15em] text-black/40 mb-1">You have</p>
+                  <p className={cn("text-4xl font-black tabular-nums", creditBalance === 0 ? "text-red-500" : "text-black")}>{creditBalance}</p>
+                  <p className="text-xs text-black/40 mt-0.5">credits</p>
                 </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-[#faf7f2] rounded-2xl p-5">
-                    <p className="text-xs font-black uppercase tracking-[0.15em] text-black/40 mb-1">You have</p>
-                    <p className={cn("text-4xl font-black tabular-nums", creditBalance === 0 ? "text-red-500" : "text-black")}>{creditBalance}</p>
-                    <p className="text-xs text-black/40 mt-0.5">credits</p>
-                  </div>
-                  <div className="bg-[#faf7f2] rounded-2xl p-5 text-right">
-                    <p className="text-xs font-black uppercase tracking-[0.15em] text-black/40 mb-1">This costs</p>
-                    <p className={cn("text-4xl font-black tabular-nums", !hasEnoughCredits ? "text-red-500" : "text-purple-600")}>{creditCost}</p>
-                    <p className="text-xs text-black/40 mt-0.5">{abTestMode ? `credits (${reviewCount} × 2)` : "credits"}</p>
-                  </div>
+                <div className="bg-[#faf7f2] rounded-2xl p-5 text-right">
+                  <p className="text-xs font-black uppercase tracking-[0.15em] text-black/40 mb-1">This costs</p>
+                  <p className={cn("text-4xl font-black tabular-nums", !hasEnoughCredits ? "text-red-500" : "text-purple-600")}>{creditCost}</p>
+                  <p className="text-xs text-black/40 mt-0.5">{abTestMode ? `credits (${reviewCount} × 2)` : "credits"}</p>
                 </div>
+              </div>
+              {isPro && (
+                <p className="text-xs text-black/40 mt-3 flex items-center gap-1.5">
+                  <Crown className="h-3.5 w-3.5 text-purple-600" /> Pro includes 30 credits every month
+                </p>
               )}
             </div>
           </div>
 
           {/* Not enough credits band */}
-          {!isPro && !hasEnoughCredits && (
+          {!hasEnoughCredits && (
             <div className="bg-[#faf7f2] border-t border-black/8 py-8">
               <div className={cn(W, "space-y-3")}>
                 <p className="font-black text-black text-base">
@@ -1083,12 +1081,14 @@ export default function SubmitTrackPage() {
                   <Sparkles className="h-4 w-4" />
                   Review a track to earn a credit
                 </Link>
-                <Link href="/pro"
-                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold transition-colors"
-                >
-                  <Crown className="h-4 w-4" />
-                  Go Pro — 30 credits / month
-                </Link>
+                {!isPro && (
+                  <Link href="/pro"
+                    className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold transition-colors"
+                  >
+                    <Crown className="h-4 w-4" />
+                    Go Pro — 30 credits / month
+                  </Link>
+                )}
               </div>
             </div>
           )}
