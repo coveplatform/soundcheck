@@ -498,13 +498,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* From the Journal */}
+      {/* From The Drop */}
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-end justify-between gap-4 mb-10">
             <div>
               <p className={`${caveat.className} text-2xl text-purple-600 leading-none mb-1`}>
-                from the journal
+                from the drop
               </p>
               <h2 className="text-3xl font-extrabold text-neutral-950">
                 Learn before you release

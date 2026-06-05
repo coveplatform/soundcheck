@@ -18,7 +18,7 @@ export async function generateMetadata({
   const post = getPost(slug);
   if (!post) return {};
   return {
-    title: `${post.title} — MixReflect Journal`,
+    title: `${post.title} — The Drop`,
     description: post.excerpt,
     openGraph: {
       title: post.title,
@@ -99,7 +99,7 @@ export default async function BlogPostPage({
             className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.25em] text-white/30 hover:text-white/60 transition-colors mb-10"
           >
             <ArrowLeft className="h-3 w-3" />
-            Journal
+            The Drop
           </Link>
 
           <div className="mb-6">
@@ -270,7 +270,7 @@ export default async function BlogPostPage({
       <div className="border-t-4 border-black bg-[#faf8f5]">
         <div className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-6">
-            More from the journal
+            More from The Drop
           </p>
           <div className="grid sm:grid-cols-2 gap-px bg-black border border-black">
             {posts
