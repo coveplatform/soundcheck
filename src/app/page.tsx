@@ -17,6 +17,7 @@ import { AnimatedSection } from "@/components/landing/animated-section";
 import { OnlineListeners } from "@/components/landing/online-listeners";
 import { HeroCTA } from "@/components/landing/hero-cta";
 import { SignupLink } from "@/components/landing/signup-link";
+import { posts } from "@/lib/blog-posts";
 
 export const metadata: Metadata = {
   title: "MixReflect — Get Real Feedback on Your Music Before You Release",
@@ -493,6 +494,74 @@ export default function Home() {
                 <p className="mt-3 text-neutral-700">{item.a}</p>
               </details>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* From the Journal */}
+      <section className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-end justify-between gap-4 mb-10">
+            <div>
+              <p className={`${caveat.className} text-2xl text-purple-600 leading-none mb-1`}>
+                from the journal
+              </p>
+              <h2 className="text-3xl font-extrabold text-neutral-950">
+                Learn before you release
+              </h2>
+            </div>
+            <Link
+              href="/blog"
+              className="hidden sm:inline-flex items-center gap-1.5 font-bold text-neutral-950 hover:text-purple-600 transition-colors"
+            >
+              View all <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.slice(0, 3).map((post) => (
+              <Link
+                key={post.slug}
+                href={`/blog/${post.slug}`}
+                className="group flex flex-col rounded-2xl bg-white border-2 border-black overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              >
+                <div className="relative aspect-[16/10] bg-neutral-200 overflow-hidden border-b-2 border-black">
+                  {post.coverImage && (
+                    <Image
+                      src={post.coverImage}
+                      alt={post.title}
+                      fill
+                      className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  )}
+                  <span className="absolute top-3 left-3 text-[10px] font-extrabold uppercase tracking-wider text-white bg-purple-600 px-2 py-1 rounded-md border border-black">
+                    {post.category}
+                  </span>
+                </div>
+                <div className="flex flex-col flex-1 p-5">
+                  <h3 className="font-extrabold text-lg leading-tight text-neutral-950 group-hover:text-purple-700 transition-colors mb-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-sm text-neutral-600 leading-relaxed line-clamp-2 mb-4">
+                    {post.excerpt}
+                  </p>
+                  <div className="mt-auto flex items-center justify-between text-xs font-bold text-neutral-400">
+                    <span>{post.readTime}</span>
+                    <ArrowRight className="h-4 w-4 text-neutral-300 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-8 sm:hidden">
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-1.5 font-bold text-neutral-950 hover:text-purple-600"
+            >
+              View all posts <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>
