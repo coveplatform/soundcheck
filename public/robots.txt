@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /login
+Disallow: /signup/verify
+
+Sitemap: https://mixreflect.com/sitemap.xml

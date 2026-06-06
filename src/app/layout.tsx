@@ -137,11 +137,23 @@ const jsonLd = {
       name: "MixReflect",
       url: "https://mixreflect.com",
       logo: "https://mixreflect.com/logo.png",
+      description: "Structured pre-release music feedback from genre-matched artists. Free to start.",
       sameAs: ["https://twitter.com/mixreflect"],
       contactPoint: {
         "@type": "ContactPoint",
         contactType: "customer support",
         url: "https://mixreflect.com/support",
+      },
+    },
+    {
+      "@type": "WebSite",
+      name: "MixReflect",
+      url: "https://mixreflect.com",
+      description: "Structured pre-release music feedback from genre-matched artists.",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://mixreflect.com/feedback/{search_term_string}",
+        "query-input": "required name=search_term_string",
       },
     },
   ],
