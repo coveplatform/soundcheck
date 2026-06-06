@@ -20,6 +20,198 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "how-to-release-music-independently",
+    title: "How to Release Music Independently in 2026: Step-by-Step",
+    coverImage: "/blog/blog10.jpg",
+    excerpt:
+      "The process is simple — finish it, master it, pick a distributor, upload it. But there's a specific order that matters, a timeline most artists get wrong, and one step the majority skip that determines how well the release actually performs.",
+    category: "GUIDE",
+    date: "June 6, 2026",
+    readTime: "7 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "Releasing music independently is more accessible than it's ever been, and more competitive for the same reason. The process is straightforward — finish the track, master it, pick a distributor, upload it, promote it. But there's a specific order that matters, a timeline most artists get wrong, and one step the overwhelming majority skip that determines how well the release actually performs. Here's the full process from a finished track to a live release, in the order it should happen.",
+      },
+      {
+        type: "paragraph",
+        text: "The barrier to release is now essentially zero. DistroKid will put your track on Spotify for $22 a year. That's both the opportunity and the problem — every artist has the same access, which means the ones who build real momentum aren't the ones who release fastest. They're the ones who release correctly: with a track that's been quality-checked, a timeline that hits the right windows, and a rollout that doesn't die the day after launch.",
+      },
+      {
+        type: "h2",
+        text: "What you actually need to release music independently",
+      },
+      {
+        type: "paragraph",
+        text: "There's a core set of things every independent release requires. Most of these are simple to get right. The ones that aren't are the ones where most artists lose ground.",
+      },
+      {
+        type: "list",
+        items: [
+          "A finished, mixed, and mastered audio file — WAV or FLAC, 44.1kHz / 24-bit minimum for most distributors",
+          "Cover artwork at 3000×3000px minimum (JPEG or PNG) — no streaming service logos or explicit content without the correct flag",
+          "A distributor account — DistroKid, TuneCore, CD Baby, or similar",
+          "ISRC codes — most distributors generate these automatically for each track",
+          "Artist profiles on Spotify for Artists and Apple Music for Artists, claimed before the release goes live",
+          "A release date set at least 3–4 weeks out if you want to pitch Spotify's editorial playlist team",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Step 1 — Finish the track properly (this is where most releases fail)",
+      },
+      {
+        type: "paragraph",
+        text: "This sounds obvious, but it's where most releases go wrong — not in the distribution, not in the promotion, but in releasing a track that wasn't ready. By the time you're done producing, you've heard the song hundreds of times and can no longer evaluate it honestly. What sounds like a finished mix to you might have vocals buried in the mix, a mid-section that loses energy, or an intro that runs 30 seconds too long. You've gone deaf to it.",
+      },
+      {
+        type: "paragraph",
+        text: "The fix is structured feedback from people who haven't heard the track before — not friends, who will protect your feelings, but listeners who have relevant musical knowledge and a structure that requires them to address weaknesses, not just strengths. Look for patterns: if three or four independent listeners flag the same issue without seeing each other's responses, it's real and worth fixing before you release. If they all flag different things, the track is ready.",
+      },
+      {
+        type: "paragraph",
+        text: "This matters more than most artists realise. The first week of a release — streams, saves, listener retention — carries disproportionate weight with the algorithm. A track that starts cold because it wasn't quite ready rarely recovers. A track that's been quality-checked and cleared starts with better numbers, which compounds.",
+      },
+      {
+        type: "quote",
+        text: "The first week of a release is the one that matters most. The algorithm, the curators, the listeners — they all form their first impression at the same time. A track that isn't ready doesn't get a second chance at that window.",
+      },
+      {
+        type: "h2",
+        text: "Step 2 — Mix and master",
+      },
+      {
+        type: "paragraph",
+        text: "If you're hiring an engineer, line them up before you need them — don't be waiting on a mix revision the week your distribution deadline hits. For mastering: the standard target for streaming is -14 LUFS integrated, with a true peak ceiling of -1 dBTP. Spotify normalises everything to roughly -14 LUFS on playback, so chasing extreme loudness beyond that doesn't help — but being significantly under it, or having no low-end weight and dynamic glue on the master, will make your track sound thin next to commercial releases.",
+      },
+      {
+        type: "paragraph",
+        text: "If you're mastering yourself: A/B against a commercial track in your genre, level-matched. The gap you hear in 10 seconds of comparison is the gap your listeners hear too. Use that to calibrate rather than guessing.",
+      },
+      {
+        type: "h2",
+        text: "Step 3 — Choose a distributor",
+      },
+      {
+        type: "paragraph",
+        text: "Three distributors cover the vast majority of independent artists. The practical differences:",
+      },
+      {
+        type: "list",
+        items: [
+          "DistroKid — $22.99/year, unlimited releases, 0% royalty cut. Best for artists releasing more than one or two tracks per year.",
+          "TuneCore — charges per release ($9.99 for a single per year), no royalty cut. Better value if you release infrequently.",
+          "CD Baby — one-time fee per release ($9.95 for a single), takes 9% of royalties. Worth considering if you want physical distribution alongside digital.",
+          "Amuse — free tier available, but slower delivery and more limited features than the paid options above.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "What matters more than which distributor you pick is setting everything up correctly before submitting. Errors in track title, artist name, or genre tags are tedious to fix once a release is live on platforms — and artist name inconsistencies will fragment your listener stats across Spotify.",
+      },
+      {
+        type: "h2",
+        text: "Step 4 — Set up your release metadata correctly",
+      },
+      {
+        type: "paragraph",
+        text: "Metadata is boring and it matters. The information you enter at distribution becomes the permanent record attached to your track everywhere it's streamed. Get the following right before you submit:",
+      },
+      {
+        type: "list",
+        items: [
+          "Track title — exactly how it appears on the release, including capitalisation, featuring credits, and version tags",
+          "Artist name — exactly matching your Spotify for Artists profile name; inconsistencies split your listener data",
+          "Genre — pick the most accurate option, not the most aspirational one; genre affects which editorial playlists can realistically consider you",
+          "ISRC codes — one per track; keep a record of these for royalty tracking",
+          "UPC — assigned per release by your distributor; also keep a record",
+          "Release date — at least 7 days from submission for most distributors, 21–28 days if you want the Spotify editorial pitch window",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Step 5 — Plan your release timeline",
+      },
+      {
+        type: "paragraph",
+        text: "Most artists submit their track and pick the soonest available release date. This single decision costs more than almost anything else in the release process, and it's entirely avoidable.",
+      },
+      {
+        type: "paragraph",
+        text: "Spotify for Artists has a pitch tool built directly into the dashboard. If your release is at least 7 days out when you submit the pitch, you can put your track in front of Spotify's editorial team for consideration on their playlists — including genre editorial playlists and the algorithmic editorial feed. The window is locked: if the track is already live, you've missed it. Plan backwards from that constraint.",
+      },
+      {
+        type: "list",
+        items: [
+          "4 weeks before release — track finished, mastered, cover art ready",
+          "3–4 weeks before — submitted to distributor, Spotify for Artists editorial pitch submitted",
+          "2–3 weeks before — independent playlist and blog pitching (SubmitHub, direct outreach to curators)",
+          "1 week before — social rollout begins: posts, press photo, pre-save link if you have one",
+          "Release day — all assets live, link-in-bio updated, email list notified if you have one",
+          "2 weeks after — keep posting; check Spotify for Artists data for save rate, playlist placements, and listener geography",
+        ],
+      },
+      {
+        type: "quote",
+        text: "Spotify editorial gets pitched before release or not at all. The window closes the moment your track goes live.",
+      },
+      {
+        type: "h2",
+        text: "Step 6 — Build the rollout before release day",
+      },
+      {
+        type: "paragraph",
+        text: "Release day is not the start of promotion — it's the midpoint. What you do in the 2–3 weeks before the track goes live determines whether release day has any momentum at all. For most independent artists without a large existing audience, that rollout is simple: build context around the song before it's available. Three or four social posts in the two weeks leading up to release, a pre-save link, and one piece of content on release day that gives people a reason to share, not just listen.",
+      },
+      {
+        type: "paragraph",
+        text: "Independent playlist pitching and blog submissions should also go out during this window, not after. Curators on SubmitHub and direct outreach to blogs work better when the track is a few days from release — curators have time to listen and schedule, blogs have time to publish around release day. Reaching out after the track is already live makes you look disorganised and misses the window where placement has the most impact.",
+      },
+      {
+        type: "h2",
+        text: "What to do after release day",
+      },
+      {
+        type: "paragraph",
+        text: "Don't go quiet. The week after release is when most independent artists check out — they've posted a few times, the initial response has landed, and they don't know what to do next. That's also when the algorithm is watching most closely. Keep posting for at least two weeks. Use your Spotify for Artists dashboard: look at which playlists are driving streams, where your listeners are geographically, and what percentage of listeners are saving the track. A save rate above 20% is strong — below 10% usually means the opening hook isn't landing or the wrong people are finding it.",
+      },
+      {
+        type: "paragraph",
+        text: "Reply to every comment. Share every organic mention. Tag playlists that picked you up. The artists who build real momentum between releases aren't doing anything sophisticated — they're just still showing up when the launch energy has faded.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How do I release music independently?",
+            a: "To release music independently: finish and quality-check the track with fresh ears, have it mixed and mastered, choose a music distributor (DistroKid, TuneCore, or CD Baby), set up your artist profiles on Spotify for Artists and Apple Music for Artists, enter your release metadata correctly, and submit at least 3–4 weeks before your intended release date so you have time to pitch Spotify's editorial team. On release day, the track will go live simultaneously on all major streaming platforms.",
+          },
+          {
+            q: "What do I need to release music independently?",
+            a: "You need a finished, mastered audio file (WAV or FLAC), cover artwork at 3000×3000px minimum, a distributor account, and artist profiles claimed on Spotify for Artists and Apple Music for Artists. Most distributors generate ISRC codes automatically. The things that trip artists up most are metadata errors, not leaving enough time before the release date to pitch editorial playlists, and releasing a track that hasn't been heard by fresh ears first.",
+          },
+          {
+            q: "How much does it cost to release music independently?",
+            a: "DistroKid costs $22.99/year for unlimited releases with 0% royalty cut — the cheapest option if you release regularly. TuneCore charges per release ($9.99/year for a single) with no royalty cut. CD Baby charges a one-time fee per release ($9.95 for a single) and takes 9% of royalties. Cover art design and mastering are separate costs if you're hiring out.",
+          },
+          {
+            q: "How far in advance should I plan a music release?",
+            a: "At minimum 3–4 weeks from when the track is finished. This gives you time to submit to your distributor, pitch Spotify for Artists editorial (requires the pitch at least 7 days before the release date, with more time giving you a better shot), and run independent playlist and blog pitching before the release goes live. Less than 3 weeks and you miss the Spotify editorial window and don't have enough runway for pre-release pitching.",
+          },
+          {
+            q: "What is the best music distributor for independent artists?",
+            a: "DistroKid is the best option for most independent artists releasing more than one or two tracks a year — $22.99/year, unlimited releases, 0% royalty cut, and fast delivery to all major platforms. TuneCore is better value if you release infrequently. CD Baby suits artists who want physical distribution alongside digital, or who prefer a one-time fee rather than a subscription.",
+          },
+          {
+            q: "Do I need a label to release music on Spotify?",
+            a: "No. Any artist can release music on Spotify independently through a distributor. You own 100% of your master recording as an independent artist, and distributors like DistroKid and TuneCore pass through 100% of your streaming royalties with no cut. The only thing a label provides that you can't replicate independently is funding and promotion at scale — not access to the platform itself.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "why-does-my-music-sound-amateur",
     title: "Why Does My Music Sound Amateur? (And How to Make It Sound Professional)",
     coverImage: "/blog/blog9.png",
