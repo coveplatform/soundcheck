@@ -1,0 +1,64 @@
+# MixReflect SEO Content Calendar
+
+The weekly blog agent reads this file, picks the next PENDING item, writes the post, and marks it DONE.
+The current highest cover image is tracked here — agent increments it after each post.
+
+## Current image counter
+Last used: blog10 → next post uses blog11
+
+## Blog post queue
+
+| Status | Date Done | Title | Target Keyword | Notes |
+|--------|-----------|-------|---------------|-------|
+| DONE | 2026-06-05 | Why Does My Music Sound Amateur? | why does my music sound amateur | |
+| DONE | 2026-06-04 | Why Your Vocals Sound Buried in the Mix | vocals buried in mix | |
+| DONE | 2026-05-31 | What Playlist Curators Actually Look For | what playlist curators look for | |
+| DONE | 2026-05-28 | How to Know If Your Song Is Ready to Release | how to know if song is ready | |
+| DONE | 2026-05-26 | How to Get Feedback on Your Music Before Releasing | how to get feedback on music | |
+| DONE | 2026-05-26 | The Best Way to Get Honest Feedback on a Beat | honest feedback on a beat | |
+| DONE | 2026-05-26 | How Music Producers Get Their Tracks Reviewed | how producers get tracks reviewed | |
+| DONE | 2026-05-27 | What 5 People Hearing Your Track Tells You That 1 Person Can't | multiple listeners feedback | |
+| DONE | 2026-05-29 | Best Music Feedback Platforms in 2026 | music feedback platforms 2026 | |
+| DONE | 2026-05-30 | MixReflect vs SubmitHub: What's the Difference | mixreflect vs submithub | |
+| DONE | 2026-06-06 | How to Release Music Independently in 2026 | how to release music independently | |
+| PENDING | | How to Mix Music at Home: A Beginner's Guide | how to mix music at home | Huge volume; early funnel — explain basics then pivot to why fresh ears matter |
+| PENDING | | How to Get on Spotify's Discover Weekly | how to get on discover weekly | High intent, specific — cover editorial pitch + save rate + listener behavior |
+| PENDING | | Music Release Checklist: What to Do Before You Drop | music release checklist | AEO gold — format as actual checklist, AI extracts this constantly |
+| PENDING | | How to Promote Your Music on Spotify (Without a Label) | how to promote music on spotify | High volume — playlists, editorial, social, pre-save |
+| PENDING | | How to Get Music Reviews Online (Honest, Useful Ones) | how to get music reviews online | Direct MixReflect keyword — compare options honestly |
+| PENDING | | Is Your Mix Good? 6 Ways to Know Before You Release | how to know if your mix is good | Strong AEO format — numbered list with clear yes/no signals |
+| PENDING | | How to Master Music at Home (And When to Hire Out) | how to master music at home | High volume — cover basics then when to hand off |
+| PENDING | | How to Build a Fanbase as an Independent Artist | how to build a fanbase | Top of funnel — social, live, release cadence |
+| PENDING | | How to Copyright Your Music (What Artists Actually Need to Know) | how to copyright music | High volume, question-based — demystify PROs, ISRC, copyright registration |
+
+## Alternatives pages queue
+
+| Status | Date Done | Slug | Competitor |
+|--------|-----------|------|------------|
+| DONE | 2026-06-06 | /alternatives/submithub | SubmitHub |
+| DONE | 2026-06-06 | /alternatives/groover | Groover |
+| DONE | 2026-06-06 | /alternatives/playlist-push | Playlist Push |
+| DONE | 2026-06-06 | /alternatives/landr | LANDR |
+| DONE | 2026-06-06 | /alternatives/soundbetter | SoundBetter |
+| DONE | 2026-06-06 | /alternatives/musosoup | Musosoup |
+| DONE | 2026-06-06 | /alternatives/reverbnation | ReverbNation |
+| PENDING | | /alternatives/distrokid | DistroKid — distribution; "distrokid alternative" is massive volume |
+| PENDING | | /alternatives/splice | Splice — sample library + some collab; different product but huge search |
+| PENDING | | /alternatives/soundcloud | SoundCloud — discovery/distribution; broad but massive |
+
+## Blog post format rules
+
+Every post MUST have these content blocks in blog-posts.ts:
+
+```
+{ type: "paragraph" }   — opening paragraph: directly answers title in 2-3 sentences (AEO target)
+{ type: "h2" }          — phrased as questions where possible ("Why does X?" not "X")
+{ type: "quote" }       — at least one per post
+{ type: "list" }        — at least one per post
+{ type: "faq" }         — 4-6 questions with schema auto-applied by renderer
+{ type: "cta" }         — always last block
+```
+
+Voice: direct, no fluff, slightly contrarian, no overused em dashes. Same register as existing posts.
+Category: "GUIDE" for how-tos, "INDUSTRY" for platform/industry topics.
+MixReflect tie-in: woven in as a genuine solution in the body, not bolted on as a pitch.
