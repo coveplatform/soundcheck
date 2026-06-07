@@ -20,6 +20,179 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "how-to-mix-music-at-home",
+    title: "How to Mix Music at Home: A Beginner's Guide",
+    coverImage: "/blog/blog11.jpg",
+    excerpt:
+      "You don't need a treated studio or expensive gear to get a clean mix at home. You need a repeatable order of operations: gain staging, balance, EQ, compression, then space. Here's the full beginner workflow, in the order that actually works.",
+    category: "GUIDE",
+    date: "June 7, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "To mix music at home, work in a fixed order: set your levels (gain staging), get a rough balance with faders and panning, carve space with subtractive EQ, control dynamics with compression, then add reverb and delay for depth. Do it at a moderate volume, reference a commercial track in your genre, and check the mix on multiple speakers before you call it done. The gear barely matters. What matters is the order you do things in and whether you can still judge the track honestly by the end.",
+      },
+      {
+        type: "paragraph",
+        text: "Most home mixes don't sound amateur because of cheap plugins or an untreated room. They sound amateur because everything was done at once, at the wrong volume, with no reference, by someone who'd heard the song two hundred times. The fix isn't more gear. It's a workflow you repeat every time, and a way to get fresh ears on the result before you commit. Here's that workflow from the first fader move to the final check.",
+      },
+      {
+        type: "h2",
+        text: "What do you actually need to mix at home?",
+      },
+      {
+        type: "paragraph",
+        text: "Less than you think. The marketing around home studios is built on selling gear, but the difference between a bad mix and a good one is almost never the equipment. Here's the honest minimum:",
+      },
+      {
+        type: "list",
+        items: [
+          "A DAW — any of them. Reaper, Logic, Ableton, FL Studio, even the free tier of something like Cakewalk or GarageBand. They all mix to the same standard.",
+          "One pair of headphones you know well — closed or open-back is fine. Knowing your headphones matters more than owning expensive ones.",
+          "The stock plugins your DAW already ships with — EQ, compressor, reverb, delay. These are good enough for a release. You do not need a plugin bundle to start.",
+          "A reference track — a professionally released song in your genre to compare against. This is the single most important tool in the list and it's free.",
+          "A quiet-ish room and a moderate listening volume — not a treated studio. Just somewhere you can hear consistently.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Notice what's not on that list: monitors, acoustic panels, an audio interface with boutique converters. Those help eventually. None of them are the reason a beginner mix sounds off. Start with what you have and the order below.",
+      },
+      {
+        type: "h2",
+        text: "Why does the order you mix in matter so much?",
+      },
+      {
+        type: "paragraph",
+        text: "Because every decision you make changes the ones after it. If you add reverb before you've balanced your levels, you're reverberating a sound that's about to get louder or quieter. If you EQ before you've set your gain staging, you're carving frequencies based on a level that's going to change. Mixing out of order means constantly undoing your own work. A fixed order means each step builds on a stable foundation under it.",
+      },
+      {
+        type: "quote",
+        text: "A good mix isn't a pile of plugins. It's a sequence of decisions, each one made on top of a stable version of the one before it.",
+      },
+      {
+        type: "h2",
+        text: "Step 1 — Gain staging: get your levels right before anything else",
+      },
+      {
+        type: "paragraph",
+        text: "Before you touch an EQ or a compressor, set the level of every track so nothing is clipping and your master bus is peaking somewhere around -6 dB with everything playing. Plugins, especially compressors and saturation, behave differently depending on how hot the signal hitting them is. If your tracks are slamming the red before you start, every processor downstream reacts wrong and you spend the rest of the mix fighting it. Pull everything down, leave headroom, and give yourself room to work.",
+      },
+      {
+        type: "h2",
+        text: "Step 2 — Balance: faders and panning before any processing",
+      },
+      {
+        type: "paragraph",
+        text: "This is the step beginners skip and it's the most important one. Before you add a single plugin, mix the whole song with nothing but volume faders and the pan knob. Get the vocal sitting right against the drums. Push the kick and snare to where they drive the track. Pan your guitars, synths, and backing vocals out to the sides so the center isn't crowded. A surprising amount of what people think is an EQ or compression problem is just a balance problem. If a balanced fader mix sounds good, you're 70% of the way there. If it doesn't, no plugin will save it.",
+      },
+      {
+        type: "paragraph",
+        text: "Spend real time here. A track that's well balanced with faders alone already sounds like a mix. Everything after this is refinement.",
+      },
+      {
+        type: "h2",
+        text: "Step 3 — EQ: carve space by cutting, not boosting",
+      },
+      {
+        type: "paragraph",
+        text: "The instinct of every beginner is to boost: more bass here, more brightness there. The pros mostly cut. The reason a home mix sounds muddy is usually that five instruments are all fighting for the same low-mid frequencies around 200-500 Hz. The fix is subtractive EQ: find the frequency where an instrument is muddy or harsh and pull it down, rather than boosting somewhere else to compensate. Give each instrument its own lane. The kick owns the sub-low, the bass sits just above it, the vocal owns the mids, the cymbals and air live up top. When everything has its own space, the whole mix gets clearer without getting louder.",
+      },
+      {
+        type: "list",
+        items: [
+          "High-pass everything that isn't a bass or kick — roll off the low rumble below ~80-100 Hz on vocals, guitars, and synths to clear up the low end.",
+          "Hunt and cut mud — sweep a narrow boost through 200-500 Hz on a muddy track, find the worst spot, then cut it instead of boosting.",
+          "Cut, don't boost, to fix clashes — if two instruments fight, lower one rather than raising the other. It keeps the mix from creeping louder and louder.",
+          "Make small moves — 2-3 dB cuts do more than you expect. If you're reaching for 9 dB, the problem is probably the arrangement, not the EQ.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Step 4 — Compression: control dynamics without crushing the life out of the track",
+      },
+      {
+        type: "paragraph",
+        text: "Compression evens out the volume difference between the loudest and quietest moments of a track so it sits consistently in the mix. The classic beginner mistake is using too much, which flattens everything and sucks the energy out. Start with the vocal: a gentle compressor with a ratio around 3:1, pulling down 3-6 dB on the loudest words, will keep the vocal sitting steady so quiet lines don't disappear and loud ones don't jump out. Do the same lightly on the bass to keep it even. You don't need to compress everything. Use it where dynamics are a problem, not as a reflex on every channel.",
+      },
+      {
+        type: "h2",
+        text: "Step 5 — Reverb and delay: add depth last",
+      },
+      {
+        type: "paragraph",
+        text: "Reverb and delay create the sense of space and distance in a mix, which is exactly why they come last: you can only judge how much space something needs once everything else is balanced and sitting right. Use sends rather than putting a reverb on every individual track, so multiple instruments share the same space and sound like they're in the same room. Less is almost always more. A touch of short reverb glues things together; drowning everything in a long hall reverb pushes the whole mix to the back and makes it sound distant and amateur. If you can clearly hear the reverb as a separate effect, it's probably too much.",
+      },
+      {
+        type: "h2",
+        text: "How do you know if your home mix is actually good?",
+      },
+      {
+        type: "paragraph",
+        text: "This is where home mixing quietly falls apart, and it has nothing to do with technique. By the time you've finished a mix, you've heard the song so many times you can no longer hear it. Your ears have adjusted to every flaw. The buried vocal sounds normal to you because you know what it's saying. The harsh cymbals stopped bothering you an hour ago. This is called ear fatigue and it's the single biggest reason home mixes ship with obvious problems the artist genuinely couldn't hear anymore.",
+      },
+      {
+        type: "paragraph",
+        text: "There are three reliable ways to get around it. First, reference: A/B your mix against a commercial track in your genre, level-matched, and the gaps become obvious in seconds. Second, check on multiple systems: phone speaker, laptop, earbuds, car. A mix that holds up everywhere is a finished mix; one that only sounds good on your headphones isn't done. Third, and most useful: get fresh ears on it before you release. Not friends who'll be nice, but listeners who'll tell you the vocal is buried or the mid-section drags, because those are exactly the things you've gone deaf to.",
+      },
+      {
+        type: "quote",
+        text: "By the end of a mix you're not listening to the song anymore, you're listening to your memory of it. That's why fresh ears catch in ten seconds what you couldn't hear in ten hours.",
+      },
+      {
+        type: "paragraph",
+        text: "That last one is what MixReflect is built for. You upload your track and get structured feedback from other artists in your genre who are hearing it for the first time, with a format that forces them to name specific weaknesses, not just say \"sounds great.\" When three or four independent listeners all flag the same thing without seeing each other's answers, that's the flaw you couldn't hear. When they each flag something different, your mix is ready. It's the cheapest, fastest way to get the one thing a home studio can't give you: an honest second listen.",
+      },
+      {
+        type: "h2",
+        text: "Common home-mixing mistakes to avoid",
+      },
+      {
+        type: "list",
+        items: [
+          "Mixing too loud — high volume makes everything sound good and hides problems. Mix at a moderate level and check loud only occasionally.",
+          "Skipping the fader balance — jumping straight to plugins on a track that was never balanced first.",
+          "Boosting everything — turning up instead of turning down, which makes the mix louder and muddier, not clearer.",
+          "Over-compressing — flattening the dynamics until the track has no energy or punch left.",
+          "Drowning the mix in reverb — pushing everything to the back so nothing sounds upfront or present.",
+          "Never referencing — mixing in a vacuum with no commercial track to compare against.",
+          "Trusting tired ears — finishing in one marathon session instead of resting and checking with fresh ears the next day.",
+        ],
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How do you mix music at home for beginners?",
+            a: "Mix in a fixed order: first set your levels so nothing clips and the master peaks around -6 dB (gain staging), then balance the whole song using only faders and panning, then use subtractive EQ to give each instrument its own frequency space, then apply gentle compression to control dynamics, and finally add reverb and delay for depth. Mix at a moderate volume, compare against a professionally released reference track in your genre, and check the result on several different speakers before finishing.",
+          },
+          {
+            q: "Can you mix music at home without expensive equipment?",
+            a: "Yes. You can produce a release-ready mix with any DAW, a single pair of headphones you know well, and the stock plugins your software already includes. Expensive monitors, acoustic treatment, and plugin bundles help eventually, but they are not the reason beginner mixes sound amateur. A repeatable workflow, a reference track, and fresh ears on the result matter far more than gear.",
+          },
+          {
+            q: "What order should you mix a song in?",
+            a: "Gain staging first, then fader and pan balance, then EQ, then compression, then reverb and delay. The order matters because each step changes the ones after it. If you add effects or EQ before your levels and balance are stable, you end up constantly redoing work as the foundation shifts under you.",
+          },
+          {
+            q: "Why does my home mix sound muddy?",
+            a: "Mud is almost always too many instruments competing for the same low-mid frequencies, roughly 200-500 Hz. Fix it with subtractive EQ: high-pass everything that isn't a bass or kick to clear the low end, then find the muddy frequency on each clashing track and cut it rather than boosting elsewhere. Give each instrument its own lane instead of stacking them in the same range.",
+          },
+          {
+            q: "Why does my mix sound good on headphones but bad on other speakers?",
+            a: "Because you mixed to the specific sound of your headphones and your fatigued ears adjusted to that one system. A finished mix has to translate everywhere. Check your mix on a phone speaker, a laptop, earbuds, and a car, and reference it against a commercial track. If it only holds up on your headphones, it isn't done. Getting fresh ears on it catches problems you've stopped being able to hear.",
+          },
+          {
+            q: "How do I know when a mix is finished?",
+            a: "When it holds up against a level-matched commercial reference in your genre, translates well across multiple playback systems, and fresh listeners aren't flagging the same problem repeatedly. The trap is your own ears: after hours on a track you can no longer judge it honestly. The most reliable finish-line check is structured feedback from people hearing it for the first time, which is exactly what a platform like MixReflect provides before you commit to a release.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-to-release-music-independently",
     title: "How to Release Music Independently in 2026: Step-by-Step",
     coverImage: "/blog/blog10.jpg",
