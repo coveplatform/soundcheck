@@ -46,7 +46,7 @@ async function handler(request: Request) {
           id: true,
           artistName: true,
           reviewCredits: true,
-          genrePreferences: true,
+          Genre_ArtistGenres: { select: { id: true } },
           Track: {
             where: { status: { not: "COMPLETED" } },
             select: {
@@ -91,7 +91,7 @@ async function handler(request: Request) {
     const reviewsReceived = latestTrack?.Review?.length ?? 0;
 
     // Tracks in their genre needing review
-    const genrePrefs: string[] = profile.genrePreferences ?? [];
+    const genrePrefs: string[] = (profile.Genre_ArtistGenres ?? []).map((g: any) => g.id);
     const genreTrackCount = await (prisma as any).track.count({
       where: {
         status: { in: ["QUEUED", "IN_PROGRESS"] },
