@@ -45,11 +45,11 @@ const DEMO: ReportViewModel = {
   percentile: 27,
   verdict: "ALMOST_THERE",
   categories: [
-    { label: "Hook Strength", score: 4.2, pct: 84 },
-    { label: "Production Quality", score: 3.8, pct: 76 },
-    { label: "Listener Retention", score: 3.4, pct: 68 },
-    { label: "Emotional Impact", score: 4.0, pct: 80 },
-    { label: "Commercial Potential", score: 3.6, pct: 72 },
+    { label: "Hook Strength", score: 4.2, pct: 84, note: "The hook lands fast — the first vocal phrase is the strongest moment and most of the room caught it on one listen. It could hit even harder if it arrived a few seconds sooner." },
+    { label: "Production Quality", score: 3.8, pct: 76, note: "The mix is clean and confident; nothing sounds amateur. The low end is a touch polite for the genre — a bit more weight under the drop would make it feel finished." },
+    { label: "Listener Retention", score: 3.4, pct: 68, note: "Attention is locked through the first drop, then dips around the 1:10 mark where the track sits on one idea too long before the back half pulls it back." },
+    { label: "Emotional Impact", score: 4.0, pct: 80, note: "There's a genuine warmth that reads as honest rather than manufactured. The emotional peak is real — leaning into it harder rather than pulling back would deepen it." },
+    { label: "Commercial Potential", score: 3.6, pct: 72, note: "Strong playlist fit for late-night electronic — it has a clear audience. What caps its reach is the absence of one undeniable, quotable moment to anchor a share." },
   ],
   summaryHeadline: "The room leaned in early, drifted a touch mid-way.",
   aiSummary:
@@ -149,6 +149,9 @@ type DbReactions = {
     quote?: string;
     positive?: boolean;
   }>;
+  categoryNotes?: Partial<
+    Record<"hook" | "production" | "retention" | "emotional" | "commercial", string>
+  >;
 };
 
 export default async function ReportPage({
@@ -208,10 +211,16 @@ export default async function ReportPage({
     count: Math.max(1, Math.round(f.count ?? 1)),
   }));
 
-  const cat = (label: string, v: number | null) => ({
+  const notes = quotes.categoryNotes ?? {};
+  const cat = (
+    label: string,
+    v: number | null,
+    key: "hook" | "production" | "retention" | "emotional" | "commercial"
+  ) => ({
     label,
     score: v ?? 0,
     pct: Math.round(((v ?? 0) / 5) * 100),
+    note: notes[key] ?? "",
   });
 
   // Real human reactions ("room of 5"). Total = reviewers actually assigned to
@@ -240,11 +249,11 @@ export default async function ReportPage({
     percentile: Math.round(report.percentile ?? 100 - score),
     verdict: asVerdict(report.verdict, score),
     categories: [
-      cat("Hook Strength", report.hookScore),
-      cat("Production Quality", report.productionScore),
-      cat("Listener Retention", report.retentionScore),
-      cat("Emotional Impact", report.emotionalScore),
-      cat("Commercial Potential", report.commercialScore),
+      cat("Hook Strength", report.hookScore, "hook"),
+      cat("Production Quality", report.productionScore, "production"),
+      cat("Listener Retention", report.retentionScore, "retention"),
+      cat("Emotional Impact", report.emotionalScore, "emotional"),
+      cat("Commercial Potential", report.commercialScore, "commercial"),
     ],
     summaryHeadline: quotes.headline || "The room weighed in.",
     aiSummary: report.aiSummary || "",

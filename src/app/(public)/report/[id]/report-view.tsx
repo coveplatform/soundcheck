@@ -44,7 +44,7 @@ export type ReportViewModel = {
   score: number;
   percentile: number;
   verdict: Verdict;
-  categories: { label: string; score: number; pct: number }[];
+  categories: { label: string; score: number; pct: number; note: string }[];
   summaryHeadline: string;
   aiSummary: string;
   reactions: {
@@ -118,13 +118,14 @@ function Sealed({
         {children}
       </div>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span
-          className={`${mono.className} inline-flex items-center gap-1.5 text-[12px] text-black px-3 py-1`}
+        <a
+          href="#unlock"
+          className={`${mono.className} inline-flex items-center gap-1.5 text-[12px] text-black px-3 py-1 cursor-pointer hover:brightness-110 transition`}
           style={{ background: ACCENT }}
         >
           <Lock className="h-3 w-3" />
           {label}
-        </span>
+        </a>
       </div>
     </div>
   );
@@ -200,7 +201,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
 
   return (
     <div
-      className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase`}
+      className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase scroll-smooth`}
     >
       {/* grain */}
       <div
@@ -285,7 +286,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-7">
             how it scored, dimension by dimension
           </h2>
-          <div className="space-y-5">
+          <div className="space-y-7">
             {data.categories.map((cat) => (
               <div key={cat.label}>
                 <div className="flex items-center justify-between mb-2">
@@ -301,9 +302,23 @@ export function ReportView({ data }: { data: ReportViewModel }) {
                     style={{ width: `${cat.pct}%`, background: ACCENT }}
                   />
                 </div>
+                {cat.note && (
+                  <div className="mt-2.5">
+                    <Sealed locked={locked} label="unlock the breakdown">
+                      <p className="text-[14px] text-white/70 leading-relaxed normal-case">
+                        {cat.note}
+                      </p>
+                    </Sealed>
+                  </div>
+                )}
               </div>
             ))}
           </div>
+          {locked && (
+            <p className={`${mono.className} text-[12px] text-white/45 mt-4 normal-case`}>
+              scores are free — unlock to read why each dimension landed where it did.
+            </p>
+          )}
         </section>
 
         {/* ── SYNTHESIS ── */}
@@ -464,7 +479,7 @@ what to fix first
 
         {/* ── UNLOCK / SHARE ── */}
         {locked ? (
-          <section className="border border-white/12 bg-[#101010] p-7 sm:p-10">
+          <section id="unlock" className="scroll-mt-20 border border-white/12 bg-[#101010] p-7 sm:p-10">
             <div className="text-center mb-8">
               <div
                 className="inline-flex items-center justify-center w-12 h-12 mb-5"

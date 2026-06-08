@@ -46,6 +46,8 @@ export type CategoryScore = {
   label: string;
   score: number; // 0-5
   pct: number; // 0-100
+  /** 1-2 sentences on WHY it scored this — the premium per-dimension read (gated). */
+  note: string;
 };
 
 export type ScoreVerdict =
@@ -126,14 +128,14 @@ Produce a reaction report as STRICT JSON (no markdown, no commentary, no code fe
 {
   "score": <integer 0-100 — see the SCORING SCALE below; judge against real released music in this genre>,
   "categories": {
-    "hook": <number 0-5, one decimal>,
-    "production": <number 0-5>,
-    "retention": <number 0-5, how well it held attention>,
-    "emotional": <number 0-5>,
-    "commercial": <number 0-5>
+    "hook": { "score": <number 0-5, one decimal>, "note": "<2 sentences: what specifically works or holds back the HOOK — where it grabs or fails to, and what would lift it>" },
+    "production": { "score": <number 0-5>, "note": "<2 sentences on the PRODUCTION/mix feel — what sounds finished vs amateur, the standout or the weak spot>" },
+    "retention": { "score": <number 0-5>, "note": "<2 sentences on RETENTION — where attention holds and the exact moment(s) it drifts>" },
+    "emotional": { "score": <number 0-5>, "note": "<2 sentences on EMOTIONAL impact — what it makes a listener feel, or why it stays flat>" },
+    "commercial": { "score": <number 0-5>, "note": "<2 sentences on COMMERCIAL potential — playlist/sync/radio fit, who it's for, what caps its reach>" }
   },
   "summaryHeadline": "<one punchy sentence, max 12 words, the honest read>",
-  "aiSummary": "<2-3 sentences, the honest read — energy arc, where attention holds or drops, emotional read. Talk about pacing, structure, energy lulls, the emotional curve. Do NOT focus on technical EQ/frequency stuff.>",
+  "aiSummary": "<a substantive 5-7 sentence read — this is the premium deliverable. Walk the track start to finish: the opening and whether it earns attention, how the energy arc moves, where it peaks and where it sags, the emotional throughline, and the single biggest thing standing between this and a release. Be specific and concrete, reference moments/sections. Talk about pacing, structure, energy, the emotional curve — NOT EQ/frequency jargon.>",
   "reactions": [ exactly 6 objects:
     {
       "initial": "<single uppercase letter>",
@@ -147,7 +149,7 @@ Produce a reaction report as STRICT JSON (no markdown, no commentary, no code fe
   "priorityFixes": [ 3 objects, ranked by how many of the room flagged it:
     {
       "label": "<short actionable fix, max 8 words>",
-      "detail": "<1-2 sentences explaining it, conversational>",
+      "detail": "<2-3 sentences: WHAT to change, WHERE (the moment/section), and HOW to actually do it — a concrete, specific step the artist can act on today, not vague advice. e.g. 'trim the 18s intro to ~8s so the hook hits by 0:10' rather than 'make the intro shorter'>",
       "count": <integer, how many of ${ROOM_SIZE} listeners flagged it, 2-14>
     }
   ]
@@ -272,31 +274,31 @@ const FALLBACK_FIXES: PriorityFix[] = [
   {
     label: "Tighten the mid-section",
     detail:
-      "A few listeners drifted around the middle. Trimming or adding a small change there would keep people locked in.",
+      "Attention drifts in the middle where it sits on one idea too long. Cut 8-16 bars there, or drop an element out and bring it back, so something changes before people check out.",
     count: 9,
   },
   {
     label: "Build to a bigger payoff",
     detail:
-      "The room wanted the energy to climb more before it resolves. A clearer peak would land harder.",
+      "The energy plateaus instead of climbing. Pull one or two elements out before the final section so it can lift — automate a riser or add a layer on the last chorus so the peak actually peaks.",
     count: 6,
   },
   {
     label: "Give the outro a moment",
     detail:
-      "The ending felt a touch abrupt to some. A short tail or a final hook repeat would round it off.",
+      "The ending arrives abruptly. Add a 4-8 bar tail — a final hook repeat or a stripped-back version of the main motif — so it resolves instead of just stopping.",
     count: 4,
   },
   {
     label: "Get to the hook sooner",
     detail:
-      "Some people waited too long for the best part. Pulling the hook earlier keeps them from drifting before it lands.",
+      "People wait too long for the best part. Trim the intro so the hook lands by ~0:10-0:15 — most listeners decide in the first 15 seconds, so don't make them dig for it.",
     count: 7,
   },
   {
     label: "Add contrast in the arrangement",
     detail:
-      "Sections blurred together for a few listeners. A drop-out or a new element makes the structure easier to follow.",
+      "Sections blur together. Make each one distinct — strip the drums for a breakdown, or add a new element each section — so the listener can feel the structure moving.",
     count: 5,
   },
 ];
@@ -323,6 +325,14 @@ function pick<T>(pool: T[], seed: number, count: number): T[] {
   return Array.from({ length: Math.min(count, pool.length) }, (_, i) => pool[(start + i) % pool.length]);
 }
 
+const FALLBACK_NOTES: Record<CategoryScore["key"], string> = {
+  hook: "The core idea is there and the opening sets it up, but the hook doesn't fully grab on the first pass. Sharpening it or bringing it forward sooner would make it stick.",
+  production: "It reads as mostly finished — the elements sit together cleanly. A little more polish on the balance would push it from solid to release-grade.",
+  retention: "Attention holds early, then loosens through the mid-section where the track sits in one idea a beat too long. A change-up there keeps people in.",
+  emotional: "There's a genuine feeling underneath it that connects when it lands. Leaning into the emotional peak rather than holding back would deepen it.",
+  commercial: "It has a lane and an audience, but a clearer standout moment is what separates a playlist add from a skip. Find the one moment people quote.",
+};
+
 function fallbackReport(input: ReportInput): GeneratedReport {
   const seed = hashString(`${input.trackTitle ?? ""}|${input.genre}|${input.notes ?? ""}`);
   const base = 58 + (seed % 28); // 58-85
@@ -333,7 +343,13 @@ function fallbackReport(input: ReportInput): GeneratedReport {
     ["hook", "production", "retention", "emotional", "commercial"] as const
   ).map((key, i) => {
     const score = cat(i * 3);
-    return { key, label: CATEGORY_LABELS[key], score, pct: Math.round((score / 5) * 100) };
+    return {
+      key,
+      label: CATEGORY_LABELS[key],
+      score,
+      pct: Math.round((score / 5) * 100),
+      note: FALLBACK_NOTES[key],
+    };
   });
 
   const summary = FALLBACK_SUMMARIES[seed % FALLBACK_SUMMARIES.length];
@@ -362,8 +378,15 @@ function coerceReport(raw: unknown, input: ReportInput): GeneratedReport {
   const score = clamp(Math.round(Number(obj.score)), 1, 100);
   const c = obj.categories ?? {};
   const mk = (key: CategoryScore["key"]): CategoryScore => {
-    const score = clamp(Number(c[key]), 0, 5);
-    return { key, label: CATEGORY_LABELS[key], score, pct: Math.round((score / 5) * 100) };
+    // New shape: { score, note }. Tolerate the old bare-number shape too.
+    const raw = c[key];
+    const scoreVal = raw && typeof raw === "object" ? raw.score : raw;
+    const score = clamp(Number(scoreVal), 0, 5);
+    const note =
+      raw && typeof raw === "object" && typeof raw.note === "string"
+        ? raw.note.trim()
+        : "";
+    return { key, label: CATEGORY_LABELS[key], score, pct: Math.round((score / 5) * 100), note };
   };
   const categories = [
     mk("hook"),
@@ -506,6 +529,9 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
       reviewerQuotes: {
         headline: generated.summaryHeadline,
         reactions: generated.reactions,
+        categoryNotes: Object.fromEntries(
+          generated.categories.map((c) => [c.key, c.note])
+        ),
       },
       priorityFixes: generated.priorityFixes,
       completedAt: new Date(),
