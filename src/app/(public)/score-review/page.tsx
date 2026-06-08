@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getScoreReviewQueue } from "@/lib/score-review";
 import { Logo } from "@/components/ui/logo";
+import { OptInButton } from "./opt-in-button";
 import { ArrowRight, Headphones } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
@@ -25,10 +26,19 @@ export default async function ScoreReviewQueuePage() {
   if (!me?.isScoreReviewer) {
     return (
       <Shell>
-        <p className={`${mono.className} text-[13px] text-white/40 mb-3`}>[ reviewer access ]</p>
-        <h1 className="text-3xl font-extrabold tracking-tight mb-3">not a reviewer (yet)</h1>
-        <p className="text-white/55 normal-case max-w-md">
-          This queue is for the internal listening panel. Ask an admin to add you.
+        <p className={`${mono.className} text-[13px] text-white/55 mb-3`}>[ join the room ]</p>
+        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+          become a <span style={{ color: ACCENT }}>reviewer</span>
+        </h1>
+        <p className="text-white/70 normal-case max-w-md mb-8 leading-relaxed">
+          Be one of the listeners artists get played for. Leave honest, two-minute
+          reactions that go straight into their report. Start now — one click.
+        </p>
+        <OptInButton label="become a reviewer" />
+        <p className={`${mono.className} text-[12px] text-white/45 mt-4 normal-case`}>
+          <Link href="/reviewer" className="hover:text-white transition-colors">
+            learn more about reviewing →
+          </Link>
         </p>
       </Shell>
     );

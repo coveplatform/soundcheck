@@ -38,6 +38,7 @@ const DEMO: ReportViewModel = {
   pending: false,
   unlocked: true,
   trackTitle: "Midnight Drive",
+  artworkUrl: "/activity-artwork/5.jpg",
   genre: "Electronic",
   scoredAt: "May 20, 2025",
   roomSize: ROOM_SIZE,
@@ -248,6 +249,7 @@ export default async function ReportPage({
     score,
     percentile: Math.round(report.percentile ?? 100 - score),
     verdict: asVerdict(report.verdict, score),
+    artworkUrl: report.artworkUrl ?? null,
     categories: [
       cat("Hook Strength", report.hookScore, "hook"),
       cat("Production Quality", report.productionScore, "production"),

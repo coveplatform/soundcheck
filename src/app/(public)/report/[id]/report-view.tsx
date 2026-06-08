@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ScoreRing } from "@/components/score/score-ring";
@@ -38,6 +39,7 @@ export type ReportViewModel = {
   pending: boolean;
   unlocked: boolean;
   trackTitle: string;
+  artworkUrl: string | null;
   genre: string;
   scoredAt: string;
   roomSize: number;
@@ -142,9 +144,20 @@ function Kicker({ children }: { children: React.ReactNode }) {
 // ── main ─────────────────────────────────────────────────────────────
 
 export function ReportView({ data }: { data: ReportViewModel }) {
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const locked = !data.unlocked;
+
+  // Live room: while listeners are still coming in, quietly re-fetch so new
+  // reactions appear without a manual refresh.
+  const roomPending =
+    !data.isDemo && data.humanReviewsIn < data.humanReviewsTotal;
+  useEffect(() => {
+    if (!roomPending) return;
+    const t = setInterval(() => router.refresh(), 25000);
+    return () => clearInterval(t);
+  }, [roomPending, router]);
   const verdict = VERDICTS[data.verdict];
 
   const handleShare = () => {
@@ -222,12 +235,19 @@ export function ReportView({ data }: { data: ReportViewModel }) {
             {data.isDemo && (
               <span className="text-white/40">[ sample ]</span>
             )}
-            <button
-              onClick={handleShare}
-              className="text-white/55 hover:text-white transition-colors"
-            >
-              {copied ? "copied!" : "share"}
-            </button>
+            {/* Share only once unlocked — a shared link shows the full report publicly. */}
+            {!locked ? (
+              <button
+                onClick={handleShare}
+                className="text-white/55 hover:text-white transition-colors"
+              >
+                {copied ? "copied!" : "share"}
+              </button>
+            ) : (
+              <a href="#unlock" className="text-white/35 hover:text-white/60 transition-colors">
+                🔒 unlock to share
+              </a>
+            )}
           </div>
         </div>
       </header>
@@ -235,12 +255,24 @@ export function ReportView({ data }: { data: ReportViewModel }) {
       {/* ── VERDICT HERO ── */}
       <section className="relative z-10 max-w-3xl mx-auto px-5 pt-14 pb-12 text-center">
         <Kicker>an honest read on your track</Kicker>
-        <h1 className="text-4xl sm:text-6xl font-extrabold tracking-[-0.03em] mb-1">
-          {data.trackTitle}
-        </h1>
-        <p className={`${mono.className} text-[13px] text-white/40 mb-9`}>
-          {data.genre} · ai feedback · {data.scoredAt}
-        </p>
+        <div className={`flex items-center gap-4 sm:gap-5 mb-9 ${data.artworkUrl ? "justify-center text-left" : "justify-center text-center flex-col gap-0"}`}>
+          {data.artworkUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={data.artworkUrl}
+              alt=""
+              className="w-20 h-20 sm:w-24 sm:h-24 object-cover border border-white/15 shrink-0"
+            />
+          )}
+          <div className={data.artworkUrl ? "min-w-0" : ""}>
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-[-0.03em] mb-1 break-words">
+              {data.trackTitle}
+            </h1>
+            <p className={`${mono.className} text-[13px] text-white/40`}>
+              {data.genre} · ai feedback · {data.scoredAt}
+            </p>
+          </div>
+        </div>
 
         <p className={`${mono.className} text-[12px] text-white/40 mb-3`}>
           resonance score
@@ -280,6 +312,78 @@ export function ReportView({ data }: { data: ReportViewModel }) {
       </section>
 
       <div className="relative z-10 max-w-3xl mx-auto px-5 pb-16 space-y-14">
+        {/* ── THE ROOM (real humans) — live, up top ── */}
+        {data.humanReviewsTotal > 0 && (
+          <section className="border-2 bg-[#0c0c0c] p-6 sm:p-7" style={{ borderColor: "rgba(110,231,255,0.35)" }}>
+            <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+              <div className="flex items-center gap-2.5">
+                <span className="relative flex h-2.5 w-2.5">
+                  {data.humanReviewsIn < data.humanReviewsTotal && (
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: ACCENT }} />
+                  )}
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: ACCENT }} />
+                </span>
+                <span className={`${mono.className} text-[12px] tracking-wide`} style={{ color: ACCENT }}>
+                  {data.humanReviewsIn < data.humanReviewsTotal ? "the room · live" : "the room"}
+                </span>
+              </div>
+              <div className={`${mono.className} text-[12px] text-white/55`}>
+                <span className="text-white font-bold">{data.humanReviewsIn}</span> / {data.humanReviewsTotal} listeners in
+              </div>
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">
+              real listeners are reviewing your track
+            </h2>
+            <p className={`${mono.className} text-[13px] text-white/55 mb-6 normal-case`}>
+              {data.humanReviewsIn < data.humanReviewsTotal
+                ? "reactions land here live as each listener finishes."
+                : "the whole room has weighed in."}
+              {locked && " headlines + ratings are free — unlock to read the rest."}
+            </p>
+
+            <div className="grid sm:grid-cols-2 gap-px bg-white/10 border border-white/10">
+              {data.humanReviews.map((r, i) => (
+                <div key={i} className="bg-[#0a0a0a] p-5 flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`${mono.className} text-[10px] font-bold text-black px-1.5 py-0.5`}
+                      style={{ background: r.positive ? ACCENT : "#b8a4ff" }}
+                    >
+                      listener
+                    </span>
+                    <Meter count={r.rating} />
+                  </div>
+                  <p className="text-[15px] font-bold text-white leading-snug">“{r.headline}”</p>
+                  <Sealed locked={locked} label="unlock">
+                    <p className="text-[14px] text-white/70 leading-relaxed normal-case">{r.quote}</p>
+                  </Sealed>
+                </div>
+              ))}
+              {/* pending seats — animated "listening now" */}
+              {Array.from({
+                length: Math.max(0, data.humanReviewsTotal - data.humanReviews.length),
+              }).map((_, i) => (
+                <div
+                  key={`pending-${i}`}
+                  className="bg-[#0a0a0a] p-5 flex flex-col items-center justify-center gap-2 min-h-[120px]"
+                >
+                  <div className="flex items-center gap-1">
+                    {[0, 1, 2].map((d) => (
+                      <span
+                        key={d}
+                        className="w-1.5 h-1.5 rounded-full animate-pulse"
+                        style={{ background: ACCENT, animationDelay: `${d * 200}ms`, opacity: 0.6 }}
+                      />
+                    ))}
+                  </div>
+                  <span className={`${mono.className} text-[11px] text-white/30`}>listening now…</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* ── BREAKDOWN ── */}
         <section>
           <Kicker>the breakdown</Kicker>
@@ -378,67 +482,6 @@ export function ReportView({ data }: { data: ReportViewModel }) {
             ))}
           </div>
         </section>
-
-        {/* ── THE ROOM (real humans) ── */}
-        {data.humanReviewsTotal > 0 && (
-          <section>
-            <Kicker>the room</Kicker>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">
-              {data.humanReviewsIn} of {data.humanReviewsTotal} real listeners in
-            </h2>
-            <p className={`${mono.className} text-[13px] text-white/55 mb-7 normal-case`}>
-              {data.humanReviewsIn < data.humanReviewsTotal
-                ? "more reactions land as the room finishes — check back."
-                : "the whole room weighed in."}
-              {locked && " headlines are free — unlock to read the rest."}
-            </p>
-
-            {data.humanReviews.length === 0 ? (
-              <div className="border border-white/10 bg-[#0a0a0a] p-6">
-                <p className={`${mono.className} text-[13px] text-white/45 normal-case`}>
-                  your track is with the room now — the first reactions are on their way.
-                </p>
-              </div>
-            ) : (
-              <div className="grid sm:grid-cols-2 gap-px bg-white/10 border border-white/10">
-                {data.humanReviews.map((r, i) => (
-                  <div key={i} className="bg-[#0a0a0a] p-5 flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={`${mono.className} text-[10px] font-bold text-black px-1.5 py-0.5`}
-                        style={{ background: r.positive ? ACCENT : "#b8a4ff" }}
-                      >
-                        listener
-                      </span>
-                      <Meter count={r.rating} />
-                    </div>
-                    <p className="text-[15px] font-bold text-white leading-snug">
-                      “{r.headline}”
-                    </p>
-                    <Sealed locked={locked} label="unlock">
-                      <p className="text-[14px] text-white/70 leading-relaxed normal-case">
-                        {r.quote}
-                      </p>
-                    </Sealed>
-                  </div>
-                ))}
-                {/* pending seats */}
-                {Array.from({
-                  length: Math.max(0, data.humanReviewsTotal - data.humanReviews.length),
-                }).map((_, i) => (
-                  <div
-                    key={`pending-${i}`}
-                    className="bg-[#0a0a0a] p-5 flex items-center justify-center min-h-[120px]"
-                  >
-                    <span className={`${mono.className} text-[12px] text-white/25`}>
-                      still listening…
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-        )}
 
         {/* ── FIXES ── */}
         <section>
