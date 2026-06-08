@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
 import { ScoreRing } from "@/components/score/score-ring";
@@ -20,19 +20,24 @@ const ACCENT = "#6ee7ff";
 
 // ── Real brand marks (official paths, monochrome) ───────────────────
 
+const SC_PATH = "M1 14.5c.28 0 .5-.9.5-2s-.22-2-.5-2-.5.9-.5 2 .22 2 .5 2zm2 1c.28 0 .5-1.34.5-3s-.22-3-.5-3-.5 1.34-.5 3 .22 3 .5 3zm2 .5c.28 0 .5-1.79.5-4s-.22-4-.5-4-.5 1.79-.5 4 .22 4 .5 4zm2 0c.28 0 .5-2.01.5-4.5S7.78 7 7.5 7s-.5 2.01-.5 4.5.22 4.5.5 4.5zm2 0c.28 0 .5-2.24.5-5s-.22-5-.5-5-.5 2.24-.5 5 .22 5 .5 5zm12.5 0a3.5 3.5 0 0 0 0-7c-.34 0-.67.05-.98.14A5.5 5.5 0 0 0 11 7.5c0 .3.03.6.08.88-.18-.08-.38-.13-.58-.13-.28 0-.5 2.24-.5 5s.22 4.27.5 4.27h11z";
+const YT_PATH = "M23.5 6.2a3 3 0 0 0-2.12-2.12C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.53A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.12 2.12c1.88.53 9.38.53 9.38.53s7.5 0 9.38-.53a3 3 0 0 0 2.12-2.12c.34-1.9.5-3.84.5-5.8 0-1.96-.16-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z";
+const BC_PATH = "M0 18.75l7.437-13.5H24l-7.437 13.5H0z";
+
+// "Trusted by / releasing on" strip — every platform artists release to (aspirational).
 const BRANDS: { name: string; path: string; color: string }[] = [
-  {
-    name: "soundcloud",
-    color: "#FF5500",
-    path: "M1 14.5c.28 0 .5-.9.5-2s-.22-2-.5-2-.5.9-.5 2 .22 2 .5 2zm2 1c.28 0 .5-1.34.5-3s-.22-3-.5-3-.5 1.34-.5 3 .22 3 .5 3zm2 .5c.28 0 .5-1.79.5-4s-.22-4-.5-4-.5 1.79-.5 4 .22 4 .5 4zm2 0c.28 0 .5-2.01.5-4.5S7.78 7 7.5 7s-.5 2.01-.5 4.5.22 4.5.5 4.5zm2 0c.28 0 .5-2.24.5-5s-.22-5-.5-5-.5 2.24-.5 5 .22 5 .5 5zm12.5 0a3.5 3.5 0 0 0 0-7c-.34 0-.67.05-.98.14A5.5 5.5 0 0 0 11 7.5c0 .3.03.6.08.88-.18-.08-.38-.13-.58-.13-.28 0-.5 2.24-.5 5s.22 4.27.5 4.27h11z",
-  },
-  {
-    name: "youtube",
-    color: "#FF0000",
-    path: "M23.5 6.2a3 3 0 0 0-2.12-2.12C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.53A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.12 2.12c1.88.53 9.38.53 9.38.53s7.5 0 9.38-.53a3 3 0 0 0 2.12-2.12c.34-1.9.5-3.84.5-5.8 0-1.96-.16-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z",
-  },
-  { name: "bandcamp", color: "#1DA0C3", path: "M0 18.75l7.437-13.5H24l-7.437 13.5H0z" },
-  { name: "mp3 / wav", color: "#6ee7ff", path: "M12 3v10.55A4 4 0 1014 17V7h4V3h-6z" },
+  { name: "spotify", color: "#1DB954", path: "M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z" },
+  { name: "apple music", color: "#FA243C", path: "M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" },
+  { name: "soundcloud", color: "#FF5500", path: SC_PATH },
+  { name: "youtube", color: "#FF0000", path: YT_PATH },
+  { name: "bandcamp", color: "#1DA0C3", path: BC_PATH },
+];
+
+// Sources we can actually pull + analyze — shown under the paste bar.
+const SUPPORTED: { name: string; path: string; color: string }[] = [
+  { name: "soundcloud", path: SC_PATH, color: "#FF5500" },
+  { name: "youtube", path: YT_PATH, color: "#FF0000" },
+  { name: "bandcamp", path: BC_PATH, color: "#1DA0C3" },
 ];
 
 // ── Assignment sequence ─────────────────────────────────────────────
@@ -42,7 +47,7 @@ const STEPS = [
   "mapping the energy curve",
   "checking the hook + structure",
   "weighing it across 5 dimensions",
-  "writing your instant ai read",
+  "writing your instant read",
   "assigning 5 real listeners to your track",
   "the room is tuning in…",
 ];
@@ -356,13 +361,47 @@ export default function ScorePage() {
     setPhase("running");
   };
 
+  // Where to land after auth — /score/finish submits the track post-login.
+  const buildFinish = () => {
+    const title = meta?.title?.trim() || "";
+    return (
+      `/score/finish?u=${encodeURIComponent(trackUrl.trim())}` +
+      (title ? `&t=${encodeURIComponent(title)}` : "")
+    );
+  };
+
+  // Inline auth (instead of bouncing to /login).
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authBusy, setAuthBusy] = useState(false);
+  const [authError, setAuthError] = useState("");
+
+  const continueWithGoogle = () => {
+    signIn("google", { callbackUrl: buildFinish() });
+  };
+
+  const continueWithEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (authBusy) return;
+    setAuthError("");
+    setAuthBusy(true);
+    const res = await signIn("credentials", {
+      email: authEmail.trim(),
+      password: authPassword,
+      redirect: false,
+    });
+    if (res?.ok) {
+      window.location.href = buildFinish();
+      return;
+    }
+    setAuthError("wrong email or password");
+    setAuthBusy(false);
+  };
+
   const seeResults = async () => {
     if (busy) return;
     setBusy(true);
-    const title = meta?.title?.trim() || "";
-    const finish =
-      `/score/finish?u=${encodeURIComponent(trackUrl.trim())}` +
-      (title ? `&t=${encodeURIComponent(title)}` : "");
+    const finish = buildFinish();
     if (!session?.user) {
       router.push(`/login?callbackUrl=${encodeURIComponent(finish)}`);
       return;
@@ -371,7 +410,7 @@ export default function ScorePage() {
       const res = await fetch("/api/score/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ trackUrl: trackUrl.trim(), trackTitle: title || undefined }),
+        body: JSON.stringify({ trackUrl: trackUrl.trim(), trackTitle: meta?.title?.trim() || undefined }),
       });
       const data = await res.json().catch(() => null);
       if (data?.slug) {
@@ -476,8 +515,8 @@ export default function ScorePage() {
               heard for <span style={{ color: ACCENT }}>real</span>.
             </h1>
             <p className="text-lg text-white/55 mt-7 max-w-md normal-case">
-              Instant ai analysis, then honest reactions from a room of real
-              listeners.
+              An instant read on your track, then honest reactions from a room
+              of real listeners.
             </p>
 
             {/* paste box + preview card */}
@@ -487,7 +526,7 @@ export default function ScorePage() {
                   type="url"
                   value={trackUrl}
                   onChange={(e) => setTrackUrl(e.target.value)}
-                  placeholder="paste your track link…"
+                  placeholder="paste a soundcloud, youtube or mp3 link…"
                   className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-5 py-4 text-[15px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
                 />
               ) : (
@@ -563,6 +602,20 @@ export default function ScorePage() {
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
 
+              {/* sources we can actually analyse */}
+              <div className={`${mono.className} mt-4 flex items-center flex-wrap gap-x-4 gap-y-2 text-[12px] text-white/55`}>
+                <span className="text-white/30">paste from</span>
+                {SUPPORTED.map((s) => (
+                  <span key={s.name} className="inline-flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill={s.color} aria-hidden>
+                      <path d={s.path} />
+                    </svg>
+                    {s.name}
+                  </span>
+                ))}
+                <span className="text-white/30">or a direct mp3 / wav link</span>
+              </div>
+
               {error && (
                 <p className={`${mono.className} text-[13px] text-red-400 mt-3`}>{error}</p>
               )}
@@ -571,7 +624,7 @@ export default function ScorePage() {
             {/* trust tags */}
             <div className={`${mono.className} mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-white/50`}>
               <span className="inline-flex items-center gap-1.5" style={{ color: ACCENT }}>
-                <Zap className="h-3.5 w-3.5" /> instant ai read
+                <Zap className="h-3.5 w-3.5" /> instant read
               </span>
               <span className="text-white/20">·</span>
               <span>real listeners</span>
@@ -595,7 +648,7 @@ export default function ScorePage() {
         {/* trusted-by brand strip */}
         <div className="mt-16 pt-8 border-t border-white/10">
           <p className={`${mono.className} text-[11px] text-white/30 mb-5`}>
-            works with everything you release on
+            trusted by musicians releasing on
           </p>
           <div className="flex flex-wrap items-center gap-x-9 gap-y-5">
             {BRANDS.map((b) => (
@@ -724,7 +777,7 @@ export default function ScorePage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border border-white/10">
             {[
               { n: "01", t: "paste your link", v: <PasteMock /> },
-              { n: "02", t: "instant ai read", v: <LogMock /> },
+              { n: "02", t: "your instant read", v: <LogMock /> },
               { n: "03", t: "the real room", v: <RoomMock /> },
               { n: "04", t: "your verdict", v: <VerdictMock /> },
             ].map((s) => (
@@ -1143,24 +1196,77 @@ export default function ScorePage() {
 
             <div className="mt-6">
               {phase === "done" ? (
-                <>
-                  <button
-                    onClick={seeResults}
-                    disabled={busy}
-                    className="group w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-base px-8 py-4 hover:bg-white transition-colors disabled:opacity-60"
-                  >
-                    {busy ? "opening…" : "see results"}
-                    {!busy && <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />}
-                  </button>
-                  {!session?.user && (
-                    <p className={`${mono.className} text-[12px] text-white/35 mt-3 text-center`}>
-                      quick log in to keep your report
+                session?.user ? (
+                  <>
+                    <button
+                      onClick={seeResults}
+                      disabled={busy}
+                      className="group w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-base px-8 py-4 hover:bg-white transition-colors disabled:opacity-60"
+                    >
+                      {busy ? "opening…" : "see results"}
+                      {!busy && <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />}
+                    </button>
+                    {error && (
+                      <p className={`${mono.className} text-[13px] text-red-400 mt-3 text-center`}>{error}</p>
+                    )}
+                  </>
+                ) : (
+                  <div className="space-y-3">
+                    <p className={`${mono.className} text-[12px] text-white/55 text-center normal-case`}>
+                      your read is ready — sign in to open it & keep it on your dashboard.
                     </p>
-                  )}
-                  {error && (
-                    <p className={`${mono.className} text-[13px] text-red-400 mt-3 text-center`}>{error}</p>
-                  )}
-                </>
+                    <button
+                      onClick={continueWithGoogle}
+                      className="w-full inline-flex items-center justify-center gap-2.5 bg-white text-black font-extrabold text-[15px] py-3.5 hover:bg-white/90 transition-colors"
+                    >
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                      </svg>
+                      continue with google
+                    </button>
+                    <div className={`${mono.className} flex items-center gap-3 text-[11px] text-white/25`}>
+                      <div className="h-px bg-white/10 flex-1" /> or <div className="h-px bg-white/10 flex-1" />
+                    </div>
+                    <form onSubmit={continueWithEmail} className="space-y-2">
+                      <input
+                        type="email"
+                        value={authEmail}
+                        onChange={(e) => setAuthEmail(e.target.value)}
+                        placeholder="email"
+                        required
+                        className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
+                      />
+                      <input
+                        type="password"
+                        value={authPassword}
+                        onChange={(e) => setAuthPassword(e.target.value)}
+                        placeholder="password"
+                        required
+                        className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
+                      />
+                      <button
+                        type="submit"
+                        disabled={authBusy}
+                        className="w-full bg-[#6ee7ff] text-black font-extrabold text-sm py-3 hover:bg-white transition-colors disabled:opacity-60"
+                      >
+                        {authBusy ? "signing in…" : "continue with email"}
+                      </button>
+                    </form>
+                    {authError && (
+                      <p className={`${mono.className} text-[13px] text-red-400 text-center`}>{authError}</p>
+                    )}
+                    <p className={`${mono.className} text-[11px] text-white/30 text-center normal-case`}>
+                      no account? continue with google to start instantly, or{" "}
+                      <Link href={`/login?callbackUrl=${encodeURIComponent(buildFinish())}`} className="hover:text-white transition-colors" style={{ color: ACCENT }}>
+                        sign up
+                      </Link>
+                      .
+                    </p>
+                  </div>
+                )
               ) : (
                 <p className={`${mono.className} text-[13px] text-white/40`}>hang tight…</p>
               )}
