@@ -9,7 +9,6 @@ import {
   DashboardThemeProvider,
   type DashboardTheme,
 } from "@/components/dashboard/theme-provider";
-import { DarkModeBanner } from "@/components/dashboard/dark-mode-banner";
 import { PurchaseSuccessBanner } from "@/components/credits/purchase-success-banner";
 
 // Cache sidebar data per user for 30s to avoid re-fetching on every navigation
@@ -119,7 +118,6 @@ export default async function DashboardLayout({
 
         {/* Main content with sidebar offset */}
         <div className="md:pl-64">
-          <DarkModeBanner />
           <main className="pb-24 md:pb-8">{children}</main>
         </div>
       </div>

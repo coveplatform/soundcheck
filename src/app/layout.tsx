@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "@/components/providers";
+import { ChangeoverBanner } from "@/components/changeover-banner";
 import { headers } from "next/headers";
 import "./globals.css";
 
@@ -179,7 +180,10 @@ export default async function RootLayout({
       <body
         className={`${plusJakarta.variable} antialiased`}
       >
-        <Providers requiresConsent={requiresConsent}>{children}</Providers>
+        <Providers requiresConsent={requiresConsent}>
+          <ChangeoverBanner />
+          {children}
+        </Providers>
         <Analytics />
         <SpeedInsights />
       </body>
