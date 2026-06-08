@@ -482,6 +482,7 @@ model User {
   updatedAt              DateTime                 @updatedAt
   isArtist               Boolean                  @default(true)
   isReviewer             Boolean                  @default(true)
+  isScoreReviewer        Boolean                  @default(false)
   referralSource         String?
   trialReminderSentAt    DateTime?
   lastActiveAt           DateTime?
@@ -500,6 +501,7 @@ model User {
   SupportTicket          SupportTicket[]
   TrackAffiliateLink     TrackAffiliateLink[]
   ChartVote              ChartVote[]
+  ScoreReview            ScoreReview[]
 }
 
 model VerificationToken {
@@ -845,6 +847,7 @@ model TrackScoreReport {
   email            String
   trackUrl         String
   trackTitle       String?
+  artworkUrl       String?
   genre            String?
   notes            String?
   status           ScoreReportStatus @default(PENDING)
@@ -863,12 +866,56 @@ model TrackScoreReport {
   reviewerQuotes   Json?
   priorityFixes    Json?
   artistId         String?
+  humanReviewsRequested Int          @default(5)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   ArtistProfile    ArtistProfile?    @relation(fields: [artistId], references: [id])
+  ScoreReview      ScoreReview[]
 
   @@index([email])
   @@index([status])
+}
+
+// A single human listener's reaction on a score report (the "room of 5").
+model ScoreReview {
+  id          String            @id @default(cuid())
+  reportId    String
+  reviewerId  String?
+  status      ScoreReviewStatus @default(ASSIGNED)
+  rating      Int?              // 1-5
+  headline    String?           // one-line gist — shown free (teaser)
+  quote       String?           // full reaction — gated until unlock
+  positive    Boolean?
+  assignedAt  DateTime          @default(now())
+  expiresAt   DateTime
+  completedAt DateTime?
+  TrackScoreReport TrackScoreReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  User             User?            @relation(fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@unique([reportId, reviewerId])
+  @@index([reviewerId, status])
+  @@index([reportId])
+}
+
+enum ScoreReviewStatus {
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+}
+
+// Email-keyed "unlimited unlocks" subscription for the score product.
+model ScoreSubscriber {
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  status               String    @default("inactive") // active | canceled | past_due | inactive
+  stripeCustomerId     String?
+  stripeSubscriptionId String?   @unique
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([stripeCustomerId])
 }
 
 enum ScoreReportStatus {

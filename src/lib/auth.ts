@@ -7,8 +7,31 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 import { checkRateLimit, RATE_LIMITS } from "./rate-limit";
 
+// Cross-subdomain auth: when COOKIE_DOMAIN is set (e.g. ".mixreflect.com"), the
+// session cookie is shared across the apex and any subdomain (try.mixreflect.com)
+// so existing users log in with the same account and the session is valid on both.
+// Unset (local dev) → default host-only cookies, no behaviour change.
+const cookieDomain = process.env.COOKIE_DOMAIN;
+const useSecureCookies = (process.env.NEXTAUTH_URL ?? "").startsWith("https://");
+
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
+  ...(cookieDomain
+    ? {
+        cookies: {
+          sessionToken: {
+            name: `${useSecureCookies ? "__Secure-" : ""}next-auth.session-token`,
+            options: {
+              httpOnly: true,
+              sameSite: "lax" as const,
+              path: "/",
+              secure: useSecureCookies,
+              domain: cookieDomain,
+            },
+          },
+        },
+      }
+    : {}),
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({

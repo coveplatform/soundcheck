@@ -241,7 +241,7 @@ export default async function AdminPage() {
           </div>
           <div className="flex-1">
             <h3 className="text-xl font-black text-white mb-1">Track Score Report — Demo</h3>
-            <p className="text-sm text-white/90 font-medium">Preview the full $9 report product with dummy data</p>
+            <p className="text-sm text-white/90 font-medium">Preview the full $6.95 report product with dummy data</p>
           </div>
           <div className="hidden sm:block text-white group-hover:translate-x-1 transition-transform">
             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

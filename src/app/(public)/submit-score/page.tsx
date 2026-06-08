@@ -1,36 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
-import { ScoreRing } from "@/components/score/score-ring";
-import {
-  ArrowRight,
-  Lock,
-  Music,
-  CheckCircle2,
-  Clock,
-} from "lucide-react";
+import { ArrowRight, Loader2, Music, X } from "lucide-react";
+
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
+const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
+const ACCENT = "#6ee7ff";
 
 const GENRES = [
-  "Electronic",
-  "Hip-Hop",
-  "Pop",
-  "R&B / Soul",
-  "Rock",
-  "Indie",
-  "Lo-Fi",
-  "Dance / Club",
-  "Ambient",
-  "Singer-Songwriter",
-  "Metal",
-  "Jazz",
-  "Classical",
-  "Country",
-  "Latin",
-  "Other",
+  "Electronic", "Hip-Hop", "Pop", "R&B / Soul", "Rock", "Indie", "Lo-Fi",
+  "Dance / Club", "Ambient", "Singer-Songwriter", "Metal", "Jazz",
+  "Classical", "Country", "Latin", "Other",
 ];
+
+type Meta = { title: string; artist: string | null; artworkUrl: string | null };
 
 export default function SubmitScorePage() {
   const { data: session } = useSession();
@@ -43,7 +30,57 @@ export default function SubmitScorePage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const isValid = trackUrl.trim().length > 0 && email.trim().length > 0 && genre.length > 0;
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [metaLoading, setMetaLoading] = useState(false);
+
+  const hasEmail = !!session?.user?.email || email.trim().length > 0;
+  const isUrl = /^https?:\/\//i.test(trackUrl.trim());
+  const isValid = trackUrl.trim().length > 0 && hasEmail;
+
+  let host = "";
+  try {
+    host = new URL(trackUrl.trim()).hostname.replace(/^www\./, "");
+  } catch {
+    /* not a url yet */
+  }
+
+  // ── debounced track preview (same as the landing) ──
+  useEffect(() => {
+    const u = trackUrl.trim();
+    if (!/^https?:\/\//i.test(u)) {
+      setMeta(null);
+      setMetaLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setMetaLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/metadata", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: u }),
+        });
+        const data = await res.json().catch(() => null);
+        if (cancelled) return;
+        if (res.ok && data?.title) {
+          setMeta({ title: data.title, artist: data.artist ?? null, artworkUrl: data.artworkUrl ?? null });
+          // prefill the title field if the artist left it blank
+          setTrackTitle((cur) => cur || data.title);
+        } else {
+          setMeta(null);
+        }
+      } catch {
+        if (!cancelled) setMeta(null);
+      } finally {
+        if (!cancelled) setMetaLoading(false);
+      }
+    }, 550);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [trackUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,262 +88,225 @@ export default function SubmitScorePage() {
     setError("");
     setSubmitting(true);
     try {
-      const res = await fetch("/api/score/checkout", {
+      const res = await fetch("/api/score/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ trackUrl, trackTitle, genre, notes, email }),
       });
       const data = await res.json().catch(() => null);
-      if (!res.ok) {
-        setError((data as any)?.error ?? "Something went wrong");
+      if (!res.ok || !data?.slug) {
+        setError(data?.error ?? "Something went wrong. Try again.");
         setSubmitting(false);
         return;
       }
-      if ((data as any)?.url) {
-        window.location.href = (data as any).url;
-      }
+      window.location.href = `/report/${data.slug}`;
     } catch {
-      setError("Failed to start checkout. Please try again.");
+      setError("Failed to submit. Try again.");
       setSubmitting(false);
     }
   };
 
+  const inputCls =
+    `${mono.className} w-full bg-[#141414] border border-white/20 focus:border-[#6ee7ff] px-4 py-3.5 text-[15px] text-white placeholder:text-white/35 focus:outline-none transition-colors normal-case`;
+
   return (
-    <div className="min-h-screen bg-[#faf8f5]" style={{ paddingTop: "56px" }}>
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#faf8f5]/90 backdrop-blur-sm border-b border-black/5">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center justify-between h-14">
-            <Link href="/" className="flex items-center gap-2">
-              <Logo />
-            </Link>
-            <Link
-              href="/score"
-              className="text-xs font-black uppercase tracking-wider text-black/30 hover:text-black transition-colors"
-            >
-              ← Back
-            </Link>
-          </div>
+    <div
+      className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase`}
+    >
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
+        <div className="max-w-3xl mx-auto px-5 h-16 flex items-center justify-between">
+          <Link href="/">
+            <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
+          </Link>
+          <Link
+            href="/score"
+            className={`${mono.className} text-[13px] text-white/65 hover:text-white transition-colors`}
+          >
+            ← back
+          </Link>
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 py-10 sm:py-14">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-          {/* ── LEFT: Form ─────────────────────────── */}
-          <div>
-            <div className="mb-8">
-              <p className="text-[11px] font-black uppercase tracking-[0.3em] text-black/25 mb-2">
-                Track Score
-              </p>
-              <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-[1.05]">
-                Submit your track.
-              </h1>
-              <p className="mt-3 text-neutral-600 text-base">
-                5 real listeners. One score. $9. Results in 24 hours.
-              </p>
-            </div>
+      <div className="max-w-2xl mx-auto px-5 py-14">
+        <p className={`${mono.className} text-[13px] text-white/55 mb-3`}>
+          [ drop your track ]
+        </p>
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-[-0.03em] mb-4">
+          get an honest <span style={{ color: ACCENT }}>read</span>.
+        </h1>
+        <p className="text-white/70 text-lg mb-10 normal-case max-w-md leading-relaxed">
+          An instant, honest read on your track. Free to submit — unlock the
+          full report whenever you like.
+        </p>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Track URL */}
-              <div>
-                <label className="block text-[11px] font-black uppercase tracking-wider text-black/40 mb-2">
-                  Track Link *
-                </label>
-                <div className="relative">
-                  <Music className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-black/25" />
-                  <input
-                    type="url"
-                    value={trackUrl}
-                    onChange={(e) => setTrackUrl(e.target.value)}
-                    placeholder="SoundCloud, Spotify, YouTube or direct URL"
-                    required
-                    className="w-full pl-10 pr-4 py-3.5 bg-white border-2 border-black/8 rounded-xl text-sm font-medium text-neutral-950 placeholder:text-neutral-400 focus:outline-none focus:border-purple-400 transition-colors"
-                  />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <Field label="track link" required>
+            {!isUrl ? (
+              <input
+                type="url"
+                value={trackUrl}
+                onChange={(e) => setTrackUrl(e.target.value)}
+                placeholder="paste a soundcloud, spotify, youtube or bandcamp link…"
+                required
+                className={inputCls}
+              />
+            ) : (
+              <div
+                className="flex items-center gap-4 bg-[#141414] border p-3.5"
+                style={{ borderColor: meta ? ACCENT : "rgba(255,255,255,0.2)", animation: "cardIn .25s ease" }}
+              >
+                <div className="w-16 h-16 bg-white/5 border border-white/10 shrink-0 overflow-hidden flex items-center justify-center">
+                  {meta?.artworkUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={meta.artworkUrl} alt="" className="w-full h-full object-cover" />
+                  ) : metaLoading ? (
+                    <Loader2 className="h-5 w-5 text-white/50 animate-spin" />
+                  ) : (
+                    <Music className="h-5 w-5 text-white/50" />
+                  )}
                 </div>
-                <p className="text-[11px] text-neutral-400 mt-1.5">
-                  Works with SoundCloud, Spotify, YouTube, Bandcamp, or a direct
-                  .mp3 link
-                </p>
-              </div>
-
-              {/* Track title */}
-              <div>
-                <label className="block text-[11px] font-black uppercase tracking-wider text-black/40 mb-2">
-                  Track Title <span className="font-medium normal-case">(optional)</span>
-                </label>
-                <input
-                  type="text"
-                  value={trackTitle}
-                  onChange={(e) => setTrackTitle(e.target.value)}
-                  placeholder="e.g. Midnight Drive"
-                  className="w-full px-4 py-3.5 bg-white border-2 border-black/8 rounded-xl text-sm font-medium text-neutral-950 placeholder:text-neutral-400 focus:outline-none focus:border-purple-400 transition-colors"
-                />
-              </div>
-
-              {/* Genre */}
-              <div>
-                <label className="block text-[11px] font-black uppercase tracking-wider text-black/40 mb-2">
-                  Genre *
-                </label>
-                <select
-                  value={genre}
-                  onChange={(e) => setGenre(e.target.value)}
-                  required
-                  className="w-full px-4 py-3.5 bg-white border-2 border-black/8 rounded-xl text-sm font-medium text-neutral-950 focus:outline-none focus:border-purple-400 transition-colors appearance-none"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' strokeWidth='1.5' fill='none' strokeLinecap='round'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "right 14px center",
-                    paddingRight: "38px",
-                  }}
-                >
-                  <option value="">Select a genre</option>
-                  {GENRES.map((g) => (
-                    <option key={g} value={g}>
-                      {g}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Email */}
-              {!session?.user?.email && (
-                <div>
-                  <label className="block text-[11px] font-black uppercase tracking-wider text-black/40 mb-2">
-                    Email for delivery *
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    required
-                    className="w-full px-4 py-3.5 bg-white border-2 border-black/8 rounded-xl text-sm font-medium text-neutral-950 placeholder:text-neutral-400 focus:outline-none focus:border-purple-400 transition-colors"
-                  />
-                  <p className="text-[11px] text-neutral-400 mt-1.5">
-                    Your report will be emailed here within 24 hours
-                  </p>
-                </div>
-              )}
-
-              {session?.user?.email && (
-                <div className="flex items-center gap-2.5 bg-purple-50 border border-purple-200/60 rounded-xl px-4 py-3">
-                  <CheckCircle2 className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                  <p className="text-sm text-purple-700">
-                    Report delivered to{" "}
-                    <span className="font-black">{session.user.email}</span>
-                  </p>
-                </div>
-              )}
-
-              {/* Notes */}
-              <div>
-                <label className="block text-[11px] font-black uppercase tracking-wider text-black/40 mb-2">
-                  Notes for reviewers{" "}
-                  <span className="font-medium normal-case">(optional)</span>
-                </label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="e.g. First full release, targeting streaming playlists. Focus on the drop and whether the intro is too long."
-                  rows={3}
-                  className="w-full px-4 py-3.5 bg-white border-2 border-black/8 rounded-xl text-sm font-medium text-neutral-950 placeholder:text-neutral-400 focus:outline-none focus:border-purple-400 transition-colors resize-none"
-                />
-              </div>
-
-              {/* Error */}
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl font-medium">
-                  {error}
-                </div>
-              )}
-
-              {/* Submit */}
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={!isValid || submitting}
-                  className="w-full inline-flex items-center justify-center gap-2 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 font-black text-base py-4 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all"
-                >
-                  {submitting ? (
+                <div className="min-w-0 flex-1">
+                  {metaLoading && !meta ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Setting up checkout...
+                      <div className="h-4 w-44 bg-white/10 animate-pulse" />
+                      <div className="h-3 w-28 bg-white/5 mt-2.5 animate-pulse" />
+                    </>
+                  ) : meta ? (
+                    <>
+                      <p className="text-[16px] font-bold text-white truncate normal-case">{meta.title}</p>
+                      <p className={`${mono.className} text-[12px] text-white/60 truncate normal-case mt-0.5`}>
+                        {meta.artist ? `by ${meta.artist}` : "track found"}
+                      </p>
                     </>
                   ) : (
                     <>
-                      Pay $9 and Get My Score
-                      <ArrowRight className="h-4 w-4" />
+                      <p className="text-[15px] font-bold text-white truncate normal-case">link added</p>
+                      <p className={`${mono.className} text-[12px] text-white/60 truncate normal-case mt-0.5`}>
+                        {host || "ready to go"}
+                      </p>
                     </>
                   )}
-                </button>
-
-                <p className="mt-3 text-xs text-neutral-400 flex items-center justify-center gap-1.5">
-                  <Lock className="h-3 w-3" />
-                  Secure payment via Stripe · No subscription · Cancel anytime
-                  isn&apos;t a thing — it&apos;s one charge.
-                </p>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className={`${mono.className} text-[11px]`} style={{ color: ACCENT }}>
+                    {metaLoading && !meta ? "reading…" : "✓ ready"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setTrackUrl("")}
+                    aria-label="change track"
+                    className="text-white/45 hover:text-white transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-            </form>
-          </div>
+            )}
+          </Field>
 
-          {/* ── RIGHT: What you get ─────────────────── */}
-          <div className="lg:pt-16">
-            {/* Score ring preview */}
-            <div className="bg-neutral-950 rounded-2xl p-8 flex flex-col items-center gap-5 mb-5">
-              <ScoreRing score={null} size="lg" dark animate={false} />
-              <div className="text-center">
-                <p className="text-sm font-black text-white/60">
-                  Your score is waiting
-                </p>
-                <p className="text-xs text-white/30 mt-1">
-                  Submit your track to find out where you stand
-                </p>
-              </div>
-            </div>
+          <Field label="track title" optional>
+            <input
+              type="text"
+              value={trackTitle}
+              onChange={(e) => setTrackTitle(e.target.value)}
+              placeholder="e.g. midnight drive"
+              className={inputCls}
+            />
+          </Field>
 
-            {/* What's included */}
-            <div className="bg-white rounded-2xl border border-black/6 p-6">
-              <p className="text-[11px] font-black uppercase tracking-wider text-black/30 mb-4">
-                What you get
-              </p>
-              <div className="space-y-3">
-                {[
-                  "MixReflect Score out of 100",
-                  "Percentile rank vs. all tracks",
-                  "5 reviewer scores across 5 dimensions",
-                  "Individual reviewer quotes",
-                  "AI synthesis of findings",
-                  "Top 2–3 priority improvements",
-                  "Permanent shareable report link",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-3">
-                    <CheckCircle2 className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                    <span className="text-sm text-neutral-700">{item}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-5 pt-4 border-t border-black/6 flex items-center gap-2 text-sm text-neutral-500">
-                <Clock className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                <span>
-                  Delivered within{" "}
-                  <span className="font-black text-neutral-800">24 hours</span>
-                </span>
-              </div>
-            </div>
+          <Field label="genre" optional>
+            <select
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              className={inputCls}
+            >
+              <option value="">pick a genre</option>
+              {GENRES.map((g) => (
+                <option key={g} value={g}>{g}</option>
+              ))}
+            </select>
+          </Field>
 
-            {/* Sample link */}
-            <div className="mt-4 text-center">
-              <Link
-                href="/report/demo"
-                className="text-sm text-neutral-500 hover:text-purple-600 transition-colors font-medium"
-              >
-                See a sample report first →
-              </Link>
-            </div>
-          </div>
+          {session?.user?.email ? (
+            <p className={`${mono.className} text-[13px] text-white/60 normal-case`}>
+              saved to <span style={{ color: ACCENT }}>{session.user.email}</span>
+            </p>
+          ) : (
+            <Field label="your email" required>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+                className={inputCls}
+              />
+            </Field>
+          )}
+
+          <Field label="anything we should know" optional>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. first release, is the intro too long?"
+              rows={3}
+              className={`${inputCls} resize-none`}
+            />
+          </Field>
+
+          {error && (
+            <p className={`${mono.className} text-[13px] text-red-400 normal-case`}>{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={!isValid || submitting}
+            className="group w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-base py-4 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {submitting ? "analyzing…" : "get my read — free"}
+            {!submitting && (
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            )}
+          </button>
+          <p className={`${mono.className} text-center text-[12px] text-white/50 normal-case`}>
+            no card to submit · unlock the full read for $6.95
+          </p>
+        </form>
+
+        <div className="mt-8 text-center">
+          <Link
+            href="/report/demo"
+            className={`${mono.className} text-[13px] text-white/60 hover:text-white transition-colors`}
+          >
+            see a sample report first →
+          </Link>
         </div>
       </div>
+
+      <style>{`@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}`}</style>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  required,
+  optional,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  optional?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label className={`${mono.className} block text-[12px] text-white/60 mb-2`}>
+        {label}
+        {required && <span style={{ color: ACCENT }}> *</span>}
+        {optional && <span className="text-white/30"> (optional)</span>}
+      </label>
+      {children}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { assignReviewersToTrack } from "@/lib/queue";
 import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email";
 import { finalizePaidCheckoutSession } from "@/lib/payments";
+import { activateSubscriber, updateSubscriberStatus } from "@/lib/score-subscription";
 import type Stripe from "stripe";
 
 
@@ -139,7 +140,62 @@ export async function POST(request: Request) {
   return NextResponse.json({ received: true });
 }
 
+async function handleScoreUnlockCheckout(session: Stripe.Checkout.Session) {
+  try {
+    const reportId = session.metadata?.reportId;
+    if (!reportId) {
+      console.error("Missing reportId in score_unlock metadata", { sessionId: session.id });
+      return;
+    }
+
+    await prisma.trackScoreReport.update({
+      where: { id: reportId },
+      data: {
+        paidAt: new Date(),
+        status: "COMPLETED",
+        stripeSessionId: session.id,
+      },
+    });
+
+    console.log(`Unlocked score report ${reportId} (session ${session.id})`);
+  } catch (error) {
+    console.error("Error handling score unlock checkout:", error);
+  }
+}
+
+async function handleScoreSubscriptionCheckout(session: Stripe.Checkout.Session) {
+  try {
+    const email = session.metadata?.email;
+    if (!email) {
+      console.error("Missing email in score_subscription metadata", { sessionId: session.id });
+      return;
+    }
+    await activateSubscriber({
+      email,
+      stripeCustomerId:
+        typeof session.customer === "string" ? session.customer : session.customer?.id ?? null,
+      stripeSubscriptionId:
+        typeof session.subscription === "string"
+          ? session.subscription
+          : session.subscription?.id ?? null,
+    });
+    console.log(`Activated score subscription for ${email} (session ${session.id})`);
+  } catch (error) {
+    console.error("Error handling score subscription checkout:", error);
+  }
+}
+
 async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
+  if (session.metadata?.type === "score_unlock") {
+    await handleScoreUnlockCheckout(session);
+    return;
+  }
+
+  if (session.metadata?.type === "score_subscription") {
+    await handleScoreSubscriptionCheckout(session);
+    return;
+  }
+
   if (session.metadata?.type === "release_decision") {
     await handleReleaseDecisionCheckout(session);
     return;
@@ -263,6 +319,19 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       typeof subscription.customer === "string"
         ? subscription.customer
         : subscription.customer.id;
+
+    // Score-product "unlimited" subscriptions are tracked in ScoreSubscriber, not
+    // ArtistProfile — route them away from the credits/Pro logic below.
+    if (subscription.metadata?.type === "score_subscription") {
+      const periodEndSeconds = subscription.items?.data?.[0]?.current_period_end;
+      await updateSubscriberStatus({
+        stripeSubscriptionId: subscription.id,
+        stripeCustomerId: customerId,
+        status: subscription.status,
+        currentPeriodEnd: periodEndSeconds ? new Date(periodEndSeconds * 1000) : null,
+      });
+      return;
+    }
 
     const periodStartSeconds = subscription.items?.data?.[0]?.current_period_start;
     const newPeriodStart = periodStartSeconds ? new Date(periodStartSeconds * 1000) : new Date();

@@ -1,772 +1,740 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Caveat } from "next/font/google";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
-import { AuthButtons } from "@/components/ui/auth-buttons";
-import { ScoreRing } from "@/components/score/score-ring";
-import {
-  Sparkle,
-  Star,
-  Squiggle,
-  Dots,
-  Scribble,
-  Zigzag,
-} from "@/components/landing/doodles";
-import { AnimatedSection } from "@/components/landing/animated-section";
-import {
-  ArrowRight,
-  CheckCircle2,
-  Clock,
-  Lock,
-  Music,
-  Share2,
-  Users,
-  BarChart3,
-  Zap,
-} from "lucide-react";
+import { posts } from "@/lib/blog-posts";
+import { ArrowRight, ArrowUpRight, Music, Loader2, X } from "lucide-react";
 
-const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
 
-const CATEGORY_SCORES = [
-  { label: "Hook Strength", score: 4.2, pct: 84 },
-  { label: "Production Quality", score: 3.8, pct: 76 },
-  { label: "Listener Retention", score: 3.4, pct: 68 },
-  { label: "Emotional Impact", score: 4.0, pct: 80 },
-  { label: "Commercial Potential", score: 3.6, pct: 72 },
+const ACCENT = "#6ee7ff";
+
+// ── Real brand marks (official paths, monochrome) ───────────────────
+
+const BRANDS: { name: string; path: string }[] = [
+  {
+    name: "spotify",
+    path: "M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z",
+  },
+  {
+    name: "apple music",
+    path: "M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z",
+  },
+  {
+    name: "soundcloud",
+    path: "M1 14.5c.28 0 .5-.9.5-2s-.22-2-.5-2-.5.9-.5 2 .22 2 .5 2zm2 1c.28 0 .5-1.34.5-3s-.22-3-.5-3-.5 1.34-.5 3 .22 3 .5 3zm2 .5c.28 0 .5-1.79.5-4s-.22-4-.5-4-.5 1.79-.5 4 .22 4 .5 4zm2 0c.28 0 .5-2.01.5-4.5S7.78 7 7.5 7s-.5 2.01-.5 4.5.22 4.5.5 4.5zm2 0c.28 0 .5-2.24.5-5s-.22-5-.5-5-.5 2.24-.5 5 .22 5 .5 5zm12.5 0a3.5 3.5 0 0 0 0-7c-.34 0-.67.05-.98.14A5.5 5.5 0 0 0 11 7.5c0 .3.03.6.08.88-.18-.08-.38-.13-.58-.13-.28 0-.5 2.24-.5 5s.22 4.27.5 4.27h11z",
+  },
+  {
+    name: "youtube",
+    path: "M23.5 6.2a3 3 0 0 0-2.12-2.12C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.53A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.12 2.12c1.88.53 9.38.53 9.38.53s7.5 0 9.38-.53a3 3 0 0 0 2.12-2.12c.34-1.9.5-3.84.5-5.8 0-1.96-.16-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z",
+  },
+  { name: "bandcamp", path: "M0 18.75l7.437-13.5H24l-7.437 13.5H0z" },
 ];
 
+// ── Assignment sequence ─────────────────────────────────────────────
+
+const STEPS = [
+  "fetching your track",
+  "mapping the energy curve",
+  "checking the hook + structure",
+  "weighing it across 5 dimensions",
+  "writing your honest read",
+  "finalising your score",
+];
+
+const CHECKS: { t: string; d: string }[] = [
+  { t: "hook strength", d: "does it grab in the first 15 seconds, or do people wait too long for the good part?" },
+  { t: "listener retention", d: "where attention holds, and where people are most likely to start drifting." },
+  { t: "production quality", d: "does it sound pro? we listen for a muddy low end, harsh highs, or a vocal that's getting buried." },
+  { t: "emotional impact", d: "does it actually make people feel something, or does it wash over them?" },
+  { t: "structure & pacing", d: "intro length, drop timing, and whether the energy arc earns its payoff." },
+  { t: "release readiness", d: "the bottom line — is this ready to put out, or is it one fix away?" },
+];
+
+type Phase = "idle" | "running" | "done";
+type Meta = { title: string; artist: string | null; artworkUrl: string | null };
+
 export default function ScorePage() {
+  const router = useRouter();
+  const { data: session } = useSession();
+
+  const [trackUrl, setTrackUrl] = useState("");
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [metaLoading, setMetaLoading] = useState(false);
+
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [step, setStep] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const logRef = useRef<HTMLDivElement>(null);
+
+  // ── debounced track preview ──
+  useEffect(() => {
+    const u = trackUrl.trim();
+    if (!/^https?:\/\//i.test(u)) {
+      setMeta(null);
+      setMetaLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setMetaLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/metadata", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: u }),
+        });
+        const data = await res.json().catch(() => null);
+        if (cancelled) return;
+        if (res.ok && data?.title) {
+          setMeta({
+            title: data.title,
+            artist: data.artist ?? null,
+            artworkUrl: data.artworkUrl ?? null,
+          });
+        } else {
+          setMeta(null);
+        }
+      } catch {
+        if (!cancelled) setMeta(null);
+      } finally {
+        if (!cancelled) setMetaLoading(false);
+      }
+    }, 550);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [trackUrl]);
+
+  // ── drive the assignment log ──
+  useEffect(() => {
+    if (phase !== "running") return;
+    if (step >= STEPS.length) {
+      const t = setTimeout(() => setPhase("done"), 560);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(() => setStep((s) => s + 1), 600 + Math.random() * 320);
+    return () => clearTimeout(t);
+  }, [phase, step]);
+
+  useEffect(() => {
+    logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
+  }, [step, phase]);
+
+  // ── esc closes the modal ──
+  useEffect(() => {
+    if (phase === "idle") return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") cancel();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [phase]);
+
+  const cancel = () => {
+    setPhase("idle");
+    setStep(0);
+    setBusy(false);
+  };
+
+  const start = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!trackUrl.trim()) {
+      setError("paste a link to your track first");
+      return;
+    }
+    setError("");
+    setStep(0);
+    setPhase("running");
+  };
+
+  const seeResults = async () => {
+    if (busy) return;
+    setBusy(true);
+    const title = meta?.title?.trim() || "";
+    const finish =
+      `/score/finish?u=${encodeURIComponent(trackUrl.trim())}` +
+      (title ? `&t=${encodeURIComponent(title)}` : "");
+    if (!session?.user) {
+      router.push(`/login?callbackUrl=${encodeURIComponent(finish)}`);
+      return;
+    }
+    try {
+      const res = await fetch("/api/score/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trackUrl: trackUrl.trim(), trackTitle: title || undefined }),
+      });
+      const data = await res.json().catch(() => null);
+      if (data?.slug) {
+        router.push(`/report/${data.slug}`);
+        return;
+      }
+      setError(data?.error ?? "something broke. try again.");
+      setBusy(false);
+    } catch {
+      setError("something broke. try again.");
+      setBusy(false);
+    }
+  };
+
+  const handleSubscribe = async (plan: "monthly" | "annual" = "monthly") => {
+    if (!session?.user?.email) {
+      router.push(`/login?callbackUrl=${encodeURIComponent("/score#pricing")}`);
+      return;
+    }
+    try {
+      const res = await fetch("/api/score/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ returnTo: "/reports", plan }),
+      });
+      const data = await res.json().catch(() => null);
+      if (data?.alreadySubscribed) {
+        router.push("/reports");
+        return;
+      }
+      if (data?.url) window.location.href = data.url;
+    } catch {
+      /* no-op */
+    }
+  };
+
+  const isUrl = /^https?:\/\//i.test(trackUrl.trim());
+  let host = "";
+  try {
+    host = new URL(trackUrl.trim()).hostname.replace(/^www\./, "");
+  } catch {
+    /* not a url yet */
+  }
+
   return (
     <div
-      className="min-h-screen bg-[#faf8f5] text-neutral-950"
-      style={{ paddingTop: "56px" }}
+      className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase scroll-smooth`}
     >
-      {/* ── HEADER ──────────────────────────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#faf8f5]/90 backdrop-blur-sm border-b border-black/5">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center justify-between h-14">
-            <Link href="/" className="flex items-center gap-2">
-              <Logo />
+      <style>{`@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}`}</style>
+
+      {/* grain */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.05] z-0 mix-blend-screen"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+        }}
+      />
+
+      {/* ── NAV ── */}
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between gap-6">
+          <Link href="/" className="shrink-0">
+            <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
+          </Link>
+          <nav
+            className={`${mono.className} hidden md:flex items-center gap-7 text-[13px] text-white/55`}
+          >
+            <a href="#product" className="hover:text-white transition-colors">product</a>
+            <a href="#checks" className="hover:text-white transition-colors">what we check</a>
+            <a href="#pricing" className="hover:text-white transition-colors">pricing</a>
+            <Link href="/blog" className="hover:text-white transition-colors">the drop</Link>
+          </nav>
+          <div className={`${mono.className} flex items-center gap-5 text-[13px] shrink-0`}>
+            <Link href="/reports" className="hidden sm:inline text-white/55 hover:text-white transition-colors">
+              my reports
             </Link>
-            <div className="flex items-center gap-3">
-              <AuthButtons theme="light" />
-            </div>
+            <Link href="/login" className="bg-white/10 hover:bg-white/20 text-white px-3.5 py-1.5 transition-colors">
+              log in
+            </Link>
           </div>
         </div>
       </header>
 
-      {/* ── HERO (dark, dramatic) ─────────────────────── */}
-      <section className="bg-neutral-950 text-white min-h-[92vh] flex items-center overflow-hidden relative">
-        {/* Background glows */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full opacity-[0.14]"
-            style={{
-              background:
-                "radial-gradient(circle, #9333ea 0%, transparent 65%)",
-            }}
-          />
-          <div
-            className="absolute -top-32 right-0 w-80 h-80 rounded-full opacity-10"
-            style={{
-              background:
-                "radial-gradient(circle, #a855f7 0%, transparent 70%)",
-            }}
-          />
-          <div
-            className="absolute -bottom-24 left-0 w-64 h-64 rounded-full opacity-8"
-            style={{
-              background:
-                "radial-gradient(circle, #c084fc 0%, transparent 70%)",
-            }}
-          />
-        </div>
+      {/* ── HERO ── */}
+      <section id="top" className="relative z-10 max-w-5xl mx-auto px-5 pt-16 sm:pt-24 pb-16 scroll-mt-16">
+        <p className={`${mono.className} text-[13px] tracking-tight text-white/40 mb-7`}>
+          [ honest feedback before you release ]
+        </p>
+        <h1 className="text-[14vw] sm:text-[92px] leading-[0.88] tracking-[-0.04em] font-extrabold">
+          your friends say
+          <br />
+          it&apos;s fire. is it
+          <br />
+          <span style={{ color: ACCENT }}>actually</span>?
+        </h1>
+        <p className="text-lg sm:text-xl text-white/55 mt-8 max-w-xl normal-case">
+          Find out if your track actually lands — an honest, instant read on
+          what&apos;s working, where it loses people, and the exact fixes that
+          matter, before you put it out.
+        </p>
 
-        <div className="max-w-6xl mx-auto px-4 py-20 sm:py-28 relative w-full">
-          <div className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-center">
-            {/* ── TEXT SIDE ── */}
-            <div>
-              <div className="inline-flex items-center gap-2 bg-purple-600/15 border border-purple-500/20 rounded-full px-3 py-1.5 text-[11px] font-black text-purple-300 uppercase tracking-wider mb-7">
-                <div className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-                Track Score · One-time · $9
+        {/* paste box + preview card */}
+        <form onSubmit={start} className="mt-10 max-w-2xl">
+          {!isUrl ? (
+            <input
+              type="url"
+              value={trackUrl}
+              onChange={(e) => setTrackUrl(e.target.value)}
+              placeholder="paste your track link…"
+              className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-5 py-4 text-[15px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
+            />
+          ) : (
+            <div
+              className="flex items-center gap-4 bg-[#141414] border p-3.5"
+              style={{
+                borderColor: meta ? ACCENT : "rgba(255,255,255,0.15)",
+                animation: "cardIn .25s ease",
+              }}
+            >
+              <div className="w-16 h-16 bg-white/5 border border-white/10 shrink-0 overflow-hidden flex items-center justify-center">
+                {meta?.artworkUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={meta.artworkUrl} alt="" className="w-full h-full object-cover" />
+                ) : metaLoading ? (
+                  <Loader2 className="h-5 w-5 text-white/40 animate-spin" />
+                ) : (
+                  <Music className="h-5 w-5 text-white/40" />
+                )}
               </div>
-
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.02]">
-                Your track
-                <br />
-                <span className="text-purple-400">has a score.</span>
-              </h1>
-
-              <p className="mt-6 text-neutral-400 text-lg sm:text-xl leading-relaxed max-w-md">
-                5 real listeners review it. You get a number out of 100, a
-                percentile, and exactly what to fix. Results in 24 hours.
-              </p>
-
-              <div className="mt-9 flex flex-col sm:flex-row gap-3">
-                <Link href="/submit-score">
-                  <button className="group inline-flex items-center gap-2.5 bg-purple-600 text-white hover:bg-purple-500 font-black text-base px-7 py-4 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                    Get My Score
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-                    <span className="text-purple-300 font-bold ml-1">$9</span>
-                  </button>
-                </Link>
-                <Link href="/report/demo">
-                  <button className="inline-flex items-center gap-2 bg-white/6 text-white/80 hover:bg-white/10 hover:text-white font-semibold text-base px-6 py-4 rounded-xl border border-white/12 transition-all">
-                    See a sample report
-                  </button>
-                </Link>
+              <div className="min-w-0 flex-1">
+                {metaLoading && !meta ? (
+                  <>
+                    <div className="h-4 w-44 bg-white/10 animate-pulse" />
+                    <div className="h-3 w-28 bg-white/5 mt-2.5 animate-pulse" />
+                  </>
+                ) : meta ? (
+                  <>
+                    <p className="text-[16px] font-bold text-white truncate normal-case">
+                      {meta.title}
+                    </p>
+                    <p className={`${mono.className} text-[12px] text-white/45 truncate normal-case mt-0.5`}>
+                      {meta.artist ? `by ${meta.artist}` : "track found"}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[15px] font-bold text-white truncate normal-case">
+                      link added
+                    </p>
+                    <p className={`${mono.className} text-[12px] text-white/45 truncate normal-case mt-0.5`}>
+                      {host || "ready to go"}
+                    </p>
+                  </>
+                )}
               </div>
-
-              <p className="mt-5 text-sm text-white/30 flex items-center gap-2">
-                <Clock className="h-3.5 w-3.5 text-white/25" />
-                Delivered to your inbox within 24 hours · No subscription
-              </p>
-            </div>
-
-            {/* ── SCORE RING SIDE ── */}
-            <div className="flex flex-col items-center justify-center relative">
-              {/* Doodles */}
-              <Sparkle className="absolute -top-4 -left-2 sm:-left-8 w-10 h-10 text-purple-400/60 -rotate-12 pointer-events-none" />
-              <Star className="absolute top-2 right-2 sm:-right-4 w-7 h-7 text-orange-400/70 rotate-12 pointer-events-none" />
-              <Dots className="absolute -bottom-4 left-4 w-10 h-10 text-white/15 rotate-6 pointer-events-none" />
-
-              {/* Glow behind ring */}
-              <div
-                className="absolute w-52 h-52 sm:w-64 sm:h-64 rounded-full blur-3xl opacity-25 pointer-events-none"
-                style={{ background: "#9333ea" }}
-              />
-
-              <div className="relative flex flex-col items-center gap-5">
-                <ScoreRing score={82} size="xl" dark animate />
-
-                <div className="flex flex-col items-center gap-2.5">
-                  <div className="bg-purple-600/20 border border-purple-500/30 rounded-full px-4 py-1.5 text-sm font-black text-purple-300">
-                    Top 27% of tracks
-                  </div>
-                  <div className="bg-amber-500/15 border border-amber-500/25 rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-widest text-amber-300">
-                    Almost There
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating mini cards */}
-              <div className="absolute top-10 -right-6 sm:-right-14 lg:-right-20 bg-neutral-900/90 backdrop-blur border border-white/8 rounded-2xl p-3.5 shadow-2xl w-44 hidden sm:block">
-                <p className="text-[9px] text-white/30 font-mono mb-1.5 uppercase tracking-wider">
-                  Reviewer 2
-                </p>
-                <div className="flex gap-0.5 mb-1.5">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className="w-2 h-2 rounded-full bg-purple-500"
-                    />
-                  ))}
-                  <div className="w-2 h-2 rounded-full bg-white/12" />
-                </div>
-                <p className="text-[11px] text-white/55 leading-relaxed">
-                  &ldquo;Hook lands perfectly. Production is clean.&rdquo;
-                </p>
-              </div>
-
-              <div className="absolute bottom-10 -left-6 sm:-left-14 lg:-left-20 bg-neutral-900/90 backdrop-blur border border-white/8 rounded-2xl p-3.5 shadow-2xl w-40 hidden sm:block">
-                <p className="text-[9px] text-white/30 font-mono mb-1.5 uppercase tracking-wider">
-                  Reviewer 4
-                </p>
-                <div className="flex gap-0.5 mb-1.5">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="w-2 h-2 rounded-full bg-amber-500"
-                    />
-                  ))}
-                  {[1, 2].map((i) => (
-                    <div
-                      key={i}
-                      className="w-2 h-2 rounded-full bg-white/12"
-                    />
-                  ))}
-                </div>
-                <p className="text-[11px] text-white/55 leading-relaxed">
-                  &ldquo;Intro is 10s too long before the drop.&rdquo;
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── SOCIAL PROOF BAR ─────────────────────────── */}
-      <div className="bg-neutral-950 border-t border-white/5 py-6">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row gap-6 items-center justify-around text-center">
-            {[
-              { val: "2,847", label: "tracks scored", color: "text-white" },
-              { val: "<24h", label: "avg delivery", color: "text-purple-400" },
-              {
-                val: "5",
-                label: "real listeners per report",
-                color: "text-white",
-              },
-              { val: "$9", label: "flat · no subscription", color: "text-emerald-400" },
-            ].map((item) => (
-              <div key={item.label}>
-                <p
-                  className={`text-3xl sm:text-4xl font-black tabular-nums ${item.color}`}
+              <div className="flex items-center gap-3 shrink-0">
+                <span className={`${mono.className} text-[11px]`} style={{ color: ACCENT }}>
+                  {metaLoading && !meta ? "reading…" : "✓ ready"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setTrackUrl("")}
+                  aria-label="change track"
+                  className="text-white/35 hover:text-white transition-colors"
                 >
-                  {item.val}
-                </p>
-                <p className="text-[11px] text-white/35 font-medium mt-0.5">
-                  {item.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── WHAT YOU GET ─────────────────────────────── */}
-      <section className="py-16 sm:py-24 bg-[#faf8f5] overflow-visible">
-        <div className="max-w-5xl mx-auto px-4">
-          <AnimatedSection className="mb-12">
-            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-black/25 mb-3">
-              What&apos;s inside
-            </p>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.05]">
-              One report.
-              <br />
-              Three things that matter.
-            </h2>
-          </AnimatedSection>
-
-          <div className="grid sm:grid-cols-3 gap-5">
-            {[
-              {
-                n: "01",
-                icon: BarChart3,
-                title: "Your Score",
-                sub: "0 – 100",
-                desc: "A single number averaged across 5 real reviewers who listened to your full track. No algorithm. No guessing.",
-                accent: "bg-purple-600",
-                ring: "ring-purple-100",
-                txt: "text-purple-600",
-              },
-              {
-                n: "02",
-                icon: Users,
-                title: "Your Percentile",
-                sub: "Where you rank",
-                desc: "Your track is benchmarked against every other track scored on MixReflect. See if you're in the top 10% or still climbing.",
-                accent: "bg-amber-500",
-                ring: "ring-amber-100",
-                txt: "text-amber-600",
-              },
-              {
-                n: "03",
-                icon: Zap,
-                title: "Your Feedback",
-                sub: "What to fix",
-                desc: "The top 2–3 things that would move your score up. Specific, actionable, from real people who actually listened.",
-                accent: "bg-emerald-600",
-                ring: "ring-emerald-100",
-                txt: "text-emerald-600",
-              },
-            ].map((item) => (
-              <AnimatedSection key={item.n}>
-                <div className="bg-white rounded-2xl border border-black/6 p-7 h-full hover:shadow-lg transition-shadow">
-                  <div
-                    className={`inline-flex w-11 h-11 rounded-xl ${item.accent} items-center justify-center mb-5 ring-4 ${item.ring}`}
-                  >
-                    <item.icon className="h-5 w-5 text-white" />
-                  </div>
-                  <h3 className="text-xl font-black text-neutral-950 mb-0.5">
-                    {item.title}
-                  </h3>
-                  <p className={`text-[11px] font-black uppercase tracking-wider mb-3 ${item.txt}`}>
-                    {item.sub}
-                  </p>
-                  <p className="text-sm text-neutral-600 leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SAMPLE REPORT TEASER ─────────────────────── */}
-      <section className="bg-neutral-950 py-16 sm:py-24 overflow-hidden relative">
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse 60% 40% at 50% 20%, rgba(147,51,234,0.12) 0%, transparent 70%)",
-          }}
-        />
-
-        <div className="max-w-4xl mx-auto px-4 relative">
-          <AnimatedSection className="text-center mb-12">
-            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-white/25 mb-3">
-              Sample report
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-[1.05]">
-              Here&apos;s what you&apos;ll get.
-            </h2>
-            <p className="mt-3 text-neutral-500 text-base max-w-sm mx-auto">
-              A real report. Score, percentile, feedback. Delivered to your
-              inbox.
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection className="relative">
-            <div className="bg-neutral-900 rounded-2xl border border-white/8 overflow-hidden shadow-2xl">
-              {/* Report header */}
-              <div className="px-5 sm:px-7 py-4 border-b border-white/8 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-purple-600/25 border border-purple-500/30 flex items-center justify-center flex-shrink-0">
-                    <Music className="h-4 w-4 text-purple-400" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-black text-white truncate">
-                      MixReflect Score Report
-                    </p>
-                    <p className="text-[10px] text-white/35 font-mono">
-                      Sample Track · 5 reviewers · May 2025
-                    </p>
-                  </div>
-                </div>
-                <div className="bg-amber-500/15 border border-amber-500/25 rounded-full px-3 py-1 text-[10px] font-black text-amber-300 uppercase tracking-widest flex-shrink-0">
-                  Almost There
-                </div>
-              </div>
-
-              {/* Score + categories */}
-              <div className="px-5 sm:px-7 py-8 flex flex-col sm:flex-row items-center gap-8">
-                <div className="flex flex-col items-center gap-3 flex-shrink-0">
-                  <ScoreRing
-                    score={82}
-                    size="lg"
-                    dark
-                    animate={false}
-                  />
-                  <div className="text-center">
-                    <div className="bg-purple-600/20 border border-purple-500/25 rounded-full px-3 py-1 text-xs font-black text-purple-300">
-                      Top 27% of tracks
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex-1 w-full space-y-3">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-4">
-                    Score breakdown
-                  </p>
-                  {CATEGORY_SCORES.map((cat) => (
-                    <div key={cat.label} className="flex items-center gap-3">
-                      <span className="text-[11px] text-white/40 w-36 shrink-0">
-                        {cat.label}
-                      </span>
-                      <div className="flex-1 h-2 bg-white/8 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-purple-600 rounded-full"
-                          style={{ width: `${cat.pct}%` }}
-                        />
-                      </div>
-                      <span className="text-[11px] font-black text-white/50 w-8 text-right tabular-nums">
-                        {cat.score}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Blurred feedback section */}
-              <div className="relative px-5 sm:px-7 pb-7">
-                <div className="blur-sm select-none pointer-events-none space-y-3">
-                  <div className="bg-white/5 rounded-xl p-4 border border-white/6">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-purple-400 mb-2">
-                      What reviewers said
-                    </p>
-                    <p className="text-sm text-white/50 leading-relaxed">
-                      &ldquo;The hook lands perfectly at 0:45 and is instantly
-                      memorable. The synth layering in the drop is really
-                      well done — everything sits nicely in the mix...&rdquo;
-                    </p>
-                  </div>
-                  <div className="bg-white/5 rounded-xl p-4 border border-white/6">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-amber-400 mb-2">
-                      Priority improvements
-                    </p>
-                    <p className="text-sm text-white/50 leading-relaxed">
-                      1. Trim the intro by 8–12 seconds to reach the hook
-                      faster. Mentioned by 4 of 5 reviewers.
-                      <br />
-                      2. The vocal competes with the lead synth around 1:30...
-                    </p>
-                  </div>
-                </div>
-
-                {/* Unlock overlay */}
-                <div className="absolute inset-0 flex items-end justify-center pb-7 bg-gradient-to-t from-neutral-900/85 via-neutral-900/40 to-transparent rounded-b-2xl">
-                  <Link href="/submit-score">
-                    <button className="inline-flex items-center gap-2.5 bg-purple-600 text-white hover:bg-purple-500 font-black text-sm px-6 py-3.5 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                      Get your full report
-                      <ArrowRight className="h-4 w-4" />
-                      <span className="text-purple-300 font-bold">— $9</span>
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </AnimatedSection>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ─────────────────────────────── */}
-      <section className="py-16 sm:py-24 bg-[#faf8f5] overflow-visible relative">
-        <div className="max-w-4xl mx-auto px-4">
-          {/* Doodles */}
-          <Sparkle className="absolute -top-6 -left-10 sm:-left-20 w-14 h-14 text-neutral-950/20 rotate-6 hidden sm:block pointer-events-none" />
-          <Zigzag className="absolute top-20 -right-10 sm:-right-20 w-8 h-20 text-purple-400/40 rotate-3 hidden sm:block pointer-events-none" />
-
-          <AnimatedSection className="mb-14">
-            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-black/25 mb-3">
-              How it works
-            </p>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.05]">
-              Simple. Fast. Honest.
-            </h2>
-          </AnimatedSection>
-
-          <div className="space-y-10">
-            {[
-              {
-                n: "01",
-                title: "Submit your track",
-                desc: "Paste your SoundCloud, Spotify, or direct audio link. Pick your genre. Add any notes. That's it.",
-                time: "Takes 60 seconds",
-                color: "bg-purple-600",
-              },
-              {
-                n: "02",
-                title: "5 real listeners review it",
-                desc: "Genre-matched artists on MixReflect listen to your full track and score it across 5 dimensions. Real ears, real opinions.",
-                time: "Usually within 12 hours",
-                color: "bg-amber-500",
-              },
-              {
-                n: "03",
-                title: "Get your full report",
-                desc: "We email you the complete report: your score, percentile ranking, individual reviewer quotes, and the top improvements.",
-                time: "Within 24 hours, guaranteed",
-                color: "bg-emerald-600",
-              },
-            ].map((step, i) => (
-              <AnimatedSection key={step.n}>
-                <div className="flex items-start gap-6">
-                  <div
-                    className={`flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${step.color} text-white flex items-center justify-center font-black text-sm`}
-                  >
-                    {step.n}
-                  </div>
-                  <div className="pt-2">
-                    <h3 className="text-xl font-black text-neutral-950">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm text-neutral-600 mt-1.5 leading-relaxed max-w-md">
-                      {step.desc}
-                    </p>
-                    <p
-                      className={`text-[11px] font-black mt-2 uppercase tracking-wider ${step.color.replace("bg-", "text-")}`}
-                    >
-                      {step.time}
-                    </p>
-                  </div>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIAL ──────────────────────────────── */}
-      <section className="py-14 bg-neutral-950">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <div
-            className={`${caveat.className} text-4xl text-purple-300/80 mb-2`}
-          >
-            &ldquo;
-          </div>
-          <p className="text-lg sm:text-xl text-white/75 leading-relaxed font-medium">
-            I scored 67. Found out 4 of 5 reviewers said my intro was too
-            slow. Cut 10 seconds. My next release got 8x the streams.
-          </p>
-          <p className="mt-4 text-sm text-white/30">
-            Marcus T. · Electronic Producer
-          </p>
-        </div>
-      </section>
-
-      {/* ── SHARE YOUR SCORE ─────────────────────────── */}
-      <section className="py-16 sm:py-20 bg-[#faf8f5]">
-        <div className="max-w-5xl mx-auto px-4">
-          <AnimatedSection className="text-center mb-12">
-            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-black/25 mb-3">
-              Built for sharing
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-[1.05]">
-              Show the world your score.
-            </h2>
-            <p className="mt-4 text-neutral-600 text-base max-w-md mx-auto">
-              Every report comes with a shareable link and a score card ready
-              for Instagram Stories, Twitter, or Discord.
-            </p>
-          </AnimatedSection>
-
-          <AnimatedSection>
-            <div className="flex flex-col sm:flex-row gap-5 items-center justify-center">
-              {/* Sample share card */}
-              <div className="w-56 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0">
-                <div
-                  className="p-5 flex flex-col items-center gap-3"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #1a0533 0%, #2d1060 50%, #0f0f0f 100%)",
-                  }}
-                >
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <svg
-                      viewBox="0 0 200 200"
-                      className="h-5 w-5"
-                    >
-                      <rect
-                        x="10" y="10" width="180" height="180"
-                        rx="40" ry="40" fill="#9333ea"
-                      />
-                      <g fill="white">
-                        <rect x="42" y="78" width="16" height="44" rx="3" />
-                        <rect x="68" y="55" width="16" height="90" rx="3" />
-                        <rect x="94" y="38" width="16" height="124" rx="3" />
-                        <rect x="120" y="62" width="16" height="76" rx="3" />
-                        <rect x="146" y="82" width="16" height="36" rx="3" />
-                      </g>
-                    </svg>
-                    <span className="text-[11px] font-black text-white/70">
-                      MixReflect
-                    </span>
-                  </div>
-                  <ScoreRing score={82} size="md" dark animate={false} />
-                  <div className="text-center">
-                    <p className="text-xs font-black text-purple-300">
-                      Top 27% of tracks
-                    </p>
-                    <p className="text-[10px] text-amber-300 font-black uppercase tracking-wider mt-0.5">
-                      Almost There
-                    </p>
-                  </div>
-                  <p className="text-[9px] text-white/25 font-mono">
-                    mixreflect.com/score
-                  </p>
-                </div>
-              </div>
-
-              {/* Share feature list */}
-              <div className="space-y-4 max-w-xs">
-                {[
-                  {
-                    icon: Share2,
-                    title: "Shareable link",
-                    desc: "Permanent URL for your report. Share with your producer or anyone.",
-                  },
-                  {
-                    icon: Music,
-                    title: "Score card",
-                    desc: "A clean image showing your score and percentile. Ready to post.",
-                  },
-                  {
-                    icon: BarChart3,
-                    title: "Full breakdown",
-                    desc: "Every category score, every reviewer quote, all in one place.",
-                  },
-                ].map((feat) => (
-                  <div key={feat.title} className="flex items-start gap-4">
-                    <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <feat.icon className="h-4 w-4 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-black text-neutral-950">
-                        {feat.title}
-                      </p>
-                      <p className="text-xs text-neutral-500 mt-0.5">
-                        {feat.desc}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </AnimatedSection>
-        </div>
-      </section>
-
-      {/* ── PRICING ──────────────────────────────────── */}
-      <section className="py-16 sm:py-24 bg-[#faf8f5] overflow-visible relative">
-        <div className="max-w-lg mx-auto px-4">
-          {/* Doodles */}
-          <Sparkle className="absolute -top-6 -left-10 sm:-left-24 w-14 h-14 text-purple-400/80 -rotate-12 hidden sm:block pointer-events-none" />
-          <Squiggle className="absolute -bottom-6 -right-10 sm:-right-24 w-20 h-20 text-orange-300/60 rotate-6 hidden sm:block pointer-events-none" />
-          <Star className="absolute top-12 -right-6 sm:-right-16 w-10 h-10 text-neutral-950/10 rotate-15 hidden sm:block pointer-events-none" />
-
-          <AnimatedSection>
-            <div className="bg-white rounded-2xl border border-black/8 p-8 sm:p-10 text-center shadow-xl shadow-black/5">
-              <div className="inline-flex items-center gap-1.5 bg-purple-100 text-purple-700 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full mb-7">
-                One-time · No subscription
-              </div>
-
-              <div className="text-8xl font-black text-neutral-950 leading-none tracking-tight">
-                $9
-              </div>
-              <p className="text-sm text-neutral-400 mt-2 mb-9">
-                Per track · Results in 24 hours
-              </p>
-
-              <div className="text-left space-y-3.5 mb-9">
-                {[
-                  "MixReflect Score out of 100",
-                  "Percentile rank vs. all tracks reviewed",
-                  "5 real reviewer scores across 5 dimensions",
-                  "Reviewer quotes (anonymised)",
-                  "AI-synthesised written summary",
-                  "Top 2–3 priority improvements",
-                  "Permanent shareable report link",
-                  "Delivered to your inbox within 24 hours",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-3">
-                    <CheckCircle2 className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                    <span className="text-sm text-neutral-700">{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <Link href="/submit-score">
-                <button className="w-full inline-flex items-center justify-center gap-2 bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-base py-4 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] transition-all">
-                  Get My Score — $9
-                  <ArrowRight className="h-4 w-4" />
+                  <X className="h-4 w-4" />
                 </button>
-              </Link>
-
-              <p className="mt-4 text-xs text-neutral-400 flex items-center justify-center gap-1.5">
-                <Lock className="h-3 w-3" />
-                Secure payment via Stripe
-              </p>
+              </div>
             </div>
-          </AnimatedSection>
-        </div>
-      </section>
+          )}
 
-      {/* ── FAQ ──────────────────────────────────────── */}
-      <section className="py-16 bg-[#faf8f5]">
-        <div className="max-w-2xl mx-auto px-4">
-          <h2 className="text-2xl font-black mb-8">Questions</h2>
-          <div className="rounded-2xl bg-white border border-black/6 overflow-hidden shadow-sm">
-            {[
-              {
-                q: "How is the score calculated?",
-                a: "5 genre-matched reviewers listen to your full track and score it across 5 dimensions: Hook Strength, Production Quality, Listener Retention, Emotional Impact, and Commercial Potential. Scores are averaged into a single 0–100 number.",
-              },
-              {
-                q: "Who are the reviewers?",
-                a: "Real artists on the MixReflect platform who share your genre. Everyone is both an artist and a reviewer. Low-quality reviewers are removed based on ratings — so feedback stays useful and honest.",
-              },
-              {
-                q: "How long does it take?",
-                a: "We guarantee delivery within 24 hours. Most reports are ready within 12 hours.",
-              },
-              {
-                q: "Can I submit an unreleased or private track?",
-                a: "Yes. Your track URL is only shared with the 5 reviewers. It's never published or made public without your permission.",
-              },
-              {
-                q: "What if the feedback feels low quality?",
-                a: "If reviewers clearly didn't engage with the track properly, contact us and we'll re-run it at no charge. Quality feedback is the whole product.",
-              },
-              {
-                q: "Do I need a MixReflect account?",
-                a: "No. You can submit with just your email. If you have an account, your report will appear in your dashboard too.",
-              },
-            ].map((item, i, arr) => (
-              <details
-                key={item.q}
-                className={`p-5 ${i < arr.length - 1 ? "border-b border-black/5" : ""}`}
-              >
-                <summary className="font-bold cursor-pointer hover:text-neutral-700 text-neutral-950 select-none">
-                  {item.q}
-                </summary>
-                <p className="mt-2.5 text-sm text-neutral-600 leading-relaxed">
-                  {item.a}
-                </p>
-              </details>
+          <button
+            type="submit"
+            disabled={!isUrl}
+            className={`${
+              isUrl
+                ? "bg-[#6ee7ff] text-black hover:bg-white"
+                : "bg-white/10 text-white/40 cursor-not-allowed"
+            } group mt-3 w-full inline-flex items-center justify-center gap-2 font-extrabold text-base px-7 py-4 transition-colors`}
+          >
+            get feedback
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+
+          {error && (
+            <p className={`${mono.className} text-[13px] text-red-400 mt-3`}>{error}</p>
+          )}
+        </form>
+
+        {/* trust tags */}
+        <div className={`${mono.className} mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-white/50`}>
+          <span style={{ color: ACCENT }}>instant</span>
+          <span className="text-white/20">·</span>
+          <span>unbiased</span>
+          <span className="text-white/20">·</span>
+          <span>audio-aware</span>
+          <span className="text-white/20">·</span>
+          <span>no waiting on anyone</span>
+        </div>
+
+        {/* trusted-by brand strip */}
+        <div className="mt-14 pt-8 border-t border-white/10">
+          <p className={`${mono.className} text-[11px] text-white/30 mb-5`}>
+            works with everything you release on
+          </p>
+          <div className="flex flex-wrap items-center gap-x-9 gap-y-5 text-white/45">
+            {BRANDS.map((b) => (
+              <div key={b.name} className="flex items-center gap-2 hover:text-white transition-colors">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
+                  <path d={b.path} />
+                </svg>
+                <span className={`${mono.className} text-[15px] font-medium`}>{b.name}</span>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── FINAL CTA ────────────────────────────────── */}
-      <section className="py-24 bg-neutral-950 relative overflow-hidden">
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse 50% 60% at 50% 60%, rgba(147,51,234,0.18) 0%, transparent 70%)",
-          }}
-        />
-        <Scribble className="absolute top-10 left-10 w-24 h-16 text-white/5 pointer-events-none hidden sm:block" />
-
-        <div className="max-w-2xl mx-auto px-4 text-center relative">
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.0]">
-            Stop guessing.
-            <br />
-            <span className="text-purple-400">Know your score.</span>
+      {/* ── HOW IT WORKS ── */}
+      <section id="product" className="relative z-10 border-t border-white/10 scroll-mt-16">
+        <div className="max-w-5xl mx-auto px-5 py-20">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-12">
+            how it works
           </h2>
-          <p className="mt-5 text-neutral-500 text-lg">
-            One number. Real feedback. $9.
-          </p>
-          <div className="mt-9">
-            <Link href="/submit-score">
-              <button className="inline-flex items-center gap-2.5 bg-purple-600 text-white hover:bg-purple-500 font-black text-lg px-9 py-5 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-                Get My Score
-                <ArrowRight className="h-5 w-5" />
-              </button>
-            </Link>
+          <div className="grid sm:grid-cols-3 gap-px bg-white/10 border border-white/10">
+            {[
+              {
+                n: "01",
+                t: "drop your link",
+                d: "soundcloud, spotify, youtube, a raw mp3 — whatever. free, no card, 60 seconds.",
+              },
+              {
+                n: "02",
+                t: "we listen, closely",
+                d: "we analyze the actual audio — energy curve, structure, hook — and read it like a sharp first listener, not a yes-man.",
+              },
+              {
+                n: "03",
+                t: "get the verdict",
+                d: "a score, your percentile, takes from every angle, and the 3 fixes that move the needle.",
+              },
+            ].map((s) => (
+              <div key={s.n} className="bg-[#0a0a0a] p-7">
+                <p className={`${mono.className} text-[13px]`} style={{ color: ACCENT }}>{s.n}</p>
+                <h3 className="text-xl font-extrabold mt-4 mb-2">{s.t}</h3>
+                <p className="text-white/65 text-[15px] leading-relaxed normal-case">{s.d}</p>
+              </div>
+            ))}
           </div>
-          <p className="mt-5 text-sm text-neutral-600">
-            No account needed · Secure payment via Stripe
-          </p>
         </div>
       </section>
 
-      {/* ── FOOTER ───────────────────────────────────── */}
-      <footer className="py-8 bg-neutral-900 border-t border-neutral-800">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
-            <Link href="/">
-              <Logo className="text-white" />
-            </Link>
-            <p className="text-neutral-500">
-              &copy; {new Date().getFullYear()} MixReflect
-            </p>
-            <div className="flex items-center gap-4 text-neutral-400">
-              <Link href="/terms" className="hover:text-white transition-colors">
-                Terms
-              </Link>
-              <Link
-                href="/privacy"
-                className="hover:text-white transition-colors"
+      {/* ── WHAT WE CHECK ── */}
+      <section id="checks" className="relative z-10 border-t border-white/10 scroll-mt-16">
+        <div className="max-w-5xl mx-auto px-5 py-20">
+          <p className={`${mono.className} text-[13px] text-white/55 mb-2`}>[ what we check ]</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+            every track, graded on 6 things
+          </h2>
+          <p className="text-white/65 text-lg mb-12 normal-case max-w-lg">
+            Our AI listens across the things that actually decide whether a
+            track lands — and grades each one.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10 border border-white/10">
+            {CHECKS.map((c, i) => (
+              <div
+                key={c.t}
+                className="group bg-[#0a0a0a] p-6 flex flex-col hover:bg-[#0e0e0e] transition-colors"
               >
-                Privacy
-              </Link>
+                <p className={`${mono.className} text-[12px]`} style={{ color: ACCENT }}>
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <h3 className="text-lg font-extrabold mt-3 mb-2">{c.t}</h3>
+                <p className="text-white/65 text-[14px] leading-relaxed normal-case flex-1">
+                  {c.d}
+                </p>
+                <a
+                  href="#top"
+                  className={`${mono.className} mt-5 inline-flex items-center gap-1 text-[12px] text-white/35 group-hover:text-[#6ee7ff] transition-colors`}
+                >
+                  check yours →
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRICING ── */}
+      <section id="pricing" className="relative z-10 border-t border-white/10 scroll-mt-16">
+        <div className="max-w-5xl mx-auto px-5 py-20">
+          <p className={`${mono.className} text-[13px] text-white/55 mb-2`}>[ pricing ]</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+            one plan. no noise.
+          </h2>
+          <p className="text-white/65 text-lg mb-12 normal-case max-w-md">
+            Submitting and your teaser are always free. Unlock one track for $6.95,
+            or go unlimited if you&apos;re dropping a lot.
+          </p>
+          <div className="grid md:grid-cols-3 gap-px bg-white/10 border border-white/10">
+            {/* free */}
+            <div className="bg-[#0a0a0a] p-8">
+              <p className={`${mono.className} text-[13px] text-white/40`}>free</p>
+              <p className="text-5xl font-extrabold mt-3">$0</p>
+              <p className={`${mono.className} text-white/40 text-[13px] mt-1 normal-case`}>
+                no card needed
+              </p>
+              <ul className={`${mono.className} mt-7 space-y-2.5 text-[13.5px] text-white/55 normal-case`}>
+                {["your resonance score out of 100", "verdict + 5-dimension breakdown", "every reaction headline", "the three things to fix"].map((x) => (
+                  <li key={x} className="flex gap-2"><span style={{ color: ACCENT }}>+</span>{x}</li>
+                ))}
+              </ul>
+              <a
+                href="#top"
+                className="mt-7 block w-full text-center bg-white/10 hover:bg-white/20 text-white font-extrabold py-3.5 transition-colors"
+              >
+                get my read →
+              </a>
+            </div>
+            {/* per track */}
+            <div className="bg-[#0a0a0a] p-8">
+              <p className={`${mono.className} text-[13px] text-white/40`}>per track</p>
+              <p className="text-5xl font-extrabold mt-3">
+                $6.95<span className="text-lg text-white/40 font-medium"> once</span>
+              </p>
+              <p className={`${mono.className} text-white/40 text-[13px] mt-1 normal-case`}>
+                one track · yours forever
+              </p>
+              <ul className={`${mono.className} mt-7 space-y-2.5 text-[13.5px] text-white/70 normal-case`}>
+                {["everything in free", "every reaction in full", "the complete written read", "the detail behind all three fixes"].map((x) => (
+                  <li key={x} className="flex gap-2"><span style={{ color: ACCENT }}>+</span>{x}</li>
+                ))}
+              </ul>
+              <a
+                href="#top"
+                className="mt-7 block w-full text-center bg-white/10 hover:bg-white/20 text-white font-extrabold py-3.5 transition-colors"
+              >
+                start free →
+              </a>
+            </div>
+            {/* unlimited */}
+            <div className="bg-[#0a0a0a] p-8 relative">
+              <div className="absolute top-0 left-0 h-1 w-full" style={{ background: ACCENT }} />
+              <p className={`${mono.className} text-[13px]`} style={{ color: ACCENT }}>unlimited</p>
+              <p className="text-5xl font-extrabold mt-3">
+                $19.95<span className="text-lg text-white/40 font-medium">/mo</span>
+              </p>
+              <p className={`${mono.className} text-white/40 text-[13px] mt-1 normal-case`}>
+                or $143.40/yr · every track auto-unlocked
+              </p>
+              <ul className={`${mono.className} mt-7 space-y-2.5 text-[13.5px] text-white/70 normal-case`}>
+                {["everything in per-track", "unlock every track you submit", "no $6.95 per report", "your dashboard + history", "cancel anytime — unlocks stay"].map((x) => (
+                  <li key={x} className="flex gap-2"><span style={{ color: ACCENT }}>+</span>{x}</li>
+                ))}
+              </ul>
+              <button
+                onClick={() => handleSubscribe("monthly")}
+                className="mt-7 block w-full text-center bg-[#6ee7ff] text-black font-extrabold py-3.5 hover:bg-white transition-colors"
+              >
+                go unlimited — $19.95/mo →
+              </button>
+              <button
+                onClick={() => handleSubscribe("annual")}
+                className={`${mono.className} mt-2 block w-full text-center text-[12px] text-white/45 hover:text-white transition-colors`}
+              >
+                or pay yearly — $143.40/yr (save 40%)
+              </button>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── WHY IT'S DIFFERENT ── */}
+      <section id="why" className="relative z-10 border-t border-white/10 bg-[#6ee7ff] text-black lowercase scroll-mt-16">
+        <div className="max-w-5xl mx-auto px-5 py-20">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div>
+              <p className={`${mono.className} text-[13px] text-black/50 mb-5`}>
+                [ why it hits different ]
+              </p>
+              <h2 className="text-4xl sm:text-6xl font-extrabold tracking-[-0.03em] leading-[0.9]">
+                no friends.
+                <br />
+                no bias. no wait.
+              </h2>
+              <p className="text-black/70 text-lg mt-6 max-w-md normal-case">
+                Your friends will always say it&apos;s great. This won&apos;t.
+                It&apos;s an honest read on your track in seconds — grounded in
+                the actual audio, not vibes.
+              </p>
+              <a
+                href="#top"
+                className="group mt-8 inline-flex items-center gap-2 bg-black text-[#6ee7ff] font-extrabold text-base px-8 py-4 hover:bg-[#141414] transition-colors"
+              >
+                get my read
+                <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </a>
+            </div>
+            <div className={`${mono.className} grid grid-cols-1 gap-px bg-black/15 border border-black/15`}>
+              {[
+                ["instant", "your read is ready in seconds, not days"],
+                ["audio-aware", "reads the actual audio — energy arc, structure, dynamics"],
+                ["brutally honest", "no ego-stroking, no friends being nice"],
+              ].map(([t, d]) => (
+                <div key={t} className="bg-[#6ee7ff] p-5">
+                  <p className="text-base font-bold text-black">{t}</p>
+                  <p className="text-[13px] text-black/60 mt-1 normal-case">{d}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── LATEST FROM THE DROP ── */}
+      <section className="relative z-10 border-t border-white/10">
+        <div className="max-w-5xl mx-auto px-5 py-20">
+          <div className="flex items-end justify-between mb-10 gap-4">
+            <div>
+              <p className={`${mono.className} text-[13px] text-white/55 mb-2`}>[ the drop ]</p>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">latest reads</h2>
+            </div>
+            <Link
+              href="/blog"
+              className={`${mono.className} text-[13px] text-white/55 hover:text-white transition-colors shrink-0`}
+            >
+              all posts →
+            </Link>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-px bg-white/10 border border-white/10">
+            {posts.slice(0, 3).map((p) => (
+              <Link
+                key={p.slug}
+                href={`/blog/${p.slug}`}
+                className="group bg-[#0a0a0a] p-6 hover:bg-[#0e0e0e] transition-colors flex flex-col"
+              >
+                <div className={`${mono.className} flex items-center gap-2 mb-3 text-[11px]`}>
+                  <span style={{ color: ACCENT }}>{p.category.toLowerCase()}</span>
+                  <span className="text-white/20">·</span>
+                  <span className="text-white/40">{p.date}</span>
+                </div>
+                <h3 className="text-lg font-extrabold tracking-tight leading-snug group-hover:text-[#6ee7ff] transition-colors mb-2">
+                  {p.title}
+                </h3>
+                <p className="text-white/45 text-[13.5px] leading-relaxed normal-case line-clamp-2 flex-1">
+                  {p.excerpt}
+                </p>
+                <span className={`${mono.className} mt-4 inline-flex items-center gap-1 text-[12px] text-white/35 group-hover:text-white transition-colors`}>
+                  {p.readTime} →
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="relative z-10 border-t border-white/10">
+        <div className={`${mono.className} max-w-5xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-white/40`}>
+          <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-6" />
+          <div className="flex items-center gap-6">
+            <Link href="/report/demo" className="hover:text-white transition-colors">sample report</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">terms</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">privacy</Link>
+          </div>
+          <span>© {new Date().getFullYear()}</span>
         </div>
       </footer>
+
+      {/* ── ASSIGNMENT MODAL (stays in place, page behind) ── */}
+      {phase !== "idle" && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/85 backdrop-blur-md"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) cancel();
+          }}
+        >
+          <div className="w-full max-w-lg bg-[#0e0e0e] border border-white/15 p-7 relative">
+            {phase !== "done" && (
+              <button
+                onClick={cancel}
+                className={`${mono.className} absolute top-4 right-4 inline-flex items-center gap-1 text-[12px] text-white/40 hover:text-white transition-colors`}
+              >
+                <X className="h-3.5 w-3.5" /> esc
+              </button>
+            )}
+
+            <p className={`${mono.className} text-[13px] text-white/40 mb-3`}>
+              {phase === "done" ? "[ analysis complete ]" : "[ analyzing your track… ]"}
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-7 lowercase">
+              {phase === "done" ? (
+                <>your read is <span style={{ color: ACCENT }}>ready</span>.</>
+              ) : (
+                <>reading your track…</>
+              )}
+            </h2>
+
+            <div
+              ref={logRef}
+              className={`${mono.className} bg-[#080808] border border-white/12 p-5 text-[13.5px] leading-7 max-h-[260px] overflow-y-auto`}
+            >
+              {STEPS.map((s, i) => {
+                const state =
+                  i < step || phase === "done" ? "done" : i === step ? "active" : "pending";
+                return (
+                  <div
+                    key={s}
+                    className={
+                      state === "pending"
+                        ? "text-white/20"
+                        : state === "active"
+                        ? "text-white"
+                        : "text-white/55"
+                    }
+                  >
+                    <span style={{ color: state === "pending" ? undefined : ACCENT }}>
+                      {state === "done" ? "✓" : state === "active" ? "▸" : "·"}
+                    </span>{" "}
+                    {s}
+                    {state === "active" && (
+                      <span className="inline-block w-2 h-4 ml-1 align-middle bg-[#6ee7ff] animate-pulse" />
+                    )}
+                  </div>
+                );
+              })}
+              {phase === "done" && (
+                <div className="text-white mt-2 pt-2 border-t border-white/10">
+                  <span style={{ color: ACCENT }}>✓</span> done · your read is ready
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6">
+              {phase === "done" ? (
+                <>
+                  <button
+                    onClick={seeResults}
+                    disabled={busy}
+                    className="group w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-base px-8 py-4 hover:bg-white transition-colors disabled:opacity-60"
+                  >
+                    {busy ? "opening…" : "see results"}
+                    {!busy && <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />}
+                  </button>
+                  {!session?.user && (
+                    <p className={`${mono.className} text-[12px] text-white/35 mt-3 text-center`}>
+                      quick log in to keep your report
+                    </p>
+                  )}
+                  {error && (
+                    <p className={`${mono.className} text-[13px] text-red-400 mt-3 text-center`}>{error}</p>
+                  )}
+                </>
+              ) : (
+                <p className={`${mono.className} text-[13px] text-white/40`}>hang tight…</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
