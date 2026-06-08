@@ -1,11 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { JetBrains_Mono } from "next/font/google";
 
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
 const ACCENT = "#6ee7ff";
+
+// Force reviewers to actually sit with the track before they can submit.
+// Shorter than the artist-side review (3 min) — these are quick room reactions.
+const LISTEN_SECONDS = 45;
+
+function fmt(s: number): string {
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${m}:${r.toString().padStart(2, "0")}`;
+}
 
 export function ReviewForm({ reviewId }: { reviewId: string }) {
   const router = useRouter();
@@ -15,7 +25,21 @@ export function ReviewForm({ reviewId }: { reviewId: string }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const valid = rating >= 1 && headline.trim().length > 0 && quote.trim().length >= 20;
+  // ── listen gate ──
+  const [elapsed, setElapsed] = useState(0);
+  const listened = elapsed >= LISTEN_SECONDS;
+
+  useEffect(() => {
+    if (listened) return;
+    const t = setInterval(() => {
+      setElapsed((e) => (e >= LISTEN_SECONDS ? e : e + 1));
+    }, 1000);
+    return () => clearInterval(t);
+  }, [listened]);
+
+  const valid =
+    listened && rating >= 1 && headline.trim().length > 0 && quote.trim().length >= 20;
+  const listenPct = Math.min(100, Math.round((elapsed / LISTEN_SECONDS) * 100));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +75,30 @@ export function ReviewForm({ reviewId }: { reviewId: string }) {
 
   return (
     <form onSubmit={submit} className="space-y-6">
+      {/* listen gate */}
+      <div
+        className="border p-4"
+        style={{
+          borderColor: listened ? "rgba(110,231,255,0.35)" : "rgba(255,255,255,0.12)",
+          background: listened ? "rgba(110,231,255,0.06)" : "#101010",
+        }}
+      >
+        <div className="flex items-center justify-between mb-2.5">
+          <span className={`${mono.className} text-[12px]`} style={{ color: listened ? ACCENT : "rgba(255,255,255,0.6)" }}>
+            {listened ? "✓ listened — your reaction's unlocked" : "play the track and give it a real listen"}
+          </span>
+          <span className={`${mono.className} text-[12px] tabular-nums text-white/45`}>
+            {fmt(Math.min(elapsed, LISTEN_SECONDS))} / {fmt(LISTEN_SECONDS)}
+          </span>
+        </div>
+        <div className="h-1.5 bg-white/[0.08] overflow-hidden">
+          <div
+            className="h-full transition-all duration-1000 ease-linear"
+            style={{ width: `${listenPct}%`, background: ACCENT }}
+          />
+        </div>
+      </div>
+
       {/* rating */}
       <div>
         <label className={`${mono.className} block text-[12px] text-white/45 mb-2`}>
@@ -118,7 +166,11 @@ export function ReviewForm({ reviewId }: { reviewId: string }) {
         disabled={!valid || submitting}
         className="w-full bg-[#6ee7ff] text-black font-extrabold text-base py-4 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        {submitting ? "submitting…" : "submit my reaction"}
+        {submitting
+          ? "submitting…"
+          : !listened
+          ? `keep listening… ${fmt(LISTEN_SECONDS - Math.min(elapsed, LISTEN_SECONDS))} left`
+          : "submit my reaction"}
       </button>
     </form>
   );
