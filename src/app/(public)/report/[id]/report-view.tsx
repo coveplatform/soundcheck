@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ScoreRing } from "@/components/score/score-ring";
 import { Logo } from "@/components/ui/logo";
-import { ArrowRight, Share2, Lock, Hourglass } from "lucide-react";
+import { ArrowRight, Share2, Lock, Hourglass, User } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -252,6 +252,31 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         </div>
       </header>
 
+      {/* ── status banner: initial analysis ready, reviews still landing ── */}
+      {roomPending && (
+        <div
+          className="relative z-20 border-b"
+          style={{ background: "rgba(110,231,255,0.08)", borderColor: "rgba(110,231,255,0.25)" }}
+        >
+          <div className={`${mono.className} max-w-3xl mx-auto px-5 py-3 flex items-center justify-center gap-2.5 text-[12px] text-center`}>
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: ACCENT }} />
+              <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: ACCENT }} />
+            </span>
+            <span className="text-white/80">
+              <span className="font-bold" style={{ color: ACCENT }}>instant read ready</span>
+              <span className="text-white/30"> · </span>
+              real listeners tuning in
+              <span className="text-white/30"> · </span>
+              <span className="font-bold text-white">{data.humanReviewsIn}/{data.humanReviewsTotal} in</span>
+              <span className="hidden sm:inline">
+                <span className="text-white/30"> · </span>reactions land live
+              </span>
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* ── VERDICT HERO ── */}
       <section className="relative z-10 max-w-3xl mx-auto px-5 pt-14 pb-12 text-center">
         <Kicker>an honest read on your track</Kicker>
@@ -347,10 +372,10 @@ export function ReportView({ data }: { data: ReportViewModel }) {
                 <div key={i} className="bg-[#0a0a0a] p-5 flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <span
-                      className={`${mono.className} text-[10px] font-bold text-black px-1.5 py-0.5`}
+                      className={`${mono.className} inline-flex items-center gap-1 text-[10px] font-bold text-black px-1.5 py-0.5`}
                       style={{ background: r.positive ? ACCENT : "#b8a4ff" }}
                     >
-                      listener
+                      <User className="h-2.5 w-2.5" /> real listener
                     </span>
                     <Meter count={r.rating} />
                   </div>
