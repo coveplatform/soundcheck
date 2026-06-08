@@ -7,7 +7,8 @@ import { prisma } from "@/lib/prisma";
 import { getScoreReviewQueue } from "@/lib/score-review";
 import { Logo } from "@/components/ui/logo";
 import { OptInButton } from "./opt-in-button";
-import { ArrowRight, Headphones } from "lucide-react";
+import { AccountMenu } from "../reports/account-menu";
+import { ArrowRight, Headphones, Plus } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -25,7 +26,7 @@ export default async function ScoreReviewQueuePage() {
   });
   if (!me?.isScoreReviewer) {
     return (
-      <Shell>
+      <Shell email={session.user.email ?? ""}>
         <p className={`${mono.className} text-[13px] text-white/55 mb-3`}>[ join the room ]</p>
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
           become a <span style={{ color: ACCENT }}>reviewer</span>
@@ -47,7 +48,7 @@ export default async function ScoreReviewQueuePage() {
   const queue = await getScoreReviewQueue(session.user.id);
 
   return (
-    <Shell>
+    <Shell email={session.user.email ?? ""}>
       <p className={`${mono.className} text-[13px] text-white/40 mb-2`}>[ the listening room ]</p>
       <h1 className="text-4xl sm:text-5xl font-extrabold tracking-[-0.03em] mb-2">your queue</h1>
       <p className="text-white/55 normal-case mb-10">
@@ -88,7 +89,7 @@ export default async function ScoreReviewQueuePage() {
   );
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({ email, children }: { email: string; children: React.ReactNode }) {
   return (
     <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase`}>
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
@@ -96,7 +97,24 @@ function Shell({ children }: { children: React.ReactNode }) {
           <Link href="/score">
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
-          <span className={`${mono.className} text-[13px] text-white/45`}>reviewer</span>
+          <div className="flex items-center gap-4 sm:gap-5">
+            <nav className={`${mono.className} hidden sm:flex items-center gap-5 text-[13px]`}>
+              <Link href="/reports" className="text-white/55 hover:text-white transition-colors">
+                my reports
+              </Link>
+              <Link href="/score-review" className="text-white hover:text-white transition-colors">
+                review queue
+              </Link>
+            </nav>
+            <Link
+              href="/submit-score"
+              className="group inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[13px] px-4 py-2 hover:bg-white transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              new track
+            </Link>
+            <AccountMenu email={email} />
+          </div>
         </div>
       </header>
       <div className="max-w-4xl mx-auto px-5 py-12">{children}</div>
