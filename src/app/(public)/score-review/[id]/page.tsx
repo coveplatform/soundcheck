@@ -5,35 +5,14 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Logo } from "@/components/ui/logo";
-import { ReviewForm } from "./review-form";
+import { detectSource } from "@/lib/metadata";
+import { ReviewExperience } from "./review-experience";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
 const ACCENT = "#6ee7ff";
 
 export const dynamic = "force-dynamic";
-
-/** Build an embeddable player URL for the common sources (else null → link only). */
-function embedFor(url: string): string | null {
-  try {
-    const u = new URL(url);
-    const host = u.hostname.replace(/^www\./, "");
-    if (host === "youtube.com") {
-      const v = u.searchParams.get("v");
-      return v ? `https://www.youtube.com/embed/${v}` : null;
-    }
-    if (host === "youtu.be") {
-      const v = u.pathname.slice(1);
-      return v ? `https://www.youtube.com/embed/${v}` : null;
-    }
-    if (host.endsWith("soundcloud.com")) {
-      return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%236ee7ff&visual=true`;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
 
 export default async function ReviewTrackPage({
   params,
@@ -65,7 +44,11 @@ export default async function ReviewTrackPage({
 
   const done = review.status === "COMPLETED";
   const track = review.TrackScoreReport;
-  const embed = embedFor(track.trackUrl);
+  const detected = detectSource(track.trackUrl);
+  const source =
+    detected === "SOUNDCLOUD" || detected === "YOUTUBE" || detected === "BANDCAMP"
+      ? detected
+      : "DIRECT";
 
   return (
     <Shell>
@@ -73,28 +56,7 @@ export default async function ReviewTrackPage({
       <h1 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.02em] mb-1">
         {track.trackTitle || "untitled track"}
       </h1>
-      <p className={`${mono.className} text-[13px] text-white/40 mb-6`}>{track.genre || "—"}</p>
-
-      {/* player */}
-      <div className="mb-8">
-        {embed ? (
-          <iframe
-            src={embed}
-            className="w-full aspect-video border border-white/10"
-            allow="autoplay; encrypted-media"
-            title="track"
-          />
-        ) : (
-          <a
-            href={track.trackUrl}
-            target="_blank"
-            rel="noreferrer"
-            className={`${mono.className} inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 px-5 py-3 text-sm transition-colors`}
-          >
-            open the track ↗
-          </a>
-        )}
-      </div>
+      <p className={`${mono.className} text-[13px] text-white/40 mb-8`}>{track.genre || "—"}</p>
 
       {done ? (
         <div className="border border-white/12 bg-[#101010] p-8 text-center">
@@ -108,7 +70,7 @@ export default async function ReviewTrackPage({
           </Link>
         </div>
       ) : (
-        <ReviewForm reviewId={review.id} />
+        <ReviewExperience reviewId={review.id} trackUrl={track.trackUrl} source={source} />
       )}
     </Shell>
   );
