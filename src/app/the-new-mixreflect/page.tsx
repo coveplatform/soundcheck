@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
-import { ArrowRight, Zap, Users, Headphones, Check } from "lucide-react";
+import { ArrowRight, Zap, Users, Headphones, Check, Wallet } from "lucide-react";
+import { SCORE_REVIEW_RATE_CENTS, SCORE_PAYOUT_THRESHOLD_CENTS } from "@/lib/score-review";
 import type { Metadata } from "next";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
 const ACCENT = "#6ee7ff";
+
+const RATE = (SCORE_REVIEW_RATE_CENTS / 100).toFixed(2);
+const THRESHOLD = (SCORE_PAYOUT_THRESHOLD_CENTS / 100).toFixed(0);
 
 export const metadata: Metadata = {
   title: "MixReflect is changing — the new MixReflect",
@@ -53,7 +57,7 @@ export default function TheNewMixReflectPage() {
             <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
           <Link href="/reviewer" className="inline-flex items-center gap-2 border border-white/20 hover:border-white/40 text-white font-extrabold text-base px-7 py-4 transition-colors">
-            <Headphones className="h-4 w-4" /> become a reviewer
+            <Wallet className="h-4 w-4" /> get paid to review
           </Link>
         </div>
       </section>
@@ -73,8 +77,8 @@ export default function TheNewMixReflectPage() {
             <Users className="h-6 w-6 mb-4" style={{ color: ACCENT }} />
             <h3 className="text-xl font-extrabold mb-2">a room of real listeners</h3>
             <p className="text-white/65 text-[14.5px] normal-case leading-relaxed">
-              Then real people listen and react — honest, specific takes that land in your report as
-              they come in. No grinding for credits, no waiting days.
+              Then real, <strong className="text-white/85">paid</strong> listeners react — honest, specific
+              takes that land in your report as they come in. No grinding for credits, no waiting days.
             </p>
           </div>
         </div>
@@ -94,14 +98,19 @@ export default function TheNewMixReflectPage() {
             </span>
           </Link>
           <Link href="/reviewer" className="group border border-white/12 bg-[#101010] p-7 hover:border-white/30 transition-colors flex flex-col">
-            <p className={`${mono.className} text-[12px] text-white/45 mb-2`}>for listeners</p>
-            <h3 className="text-2xl font-extrabold mb-2">review tracks</h3>
+            <div className="flex items-center justify-between mb-2">
+              <p className={`${mono.className} text-[12px] text-white/45`}>for listeners</p>
+              <span className={`${mono.className} text-[12px] font-bold px-2 py-0.5 border`} style={{ color: ACCENT, borderColor: "rgba(110,231,255,0.4)" }}>
+                ${RATE}/review
+              </span>
+            </div>
+            <h3 className="text-2xl font-extrabold mb-2">get paid to listen</h3>
             <p className="text-white/60 text-[14px] normal-case leading-relaxed flex-1">
               Be one of the listeners artists get played for. Hear unreleased tracks first and earn
-              for every honest two-minute reaction — sign up in one click.
+              ${RATE} for every honest two-minute reaction — cash out at ${THRESHOLD}. Sign up in one click.
             </p>
             <span className={`${mono.className} mt-5 inline-flex items-center gap-1.5 text-[13px] group-hover:gap-2.5 transition-all`} style={{ color: ACCENT }}>
-              become a reviewer →
+              start earning →
             </span>
           </Link>
         </div>

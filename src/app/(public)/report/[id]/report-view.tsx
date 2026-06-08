@@ -149,6 +149,29 @@ export function ReportView({ data }: { data: ReportViewModel }) {
   const [unlocking, setUnlocking] = useState(false);
   const locked = !data.unlocked;
 
+  // Just back from Stripe? The success redirect lands a beat before the webhook
+  // flips `paidAt`, so the report can still read locked. Poll a refresh until the
+  // unlock lands (or we give up) instead of stranding a paying customer on the
+  // paywall. `finalizing` drives a "finalizing your unlock…" state over the gate.
+  const [finalizing, setFinalizing] = useState(false);
+  useEffect(() => {
+    if (data.isDemo || !locked) return;
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("unlocked") && !params.has("subscribed")) return;
+    setFinalizing(true);
+    let tries = 0;
+    const t = setInterval(() => {
+      tries += 1;
+      if (tries > 10) {
+        setFinalizing(false);
+        clearInterval(t);
+        return;
+      }
+      router.refresh();
+    }, 2000);
+    return () => clearInterval(t);
+  }, [data.isDemo, locked, router]);
+
   // Live room: while listeners are still coming in, quietly re-fetch so new
   // reactions appear without a manual refresh.
   const roomPending =
@@ -548,6 +571,17 @@ what to fix first
         {/* ── UNLOCK / SHARE ── */}
         {locked ? (
           <section id="unlock" className="scroll-mt-20 border border-white/12 bg-[#101010] p-7 sm:p-10">
+            {finalizing && (
+              <div
+                className="mb-7 flex items-center justify-center gap-3 border p-4 text-center"
+                style={{ borderColor: "rgba(110,231,255,0.4)", background: "rgba(110,231,255,0.06)" }}
+              >
+                <Hourglass className="h-4 w-4 animate-pulse" style={{ color: ACCENT }} />
+                <p className="text-[14px] normal-case" style={{ color: ACCENT }}>
+                  payment received — finalizing your unlock…
+                </p>
+              </div>
+            )}
             <div className="text-center mb-8">
               <div
                 className="inline-flex items-center justify-center w-12 h-12 mb-5"
