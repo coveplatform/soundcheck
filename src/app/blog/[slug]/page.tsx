@@ -2,8 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { JetBrains_Mono } from "next/font/google";
+import { Logo } from "@/components/ui/logo";
 import { posts, getPost } from "@/lib/blog-posts";
 import type { Metadata } from "next";
+
+const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
+const ACCENT = "#6ee7ff";
 
 export function generateStaticParams() {
   return posts.map((p) => ({ slug: p.slug }));
@@ -91,6 +96,27 @@ export default async function BlogPostPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       )}
+
+      {/* ── NAV (matches the score product) ──────────────────────── */}
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
+        <div className="max-w-4xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between">
+          <Link href="/score">
+            <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
+          </Link>
+          <div className={`${mono.className} flex items-center gap-5 text-[13px] lowercase`}>
+            <Link href="/blog" className="text-white/55 hover:text-white transition-colors">
+              ← the drop
+            </Link>
+            <Link
+              href="/score#pricing"
+              className="bg-[#6ee7ff] text-black px-3.5 py-1.5 font-bold transition-colors hover:bg-white"
+            >
+              get feedback
+            </Link>
+          </div>
+        </div>
+      </header>
+
       {/* ── HERO ─────────────────────────────────────────────────── */}
       <div className="bg-[#0d0d0d]">
         <div className="max-w-4xl mx-auto px-4 sm:px-8 pt-12 pb-16 sm:pt-16 sm:pb-20">
@@ -103,7 +129,7 @@ export default async function BlogPostPage({
           </Link>
 
           <div className="mb-6">
-            <span className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-white bg-purple-600 px-3 py-1.5">
+            <span className="inline-block text-[10px] font-black uppercase tracking-[0.3em] text-black bg-[#6ee7ff] px-3 py-1.5">
               {post.category}
             </span>
           </div>

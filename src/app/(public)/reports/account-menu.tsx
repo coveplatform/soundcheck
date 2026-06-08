@@ -40,7 +40,7 @@ export function AccountMenu({ email }: { email: string }) {
             <p className="text-[13px] text-white truncate normal-case mt-0.5">{email}</p>
           </div>
           <Link
-            href="/account"
+            href="/reports/settings"
             className={`${mono.className} flex items-center gap-2.5 px-4 py-3 text-[13px] text-white/75 hover:bg-white/5 transition-colors`}
           >
             <Settings className="h-3.5 w-3.5" />

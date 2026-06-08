@@ -92,17 +92,20 @@ export default async function ReportsPage() {
           <Link href="/score">
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
-          <div className="flex items-center gap-4">
-            {me?.isScoreReviewer && (
-              <Link
-                href="/score-review"
-                className={`${mono.className} text-[13px] text-white/55 hover:text-white transition-colors`}
-              >
-                reviewer queue →
+          <div className="flex items-center gap-4 sm:gap-5">
+            <nav className={`${mono.className} hidden sm:flex items-center gap-5 text-[13px]`}>
+              <Link href="/reports" className="text-white hover:text-white transition-colors">
+                my reports
               </Link>
-            )}
+              <Link
+                href={me?.isScoreReviewer ? "/score-review" : "/reviewer"}
+                className="text-white/55 hover:text-white transition-colors"
+              >
+                review queue
+              </Link>
+            </nav>
             <Link
-              href="/score"
+              href="/submit-score"
               className="group inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[13px] px-4 py-2 hover:bg-white transition-colors"
             >
               <Plus className="h-4 w-4" />
