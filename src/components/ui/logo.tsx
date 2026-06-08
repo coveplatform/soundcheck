@@ -2,9 +2,19 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-export type LogoProps = React.ComponentPropsWithoutRef<"div">;
+export type LogoProps = React.ComponentPropsWithoutRef<"div"> & {
+  /** Fill of the rounded-square mark. Defaults to the brand purple. */
+  markFill?: string;
+  /** Fill of the equaliser bars. Defaults to white. */
+  barFill?: string;
+};
 
-export function Logo({ className, ...props }: LogoProps) {
+export function Logo({
+  className,
+  markFill = "#9333ea",
+  barFill = "white",
+  ...props
+}: LogoProps) {
   return (
     <div
       className={cn("inline-flex items-center gap-2.5 text-black", className)}
@@ -25,10 +35,10 @@ export function Logo({ className, ...props }: LogoProps) {
           height="180"
           rx="40"
           ry="40"
-          fill="#9333ea"
+          fill={markFill}
         />
 
-        <g fill="white">
+        <g fill={barFill}>
           <rect x="42" y="78" width="16" height="44" rx="3" />
           <rect x="68" y="55" width="16" height="90" rx="3" />
           <rect x="94" y="38" width="16" height="124" rx="3" />
