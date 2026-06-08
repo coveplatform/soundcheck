@@ -5,7 +5,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Logo } from "@/components/ui/logo";
 import { OptInButton } from "../score-review/opt-in-button";
-import { ArrowRight, Headphones, Heart, Zap } from "lucide-react";
+import { SCORE_REVIEW_RATE_CENTS, SCORE_PAYOUT_THRESHOLD_CENTS } from "@/lib/score-review";
+import { ArrowRight, Headphones, Wallet, Zap } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -13,10 +14,13 @@ const ACCENT = "#6ee7ff";
 
 export const dynamic = "force-dynamic";
 
+const RATE = (SCORE_REVIEW_RATE_CENTS / 100).toFixed(2);
+const THRESHOLD = (SCORE_PAYOUT_THRESHOLD_CENTS / 100).toFixed(0);
+
 const PERKS = [
-  { icon: Headphones, t: "hear it first", d: "fresh tracks land in your queue — be one of the first ears on new music." },
-  { icon: Heart, t: "shape the room", d: "your honest reaction goes straight into an artist's report. real impact, real fast." },
-  { icon: Zap, t: "two minutes each", d: "listen, leave a rating and a few honest lines. no long forms, no commitment." },
+  { icon: Wallet, t: `$${RATE} a review`, d: "earn for every honest reaction — it stacks up in your balance." },
+  { icon: Headphones, t: "hear it first", d: "fresh, unreleased tracks land in your queue before anyone else." },
+  { icon: Zap, t: "~2 minutes each", d: `listen, rate, leave a few honest lines. cash out once you hit $${THRESHOLD}.` },
 ];
 
 export default async function ReviewerLandingPage() {
@@ -47,12 +51,13 @@ export default async function ReviewerLandingPage() {
       <div className="max-w-2xl mx-auto px-5 py-16">
         <p className={`${mono.className} text-[13px] text-white/55 mb-3`}>[ the listening panel ]</p>
         <h1 className="text-4xl sm:text-6xl font-extrabold tracking-[-0.03em] mb-4">
-          review tracks.<br />
-          <span style={{ color: ACCENT }}>help artists</span> land.
+          get paid<br />
+          to <span style={{ color: ACCENT }}>listen</span>.
         </h1>
         <p className="text-white/70 text-lg mb-10 normal-case max-w-md leading-relaxed">
-          Artists drop a track and get played for a room of real listeners. Be one of
-          them — leave honest, fast reactions and shape what they fix before release.
+          Be one of the real listeners artists get played for. Hear unreleased
+          tracks first, leave an honest two-minute reaction, and earn ${RATE} for
+          every one — cash out at ${THRESHOLD}.
         </p>
 
         {/* CTA — state-aware */}

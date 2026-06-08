@@ -11,6 +11,32 @@ import { prisma } from "@/lib/prisma";
 
 const ASSIGN_EXPIRY_DAYS = 3;
 
+// Reviewer pay. Earnings are derived from completed reviews (no stored balance
+// yet) and paid out manually once a reviewer clears the threshold.
+export const SCORE_REVIEW_RATE_CENTS = 40; // $0.40 per completed review
+export const SCORE_PAYOUT_THRESHOLD_CENTS = 1000; // $10.00 minimum cash-out
+
+export type ScoreReviewerEarnings = {
+  completed: number;
+  cents: number;
+  canPayout: boolean;
+};
+
+/** Live earnings for a score reviewer, derived from their completed reactions. */
+export async function getScoreReviewerEarnings(
+  userId: string
+): Promise<ScoreReviewerEarnings> {
+  const completed = await prisma.scoreReview.count({
+    where: { reviewerId: userId, status: "COMPLETED" },
+  });
+  const cents = completed * SCORE_REVIEW_RATE_CENTS;
+  return {
+    completed,
+    cents,
+    canPayout: cents >= SCORE_PAYOUT_THRESHOLD_CENTS,
+  };
+}
+
 /**
  * Assign a report to up to `count` human reviewers from the internal pool.
  * Idempotent-ish: only tops up to the target, never double-assigns the same
