@@ -22,16 +22,6 @@ const ACCENT = "#6ee7ff";
 
 const BRANDS: { name: string; path: string; color: string }[] = [
   {
-    name: "spotify",
-    color: "#1DB954",
-    path: "M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.559.3z",
-  },
-  {
-    name: "apple music",
-    color: "#FA243C",
-    path: "M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z",
-  },
-  {
     name: "soundcloud",
     color: "#FF5500",
     path: "M1 14.5c.28 0 .5-.9.5-2s-.22-2-.5-2-.5.9-.5 2 .22 2 .5 2zm2 1c.28 0 .5-1.34.5-3s-.22-3-.5-3-.5 1.34-.5 3 .22 3 .5 3zm2 .5c.28 0 .5-1.79.5-4s-.22-4-.5-4-.5 1.79-.5 4 .22 4 .5 4zm2 0c.28 0 .5-2.01.5-4.5S7.78 7 7.5 7s-.5 2.01-.5 4.5.22 4.5.5 4.5zm2 0c.28 0 .5-2.24.5-5s-.22-5-.5-5-.5 2.24-.5 5 .22 5 .5 5zm12.5 0a3.5 3.5 0 0 0 0-7c-.34 0-.67.05-.98.14A5.5 5.5 0 0 0 11 7.5c0 .3.03.6.08.88-.18-.08-.38-.13-.58-.13-.28 0-.5 2.24-.5 5s.22 4.27.5 4.27h11z",
@@ -42,6 +32,7 @@ const BRANDS: { name: string; path: string; color: string }[] = [
     path: "M23.5 6.2a3 3 0 0 0-2.12-2.12C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.53A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.12 2.12c1.88.53 9.38.53 9.38.53s7.5 0 9.38-.53a3 3 0 0 0 2.12-2.12c.34-1.9.5-3.84.5-5.8 0-1.96-.16-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z",
   },
   { name: "bandcamp", color: "#1DA0C3", path: "M0 18.75l7.437-13.5H24l-7.437 13.5H0z" },
+  { name: "mp3 / wav", color: "#6ee7ff", path: "M12 3v10.55A4 4 0 1014 17V7h4V3h-6z" },
 ];
 
 // ── Assignment sequence ─────────────────────────────────────────────
@@ -51,8 +42,9 @@ const STEPS = [
   "mapping the energy curve",
   "checking the hook + structure",
   "weighing it across 5 dimensions",
-  "writing your honest read",
-  "finalising your score",
+  "writing your instant ai read",
+  "assigning 5 real listeners to your track",
+  "the room is tuning in…",
 ];
 
 const CHECKS: { t: string; d: string }[] = [
@@ -88,6 +80,23 @@ const SAMPLE = {
     "give the outro a softer landing",
   ],
 };
+
+// ── Recently read by the room (real artwork) ────────────────────────
+
+const RECENT: { src: string; score: number }[] = [
+  { src: "/activity-artwork/1.jpg", score: 82 },
+  { src: "/activity-artwork/7.jpg", score: 74 },
+  { src: "/activity-artwork/12.jpg", score: 91 },
+  { src: "/activity-artwork/18.jpg", score: 68 },
+  { src: "/activity-artwork/4.jpg", score: 79 },
+  { src: "/activity-artwork/22.jpg", score: 88 },
+  { src: "/activity-artwork/27.jpg", score: 71 },
+  { src: "/activity-artwork/31.jpg", score: 85 },
+  { src: "/activity-artwork/9.jpg", score: 64 },
+  { src: "/activity-artwork/20.jpg", score: 90 },
+  { src: "/activity-artwork/25.jpg", score: 77 },
+  { src: "/activity-artwork/3.jpg", score: 83 },
+];
 
 type Phase = "idle" | "running" | "done";
 type Meta = { title: string; artist: string | null; artworkUrl: string | null };
@@ -411,7 +420,7 @@ export default function ScorePage() {
     <div
       className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase scroll-smooth`}
     >
-      <style>{`@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}`}</style>
+      <style>{`@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
 
       {/* grain */}
       <div
@@ -600,6 +609,35 @@ export default function ScorePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── RECENTLY READ BY THE ROOM (real artwork strip) ── */}
+      <section className="relative z-10 border-t border-white/10 overflow-hidden py-8">
+        <p className={`${mono.className} max-w-6xl mx-auto px-5 text-[11px] text-white/35 mb-5`}>
+          [ recently read by the room ]
+        </p>
+        <div className="relative">
+          <div className="flex gap-3 w-max px-5" style={{ animation: "marquee 50s linear infinite" }}>
+            {[...RECENT, ...RECENT].map((r, i) => (
+              <div
+                key={i}
+                className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 border border-white/10 overflow-hidden"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={r.src} alt="" className="w-full h-full object-cover" loading="lazy" />
+                <span
+                  className={`${mono.className} absolute bottom-0 right-0 text-[10px] font-bold text-black px-1 leading-tight`}
+                  style={{ background: ACCENT }}
+                >
+                  {r.score}
+                </span>
+              </div>
+            ))}
+          </div>
+          {/* edge fades */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#0a0a0a] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#0a0a0a] to-transparent" />
         </div>
       </section>
 
