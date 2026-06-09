@@ -21,7 +21,7 @@ export const genreDetails: Record<string, GenreDetail> = {
       "The track holds energy through the second verse instead of sagging after the first hook",
     ],
     proTip:
-      "The single highest-leverage fix in independent hip-hop is vocal level. Most producers mix the beat to sound huge, then drop the vocal in too low because they already know every word. A first-time listener doesn't. If your reviewers consistently say the bars get lost, raise the vocal 1.5–3 dB and add light compression so it stays present through the loud sections of the beat — it's usually the difference between a track that sounds amateur and one that sounds finished.",
+      "The single highest-leverage fix in independent hip-hop is vocal level. Most producers mix the beat to sound huge, then drop the vocal in too low because they already know every word. A first-time listener doesn't. If listeners consistently say the bars get lost, raise the vocal 1.5–3 dB and add light compression so it stays present through the loud sections of the beat — it's usually the difference between a track that sounds amateur and one that sounds finished.",
   },
   trap: {
     releaseChecklist: [

@@ -28,7 +28,7 @@ export type AlternativePage = {
 };
 
 const FREE_MODEL =
-  "Free to start. You earn credits by reviewing other artists' tracks, then spend them on reviews of your own. Pro is $24.95/month for 30 credits and priority placement.";
+  "Free to submit — you get an instant AI score and a teaser of the full report. Unlock a track's complete breakdown and every listener reaction for $6.95, or go unlimited for $19.95/month.";
 
 export const alternativePages: AlternativePage[] = [
   {
@@ -36,10 +36,10 @@ export const alternativePages: AlternativePage[] = [
     competitor: "LANDR",
     metaTitle: "The Best LANDR Alternative for Music Feedback | MixReflect",
     metaDescription:
-      "Looking for a LANDR alternative? MixReflect gives you honest structured feedback from genre-matched artists before you master or distribute — so you know the track is actually ready.",
+      "Looking for a LANDR alternative? MixReflect gives you honest structured feedback from real listeners before you master or distribute — so you know the track is actually ready.",
     h1: "The best LANDR alternative for honest pre-release feedback",
     verdict:
-      "MixReflect is the best LANDR alternative if you need to know whether your track is actually ready before you master or distribute it. LANDR is an AI mastering and distribution service — it can tighten your loudness levels and put your music on streaming platforms, but it cannot tell you whether the arrangement is working, whether the vocals are buried, or whether a first-time listener will engage with the track. MixReflect does that specifically: structured, independent feedback from genre-matched artists before any money is spent on mastering or distribution. The right order is MixReflect first, LANDR after.",
+      "MixReflect is the best LANDR alternative if you need to know whether your track is actually ready before you master or distribute it. LANDR is an AI mastering and distribution service — it can tighten your loudness levels and put your music on streaming platforms, but it cannot tell you whether the arrangement is working, whether the vocals are buried, or whether a first-time listener will engage with the track. MixReflect does that specifically: structured, independent feedback from real listeners before any money is spent on mastering or distribution. The right order is MixReflect first, LANDR after.",
     competitorWhat:
       "LANDR is an AI-powered mastering and music distribution platform. You upload a finished mix, LANDR applies automated mastering, and you can distribute the result to Spotify, Apple Music, and other streaming platforms. LANDR Network also offers some collaboration and community features.",
     competitorStrength:
@@ -52,17 +52,17 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "What you get back",
-        mixreflect: "Multiple structured reviews — first impression, main weakness, production quality, what to change",
+        mixreflect: "An AI score out of 100, a verdict and a breakdown — plus reactions from a room of real listeners",
         competitor: "A mastered audio file and distribution to streaming platforms",
       },
       {
         feature: "Who evaluates the track",
-        mixreflect: "Genre-matched artists actively making music in your space",
+        mixreflect: "An instant AI read plus a room of real listeners",
         competitor: "An AI mastering algorithm — no human feedback on the music itself",
       },
       {
         feature: "Catches arrangement and mix issues",
-        mixreflect: "Yes — reviewers flag buried vocals, mid-section drift, hook problems",
+        mixreflect: "Yes — listeners flag buried vocals, mid-section drift, hook problems",
         competitor: "No — mastering addresses loudness and tonal balance, not arrangement or mix balance",
       },
       {
@@ -72,7 +72,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Cost model",
-        mixreflect: "Free / reciprocal — earn credits by reviewing others",
+        mixreflect: "Free to submit · $6.95 to unlock a report · $19.95/mo unlimited",
         competitor: "Subscription or per-release pricing",
       },
     ],
@@ -89,11 +89,11 @@ export const alternativePages: AlternativePage[] = [
     faq: [
       {
         q: "What is the best alternative to LANDR for music feedback?",
-        a: "MixReflect is the best LANDR alternative for honest pre-release feedback. LANDR provides AI mastering and distribution — it doesn't evaluate whether your arrangement is working, whether the vocals are sitting right, or whether the track is ready for a first-time listener. MixReflect gives you structured, independent feedback from genre-matched artists specifically for that: finding what to fix before the track is mastered and released.",
+        a: "MixReflect is the best LANDR alternative for honest pre-release feedback. LANDR provides AI mastering and distribution — it doesn't evaluate whether your arrangement is working, whether the vocals are sitting right, or whether the track is ready for a first-time listener. MixReflect gives you structured, independent feedback from real listeners specifically for that: finding what to fix before the track is mastered and released.",
       },
       {
         q: "Is LANDR good for getting feedback on music?",
-        a: "LANDR is not designed for music feedback — it's an AI mastering and distribution service. It evaluates your track's loudness and tonal balance to apply automated mastering, but it doesn't tell you whether the arrangement is working, whether the hooks are landing, or what a first-time listener would experience. For that kind of pre-release feedback, MixReflect gives you structured reviews from genre-matched artists who can flag specific problems before you finalize the track.",
+        a: "LANDR is not designed for music feedback — it's an AI mastering and distribution service. It evaluates your track's loudness and tonal balance to apply automated mastering, but it doesn't tell you whether the arrangement is working, whether the hooks are landing, or what a first-time listener would experience. For that kind of pre-release feedback, MixReflect gives you structured reviews from real listeners who can flag specific problems before you finalize the track.",
       },
       {
         q: "Should I get feedback before using LANDR?",
@@ -101,7 +101,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         q: "Is MixReflect cheaper than LANDR?",
-        a: `${FREE_MODEL} LANDR's pricing depends on the mastering tier and distribution plan — costs vary by subscription level and release volume. MixReflect's core feedback loop doesn't require a subscription: you earn credits by reviewing others' tracks.`,
+        a: `${FREE_MODEL} LANDR's pricing depends on the mastering tier and distribution plan — costs vary by subscription level and release volume. MixReflect's core read doesn't require a subscription — you submit and get an instant AI score for free.`,
       },
     ],
   },
@@ -110,10 +110,10 @@ export const alternativePages: AlternativePage[] = [
     competitor: "SoundBetter",
     metaTitle: "The Best SoundBetter Alternative for Music Feedback | MixReflect",
     metaDescription:
-      "Looking for a SoundBetter alternative? MixReflect gives you structured feedback from genre-matched peers before you spend money on a professional engineer — so you know what to fix first.",
+      "Looking for a SoundBetter alternative? MixReflect gives you structured feedback from real listeners before you spend money on a professional engineer — so you know what to fix first.",
     h1: "The best SoundBetter alternative for pre-release feedback",
     verdict:
-      "MixReflect is the best SoundBetter alternative if you need feedback before you're ready to hire. SoundBetter is a hiring marketplace — you find and pay professional mix engineers, mastering engineers, producers, and session musicians to work on your track. MixReflect is a development tool — you get honest, structured feedback from genre-matched artists before your track goes into a paid engineering session, so you know what actually needs fixing and don't pay a professional to work on a track that isn't arrangement-ready. Use MixReflect to identify the real problems, SoundBetter to execute the fix.",
+      "MixReflect is the best SoundBetter alternative if you need feedback before you're ready to hire. SoundBetter is a hiring marketplace — you find and pay professional mix engineers, mastering engineers, producers, and session musicians to work on your track. MixReflect is a development tool — you get honest, structured feedback from real listeners before your track goes into a paid engineering session, so you know what actually needs fixing and don't pay a professional to work on a track that isn't arrangement-ready. Use MixReflect to identify the real problems, SoundBetter to execute the fix.",
     competitorWhat:
       "SoundBetter is a marketplace for hiring music production professionals — mixing engineers, mastering engineers, session musicians, vocalists, and producers. You browse profiles, listen to samples, and hire someone to work on your track for a per-project fee.",
     competitorStrength:
@@ -121,7 +121,7 @@ export const alternativePages: AlternativePage[] = [
     rows: [
       {
         feature: "Primary purpose",
-        mixreflect: "Structured peer feedback — find what's wrong before spending money",
+        mixreflect: "An AI score plus real-listener feedback — find what's wrong before spending money",
         competitor: "Hire professional engineers, producers, and musicians",
       },
       {
@@ -131,7 +131,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Who responds",
-        mixreflect: "Genre-matched artists giving honest pre-release feedback",
+        mixreflect: "An instant AI read plus honest reactions from real listeners",
         competitor: "Hired professionals executing a specific brief",
       },
       {
@@ -146,7 +146,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Cost model",
-        mixreflect: "Free / reciprocal — earn credits by reviewing others",
+        mixreflect: "Free to submit · $6.95 to unlock a report · $19.95/mo unlimited",
         competitor: "Per-project fee paid to the hired professional",
       },
     ],
@@ -163,7 +163,7 @@ export const alternativePages: AlternativePage[] = [
     faq: [
       {
         q: "What is the best alternative to SoundBetter for music feedback?",
-        a: "MixReflect is the best SoundBetter alternative for pre-release feedback. SoundBetter is a hiring marketplace — you pay professionals to work on your track. MixReflect gives you structured, independent feedback from genre-matched artists so you can identify what actually needs fixing before you spend money commissioning professional work. The right order is MixReflect for diagnosis, SoundBetter for execution.",
+        a: "MixReflect is the best SoundBetter alternative for pre-release feedback. SoundBetter is a hiring marketplace — you pay professionals to work on your track. MixReflect gives you structured, independent feedback from real listeners so you can identify what actually needs fixing before you spend money commissioning professional work. The right order is MixReflect for diagnosis, SoundBetter for execution.",
       },
       {
         q: "Should I get feedback before hiring on SoundBetter?",
@@ -171,11 +171,11 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         q: "Is MixReflect cheaper than SoundBetter?",
-        a: `MixReflect's core model is free — you earn credits by reviewing other artists' tracks. ${FREE_MODEL} SoundBetter charges per project: prices vary by professional and scope, from budget options to high-end engineers at several hundred dollars per mix. They serve different functions: MixReflect for finding what to fix, SoundBetter for hiring someone to fix it.`,
+        a: `MixReflect's core read is free — you submit a track and get an instant AI score. ${FREE_MODEL} SoundBetter charges per project: prices vary by professional and scope, from budget options to high-end engineers at several hundred dollars per mix. They serve different functions: MixReflect for finding what to fix, SoundBetter for hiring someone to fix it.`,
       },
       {
         q: "How do I know if my track is ready to hire a professional mix engineer?",
-        a: "A track is ready for a professional mix when the arrangement is locked — every section is intentional, the energy arc is right, the hook is strong, and you've confirmed it with fresh ears who don't know the track. Getting structured feedback on MixReflect first tells you whether you're at that point. If multiple reviewers flag the same arrangement problem, fix that before going to a mix engineer. If feedback is scattered and the track is getting positive responses, it's ready for the professional step.",
+        a: "A track is ready for a professional mix when the arrangement is locked — every section is intentional, the energy arc is right, the hook is strong, and you've confirmed it with fresh ears who don't know the track. Getting structured feedback on MixReflect first tells you whether you're at that point. If multiple listeners flag the same arrangement problem, fix that before going to a mix engineer. If feedback is scattered and the track is getting positive responses, it's ready for the professional step.",
       },
     ],
   },
@@ -184,10 +184,10 @@ export const alternativePages: AlternativePage[] = [
     competitor: "Musosoup",
     metaTitle: "The Best Musosoup Alternative for Music Feedback | MixReflect",
     metaDescription:
-      "Looking for a Musosoup alternative? MixReflect gives you structured pre-release feedback from genre-matched artists — the step before you pitch to blogs and playlists.",
+      "Looking for a Musosoup alternative? MixReflect gives you structured pre-release feedback from real listeners — the step before you pitch to blogs and playlists.",
     h1: "The best Musosoup alternative for pre-release feedback",
     verdict:
-      "MixReflect is the best Musosoup alternative if your goal is improving a track before you pitch it, not pitching it. Musosoup is a submission platform — you pay to have your finished track considered by blogs, playlist curators, and press. MixReflect is a development tool — structured, independent feedback from genre-matched artists so you can find what needs fixing before anyone outside your inner circle hears the track. Use MixReflect to get the track right; use Musosoup to place it.",
+      "MixReflect is the best Musosoup alternative if your goal is improving a track before you pitch it, not pitching it. Musosoup is a submission platform — you pay to have your finished track considered by blogs, playlist curators, and press. MixReflect is a development tool — structured, independent feedback from real listeners so you can find what needs fixing before anyone outside your inner circle hears the track. Use MixReflect to get the track right; use Musosoup to place it.",
     competitorWhat:
       "Musosoup is a music promotion platform where independent artists pay to have their tracks considered by blogs, playlists, radio stations, and music journalists. Curators commit to providing feedback with every submission, which distinguishes it from some other submission platforms.",
     competitorStrength:
@@ -195,7 +195,7 @@ export const alternativePages: AlternativePage[] = [
     rows: [
       {
         feature: "Primary purpose",
-        mixreflect: "Improve the track before release — structured peer feedback",
+        mixreflect: "Improve the track before release — AI score plus real listeners",
         competitor: "Pitch a finished track to blogs, playlists, and press",
       },
       {
@@ -215,7 +215,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Cost model",
-        mixreflect: "Free / reciprocal — earn credits by reviewing others",
+        mixreflect: "Free to submit · $6.95 to unlock a report · $19.95/mo unlimited",
         competitor: "Paid credits per submission",
       },
     ],
@@ -232,15 +232,15 @@ export const alternativePages: AlternativePage[] = [
     faq: [
       {
         q: "What is the best alternative to Musosoup?",
-        a: "It depends on your goal. For pre-release development feedback, MixReflect is the best alternative — structured, independent reviews from genre-matched artists so you can find and fix problems before pitching. For the same job Musosoup does (paid curator/blog submissions), SubmitHub and Groover are the direct alternatives. The right choice depends on whether you need to improve the track or place it.",
+        a: "It depends on your goal. For pre-release development feedback, MixReflect is the best alternative — structured, independent reviews from real listeners so you can find and fix problems before pitching. For the same job Musosoup does (paid curator/blog submissions), SubmitHub and Groover are the direct alternatives. The right choice depends on whether you need to improve the track or place it.",
       },
       {
         q: "Should I use MixReflect before Musosoup?",
-        a: "Yes. Paid curator submissions are more effective on a track that's already been quality-checked. If your track has a fixable issue — buried vocals, a slow intro, an energy dip — a curator will catch it and reject the submission. Getting structured feedback first on MixReflect, fixing any patterns reviewers flag, then submitting the stronger version to Musosoup gets more out of each campaign credit.",
+        a: "Yes. Paid curator submissions are more effective on a track that's already been quality-checked. If your track has a fixable issue — buried vocals, a slow intro, an energy dip — a curator will catch it and reject the submission. Getting structured feedback first on MixReflect, fixing any patterns listeners flag, then submitting the stronger version to Musosoup gets more out of each campaign credit.",
       },
       {
         q: "Is MixReflect cheaper than Musosoup?",
-        a: `${FREE_MODEL} Musosoup charges credits per submission — costs vary by curator type and how many you target. MixReflect's core feedback loop is free: you earn credits by reviewing other artists' tracks, so the cost is time rather than money.`,
+        a: `${FREE_MODEL} Musosoup charges credits per submission — costs vary by curator type and how many you target. MixReflect is free to submit: you get an instant AI score, and only pay if you unlock the full report.`,
       },
     ],
   },
@@ -249,10 +249,10 @@ export const alternativePages: AlternativePage[] = [
     competitor: "ReverbNation",
     metaTitle: "The Best ReverbNation Alternative for Artists | MixReflect",
     metaDescription:
-      "Looking for a ReverbNation alternative? MixReflect is purpose-built for one thing: structured, honest feedback from genre-matched artists before you release.",
+      "Looking for a ReverbNation alternative? MixReflect is purpose-built for one thing: structured, honest feedback from real listeners before you release.",
     h1: "The best ReverbNation alternative for independent artists in 2026",
     verdict:
-      "MixReflect is the best ReverbNation alternative for independent artists who want honest, structured feedback on their music before release. ReverbNation is a broad music promotion platform — artist pages, fan-building tools, and an 'Opportunities' marketplace for gigs, labels, and sync. It does many things at a general level. MixReflect does one thing specifically: structured, independent pre-release feedback from genre-matched artists who tell you what's working, what to fix, and whether the track is ready. If feedback is what you actually need, MixReflect is the focused option.",
+      "MixReflect is the best ReverbNation alternative for independent artists who want honest, structured feedback on their music before release. ReverbNation is a broad music promotion platform — artist pages, fan-building tools, and an 'Opportunities' marketplace for gigs, labels, and sync. It does many things at a general level. MixReflect does one thing specifically: structured, independent pre-release feedback from real listeners who tell you what's working, what to fix, and whether the track is ready. If feedback is what you actually need, MixReflect is the focused option.",
     competitorWhat:
       "ReverbNation is a long-running music promotion and discovery platform that provides artist pages, EPK tools, fan engagement features, and an Opportunities marketplace for gigs, labels, sync placements, and contests. It's designed as a general-purpose artist platform covering promotion, distribution, and industry connections.",
     competitorStrength:
@@ -260,7 +260,7 @@ export const alternativePages: AlternativePage[] = [
     rows: [
       {
         feature: "Primary purpose",
-        mixreflect: "Structured pre-release feedback from genre-matched peers",
+        mixreflect: "An instant AI score plus real-listener reactions, pre-release",
         competitor: "General music promotion — artist pages, fan tools, opportunities marketplace",
       },
       {
@@ -270,7 +270,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Feedback quality",
-        mixreflect: "Structured, independent, genre-matched — patterns emerge across reviewers",
+        mixreflect: "Instant AI score plus independent listener reactions — patterns emerge across the room",
         competitor: "Fan reactions and general community engagement; not structured critique",
       },
       {
@@ -285,7 +285,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Cost model",
-        mixreflect: "Free / reciprocal — earn credits by reviewing others",
+        mixreflect: "Free to submit · $6.95 to unlock a report · $19.95/mo unlimited",
         competitor: "Free tier with paid upgrades",
       },
     ],
@@ -302,7 +302,7 @@ export const alternativePages: AlternativePage[] = [
     faq: [
       {
         q: "What is the best ReverbNation alternative in 2026?",
-        a: "It depends on what you need. For honest pre-release feedback from genre-matched artists, MixReflect is the best alternative — structured, independent reviews that tell you what to fix before release. For general artist promotion, fan-building, and industry connections, Bandcamp and DistroKid serve overlapping needs. For music distribution specifically, DistroKid and TuneCore are the dominant options. ReverbNation tries to cover all of these; the better approach is usually a dedicated tool for each job.",
+        a: "It depends on what you need. For honest pre-release feedback from real listeners, MixReflect is the best alternative — structured, independent reviews that tell you what to fix before release. For general artist promotion, fan-building, and industry connections, Bandcamp and DistroKid serve overlapping needs. For music distribution specifically, DistroKid and TuneCore are the dominant options. ReverbNation tries to cover all of these; the better approach is usually a dedicated tool for each job.",
       },
       {
         q: "Is ReverbNation still worth using in 2026?",
@@ -310,7 +310,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         q: "How is MixReflect different from ReverbNation?",
-        a: "MixReflect does one thing: structured, independent pre-release feedback from genre-matched artists. You upload a track before it's released, genre-matched artists review it independently using a structured format, and you see where multiple reviewers converge on the same issue. ReverbNation is a broad platform covering artist pages, fan tools, promotion, and an industry opportunities marketplace. They solve different problems: MixReflect is for getting the track right before release, ReverbNation is for promotion and connections after.",
+        a: "MixReflect does one thing: structured, independent pre-release feedback from real listeners. You upload a track before it's released, real listeners review it independently using a structured format, and you see where multiple listeners converge on the same issue. ReverbNation is a broad platform covering artist pages, fan tools, promotion, and an industry opportunities marketplace. They solve different problems: MixReflect is for getting the track right before release, ReverbNation is for promotion and connections after.",
       },
     ],
   },
@@ -319,10 +319,10 @@ export const alternativePages: AlternativePage[] = [
     competitor: "SubmitHub",
     metaTitle: "The Best SubmitHub Alternative for Pre-Release Feedback | MixReflect",
     metaDescription:
-      "Looking for a SubmitHub alternative? MixReflect gives you structured, independent feedback from genre-matched artists before you release — not paid curator placement after.",
+      "Looking for a SubmitHub alternative? MixReflect gives you structured, independent feedback from real listeners before you release — not paid curator placement after.",
     h1: "The best SubmitHub alternative for honest pre-release feedback",
     verdict:
-      "MixReflect is the best SubmitHub alternative if your goal is to improve a track before release rather than place a finished one. SubmitHub is a distribution tool — you pay credits to pitch release-ready music to curators, blogs, and playlists who accept or reject it. MixReflect is a development tool — you get structured, independent feedback from genre-matched artists so you can find and fix problems before the track goes public. They solve different problems and work best in sequence: MixReflect first to get the track right, SubmitHub after to place it.",
+      "MixReflect is the best SubmitHub alternative if your goal is to improve a track before release rather than place a finished one. SubmitHub is a distribution tool — you pay credits to pitch release-ready music to curators, blogs, and playlists who accept or reject it. MixReflect is a development tool — you get structured, independent feedback from real listeners so you can find and fix problems before the track goes public. They solve different problems and work best in sequence: MixReflect first to get the track right, SubmitHub after to place it.",
     competitorWhat:
       "SubmitHub is a music submission platform where you pay credits to send tracks to curators — blogs, Spotify playlist owners, YouTube channels, and influencers — who either accept your track for their audience or decline it, sometimes with a short note.",
     competitorStrength:
@@ -340,12 +340,12 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Who responds",
-        mixreflect: "Genre-matched artists actively making music in your space",
+        mixreflect: "An instant AI read plus a room of real listeners",
         competitor: "Curators evaluating fit for their audience or playlist",
       },
       {
         feature: "Independent feedback",
-        mixreflect: "Yes — reviewers don't see each other's responses, so you can spot patterns",
+        mixreflect: "Yes — listeners don't see each other's responses, so you can spot patterns",
         competitor: "Each curator decides independently, but feedback is placement-oriented",
       },
       {
@@ -355,7 +355,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Cost model",
-        mixreflect: "Free / reciprocal — earn credits by reviewing others",
+        mixreflect: "Free to submit · $6.95 to unlock a report · $19.95/mo unlimited",
         competitor: "Pay credits per submission",
       },
     ],
@@ -372,11 +372,11 @@ export const alternativePages: AlternativePage[] = [
     faq: [
       {
         q: "What is the best alternative to SubmitHub?",
-        a: "For pre-release feedback, MixReflect is the best SubmitHub alternative — it gives you structured, independent reviews from genre-matched artists so you can improve a track before release, rather than paid curator placement for a finished one. For placement specifically (the job SubmitHub does), the main alternatives are Groover and direct curator outreach. The right choice depends on whether you need to develop the track or distribute it.",
+        a: "For pre-release feedback, MixReflect is the best SubmitHub alternative — it gives you structured, independent reviews from real listeners so you can improve a track before release, rather than paid curator placement for a finished one. For placement specifically (the job SubmitHub does), the main alternatives are Groover and direct curator outreach. The right choice depends on whether you need to develop the track or distribute it.",
       },
       {
         q: "Is MixReflect cheaper than SubmitHub?",
-        a: `MixReflect's core model is free and reciprocal — you earn credits by reviewing other artists' tracks, so there's no per-submission fee for the main review loop. ${FREE_MODEL} SubmitHub charges credits per submission, and costs add up quickly with regular use, especially for premium curators.`,
+        a: `MixReflect is free to submit — you get an instant AI score with no per-submission fee. ${FREE_MODEL} SubmitHub charges credits per submission, and costs add up quickly with regular use, especially for premium curators.`,
       },
       {
         q: "Should I use MixReflect or SubmitHub?",
@@ -393,10 +393,10 @@ export const alternativePages: AlternativePage[] = [
     competitor: "Groover",
     metaTitle: "The Best Groover Alternative for Music Feedback | MixReflect",
     metaDescription:
-      "Looking for a Groover alternative? MixReflect gives you structured, independent feedback from genre-matched peers before release — not paid one-curator reactions.",
+      "Looking for a Groover alternative? MixReflect gives you structured, independent feedback from real listeners before release — not paid one-curator reactions.",
     h1: "The best Groover alternative for structured music feedback",
     verdict:
-      "MixReflect is the best Groover alternative if you want development feedback rather than paid curator outreach. Groover guarantees a response from each curator you pay to reach, which is useful for placement and contacts — but it's one curator's reaction per paid submission, oriented toward whether they'd feature you. MixReflect gives you multiple structured reviews from genre-matched peers, independently, so you can see where they converge and fix real problems before release. Groover is closer to a distribution and networking tool; MixReflect is a development tool.",
+      "MixReflect is the best Groover alternative if you want development feedback rather than paid curator outreach. Groover guarantees a response from each curator you pay to reach, which is useful for placement and contacts — but it's one curator's reaction per paid submission, oriented toward whether they'd feature you. MixReflect gives you multiple structured reviews from real listeners, independently, so you can see where they converge and fix real problems before release. Groover is closer to a distribution and networking tool; MixReflect is a development tool.",
     competitorWhat:
       "Groover is a submission platform where you pay to send your track to a curated list of influencers, playlists, blogs, labels, and radio — and they guarantee each one listens and responds, often with a short reaction and the option to share or sign you.",
     competitorStrength:
@@ -429,7 +429,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Cost model",
-        mixreflect: "Free / reciprocal — earn credits by reviewing others",
+        mixreflect: "Free to submit · $6.95 to unlock a report · $19.95/mo unlimited",
         competitor: "Pay per curator reached",
       },
     ],
@@ -446,7 +446,7 @@ export const alternativePages: AlternativePage[] = [
     faq: [
       {
         q: "What is the best alternative to Groover?",
-        a: "For pre-release feedback, MixReflect is the best Groover alternative — it gives you multiple structured, independent reviews from genre-matched artists so you can identify and fix problems before release. Groover is oriented toward paid curator outreach and placement; MixReflect is oriented toward developing the track. For paid curator outreach specifically, SubmitHub is the other main option.",
+        a: "For pre-release feedback, MixReflect is the best Groover alternative — it gives you multiple structured, independent reviews from real listeners so you can identify and fix problems before release. Groover is oriented toward paid curator outreach and placement; MixReflect is oriented toward developing the track. For paid curator outreach specifically, SubmitHub is the other main option.",
       },
       {
         q: "Does Groover give real feedback?",
@@ -454,7 +454,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         q: "Is MixReflect cheaper than Groover?",
-        a: `MixReflect's core review loop is free and reciprocal — you earn credits by reviewing other artists. ${FREE_MODEL} Groover charges per curator you reach, so the cost scales with how many contacts you want and how often you submit.`,
+        a: `MixReflect is free to submit — you get an instant AI score with no per-track fee. ${FREE_MODEL} Groover charges per curator you reach, so the cost scales with how many contacts you want and how often you submit.`,
       },
     ],
   },
@@ -463,10 +463,10 @@ export const alternativePages: AlternativePage[] = [
     competitor: "Playlist Push",
     metaTitle: "The Best Playlist Push Alternative for Music Feedback | MixReflect",
     metaDescription:
-      "Looking for a Playlist Push alternative? MixReflect gives you structured pre-release feedback from genre-matched artists — for improving the track, not paid playlist campaigns.",
+      "Looking for a Playlist Push alternative? MixReflect gives you structured pre-release feedback from real listeners — for improving the track, not paid playlist campaigns.",
     h1: "The best Playlist Push alternative for pre-release feedback",
     verdict:
-      "MixReflect is the best Playlist Push alternative if your goal is to make the track better, not to run a paid placement campaign. Playlist Push is a campaign tool — you pay for curators and TikTok creators to consider your finished track for playlists and content, and you get ratings and reactions back. MixReflect is a development tool — structured, independent feedback from genre-matched artists so you can fix what's weak before release. Playlist Push is for promoting a finished track; MixReflect is for getting the track ready to promote.",
+      "MixReflect is the best Playlist Push alternative if your goal is to make the track better, not to run a paid placement campaign. Playlist Push is a campaign tool — you pay for curators and TikTok creators to consider your finished track for playlists and content, and you get ratings and reactions back. MixReflect is a development tool — structured, independent feedback from real listeners so you can fix what's weak before release. Playlist Push is for promoting a finished track; MixReflect is for getting the track ready to promote.",
     competitorWhat:
       "Playlist Push is a paid promotion platform that pitches your finished track to independent playlist curators and TikTok creators for potential placement, returning curator ratings and feedback as part of the campaign.",
     competitorStrength:
@@ -484,7 +484,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Who responds",
-        mixreflect: "Genre-matched artists making music in your space",
+        mixreflect: "An instant AI read plus a room of real listeners",
         competitor: "Playlist curators and TikTok creators evaluating for placement",
       },
       {
@@ -494,7 +494,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Cost model",
-        mixreflect: "Free / reciprocal — earn credits by reviewing others",
+        mixreflect: "Free to submit · $6.95 to unlock a report · $19.95/mo unlimited",
         competitor: "Paid campaign pricing",
       },
     ],
@@ -511,15 +511,15 @@ export const alternativePages: AlternativePage[] = [
     faq: [
       {
         q: "What is the best alternative to Playlist Push?",
-        a: "It depends on your goal. For improving a track before release, MixReflect is the best alternative — structured, independent feedback from genre-matched artists. For paid placement specifically (what Playlist Push does), SubmitHub and Groover are the closest alternatives. Playlist Push is a promotion tool, so the right alternative depends on whether you need to develop the track or distribute it.",
+        a: "It depends on your goal. For improving a track before release, MixReflect is the best alternative — structured, independent feedback from real listeners. For paid placement specifically (what Playlist Push does), SubmitHub and Groover are the closest alternatives. Playlist Push is a promotion tool, so the right alternative depends on whether you need to develop the track or distribute it.",
       },
       {
         q: "Is MixReflect a playlist promotion service?",
-        a: "No. MixReflect is a pre-release feedback platform, not a playlist promotion service. It's designed to help you improve a track before you release it by getting structured feedback from genre-matched artists. Once your track is ready, you'd use a promotion tool like Playlist Push, SubmitHub, or the Spotify for Artists pitch tool to pursue placement.",
+        a: "No. MixReflect is a pre-release feedback platform, not a playlist promotion service. It's designed to help you improve a track before you release it by getting structured feedback from real listeners. Once your track is ready, you'd use a promotion tool like Playlist Push, SubmitHub, or the Spotify for Artists pitch tool to pursue placement.",
       },
       {
         q: "Should I get feedback before running a Playlist Push campaign?",
-        a: "Yes — paid promotion is far more effective on a track that's already been quality-checked. Running a campaign on a track with fixable issues (buried vocals, a slow intro, an energy dip) wastes budget and gets weaker curator responses. Getting structured feedback first on MixReflect, fixing any patterns reviewers flag, then promoting the stronger version gets more out of every campaign dollar.",
+        a: "Yes — paid promotion is far more effective on a track that's already been quality-checked. Running a campaign on a track with fixable issues (buried vocals, a slow intro, an energy dip) wastes budget and gets weaker curator responses. Getting structured feedback first on MixReflect, fixing any patterns listeners flag, then promoting the stronger version gets more out of every campaign dollar.",
       },
     ],
   },

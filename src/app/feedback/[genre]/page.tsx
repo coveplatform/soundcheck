@@ -75,13 +75,13 @@ export default async function GenreFeedbackPage({
     "@type": "SoftwareApplication",
     name: "MixReflect",
     applicationCategory: "MusicApplication",
-    description: `MixReflect is a structured ${page.name.toLowerCase()} music feedback platform where independent artists upload unreleased tracks and receive honest, structured reviews from genre-matched peers.`,
+    description: `MixReflect scores your ${page.name.toLowerCase()} track instantly with AI — a rating out of 100, a verdict and a breakdown across hook, production, retention, emotion and commercial pull — plus honest reactions from a room of real listeners.`,
     url: "https://mixreflect.com",
     offers: {
       "@type": "Offer",
       price: "0",
       priceCurrency: "USD",
-      description: "Free to start — earn credits by reviewing other artists",
+      description: "Free to submit — get your instant AI score and a teaser of the full report",
     },
   };
 
@@ -103,20 +103,20 @@ export default async function GenreFeedbackPage({
     {
       icon: <Zap className="h-5 w-5 text-purple-400" />,
       step: "1",
-      title: "Upload your track",
-      body: `Paste a SoundCloud, Bandcamp, or YouTube link — or upload an audio file directly. Select ${page.name} as your genre so reviewers are matched correctly.`,
-    },
-    {
-      icon: <Users className="h-5 w-5 text-purple-400" />,
-      step: "2",
-      title: `${page.name} artists review it`,
-      body: `Genre-matched ${page.name.toLowerCase()} artists on the platform receive your track and fill out a structured review independently — covering first impression, what's working, the main weakness, and production quality.`,
+      title: "Paste your track link",
+      body: `Drop a SoundCloud, Bandcamp, or YouTube link — no upload, no account hoops. Free to submit your ${page.name.toLowerCase()} track.`,
     },
     {
       icon: <BarChart3 className="h-5 w-5 text-purple-400" />,
+      step: "2",
+      title: "Get your instant AI read",
+      body: `In seconds you get a score out of 100, a verdict, and a breakdown across hook, production, retention, emotion and commercial pull — tuned to what matters in ${page.name.toLowerCase()}.`,
+    },
+    {
+      icon: <Users className="h-5 w-5 text-purple-400" />,
       step: "3",
-      title: "See the patterns",
-      body: "When multiple reviewers flag the same thing, it appears clearly in your results. That's the signal worth acting on. When feedback is scattered, the track is ready.",
+      title: "A room of real listeners weighs in",
+      body: "Then real listeners react with honest, specific takes as they land in your report. When several flag the same thing without seeing each other, that's the signal worth acting on.",
     },
   ];
 
@@ -190,12 +190,12 @@ export default async function GenreFeedbackPage({
                 size="lg"
                 className="bg-purple-600 text-white hover:bg-purple-700 active:bg-purple-800 font-black text-lg px-8 py-6 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[6px] active:translate-y-[6px] transition-all duration-150 ease-out"
               >
-                Get feedback free <ArrowRight className="ml-2 h-5 w-5" />
+                Score my track free <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </SignupLink>
           </div>
           <p className="mt-4 text-sm text-neutral-400">
-            Free to start · Earn credits by reviewing others · No credit card required
+            Free to submit · Instant AI score + real listeners · No credit card required
           </p>
         </div>
       </section>
@@ -204,7 +204,7 @@ export default async function GenreFeedbackPage({
       <section className="py-14 sm:py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-black text-neutral-950 mb-3">
-            What {page.name} reviewers actually catch
+            What {page.name} listeners actually catch
           </h2>
           <p className="text-neutral-500 mb-8 max-w-2xl leading-relaxed">
             {page.reviewerBlurb}
@@ -304,10 +304,10 @@ export default async function GenreFeedbackPage({
               After producing a track, you&apos;ve heard it hundreds of times. You know what the intro is building to, so it doesn&apos;t feel slow. You know the vocals are there, so the burial in the mix doesn&apos;t register. You&apos;re hearing your memory of the track, not the track itself.
             </p>
             <p className="text-neutral-400 leading-relaxed mb-4">
-              A reviewer hearing it for the first time catches exactly what a new listener catches — no context, no forgiveness. That&apos;s the feedback that actually changes something before you release.
+              A listener hearing it for the first time catches exactly what a new listener catches — no context, no forgiveness. That&apos;s the feedback that actually changes something before you release.
             </p>
             <p className="text-neutral-400 leading-relaxed mb-8">
-              One person&apos;s note might be taste. When three independent reviewers flag the same moment without seeing each other&apos;s responses, it&apos;s real — and it&apos;s almost always fixable before you put the track out.
+              One person&apos;s note might be taste. When several independent listeners flag the same moment without seeing each other&apos;s responses, it&apos;s real — and it&apos;s almost always fixable before you put the track out.
             </p>
             <SignupLink>
               <Button className="bg-white text-neutral-950 hover:bg-neutral-100 font-black border-2 border-neutral-200 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
@@ -379,7 +379,7 @@ export default async function GenreFeedbackPage({
             Ready to find out what&apos;s actually working?
           </h2>
           <p className="text-purple-200 mb-8 max-w-xl mx-auto">
-            Upload your {page.name.toLowerCase()} track and get structured feedback from genre-matched artists. Free to start — no credit card required.
+            Paste your {page.name.toLowerCase()} track and get an instant AI score plus honest reactions from a room of real listeners. Free to submit — no credit card required.
           </p>
           <SignupLink>
             <Button
@@ -390,7 +390,7 @@ export default async function GenreFeedbackPage({
             </Button>
           </SignupLink>
           <p className="mt-4 text-purple-300 text-sm">
-            Free to start · Earn credits by reviewing others · No credit card required
+            Free to submit · Instant AI score + real listeners · No credit card required
           </p>
         </div>
       </section>

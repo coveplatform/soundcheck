@@ -2,11 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
 import { posts, getPost } from "@/lib/blog-posts";
 import type { Metadata } from "next";
 
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
 const ACCENT = "#6ee7ff";
 
@@ -85,7 +86,15 @@ export default async function BlogPostPage({
   } : null;
 
   return (
-    <div>
+    <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black`}>
+      {/* grain */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.05] z-0 mix-blend-screen"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+        }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
@@ -118,7 +127,7 @@ export default async function BlogPostPage({
       </header>
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <div className="bg-[#0d0d0d]">
+      <div className="relative z-10 bg-[#0d0d0d] border-b border-white/10">
         <div className="max-w-4xl mx-auto px-4 sm:px-8 pt-12 pb-16 sm:pt-16 sm:pb-20">
           <Link
             href="/blog"
@@ -164,14 +173,14 @@ export default async function BlogPostPage({
       )}
 
       {/* ── CONTENT ──────────────────────────────────────────────── */}
-      <div className="bg-[#faf8f5]">
+      <div className="relative z-10 bg-[#0a0a0a]">
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-14 sm:py-20">
           {post.content.map((block, i) => {
             if (block.type === "paragraph") {
               return (
                 <p
                   key={i}
-                  className="text-[1.0625rem] text-black/75 leading-[1.8] mb-6 font-medium"
+                  className="text-[1.0625rem] text-white/70 leading-[1.8] mb-6"
                 >
                   {block.text}
                 </p>
@@ -182,7 +191,7 @@ export default async function BlogPostPage({
               return (
                 <h2
                   key={i}
-                  className="text-2xl sm:text-3xl font-black text-black tracking-tight leading-tight mt-14 mb-5"
+                  className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight mt-14 mb-5"
                 >
                   {block.text}
                 </h2>
@@ -192,9 +201,9 @@ export default async function BlogPostPage({
             if (block.type === "quote") {
               return (
                 <div key={i} className="my-10 -mx-4 sm:-mx-8">
-                  <div className="bg-[#0d0d0d] px-8 sm:px-12 py-10 border-l-4 border-purple-500">
+                  <div className="bg-[#101010] px-8 sm:px-12 py-10 border-l-4" style={{ borderColor: ACCENT }}>
                     <p
-                      className="font-black text-white leading-tight tracking-tight"
+                      className="font-extrabold text-white leading-tight tracking-tight"
                       style={{ fontSize: "clamp(1.3rem, 3vw, 1.75rem)" }}
                     >
                       &ldquo;{block.text}&rdquo;
@@ -209,8 +218,8 @@ export default async function BlogPostPage({
                 <ul key={i} className="mb-6 space-y-3">
                   {block.items.map((item, j) => (
                     <li key={j} className="flex items-start gap-3">
-                      <span className="mt-2 w-1.5 h-1.5 rounded-full bg-purple-500 flex-shrink-0" />
-                      <span className="text-[1.0625rem] text-black/75 leading-[1.8] font-medium">
+                      <span className="mt-2.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: ACCENT }} />
+                      <span className="text-[1.0625rem] text-white/70 leading-[1.8]">
                         {item}
                       </span>
                     </li>
@@ -232,7 +241,7 @@ export default async function BlogPostPage({
                     />
                   </div>
                   {block.caption && (
-                    <figcaption className="mt-3 px-4 sm:px-8 text-xs text-black/40 font-medium italic">
+                    <figcaption className="mt-3 px-4 sm:px-8 text-xs text-white/35 italic">
                       {block.caption}
                     </figcaption>
                   )}
@@ -243,16 +252,16 @@ export default async function BlogPostPage({
             if (block.type === "faq") {
               return (
                 <div key={i} className="mt-14 mb-6">
-                  <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight leading-tight mb-8">
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight mb-8">
                     Frequently asked questions
                   </h2>
-                  <div className="space-y-0 border-t border-black/10">
+                  <div className="space-y-0 border-t border-white/10">
                     {block.items.map((item, j) => (
-                      <div key={j} className="border-b border-black/10 py-6">
-                        <p className="font-black text-black text-base tracking-tight mb-3">
+                      <div key={j} className="border-b border-white/10 py-6">
+                        <p className="font-extrabold text-white text-base tracking-tight mb-3">
                           {item.q}
                         </p>
-                        <p className="text-[1.0rem] text-black/65 leading-[1.8] font-medium">
+                        <p className="text-[1.0rem] text-white/60 leading-[1.8]">
                           {item.a}
                         </p>
                       </div>
@@ -265,21 +274,21 @@ export default async function BlogPostPage({
             if (block.type === "cta") {
               return (
                 <div key={i} className="mt-14 -mx-4 sm:-mx-8">
-                  <div className="bg-purple-600 px-8 sm:px-12 py-12 border-t-4 border-black">
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 mb-3">
+                  <div className="px-8 sm:px-12 py-12" style={{ background: ACCENT }}>
+                    <p className={`${mono.className} text-[11px] font-bold uppercase tracking-[0.3em] text-black/55 mb-3`}>
                       MixReflect
                     </p>
-                    <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight mb-6">
+                    <h3 className="text-2xl sm:text-3xl font-extrabold text-black tracking-tight leading-tight mb-6">
                       Find out what&apos;s working<br />in your track.
                     </h3>
-                    <p className="text-white/70 text-sm font-medium mb-8 leading-relaxed max-w-sm">
-                      Upload your track and get structured feedback from artists in your genre — usually within 24 hours.
+                    <p className="text-black/70 text-sm mb-8 leading-relaxed max-w-sm">
+                      Paste a link and get an instant AI score — out of 100, with a verdict and a full breakdown — plus honest reactions from a room of real listeners. Free to submit.
                     </p>
                     <Link
-                      href="/signup"
-                      className="inline-flex items-center gap-2 bg-white text-black font-black px-8 py-4 text-sm hover:bg-black hover:text-white transition-colors border-2 border-white"
+                      href="/"
+                      className="inline-flex items-center gap-2 bg-black text-[#6ee7ff] font-extrabold px-8 py-4 text-sm hover:bg-[#141414] transition-colors"
                     >
-                      Start free
+                      Score my track free
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                   </div>
@@ -293,12 +302,12 @@ export default async function BlogPostPage({
       </div>
 
       {/* ── MORE POSTS ───────────────────────────────────────────── */}
-      <div className="border-t-4 border-black bg-[#faf8f5]">
+      <div className="relative z-10 border-t border-white/10 bg-[#0a0a0a]">
         <div className="max-w-4xl mx-auto px-4 sm:px-8 py-12">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/25 mb-6">
+          <p className={`${mono.className} text-[11px] uppercase tracking-[0.3em] text-white/30 mb-6`}>
             More from The Drop
           </p>
-          <div className="grid sm:grid-cols-2 gap-px bg-black border border-black">
+          <div className="grid sm:grid-cols-2 gap-px bg-white/10 border border-white/10">
             {posts
               .filter((p) => p.slug !== post.slug)
               .slice(0, 2)
@@ -306,19 +315,19 @@ export default async function BlogPostPage({
                 <Link
                   key={p.slug}
                   href={`/blog/${p.slug}`}
-                  className="group bg-[#faf8f5] p-7 hover:bg-white transition-colors flex flex-col gap-3"
+                  className="group bg-[#0a0a0a] p-7 hover:bg-[#0e0e0e] transition-colors flex flex-col gap-3"
                 >
-                  <span className="self-start text-[10px] font-black uppercase tracking-[0.25em] text-white px-2 py-1 bg-black">
+                  <span className={`${mono.className} self-start text-[10px] uppercase tracking-[0.25em] text-black px-2 py-1`} style={{ background: ACCENT }}>
                     {p.category}
                   </span>
-                  <h3 className="font-black text-black text-lg tracking-tight leading-tight group-hover:text-purple-700 transition-colors">
+                  <h3 className="font-extrabold text-white text-lg tracking-tight leading-tight group-hover:text-[#6ee7ff] transition-colors">
                     {p.title}
                   </h3>
                   <div className="mt-auto flex items-center justify-between pt-3">
-                    <span className="text-[11px] font-bold text-black/25 uppercase tracking-widest">
+                    <span className={`${mono.className} text-[11px] text-white/30 uppercase tracking-widest`}>
                       {p.readTime}
                     </span>
-                    <ArrowRight className="h-4 w-4 text-black/25 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="h-4 w-4 text-white/25 group-hover:text-[#6ee7ff] group-hover:translate-x-1 transition-all" />
                   </div>
                 </Link>
               ))}

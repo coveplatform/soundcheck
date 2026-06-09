@@ -267,14 +267,14 @@ export default async function AlternativePage({
             Get your track right before you pitch it
           </h2>
           <p className="text-purple-200 mb-8 max-w-xl mx-auto">
-            Upload your track and get structured feedback from genre-matched artists. Free to start — no credit card required.
+            Paste your track and get an instant AI score plus honest reactions from a room of real listeners. Free to submit — no credit card required.
           </p>
           <SignupLink>
             <Button
               size="lg"
               className="bg-white text-purple-600 hover:bg-neutral-100 font-black border-2 border-white text-base px-8 py-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
-              Get feedback free <ArrowRight className="ml-2 h-5 w-5" />
+              Score my track free <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </SignupLink>
         </div>
