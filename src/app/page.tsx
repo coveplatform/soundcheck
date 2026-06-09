@@ -42,16 +42,16 @@ const SUPPORTED: { name: string; path: string; color: string }[] = [
   { name: "bandcamp", path: BC_PATH, color: "#1DA0C3" },
 ];
 
-// ── Assignment sequence ─────────────────────────────────────────────
+// ── Instant AI read sequence (the room of real listeners comes after unlock) ──
 
 const STEPS = [
   "fetching your track",
   "mapping the energy curve",
   "checking the hook + structure",
   "weighing it across 5 dimensions",
+  "scoring against released music",
   "writing your instant read",
-  "assigning 5 real listeners to your track",
-  "the room is tuning in…",
+  "almost there…",
 ];
 
 const CHECKS: { t: string; d: string }[] = [
@@ -1324,7 +1324,7 @@ export default function ScorePage() {
                       disabled={busy}
                       className="group w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-base px-8 py-4 hover:bg-white transition-colors disabled:opacity-60"
                     >
-                      {busy ? "opening…" : "see results"}
+                      {busy ? "opening…" : "see my report"}
                       {!busy && <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />}
                     </button>
                     {error && (

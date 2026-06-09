@@ -17,15 +17,15 @@ const GENRES = [
   "Classical", "Country", "Latin", "Other",
 ];
 
-// Same progress steps the landing shows while it reads a track.
+// Same instant-AI-read steps the landing shows (the room comes after unlock).
 const STEPS = [
   "fetching your track",
   "mapping the energy curve",
   "checking the hook + structure",
   "weighing it across 5 dimensions",
+  "scoring against released music",
   "writing your instant read",
-  "assigning 5 real listeners to your track",
-  "the room is tuning in…",
+  "almost there…",
 ];
 
 type Meta = { title: string; artist: string | null; artworkUrl: string | null };
