@@ -46,6 +46,7 @@ export default function SubmitScorePage() {
   const [metaLoading, setMetaLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadedName, setUploadedName] = useState("");
+  const [dragging, setDragging] = useState(false);
 
   const MAX_FILE_BYTES = 25 * 1024 * 1024;
   const handleFile = async (file: File) => {
@@ -197,7 +198,11 @@ export default function SubmitScorePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <Field label="track link" required>
             {!isUrl ? (
-              <div>
+              <div
+                onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={(e) => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
+              >
                 <input
                   type="url"
                   value={trackUrl}
@@ -211,12 +216,18 @@ export default function SubmitScorePage() {
                   <div className="h-px bg-white/10 flex-1" />
                 </div>
                 <label
-                  className={`${mono.className} mt-3 flex items-center justify-center gap-2 border border-white/20 hover:border-[#6ee7ff] text-white/70 hover:text-white text-[13px] py-3.5 cursor-pointer transition-colors ${uploading ? "opacity-60 pointer-events-none" : ""}`}
+                  className={`${mono.className} mt-3 flex items-center justify-center gap-2 border border-dashed text-[13px] py-3.5 cursor-pointer transition-colors ${
+                    dragging
+                      ? "border-[#6ee7ff] bg-[#6ee7ff]/10 text-white"
+                      : "border-white/20 hover:border-[#6ee7ff] text-white/70 hover:text-white"
+                  } ${uploading ? "opacity-60 pointer-events-none" : ""}`}
                 >
                   {uploading ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> uploading…</>
+                  ) : dragging ? (
+                    "drop your mp3 here"
                   ) : (
-                    <><Upload className="h-4 w-4" /> upload an mp3 (max 25mb)</>
+                    <><Upload className="h-4 w-4" /> upload or drag an mp3 (max 25mb)</>
                   )}
                   <input
                     type="file"

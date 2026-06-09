@@ -9,7 +9,7 @@ import { Logo } from "@/components/ui/logo";
 import { ScoreRing } from "@/components/score/score-ring";
 import { RealReviews } from "@/components/landing/real-reviews";
 import { posts } from "@/lib/blog-posts";
-import { ArrowRight, ArrowDown, Music, Loader2, X, Zap, Users, Headphones, Play } from "lucide-react";
+import { ArrowRight, ArrowDown, Music, Loader2, X, Zap, Users, Headphones, Play, Upload } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -335,7 +335,41 @@ export default function ScorePage() {
   const [busy, setBusy] = useState(false);
   const [subscribing, setSubscribing] = useState<"monthly" | "annual" | null>(null);
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadedName, setUploadedName] = useState("");
+  const [dragging, setDragging] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
+
+  // Upload an mp3 (anonymous-friendly): presign → PUT → use the file URL.
+  const handleFile = async (file: File) => {
+    if (!file) return;
+    if (!/\.(mp3)$/i.test(file.name) && !/audio\/(mpeg|mp3)/i.test(file.type)) {
+      setError("please choose an mp3 file"); return;
+    }
+    if (file.size > 25 * 1024 * 1024) { setError("file too large (max 25mb)"); return; }
+    setError("");
+    setUploading(true);
+    try {
+      const presignRes = await fetch("/api/uploads/track/presign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, contentType: file.type || "audio/mpeg", contentLength: file.size }),
+      });
+      if (!presignRes.ok) {
+        const d = await presignRes.json().catch(() => null);
+        setError(d?.error ?? "upload failed"); setUploading(false); return;
+      }
+      const { uploadUrl, fileUrl } = await presignRes.json();
+      const up = await fetch(uploadUrl, { method: "PUT", body: file, headers: { "Content-Type": file.type || "audio/mpeg" } });
+      if (!up.ok) { setError("upload failed. try again."); setUploading(false); return; }
+      setUploadedName(file.name);
+      setTrackUrl(fileUrl);
+    } catch {
+      setError("upload failed. try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // ── debounced track preview ──
   useEffect(() => {
@@ -603,13 +637,40 @@ export default function ScorePage() {
             {/* paste box + preview card */}
             <form onSubmit={start} className="mt-8 max-w-xl">
               {!isUrl ? (
-                <input
-                  type="url"
-                  value={trackUrl}
-                  onChange={(e) => setTrackUrl(e.target.value)}
-                  placeholder="paste a soundcloud, youtube or mp3 link…"
-                  className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-5 py-4 text-[15px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
-                />
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                  onDragLeave={() => setDragging(false)}
+                  onDrop={(e) => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
+                >
+                  <input
+                    type="url"
+                    value={trackUrl}
+                    onChange={(e) => setTrackUrl(e.target.value)}
+                    placeholder="paste a soundcloud, youtube or mp3 link…"
+                    className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-5 py-4 text-[15px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
+                  />
+                  <label
+                    className={`${mono.className} mt-2.5 flex items-center justify-center gap-2 border border-dashed py-3.5 text-[13px] cursor-pointer transition-colors ${
+                      dragging
+                        ? "border-[#6ee7ff] bg-[#6ee7ff]/10 text-white"
+                        : "border-white/20 hover:border-[#6ee7ff] text-white/60 hover:text-white"
+                    } ${uploading ? "opacity-60 pointer-events-none" : ""}`}
+                  >
+                    {uploading ? (
+                      <><Loader2 className="h-4 w-4 animate-spin" /> uploading…</>
+                    ) : dragging ? (
+                      "drop your mp3 here"
+                    ) : (
+                      <><Upload className="h-4 w-4" /> upload or drag an mp3 (max 25mb)</>
+                    )}
+                    <input
+                      type="file"
+                      accept="audio/mpeg,audio/mp3,.mp3"
+                      className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+                    />
+                  </label>
+                </div>
               ) : (
                 <div
                   className="flex items-center gap-4 bg-[#141414] border p-3.5"
@@ -646,10 +707,10 @@ export default function ScorePage() {
                     ) : (
                       <>
                         <p className="text-[15px] font-bold text-white truncate normal-case">
-                          link added
+                          {uploadedName ? "uploaded" : "link added"}
                         </p>
                         <p className={`${mono.className} text-[12px] text-white/45 truncate normal-case mt-0.5`}>
-                          {host || "ready to go"}
+                          {uploadedName || host || "ready to go"}
                         </p>
                       </>
                     )}
@@ -660,7 +721,7 @@ export default function ScorePage() {
                     </span>
                     <button
                       type="button"
-                      onClick={() => setTrackUrl("")}
+                      onClick={() => { setTrackUrl(""); setUploadedName(""); }}
                       aria-label="change track"
                       className="text-white/35 hover:text-white transition-colors"
                     >

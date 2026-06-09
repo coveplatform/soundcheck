@@ -50,11 +50,9 @@ function getS3Client(): { client: S3Client | null; missingEnv: string[] } {
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // The score product is email-first — uploads are allowed before sign-in
+    // (the submit step still authenticates). mp3-only + 25MB cap below guard it.
+    await getServerSession(authOptions);
 
     const bucket = process.env.UPLOADS_S3_BUCKET;
     const publicBaseUrl = process.env.UPLOADS_PUBLIC_BASE_URL;
