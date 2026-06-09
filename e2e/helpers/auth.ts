@@ -40,17 +40,10 @@ export async function signup(page: Page, user: TestUser) {
     throw new Error('Signup redirected to login - authentication may have failed');
   }
 
-  // If we're on onboarding, success - wait for the form to load
-  if (currentUrl.includes('/onboarding')) {
-    try {
-      // Wait for the onboarding form to be ready (step 1: artist name)
-      await page.waitForSelector('#artistName, button:has-text("Continue")', { timeout: 15000 });
-      return; // Success!
-    } catch (error) {
-      // Onboarding page loaded but form didn't appear
-      const pageText = await page.textContent('body');
-      throw new Error(`On onboarding page but form not loading. Page text: ${pageText?.substring(0, 200)}`);
-    }
+  // Post-cutover (2026-06-09): new signups land in the new product at /dashboard.
+  // (Legacy Classic onboarding still accepted if a callbackUrl routed there.)
+  if (currentUrl.includes('/dashboard') || currentUrl.includes('/onboarding')) {
+    return; // Success!
   }
 
   // We're somewhere else - provide details
@@ -58,7 +51,7 @@ export async function signup(page: Page, user: TestUser) {
   const errorText = errorElement ? await errorElement.textContent() : 'No error message';
 
   throw new Error(
-    `Signup did not reach onboarding page.\n` +
+    `Signup did not reach the dashboard.\n` +
     `Current URL: ${currentUrl}\n` +
     `Error: ${errorText}`
   );

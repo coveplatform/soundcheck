@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /dashboard/
+Disallow: /classic
 Disallow: /api/
 Disallow: /login
 Disallow: /signup/verify

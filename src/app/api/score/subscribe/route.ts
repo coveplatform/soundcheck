@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       process.env.NEXT_PUBLIC_SITE_URL ||
       "http://localhost:3000";
 
-    const success = returnTo?.startsWith("/") ? returnTo : "/reports";
+    const success = returnTo?.startsWith("/") ? returnTo : "/dashboard";
 
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "subscription",

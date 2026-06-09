@@ -3,9 +3,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
+import { PRO_SALE_ACTIVE, PRO_SALE_PERCENT_OFF } from "@/lib/pricing";
 
 // Cache the price ID in memory so we only create once per server lifecycle
 let cachedPriceId: string | null = null;
+// Cache the sale coupon ID per server lifecycle
+let cachedSaleCouponId: string | null = null;
 // Track whether we've synced the product description this server lifecycle
 let productDescriptionSynced = false;
 
@@ -72,6 +75,30 @@ async function getOrCreateProMonthlyPrice(): Promise<string> {
   cachedPriceId = price.id;
   console.log(`Created Stripe Pro Monthly price: ${price.id} (product: ${product.id})`);
   return cachedPriceId;
+}
+
+// Returns the Stripe coupon ID for the active sale, creating it if needed.
+async function getOrCreateSaleCoupon(): Promise<string> {
+  if (cachedSaleCouponId) return cachedSaleCouponId;
+  const stripe = getStripe();
+  const COUPON_ID = `mixreflect_pro_sale_${PRO_SALE_PERCENT_OFF}pct`;
+  try {
+    const existing = await stripe.coupons.retrieve(COUPON_ID);
+    cachedSaleCouponId = existing.id;
+    return cachedSaleCouponId;
+  } catch {
+    // Coupon doesn't exist yet — create it
+    const coupon = await stripe.coupons.create({
+      id: COUPON_ID,
+      percent_off: PRO_SALE_PERCENT_OFF,
+      duration: "once",
+      name: `MixReflect Pro ${PRO_SALE_PERCENT_OFF}% Off Launch Sale`,
+      metadata: { app: "mixreflect", type: "pro_launch_sale" },
+    });
+    cachedSaleCouponId = coupon.id;
+    console.log(`Created Stripe sale coupon: ${coupon.id}`);
+    return cachedSaleCouponId;
+  }
 }
 
 // Sync the Stripe product description once per server lifecycle.
@@ -151,11 +178,19 @@ export async function POST() {
       process.env.NEXT_PUBLIC_SITE_URL ||
       "http://localhost:3000";
 
+    // Resolve sale discount — apply a Stripe coupon when the sale is active.
+    const saleDiscounts: { coupon: string }[] = [];
+    if (PRO_SALE_ACTIVE) {
+      const couponId = await getOrCreateSaleCoupon();
+      saleDiscounts.push({ coupon: couponId });
+    }
+
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
+      ...(saleDiscounts.length > 0 && { discounts: saleDiscounts }),
       success_url: `${appUrl}/pro?success=true`,
       cancel_url: `${appUrl}/pro?canceled=true`,
       metadata: {

@@ -183,7 +183,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             }
             if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
               // Keep loading state active during navigation
-              router.push("/dashboard");
+              router.push("/classic/dashboard");
               router.refresh();
               return;
             }
@@ -505,7 +505,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
             // Keep loading state active during navigation
-            router.push("/dashboard");
+            router.push("/classic/dashboard");
             router.refresh();
             return;
           }
@@ -564,7 +564,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
             // Keep loading state active during navigation
-            router.push("/dashboard");
+            router.push("/classic/dashboard");
             router.refresh();
             return;
           }
@@ -624,7 +624,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
             // Keep loading state active during navigation
-            router.push("/dashboard");
+            router.push("/classic/dashboard");
             router.refresh();
             return;
           }
@@ -729,7 +729,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             return;
           }
           if (typeof message === "string" && message.toLowerCase().includes("restricted")) {
-            router.push("/dashboard");
+            router.push("/classic/dashboard");
             router.refresh();
             return;
           }
@@ -782,7 +782,7 @@ export default function ReviewPage({ params }: { params: Promise<{ id: string }>
             return;
           }
           if (msg.includes("restricted")) {
-            router.push("/dashboard");
+            router.push("/classic/dashboard");
             router.refresh();
             return;
           }

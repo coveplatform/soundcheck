@@ -82,7 +82,7 @@ export function AccountSettingsForm({
     try {
       const res = await fetch("/api/account/delete", { method: "DELETE" });
       if (res.ok) {
-        await signOut({ callbackUrl: "/score" });
+        await signOut({ callbackUrl: "/" });
         return;
       }
     } finally {
@@ -140,7 +140,7 @@ export function AccountSettingsForm({
             <p className="text-[14px] text-white/75 normal-case">
               You&apos;re on pay-per-track ($6.95 each).
             </p>
-            <Link href="/score#pricing" className="bg-[#6ee7ff] text-black font-extrabold text-[13px] px-4 py-2.5 hover:bg-white transition-colors">
+            <Link href="/#pricing" className="bg-[#6ee7ff] text-black font-extrabold text-[13px] px-4 py-2.5 hover:bg-white transition-colors">
               go unlimited →
             </Link>
           </div>
@@ -176,7 +176,7 @@ export function AccountSettingsForm({
           </button>
           <div>
             <button
-              onClick={() => signOut({ callbackUrl: "/score" })}
+              onClick={() => signOut({ callbackUrl: "/" })}
               className={`${mono.className} inline-flex items-center gap-2 text-[13px] text-white/65 hover:text-white transition-colors`}
             >
               <LogOut className="h-3.5 w-3.5" /> sign out

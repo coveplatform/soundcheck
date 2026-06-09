@@ -82,7 +82,7 @@ export default function OnboardingPage() {
       const ok = await saveProfile();
       if (!ok) { setIsLoading(false); return; }
       await updateSession();
-      router.push("/dashboard"); router.refresh();
+      router.push("/classic/dashboard"); router.refresh();
     } catch { setError("Something went wrong. Please try again."); setIsLoading(false); }
   };
 
@@ -107,7 +107,7 @@ export default function OnboardingPage() {
         body: JSON.stringify({ desiredReviews: 1 }),
       });
       await updateSession();
-      router.push("/dashboard?welcome=1"); router.refresh();
+      router.push("/classic/dashboard?welcome=1"); router.refresh();
     } catch { setError("Something went wrong. Please try again."); setIsSubmittingTrack(false); }
   };
 

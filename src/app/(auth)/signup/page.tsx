@@ -142,9 +142,9 @@ export default function SignupPage() {
         return;
       }
 
-      // Redirect to submit page or callback URL
-      // Keep loading state active during navigation
-      router.push(callbackUrl || "/onboarding");
+      // Land new users in the new product (the report dashboard) unless a
+      // specific callbackUrl was supplied. Classic onboarding is retired.
+      router.push(callbackUrl || "/dashboard");
       router.refresh();
     } catch (err) {
       if (err instanceof TypeError && err.message.includes("fetch")) {
@@ -184,7 +184,7 @@ export default function SignupPage() {
         type="button"
         variant="outline"
         className="w-full h-12 bg-white border-2 border-neutral-300 text-neutral-950 hover:bg-neutral-100 hover:border-neutral-400 font-bold transition-colors duration-150 ease-out motion-reduce:transition-none"
-        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/onboarding" })}
+        onClick={() => signIn("google", { callbackUrl: callbackUrl || "/dashboard" })}
       >
         <GoogleIcon className="h-5 w-5 mr-2" />
         Continue with Google

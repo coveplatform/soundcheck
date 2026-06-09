@@ -49,9 +49,9 @@ export async function POST(request: Request) {
       });
     }
 
-    // Determine the return URL — defaults to /dashboard, but allow callers
-    // to send users back to the page they came from (e.g. /submit, /tracks/:id/request-reviews)
-    let returnPath = "/dashboard";
+    // Determine the return URL — defaults to the Classic dashboard, but allow
+    // callers to send users back to the page they came from (e.g. /submit, /tracks/:id/request-reviews)
+    let returnPath = "/classic/dashboard";
     try {
       const body = await request.json().catch(() => null);
       if (body && typeof body.returnPath === "string" && body.returnPath.startsWith("/")) {

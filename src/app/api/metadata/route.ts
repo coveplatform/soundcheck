@@ -143,6 +143,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       title: data.title || "Untitled Track",
+      artist: data.author_name || null,
       artworkUrl: data.thumbnail_url,
       embedUrl, // Include embed URL for Bandcamp
     });

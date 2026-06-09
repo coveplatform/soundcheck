@@ -118,7 +118,7 @@ export async function sendTotdWeeklyEmail(params: {
 
     ${pickRows}
 
-    ${emailButton("Listen on MixReflect →", `${appUrl}/dashboard`)}
+    ${emailButton("Listen on MixReflect →", `${appUrl}/classic/dashboard`)}
 
     <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 18px; margin-top: 24px; text-align: center;">
       <p style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: ${COLORS.black};">

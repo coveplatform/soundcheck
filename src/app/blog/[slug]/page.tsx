@@ -100,7 +100,7 @@ export default async function BlogPostPage({
       {/* ── NAV (matches the score product) ──────────────────────── */}
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
         <div className="max-w-4xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between">
-          <Link href="/score">
+          <Link href="/">
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
           <div className={`${mono.className} flex items-center gap-5 text-[13px] lowercase`}>
@@ -108,7 +108,7 @@ export default async function BlogPostPage({
               ← the drop
             </Link>
             <Link
-              href="/score#pricing"
+              href="/#pricing"
               className="bg-[#6ee7ff] text-black px-3.5 py-1.5 font-bold transition-colors hover:bg-white"
             >
               get feedback

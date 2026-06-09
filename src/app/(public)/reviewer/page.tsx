@@ -39,10 +39,10 @@ export default async function ReviewerLandingPage() {
     <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase`}>
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
         <div className="max-w-3xl mx-auto px-5 h-16 flex items-center justify-between">
-          <Link href="/score">
+          <Link href="/">
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
-          <Link href="/score" className={`${mono.className} text-[13px] text-white/65 hover:text-white transition-colors`}>
+          <Link href="/" className={`${mono.className} text-[13px] text-white/65 hover:text-white transition-colors`}>
             ← back
           </Link>
         </div>

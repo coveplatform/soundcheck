@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AccountSettingsPage() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) redirect("/login?callbackUrl=/reports/settings");
+  if (!session?.user?.id) redirect("/login?callbackUrl=/dashboard/settings");
 
   const [user, subscribed] = await Promise.all([
     prisma.user.findUnique({
@@ -30,10 +30,10 @@ export default async function AccountSettingsPage() {
     <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase`}>
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
         <div className="max-w-2xl mx-auto px-5 h-16 flex items-center justify-between">
-          <Link href="/score">
+          <Link href="/">
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
-          <Link href="/reports" className={`${mono.className} text-[13px] text-white/65 hover:text-white transition-colors`}>
+          <Link href="/dashboard" className={`${mono.className} text-[13px] text-white/65 hover:text-white transition-colors`}>
             ← my reports
           </Link>
         </div>

@@ -31,7 +31,7 @@ export function BuyCreditsButton({
       const res = await fetch("/api/credits/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnPath: returnPath ?? pathname ?? "/dashboard" }),
+        body: JSON.stringify({ returnPath: returnPath ?? pathname ?? "/classic/dashboard" }),
       });
       const data = await res.json();
       if (data.url) {

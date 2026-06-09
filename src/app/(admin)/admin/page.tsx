@@ -303,12 +303,12 @@ export default async function AdminPage() {
           <div className="text-xs text-neutral-400 mt-1">Edit the daily editor&rsquo;s note &amp; pick winner</div>
         </Link>
         <Link
-          href="/score"
+          href="/"
           className="block rounded-xl border border-emerald-200 bg-emerald-50 p-5 hover:border-emerald-400 transition-colors"
         >
           <div className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Product</div>
           <div className="mt-2 text-base font-bold text-neutral-950">Track Score Landing</div>
-          <div className="text-xs text-neutral-400 mt-1">View the /score sales page</div>
+          <div className="text-xs text-neutral-400 mt-1">View the homepage sales page</div>
         </Link>
         <Link
           href="/submit-score"

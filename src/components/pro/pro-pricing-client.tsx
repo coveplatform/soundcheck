@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Shield,
   Coins,
+  Flame,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BuyCreditsButton } from "@/components/credits/buy-credits-button";
@@ -23,6 +24,9 @@ import {
   PRO_MONTHLY_PRICE_DISPLAY,
   PRO_ACTIVE_SLOTS,
   PRO_MAX_REVIEWS_PER_TRACK,
+  PRO_SALE_ACTIVE,
+  PRO_SALE_PRICE_DISPLAY,
+  PRO_SALE_LABEL,
 } from "@/lib/pricing";
 
 interface ProPricingClientProps {
@@ -157,6 +161,24 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
         </div>
       )}
 
+      {/* Sale banner */}
+      {PRO_SALE_ACTIVE && (
+        <div className="bg-gradient-to-r from-purple-600 to-purple-700 rounded-2xl px-5 py-4 flex items-center gap-3 border-2 border-purple-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="flex-shrink-0 bg-white/20 rounded-xl p-2">
+            <Flame className="h-5 w-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-white font-black text-sm">{PRO_SALE_LABEL}</p>
+            <p className="text-white/70 text-xs font-medium mt-0.5">
+              Get Pro for <strong className="text-white">{PRO_SALE_PRICE_DISPLAY}/month</strong> — first month only. Cancel anytime.
+            </p>
+          </div>
+          <div className="flex-shrink-0 bg-white text-purple-700 font-black text-sm px-3 py-1.5 rounded-xl">
+            50% OFF
+          </div>
+        </div>
+      )}
+
       {/* Pricing cards — 3 columns */}
       <div className="grid md:grid-cols-3 gap-5">
 
@@ -240,8 +262,11 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
         {/* Pro tier */}
         <div className="bg-neutral-900 border-2 border-black rounded-2xl p-6 flex flex-col relative shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
           <div className="absolute -top-3 left-6">
-            <span className="bg-purple-600 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border-2 border-black">
-              Best value
+            <span className={cn(
+              "text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border-2 border-black",
+              PRO_SALE_ACTIVE ? "bg-amber-500" : "bg-purple-600"
+            )}>
+              {PRO_SALE_ACTIVE ? "50% OFF TODAY" : "Best value"}
             </span>
           </div>
 
@@ -254,13 +279,30 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
           </div>
 
           <div className="mb-6">
-            <div className="flex items-baseline gap-1">
-              <span className="text-5xl font-black text-white tabular-nums">{PRO_MONTHLY_PRICE_DISPLAY}</span>
-              <span className="text-white/30 text-sm font-black">/month</span>
-            </div>
-            <p className="text-[11px] text-white/25 font-medium mt-1">
-              {PRO_MONTHLY_CREDITS} credits/month · cancel anytime
-            </p>
+            {PRO_SALE_ACTIVE ? (
+              <>
+                <div className="flex items-baseline gap-2 mb-0.5">
+                  <span className="text-5xl font-black text-white tabular-nums">{PRO_SALE_PRICE_DISPLAY}</span>
+                  <span className="text-white/30 text-sm font-black">/first month</span>
+                </div>
+                <p className="text-[11px] text-white/40 font-medium line-through">
+                  then {PRO_MONTHLY_PRICE_DISPLAY}/month
+                </p>
+                <p className="text-[11px] text-purple-400 font-black mt-1 uppercase tracking-wide">
+                  {PRO_SALE_LABEL}
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-5xl font-black text-white tabular-nums">{PRO_MONTHLY_PRICE_DISPLAY}</span>
+                  <span className="text-white/30 text-sm font-black">/month</span>
+                </div>
+                <p className="text-[11px] text-white/25 font-medium mt-1">
+                  {PRO_MONTHLY_CREDITS} credits/month · cancel anytime
+                </p>
+              </>
+            )}
           </div>
 
           <div className="space-y-2.5 mb-8 flex-1">
@@ -286,9 +328,20 @@ export function ProPricingClient({ isPro }: ProPricingClientProps) {
       </div>
 
       {/* Value compare strip */}
-      <div className="bg-black/5 border-2 border-black/10 rounded-2xl px-5 py-4 text-center">
+      <div className={cn(
+        "border-2 rounded-2xl px-5 py-4 text-center",
+        PRO_SALE_ACTIVE ? "bg-purple-50 border-purple-200" : "bg-black/5 border-black/10"
+      )}>
         <p className="text-sm font-bold text-black/60">
-          <span className="text-black font-black">Tip:</span> Pro is the best per-credit value — {PRO_MONTHLY_CREDITS} credits for {PRO_MONTHLY_PRICE_DISPLAY} works out cheaper than buying 3 packs.
+          {PRO_SALE_ACTIVE ? (
+            <>
+              <span className="text-purple-700 font-black">Sale ends soon.</span> First month at {PRO_SALE_PRICE_DISPLAY}, then {PRO_MONTHLY_PRICE_DISPLAY}/mo — still the best per-credit value with {PRO_MONTHLY_CREDITS} credits every month.
+            </>
+          ) : (
+            <>
+              <span className="text-black font-black">Tip:</span> Pro is the best per-credit value — {PRO_MONTHLY_CREDITS} credits for {PRO_MONTHLY_PRICE_DISPLAY} works out cheaper than buying 3 packs.
+            </>
+          )}
         </p>
       </div>
 

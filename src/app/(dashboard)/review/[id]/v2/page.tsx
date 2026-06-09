@@ -128,7 +128,7 @@ export default function ReviewPageV2({ params }: { params: Promise<{ id: string 
           if (res.status === 403) {
             const msg = (data?.error ?? "").toLowerCase();
             if (msg.includes("onboarding")) { router.push("/onboarding"); return; }
-            if (msg.includes("restricted")) { router.push("/dashboard"); return; }
+            if (msg.includes("restricted")) { router.push("/classic/dashboard"); return; }
           }
           setError(data?.error ?? "Review not found"); setIsLoading(false); return;
         }

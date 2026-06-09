@@ -119,7 +119,7 @@ export default function SubmitScorePage() {
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
           <Link
-            href="/score"
+            href="/"
             className={`${mono.className} text-[13px] text-white/65 hover:text-white transition-colors`}
           >
             ← back
@@ -146,7 +146,7 @@ export default function SubmitScorePage() {
                 type="url"
                 value={trackUrl}
                 onChange={(e) => setTrackUrl(e.target.value)}
-                placeholder="paste a soundcloud, spotify, youtube or bandcamp link…"
+                placeholder="paste a soundcloud, youtube, bandcamp or mp3 link…"
                 required
                 className={inputCls}
               />

@@ -1,4 +1,5 @@
 import { COLORS, getAppUrl, emailWrapper, emailButton, sendEmail } from "./templates";
+import { PRO_MONTHLY_PRICE_DISPLAY, PRO_SALE_PRICE_DISPLAY, PRO_MONTHLY_CREDITS, PRO_ACTIVE_SLOTS, PRO_MAX_REVIEWS_PER_TRACK } from "@/lib/pricing";
 
 // ── Announcement / Blast Email ──────────────────────────────────────────────
 export function buildAnnouncementEmail(params: { userName?: string }): { subject: string; html: string } {
@@ -361,7 +362,7 @@ export async function sendDiscoverAnnouncementEmail(params: { to: string; userNa
 export function buildRecaptureEmail(params: { userName?: string }): { subject: string; html: string } {
   const name = params.userName ? params.userName.split(" ")[0] : null;
   const appUrl = getAppUrl();
-  const dashboardUrl = `${appUrl}/dashboard`;
+  const dashboardUrl = `${appUrl}/classic/dashboard`;
   const submitUrl = `${appUrl}/submit`;
 
   const heroImageUrl = "https://mixreflect.com/blog/blog1.jpg";
@@ -485,5 +486,150 @@ export function buildRecaptureEmail(params: { userName?: string }): { subject: s
 export async function sendRecaptureEmail(params: { to: string; userName?: string }): Promise<boolean> {
   if (!params.to) return false;
   const { subject, html } = buildRecaptureEmail({ userName: params.userName });
+  return sendEmail({ to: params.to, subject, html });
+}
+
+// ── Pro Sale Email ──────────────────────────────────────────────────────────
+export function buildProSaleEmail(params: { userName?: string }): { subject: string; html: string } {
+  const name = params.userName ? params.userName.split(" ")[0] : null;
+  const appUrl = getAppUrl();
+  const proUrl = `${appUrl}/pro`;
+
+  const content = `
+    <!-- Sale banner -->
+    <div style="background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%); border-radius: 14px; padding: 28px 24px; margin-bottom: 28px; text-align: center;">
+      <div style="display: inline-block; background-color: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 14px; margin-bottom: 12px;">
+        <span style="font-size: 11px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px;">Limited Time</span>
+      </div>
+      <p style="margin: 0 0 4px; font-size: 36px; font-weight: 900; color: #ffffff; line-height: 1; letter-spacing: -1px;">50% OFF</p>
+      <p style="margin: 0; font-size: 14px; color: rgba(255,255,255,0.8); font-weight: 600;">MixReflect Pro — first month</p>
+    </div>
+
+    <p style="margin: 0 0 16px; font-size: 15px; color: ${COLORS.black}; line-height: 1.7;">
+      ${name ? `Hey ${name},` : "Hey,"}
+    </p>
+
+    <p style="margin: 0 0 16px; font-size: 15px; color: ${COLORS.gray}; line-height: 1.7;">
+      For a limited time, you can get your first month of <strong style="color: ${COLORS.black};">MixReflect Pro for ${PRO_SALE_PRICE_DISPLAY}</strong> — half the normal price.
+    </p>
+
+    <p style="margin: 0 0 24px; font-size: 15px; color: ${COLORS.gray}; line-height: 1.7;">
+      Pro is built for artists who are serious about getting better. You get ${PRO_MONTHLY_CREDITS} credits every month, priority placement in the review queue, up to ${PRO_ACTIVE_SLOTS} tracks in review at once, and up to ${PRO_MAX_REVIEWS_PER_TRACK} reviews per track — all without having to earn credits by reviewing others first.
+    </p>
+
+    <!-- What you get — dark card -->
+    <div style="background-color: #0a0a0a; border-radius: 14px; padding: 24px; margin-bottom: 28px;">
+      <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: ${COLORS.purple};">
+        What's included
+      </p>
+      <p style="margin: 0 0 20px; font-size: 16px; font-weight: 700; color: #ffffff; line-height: 1.4;">
+        Everything in Pro:
+      </p>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 8px;">
+        <tr>
+          <td style="background-color: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+              <tr>
+                <td style="width: 44px; vertical-align: middle;">
+                  <div style="font-size: 22px;">🎟</div>
+                </td>
+                <td style="vertical-align: middle;">
+                  <div style="font-size: 14px; font-weight: 700; color: #ffffff;">${PRO_MONTHLY_CREDITS} credits every month</div>
+                  <div style="font-size: 12px; color: #737373; margin-top: 2px;">No reviewing required — just drop in and submit</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 8px;">
+        <tr>
+          <td style="background-color: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+              <tr>
+                <td style="width: 44px; vertical-align: middle;">
+                  <div style="font-size: 22px;">⚡</div>
+                </td>
+                <td style="vertical-align: middle;">
+                  <div style="font-size: 14px; font-weight: 700; color: #ffffff;">Priority queue placement</div>
+                  <div style="font-size: 12px; color: #737373; margin-top: 2px;">Your tracks go in front — faster turnaround, less waiting</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 8px;">
+        <tr>
+          <td style="background-color: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+              <tr>
+                <td style="width: 44px; vertical-align: middle;">
+                  <div style="font-size: 22px;">🎛</div>
+                </td>
+                <td style="vertical-align: middle;">
+                  <div style="font-size: 14px; font-weight: 700; color: #ffffff;">${PRO_ACTIVE_SLOTS} active tracks at once</div>
+                  <div style="font-size: 12px; color: #737373; margin-top: 2px;">Run multiple tracks through review simultaneously</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 16px;">
+        <tr>
+          <td style="background-color: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+              <tr>
+                <td style="width: 44px; vertical-align: middle;">
+                  <div style="font-size: 22px;">📊</div>
+                </td>
+                <td style="vertical-align: middle;">
+                  <div style="font-size: 14px; font-weight: 700; color: #ffffff;">Up to ${PRO_MAX_REVIEWS_PER_TRACK} reviews per track</div>
+                  <div style="font-size: 12px; color: #737373; margin-top: 2px;">More ears, more consensus, stronger signal</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Pricing callout -->
+    <div style="background-color: ${COLORS.purpleLight}; border-radius: 12px; padding: 20px 24px; margin-bottom: 28px; border-left: 4px solid ${COLORS.purple};">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+        <tr>
+          <td style="vertical-align: middle;">
+            <p style="margin: 0; font-size: 13px; font-weight: 700; color: ${COLORS.purple}; text-transform: uppercase; letter-spacing: 0.5px;">Sale price</p>
+            <p style="margin: 4px 0 0; font-size: 28px; font-weight: 900; color: ${COLORS.black}; line-height: 1;">${PRO_SALE_PRICE_DISPLAY}<span style="font-size: 14px; font-weight: 600; color: ${COLORS.gray};">/first month</span></p>
+          </td>
+          <td style="text-align: right; vertical-align: middle;">
+            <p style="margin: 0; font-size: 13px; color: ${COLORS.grayLight}; text-decoration: line-through;">${PRO_MONTHLY_PRICE_DISPLAY}/mo</p>
+            <p style="margin: 4px 0 0; font-size: 11px; color: ${COLORS.gray};">then ${PRO_MONTHLY_PRICE_DISPLAY}/month · cancel anytime</p>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    ${emailButton("Get Pro — 50% off →", proUrl)}
+
+    <p style="margin: 20px 0 0; font-size: 14px; color: ${COLORS.grayLight}; line-height: 1.7;">
+      — The MixReflect team
+    </p>
+  `;
+
+  return {
+    subject: "MixReflect Pro is 50% off — today only",
+    html: emailWrapper(content),
+  };
+}
+
+export async function sendProSaleEmail(params: { to: string; userName?: string }): Promise<boolean> {
+  if (!params.to) return false;
+  const { subject, html } = buildProSaleEmail({ userName: params.userName });
   return sendEmail({ to: params.to, subject, html });
 }

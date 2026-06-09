@@ -13,7 +13,7 @@ import {
 import { Logo } from "@/components/ui/logo";
 import { OptInButton } from "./opt-in-button";
 import { PayoutButton } from "./payout-button";
-import { AccountMenu } from "../reports/account-menu";
+import { AccountMenu } from "../dashboard/account-menu";
 import { ArrowRight, Headphones, Plus, Zap, Wallet, Clock } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
@@ -190,12 +190,12 @@ function Shell({ email, children }: { email: string; children: React.ReactNode }
     <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase`}>
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
         <div className="max-w-4xl mx-auto px-5 h-16 flex items-center justify-between">
-          <Link href="/score">
+          <Link href="/">
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
           <div className="flex items-center gap-4 sm:gap-5">
             <nav className={`${mono.className} hidden sm:flex items-center gap-5 text-[13px]`}>
-              <Link href="/reports" className="text-white/55 hover:text-white transition-colors">
+              <Link href="/dashboard" className="text-white/55 hover:text-white transition-colors">
                 my reports
               </Link>
               <Link href="/score-review" className="text-white hover:text-white transition-colors">

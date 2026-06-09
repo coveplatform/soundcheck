@@ -34,7 +34,7 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
   const searchParams = useSearchParams();
 
   const mainLinks = [
-    { href: "/dashboard", label: "Dashboard", icon: Home },
+    { href: "/classic/dashboard", label: "Dashboard", icon: Home },
     { href: "/tracks", label: "My Tracks", icon: Music },
     { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
   ];
@@ -127,7 +127,7 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
       <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 bg-[#faf8f5] border-r border-black/10 flex-col z-40">
         {/* Header */}
         <div className="p-6 border-b border-black/10">
-          <Link href="/dashboard" className="flex items-center gap-2.5">
+          <Link href="/classic/dashboard" className="flex items-center gap-2.5">
             <Logo />
           </Link>
         </div>
@@ -321,7 +321,7 @@ function MobileBottomNav({
   }, [pathname]);
 
   const primaryLinks = [
-    { href: "/dashboard", label: "Home", icon: Home },
+    { href: "/classic/dashboard", label: "Home", icon: Home },
     { href: "/tracks?view=insights", label: "Insights", icon: BarChart3 },
     { href: "/tracks", label: "Tracks", icon: Music },
     { href: "/review", label: "Listen", icon: Headphones },

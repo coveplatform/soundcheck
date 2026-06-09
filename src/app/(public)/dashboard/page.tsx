@@ -34,7 +34,7 @@ function fmt(d: Date): string {
 export default async function ReportsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    redirect("/login?callbackUrl=/reports");
+    redirect("/login?callbackUrl=/dashboard");
   }
 
   const [profile, me] = await Promise.all([
@@ -89,12 +89,12 @@ export default async function ReportsPage() {
     >
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
         <div className="max-w-4xl mx-auto px-5 h-16 flex items-center justify-between">
-          <Link href="/score">
+          <Link href="/">
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
           <div className="flex items-center gap-4 sm:gap-5">
             <nav className={`${mono.className} hidden sm:flex items-center gap-5 text-[13px]`}>
-              <Link href="/reports" className="text-white hover:text-white transition-colors">
+              <Link href="/dashboard" className="text-white hover:text-white transition-colors">
                 my reports
               </Link>
               <Link
@@ -139,7 +139,7 @@ export default async function ReportsPage() {
               <ManageSubButton />
             ) : (
               <Link
-                href="/score#pricing"
+                href="/#pricing"
                 className="border border-white/12 bg-[#101010] px-4 py-3 hover:border-white/30 transition-colors"
               >
                 <span style={{ color: ACCENT }}>go unlimited →</span>
@@ -154,7 +154,7 @@ export default async function ReportsPage() {
               No tracks yet. Drop your first link and get an honest read.
             </p>
             <Link
-              href="/score"
+              href="/"
               className="inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-base px-7 py-4 hover:bg-white transition-colors"
             >
               get feedback

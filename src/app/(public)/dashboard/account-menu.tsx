@@ -40,14 +40,14 @@ export function AccountMenu({ email }: { email: string }) {
             <p className="text-[13px] text-white truncate normal-case mt-0.5">{email}</p>
           </div>
           <Link
-            href="/reports/settings"
+            href="/dashboard/settings"
             className={`${mono.className} flex items-center gap-2.5 px-4 py-3 text-[13px] text-white/75 hover:bg-white/5 transition-colors`}
           >
             <Settings className="h-3.5 w-3.5" />
             account settings
           </Link>
           <button
-            onClick={() => signOut({ callbackUrl: "/score" })}
+            onClick={() => signOut({ callbackUrl: "/" })}
             className={`${mono.className} w-full flex items-center gap-2.5 px-4 py-3 text-[13px] hover:bg-white/5 transition-colors`}
             style={{ color: ACCENT }}
           >

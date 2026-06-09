@@ -195,7 +195,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
 
   const handleUnlock = async () => {
     if (data.isDemo) {
-      window.location.href = "/score";
+      window.location.href = "/";
       return;
     }
     setUnlocking(true);
@@ -212,7 +212,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
 
   const handleSubscribe = async (plan: "monthly" | "annual" = "monthly") => {
     if (data.isDemo) {
-      window.location.href = "/score#pricing";
+      window.location.href = "/#pricing";
       return;
     }
     try {
@@ -667,7 +667,7 @@ what to fix first
                 <Share2 className="h-4 w-4" />
                 {copied ? "link copied!" : "copy share link"}
               </button>
-              <Link href="/score">
+              <Link href="/">
                 <button className="inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-sm px-5 py-3 hover:bg-white transition-colors">
                   play another track
                   <ArrowRight className="h-4 w-4" />

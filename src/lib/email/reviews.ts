@@ -153,7 +153,7 @@ export async function sendReviewProgressEmail(
 
   const pct = Math.round((reviewCount / Math.max(1, totalReviews)) * 100);
   const isComplete = reviewCount >= totalReviews;
-  const trackUrl = trackId ? `${getAppUrl()}/tracks/${trackId}` : `${getAppUrl()}/dashboard`;
+  const trackUrl = trackId ? `${getAppUrl()}/tracks/${trackId}` : `${getAppUrl()}/classic/dashboard`;
   const moreReviewsUrl = trackId ? `${getAppUrl()}/tracks/${trackId}/request-reviews` : null;
 
   const progressBar = `

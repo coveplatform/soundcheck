@@ -28,7 +28,7 @@ function FinishInner() {
     }
 
     if (!trackUrl) {
-      router.replace("/score");
+      router.replace("/");
       return;
     }
 
@@ -82,7 +82,7 @@ function FinishInner() {
         </p>
         {error && (
           <button
-            onClick={() => router.replace("/score")}
+            onClick={() => router.replace("/")}
             className="mt-6 inline-flex bg-[#6ee7ff] text-black font-extrabold text-sm px-6 py-3"
           >
             start over

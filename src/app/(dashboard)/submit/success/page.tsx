@@ -245,7 +245,7 @@ export default function SuccessPage() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <Link href="/dashboard" className="flex-1">
+          <Link href="/classic/dashboard" className="flex-1">
             <Button className="w-full bg-black text-white hover:bg-neutral-800 border-2 border-black font-black h-12 text-sm">
               Go to dashboard <ArrowRight className="ml-2 h-4 w-4" />
             </Button>

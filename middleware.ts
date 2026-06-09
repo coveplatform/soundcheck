@@ -16,21 +16,9 @@ function redirectToLogin(request: NextRequest) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // ── Score-product subdomain (run-alongside testing) ──────────────────
-  // When SCORE_HOST is set (e.g. "soundcheck.mixreflect.com") and the request
-  // hits that host, serve the score landing at the root so the subdomain feels
-  // like its own product. mixreflect.com is left completely untouched. The rest
-  // of the score routes (/submit-score, /report, /reports, /score-review) already
-  // live at those paths, so they work on the subdomain without any rewrite.
-  const scoreHost = process.env.SCORE_HOST;
-  if (scoreHost) {
-    const host = (request.headers.get("host") || "").split(":")[0].toLowerCase();
-    if (host === scoreHost.toLowerCase() && pathname === "/") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/score";
-      return NextResponse.rewrite(url);
-    }
-  }
+  // NB: The Score product is now served directly at "/" (cutover 2026-06-09),
+  // so the old SCORE_HOST subdomain rewrite (/ → /score) was removed — it would
+  // now loop, since /score permanently redirects back to /.
 
   // Add pathname header for layouts to detect current route
   const requestHeaders = new Headers(request.headers);

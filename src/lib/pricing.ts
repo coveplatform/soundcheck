@@ -7,6 +7,14 @@
 export const PRO_MONTHLY_PRICE_CENTS = 2495;
 export const PRO_MONTHLY_PRICE_DISPLAY = "$24.95";
 export const PRO_MONTHLY_CREDITS = 30;
+
+// Limited-time sale — flip PRO_SALE_ACTIVE to false to end the sale.
+// Stripe coupon is created/cached automatically in the checkout route.
+export const PRO_SALE_ACTIVE = true;
+export const PRO_SALE_PERCENT_OFF = 50;
+export const PRO_SALE_PRICE_CENTS = Math.round(PRO_MONTHLY_PRICE_CENTS * (1 - PRO_SALE_PERCENT_OFF / 100)); // 1248
+export const PRO_SALE_PRICE_DISPLAY = "$12.48";
+export const PRO_SALE_LABEL = "50% OFF — Limited Time";
 export const PRO_ACTIVE_SLOTS = 3;
 export const PRO_MAX_REVIEWS_PER_TRACK = 10;
 

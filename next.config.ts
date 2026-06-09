@@ -45,6 +45,11 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // ── Cutover 2026-06-09: Score product promoted to the apex ──
+      // Score landing now lives at "/", the report list at "/dashboard".
+      { source: "/score", destination: "/", permanent: true },
+      { source: "/reports", destination: "/dashboard", permanent: true },
+      { source: "/reports/settings", destination: "/dashboard/settings", permanent: true },
       // Old /artist/tracks → /tracks
       {
         source: "/artist/tracks",

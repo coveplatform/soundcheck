@@ -15,8 +15,8 @@ test.describe("Authentication Flow", () => {
       // Use signup helper which handles session persistence
       await signup(page, user);
 
-      // Verify we reached the onboarding page
-      expect(page.url()).toContain("/onboarding");
+      // Post-cutover: new signups land on the new product dashboard
+      expect(page.url()).toContain("/dashboard");
     });
 
     test("should show error for duplicate email", async ({ page }) => {

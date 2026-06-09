@@ -36,7 +36,7 @@ export default async function ReviewHistoryPage() {
   }
 
   if (reviewerProfile?.isRestricted) {
-    redirect("/dashboard");
+    redirect("/classic/dashboard");
   }
 
   const hasCompletedOnboarding =

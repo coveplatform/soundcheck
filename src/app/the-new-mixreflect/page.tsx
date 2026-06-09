@@ -32,10 +32,10 @@ export default function TheNewMixReflectPage() {
 
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
         <div className="max-w-4xl mx-auto px-5 h-16 flex items-center justify-between">
-          <Link href="/score">
+          <Link href="/">
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
-          <Link href="/score" className={`${mono.className} text-[13px] bg-[#6ee7ff] text-black px-3.5 py-1.5 font-bold hover:bg-white transition-colors`}>
+          <Link href="/" className={`${mono.className} text-[13px] bg-[#6ee7ff] text-black px-3.5 py-1.5 font-bold hover:bg-white transition-colors`}>
             try it free →
           </Link>
         </div>
@@ -52,7 +52,7 @@ export default function TheNewMixReflectPage() {
           release — but instant, and from real ears.
         </p>
         <div className="mt-9 flex flex-wrap gap-3 justify-center">
-          <Link href="/score" className="group inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-base px-7 py-4 hover:bg-white transition-colors">
+          <Link href="/" className="group inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-base px-7 py-4 hover:bg-white transition-colors">
             get my track scored
             <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -87,7 +87,7 @@ export default function TheNewMixReflectPage() {
       {/* two ways in */}
       <section className="relative z-10 max-w-4xl mx-auto px-5 py-8">
         <div className="grid sm:grid-cols-2 gap-4">
-          <Link href="/score" className="group border border-white/12 bg-[#101010] p-7 hover:border-white/30 transition-colors flex flex-col">
+          <Link href="/" className="group border border-white/12 bg-[#101010] p-7 hover:border-white/30 transition-colors flex flex-col">
             <p className={`${mono.className} text-[12px] text-white/45 mb-2`}>for artists</p>
             <h3 className="text-2xl font-extrabold mb-2">drop a track</h3>
             <p className="text-white/60 text-[14px] normal-case leading-relaxed flex-1">
@@ -165,7 +165,7 @@ export default function TheNewMixReflectPage() {
 
       {/* final CTA */}
       <section className="relative z-10 max-w-4xl mx-auto px-5 py-12 text-center">
-        <Link href="/score" className="group inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-lg px-9 py-4 hover:bg-white transition-colors">
+        <Link href="/" className="group inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-lg px-9 py-4 hover:bg-white transition-colors">
           try the new mixreflect
           <ArrowRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
         </Link>
