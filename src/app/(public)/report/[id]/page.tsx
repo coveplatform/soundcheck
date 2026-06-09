@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getReportHumanReviews } from "@/lib/score-review";
+import { getReportHumanReviews, getScoreRoomQuota } from "@/lib/score-review";
 import { ReportView, type ReportViewModel, type Verdict } from "./report-view";
 
 export const dynamic = "force-dynamic";
@@ -241,6 +241,12 @@ export default async function ReportPage({
     positive: Boolean(h.positive),
   }));
 
+  // Subscriber submitted past their monthly room allowance: AI read only.
+  const roomSkipped = report.humanRoomSkipped && humanTotal === 0;
+  const roomResetsAt = roomSkipped
+    ? fmtDate((await getScoreRoomQuota(report.email)).resetsAt)
+    : null;
+
   const data: ReportViewModel = {
     slug: report.slug,
     isDemo: false,
@@ -267,6 +273,8 @@ export default async function ReportPage({
     humanReviews,
     humanReviewsIn: humanReviews.length,
     humanReviewsTotal: humanTotal,
+    roomSkipped,
+    roomResetsAt,
     priorityFixes: fixes,
     invalid: quotes.invalid?.reason
       ? { reason: quotes.invalid.reason, durationSec: quotes.invalid.durationSec }

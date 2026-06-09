@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { isScoreSubscribed } from "@/lib/score-subscription";
+import { getScoreRoomQuota } from "@/lib/score-review";
 import { ManageSubButton } from "./manage-sub-button";
 import { AccountMenu } from "./account-menu";
 import { DeleteReportButton } from "./delete-report-button";
@@ -66,12 +67,14 @@ export default async function ReportsPage() {
       percentile: true,
       verdict: true,
       paidAt: true,
+      humanRoomSkipped: true,
       createdAt: true,
     },
   });
 
   const unlockedCount = reports.filter((r) => r.paidAt != null).length;
   const subscribed = await isScoreSubscribed(email);
+  const roomQuota = subscribed ? await getScoreRoomQuota(email) : null;
 
   // Human "room" progress per report: completed vs assigned.
   const reportIds = reports.map((r) => r.id);
@@ -128,7 +131,7 @@ export default async function ReportsPage() {
               my reports
             </h1>
           </div>
-          <div className={`${mono.className} text-[13px] flex items-center gap-3`}>
+          <div className={`${mono.className} text-[13px] flex items-center flex-wrap gap-3 sm:justify-end`}>
             <div className="border border-white/12 bg-[#101010] px-4 py-3">
               <span style={{ color: ACCENT }}>{reports.length}</span>
               <span className="text-white/45"> track{reports.length === 1 ? "" : "s"}</span>
@@ -136,6 +139,13 @@ export default async function ReportsPage() {
                 <span className="text-white/45"> · {unlockedCount} unlocked</span>
               )}
             </div>
+            {roomQuota && (
+              <div className="border border-white/12 bg-[#101010] px-4 py-3" title="Each round is a full room of 5 real listeners on one track. Unlimited AI reads always.">
+                <span className="text-white/45">real-reviewer rounds </span>
+                <span style={{ color: ACCENT }}>{roomQuota.used}/{roomQuota.cap}</span>
+                <span className="text-white/45"> · resets {fmt(roomQuota.resetsAt)}</span>
+              </div>
+            )}
             {subscribed ? (
               <ManageSubButton />
             ) : (
@@ -219,11 +229,15 @@ export default async function ReportsPage() {
                             r.score != null ? ` · ${r.score} / 100` : ""
                           }`}
                     </p>
-                    {(assignedBy.get(r.id) ?? 0) > 0 && (
+                    {(assignedBy.get(r.id) ?? 0) > 0 ? (
                       <p className={`${mono.className} text-[11px] mt-1`} style={{ color: ACCENT }}>
                         ♫ {completedBy.get(r.id) ?? 0}/{assignedBy.get(r.id)} listeners in
                       </p>
-                    )}
+                    ) : r.humanRoomSkipped ? (
+                      <p className={`${mono.className} text-[11px] mt-1 text-white/35`}>
+                        ai read only · used your monthly rounds
+                      </p>
+                    ) : null}
                     <p className={`${mono.className} text-[11px] text-white/30 mt-1.5`}>
                       {fmt(r.createdAt)}
                       {!unlocked && !pending && (

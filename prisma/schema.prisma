@@ -867,6 +867,9 @@ model TrackScoreReport {
   priorityFixes    Json?
   artistId         String?
   humanReviewsRequested Int          @default(5)
+  // Subscriber submitted past their monthly real-reviewer-round allowance:
+  // full AI read still delivered, but no human room assigned for this one.
+  humanRoomSkipped Boolean           @default(false)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   ArtistProfile    ArtistProfile?    @relation(fields: [artistId], references: [id])

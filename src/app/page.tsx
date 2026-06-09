@@ -731,8 +731,8 @@ export default function ScorePage() {
               heard for <span style={{ color: ACCENT }}>real</span>.
             </h1>
             <p className="text-lg text-white/55 mt-7 max-w-md normal-case">
-              An instant read on your track, then honest reactions from a room
-              of real listeners.
+              Honest music feedback and an instant track score — an AI read out
+              of 100, then real reactions from a room of five listeners.
             </p>
 
             {/* paste box + preview card */}
@@ -1233,7 +1233,7 @@ export default function ScorePage() {
                 or $143.40/yr · every track auto-unlocked
               </p>
               <ul className={`${mono.className} mt-7 space-y-2.5 text-[13.5px] text-black/80 normal-case`}>
-                {["everything in per-track", "unlock every track you submit", "no $6.95 per report", "your dashboard + history", "cancel anytime — unlocks stay"].map((x) => (
+                {["unlimited AI reads, every one in full", "unlock every track you submit — no $6.95 per report", "the real room on 3 tracks a month (5 listeners each)", "your dashboard + history", "cancel anytime — unlocks stay"].map((x) => (
                   <li key={x} className="flex gap-2"><span className="font-bold">+</span>{x}</li>
                 ))}
               </ul>

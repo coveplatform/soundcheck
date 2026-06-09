@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateAndStoreReport } from "@/lib/score-report-ai";
-import { assignScoreReviewers } from "@/lib/score-review";
+import { claimAndAssignRoom } from "@/lib/score-review";
 import { isScoreSubscribed } from "@/lib/score-subscription";
 import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
 
@@ -87,9 +87,15 @@ export async function POST(request: Request) {
     // unlocked (subscriber here, or on payment via the Stripe webhook). Free
     // submitters get the instant AI read + teaser only, so we never pay
     // reviewers for tracks that are never unlocked.
+    //
+    // It's also metered for subscribers: each gets SCORE_ROOM_CAP real-reviewer
+    // rounds per 30-day cycle. Over the cap the report still unlocks with the
+    // full AI read, but we skip (and flag) the human room so payouts stay
+    // bounded. One-off payers always get their room (assigned via the webhook).
     if (unlocked) {
       try {
-        await assignScoreReviewers(report.id);
+        // Atomic: serializes per-subscriber so the monthly cap can't be raced.
+        await claimAndAssignRoom(effectiveEmail, report.id);
       } catch (err) {
         console.error("[score/submit] reviewer assignment error:", err);
       }

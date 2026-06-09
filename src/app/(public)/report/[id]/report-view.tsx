@@ -66,6 +66,10 @@ export type ReportViewModel = {
   }[];
   humanReviewsIn: number;
   humanReviewsTotal: number;
+  /** Subscriber over their monthly room allowance: AI read only, no human room. */
+  roomSkipped?: boolean;
+  /** When their real-reviewer rounds refresh (formatted), for the skipped notice. */
+  roomResetsAt?: string | null;
   priorityFixes: { label: string; detail: string; count: number }[];
   /** Set when the clip was too short to score as a real track. */
   invalid?: { reason: string; durationSec?: number } | null;
@@ -449,6 +453,30 @@ export function ReportView({ data }: { data: ReportViewModel }) {
           </section>
         )}
 
+        {/* ── ROOM SKIPPED (subscriber over their monthly rounds) ── */}
+        {!locked && !data.isDemo && data.humanReviewsTotal === 0 && data.roomSkipped && (
+          <section className="border border-white/12 bg-[#0c0c0c] p-6 sm:p-7">
+            <div className="flex items-center gap-2.5 mb-3">
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white/40" />
+              <span className={`${mono.className} text-[12px] tracking-wide text-white/55`}>
+                the room · not this one
+              </span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight mb-2">
+              Your AI read is here — but this track didn&apos;t get the real room.
+            </h3>
+            <p className="text-white/65 normal-case leading-relaxed max-w-lg">
+              You&apos;ve used all your{" "}
+              <strong className="text-white">real-listener rounds</strong> for this cycle (each round
+              is a full room of 5 real people on one track).
+              {data.roomResetsAt && (
+                <> Your rounds refresh on <strong className="text-white">{data.roomResetsAt}</strong>.</>
+              )}{" "}
+              The instant AI read above is still yours in full.
+            </p>
+          </section>
+        )}
+
         {/* ── THE ROOM (real humans) — live, up top ── */}
         {data.humanReviewsTotal > 0 && (
           <section className="border-2 bg-[#0c0c0c] p-6 sm:p-7" style={{ borderColor: "rgba(110,231,255,0.35)" }}>
@@ -722,7 +750,7 @@ what to fix first
                   $19.95<span className="text-base text-white/45 font-medium">/mo</span>
                 </p>
                 <p className={`${mono.className} text-[12px] text-white/55 mt-1 normal-case`}>
-                  every track you submit, auto-unlocked
+                  every track auto-unlocked · real room on 3 a month
                 </p>
                 <button
                   onClick={() => handleSubscribe("monthly")}
