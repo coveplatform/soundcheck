@@ -54,7 +54,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!isAdminEmail(session?.user?.email)) {
+    if (!isAdminEmail(session?.user?.email) || !session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
