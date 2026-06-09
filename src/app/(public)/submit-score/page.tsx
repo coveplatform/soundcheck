@@ -383,7 +383,7 @@ export default function SubmitScorePage() {
               reading your track…
             </h2>
             <div
-              className={`${mono.className} bg-[#080808] border border-white/12 p-5 text-[13.5px] leading-7 max-h-[260px] overflow-y-auto`}
+              className={`${mono.className} bg-[#080808] border border-white/12 p-5 text-[13.5px] leading-7`}
             >
               {STEPS.map((s, i) => {
                 const state = i < step ? "done" : i === step ? "active" : "pending";

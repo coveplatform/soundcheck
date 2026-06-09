@@ -1246,7 +1246,7 @@ export default function ScorePage() {
 
             <div
               ref={logRef}
-              className={`${mono.className} bg-[#080808] border border-white/12 p-5 text-[13.5px] leading-7 max-h-[260px] overflow-y-auto`}
+              className={`${mono.className} bg-[#080808] border border-white/12 p-5 text-[13.5px] leading-7`}
             >
               {STEPS.map((s, i) => {
                 const state =
