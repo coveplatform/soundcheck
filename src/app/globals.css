@@ -31,7 +31,10 @@
 html,
 body {
   width: 100%;
-  overflow-x: hidden;
+  /* `clip` prevents sideways scroll WITHOUT creating a scroll container —
+     `overflow-x: hidden` here forces overflow-y to `auto` and silently breaks
+     `position: sticky` (e.g. the landing-page header). */
+  overflow-x: clip;
 }
 
 body {
