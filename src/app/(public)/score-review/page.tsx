@@ -196,7 +196,7 @@ function Shell({ email, children }: { email: string; children: React.ReactNode }
           <div className="flex items-center gap-4 sm:gap-5">
             <nav className={`${mono.className} hidden sm:flex items-center gap-5 text-[13px]`}>
               <Link href="/dashboard" className="text-white/55 hover:text-white transition-colors">
-                my reports
+                dashboard
               </Link>
               <Link href="/score-review" className="text-white hover:text-white transition-colors">
                 review queue

@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "@/components/providers";
 import { ChangeoverBanner } from "@/components/changeover-banner";
+import { WelcomeBanner } from "@/components/welcome-banner";
 import { headers } from "next/headers";
 import "./globals.css";
 
@@ -182,6 +183,7 @@ export default async function RootLayout({
       >
         <Providers requiresConsent={requiresConsent}>
           <ChangeoverBanner />
+          <WelcomeBanner />
           {children}
         </Providers>
         <Analytics />

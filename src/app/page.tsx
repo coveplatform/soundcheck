@@ -125,68 +125,104 @@ function Dots({ count, max = 5 }: { count: number; max?: number }) {
 /** A real, miniature report — the actual product, shown not described. */
 function ReportPreview() {
   return (
-    <div className="relative border border-white/12 bg-[#0e0e0e] shadow-[0_30px_80px_-40px_rgba(0,0,0,0.9)]">
-      {/* track header */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
-        <div className="w-11 h-11 bg-white/5 border border-white/10 shrink-0 flex items-center justify-center">
-          <Music className="h-4 w-4 text-white/40" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-[15px] font-bold truncate">{SAMPLE.title}</p>
-          <p className={`${mono.className} text-[11px] text-white/40 normal-case mt-0.5`}>
-            {SAMPLE.genre} · ai + the room
-          </p>
-        </div>
-        <span
-          className={`${mono.className} text-[11px] text-black px-2.5 py-1 shrink-0`}
-          style={{ background: ACCENT }}
-        >
-          almost there
-        </span>
-      </div>
+    <div className="relative" style={{ animation: "previewIn .6s cubic-bezier(.2,.7,.2,1) both" }}>
+      <style>{`
+        @keyframes previewIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+        @keyframes eqBar{0%,100%{transform:scaleY(.32)}50%{transform:scaleY(1)}}
+        @keyframes growBar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+        @keyframes sheen{0%{transform:translateX(-130%)}55%,100%{transform:translateX(260%)}}
+        @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.25}}
+        @keyframes ringGlow{0%,100%{opacity:.45}50%{opacity:.9}}
+        @keyframes chipIn{from{opacity:0;transform:translateY(10px) rotate(-3deg)}to{opacity:1;transform:translateY(0) rotate(-3deg)}}
+        @keyframes chipFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(-3deg)}}
+      `}</style>
 
-      {/* score */}
-      <div className="flex flex-col items-center text-center px-6 pt-7 pb-6 border-b border-white/10">
-        <p className={`${mono.className} text-[11px] text-white/40 mb-4`}>resonance score</p>
-        <ScoreRing score={SAMPLE.score} size="md" dark animate />
-      </div>
+      {/* depth: ghost card behind */}
+      <div className="absolute inset-0 translate-x-3 translate-y-4 border border-white/5 bg-[#0b0b0b] -z-10" />
 
-      {/* breakdown */}
-      <div className="px-6 py-5 space-y-3 border-b border-white/10">
-        {SAMPLE.bars.map((b) => (
-          <div key={b.label}>
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[12.5px] text-white/70">{b.label}</span>
-              <span className={`${mono.className} text-[12px] font-bold`}>
-                {b.v.toFixed(1)}
-                <span className="text-white/30"> / 5</span>
-              </span>
-            </div>
-            <div className="h-1.5 bg-white/[0.07] overflow-hidden">
-              <div className="h-full" style={{ width: `${(b.v / 5) * 100}%`, background: ACCENT }} />
-            </div>
+      <div className="relative border border-white/12 bg-[#0e0e0e] shadow-[0_40px_100px_-40px_rgba(0,0,0,0.95)] overflow-hidden">
+        {/* animated cyan accent bar + sheen across the top */}
+        <div className="relative h-1 w-full overflow-hidden" style={{ background: `linear-gradient(90deg, ${ACCENT}, #a78bfa, ${ACCENT})` }}>
+          <div className="absolute inset-y-0 w-1/3 bg-white/60 blur-[2px]" style={{ animation: "sheen 3.2s ease-in-out infinite" }} />
+        </div>
+
+        {/* track header */}
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
+          {/* live equalizer instead of a static icon */}
+          <div className="w-11 h-11 shrink-0 flex items-end justify-center gap-[3px] bg-white/5 border border-white/10 p-2.5">
+            {[0, 1, 2, 3].map((i) => (
+              <span
+                key={i}
+                className="w-[3px] flex-1 origin-bottom"
+                style={{ background: ACCENT, animation: `eqBar ${0.7 + i * 0.18}s ease-in-out ${i * 0.12}s infinite` }}
+              />
+            ))}
           </div>
-        ))}
+          <div className="min-w-0 flex-1">
+            <p className="text-[15px] font-bold truncate">{SAMPLE.title}</p>
+            <p className={`${mono.className} text-[11px] text-white/40 normal-case mt-0.5`}>
+              {SAMPLE.genre} · ai + the room
+            </p>
+          </div>
+          <span
+            className={`${mono.className} text-[11px] text-black px-2.5 py-1 shrink-0`}
+            style={{ background: ACCENT }}
+          >
+            almost there
+          </span>
+        </div>
+
+        {/* score with a glowing halo */}
+        <div className="relative flex flex-col items-center text-center px-6 pt-7 pb-6 border-b border-white/10">
+          <div
+            className="absolute left-1/2 top-1/2 w-44 h-44 -translate-x-1/2 -translate-y-1/3 rounded-full blur-3xl pointer-events-none"
+            style={{ background: ACCENT, opacity: 0.5, animation: "ringGlow 3s ease-in-out infinite" }}
+          />
+          <p className={`${mono.className} relative text-[11px] text-white/40 mb-4`}>resonance score</p>
+          <div className="relative">
+            <ScoreRing score={SAMPLE.score} size="md" dark animate />
+          </div>
+        </div>
+
+        {/* breakdown — bars grow in with a stagger */}
+        <div className="px-6 py-5 space-y-3">
+          {SAMPLE.bars.map((b, i) => (
+            <div key={b.label}>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[12.5px] text-white/70">{b.label}</span>
+                <span className={`${mono.className} text-[12px] font-bold`}>
+                  {b.v.toFixed(1)}
+                  <span className="text-white/30"> / 5</span>
+                </span>
+              </div>
+              <div className="h-1.5 bg-white/[0.07] overflow-hidden">
+                <div
+                  className="h-full origin-left"
+                  style={{
+                    width: `${(b.v / 5) * 100}%`,
+                    background: `linear-gradient(90deg, ${ACCENT}, #a78bfa)`,
+                    animation: `growBar .9s cubic-bezier(.2,.7,.2,1) ${0.3 + i * 0.12}s both`,
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* one reaction */}
-      <div className="flex gap-3 px-6 py-5">
-        <span
-          className={`${mono.className} w-8 h-8 shrink-0 flex items-center justify-center text-[12px] font-bold text-black`}
-          style={{ background: ACCENT }}
-        >
-          S
-        </span>
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className={`${mono.className} text-[11px] text-white/50`}>the producer</span>
-            <Dots count={5} />
-          </div>
-          <p className="text-[13px] font-bold leading-snug">“felt release-ready to me”</p>
-          <p className="text-[12.5px] text-white/55 leading-relaxed normal-case mt-1">
-            this one is clean. everthing sits nicely and it kept my attention the whole way.
-          </p>
+      {/* floating "just landed" reaction chip — overlaps the bottom edge */}
+      <div
+        className="absolute -bottom-5 left-4 right-8 bg-[#141414] border p-3.5 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.9)]"
+        style={{ borderColor: ACCENT, animation: "chipIn .5s ease .7s both, chipFloat 5s ease-in-out 1.2s infinite" }}
+      >
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full rounded-full" style={{ background: ACCENT, animation: "livePulse 1.4s ease-in-out infinite" }} />
+          </span>
+          <span className={`${mono.className} text-[10px] text-white/45 uppercase tracking-wider`}>just landed · the producer</span>
+          <Dots count={5} />
         </div>
+        <p className="text-[13px] font-bold leading-snug">“felt release-ready to me”</p>
       </div>
     </div>
   );
@@ -276,6 +312,7 @@ export default function ScorePage() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [subscribing, setSubscribing] = useState<"monthly" | "annual" | null>(null);
   const [error, setError] = useState("");
   const logRef = useRef<HTMLDivElement>(null);
 
@@ -426,10 +463,13 @@ export default function ScorePage() {
   };
 
   const handleSubscribe = async (plan: "monthly" | "annual" = "monthly") => {
+    if (subscribing) return;
     if (!session?.user?.email) {
+      setSubscribing(plan);
       router.push(`/login?callbackUrl=${encodeURIComponent("/#pricing")}`);
       return;
     }
+    setSubscribing(plan);
     try {
       const res = await fetch("/api/score/subscribe", {
         method: "POST",
@@ -441,9 +481,13 @@ export default function ScorePage() {
         router.push("/dashboard");
         return;
       }
-      if (data?.url) window.location.href = data.url;
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+      setSubscribing(null);
     } catch {
-      /* no-op */
+      setSubscribing(null);
     }
   };
 
@@ -1060,15 +1104,21 @@ export default function ScorePage() {
               </ul>
               <button
                 onClick={() => handleSubscribe("monthly")}
-                className="mt-7 block w-full text-center bg-black text-[#6ee7ff] font-extrabold py-3.5 hover:bg-[#141414] transition-colors"
+                disabled={subscribing !== null}
+                className="mt-7 w-full inline-flex items-center justify-center gap-2 text-center bg-black text-[#6ee7ff] font-extrabold py-3.5 hover:bg-[#141414] transition-colors disabled:opacity-70 disabled:cursor-wait"
               >
-                go unlimited — $19.95/mo →
+                {subscribing === "monthly" ? (
+                  <><Loader2 className="h-4 w-4 animate-spin" /> opening checkout…</>
+                ) : (
+                  "go unlimited — $19.95/mo →"
+                )}
               </button>
               <button
                 onClick={() => handleSubscribe("annual")}
-                className={`${mono.className} mt-2 block w-full text-center text-[12px] text-black/55 hover:text-black transition-colors`}
+                disabled={subscribing !== null}
+                className={`${mono.className} mt-2 block w-full text-center text-[12px] text-black/55 hover:text-black transition-colors disabled:opacity-70 disabled:cursor-wait`}
               >
-                or pay yearly — $143.40/yr (save 40%)
+                {subscribing === "annual" ? "opening checkout…" : "or pay yearly — $143.40/yr (save 40%)"}
               </button>
             </div>
           </div>

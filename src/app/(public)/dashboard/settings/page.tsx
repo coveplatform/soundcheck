@@ -34,7 +34,7 @@ export default async function AccountSettingsPage() {
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
           <Link href="/dashboard" className={`${mono.className} text-[13px] text-white/65 hover:text-white transition-colors`}>
-            ← my reports
+            ← dashboard
           </Link>
         </div>
       </header>

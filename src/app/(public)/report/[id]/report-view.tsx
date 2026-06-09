@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ScoreRing } from "@/components/score/score-ring";
 import { Logo } from "@/components/ui/logo";
-import { ArrowRight, Share2, Lock, Hourglass, User } from "lucide-react";
+import { ArrowRight, Share2, Lock, Hourglass, User, Loader2 } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -147,6 +147,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
+  const [subscribing, setSubscribing] = useState<"monthly" | "annual" | null>(null);
   const locked = !data.unlocked;
 
   // Just back from Stripe? The success redirect lands a beat before the webhook
@@ -211,10 +212,12 @@ export function ReportView({ data }: { data: ReportViewModel }) {
   };
 
   const handleSubscribe = async (plan: "monthly" | "annual" = "monthly") => {
+    if (subscribing) return;
     if (data.isDemo) {
       window.location.href = "/#pricing";
       return;
     }
+    setSubscribing(plan);
     try {
       const res = await fetch(`/api/score/subscribe`, {
         method: "POST",
@@ -227,7 +230,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
       // not signed in / no email on file → send them to sign in
       window.location.href = `/login?callbackUrl=${encodeURIComponent(`/report/${data.slug}`)}`;
     } catch {
-      /* no-op */
+      setSubscribing(null);
     }
   };
 
@@ -251,9 +254,19 @@ export function ReportView({ data }: { data: ReportViewModel }) {
       {/* nav */}
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
         <div className="max-w-3xl mx-auto px-5 h-16 flex items-center justify-between">
-          <Link href="/">
-            <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
-          </Link>
+          <div className="flex items-center gap-5 sm:gap-7">
+            <Link href="/">
+              <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
+            </Link>
+            <nav className={`${mono.className} hidden sm:flex items-center gap-5 text-[13px]`}>
+              <Link href="/dashboard" className="text-white/55 hover:text-white transition-colors">
+                dashboard
+              </Link>
+              <Link href="/score-review" className="text-white/55 hover:text-white transition-colors">
+                review queue
+              </Link>
+            </nav>
+          </div>
           <div className={`${mono.className} flex items-center gap-3 text-[13px]`}>
             {data.isDemo && (
               <span className="text-white/40">[ sample ]</span>
@@ -636,16 +649,21 @@ what to fix first
                 </p>
                 <button
                   onClick={() => handleSubscribe("monthly")}
-                  className="group mt-auto pt-6 w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] py-3.5 hover:bg-white transition-colors"
+                  disabled={subscribing !== null}
+                  className="group mt-auto pt-6 w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] py-3.5 hover:bg-white transition-colors disabled:opacity-70 disabled:cursor-wait"
                 >
-                  go unlimited
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                  {subscribing === "monthly" ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> opening checkout…</>
+                  ) : (
+                    <>go unlimited <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" /></>
+                  )}
                 </button>
                 <button
                   onClick={() => handleSubscribe("annual")}
-                  className={`${mono.className} mt-2 text-[12px] text-white/55 hover:text-white transition-colors`}
+                  disabled={subscribing !== null}
+                  className={`${mono.className} mt-2 text-[12px] text-white/55 hover:text-white transition-colors disabled:opacity-70 disabled:cursor-wait`}
                 >
-                  or $143.40/yr (save 40%)
+                  {subscribing === "annual" ? "opening checkout…" : "or $143.40/yr (save 40%)"}
                 </button>
               </div>
             </div>
