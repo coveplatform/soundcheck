@@ -1,10 +1,11 @@
 import { posts } from "../src/lib/blog-posts";
 import { genrePages } from "../src/lib/genre-pages";
 import { alternativePages } from "../src/lib/alternatives";
+import { SITE_URL } from "../src/lib/site";
 
 const KEY = "7e347151c740f1f4389aacc10a6f0b7b";
-const HOST = "mixreflect.com";
-const BASE_URL = `https://${HOST}`;
+const BASE_URL = SITE_URL;
+const HOST = new URL(SITE_URL).host;
 
 const urls = [
   BASE_URL,
