@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { authOptions } from "@/lib/auth";
@@ -26,13 +27,13 @@ const PERKS = [
 export default async function ReviewerLandingPage() {
   const session = await getServerSession(authOptions);
 
-  let isReviewer = false;
   if (session?.user?.id) {
     const me = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { isScoreReviewer: true },
     });
-    isReviewer = !!me?.isScoreReviewer;
+    // Already a reviewer — skip the pitch, go straight to their queue.
+    if (me?.isScoreReviewer) redirect("/score-review");
   }
 
   return (
@@ -62,15 +63,7 @@ export default async function ReviewerLandingPage() {
 
         {/* CTA — state-aware */}
         <div className="mb-12">
-          {isReviewer ? (
-            <Link
-              href="/score-review"
-              className="group inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-base px-8 py-4 hover:bg-white transition-colors"
-            >
-              go to your queue
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-          ) : session?.user ? (
+          {session?.user ? (
             <>
               <OptInButton label="become a reviewer" />
               <p className={`${mono.className} text-[12px] text-white/45 mt-3 normal-case`}>

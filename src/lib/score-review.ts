@@ -132,6 +132,26 @@ export async function getScoreReviewQueue(userId: string) {
     : rows;
 }
 
+/** A reviewer's own completed reactions, newest first — for their history view. */
+export async function getScoreReviewerHistory(userId: string, take = 50) {
+  return prisma.scoreReview.findMany({
+    where: { reviewerId: userId, status: "COMPLETED" },
+    orderBy: { completedAt: "desc" },
+    take,
+    select: {
+      id: true,
+      rating: true,
+      headline: true,
+      quote: true,
+      positive: true,
+      completedAt: true,
+      TrackScoreReport: {
+        select: { trackTitle: true, genre: true },
+      },
+    },
+  });
+}
+
 /** Completed human reactions for a report (for the report view). */
 export async function getReportHumanReviews(reportId: string) {
   return prisma.scoreReview.findMany({

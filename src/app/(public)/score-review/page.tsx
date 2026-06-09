@@ -7,12 +7,14 @@ import { prisma } from "@/lib/prisma";
 import {
   getScoreReviewQueue,
   getScoreReviewerEarnings,
+  getScoreReviewerHistory,
   SCORE_REVIEW_RATE_CENTS,
   SCORE_PAYOUT_THRESHOLD_CENTS,
 } from "@/lib/score-review";
 import { Logo } from "@/components/ui/logo";
 import { OptInButton } from "./opt-in-button";
 import { PayoutButton } from "./payout-button";
+import { ReviewHistory } from "./review-history";
 import { AccountMenu } from "../dashboard/account-menu";
 import { ArrowRight, Headphones, Plus, Zap, Wallet, Clock } from "lucide-react";
 
@@ -92,9 +94,10 @@ export default async function ScoreReviewQueuePage() {
     );
   }
 
-  const [queue, earnings] = await Promise.all([
+  const [queue, earnings, history] = await Promise.all([
     getScoreReviewQueue(session.user.id),
     getScoreReviewerEarnings(session.user.id),
+    getScoreReviewerHistory(session.user.id),
   ]);
   const dollars = (earnings.cents / 100).toFixed(2);
   const pct = Math.min(100, Math.round((earnings.cents / SCORE_PAYOUT_THRESHOLD_CENTS) * 100));
@@ -181,6 +184,8 @@ export default async function ScoreReviewQueuePage() {
           </p>
         </div>
       )}
+
+      <ReviewHistory items={history} />
     </Shell>
   );
 }
