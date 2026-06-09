@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
+import { mono } from "../../admin-ui";
 
 type AdminTicketListItem = {
   id: string;
@@ -56,10 +57,10 @@ export default async function AdminSupportPage({
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-[#f4f4ef]">
       <div>
-        <h1 className="text-2xl font-bold">Support</h1>
-        <p className="text-neutral-500">Most recent tickets (up to 50)</p>
+        <h1 className="text-2xl font-extrabold lowercase">support</h1>
+        <p className="text-white/45 text-sm">Most recent tickets (up to 50)</p>
       </div>
 
       <form className="flex flex-col sm:flex-row gap-2" action="/admin/support" method="GET">
@@ -67,12 +68,12 @@ export default async function AdminSupportPage({
           name="q"
           defaultValue={q}
           placeholder="Search ticket id, subject, or user email"
-          className="flex-1 h-9 px-3 border border-neutral-200 rounded-md text-sm"
+          className="flex-1 h-9 px-3 bg-[#141414] border border-white/15 rounded-md text-sm text-[#f4f4ef] placeholder:text-white/30 focus:border-[#6ee7ff] focus:outline-none"
         />
         <select
           name="status"
           defaultValue={status}
-          className="h-9 px-3 border border-neutral-200 rounded-md text-sm"
+          className="h-9 px-3 bg-[#141414] border border-white/15 rounded-md text-sm text-[#f4f4ef] focus:border-[#6ee7ff] focus:outline-none"
         >
           <option value="">All statuses</option>
           <option value="OPEN">OPEN</option>
@@ -80,41 +81,41 @@ export default async function AdminSupportPage({
           <option value="RESOLVED">RESOLVED</option>
           <option value="CLOSED">CLOSED</option>
         </select>
-        <button type="submit" className="h-9 px-3 rounded-md text-sm font-medium bg-neutral-900 text-white">
+        <button type="submit" className="h-9 px-4 rounded-md text-sm font-bold bg-[#6ee7ff] text-black hover:bg-white transition-colors">
           Apply
         </button>
       </form>
 
-      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-white/10 bg-[#0e0e0e] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
-            <thead className="bg-neutral-50 text-neutral-600">
+            <thead className="bg-white/[0.03] text-white/40">
               <tr>
                 <th className="text-left font-medium px-4 py-3">Subject</th>
                 <th className="text-left font-medium px-4 py-3">Status</th>
                 <th className="text-left font-medium px-4 py-3">User</th>
                 <th className="text-left font-medium px-4 py-3">Updated</th>
-                <th className="text-left font-medium px-4 py-3">Messages</th>
+                <th className="text-right font-medium px-4 py-3">Messages</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100">
+            <tbody className="divide-y divide-white/[0.06]">
               {tickets.map((t) => (
-                <tr key={t.id} className="text-neutral-700">
+                <tr key={t.id} className="text-white/75 hover:bg-white/[0.03]">
                   <td className="px-4 py-3">
-                    <Link className="underline" href={`/admin/support/${t.id}`}>
+                    <Link className="underline decoration-white/20 hover:text-[#6ee7ff]" href={`/admin/support/${t.id}`}>
                       {t.subject}
                     </Link>
-                    <div className="text-xs text-neutral-500 font-mono mt-1">{t.id}</div>
+                    <div className={`text-xs text-white/35 ${mono.className} mt-1`}>{t.id}</div>
                   </td>
-                  <td className="px-4 py-3">{t.status}</td>
-                  <td className="px-4 py-3">{t.User.email}</td>
-                  <td className="px-4 py-3">{new Date(t.updatedAt).toLocaleString()}</td>
-                  <td className="px-4 py-3">{t._count.SupportMessage}</td>
+                  <td className="px-4 py-3 text-white/60 lowercase">{t.status.toLowerCase().replace(/_/g, " ")}</td>
+                  <td className={`px-4 py-3 text-white/60 ${mono.className} text-xs`}>{t.User.email}</td>
+                  <td className="px-4 py-3 text-white/45">{new Date(t.updatedAt).toLocaleString()}</td>
+                  <td className={`px-4 py-3 text-right text-white/55 ${mono.className}`}>{t._count.SupportMessage}</td>
                 </tr>
               ))}
               {tickets.length === 0 ? (
                 <tr>
-                  <td className="px-4 py-6 text-center text-neutral-500" colSpan={5}>
+                  <td className="px-4 py-6 text-center text-white/40" colSpan={5}>
                     No tickets
                   </td>
                 </tr>

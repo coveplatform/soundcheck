@@ -116,9 +116,9 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
   };
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
-      <div className="flex flex-col gap-2 border-b border-neutral-200 bg-neutral-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-sm text-neutral-600">
+    <div className="rounded-xl border border-white/10 bg-[#0e0e0e] overflow-hidden">
+      <div className="flex flex-col gap-2 border-b border-white/10 bg-white/[0.03] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="text-sm text-white/55">
           {selectedCount
             ? `${selectedCount} track${selectedCount > 1 ? "s" : ""} selected`
             : "Select tracks to enable bulk delete"}
@@ -134,19 +134,19 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
         </Button>
       </div>
       {bulkError ? (
-        <div className="border-b border-neutral-200 px-4 py-2 text-sm text-red-600">
+        <div className="border-b border-white/10 px-4 py-2 text-sm text-[#ff6b6b]">
           {bulkError}
         </div>
       ) : null}
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
-          <thead className="bg-neutral-50 text-neutral-600">
+          <thead className="bg-white/[0.03] text-white/40">
             <tr>
               <th className="px-4 py-3 w-10">
                 <input
                   ref={selectAllRef}
                   type="checkbox"
-                  className="h-4 w-4 rounded border-neutral-300"
+                  className="h-4 w-4 rounded border-white/20 bg-transparent"
                   checked={allSelected}
                   onChange={(event) => toggleAll(event.target.checked)}
                   aria-label="Select all tracks"
@@ -162,38 +162,37 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
               <th className="text-left font-medium px-4 py-3">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-100">
+          <tbody className="divide-y divide-white/[0.06]">
             {tracks.map((track) => {
-              const isPro = track.ArtistProfile.subscriptionStatus === "active";
               const packageName = track.packageType
                 ? PACKAGE_NAMES[track.packageType] || track.packageType
                 : null;
 
               return (
-                <tr key={track.id} className="text-neutral-700">
+                <tr key={track.id} className="text-white/75 hover:bg-white/[0.03]">
                   <td className="px-4 py-3 w-10">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 rounded border-neutral-300"
+                      className="h-4 w-4 rounded border-white/20 bg-transparent"
                       checked={selectedIds.has(track.id)}
                       onChange={() => toggleSelection(track.id)}
                       aria-label={`Select ${track.title}`}
                     />
                   </td>
                   <td className="px-4 py-3">
-                    <Link className="underline" href={`/admin/tracks/${track.id}`}>
+                    <Link className="underline decoration-white/20 hover:text-[#6ee7ff]" href={`/admin/tracks/${track.id}`}>
                       {track.title}
                     </Link>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
-                      <span>{track.status}</span>
+                      <span className="text-white/60">{track.status}</span>
                       {track.isPublic ? (
-                        <span className="px-1.5 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded w-fit">
+                        <span className="px-1.5 py-0.5 text-xs font-bold bg-[#7cffc4]/10 text-[#7cffc4] rounded w-fit">
                           PUBLIC
                         </span>
                       ) : (
-                        <span className="px-1.5 py-0.5 text-xs font-bold bg-neutral-100 text-neutral-500 rounded w-fit">
+                        <span className="px-1.5 py-0.5 text-xs font-bold bg-white/5 text-white/40 rounded w-fit">
                           PRIVATE
                         </span>
                       )}
@@ -204,72 +203,59 @@ export function AdminTracksTable({ tracks }: { tracks: AdminTrackRow[] }) {
                       (() => {
                         const remaining = track.reviewsRequested - track.reviewsCompleted;
                         return (
-                          <span className={`font-medium text-sm ${remaining === 1 ? "text-amber-600" : remaining === 0 ? "text-green-600" : "text-neutral-700"}`}>
+                          <span className={`font-medium text-sm ${remaining === 1 ? "text-[#fbbf24]" : remaining === 0 ? "text-[#7cffc4]" : "text-white/70"}`}>
                             {track.reviewsCompleted}/{track.reviewsRequested}
-                            {remaining === 1 && <span className="ml-1 text-xs text-amber-500">(1 left)</span>}
+                            {remaining === 1 && <span className="ml-1 text-xs text-[#fbbf24]/70">(1 left)</span>}
                           </span>
                         );
                       })()
                     ) : (
-                      <span className="text-neutral-300">—</span>
+                      <span className="text-white/20">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     {track.promoCode ? (
                       <span className="inline-flex items-center gap-1">
-                        <span className="px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
+                        <span className="px-1.5 py-0.5 text-xs font-bold bg-[#6ee7ff]/10 text-[#6ee7ff] rounded">
                           PROMO
                         </span>
-                        <span className="text-neutral-400 text-xs">
+                        <span className="text-white/40 text-xs">
                           {track.promoCode}
                         </span>
                       </span>
                     ) : packageName ? (
                       <span className="inline-flex flex-col">
-                        <span>{packageName}</span>
-                        <span className="text-xs text-neutral-400">{track.packageType}</span>
+                        <span className="text-white/65">{packageName}</span>
+                        <span className="text-xs text-white/40">{track.packageType}</span>
                       </span>
                     ) : (
-                      <span className="text-neutral-400">—</span>
+                      <span className="text-white/30">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-xs font-bold">
+                      <span className="text-xs font-bold text-white/65">
                         {track.creditsSpent} spent
                       </span>
-                      <span className="text-xs text-neutral-400">
+                      <span className="text-xs text-white/40">
                         {track.ArtistProfile.reviewCredits} remaining
                       </span>
                       {track.Payment?.status === "COMPLETED" && (
-                        <span className="px-1.5 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded w-fit">
+                        <span className="px-1.5 py-0.5 text-xs font-bold bg-[#7cffc4]/10 text-[#7cffc4] rounded w-fit">
                           PAID
                         </span>
                       )}
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex flex-col">
-                      <Link
-                        className="underline"
-                        href={`/admin/users/${track.ArtistProfile.User.id}`}
-                      >
-                        {track.ArtistProfile.User.email}
-                      </Link>
-                      <span className="inline-flex items-center gap-1 mt-0.5">
-                        {isPro ? (
-                          <span className="px-1.5 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
-                            PRO
-                          </span>
-                        ) : (
-                          <span className="px-1.5 py-0.5 text-xs font-bold bg-neutral-100 text-neutral-500 rounded">
-                            FREE
-                          </span>
-                        )}
-                      </span>
-                    </div>
+                    <Link
+                      className="underline decoration-white/20 hover:text-[#6ee7ff]"
+                      href={`/admin/users/${track.ArtistProfile.User.id}`}
+                    >
+                      {track.ArtistProfile.User.email}
+                    </Link>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-white/45">
                     {new Date(track.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3">

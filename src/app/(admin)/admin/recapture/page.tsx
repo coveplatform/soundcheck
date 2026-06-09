@@ -110,22 +110,22 @@ export default function RecapturePage() {
   return (
     <div className="pt-8 pb-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-black/50 hover:text-black mb-6">
+        <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-[#6ee7ff] mb-6">
           <ArrowLeft className="h-4 w-4" />
           Back to Admin
         </Link>
 
         <div className="flex items-start justify-between mb-2">
           <div>
-            <h1 className="text-2xl font-bold text-black">Win-back Campaign</h1>
-            <p className="text-sm text-neutral-500 mt-1">
+            <h1 className="text-2xl font-extrabold text-[#f4f4ef] lowercase">win-back campaign</h1>
+            <p className="text-sm text-white/45 mt-1">
               Send a recapture email to users who haven&apos;t been active in 7+ days — includes 5 free credits, added automatically.
             </p>
           </div>
           {count !== null && (
-            <div className="flex items-center gap-2 bg-neutral-100 px-3 py-2 rounded-lg flex-shrink-0 ml-4">
-              <Users className="h-4 w-4 text-neutral-500" />
-              <span className="text-sm font-semibold text-neutral-700">{count} lapsed users</span>
+            <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-2 rounded-lg flex-shrink-0 ml-4">
+              <Users className="h-4 w-4 text-white/40" />
+              <span className="text-sm font-semibold text-white/70">{count} lapsed users</span>
             </div>
           )}
         </div>

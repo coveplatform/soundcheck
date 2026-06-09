@@ -69,11 +69,11 @@ export default async function AdminTrackDetailPage({
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-[#f4f4ef]">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Track</h1>
-          <p className="text-neutral-500">{track.title}</p>
+          <h1 className="text-2xl font-extrabold lowercase">track</h1>
+          <p className="text-white/50">{track.title}</p>
         </div>
         <div className="flex items-center gap-2">
           {canRefund ? <RefundButton trackId={track.id} /> : null}
@@ -82,8 +82,8 @@ export default async function AdminTrackDetailPage({
         </div>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-        <div className="text-sm text-neutral-500">Listen</div>
+      <div className="rounded-xl border border-white/10 bg-[#0e0e0e] p-4">
+        <div className="text-sm text-white/40">Listen</div>
         <div className="mt-3">
           <AudioPlayer
             sourceUrl={track.sourceUrl}
@@ -92,15 +92,15 @@ export default async function AdminTrackDetailPage({
             showWaveform={track.sourceType === "UPLOAD"}
           />
         </div>
-        <div className="mt-3 pt-3 border-t border-neutral-100">
+        <div className="mt-3 pt-3 border-t border-white/10">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="text-xs text-neutral-400">Source URL ({track.sourceType})</div>
+              <div className="text-xs text-white/35">Source URL ({track.sourceType})</div>
               <a
                 href={track.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-blue-600 hover:text-blue-800 underline break-all"
+                className="text-sm text-[#6ee7ff] hover:text-white underline break-all"
               >
                 {track.sourceUrl}
               </a>
@@ -108,7 +108,7 @@ export default async function AdminTrackDetailPage({
             {track.sourceType !== "UPLOAD" && (
               <div className="flex-shrink-0">
                 {track.linkIssueNotifiedAt ? (
-                  <span className="text-xs text-orange-600 font-medium">
+                  <span className="text-xs text-[#fbbf24] font-medium">
                     Notified {new Date(track.linkIssueNotifiedAt).toLocaleDateString()}
                   </span>
                 ) : (
@@ -120,18 +120,18 @@ export default async function AdminTrackDetailPage({
         </div>
       </div>
 
-      <div className="grid md:grid-cols-4 gap-4">
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Status</div>
+      <div className="grid md:grid-cols-3 gap-4">
+        <div className="rounded-xl border border-white/10 bg-[#0e0e0e] p-4">
+          <div className="text-sm text-white/40">Status</div>
           <div className="font-medium">{track.status}</div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Payment</div>
+        <div className="rounded-xl border border-white/10 bg-[#0e0e0e] p-4">
+          <div className="text-sm text-white/40">Payment</div>
           <div className="font-medium">
             {track.Payment?.status ? (
               track.Payment.status
             ) : track.status !== "PENDING_PAYMENT" ? (
-              <span className="px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-700 rounded">
+              <span className="px-2 py-0.5 text-xs font-bold bg-[#6ee7ff]/10 text-[#6ee7ff] rounded">
                 REVIEW CREDITS
               </span>
             ) : (
@@ -139,74 +139,57 @@ export default async function AdminTrackDetailPage({
             )}
           </div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Artist</div>
+        <div className="rounded-xl border border-white/10 bg-[#0e0e0e] p-4">
+          <div className="text-sm text-white/40">Artist</div>
           <div className="font-medium">
-            <Link className="underline" href={`/admin/users/${track.ArtistProfile.User.id}`}>
+            <Link className="underline decoration-white/20 hover:text-[#6ee7ff]" href={`/admin/users/${track.ArtistProfile.User.id}`}>
               {track.ArtistProfile.User.email}
             </Link>
           </div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500">Subscription</div>
-          <div className="font-medium">
-            {track.ArtistProfile.subscriptionStatus === "active" ? (
-              <span className="px-2 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
-                PRO
-              </span>
-            ) : (
-              <span className="px-2 py-0.5 text-xs font-bold bg-neutral-100 text-neutral-500 rounded">
-                FREE TIER
-              </span>
-            )}
-            <span className="ml-2 text-sm text-neutral-400">
-              {track.ArtistProfile.reviewCredits} credits remaining
-            </span>
-          </div>
-        </div>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-        <div className="text-sm text-neutral-500">Details</div>
+      <div className="rounded-xl border border-white/10 bg-[#0e0e0e] p-4">
+        <div className="text-sm text-white/40">Details</div>
         <div className="mt-2 grid md:grid-cols-3 gap-3 text-sm">
           <div>
-            <div className="text-neutral-500">Package</div>
+            <div className="text-white/40">Package</div>
             <div className="font-medium">
               {track.promoCode ? (
                 <span className="inline-flex items-center gap-2">
-                  <span className="px-2 py-0.5 text-xs font-bold bg-purple-100 text-purple-700 rounded">
+                  <span className="px-2 py-0.5 text-xs font-bold bg-[#6ee7ff]/10 text-[#6ee7ff] rounded">
                     PROMO: {track.promoCode}
                   </span>
                 </span>
               ) : track.packageType ? (
                 <span>
                   {(PACKAGES as Record<string, { name: string }>)[track.packageType]?.name || track.packageType}
-                  <span className="ml-1 text-xs text-neutral-400">({track.packageType})</span>
+                  <span className="ml-1 text-xs text-white/40">({track.packageType})</span>
                 </span>
               ) : (
-                <span className="text-neutral-400">—</span>
+                <span className="text-white/30">—</span>
               )}
             </div>
           </div>
           <div>
-            <div className="text-neutral-500">Reviews</div>
+            <div className="text-white/40">Reviews</div>
             <div className="font-medium">
               {countedCompletedReviews} / {track.reviewsRequested}
             </div>
           </div>
           <div>
-            <div className="text-neutral-500">Created</div>
+            <div className="text-white/40">Created</div>
             <div className="font-medium">{new Date(track.createdAt).toLocaleString()}</div>
           </div>
         </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b border-neutral-200 font-medium">Reviews</div>
+        <div className="rounded-xl border border-white/10 bg-[#0e0e0e] overflow-hidden">
+          <div className="px-4 py-3 border-b border-white/10 font-bold lowercase">reviews</div>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
-              <thead className="bg-neutral-50 text-neutral-600">
+              <thead className="bg-white/[0.03] text-white/40">
                 <tr>
                   <th className="text-left font-medium px-4 py-3">Reviewer</th>
                   <th className="text-left font-medium px-4 py-3">Status</th>
@@ -215,9 +198,9 @@ export default async function AdminTrackDetailPage({
                   <th className="text-left font-medium px-4 py-3"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-white/[0.06]">
                 {track.Review.map((r) => (
-                  <tr key={r.id} className="text-neutral-700">
+                  <tr key={r.id} className="text-white/75">
                     <td className="px-4 py-3">{r.ReviewerProfile?.User.email || r.ArtistProfile?.User?.email || "Peer"}</td>
                     <td className="px-4 py-3">{r.status}</td>
                     <td className="px-4 py-3">{r.wasFlagged ? "Yes" : "No"}</td>
@@ -226,7 +209,7 @@ export default async function AdminTrackDetailPage({
                       {r.status === "COMPLETED" ? (
                         <Link
                           href={`/admin/reviews/${r.id}`}
-                          className="text-sm text-blue-600 hover:text-blue-800 underline"
+                          className="text-sm text-[#6ee7ff] hover:text-white underline"
                         >
                           View
                         </Link>
@@ -236,7 +219,7 @@ export default async function AdminTrackDetailPage({
                 ))}
                 {track.Review.length === 0 ? (
                   <tr>
-                    <td className="px-4 py-6 text-center text-neutral-500" colSpan={5}>
+                    <td className="px-4 py-6 text-center text-white/40" colSpan={5}>
                       No reviews yet
                     </td>
                   </tr>
@@ -246,11 +229,11 @@ export default async function AdminTrackDetailPage({
           </div>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b border-neutral-200 font-medium">Queue</div>
+        <div className="rounded-xl border border-white/10 bg-[#0e0e0e] overflow-hidden">
+          <div className="px-4 py-3 border-b border-white/10 font-bold lowercase">queue</div>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
-              <thead className="bg-neutral-50 text-neutral-600">
+              <thead className="bg-white/[0.03] text-white/40">
                 <tr>
                   <th className="text-left font-medium px-4 py-3">Reviewer</th>
                   <th className="text-left font-medium px-4 py-3">Assigned</th>
@@ -258,9 +241,9 @@ export default async function AdminTrackDetailPage({
                   <th className="text-left font-medium px-4 py-3"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-white/[0.06]">
                 {track.ReviewQueue.map((q) => (
-                  <tr key={q.id} className="text-neutral-700">
+                  <tr key={q.id} className="text-white/75">
                     <td className="px-4 py-3">{q.ReviewerProfile?.User.email || q.ArtistProfile?.User?.email || "Peer"}</td>
                     <td className="px-4 py-3">{new Date(q.assignedAt).toLocaleString()}</td>
                     <td className="px-4 py-3">{new Date(q.expiresAt).toLocaleString()}</td>
@@ -277,7 +260,7 @@ export default async function AdminTrackDetailPage({
                 ))}
                 {track.ReviewQueue.length === 0 ? (
                   <tr>
-                    <td className="px-4 py-6 text-center text-neutral-500" colSpan={4}>
+                    <td className="px-4 py-6 text-center text-white/40" colSpan={4}>
                       Queue is empty
                     </td>
                   </tr>
@@ -290,14 +273,14 @@ export default async function AdminTrackDetailPage({
 
       {/* Debug Assignment */}
       {track.status === "QUEUED" || track.status === "IN_PROGRESS" ? (
-        <div className="rounded-xl border border-neutral-200 bg-white shadow-sm p-4">
-          <div className="text-sm text-neutral-500 mb-3">Debug</div>
+        <div className="rounded-xl border border-white/10 bg-[#0e0e0e] p-4">
+          <div className="text-sm text-white/40 mb-3">Debug</div>
           <DebugAssignButton trackId={track.id} />
         </div>
       ) : null}
 
       <div>
-        <Link className="text-sm text-neutral-600 hover:text-neutral-900 underline" href="/admin/tracks">
+        <Link className="text-sm text-white/50 hover:text-[#6ee7ff] underline decoration-white/20" href="/admin/tracks">
           Back to tracks
         </Link>
       </div>

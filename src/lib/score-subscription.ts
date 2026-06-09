@@ -13,6 +13,9 @@ import { prisma } from "@/lib/prisma";
 const SUB_MONTHLY_CENTS = 1995; // $19.95 / month
 const SUB_ANNUAL_CENTS = 14340; // $143.40 / year (= $11.95/mo, ~40% off monthly)
 
+/** One-time price to unlock a single report's full results. */
+export const UNLOCK_PRICE_CENTS = 695; // $6.95 one-time
+
 export type SubPlan = "monthly" | "annual";
 
 export function scoreSubPrice(plan: SubPlan): {

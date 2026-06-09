@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { AdminTracksTable } from "@/components/admin/admin-tracks-table";
 
@@ -62,33 +63,33 @@ export default async function AdminTracksPage({
   ).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-[#f4f4ef]">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Tracks</h1>
-          <p className="text-neutral-500">All tracks</p>
+          <h1 className="text-2xl font-extrabold lowercase">tracks</h1>
+          <p className="text-white/45 text-sm">Peer-review submissions (legacy marketplace)</p>
         </div>
         {!filterOneRemaining && oneRemainingCount > 0 && (
-          <a
+          <Link
             href="/admin/tracks?remaining=1"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-sm font-semibold hover:bg-amber-100"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#fbbf24]/10 border border-[#fbbf24]/30 text-[#fbbf24] text-sm font-semibold hover:bg-[#fbbf24]/20"
           >
-            <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
+            <span className="inline-block w-2 h-2 rounded-full bg-[#fbbf24]" />
             {oneRemainingCount} track{oneRemainingCount !== 1 ? "s" : ""} need 1 more review
-          </a>
+          </Link>
         )}
         {filterOneRemaining && (
-          <a
+          <Link
             href="/admin/tracks"
-            className="text-sm text-neutral-500 underline hover:text-neutral-800"
+            className="text-sm text-white/50 underline hover:text-[#6ee7ff]"
           >
             ← Show all tracks
-          </a>
+          </Link>
         )}
       </div>
 
       {filterOneRemaining && (
-        <div className="px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800">
+        <div className="px-4 py-3 rounded-lg bg-[#fbbf24]/10 border border-[#fbbf24]/30 text-sm text-[#fbbf24]">
           Showing <strong>{tracks.length}</strong> active track{tracks.length !== 1 ? "s" : ""} with exactly 1 review still outstanding.
         </div>
       )}
@@ -99,12 +100,12 @@ export default async function AdminTracksPage({
           name="q"
           defaultValue={q}
           placeholder="Search title or artist email"
-          className="flex-1 h-9 px-3 border border-neutral-200 rounded-md text-sm"
+          className="flex-1 h-9 px-3 bg-[#141414] border border-white/15 rounded-md text-sm text-[#f4f4ef] placeholder:text-white/30 focus:border-[#6ee7ff] focus:outline-none"
         />
         <select
           name="status"
           defaultValue={status ?? ""}
-          className="h-9 px-3 border border-neutral-200 rounded-md text-sm"
+          className="h-9 px-3 bg-[#141414] border border-white/15 rounded-md text-sm text-[#f4f4ef] focus:border-[#6ee7ff] focus:outline-none"
           disabled={filterOneRemaining}
         >
           <option value="">All statuses</option>
@@ -116,7 +117,7 @@ export default async function AdminTracksPage({
         </select>
         <button
           type="submit"
-          className="h-9 px-3 rounded-md text-sm font-medium bg-neutral-900 text-white"
+          className="h-9 px-4 rounded-md text-sm font-bold bg-[#6ee7ff] text-black hover:bg-white transition-colors"
         >
           Apply
         </button>

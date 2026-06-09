@@ -1,26 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { getScoreStatsForEmails, type ScoreStats } from "@/lib/admin-score-stats";
+import { TierBadge, SortHeader, getRelativeTime, mono } from "../../admin-ui";
 
 export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 100;
-
-function getRelativeTime(date: Date | null): string {
-  if (!date) return '—';
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-  if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
-  return `${Math.floor(diffDays / 365)}y ago`;
-}
 
 export default async function AdminUsersPage({
   searchParams,
@@ -160,6 +145,7 @@ export default async function AdminUsersPage({
   ];
 
   // Build where clause
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const whereClause: any = {};
 
   if (q) {
@@ -169,13 +155,11 @@ export default async function AdminUsersPage({
     ];
   }
 
-  if (filter === "tracks") {
-    whereClause.isArtist = true;
-  } else if (filter === "reviews") {
-    whereClause.isReviewer = true;
+  // DB-level filter (the rest are computed from score stats below).
+  if (filter === "reviewers") {
+    whereClause.isScoreReviewer = true;
   } else if (filter === "inactive") {
-    whereClause.isArtist = false;
-    whereClause.isReviewer = false;
+    whereClause.lastActiveAt = null;
   }
 
   if (!showDemo) {
@@ -191,72 +175,63 @@ export default async function AdminUsersPage({
     id: true,
     email: true,
     name: true,
-    isArtist: true,
-    isReviewer: true,
+    isScoreReviewer: true,
     createdAt: true,
     lastActiveAt: true,
     referredByCode: true,
     totalReferrals: true,
-    ArtistProfile: {
-      select: {
-        artistName: true,
-        completedOnboarding: true,
-        totalPeerReviews: true,
-        reviewCredits: true,
-        Track: {
-          select: {
-            reviewsRequested: true,
-            status: true,
-          },
-        },
-      },
-    },
-    ReviewerProfile: {
-      select: {
-        completedOnboarding: true,
-        onboardingQuizPassed: true,
-        totalReviews: true,
-      },
-    },
-    Account: {
-      select: { provider: true },
-      take: 1,
-    },
+    ArtistProfile: { select: { artistName: true } },
+    Account: { select: { provider: true }, take: 1 },
   };
 
-  // Computed sorts require fetching all users and sorting in JS
-  const isComputedSort = ["uploaded", "inqueue", "reviews"].includes(sort);
+  // Tier filters + report/spend sorts are computed from email-keyed score stats,
+  // so they need every matching user enriched before we can filter/sort/paginate.
+  const isTierFilter = ["unlimited", "onetime", "free"].includes(filter);
+  const isComputedSort = ["reports", "spend"].includes(sort);
+  const needsAllUsers = isTierFilter || isComputedSort;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let users: any[];
+  type Row = any & { _stats: ScoreStats };
+  let users: Row[];
   let totalUsers: number;
 
-  if (isComputedSort) {
+  const attachStats = async (rows: { email: string }[]): Promise<Map<string, ScoreStats>> => {
+    return getScoreStatsForEmails(rows.map((r) => r.email));
+  };
+
+  if (needsAllUsers) {
     const allRaw = await prisma.user.findMany({ where: whereClause, select: userSelect });
-    const withComputed = allRaw.map((u) => ({
+    const stats = await attachStats(allRaw);
+    let enriched: Row[] = allRaw.map((u) => ({
       ...u,
-      _uploaded: u.ArtistProfile?.Track.filter(
-        (t) => t.status !== "UPLOADED" && t.status !== "PENDING_PAYMENT" && t.status !== "CANCELLED"
-      ).length ?? 0,
-      _inqueue: u.ArtistProfile?.Track.filter(
-        (t) => t.status === "QUEUED" || t.status === "IN_PROGRESS" || t.status === "PENDING_PAYMENT"
-      ).length ?? 0,
-      _reviews: (u.ArtistProfile?.totalPeerReviews ?? 0) + (u.ReviewerProfile?.totalReviews ?? 0),
+      _stats: stats.get(u.email.trim().toLowerCase()) ?? {
+        tier: "Free", subStatus: null, subActive: false, renewsAt: null,
+        reports: 0, paidReports: 0, lastReportAt: null, spendCents: 0,
+      },
     }));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    withComputed.sort((a: any, b: any) => {
-      const va = sort === "uploaded" ? a._uploaded : sort === "inqueue" ? a._inqueue : a._reviews;
-      const vb = sort === "uploaded" ? b._uploaded : sort === "inqueue" ? b._inqueue : b._reviews;
-      return dir === "desc" ? vb - va : va - vb;
-    });
-    totalUsers = withComputed.length;
-    users = withComputed.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+    if (filter === "unlimited") enriched = enriched.filter((u) => u._stats.tier === "Unlimited");
+    else if (filter === "onetime") enriched = enriched.filter((u) => u._stats.tier === "One-time");
+    else if (filter === "free") enriched = enriched.filter((u) => u._stats.tier === "Free");
+
+    if (isComputedSort) {
+      enriched.sort((a, b) => {
+        const va = sort === "reports" ? a._stats.reports : a._stats.spendCents;
+        const vb = sort === "reports" ? b._stats.reports : b._stats.spendCents;
+        return dir === "desc" ? vb - va : va - vb;
+      });
+    } else {
+      enriched.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    }
+
+    totalUsers = enriched.length;
+    users = enriched.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   } else {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let orderBy: any = { createdAt: "desc" };
-    if (sort === "credits") orderBy = { ArtistProfile: { reviewCredits: dir } };
-    else if (sort === "active") orderBy = { lastActiveAt: dir };
+    if (sort === "active") orderBy = { lastActiveAt: dir };
     else if (sort === "joined") orderBy = { createdAt: dir };
-    [totalUsers, users] = await Promise.all([
+    const [count, rawPage] = await Promise.all([
       prisma.user.count({ where: whereClause }),
       prisma.user.findMany({
         where: whereClause,
@@ -266,6 +241,15 @@ export default async function AdminUsersPage({
         select: userSelect,
       }),
     ]);
+    totalUsers = count;
+    const stats = await attachStats(rawPage);
+    users = rawPage.map((u) => ({
+      ...u,
+      _stats: stats.get(u.email.trim().toLowerCase()) ?? {
+        tier: "Free", subStatus: null, subActive: false, renewsAt: null,
+        reports: 0, paidReports: 0, lastReportAt: null, spendCents: 0,
+      },
+    }));
   }
 
   const totalPages = Math.ceil(totalUsers / PAGE_SIZE);
@@ -284,28 +268,34 @@ export default async function AdminUsersPage({
     return `/admin/users${url.toString() ? `?${url.toString()}` : ""}`;
   };
 
-  // Sortable column header helper
-  const sortLink = (label: string, key: string, align: "left" | "right" = "right") => {
+  const sortHeader = (label: string, key: string, align: "left" | "right" = "right") => {
     const isActive = sort === key;
     const nextDir: "asc" | "desc" = isActive && dir === "desc" ? "asc" : "desc";
     return (
-      <th className={`text-${align} font-medium px-3 py-2`}>
-        <Link
-          href={buildUrl({ sort: key, dir: nextDir, page: 1 })}
-          className={`inline-flex items-center gap-1 ${align === "right" ? "w-full justify-end" : ""} hover:text-black transition-colors select-none ${isActive ? "text-black" : ""}`}
-        >
-          {label}
-          <span className="text-[9px] opacity-50">{isActive ? (dir === "desc" ? "▼" : "▲") : "⇅"}</span>
-        </Link>
-      </th>
+      <SortHeader label={label} href={buildUrl({ sort: key, dir: nextDir, page: 1 })} active={isActive} dir={dir} align={align} />
     );
   };
+
+  const filterTab = (label: string, key: string, accent = false) => (
+    <Link
+      href={buildUrl({ filter: key, page: 1 })}
+      className={`h-9 px-3 rounded-md text-sm font-medium flex items-center transition-colors ${
+        filter === key
+          ? accent
+            ? "bg-[#6ee7ff] text-black"
+            : "bg-white/10 text-[#f4f4ef] border border-white/15"
+          : "bg-white/5 text-white/55 hover:bg-white/10 hover:text-[#f4f4ef]"
+      }`}
+    >
+      {label}
+    </Link>
+  );
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Users</h1>
-        <p className="text-neutral-500">
+        <h1 className="text-2xl font-extrabold text-[#f4f4ef] lowercase">users</h1>
+        <p className="text-white/45 text-sm">
           {totalUsers} total users {q && `matching "${q}"`}
         </p>
       </div>
@@ -316,165 +306,128 @@ export default async function AdminUsersPage({
             name="q"
             defaultValue={q}
             placeholder="Search email or name"
-            className="flex-1 h-9 px-3 border border-neutral-200 rounded-md text-sm"
+            className="flex-1 h-9 px-3 bg-[#141414] border border-white/15 rounded-md text-sm text-[#f4f4ef] placeholder:text-white/30 focus:border-[#6ee7ff] focus:outline-none"
           />
           {filter && <input type="hidden" name="filter" value={filter} />}
           {showDemo && <input type="hidden" name="demo" value="show" />}
           <button
             type="submit"
-            className="h-9 px-3 rounded-md text-sm font-medium bg-neutral-900 text-white"
+            className="h-9 px-3 rounded-md text-sm font-bold bg-[#6ee7ff] text-black hover:bg-white transition-colors"
           >
             Search
           </button>
         </form>
 
-        <div className="flex gap-1">
-          <Link
-            href={buildUrl({ filter: "", page: 1 })}
-            className={`h-9 px-3 rounded-md text-sm font-medium flex items-center ${
-              !filter ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-            }`}
-          >
-            All
-          </Link>
-          <Link
-            href={buildUrl({ filter: "tracks", page: 1 })}
-            className={`h-9 px-3 rounded-md text-sm font-medium flex items-center ${
-              filter === "tracks" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-            }`}
-          >
-            Has Tracks
-          </Link>
-          <Link
-            href={buildUrl({ filter: "reviews", page: 1 })}
-            className={`h-9 px-3 rounded-md text-sm font-medium flex items-center ${
-              filter === "reviews" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-            }`}
-          >
-            Has Reviews
-          </Link>
-          <Link
-            href={buildUrl({ filter: "inactive", page: 1 })}
-            className={`h-9 px-3 rounded-md text-sm font-medium flex items-center ${
-              filter === "inactive" ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-            }`}
-          >
-            Inactive
-          </Link>
-          <span className="w-px h-6 bg-neutral-200 mx-1" />
+        <div className="flex gap-1 flex-wrap">
+          {filterTab("All", "")}
+          {filterTab("Unlimited", "unlimited", true)}
+          {filterTab("One-time", "onetime")}
+          {filterTab("Free", "free")}
+          {filterTab("Reviewers", "reviewers")}
+          {filterTab("Inactive", "inactive")}
+          <span className="w-px h-6 bg-white/10 mx-1" />
           <Link
             href={buildUrl({ demo: showDemo ? "" : "show", page: 1 })}
-            className={`h-9 px-3 rounded-md text-sm font-medium flex items-center ${
-              showDemo ? "bg-amber-100 text-amber-700 hover:bg-amber-200" : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+            className={`h-9 px-3 rounded-md text-sm font-medium flex items-center transition-colors ${
+              showDemo ? "bg-[#fbbf24]/15 text-[#fbbf24] border border-[#fbbf24]/30" : "bg-white/5 text-white/55 hover:bg-white/10"
             }`}
           >
-            {showDemo ? "Demo" : "Demo"}
+            Demo
           </Link>
         </div>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-xl border border-white/10 bg-[#0e0e0e] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-xs">
-            <thead className="bg-neutral-50 text-neutral-500">
+            <thead className="bg-white/[0.03] text-white/40">
               <tr>
                 <th className="text-left font-medium px-3 py-2">Email</th>
                 <th className="text-left font-medium px-3 py-2">Artist Name</th>
-                {sortLink("Uploaded", "uploaded")}
-                {sortLink("In Queue", "inqueue")}
-                {sortLink("Reviews", "reviews")}
-                {sortLink("Credits", "credits")}
+                <th className="text-left font-medium px-3 py-2">Tier</th>
+                {sortHeader("Reports", "reports")}
+                {sortHeader("Spend", "spend")}
+                <th className="text-left font-medium px-3 py-2">Renews</th>
                 <th className="text-right font-medium px-3 py-2">Refs</th>
                 <th className="text-left font-medium px-3 py-2">Ref By</th>
-                {sortLink("Active", "active", "left")}
-                {sortLink("Joined", "joined", "left")}
+                {sortHeader("Active", "active", "left")}
+                {sortHeader("Joined", "joined", "left")}
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100">
+            <tbody className="divide-y divide-white/[0.06]">
               {users.map((u) => {
-                const tracksPosted = u.ArtistProfile?.Track?.filter((t: any) =>
-                  t.status !== "UPLOADED" && t.status !== "PENDING_PAYMENT" && t.status !== "CANCELLED"
-                ).length ?? 0;
-                const tracksInQueue = u.ArtistProfile?.Track?.filter((t: any) =>
-                  t.status === "QUEUED" || t.status === "IN_PROGRESS" || t.status === "PENDING_PAYMENT"
-                ).length ?? 0;
-                const peerReviewsDone = u.ArtistProfile?.totalPeerReviews ?? 0;
-                const proReviewsDone = u.ReviewerProfile?.totalReviews ?? 0;
-                const reviewsDone = peerReviewsDone + proReviewsDone;
-
+                const s: ScoreStats = u._stats;
                 return (
-                <tr key={u.id} className="text-neutral-700 hover:bg-neutral-50">
+                <tr key={u.id} className="text-white/75 hover:bg-white/[0.03]">
                   <td className="px-3 py-2">
-                    <Link className="underline hover:text-purple-600" href={`/admin/users/${u.id}`}>
+                    <Link className="underline decoration-white/20 hover:text-[#6ee7ff]" href={`/admin/users/${u.id}`}>
                       {u.email}
                     </Link>
                     {u.Account?.[0]?.provider === "google" && (
-                      <span className="ml-1.5 inline-block text-[9px] font-bold uppercase tracking-wide text-blue-700 bg-blue-50 px-1 py-0.5 rounded">G</span>
+                      <span className="ml-1.5 inline-block text-[9px] font-bold uppercase tracking-wide text-[#6ee7ff] bg-[#6ee7ff]/10 px-1 py-0.5 rounded">G</span>
+                    )}
+                    {u.isScoreReviewer && (
+                      <span className="ml-1.5 inline-block text-[9px] font-bold uppercase tracking-wide text-[#7cffc4] bg-[#7cffc4]/10 px-1 py-0.5 rounded">Reviewer</span>
                     )}
                   </td>
-                  <td className="px-3 py-2 text-neutral-500">{u.ArtistProfile?.artistName ?? u.name ?? ""}</td>
-                  <td className="px-3 py-2 text-right">
-                    {tracksPosted > 0 ? (
-                      <span className={`font-medium tabular-nums ${tracksPosted >= 5 ? 'text-green-600' : tracksPosted >= 3 ? 'text-blue-600' : ''}`}>
-                        {tracksPosted}
+                  <td className="px-3 py-2 text-white/45">{u.ArtistProfile?.artistName ?? u.name ?? ""}</td>
+                  <td className="px-3 py-2"><TierBadge tier={s.tier} subStatus={s.subStatus} /></td>
+                  <td className={`px-3 py-2 text-right ${mono.className}`}>
+                    {s.reports > 0 ? (
+                      <span className="tabular-nums">
+                        <span className="text-[#6ee7ff] font-medium">{s.paidReports}</span>
+                        <span className="text-white/25">/{s.reports}</span>
                       </span>
                     ) : (
-                      <span className="text-neutral-300">—</span>
+                      <span className="text-white/20">—</span>
                     )}
                   </td>
-                  <td className="px-3 py-2 text-right">
-                    {tracksInQueue > 0 ? (
-                      <span className="font-medium tabular-nums text-purple-600">{tracksInQueue}</span>
+                  <td className={`px-3 py-2 text-right ${mono.className}`}>
+                    {s.spendCents > 0 ? (
+                      <span className="tabular-nums text-[#7cffc4] font-medium">${(s.spendCents / 100).toFixed(2)}</span>
                     ) : (
-                      <span className="text-neutral-300">—</span>
+                      <span className="text-white/20">—</span>
                     )}
                   </td>
-                  <td className="px-3 py-2 text-right">
-                    {reviewsDone > 0 ? (
-                      <span className={`font-medium tabular-nums ${reviewsDone >= 25 ? 'text-purple-600' : reviewsDone >= 5 ? 'text-blue-600' : ''}`}>
-                        {reviewsDone}
+                  <td className="px-3 py-2">
+                    {s.subActive && s.renewsAt ? (
+                      <span className={`${mono.className} text-white/55`} title={new Date(s.renewsAt).toLocaleString()}>
+                        {new Date(s.renewsAt).toLocaleDateString()}
                       </span>
                     ) : (
-                      <span className="text-neutral-300">—</span>
+                      <span className="text-white/20">—</span>
                     )}
                   </td>
-                  <td className="px-3 py-2 text-right">
-                    {u.ArtistProfile ? (
-                      <span className="font-medium tabular-nums">{u.ArtistProfile.reviewCredits ?? 0}</span>
-                    ) : (
-                      <span className="text-neutral-300">—</span>
-                    )}
-                  </td>
-                  <td className="px-3 py-2 text-right">
+                  <td className={`px-3 py-2 text-right ${mono.className}`}>
                     {(u.totalReferrals ?? 0) > 0 ? (
-                      <span className="font-medium tabular-nums text-green-600">{u.totalReferrals}</span>
+                      <span className="tabular-nums text-[#7cffc4] font-medium">{u.totalReferrals}</span>
                     ) : (
-                      <span className="text-neutral-300">—</span>
+                      <span className="text-white/20">—</span>
                     )}
                   </td>
                   <td className="px-3 py-2">
                     {u.referredByCode ? (
-                      <span className="inline-flex items-center font-mono font-medium px-1 py-0.5 rounded bg-green-50 text-green-700">{u.referredByCode}</span>
+                      <span className={`inline-flex items-center ${mono.className} px-1 py-0.5 rounded bg-[#7cffc4]/10 text-[#7cffc4]`}>{u.referredByCode}</span>
                     ) : (
-                      <span className="text-neutral-300">—</span>
+                      <span className="text-white/20">—</span>
                     )}
                   </td>
                   <td className="px-3 py-2">
                     {u.lastActiveAt ? (
                       <span className={
                         new Date().getTime() - new Date(u.lastActiveAt).getTime() < 86400000
-                          ? 'text-green-600 font-medium'
+                          ? 'text-[#7cffc4] font-medium'
                           : new Date().getTime() - new Date(u.lastActiveAt).getTime() < 604800000
-                          ? 'text-blue-600'
-                          : 'text-neutral-500'
+                          ? 'text-[#6ee7ff]'
+                          : 'text-white/45'
                       } title={new Date(u.lastActiveAt).toLocaleString()}>
                         {getRelativeTime(u.lastActiveAt)}
                       </span>
                     ) : (
-                      <span className="text-neutral-300">Never</span>
+                      <span className="text-white/20">Never</span>
                     )}
                   </td>
-                  <td className="px-3 py-2 text-neutral-500">
+                  <td className={`px-3 py-2 text-white/45 ${mono.className}`}>
                     {new Date(u.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
@@ -482,7 +435,7 @@ export default async function AdminUsersPage({
               })}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="px-3 py-8 text-center text-neutral-500">
+                  <td colSpan={10} className="px-3 py-8 text-center text-white/40">
                     No users found
                   </td>
                 </tr>
@@ -495,20 +448,19 @@ export default async function AdminUsersPage({
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-white/45">
             Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, totalUsers)} of {totalUsers}
           </p>
           <div className="flex gap-1">
             {page > 1 && (
               <Link
                 href={buildUrl({ page: page - 1 })}
-                className="h-9 px-3 rounded-md text-sm font-medium bg-neutral-100 text-neutral-700 hover:bg-neutral-200 flex items-center"
+                className="h-9 px-3 rounded-md text-sm font-medium bg-white/5 text-white/70 hover:bg-white/10 flex items-center"
               >
                 Previous
               </Link>
             )}
 
-            {/* Page numbers */}
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNum: number;
               if (totalPages <= 5) {
@@ -526,8 +478,8 @@ export default async function AdminUsersPage({
                   href={buildUrl({ page: pageNum })}
                   className={`h-9 w-9 rounded-md text-sm font-medium flex items-center justify-center ${
                     pageNum === page
-                      ? "bg-neutral-900 text-white"
-                      : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+                      ? "bg-[#6ee7ff] text-black"
+                      : "bg-white/5 text-white/70 hover:bg-white/10"
                   }`}
                 >
                   {pageNum}
@@ -538,7 +490,7 @@ export default async function AdminUsersPage({
             {page < totalPages && (
               <Link
                 href={buildUrl({ page: page + 1 })}
-                className="h-9 px-3 rounded-md text-sm font-medium bg-neutral-100 text-neutral-700 hover:bg-neutral-200 flex items-center"
+                className="h-9 px-3 rounded-md text-sm font-medium bg-white/5 text-white/70 hover:bg-white/10 flex items-center"
               >
                 Next
               </Link>

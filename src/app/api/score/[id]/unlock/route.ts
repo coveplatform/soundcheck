@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
-
-const UNLOCK_PRICE_CENTS = 695; // $6.95 one-time
+import { UNLOCK_PRICE_CENTS } from "@/lib/score-subscription";
 
 /**
  * Create a Stripe checkout session to unlock a report's full results.

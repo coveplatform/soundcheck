@@ -29,16 +29,16 @@ export function UserGrowthChart({ weekly, monthly }: Props) {
   const data = view === "weekly" ? weekly : monthly;
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden">
-      <div className="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-neutral-950">User Growth</h2>
+    <div className="rounded-xl border border-white/10 bg-[#0e0e0e] overflow-hidden">
+      <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+        <h2 className="text-sm font-bold text-[#f4f4ef] lowercase">user growth</h2>
         <div className="flex gap-1">
           <button
             onClick={() => setView("weekly")}
             className={`px-3 py-1 text-xs font-semibold rounded-lg border transition-colors ${
               view === "weekly"
-                ? "bg-neutral-950 text-white border-neutral-950"
-                : "bg-white text-neutral-500 border-neutral-200 hover:border-neutral-400"
+                ? "bg-[#6ee7ff] text-black border-[#6ee7ff]"
+                : "bg-white/5 text-white/50 border-white/15 hover:border-white/30"
             }`}
           >
             Weekly
@@ -47,8 +47,8 @@ export function UserGrowthChart({ weekly, monthly }: Props) {
             onClick={() => setView("monthly")}
             className={`px-3 py-1 text-xs font-semibold rounded-lg border transition-colors ${
               view === "monthly"
-                ? "bg-neutral-950 text-white border-neutral-950"
-                : "bg-white text-neutral-500 border-neutral-200 hover:border-neutral-400"
+                ? "bg-[#6ee7ff] text-black border-[#6ee7ff]"
+                : "bg-white/5 text-white/50 border-white/15 hover:border-white/30"
             }`}
           >
             Monthly
@@ -58,41 +58,42 @@ export function UserGrowthChart({ weekly, monthly }: Props) {
 
       <div className="p-5">
         {data.length < 2 ? (
-          <div className="h-52 flex items-center justify-center text-neutral-400 text-sm">
+          <div className="h-52 flex items-center justify-center text-white/30 text-sm">
             Not enough data to display
           </div>
         ) : (
           <div className="h-52 sm:h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={data} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                 <XAxis
                   dataKey="period"
-                  stroke="#a3a3a3"
+                  stroke="rgba(255,255,255,0.2)"
                   style={{ fontSize: "11px" }}
-                  tick={{ fill: "#737373" }}
+                  tick={{ fill: "rgba(255,255,255,0.45)" }}
                 />
                 <YAxis
                   yAxisId="left"
-                  stroke="#a3a3a3"
+                  stroke="rgba(255,255,255,0.2)"
                   style={{ fontSize: "11px" }}
-                  tick={{ fill: "#737373" }}
+                  tick={{ fill: "rgba(255,255,255,0.45)" }}
                   allowDecimals={false}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
-                  stroke="#a3a3a3"
+                  stroke="rgba(255,255,255,0.2)"
                   style={{ fontSize: "11px" }}
-                  tick={{ fill: "#737373" }}
+                  tick={{ fill: "rgba(255,255,255,0.45)" }}
                   allowDecimals={false}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#fff",
-                    border: "1.5px solid #e5e5e5",
+                    backgroundColor: "#141414",
+                    border: "1px solid rgba(255,255,255,0.15)",
                     borderRadius: "8px",
                     fontSize: "12px",
+                    color: "#f4f4ef",
                   }}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(value: any, name: any) => [
@@ -109,8 +110,8 @@ export function UserGrowthChart({ weekly, monthly }: Props) {
                 <Bar
                   yAxisId="left"
                   dataKey="newUsers"
-                  fill="#a855f7"
-                  fillOpacity={0.75}
+                  fill="#6ee7ff"
+                  fillOpacity={0.65}
                   radius={[3, 3, 0, 0]}
                   maxBarSize={40}
                 />
@@ -118,9 +119,9 @@ export function UserGrowthChart({ weekly, monthly }: Props) {
                   yAxisId="right"
                   type="monotone"
                   dataKey="total"
-                  stroke="#171717"
+                  stroke="#f4f4ef"
                   strokeWidth={2}
-                  dot={{ fill: "#171717", r: 3 }}
+                  dot={{ fill: "#f4f4ef", r: 3 }}
                   activeDot={{ r: 5 }}
                 />
               </ComposedChart>
