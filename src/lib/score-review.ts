@@ -58,12 +58,35 @@ export async function assignScoreReviewers(
     .map((e) => e.reviewerId)
     .filter((id): id is string => !!id);
 
+  // Never assign a track to its own owner (by email or linked artist profile).
+  const report = await prisma.trackScoreReport.findUnique({
+    where: { id: reportId },
+    select: { email: true, artistId: true },
+  });
+  const ownerIds: string[] = [];
+  if (report?.email) {
+    const owner = await prisma.user.findFirst({
+      where: { email: { equals: report.email, mode: "insensitive" } },
+      select: { id: true },
+    });
+    if (owner) ownerIds.push(owner.id);
+  }
+  if (report?.artistId) {
+    const ap = await prisma.artistProfile.findUnique({
+      where: { id: report.artistId },
+      select: { userId: true },
+    });
+    if (ap?.userId) ownerIds.push(ap.userId);
+  }
+
+  const exclude = [...alreadyAssigned, ...ownerIds];
+
   // Pick reviewers from the pool who aren't already on this report. Bias toward
   // the least-recently-active so load spreads across the pool.
   const reviewers = await prisma.user.findMany({
     where: {
       isScoreReviewer: true,
-      id: { notIn: alreadyAssigned.length ? alreadyAssigned : ["__none__"] },
+      id: { notIn: exclude.length ? exclude : ["__none__"] },
     },
     select: { id: true },
     orderBy: { lastActiveAt: "asc" },
@@ -86,7 +109,10 @@ export async function assignScoreReviewers(
 
 /** A reviewer's open queue: assigned/in-progress, not expired, newest first. */
 export async function getScoreReviewQueue(userId: string) {
-  return prisma.scoreReview.findMany({
+  const me = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+  const myEmail = me?.email?.trim().toLowerCase() ?? null;
+
+  const rows = await prisma.scoreReview.findMany({
     where: {
       reviewerId: userId,
       status: { in: ["ASSIGNED", "IN_PROGRESS"] },
@@ -95,10 +121,15 @@ export async function getScoreReviewQueue(userId: string) {
     orderBy: { assignedAt: "asc" },
     include: {
       TrackScoreReport: {
-        select: { slug: true, trackTitle: true, trackUrl: true, genre: true },
+        select: { slug: true, trackTitle: true, trackUrl: true, genre: true, email: true },
       },
     },
   });
+
+  // Never show someone their own submission to review (covers any legacy self-assignments).
+  return myEmail
+    ? rows.filter((r) => (r.TrackScoreReport?.email ?? "").trim().toLowerCase() !== myEmail)
+    : rows;
 }
 
 /** Completed human reactions for a report (for the report view). */
@@ -139,6 +170,19 @@ export async function submitScoreReview(input: SubmitScoreReviewInput) {
   if (review.reviewerId !== input.reviewerId) throw new Error("Not your assignment");
   if (review.status === "COMPLETED") {
     return { ok: true, alreadyDone: true, earnings: await getScoreReviewerEarnings(input.reviewerId) };
+  }
+
+  // Guard: you can't review your own track.
+  const [reportOwner, reviewerUser] = await Promise.all([
+    prisma.trackScoreReport.findUnique({ where: { id: review.reportId }, select: { email: true } }),
+    prisma.user.findUnique({ where: { id: input.reviewerId }, select: { email: true } }),
+  ]);
+  if (
+    reportOwner?.email &&
+    reviewerUser?.email &&
+    reportOwner.email.trim().toLowerCase() === reviewerUser.email.trim().toLowerCase()
+  ) {
+    throw new Error("You can't review your own track");
   }
 
   await prisma.scoreReview.update({
