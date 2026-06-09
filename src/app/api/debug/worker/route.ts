@@ -5,8 +5,40 @@ import { NextResponse } from "next/server";
 // Delete once the worker is confirmed grounding.
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   const url = process.env.AUDIO_WORKER_URL || null;
+  const testUrl = new URL(request.url).searchParams.get("url");
+
+  // Optional: run a real /analyze through the worker (server-side, with the
+  // secret) to prove the full grounding pipeline — ?url=<track link>.
+  if (url && testUrl) {
+    try {
+      const base = url.replace(/\/$/, "");
+      const t0 = Date.now();
+      const r = await fetch(`${base}/analyze`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(process.env.AUDIO_WORKER_SECRET ? { Authorization: `Bearer ${process.env.AUDIO_WORKER_SECRET}` } : {}),
+        },
+        body: JSON.stringify({ url: testUrl }),
+        signal: AbortSignal.timeout(60_000),
+      });
+      const data = (await r.json().catch(() => null)) as { features?: { durationSec?: number; tempo?: number; key?: string } | null; took?: number } | null;
+      return NextResponse.json({
+        analyzeStatus: r.status,
+        grounded: !!data?.features,
+        durationSec: data?.features?.durationSec ?? null,
+        tempo: data?.features?.tempo ?? null,
+        key: data?.features?.key ?? null,
+        took: data?.took ?? null,
+        roundTripMs: Date.now() - t0,
+      });
+    } catch (e) {
+      return NextResponse.json({ analyzeError: e instanceof Error ? e.message : String(e) });
+    }
+  }
+
   const secretSet = !!process.env.AUDIO_WORKER_SECRET;
   let host: string | null = null;
   try {
