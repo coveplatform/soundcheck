@@ -66,6 +66,7 @@ export function ReviewExperience({
   const [quote, setQuote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [done, setDone] = useState<{ earnedCents: number; balanceCents: number } | null>(null);
 
   // ── listen state ──
   const [isPlaying, setIsPlaying] = useState(false);
@@ -170,8 +171,11 @@ export function ReviewExperience({
         setSubmitting(false);
         return;
       }
-      router.push("/score-review");
-      router.refresh();
+      // Confirm the +$0.40 and new balance before sending them back to the queue.
+      setDone({
+        earnedCents: data?.earnedCents ?? 40,
+        balanceCents: data?.earnings?.cents ?? 0,
+      });
     } catch {
       setError("Failed to submit. Try again.");
       setSubmitting(false);
@@ -181,6 +185,41 @@ export function ReviewExperience({
   const inputCls = `${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-4 py-3.5 text-[14px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`;
   const isDirect = source === "DIRECT";
   const needsManual = source === "BANDCAMP" || (isDirect && !/\.(mp3|wav|m4a|ogg|flac)(\?|$)/i.test(trackUrl));
+
+  if (done) {
+    return (
+      <div className="border border-white/12 bg-[#101010] p-8 sm:p-10 text-center">
+        <div
+          className="mx-auto w-14 h-14 flex items-center justify-center text-black text-2xl font-extrabold mb-5"
+          style={{ background: ACCENT }}
+        >
+          ✓
+        </div>
+        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3 lowercase">
+          reaction in — <span style={{ color: ACCENT }}>+${(done.earnedCents / 100).toFixed(2)}</span>
+        </h2>
+        <p className="text-white/65 normal-case mb-1">Nice. Your balance just went up.</p>
+        <p className={`${mono.className} text-[15px] mb-7`}>
+          balance now <span style={{ color: ACCENT }}>${(done.balanceCents / 100).toFixed(2)}</span>
+          <span className="text-white/40"> · cash out at $10</span>
+        </p>
+        <div className="flex flex-wrap gap-3 justify-center">
+          <button
+            onClick={() => { router.push("/score-review"); router.refresh(); }}
+            className="inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] px-6 py-3.5 hover:bg-white transition-colors"
+          >
+            review another track →
+          </button>
+          <button
+            onClick={() => router.push("/dashboard/settings")}
+            className={`${mono.className} text-[13px] text-white/60 hover:text-white px-4 py-3.5 transition-colors`}
+          >
+            view balance in settings
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

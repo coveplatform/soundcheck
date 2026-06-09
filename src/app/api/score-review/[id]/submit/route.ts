@@ -30,7 +30,7 @@ export async function POST(
       );
     }
 
-    await submitScoreReview({
+    const result = await submitScoreReview({
       reviewId: id,
       reviewerId: session.user.id,
       rating: Number(rating),
@@ -39,7 +39,12 @@ export async function POST(
       positive: positive ?? Number(rating) >= 3,
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      alreadyDone: "alreadyDone" in result ? result.alreadyDone : false,
+      earnedCents: "earnedCents" in result ? result.earnedCents : 0,
+      earnings: result.earnings ?? null,
+    });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Failed to submit";
     const status = msg.includes("Not your") ? 403 : msg.includes("not found") ? 404 : 500;

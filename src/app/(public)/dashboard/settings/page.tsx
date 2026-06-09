@@ -5,6 +5,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isScoreSubscribed } from "@/lib/score-subscription";
+import { getScoreReviewerEarnings } from "@/lib/score-review";
 import { Logo } from "@/components/ui/logo";
 import { AccountSettingsForm } from "./account-settings-form";
 
@@ -25,6 +26,10 @@ export default async function AccountSettingsPage() {
     }),
     isScoreSubscribed(session.user.email ?? ""),
   ]);
+
+  const earnings = user?.isScoreReviewer
+    ? await getScoreReviewerEarnings(session.user.id)
+    : null;
 
   return (
     <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase`}>
@@ -48,6 +53,7 @@ export default async function AccountSettingsPage() {
           initialName={user?.name ?? ""}
           subscribed={subscribed}
           isReviewer={!!user?.isScoreReviewer}
+          earnings={earnings}
         />
       </div>
     </div>

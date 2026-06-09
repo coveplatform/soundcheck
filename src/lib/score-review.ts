@@ -136,7 +136,9 @@ export async function submitScoreReview(input: SubmitScoreReviewInput) {
   });
   if (!review) throw new Error("Assignment not found");
   if (review.reviewerId !== input.reviewerId) throw new Error("Not your assignment");
-  if (review.status === "COMPLETED") return { ok: true, alreadyDone: true };
+  if (review.status === "COMPLETED") {
+    return { ok: true, alreadyDone: true, earnings: await getScoreReviewerEarnings(input.reviewerId) };
+  }
 
   await prisma.scoreReview.update({
     where: { id: review.id },
@@ -166,5 +168,7 @@ export async function submitScoreReview(input: SubmitScoreReviewInput) {
       });
     }
   }
-  return { ok: true };
+  // +$0.40 — return the reviewer's updated balance for instant UI feedback.
+  const earnings = await getScoreReviewerEarnings(input.reviewerId);
+  return { ok: true, earnings, earnedCents: SCORE_REVIEW_RATE_CENTS };
 }
