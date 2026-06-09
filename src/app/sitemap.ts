@@ -2,8 +2,9 @@ import type { MetadataRoute } from "next";
 import { posts } from "@/lib/blog-posts";
 import { genrePages } from "@/lib/genre-pages";
 import { alternativePages } from "@/lib/alternatives";
+import { SITE_URL } from "@/lib/site";
 
-const BASE_URL = "https://mixreflect.com";
+const BASE_URL = SITE_URL;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [

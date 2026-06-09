@@ -36,7 +36,7 @@ export function ShareReviewButton({
   const [imgLoaded, setImgLoaded] = useState(false);
 
   const cardUrl = `/api/og/review-card?reviewId=${reviewId}`;
-  const shareUrl = `${typeof window !== "undefined" ? window.location.origin : "https://mixreflect.com"}/r/${reviewId}`;
+  const shareUrl = `${typeof window !== "undefined" ? window.location.origin : "https://www.mixreflect.com"}/r/${reviewId}`;
 
   const xIntent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`"${trackTitle}" — real feedback from real artists 🎧\n\n`)}&url=${encodeURIComponent(shareUrl)}`;
 

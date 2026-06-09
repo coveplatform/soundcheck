@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     title: "MixReflect — Get Real Feedback on Your Music Before You Release",
     description:
       "Upload your track and get honest, structured feedback from genre-matched artists within hours. Free to start. No credit card required.",
-    url: "https://mixreflect.com",
+    url: "https://www.mixreflect.com",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "MixReflect" }],
   },
 };

@@ -6,6 +6,7 @@ import { Providers } from "@/components/providers";
 import { ChangeoverBanner } from "@/components/changeover-banner";
 import { WelcomeBanner } from "@/components/welcome-banner";
 import { headers } from "next/headers";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const GDPR_COUNTRIES = new Set([
@@ -25,7 +26,7 @@ const plusJakarta = Plus_Jakarta_Sans({
   weight: ["400", "600", "700", "800"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mixreflect.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || SITE_URL;
 
 export const viewport = {
   width: "device-width",
@@ -40,6 +41,7 @@ export const metadata: Metadata = {
   },
   description:
     "Paste a link to your track and get an instant AI read — a score out of 100, a verdict and a breakdown — plus honest reactions from a room of real, paid listeners. Free to submit.",
+  alternates: { canonical: "/" },
   keywords: [
     "music feedback",
     "song score",
@@ -106,7 +108,7 @@ const jsonLd = {
     {
       "@type": "SoftwareApplication",
       name: "MixReflect",
-      url: "https://mixreflect.com",
+      url: SITE_URL,
       applicationCategory: "MusicApplication",
       operatingSystem: "Web",
       description: "Paste a link to your track and get an instant AI read — a score out of 100, a verdict and a breakdown across hook, production, retention, emotion and commercial pull — plus honest reactions from a room of real, paid listeners. Free to submit.",
@@ -137,24 +139,24 @@ const jsonLd = {
     {
       "@type": "Organization",
       name: "MixReflect",
-      url: "https://mixreflect.com",
-      logo: "https://mixreflect.com/logo.png",
+      url: SITE_URL,
+      logo: `${SITE_URL}/logo.png`,
       description: "Instant AI track scoring plus honest reactions from a room of real, paid listeners. Free to submit.",
       sameAs: ["https://twitter.com/mixreflect"],
       contactPoint: {
         "@type": "ContactPoint",
         contactType: "customer support",
-        url: "https://mixreflect.com/support",
+        url: `${SITE_URL}/support`,
       },
     },
     {
       "@type": "WebSite",
       name: "MixReflect",
-      url: "https://mixreflect.com",
+      url: SITE_URL,
       description: "Instant AI track scoring plus a room of real listeners — honest feedback before you release.",
       potentialAction: {
         "@type": "SearchAction",
-        target: "https://mixreflect.com/feedback/{search_term_string}",
+        target: `${SITE_URL}/feedback/{search_term_string}`,
         "query-input": "required name=search_term_string",
       },
     },

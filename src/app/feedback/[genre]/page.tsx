@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { SignupLink } from "@/components/landing/signup-link";
 import { getGenrePage, genrePages } from "@/lib/genre-pages";
 import { getGenreDetail } from "@/lib/genre-pages-detail";
+import { SITE_URL } from "@/lib/site";
 
 export function generateStaticParams() {
   return genrePages.map((p) => ({ genre: p.slug }));
@@ -24,11 +25,11 @@ export async function generateMetadata({
   return {
     title: page.metaTitle,
     description: page.metaDescription,
-    alternates: { canonical: `https://mixreflect.com/feedback/${page.slug}` },
+    alternates: { canonical: `${SITE_URL}/feedback/${page.slug}` },
     openGraph: {
       title: page.metaTitle,
       description: page.metaDescription,
-      url: `https://mixreflect.com/feedback/${page.slug}`,
+      url: `${SITE_URL}/feedback/${page.slug}`,
       images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "MixReflect" }],
     },
   };
@@ -59,13 +60,13 @@ export default async function GenreFeedbackPage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://mixreflect.com" },
-      { "@type": "ListItem", position: 2, name: "Music Feedback", item: "https://mixreflect.com" },
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Music Feedback", item: SITE_URL },
       {
         "@type": "ListItem",
         position: 3,
         name: `${page.name} Feedback`,
-        item: `https://mixreflect.com/feedback/${page.slug}`,
+        item: `${SITE_URL}/feedback/${page.slug}`,
       },
     ],
   };
@@ -76,7 +77,7 @@ export default async function GenreFeedbackPage({
     name: "MixReflect",
     applicationCategory: "MusicApplication",
     description: `MixReflect scores your ${page.name.toLowerCase()} track instantly with AI — a rating out of 100, a verdict and a breakdown across hook, production, retention, emotion and commercial pull — plus honest reactions from a room of real listeners.`,
-    url: "https://mixreflect.com",
+    url: SITE_URL,
     offers: {
       "@type": "Offer",
       price: "0",

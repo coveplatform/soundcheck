@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
 import { posts, getPost } from "@/lib/blog-posts";
+import { SITE_URL } from "@/lib/site";
 import type { Metadata } from "next";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
@@ -26,6 +27,7 @@ export async function generateMetadata({
   return {
     title: `${post.title} — The Drop`,
     description: post.excerpt,
+    alternates: { canonical: `${SITE_URL}/blog/${post.slug}` },
     openGraph: {
       title: post.title,
       description: post.excerpt,
@@ -64,15 +66,15 @@ export default async function BlogPostPage({
     description: post.excerpt,
     datePublished: post.date,
     dateModified: post.date,
-    author: { "@type": "Organization", name: "MixReflect", url: "https://mixreflect.com" },
+    author: { "@type": "Organization", name: "MixReflect", url: SITE_URL },
     publisher: {
       "@type": "Organization",
       name: "MixReflect",
-      url: "https://mixreflect.com",
-      logo: { "@type": "ImageObject", url: "https://mixreflect.com/logo.png" },
+      url: SITE_URL,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/logo.png` },
     },
-    mainEntityOfPage: { "@type": "WebPage", "@id": `https://mixreflect.com/blog/${post.slug}` },
-    ...(post.coverImage && { image: `https://mixreflect.com${post.coverImage}` }),
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/blog/${post.slug}` },
+    ...(post.coverImage && { image: `${SITE_URL}${post.coverImage}` }),
   };
 
   const faqJsonLd = faqItems.length > 0 ? {

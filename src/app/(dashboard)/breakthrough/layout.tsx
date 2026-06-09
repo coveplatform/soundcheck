@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const baseUrl = process.env.NEXTAUTH_URL ?? "https://mixreflect.com";
+const baseUrl = process.env.NEXTAUTH_URL ?? "https://www.mixreflect.com";
 
 export const metadata: Metadata = {
   title: "Breakthrough · MixReflect",

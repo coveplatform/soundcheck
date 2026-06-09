@@ -9,7 +9,7 @@ import { ShareReviewButton } from "@/components/reviews/share-review-button";
 
 export const revalidate = 3600; // Cache for 1 hour
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://mixreflect.com";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.mixreflect.com";
 
 const qualityLabels: Record<string, string> = {
   PROFESSIONAL: "Professional",

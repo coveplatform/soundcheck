@@ -7,6 +7,7 @@ import { AuthButtons } from "@/components/ui/auth-buttons";
 import { Button } from "@/components/ui/button";
 import { SignupLink } from "@/components/landing/signup-link";
 import { getAlternativePage, alternativePages } from "@/lib/alternatives";
+import { SITE_URL } from "@/lib/site";
 
 export function generateStaticParams() {
   return alternativePages.map((p) => ({ competitor: p.slug }));
@@ -23,11 +24,11 @@ export async function generateMetadata({
   return {
     title: page.metaTitle,
     description: page.metaDescription,
-    alternates: { canonical: `https://mixreflect.com/alternatives/${page.slug}` },
+    alternates: { canonical: `${SITE_URL}/alternatives/${page.slug}` },
     openGraph: {
       title: page.metaTitle,
       description: page.metaDescription,
-      url: `https://mixreflect.com/alternatives/${page.slug}`,
+      url: `${SITE_URL}/alternatives/${page.slug}`,
       images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "MixReflect" }],
     },
   };
@@ -56,13 +57,13 @@ export default async function AlternativePage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://mixreflect.com" },
-      { "@type": "ListItem", position: 2, name: "Alternatives", item: "https://mixreflect.com" },
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Alternatives", item: SITE_URL },
       {
         "@type": "ListItem",
         position: 3,
         name: `${page.competitor} Alternative`,
-        item: `https://mixreflect.com/alternatives/${page.slug}`,
+        item: `${SITE_URL}/alternatives/${page.slug}`,
       },
     ],
   };

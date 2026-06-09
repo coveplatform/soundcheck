@@ -14,7 +14,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "hip-hop",
     name: "Hip-Hop",
-    metaTitle: "Hip-Hop Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Hip-Hop Track | MixReflect",
     metaDescription:
       "Get structured feedback on your hip-hop track from real listeners. Find out what's landing, what to fix, and whether it's ready to release.",
     h1: "Hip-hop feedback from producers who actually make hip-hop",
@@ -51,7 +51,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "trap",
     name: "Trap",
-    metaTitle: "Trap Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Trap Track | MixReflect",
     metaDescription:
       "Get honest feedback on your trap beats and tracks from real listeners. Find out if the 808s hit, the hi-hats work, and what to fix before you drop.",
     h1: "Trap beat feedback from producers who know the genre",
@@ -88,7 +88,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "boom-bap",
     name: "Boom Bap",
-    metaTitle: "Boom Bap Beat Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Boom Bap Track | MixReflect",
     metaDescription:
       "Get structured feedback on your boom bap beats from producers who know the genre. Drum punch, sample chops, low end — find out what's working before you release.",
     h1: "Boom bap feedback from producers who grew up on the genre",
@@ -121,7 +121,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "drill",
     name: "Drill",
-    metaTitle: "Drill Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Drill Track | MixReflect",
     metaDescription:
       "Get honest feedback on your drill track from real listeners. UK drill, Chicago drill, NY drill — find out what's landing before you release.",
     h1: "Drill feedback from producers who know the sound",
@@ -154,7 +154,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "rnb",
     name: "R&B",
-    metaTitle: "R&B Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your R&B Track | MixReflect",
     metaDescription:
       "Get structured feedback on your R&B track from real listeners. Vocals, production, emotional arc — find out what's landing before you release.",
     h1: "R&B feedback from artists who understand the genre",
@@ -187,7 +187,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "electronic",
     name: "Electronic",
-    metaTitle: "Electronic Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Electronic Track | MixReflect",
     metaDescription:
       "Get structured feedback on your electronic music from real listeners. Arrangement, mixdown, sound design — find out what to fix before you release.",
     h1: "Electronic music feedback from producers who know the craft",
@@ -220,7 +220,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "house",
     name: "House",
-    metaTitle: "House Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your House Track | MixReflect",
     metaDescription:
       "Get structured feedback on your house music from real listeners. Groove, mix, arrangement — find out if your track would actually work on a dance floor.",
     h1: "House music feedback from producers who play and make it",
@@ -253,7 +253,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "deep-house",
     name: "Deep House",
-    metaTitle: "Deep House Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Deep House Track | MixReflect",
     metaDescription:
       "Get honest feedback on your deep house track from real listeners. Atmosphere, groove, warmth — find out if the vibe is landing before you release.",
     h1: "Deep house feedback from producers who understand the vibe",
@@ -286,7 +286,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "techno",
     name: "Techno",
-    metaTitle: "Techno Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Techno Track | MixReflect",
     metaDescription:
       "Get structured feedback on your techno track from real listeners. Drive, mix, arrangement — find out whether your track holds up before you release.",
     h1: "Techno feedback from producers who make it",
@@ -319,7 +319,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "lo-fi",
     name: "Lo-Fi",
-    metaTitle: "Lo-Fi Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Lo-Fi Track | MixReflect",
     metaDescription:
       "Get honest feedback on your lo-fi track from real listeners. Texture, warmth, vibe — find out if the atmosphere is landing before you release.",
     h1: "Lo-fi feedback from producers who know what the vibe actually is",
@@ -356,7 +356,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "edm",
     name: "EDM",
-    metaTitle: "EDM Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your EDM Track | MixReflect",
     metaDescription:
       "Get structured feedback on your EDM track from real listeners. Drop, build, energy — find out what's working before you release.",
     h1: "EDM feedback from producers who know whether the drop actually hits",
@@ -389,7 +389,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "ambient",
     name: "Ambient",
-    metaTitle: "Ambient Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Ambient Track | MixReflect",
     metaDescription:
       "Get structured feedback on your ambient music from real listeners. Texture, space, emotional arc — find out if it's working before you release.",
     h1: "Ambient music feedback from producers who understand the form",
@@ -422,7 +422,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "synthwave",
     name: "Synthwave",
-    metaTitle: "Synthwave Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Synthwave Track | MixReflect",
     metaDescription:
       "Get honest feedback on your synthwave track from real listeners. Aesthetic, production, emotional arc — find out if it's hitting before you release.",
     h1: "Synthwave feedback from producers who live in the aesthetic",
@@ -455,7 +455,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "pop",
     name: "Pop",
-    metaTitle: "Pop Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Pop Track | MixReflect",
     metaDescription:
       "Get structured feedback on your pop song from real listeners. Hook, production, vocal mix — find out if it's ready to release.",
     h1: "Pop music feedback from artists who know what makes a song land",
@@ -492,7 +492,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "indie-pop",
     name: "Indie Pop",
-    metaTitle: "Indie Pop Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Indie Pop Track | MixReflect",
     metaDescription:
       "Get honest feedback on your indie pop track from real listeners. Hook, personality, production — find out what's working before you release.",
     h1: "Indie pop feedback from artists who understand the balance",
@@ -525,7 +525,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "indie-rock",
     name: "Indie Rock",
-    metaTitle: "Indie Rock Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Indie Rock Track | MixReflect",
     metaDescription:
       "Get structured feedback on your indie rock track from real listeners. Energy, mix, arrangement — find out what's landing before you release.",
     h1: "Indie rock feedback from artists who know the sound",
@@ -558,7 +558,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "rock",
     name: "Rock",
-    metaTitle: "Rock Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Rock Track | MixReflect",
     metaDescription:
       "Get structured feedback on your rock track from real listeners. Mix, arrangement, energy — find out what's working before you release.",
     h1: "Rock music feedback from artists who know the genre",
@@ -591,7 +591,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "alternative",
     name: "Alternative",
-    metaTitle: "Alternative Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Alternative Track | MixReflect",
     metaDescription:
       "Get honest feedback on your alternative track from real listeners. Find out if your sound is landing and what to fix before you release.",
     h1: "Alternative music feedback from artists who get it",
@@ -620,7 +620,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "singer-songwriter",
     name: "Singer-Songwriter",
-    metaTitle: "Singer-Songwriter Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Singer-Songwriter Track | MixReflect",
     metaDescription:
       "Get honest feedback on your singer-songwriter music from real listeners. Lyrics, melody, arrangement — find out if it's connecting before you release.",
     h1: "Singer-songwriter feedback from artists who understand the format",
@@ -657,7 +657,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "folk",
     name: "Folk",
-    metaTitle: "Folk Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Folk Track | MixReflect",
     metaDescription:
       "Get honest feedback on your folk music from real listeners. Authenticity, arrangement, vocal — find out if it's landing before you release.",
     h1: "Folk music feedback from artists who understand the tradition",
@@ -686,7 +686,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "soul",
     name: "Soul",
-    metaTitle: "Soul Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Soul Track | MixReflect",
     metaDescription:
       "Get structured feedback on your soul music from real listeners. Vocal, groove, emotion — find out if it's hitting before you release.",
     h1: "Soul music feedback from artists who understand the feeling",
@@ -715,7 +715,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "metal",
     name: "Metal",
-    metaTitle: "Metal Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Metal Track | MixReflect",
     metaDescription:
       "Get structured feedback on your metal track from real listeners. Mix, performance, arrangement — find out what's working before you release.",
     h1: "Metal feedback from artists who know the standard",
@@ -748,7 +748,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "drum-and-bass",
     name: "Drum & Bass",
-    metaTitle: "Drum and Bass Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Drum & Bass Track | MixReflect",
     metaDescription:
       "Get structured feedback on your drum and bass track from real listeners. Energy, mix, arrangement — find out if it's hitting before you release.",
     h1: "Drum and bass feedback from producers who know the genre",
@@ -777,7 +777,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "dubstep",
     name: "Dubstep",
-    metaTitle: "Dubstep Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Dubstep Track | MixReflect",
     metaDescription:
       "Get honest feedback on your dubstep track from real listeners. Bass design, drop impact, mix — find out if it's working before you release.",
     h1: "Dubstep feedback from producers who know whether the drop hits",
@@ -806,7 +806,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "future-bass",
     name: "Future Bass",
-    metaTitle: "Future Bass Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Future Bass Track | MixReflect",
     metaDescription:
       "Get structured feedback on your future bass track from real listeners. Emotion, sound design, drop energy — find out if it's landing before you release.",
     h1: "Future bass feedback from producers who know the feel",
@@ -835,7 +835,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "progressive-house",
     name: "Progressive House",
-    metaTitle: "Progressive House Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Progressive House Track | MixReflect",
     metaDescription:
       "Get structured feedback on your progressive house track from real listeners. Build, arrangement, mixdown — find out if it's working before you release.",
     h1: "Progressive house feedback from producers who build journeys",
@@ -864,7 +864,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "trance",
     name: "Trance",
-    metaTitle: "Trance Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Trance Track | MixReflect",
     metaDescription:
       "Get structured feedback on your trance track from real listeners. Melody, build, emotional impact — find out if it's working before you release.",
     h1: "Trance feedback from producers who understand the journey",
@@ -893,7 +893,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "jazz",
     name: "Jazz",
-    metaTitle: "Jazz Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Jazz Track | MixReflect",
     metaDescription:
       "Get structured feedback on your jazz music from real listeners. Feel, interaction, mix — find out if it's landing before you release.",
     h1: "Jazz feedback from musicians who understand the conversation",
@@ -922,7 +922,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "funk",
     name: "Funk",
-    metaTitle: "Funk Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Funk Track | MixReflect",
     metaDescription:
       "Get honest feedback on your funk track from real listeners. Groove, pocket, arrangement — find out if it's moving people before you release.",
     h1: "Funk feedback from musicians who know whether the groove locks",
@@ -951,7 +951,7 @@ export const genrePages: GenrePage[] = [
   {
     slug: "punk",
     name: "Punk",
-    metaTitle: "Punk Music Feedback | MixReflect",
+    metaTitle: "Get Honest Feedback on Your Punk Track | MixReflect",
     metaDescription:
       "Get honest feedback on your punk track from real listeners. Energy, rawness, impact — find out if it's hitting before you release.",
     h1: "Punk feedback from artists who know whether the energy is real",
