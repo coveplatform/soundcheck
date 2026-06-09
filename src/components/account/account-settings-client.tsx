@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { fullSignOut } from "@/lib/full-signout";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,7 +100,7 @@ export function AccountSettingsClient({
         setDeleteError(data?.error || "Failed to delete account");
         return;
       }
-      await signOut({ callbackUrl: "/" });
+      await fullSignOut("/");
     } catch {
       setDeleteError("Failed to delete account");
     } finally {

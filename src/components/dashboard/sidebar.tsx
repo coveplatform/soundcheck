@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { fullSignOut } from "@/lib/full-signout";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "./theme-toggle";
@@ -235,7 +235,7 @@ export function Sidebar({ artistName, credits, pendingReviews, isPro }: SidebarP
 
             <button
               type="button"
-              onClick={() => signOut({ callbackUrl: "/" })}
+              onClick={() => fullSignOut("/")}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium text-neutral-600 hover:text-black transition-colors border-l-2 border-transparent hover:border-purple-300"
             >
               <LogOut className="w-4 h-4 opacity-70" />
@@ -425,7 +425,7 @@ function MobileBottomNav({
               <div className="my-1 border-t border-neutral-100" />
               <button
                 type="button"
-                onClick={() => signOut({ callbackUrl: "/" })}
+                onClick={() => fullSignOut("/")}
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
               >
                 <LogOut className="w-4 h-4 opacity-70 flex-shrink-0" />

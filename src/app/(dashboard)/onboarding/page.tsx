@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { fullSignOut } from "@/lib/full-signout";
 import { Button } from "@/components/ui/button";
 import { validateTrackUrl, fetchTrackMetadata, detectSource } from "@/lib/metadata";
 import { ArrowRight, ArrowLeft, Music, Loader2, Link2, Check } from "lucide-react";
@@ -63,7 +64,7 @@ export default function OnboardingPage() {
       body: JSON.stringify({ artistName: artistName.trim(), genreIds: [], completedOnboarding: true }),
     });
     if (!res.ok) {
-      if (res.status === 401) { await signOut({ callbackUrl: "/signup" }); return false; }
+      if (res.status === 401) { await fullSignOut("/signup"); return false; }
       if (res.status === 409) {
         const patchRes = await fetch("/api/profile", {
           method: "PATCH",

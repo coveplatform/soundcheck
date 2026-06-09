@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { fullSignOut } from "@/lib/full-signout";
 import { JetBrains_Mono } from "next/font/google";
 import { LogOut } from "lucide-react";
 
@@ -84,7 +84,7 @@ export function AccountSettingsForm({
     try {
       const res = await fetch("/api/account/delete", { method: "DELETE" });
       if (res.ok) {
-        await signOut({ callbackUrl: "/" });
+        await fullSignOut("/");
         return;
       }
     } finally {
@@ -200,7 +200,7 @@ export function AccountSettingsForm({
           </button>
           <div>
             <button
-              onClick={() => signOut({ callbackUrl: "/" })}
+              onClick={() => fullSignOut("/")}
               className={`${mono.className} inline-flex items-center gap-2 text-[13px] text-white/65 hover:text-white transition-colors`}
             >
               <LogOut className="h-3.5 w-3.5" /> sign out

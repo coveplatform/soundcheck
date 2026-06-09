@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
+import { fullSignOut } from "@/lib/full-signout";
 import { JetBrains_Mono } from "next/font/google";
 import { User, LogOut, Settings } from "lucide-react";
 
@@ -47,7 +47,7 @@ export function AccountMenu({ email }: { email: string }) {
             account settings
           </Link>
           <button
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={() => fullSignOut("/")}
             className={`${mono.className} w-full flex items-center gap-2.5 px-4 py-3 text-[13px] hover:bg-white/5 transition-colors`}
             style={{ color: ACCENT }}
           >
