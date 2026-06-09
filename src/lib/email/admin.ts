@@ -56,3 +56,57 @@ export async function sendAdminNewTrackNotification(params: {
     html: emailWrapper(content),
   });
 }
+
+/**
+ * Admin ping for the new MixReflect (score-report) upload flow. Fires on every
+ * free submit, regardless of whether the report is unlocked.
+ */
+export async function sendAdminNewScoreSubmissionEmail(params: {
+  trackTitle: string;
+  artistEmail: string;
+  genre: string;
+  reportSlug: string;
+  unlocked: boolean;
+}) {
+  const { trackTitle, artistEmail, genre, reportSlug, unlocked } = params;
+
+  const content = `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-block; background-color: ${unlocked ? "#10b981" : COLORS.purple}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #ffffff; border-radius: 6px;">
+        ${unlocked ? "Score upload · unlocked" : "Score upload · teaser"}
+      </div>
+    </div>
+    <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
+      New track uploaded
+    </h1>
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid ${COLORS.border};">
+            <span style="font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase;">Track</span><br>
+            <span style="font-size: 16px; font-weight: 700; color: ${COLORS.black};">${trackTitle}</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid ${COLORS.border};">
+            <span style="font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase;">Uploaded by</span><br>
+            <span style="font-size: 14px; color: ${COLORS.black};">${artistEmail}</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0;">
+            <span style="font-size: 12px; color: ${COLORS.gray}; text-transform: uppercase;">Genre</span><br>
+            <span style="font-size: 14px; color: ${COLORS.black};">${genre}</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+    ${emailButton("View report", `${getAppUrl()}/report/${reportSlug}`)}
+  `;
+
+  await sendEmail({
+    to: ADMIN_EMAIL,
+    subject: `🎵 New upload: ${trackTitle}`,
+    html: emailWrapper(content),
+  });
+}

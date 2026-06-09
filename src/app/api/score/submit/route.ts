@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { generateAndStoreReport } from "@/lib/score-report-ai";
 import { assignScoreReviewers } from "@/lib/score-review";
 import { isScoreSubscribed } from "@/lib/score-subscription";
+import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
 
 export const maxDuration = 60;
 
@@ -93,6 +94,15 @@ export async function POST(request: Request) {
         console.error("[score/submit] reviewer assignment error:", err);
       }
     }
+
+    // Ping admin on every upload (fire-and-forget — never blocks the submit).
+    void sendAdminNewScoreSubmissionEmail({
+      trackTitle: trackTitle?.trim() || trackUrl.trim(),
+      artistEmail: effectiveEmail,
+      genre: effectiveGenre,
+      reportSlug: report.slug,
+      unlocked,
+    }).catch((err) => console.error("[score/submit] admin notify error:", err));
 
     // Generate the AI read inline so the report is populated on arrival (free).
     // generateAndStoreReport never throws on API failure (it falls back).

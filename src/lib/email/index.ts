@@ -15,7 +15,7 @@ export {
 } from "./reviews";
 
 // Admin emails
-export { sendAdminNewTrackNotification } from "./admin";
+export { sendAdminNewTrackNotification, sendAdminNewScoreSubmissionEmail } from "./admin";
 
 // Announcement emails
 export { buildAnnouncementEmail, sendAnnouncementEmail } from "./announcements";
