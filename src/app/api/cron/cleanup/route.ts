@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { cleanupAbandonedTracks, cleanupExpiredCheckouts } from "@/lib/cleanup";
+import {
+  cleanupAbandonedTracks,
+  cleanupExpiredCheckouts,
+  cleanupAbandonedScoreReports,
+} from "@/lib/cleanup";
 
 /**
  * Cron endpoint for cleaning up abandoned tracks.
@@ -37,16 +41,18 @@ export async function POST(request: Request) {
 
     console.log("[Cleanup] Starting cleanup job...");
 
-    // Run both cleanup tasks
-    const [abandonedResult, expiredResult] = await Promise.all([
+    // Run all cleanup tasks
+    const [abandonedResult, expiredResult, abandonedReportsResult] = await Promise.all([
       cleanupAbandonedTracks(),
       cleanupExpiredCheckouts(),
+      cleanupAbandonedScoreReports(),
     ]);
 
-    const totalDeleted = abandonedResult.deleted + expiredResult.deleted;
+    const totalDeleted =
+      abandonedResult.deleted + expiredResult.deleted + abandonedReportsResult.deleted;
 
     console.log(
-      `[Cleanup] Job complete. Deleted ${totalDeleted} tracks total (${abandonedResult.deleted} abandoned, ${expiredResult.deleted} expired)`
+      `[Cleanup] Job complete. Deleted ${totalDeleted} total (${abandonedResult.deleted} abandoned tracks, ${expiredResult.deleted} expired, ${abandonedReportsResult.deleted} abandoned score reports)`
     );
 
     return NextResponse.json({
@@ -58,6 +64,10 @@ export async function POST(request: Request) {
       expired: {
         deleted: expiredResult.deleted,
         tracks: expiredResult.tracks,
+      },
+      abandonedScoreReports: {
+        deleted: abandonedReportsResult.deleted,
+        reports: abandonedReportsResult.reports,
       },
       total: totalDeleted,
       timestamp: new Date().toISOString(),

@@ -504,6 +504,25 @@ export default function ScorePage() {
       .catch(() => null);
   };
 
+  // Logged-OUT path: create the report and start generating it BEFORE we send
+  // the user to Google. The read then builds during the auth round-trip instead
+  // of after it. We carry the slug + claim token through login and redeem it on
+  // the way back (/score/finish → /api/score/claim).
+  const startRef = useRef<Promise<{ slug?: string; claimToken?: string } | null> | null>(null);
+  const fireStart = () => {
+    return fetch("/api/score/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trackUrl: trackUrl.trim(), trackTitle: meta?.title?.trim() || undefined }),
+    })
+      .then((r) => r.json().catch(() => null))
+      .catch(() => null);
+  };
+  const ensureStarted = () => {
+    if (!startRef.current) startRef.current = fireStart();
+    return startRef.current;
+  };
+
   const start = (e: React.FormEvent) => {
     e.preventDefault();
     if (!trackUrl.trim()) {
@@ -513,17 +532,28 @@ export default function ScorePage() {
     setError("");
     setStep(0);
     setPhase("running");
-    // Logged-in users: start generating now, in parallel with the animation.
+    // Start generating now, in parallel with the animation — submit for
+    // logged-in users, the pre-auth start for everyone else.
     if (session?.user) submitRef.current = fireSubmit();
+    else void ensureStarted();
   };
 
-  // Where to land after auth — /score/finish submits the track post-login.
+  // Where to land after auth. Preferred: claim the report we already started
+  // (slug + claim token). Falls back to the legacy submit-on-return URL if the
+  // start call didn't yield a slug.
   const buildFinish = () => {
     const title = meta?.title?.trim() || "";
     return (
       `/score/finish?u=${encodeURIComponent(trackUrl.trim())}` +
       (title ? `&t=${encodeURIComponent(title)}` : "")
     );
+  };
+  const finishUrl = async () => {
+    const data = await ensureStarted();
+    if (data?.slug && data.claimToken) {
+      return `/score/finish?slug=${encodeURIComponent(data.slug)}&claim=${encodeURIComponent(data.claimToken)}`;
+    }
+    return buildFinish();
   };
 
   // Inline auth (instead of bouncing to /login).
@@ -532,8 +562,9 @@ export default function ScorePage() {
   const [authBusy, setAuthBusy] = useState(false);
   const [authError, setAuthError] = useState("");
 
-  const continueWithGoogle = () => {
-    signIn("google", { callbackUrl: buildFinish() });
+  const continueWithGoogle = async () => {
+    // Kick off generation before the Google redirect so it builds during auth.
+    signIn("google", { callbackUrl: await finishUrl() });
   };
 
   const continueWithEmail = async (e: React.FormEvent) => {
@@ -547,7 +578,7 @@ export default function ScorePage() {
       redirect: false,
     });
     if (res?.ok) {
-      window.location.href = buildFinish();
+      window.location.href = await finishUrl();
       return;
     }
     setAuthError("wrong email or password");
@@ -558,7 +589,7 @@ export default function ScorePage() {
     if (busy) return;
     setBusy(true);
     if (!session?.user) {
-      router.push(`/login?callbackUrl=${encodeURIComponent(buildFinish())}`);
+      router.push(`/login?callbackUrl=${encodeURIComponent(await finishUrl())}`);
       return;
     }
     try {

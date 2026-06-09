@@ -866,6 +866,15 @@ model TrackScoreReport {
   reviewerQuotes   Json?
   priorityFixes    Json?
   artistId         String?
+  // Pre-auth submissions: the report is generated before the user signs in.
+  // `claimToken` is an anonymous handle issued at /api/score/start and redeemed
+  // at /api/score/claim once the user authenticates (which sets the real email,
+  // links the artist, and stamps `claimedAt`). Unclaimed reports are swept by
+  // the abandoned-report GC.
+  claimToken       String?           @unique
+  claimedAt        DateTime?
+  // Client IP at creation — abuse cap for pre-auth /start (no email to key on).
+  createdByIp      String?
   humanReviewsRequested Int          @default(5)
   // Subscriber submitted past their monthly real-reviewer-round allowance:
   // full AI read still delivered, but no human room assigned for this one.

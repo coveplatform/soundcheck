@@ -15,6 +15,10 @@ function FinishInner() {
   const { data: session, status } = useSession();
   const trackUrl = params.get("u") || "";
   const trackTitle = params.get("t") || "";
+  // New "start at click" flow: the report was already created (and is generating)
+  // before login — we just claim it now that the user is authenticated.
+  const slug = params.get("slug") || "";
+  const claim = params.get("claim") || "";
   const started = useRef(false);
   const [error, setError] = useState("");
 
@@ -22,12 +26,14 @@ function FinishInner() {
     if (status === "loading" || started.current) return;
 
     if (status === "unauthenticated") {
-      const back = `/score/finish?u=${encodeURIComponent(trackUrl)}`;
+      const back = slug
+        ? `/score/finish?slug=${encodeURIComponent(slug)}&claim=${encodeURIComponent(claim)}`
+        : `/score/finish?u=${encodeURIComponent(trackUrl)}`;
       router.replace(`/login?callbackUrl=${encodeURIComponent(back)}`);
       return;
     }
 
-    if (!trackUrl) {
+    if (!slug && !trackUrl) {
       router.replace("/");
       return;
     }
@@ -35,6 +41,23 @@ function FinishInner() {
     started.current = true;
     (async () => {
       try {
+        // Preferred path: claim the pre-generated report (it built during auth).
+        if (slug && claim) {
+          const res = await fetch("/api/score/claim", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ slug, claim, claimToken: claim }),
+          });
+          const data = await res.json().catch(() => null);
+          if (data?.slug) {
+            router.replace(`/report/${data.slug}`);
+            return;
+          }
+          setError(data?.error ?? "something broke. try again.");
+          return;
+        }
+
+        // Legacy path: no pre-generated report, submit now.
         const res = await fetch("/api/score/submit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -54,7 +77,7 @@ function FinishInner() {
         setError("something broke. try again.");
       }
     })();
-  }, [status, trackUrl, trackTitle, session, router]);
+  }, [status, trackUrl, trackTitle, slug, claim, session, router]);
 
   return (
     <div
