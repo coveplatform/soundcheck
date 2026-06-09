@@ -323,6 +323,25 @@ function VerdictMock() {
   );
 }
 
+// Read an uploaded file's duration in the browser (null if it can't be decoded).
+function audioDuration(file: File): Promise<number | null> {
+  return new Promise((resolve) => {
+    try {
+      const el = document.createElement("audio");
+      el.preload = "metadata";
+      el.onloadedmetadata = () => {
+        const d = el.duration;
+        URL.revokeObjectURL(el.src);
+        resolve(Number.isFinite(d) ? d : null);
+      };
+      el.onerror = () => { URL.revokeObjectURL(el.src); resolve(null); };
+      el.src = URL.createObjectURL(file);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
 export default function ScorePage() {
   const router = useRouter();
   const { data: session } = useSession();
@@ -348,6 +367,12 @@ export default function ScorePage() {
       setError("please choose an mp3 file"); return;
     }
     if (file.size > 25 * 1024 * 1024) { setError("file too large (max 25mb)"); return; }
+    // Guard against tiny / non-track clips (e.g. a 2-second sound effect).
+    const dur = await audioDuration(file);
+    if (dur != null && dur < 20) {
+      setError(`that clip is only ${Math.round(dur)}s — upload the full track (20s+).`);
+      return;
+    }
     setError("");
     setUploading(true);
     try {

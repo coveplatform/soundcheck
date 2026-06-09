@@ -49,9 +49,24 @@ export default function SubmitScorePage() {
   const [dragging, setDragging] = useState(false);
 
   const MAX_FILE_BYTES = 25 * 1024 * 1024;
+  const audioDuration = (file: File): Promise<number | null> =>
+    new Promise((resolve) => {
+      try {
+        const el = document.createElement("audio");
+        el.preload = "metadata";
+        el.onloadedmetadata = () => { const d = el.duration; URL.revokeObjectURL(el.src); resolve(Number.isFinite(d) ? d : null); };
+        el.onerror = () => { URL.revokeObjectURL(el.src); resolve(null); };
+        el.src = URL.createObjectURL(file);
+      } catch { resolve(null); }
+    });
   const handleFile = async (file: File) => {
     if (!file) return;
     if (file.size > MAX_FILE_BYTES) { setError("File too large (max 25MB)."); return; }
+    const dur = await audioDuration(file);
+    if (dur != null && dur < 20) {
+      setError(`That clip is only ${Math.round(dur)}s — upload the full track (20s+).`);
+      return;
+    }
     setError("");
     setUploading(true);
     try {
