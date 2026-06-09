@@ -3,8 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { buildNewMixReflectAnnouncement, sendNewMixReflectAnnouncement } from "@/lib/email/score";
-
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "").split(",").map((e) => e.trim().toLowerCase());
+import { isAdminEmail } from "@/lib/admin";
 
 // Patterns for seed/demo/test/internal accounts — same as admin/users page
 const DEMO_EMAIL_PATTERNS = [
@@ -22,7 +21,7 @@ const DEMO_EMAIL_EXACT = [
 // GET: preview the announcement email
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.email || !ADMIN_EMAILS.includes(session.user.email.toLowerCase())) {
+  if (!isAdminEmail(session?.user?.email)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -55,7 +54,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email || !ADMIN_EMAILS.includes(session.user.email.toLowerCase())) {
+    if (!isAdminEmail(session?.user?.email)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
