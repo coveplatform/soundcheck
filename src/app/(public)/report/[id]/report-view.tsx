@@ -67,6 +67,10 @@ export type ReportViewModel = {
   humanReviewsIn: number;
   humanReviewsTotal: number;
   priorityFixes: { label: string; detail: string; count: number }[];
+  /** Set when the clip was too short to score as a real track. */
+  invalid?: { reason: string; durationSec?: number } | null;
+  /** False when the read wasn't grounded in measured audio (title/metadata only). */
+  grounded?: boolean;
 };
 
 /** Honest, score-derived standing — no fabricated population ranking. */
@@ -238,6 +242,27 @@ export function ReportView({ data }: { data: ReportViewModel }) {
     return <PendingState slug={data.slug} trackTitle={data.trackTitle} />;
   }
 
+  // Too short to be a real track — don't show a fabricated score.
+  if (data.invalid) {
+    return (
+      <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] flex items-center justify-center px-5 lowercase`}>
+        <div className="max-w-md w-full border border-white/12 bg-[#101010] p-8 text-center">
+          <div className="mx-auto w-12 h-12 flex items-center justify-center text-2xl mb-5" style={{ background: ACCENT, color: "#000" }}>!</div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">that&apos;s not a full track</h1>
+          <p className="text-white/65 normal-case leading-relaxed mb-7">
+            {data.invalid.durationSec != null
+              ? `We measured only ${data.invalid.durationSec}s of audio — too short to score. `
+              : "This clip is too short to score as a track. "}
+            Submit the complete song and we&apos;ll give you a real read.
+          </p>
+          <a href="/" className="inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] px-6 py-3.5 hover:bg-white transition-colors">
+            score a full track →
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase scroll-smooth`}
@@ -341,6 +366,13 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         <div className="flex justify-center mb-3">
           <ScoreRing score={data.score} size="xl" dark animate />
         </div>
+
+        {/* Honesty: this read wasn't grounded in measured audio. */}
+        {data.grounded === false && !data.isDemo && (
+          <p className={`${mono.className} text-[11px] text-amber-300/80 text-center normal-case mb-3 max-w-sm mx-auto`}>
+            ⚠ scored from the title &amp; metadata — we couldn&apos;t analyse the audio this time, so treat the number as a rough read.
+          </p>
+        )}
         <p className={`${mono.className} text-[11px] text-white/30 mb-6 normal-case max-w-xs mx-auto`}>
           how your track scores across hook, retention, production, emotion
           &amp; commercial pull

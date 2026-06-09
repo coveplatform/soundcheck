@@ -153,6 +153,10 @@ type DbReactions = {
   categoryNotes?: Partial<
     Record<"hook" | "production" | "retention" | "emotional" | "commercial", string>
   >;
+  // Set by generateAndStoreReport: the clip was too short to score, and whether
+  // the read was grounded in real measured audio (vs. title/metadata only).
+  invalid?: { reason?: string; durationSec?: number };
+  grounded?: boolean;
 };
 
 export default async function ReportPage({
@@ -264,6 +268,11 @@ export default async function ReportPage({
     humanReviewsIn: humanReviews.length,
     humanReviewsTotal: humanTotal,
     priorityFixes: fixes,
+    invalid: quotes.invalid?.reason
+      ? { reason: quotes.invalid.reason, durationSec: quotes.invalid.durationSec }
+      : null,
+    // Absent (old reports) → treat as grounded; only an explicit false flags it.
+    grounded: quotes.grounded !== false,
   };
 
   return <ReportView data={data} />;

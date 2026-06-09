@@ -502,6 +502,34 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
     fetchTrackMeta(report.trackUrl).catch(() => null),
   ]);
 
+  // Guard 1: the worker measured a clip too short to be a real track (e.g. a
+  // 2-second sound effect). Don't fabricate a full musical read — say so plainly.
+  const MIN_TRACK_SEC = 30;
+  if (features?.durationSec != null && features.durationSec < MIN_TRACK_SEC) {
+    const secs = Math.round(features.durationSec);
+    await prisma.trackScoreReport.update({
+      where: { id: reportId },
+      data: {
+        ...(report.trackTitle ? {} : meta?.title ? { trackTitle: meta.title } : {}),
+        ...(meta?.artworkUrl ? { artworkUrl: meta.artworkUrl } : {}),
+        status: "IN_REVIEW",
+        score: 0,
+        percentile: 0,
+        verdict: "NOT_READY",
+        aiSummary: `This is only ${secs}s of audio — too short to score as a track. Submit the full song for a real read.`,
+        reviewerQuotes: {
+          invalid: { reason: "too_short", durationSec: secs },
+          grounded: true,
+          headline: "",
+          reactions: [],
+        },
+        priorityFixes: [],
+        completedAt: new Date(),
+      },
+    });
+    return;
+  }
+
   const generated = await generateReport({
     trackTitle: report.trackTitle || meta?.title || null,
     artist: meta?.artist ?? null,
@@ -532,6 +560,9 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
         categoryNotes: Object.fromEntries(
           generated.categories.map((c) => [c.key, c.note])
         ),
+        // Guard 2: was this read grounded in real measured audio, or did the
+        // worker fail / not run (→ scored from title + metadata only)?
+        grounded: features != null,
       },
       priorityFixes: generated.priorityFixes,
       completedAt: new Date(),
