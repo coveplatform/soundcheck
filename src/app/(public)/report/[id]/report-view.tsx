@@ -373,6 +373,50 @@ export function ReportView({ data }: { data: ReportViewModel }) {
       </section>
 
       <div className="relative z-10 max-w-3xl mx-auto px-5 pb-16 space-y-14">
+        {/* ── THE ROOM IS WAITING (locked, before payment) ── */}
+        {locked && !data.isDemo && data.humanReviewsTotal === 0 && (
+          <section className="border-2 bg-[#0c0c0c] p-6 sm:p-8" style={{ borderColor: "rgba(110,231,255,0.45)" }}>
+            <div className="flex items-center gap-2.5 mb-4">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: ACCENT }} />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: ACCENT }} />
+              </span>
+              <span className={`${mono.className} text-[12px] tracking-wide`} style={{ color: ACCENT }}>
+                the room · standing by
+              </span>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
+              5 real listeners are <span style={{ color: ACCENT }}>waiting</span> to hear this.
+            </h3>
+            <p className="text-white/70 normal-case leading-relaxed mb-6 max-w-lg">
+              The score above is your instant AI read. Unlock and your track goes straight to a room
+              of <strong className="text-white">5 real people</strong> — they listen end to end and
+              leave honest, specific reactions. You&apos;ll watch each one land right here.
+            </p>
+            <div className="flex items-center gap-2 mb-7 flex-wrap">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <span
+                  key={i}
+                  className={`${mono.className} w-10 h-10 flex items-center justify-center text-[14px] border border-dashed`}
+                  style={{ borderColor: "rgba(110,231,255,0.4)", color: "rgba(255,255,255,0.35)" }}
+                >
+                  ?
+                </span>
+              ))}
+              <span className={`${mono.className} text-[12px] text-white/45 ml-2 normal-case`}>
+                5 seats ready &amp; waiting
+              </span>
+            </div>
+            <a
+              href="#unlock"
+              className="group inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] px-6 py-3.5 hover:bg-white transition-colors"
+            >
+              unlock &amp; send it to the room
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            </a>
+          </section>
+        )}
+
         {/* ── THE ROOM (real humans) — live, up top ── */}
         {data.humanReviewsTotal > 0 && (
           <section className="border-2 bg-[#0c0c0c] p-6 sm:p-7" style={{ borderColor: "rgba(110,231,255,0.35)" }}>
@@ -602,13 +646,14 @@ what to fix first
               >
                 <Lock className="h-5 w-5 text-black" />
               </div>
-              <Kicker>the full read is right here</Kicker>
+              <Kicker>the full read + the room</Kicker>
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
-                unlock the full read
+                unlock &amp; send it to the room
               </h2>
               <p className="text-white/70 text-[15px] max-w-md mx-auto normal-case leading-relaxed">
-                Every reaction in full, the complete synthesis, and the detail
-                behind all three fixes.
+                Unlock the complete breakdown — and <strong className="text-white">5 real
+                listeners</strong> start reacting to your track, honestly and in full. You watch
+                every take land here.
               </p>
             </div>
 
@@ -620,7 +665,7 @@ what to fix first
                   $6.95<span className="text-base text-white/45 font-medium"> once</span>
                 </p>
                 <p className={`${mono.className} text-[12px] text-white/55 mt-1 normal-case`}>
-                  unlock this one report — yours forever
+                  full read + 5 real listeners react — yours forever
                 </p>
                 <button
                   onClick={handleUnlock}

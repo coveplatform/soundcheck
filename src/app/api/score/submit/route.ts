@@ -69,25 +69,32 @@ export async function POST(request: Request) {
     });
 
     // Unlimited subscribers: auto-unlock this report (the gate is paidAt != null).
+    let unlocked = false;
     try {
       if (await isScoreSubscribed(effectiveEmail)) {
         await prisma.trackScoreReport.update({
           where: { id: report.id },
           data: { paidAt: new Date() },
         });
+        unlocked = true;
       }
     } catch (err) {
       console.error("[score/submit] auto-unlock error:", err);
     }
 
-    // Assign the human "room of 5" (best-effort — never blocks the submit).
-    try {
-      await assignScoreReviewers(report.id);
-    } catch (err) {
-      console.error("[score/submit] reviewer assignment error:", err);
+    // The human "room of 5" is a paid feature — only assign once the report is
+    // unlocked (subscriber here, or on payment via the Stripe webhook). Free
+    // submitters get the instant AI read + teaser only, so we never pay
+    // reviewers for tracks that are never unlocked.
+    if (unlocked) {
+      try {
+        await assignScoreReviewers(report.id);
+      } catch (err) {
+        console.error("[score/submit] reviewer assignment error:", err);
+      }
     }
 
-    // Generate the room's read inline so the report is populated on arrival.
+    // Generate the AI read inline so the report is populated on arrival (free).
     // generateAndStoreReport never throws on API failure (it falls back).
     try {
       await generateAndStoreReport(report.id);

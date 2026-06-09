@@ -6,6 +6,7 @@ import { assignReviewersToTrack } from "@/lib/queue";
 import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email";
 import { finalizePaidCheckoutSession } from "@/lib/payments";
 import { activateSubscriber, updateSubscriberStatus } from "@/lib/score-subscription";
+import { assignScoreReviewers } from "@/lib/score-review";
 import type Stripe from "stripe";
 
 
@@ -152,10 +153,18 @@ async function handleScoreUnlockCheckout(session: Stripe.Checkout.Session) {
       where: { id: reportId },
       data: {
         paidAt: new Date(),
-        status: "COMPLETED",
+        status: "IN_REVIEW",
         stripeSessionId: session.id,
       },
     });
+
+    // The room is a paid feature — assign the 5 real listeners now that they've
+    // unlocked. They watch the reactions land on their report.
+    try {
+      await assignScoreReviewers(reportId);
+    } catch (err) {
+      console.error("Error assigning reviewers after unlock:", err);
+    }
 
     console.log(`Unlocked score report ${reportId} (session ${session.id})`);
   } catch (error) {
