@@ -7,6 +7,7 @@ import { useSession, signIn } from "next-auth/react";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
 import { ScoreRing } from "@/components/score/score-ring";
+import { RealReviews } from "@/components/landing/real-reviews";
 import { posts } from "@/lib/blog-posts";
 import { ArrowRight, ArrowDown, Music, Loader2, X, Zap, Users, Headphones, Play } from "lucide-react";
 
@@ -767,6 +768,9 @@ export default function ScorePage() {
           <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#0a0a0a] to-transparent" />
         </div>
       </section>
+
+      {/* ── REAL REVIEWS (social proof from completed reviews) ── */}
+      <RealReviews />
 
       {/* ── REAL SAMPLE (this is what you get) ── */}
       <section id="sample" className="relative z-10 border-t border-white/10 scroll-mt-16">
