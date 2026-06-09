@@ -8,6 +8,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
 import { ScoreRing } from "@/components/score/score-ring";
 import { RealReviews } from "@/components/landing/real-reviews";
+import { RoomShowcase } from "@/components/landing/room-showcase";
 import { posts } from "@/lib/blog-posts";
 import { ArrowRight, ArrowDown, Music, Loader2, X, Zap, Users, Headphones, Play, Upload } from "lucide-react";
 
@@ -836,82 +837,8 @@ export default function ScorePage() {
         </div>
       </section>
 
-      {/* ── REAL REVIEWS (social proof from completed reviews) ── */}
-      <RealReviews />
-
-      {/* ── REAL SAMPLE (this is what you get) ── */}
-      <section id="sample" className="relative z-10 border-t border-white/10 scroll-mt-16">
-        <div className="max-w-6xl mx-auto px-5 py-20">
-          <div className="flex flex-wrap items-end justify-between gap-4 mb-12">
-            <div>
-              <p className={`${mono.className} text-[13px] text-white/55 mb-2`}>[ a real read ]</p>
-              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-                this is what you get<span style={{ color: ACCENT }}>.</span>
-              </h2>
-            </div>
-            <Link
-              href="/report/demo"
-              className={`${mono.className} inline-flex items-center gap-1.5 text-[13px] text-black bg-[#6ee7ff] hover:bg-white px-4 py-2 transition-colors shrink-0`}
-            >
-              open the full sample →
-            </Link>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-px bg-white/10 border border-white/10">
-            {/* the score */}
-            <div className="bg-[#0a0a0a] p-7 flex flex-col items-center text-center">
-              <p className={`${mono.className} text-[12px] text-white/40 mb-5`}>resonance score</p>
-              <ScoreRing score={SAMPLE.score} size="lg" dark animate />
-              <span
-                className={`${mono.className} inline-block mt-6 text-[12px] text-black px-3 py-1`}
-                style={{ background: ACCENT }}
-              >
-                almost there
-              </span>
-              <p className="text-white/55 text-[14px] normal-case mt-4 leading-relaxed">
-                one number, weighed across five dimensions — plus the verdict.
-              </p>
-            </div>
-
-            {/* reactions */}
-            <div className="bg-[#0a0a0a] p-7">
-              <p className={`${mono.className} text-[12px] text-white/40 mb-5`}>the room reacts</p>
-              <div className="space-y-4">
-                {SAMPLE.reactions.map((r) => (
-                  <div key={r.lens} className="border-l-2 pl-4" style={{ borderColor: ACCENT }}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className={`${mono.className} text-[11px] text-white/50`}>{r.lens}</span>
-                      <Dots count={r.rating} />
-                    </div>
-                    <p className="text-[14px] font-bold leading-snug">“{r.headline}”</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* fixes */}
-            <div className="bg-[#0a0a0a] p-7">
-              <p className={`${mono.className} text-[12px] text-white/40 mb-5`}>fix these three</p>
-              <div className="space-y-3">
-                {SAMPLE.fixes.map((f, i) => (
-                  <div key={f} className="flex items-start gap-3">
-                    <span
-                      className={`${mono.className} shrink-0 w-7 h-7 flex items-center justify-center text-[13px] font-bold text-black`}
-                      style={{ background: ACCENT }}
-                    >
-                      {i + 1}
-                    </span>
-                    <p className="text-[14px] font-bold leading-snug pt-1">{f}</p>
-                  </div>
-                ))}
-              </div>
-              <p className="text-white/45 text-[13px] normal-case mt-6 leading-relaxed">
-                ranked by impact — start at the top and your score moves.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── PLAYED FOR THE ROOM (what you get — real listeners + AI read) ── */}
+      <RoomShowcase />
 
       {/* ── HOW IT WORKS (visual flow) ── */}
       <section id="how" className="relative z-10 border-t border-white/10 scroll-mt-16">
@@ -1141,6 +1068,9 @@ export default function ScorePage() {
           </div>
         </div>
       </section>
+
+      {/* ── REAL REVIEWS (social proof, just before the ask) ── */}
+      <RealReviews />
 
       {/* ── PRICING ── */}
       <section id="pricing" className="relative z-10 border-t border-white/10 scroll-mt-16">
