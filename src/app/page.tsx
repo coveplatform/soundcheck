@@ -86,6 +86,17 @@ const SAMPLE = {
   ],
 };
 
+// Reactions that cycle through the hero preview's "just landed" chip — real
+// listener names, so it reads like the room is reacting live.
+const HERO_REACTIONS: { name: string; lens: string; rating: number; headline: string }[] = [
+  { name: "nova reyes", lens: "producer", rating: 5, headline: "felt release-ready to me" },
+  { name: "jules okafor", lens: "casual listener", rating: 4, headline: "hook caught me straight away" },
+  { name: "mara linde", lens: "mix engineer", rating: 3, headline: "low end's a touch polite" },
+  { name: "theo brandt", lens: "fellow artist", rating: 5, headline: "this would slap live" },
+  { name: "kavi anand", lens: "first-time listener", rating: 4, headline: "kept me till the very end" },
+  { name: "sienna cole", lens: "producer", rating: 4, headline: "tighten the intro and it's there" },
+];
+
 // ── Recently read by the room (real artwork) ────────────────────────
 
 const RECENT: { src: string; score: number }[] = [
@@ -124,6 +135,13 @@ function Dots({ count, max = 5 }: { count: number; max?: number }) {
 
 /** A real, miniature report — the actual product, shown not described. */
 function ReportPreview() {
+  const [ri, setRi] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setRi((n) => (n + 1) % HERO_REACTIONS.length), 2600);
+    return () => clearInterval(t);
+  }, []);
+  const r = HERO_REACTIONS[ri];
+
   return (
     <div className="relative" style={{ animation: "previewIn .6s cubic-bezier(.2,.7,.2,1) both" }}>
       <style>{`
@@ -133,8 +151,7 @@ function ReportPreview() {
         @keyframes sheen{0%{transform:translateX(-130%)}55%,100%{transform:translateX(260%)}}
         @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.25}}
         @keyframes ringGlow{0%,100%{opacity:.45}50%{opacity:.9}}
-        @keyframes chipIn{from{opacity:0;transform:translateY(10px) rotate(-3deg)}to{opacity:1;transform:translateY(0) rotate(-3deg)}}
-        @keyframes chipFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(-3deg)}}
+        @keyframes chipSwap{0%{opacity:0;transform:translateY(12px) rotate(-3deg)}14%{opacity:1;transform:translateY(0) rotate(-3deg)}82%{opacity:1;transform:translateY(0) rotate(-3deg)}100%{opacity:0;transform:translateY(-10px) rotate(-3deg)}}
       `}</style>
 
       {/* depth: ghost card behind */}
@@ -210,19 +227,22 @@ function ReportPreview() {
         </div>
       </div>
 
-      {/* floating "just landed" reaction chip — overlaps the bottom edge */}
+      {/* floating reaction chip — cycles through real listeners as they "land" */}
       <div
+        key={ri}
         className="absolute -bottom-5 left-4 right-8 bg-[#141414] border p-3.5 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.9)]"
-        style={{ borderColor: ACCENT, animation: "chipIn .5s ease .7s both, chipFloat 5s ease-in-out 1.2s infinite" }}
+        style={{ borderColor: ACCENT, animation: "chipSwap 2.6s ease-in-out both" }}
       >
         <div className="flex items-center gap-2 mb-1.5">
-          <span className="relative flex h-2 w-2">
+          <span className="relative flex h-2 w-2 shrink-0">
             <span className="absolute inline-flex h-full w-full rounded-full" style={{ background: ACCENT, animation: "livePulse 1.4s ease-in-out infinite" }} />
           </span>
-          <span className={`${mono.className} text-[10px] text-white/45 uppercase tracking-wider`}>just landed · the producer</span>
-          <Dots count={5} />
+          <span className={`${mono.className} text-[10px] text-white/55 uppercase tracking-wider truncate`}>
+            {r.name} · {r.lens}
+          </span>
+          <span className="ml-auto shrink-0"><Dots count={r.rating} /></span>
         </div>
-        <p className="text-[13px] font-bold leading-snug">“felt release-ready to me”</p>
+        <p className="text-[13px] font-bold leading-snug">“{r.headline}”</p>
       </div>
     </div>
   );
@@ -503,7 +523,7 @@ export default function ScorePage() {
     <div
       className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase scroll-smooth`}
     >
-      <style>{`@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
+      <style>{`@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}@keyframes paidBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}`}</style>
 
       {/* grain */}
       <div
@@ -547,6 +567,16 @@ export default function ScorePage() {
 
       {/* ── HERO ── */}
       <section id="top" className="relative z-10 max-w-6xl mx-auto px-5 pt-14 sm:pt-20 pb-16 scroll-mt-16">
+        {/* quirky floating "get paid to listen" — bobs off to the right, scrolls to #earn */}
+        <a
+          href="#earn"
+          className="hidden sm:flex fixed right-5 bottom-6 z-40 items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[14px] px-4 py-3 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+          style={{ animation: "paidBob 2.6s ease-in-out infinite" }}
+        >
+          <span aria-hidden className="text-base">🎧</span>
+          get paid to listen
+          <span aria-hidden>↓</span>
+        </a>
         <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-14 items-center">
           {/* left — copy + paste box */}
           <div>
@@ -635,12 +665,7 @@ export default function ScorePage() {
 
               <button
                 type="submit"
-                disabled={!isUrl}
-                className={`${
-                  isUrl
-                    ? "bg-[#6ee7ff] text-black hover:bg-white"
-                    : "bg-white/10 text-white/40 cursor-not-allowed"
-                } group mt-3 w-full inline-flex items-center justify-center gap-2 font-extrabold text-base px-7 py-4 transition-colors`}
+                className="group mt-3 w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black hover:bg-white font-extrabold text-base px-7 py-4 transition-colors shadow-[0_0_30px_-6px_rgba(110,231,255,0.7)]"
               >
                 score my track — free
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
@@ -715,20 +740,25 @@ export default function ScorePage() {
           [ recently read by the room ]
         </p>
         <div className="relative">
-          <div className="flex gap-3 w-max px-5" style={{ animation: "marquee 50s linear infinite" }}>
-            {[...RECENT, ...RECENT].map((r, i) => (
-              <div
-                key={i}
-                className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 border border-white/10 overflow-hidden"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={r.src} alt="" className="w-full h-full object-cover" loading="lazy" />
-                <span
-                  className={`${mono.className} absolute bottom-0 right-0 text-[10px] font-bold text-black px-1 leading-tight`}
-                  style={{ background: ACCENT }}
-                >
-                  {r.score}
-                </span>
+          {/* two identical groups, each with matching trailing gap → seamless -50% loop */}
+          <div className="flex w-max" style={{ animation: "marquee 50s linear infinite" }}>
+            {[0, 1].map((g) => (
+              <div key={g} className="flex gap-3 pr-3 shrink-0" aria-hidden={g === 1}>
+                {RECENT.map((r, i) => (
+                  <div
+                    key={i}
+                    className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 border border-white/10 overflow-hidden"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={r.src} alt="" className="w-full h-full object-cover" loading="lazy" />
+                    <span
+                      className={`${mono.className} absolute bottom-0 right-0 text-[10px] font-bold text-black px-1 leading-tight`}
+                      style={{ background: ACCENT }}
+                    >
+                      {r.score}
+                    </span>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
