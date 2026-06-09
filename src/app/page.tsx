@@ -443,6 +443,19 @@ export default function ScorePage() {
     setBusy(false);
   };
 
+  // The actual (slow) submit. Kicked off as soon as the animation starts so the
+  // read generates *during* the animation instead of after the user clicks.
+  const submitRef = useRef<Promise<{ slug?: string; error?: string } | null> | null>(null);
+  const fireSubmit = () => {
+    return fetch("/api/score/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trackUrl: trackUrl.trim(), trackTitle: meta?.title?.trim() || undefined }),
+    })
+      .then((r) => r.json().catch(() => null))
+      .catch(() => null);
+  };
+
   const start = (e: React.FormEvent) => {
     e.preventDefault();
     if (!trackUrl.trim()) {
@@ -452,6 +465,8 @@ export default function ScorePage() {
     setError("");
     setStep(0);
     setPhase("running");
+    // Logged-in users: start generating now, in parallel with the animation.
+    if (session?.user) submitRef.current = fireSubmit();
   };
 
   // Where to land after auth — /score/finish submits the track post-login.
@@ -494,18 +509,14 @@ export default function ScorePage() {
   const seeResults = async () => {
     if (busy) return;
     setBusy(true);
-    const finish = buildFinish();
     if (!session?.user) {
-      router.push(`/login?callbackUrl=${encodeURIComponent(finish)}`);
+      router.push(`/login?callbackUrl=${encodeURIComponent(buildFinish())}`);
       return;
     }
     try {
-      const res = await fetch("/api/score/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ trackUrl: trackUrl.trim(), trackTitle: meta?.title?.trim() || undefined }),
-      });
-      const data = await res.json().catch(() => null);
+      // Await the submit that already started with the animation (or fire one now).
+      const data = await (submitRef.current ?? fireSubmit());
+      submitRef.current = null;
       if (data?.slug) {
         router.push(`/report/${data.slug}`);
         return;
