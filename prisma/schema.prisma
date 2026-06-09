@@ -865,6 +865,11 @@ model TrackScoreReport {
   aiSummary        String?
   reviewerQuotes   Json?
   priorityFixes    Json?
+  // Link-independent acoustic identity (duration/tempo/key/spectral/energy +
+  // arrangement shape) from the audio worker. Lets us recognise re-uploads and
+  // new versions of the same track across different links, so the read stays
+  // consistent (and can diff against a prior version).
+  fingerprint      Json?
   artistId         String?
   // Pre-auth submissions: the report is generated before the user signs in.
   // `claimToken` is an anonymous handle issued at /api/score/start and redeemed

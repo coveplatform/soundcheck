@@ -3,6 +3,7 @@ import {
   acquireAudioFeatures,
   describeFeatures,
   type AudioFeatures,
+  type AcousticFingerprint,
 } from "@/lib/audio-analysis";
 import { fetchTrackMeta } from "@/lib/track-metadata";
 
@@ -107,6 +108,14 @@ export type GenerateOpts = {
     score: number;
     categories: { key: CategoryScore["key"]; score: number }[];
   };
+  /** A prior read of this same track (re-upload), so the model stays consistent
+   * (identical audio) or diffs against the last version (changed master). */
+  prior?: {
+    relation: "identical" | "changed";
+    headline: string;
+    summary: string;
+    score: number;
+  };
 };
 
 const ROOM_SIZE = 20;
@@ -130,6 +139,13 @@ function buildPrompt(input: ReportInput, opts: GenerateOpts = {}): string {
     deep && opts.locked
       ? `\n\nDEEP READ (this track was already scored ${opts.locked.score}/100 at the instant read, and that number plus the per-dimension scores are LOCKED — the artist has paid to unlock the full report, NOT to be re-graded). Rules for this pass:\n- Do NOT change the score or argue it should be different; write a read that is fully consistent with ${opts.locked.score}/100.\n- Echo the same numbers back in the JSON (score: ${opts.locked.score}, and the category scores you're given) — we keep them locked regardless of what you return.\n- This is the PREMIUM deliverable: go deeper and longer than a quick read. Walk the whole track start to finish, name specific moments by timestamp, trace the energy arc and the emotional throughline, and give the artist the kind of detailed, expert breakdown that's worth paying for. Expand the synthesis to 9-12 sentences, the per-dimension notes to 3-4 sentences each, and make each priority fix a concrete, step-by-step instruction.\n- Locked category scores: ${opts.locked.categories.map((c) => `${c.key}=${c.score}`).join(", ")}.`
       : "";
+  // Re-upload memory: keep the read consistent with (or an explicit diff against)
+  // a prior read of the same track, so the same song never gets contradictory feedback.
+  const priorBlock = opts.prior
+    ? opts.prior.relation === "identical"
+      ? `\n\nCONSISTENCY (IMPORTANT): you have ALREADY read this exact track before. Your previous read was: "${opts.prior.headline}" — ${opts.prior.summary.slice(0, 600)}. This is the SAME audio, so STAY CONSISTENT with that read — do NOT reverse earlier claims (e.g. if you said the drums were buried, don't now say they're upfront). Refine and go deeper, but the story must match.`
+      : `\n\nNEW VERSION: this is a newer version of a track you read before. Your previous read was: "${opts.prior.headline}" — ${opts.prior.summary.slice(0, 600)}. Treat this as a revision: keep the parts that still hold, and explicitly call out what has CHANGED since the last version (e.g. "the low end is fuller than before", "the breakdown still saps momentum"). Make at least one observation framed as progress-vs-last-version.`
+    : "";
   const title = input.trackTitle?.trim() || "(untitled)";
   // The worker returns the track's whole arrangement (section map + energy dips
   // across the analysed span, not just the first few seconds). The instant read
@@ -152,7 +168,7 @@ Give your takes from a few distinct angles (a producer, a casual listener, a pla
 TRACK: "${title}"
 ARTIST: ${artist || "(unknown)"}
 GENRE: ${input.genre}
-ARTIST'S NOTE: ${input.notes?.trim() || "(none)"}${recognition}${measured}${lockedBlock}
+ARTIST'S NOTE: ${input.notes?.trim() || "(none)"}${recognition}${measured}${lockedBlock}${priorBlock}
 
 Produce a reaction report as STRICT JSON (no markdown, no commentary, no code fences). Shape:
 
@@ -529,6 +545,80 @@ export async function generateReport(
   }
 }
 
+// ── Re-upload / version detection (track identity) ──────────────────
+
+function relDiff(a?: number | null, b?: number | null): number {
+  if (a == null || b == null) return 1;
+  const m = Math.max(Math.abs(a), Math.abs(b), 1e-6);
+  return Math.abs(a - b) / m;
+}
+
+function spectralDist(
+  a?: AcousticFingerprint["spectral"],
+  b?: AcousticFingerprint["spectral"]
+): number {
+  if (!a || !b) return 1;
+  return (["sub", "bass", "lowMid", "mid", "high"] as const).reduce(
+    (s, k) => s + Math.abs((a[k] ?? 0) - (b[k] ?? 0)),
+    0
+  );
+}
+
+/** How two tracks relate: the same recording, a new version, or unrelated. */
+function fpRelation(
+  a: AcousticFingerprint,
+  b: AcousticFingerprint
+): "identical" | "changed" | "different" {
+  const durRel = relDiff(a.durationSec, b.durationSec);
+  const tempoRel = relDiff(a.tempo, b.tempo);
+  const keyMatch = !a.key || !b.key || a.key === b.key;
+  // Same song: near-identical length + tempo, compatible key.
+  if (!(durRel < 0.06 && tempoRel < 0.05 && keyMatch)) return "different";
+  // Same song AND same master ⇒ identical; otherwise a re-mix / new version.
+  const identical =
+    durRel < 0.012 &&
+    spectralDist(a.spectral, b.spectral) < 0.06 &&
+    relDiff(a.energy, b.energy) < 0.06;
+  return identical ? "identical" : "changed";
+}
+
+/**
+ * Find a prior read of the same track by the same artist (by acoustic
+ * fingerprint, so it works across different links / re-encodes). Returns the
+ * closest match plus whether the audio is identical or a changed version — used
+ * to keep the read consistent (or diff it against the last version).
+ */
+async function findPriorVersion(
+  email: string,
+  fp: AcousticFingerprint,
+  excludeReportId: string
+): Promise<GenerateOpts["prior"] | undefined> {
+  if (!email) return undefined;
+  const candidates = await prisma.trackScoreReport.findMany({
+    where: {
+      email: { equals: email.trim().toLowerCase(), mode: "insensitive" },
+      id: { not: excludeReportId },
+      score: { not: null },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 12,
+    select: { score: true, aiSummary: true, reviewerQuotes: true, fingerprint: true },
+  });
+  for (const c of candidates) {
+    const cfp = c.fingerprint as AcousticFingerprint | null;
+    if (!cfp) continue;
+    const r = fpRelation(fp, cfp);
+    if (r === "different") continue;
+    return {
+      relation: r,
+      headline: (c.reviewerQuotes as Record<string, any> | null)?.headline ?? "",
+      summary: c.aiSummary ?? "",
+      score: c.score ?? 0,
+    };
+  }
+  return undefined;
+}
+
 /**
  * Generate a report and persist it onto an existing TrackScoreReport row.
  * Moves the report from PENDING → IN_REVIEW (results are in but still gated).
@@ -536,7 +626,7 @@ export async function generateReport(
 export async function generateAndStoreReport(reportId: string): Promise<void> {
   const report = await prisma.trackScoreReport.findUnique({
     where: { id: reportId },
-    select: { id: true, trackTitle: true, genre: true, notes: true, trackUrl: true, paidAt: true },
+    select: { id: true, email: true, trackTitle: true, genre: true, notes: true, trackUrl: true, paidAt: true },
   });
   if (!report) throw new Error(`TrackScoreReport ${reportId} not found`);
 
@@ -576,13 +666,22 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
     return;
   }
 
-  const generated = await generateReport({
-    trackTitle: report.trackTitle || meta?.title || null,
-    artist: meta?.artist ?? null,
-    genre: report.genre ?? "Other",
-    notes: report.notes,
-    features,
-  });
+  // Re-upload memory: if this artist has read this same track before, keep the
+  // read consistent (or diff it against the prior version).
+  const prior = features?.fingerprint
+    ? await findPriorVersion(report.email, features.fingerprint, report.id)
+    : undefined;
+
+  const generated = await generateReport(
+    {
+      trackTitle: report.trackTitle || meta?.title || null,
+      artist: meta?.artist ?? null,
+      genre: report.genre ?? "Other",
+      notes: report.notes,
+      features,
+    },
+    { prior }
+  );
 
   await prisma.trackScoreReport.update({
     where: { id: reportId },
@@ -590,6 +689,7 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
       // Backfill the title from oEmbed when the submitter didn't give one.
       ...(report.trackTitle ? {} : meta?.title ? { trackTitle: meta.title } : {}),
       ...(meta?.artworkUrl ? { artworkUrl: meta.artworkUrl } : {}),
+      ...(features?.fingerprint ? { fingerprint: features.fingerprint as object } : {}),
       status: "IN_REVIEW",
       score: generated.score,
       percentile: generated.percentile,
@@ -641,7 +741,7 @@ export async function regenerateDeepReport(reportId: string): Promise<void> {
   const report = await prisma.trackScoreReport.findUnique({
     where: { id: reportId },
     select: {
-      id: true, trackTitle: true, genre: true, notes: true, trackUrl: true,
+      id: true, email: true, trackTitle: true, genre: true, notes: true, trackUrl: true,
       score: true, hookScore: true, productionScore: true, retentionScore: true,
       emotionalScore: true, commercialScore: true, reviewerQuotes: true,
     },
@@ -655,10 +755,15 @@ export async function regenerateDeepReport(reportId: string): Promise<void> {
   if (quotes.invalid) return;
   if (quotes.deep) return;
 
+  // Deep read runs the stem-separation pass (drums/bass/vocals/other balance).
   const [features, meta] = await Promise.all([
-    acquireAudioFeatures(report.trackUrl).catch(() => null),
+    acquireAudioFeatures(report.trackUrl, { deep: true }).catch(() => null),
     fetchTrackMeta(report.trackUrl).catch(() => null),
   ]);
+
+  const prior = features?.fingerprint
+    ? await findPriorVersion(report.email, features.fingerprint, report.id)
+    : undefined;
 
   const generated = await generateReport(
     {
@@ -670,6 +775,7 @@ export async function regenerateDeepReport(reportId: string): Promise<void> {
     },
     {
       depth: "deep",
+      prior,
       locked: {
         score: report.score,
         categories: [

@@ -43,10 +43,34 @@ export type AudioFeatures = {
   sections?: { kind: string; startSec: number; endSec: number }[];
   /** Rough 0-1 proxy for how present vocals are across the track. */
   vocalPresence?: number;
+  /** True when the deep (stem-separation) pass ran for this analysis. */
+  stemsUsed?: boolean;
+  /** Per-stem balance from demucs/Replicate (deep reads only). */
+  stemMix?: {
+    drums?: number;
+    bass?: number;
+    vocals?: number;
+    /** >1 = vocal sits above the rhythm section; <1 = tucked under it. */
+    vocalVsInstruments?: number;
+  };
+  /** Link-independent acoustic identity — for re-upload / version detection. */
+  fingerprint?: AcousticFingerprint;
   /** Confidence of the detected beatgrid ("high" | "low"). */
   gridConfidence?: string;
   /** Anything extra the worker returns. */
   extra?: Record<string, unknown>;
+};
+
+/** Compact descriptor the worker derives so we can recognise the same song
+ * across different links / re-encodes (see worker `_acoustic_fingerprint`). */
+export type AcousticFingerprint = {
+  durationSec?: number;
+  tempo?: number;
+  key?: string;
+  spectral?: { sub: number; bass: number; lowMid: number; mid: number; high: number };
+  energy?: number;
+  /** Section start times normalised by duration (the arrangement "shape"). */
+  sectionBounds?: number[];
 };
 
 function detectSpotify(url: string): boolean {
@@ -139,13 +163,17 @@ async function spotifyFeatures(url: string): Promise<AudioFeatures | null> {
 
 // ── Extraction worker (SoundCloud / YouTube / direct files) ─────────
 
-async function workerFeatures(url: string): Promise<AudioFeatures | null> {
+async function workerFeatures(
+  url: string,
+  deep = false
+): Promise<AudioFeatures | null> {
   const workerUrl = process.env.AUDIO_WORKER_URL;
   if (!workerUrl) return null;
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 60_000);
+    // Deep reads run stem separation (slow / GPU) — give them a longer ceiling.
+    const timeout = setTimeout(() => controller.abort(), deep ? 180_000 : 60_000);
     const res = await fetch(`${workerUrl.replace(/\/$/, "")}/analyze`, {
       method: "POST",
       headers: {
@@ -154,7 +182,7 @@ async function workerFeatures(url: string): Promise<AudioFeatures | null> {
           ? { Authorization: `Bearer ${process.env.AUDIO_WORKER_SECRET}` }
           : {}),
       },
-      body: JSON.stringify({ url }),
+      body: JSON.stringify({ url, deep }),
       signal: controller.signal,
     });
     clearTimeout(timeout);
@@ -174,14 +202,16 @@ async function workerFeatures(url: string): Promise<AudioFeatures | null> {
  * Returns null when nothing is configured/available (report stays non-grounded).
  */
 export async function acquireAudioFeatures(
-  url: string
+  url: string,
+  opts: { deep?: boolean } = {}
 ): Promise<AudioFeatures | null> {
   if (detectSpotify(url)) {
     const sf = await spotifyFeatures(url);
     if (sf) return sf;
   }
-  // SoundCloud / YouTube / Bandcamp / direct → extraction worker
-  return workerFeatures(url);
+  // SoundCloud / YouTube / Bandcamp / direct → extraction worker. `deep` runs the
+  // stem-separation pass (paid reads only).
+  return workerFeatures(url, opts.deep ?? false);
 }
 
 // Turn a 0–1 signal into a plain-language band so the model describes the feel
@@ -223,6 +253,20 @@ export function describeFeatures(f: AudioFeatures): string {
   }
   if (f.vocalPresence != null)
     lines.push(`vocals: ${band(f.vocalPresence, ["barely present / likely instrumental", "sitting well back in the mix", "present and clear", "upfront"])}`);
+  // Stem separation (deep reads): how the parts actually sit against each other.
+  if (f.stemMix) {
+    const m = f.stemMix;
+    const vvi = m.vocalVsInstruments;
+    const vocalSit =
+      vvi == null ? null
+      : vvi >= 1.15 ? "vocal sits clearly on top of the instruments"
+      : vvi <= 0.85 ? "vocal is tucked under the instruments"
+      : "vocal and instruments sit at a similar level";
+    const parts: string[] = [];
+    if (m.drums != null) parts.push(`drums ${band(Math.min(1, m.drums), ["soft", "moderate", "strong", "dominant"])}`);
+    if (m.bass != null) parts.push(`bass ${band(Math.min(1, m.bass), ["light", "moderate", "strong", "heavy"])}`);
+    lines.push(`stems (separated): ${parts.join(", ")}${vocalSit ? `; ${vocalSit}` : ""}`);
+  }
   if (f.sections?.length) {
     lines.push(
       `arrangement: ${f.sections.map((s) => `${s.kind} (${mmss(s.startSec)}–${mmss(s.endSec)})`).join(" → ")}`
