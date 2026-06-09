@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
-import { ArrowRight, Loader2, Music, X } from "lucide-react";
+import { ArrowRight, Loader2, Music, X, Upload } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -44,6 +44,39 @@ export default function SubmitScorePage() {
 
   const [meta, setMeta] = useState<Meta | null>(null);
   const [metaLoading, setMetaLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedName, setUploadedName] = useState("");
+
+  const MAX_FILE_BYTES = 25 * 1024 * 1024;
+  const handleFile = async (file: File) => {
+    if (!file) return;
+    if (file.size > MAX_FILE_BYTES) { setError("File too large (max 25MB)."); return; }
+    setError("");
+    setUploading(true);
+    try {
+      const presignRes = await fetch("/api/uploads/track/presign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, contentType: file.type || "audio/mpeg", contentLength: file.size }),
+      });
+      if (!presignRes.ok) {
+        const d = await presignRes.json().catch(() => null);
+        setError(d?.error === "Unauthorized" ? "Sign in to upload a file, or paste a link instead." : (d?.error ?? "Upload failed."));
+        setUploading(false);
+        return;
+      }
+      const { uploadUrl, fileUrl } = await presignRes.json();
+      const up = await fetch(uploadUrl, { method: "PUT", body: file, headers: { "Content-Type": file.type || "audio/mpeg" } });
+      if (!up.ok) { setError("Upload failed. Try again."); setUploading(false); return; }
+      setUploadedName(file.name);
+      setTrackUrl(fileUrl);
+      setTrackTitle((cur) => cur || file.name.replace(/\.[^/.]+$/, ""));
+    } catch {
+      setError("Upload failed. Try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // Advance the progress steps while the read is being generated. Hold on the
   // last step until the redirect fires so it never looks finished early.
@@ -164,14 +197,35 @@ export default function SubmitScorePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <Field label="track link" required>
             {!isUrl ? (
-              <input
-                type="url"
-                value={trackUrl}
-                onChange={(e) => setTrackUrl(e.target.value)}
-                placeholder="paste a soundcloud, youtube, bandcamp or mp3 link…"
-                required
-                className={inputCls}
-              />
+              <div>
+                <input
+                  type="url"
+                  value={trackUrl}
+                  onChange={(e) => setTrackUrl(e.target.value)}
+                  placeholder="paste a soundcloud, youtube, bandcamp or mp3 link…"
+                  className={inputCls}
+                />
+                <div className="mt-3 flex items-center gap-3">
+                  <div className="h-px bg-white/10 flex-1" />
+                  <span className={`${mono.className} text-[11px] text-white/30`}>or</span>
+                  <div className="h-px bg-white/10 flex-1" />
+                </div>
+                <label
+                  className={`${mono.className} mt-3 flex items-center justify-center gap-2 border border-white/20 hover:border-[#6ee7ff] text-white/70 hover:text-white text-[13px] py-3.5 cursor-pointer transition-colors ${uploading ? "opacity-60 pointer-events-none" : ""}`}
+                >
+                  {uploading ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> uploading…</>
+                  ) : (
+                    <><Upload className="h-4 w-4" /> upload an mp3 (max 25mb)</>
+                  )}
+                  <input
+                    type="file"
+                    accept="audio/mpeg,audio/mp3,.mp3"
+                    className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+                  />
+                </label>
+              </div>
             ) : (
               <div
                 className="flex items-center gap-4 bg-[#141414] border p-3.5"
@@ -202,9 +256,11 @@ export default function SubmitScorePage() {
                     </>
                   ) : (
                     <>
-                      <p className="text-[15px] font-bold text-white truncate normal-case">link added</p>
+                      <p className="text-[15px] font-bold text-white truncate normal-case">
+                        {uploadedName ? "uploaded" : "link added"}
+                      </p>
                       <p className={`${mono.className} text-[12px] text-white/60 truncate normal-case mt-0.5`}>
-                        {host || "ready to go"}
+                        {uploadedName || host || "ready to go"}
                       </p>
                     </>
                   )}
@@ -215,7 +271,7 @@ export default function SubmitScorePage() {
                   </span>
                   <button
                     type="button"
-                    onClick={() => setTrackUrl("")}
+                    onClick={() => { setTrackUrl(""); setUploadedName(""); }}
                     aria-label="change track"
                     className="text-white/45 hover:text-white transition-colors"
                   >
