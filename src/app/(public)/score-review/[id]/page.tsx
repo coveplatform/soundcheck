@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Logo } from "@/components/ui/logo";
 import { detectSource } from "@/lib/metadata";
+import { claimScoreReviewSeat } from "@/lib/score-review";
 import { ReviewExperience } from "./review-experience";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
@@ -23,24 +24,35 @@ export default async function ReviewTrackPage({
   const { id } = await params;
   if (!session?.user?.id) redirect(`/login?callbackUrl=/score-review/${id}`);
 
-  const review = await prisma.scoreReview.findUnique({
-    where: { id },
-    include: {
-      TrackScoreReport: { select: { trackTitle: true, trackUrl: true, genre: true } },
-    },
-  });
+  // `id` is the reportId. Claim a reviewer seat on open (idempotent — returns the
+  // existing seat if already held). This is the pull side of the room.
+  const claim = await claimScoreReviewSeat(session.user.id, id);
 
-  if (!review) notFound();
-  if (review.reviewerId !== session.user.id) {
+  if (!claim.ok) {
+    const msg =
+      claim.reason === "own_track"
+        ? "that's your own track — you can't review it."
+        : claim.reason === "full"
+          ? "this one just filled up — the room's complete."
+          : "this track isn't available to review right now.";
     return (
       <Shell>
-        <h1 className="text-3xl font-extrabold tracking-tight mb-3">not your assignment</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">already taken care of</h1>
+        <p className="text-white/60 normal-case mb-6">{msg}</p>
         <Link href="/score-review" className={`${mono.className} text-[13px]`} style={{ color: ACCENT }}>
           ← back to your queue
         </Link>
       </Shell>
     );
   }
+
+  const review = await prisma.scoreReview.findUnique({
+    where: { id: claim.reviewId },
+    include: {
+      TrackScoreReport: { select: { trackTitle: true, trackUrl: true, genre: true } },
+    },
+  });
+  if (!review?.TrackScoreReport) notFound();
 
   const done = review.status === "COMPLETED";
   const track = review.TrackScoreReport;

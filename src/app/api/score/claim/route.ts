@@ -2,7 +2,7 @@ import { NextResponse, after } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { claimAndAssignRoom } from "@/lib/score-review";
+import { decideRoomEligibility } from "@/lib/score-review";
 import { regenerateDeepReport } from "@/lib/score-report-ai";
 import { isScoreSubscribed } from "@/lib/score-subscription";
 import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
@@ -81,8 +81,8 @@ export async function POST(request: Request) {
           data: { paidAt: new Date() },
         });
         unlocked = true;
-        // Atomic per-subscriber claim of a real-reviewer round.
-        await claimAndAssignRoom(email, report.id);
+        // Atomic per-subscriber grant of a real-reviewer round (honors the cap).
+        await decideRoomEligibility(email, report.id);
         // Premium deep read (score stays locked). Idempotent + guards on the
         // instant read being done, so it's safe even if generation is still
         // running — generateAndStoreReport re-triggers it on completion.

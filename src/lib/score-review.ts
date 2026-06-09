@@ -42,12 +42,20 @@ export type ScoreRoomQuota = {
   resetsAt: Date;
 };
 
+/** Where in their 30-day cycle a subscriber currently sits. */
+function roomCycle(anchor: Date): { periodStart: Date; resetsAt: Date } {
+  const periodsPassed = Math.max(0, Math.floor((Date.now() - anchor.getTime()) / ROOM_CYCLE_MS));
+  const periodStart = new Date(anchor.getTime() + periodsPassed * ROOM_CYCLE_MS);
+  return { periodStart, resetsAt: new Date(periodStart.getTime() + ROOM_CYCLE_MS) };
+}
+
 /**
  * A subscriber's monthly real-reviewer-round allowance.
  *
- * "Rounds used" = their reports that had a human room assigned in the current
- * 30-day window (anchored at their subscription start). AI-only re-reads never
- * assign a room, so they don't burn a round.
+ * "Rounds used" = reports granted the real room this 30-day cycle (anchored at
+ * subscription start). A report is granted a room when it's unlocked and not
+ * room-skipped — independent of whether reviewers have claimed it yet — so the
+ * cap holds even before any listener picks the track up.
  */
 export async function getScoreRoomQuota(email: string): Promise<ScoreRoomQuota> {
   const norm = email.trim().toLowerCase();
@@ -56,17 +64,14 @@ export async function getScoreRoomQuota(email: string): Promise<ScoreRoomQuota> 
     select: { createdAt: true },
   });
 
-  const anchor = sub?.createdAt ?? new Date();
-  const now = Date.now();
-  const periodsPassed = Math.max(0, Math.floor((now - anchor.getTime()) / ROOM_CYCLE_MS));
-  const periodStart = new Date(anchor.getTime() + periodsPassed * ROOM_CYCLE_MS);
-  const resetsAt = new Date(periodStart.getTime() + ROOM_CYCLE_MS);
+  const { periodStart, resetsAt } = roomCycle(sub?.createdAt ?? new Date());
 
   const used = await prisma.trackScoreReport.count({
     where: {
       email: { equals: norm, mode: "insensitive" },
       createdAt: { gte: periodStart },
-      ScoreReview: { some: {} },
+      paidAt: { not: null },
+      humanRoomSkipped: false,
     },
   });
 
@@ -165,16 +170,19 @@ export async function assignScoreReviewers(
 }
 
 /**
- * Atomically claim a real-reviewer round for a subscriber and assign the room.
+ * Decide whether an unlocked report gets the real room, honoring the subscriber's
+ * monthly cap. We no longer push the room onto specific reviewers — instead an
+ * eligible report (unlocked + not skipped) simply enters the open claim pool that
+ * reviewers pull from. This only flags the report when the subscriber is OVER
+ * their cap (humanRoomSkipped = true → excluded from the pool; AI read only).
  *
  * A Postgres advisory lock keyed on the subscriber's email serializes concurrent
- * submits, so the monthly cap can't be raced (two simultaneous submits at the
- * boundary can no longer both slip through and over-assign a paid room).
+ * submits, so the cap can't be raced at the boundary.
  */
-export async function claimAndAssignRoom(
+export async function decideRoomEligibility(
   email: string,
   reportId: string
-): Promise<{ assigned: boolean }> {
+): Promise<{ granted: boolean }> {
   const norm = email.trim().toLowerCase();
   return prisma.$transaction(async (tx) => {
     // Block other submits for this subscriber until we commit.
@@ -184,54 +192,179 @@ export async function claimAndAssignRoom(
       where: { email: norm },
       select: { createdAt: true },
     });
-    const anchor = sub?.createdAt ?? new Date();
-    const periodsPassed = Math.max(0, Math.floor((Date.now() - anchor.getTime()) / ROOM_CYCLE_MS));
-    const periodStart = new Date(anchor.getTime() + periodsPassed * ROOM_CYCLE_MS);
+    const { periodStart } = roomCycle(sub?.createdAt ?? new Date());
 
-    const used = await tx.trackScoreReport.count({
+    // Granted rounds this cycle (this report already has paidAt set by the caller).
+    const granted = await tx.trackScoreReport.count({
       where: {
         email: { equals: norm, mode: "insensitive" },
         createdAt: { gte: periodStart },
-        ScoreReview: { some: {} },
+        paidAt: { not: null },
+        humanRoomSkipped: false,
       },
     });
 
-    if (used >= SCORE_ROOM_CAP) {
+    if (granted > SCORE_ROOM_CAP) {
       await tx.trackScoreReport.update({
         where: { id: reportId },
         data: { humanRoomSkipped: true },
       });
-      return { assigned: false };
+      return { granted: false };
     }
-
-    await assignScoreReviewers(reportId, 5, tx);
-    return { assigned: true };
+    return { granted: true };
   });
 }
 
-/** A reviewer's open queue: assigned/in-progress, not expired, newest first. */
-export async function getScoreReviewQueue(userId: string) {
-  const me = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
-  const myEmail = me?.email?.trim().toLowerCase() ?? null;
+const CLAIM_TTL_MS = 3 * 24 * 60 * 60 * 1000; // a claimed seat must be reviewed within 3 days
 
-  const rows = await prisma.scoreReview.findMany({
-    where: {
-      reviewerId: userId,
-      status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-      expiresAt: { gt: new Date() },
-    },
+export type ClaimResult =
+  | { ok: true; reviewId: string }
+  | { ok: false; reason: "unavailable" | "own_track" | "full" };
+
+/**
+ * Claim a reviewer seat on a report (the pull side of the room).
+ *
+ * Idempotent: if the reviewer already holds a seat, returns it. Atomic via an
+ * advisory lock on the report so the room can't be over-filled by races. A report
+ * is claimable while it's unlocked, room-eligible (not skipped), not yet complete,
+ * and still has open seats — and never by its own artist.
+ */
+export async function claimScoreReviewSeat(
+  userId: string,
+  reportId: string
+): Promise<ClaimResult> {
+  const me = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, ArtistProfile: { select: { id: true } } },
+  });
+  const myEmail = me?.email?.trim().toLowerCase() ?? null;
+  const myArtistId = me?.ArtistProfile?.id ?? null;
+
+  return prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`room:${reportId}`}))`;
+
+    const report = await tx.trackScoreReport.findUnique({
+      where: { id: reportId },
+      select: { id: true, email: true, artistId: true, paidAt: true, status: true, humanRoomSkipped: true, humanReviewsRequested: true },
+    });
+    if (!report || report.paidAt == null || report.humanRoomSkipped || report.status === "COMPLETED") {
+      return { ok: false as const, reason: "unavailable" as const };
+    }
+
+    // Already holding a seat? Hand it back (re-entry / refresh).
+    const mine = await tx.scoreReview.findFirst({
+      where: { reportId, reviewerId: userId },
+      select: { id: true },
+    });
+    if (mine) return { ok: true as const, reviewId: mine.id };
+
+    // Never review your own track.
+    if (
+      (myEmail && report.email.trim().toLowerCase() === myEmail) ||
+      (myArtistId && report.artistId === myArtistId)
+    ) {
+      return { ok: false as const, reason: "own_track" as const };
+    }
+
+    // Seats: active claims (not expired) + completed. Stop at the target.
+    const taken = await tx.scoreReview.count({
+      where: {
+        reportId,
+        OR: [{ status: "COMPLETED" }, { status: { in: ["ASSIGNED", "IN_PROGRESS"] }, expiresAt: { gt: new Date() } }],
+      },
+    });
+    if (taken >= report.humanReviewsRequested) {
+      return { ok: false as const, reason: "full" as const };
+    }
+
+    const created = await tx.scoreReview.create({
+      data: {
+        reportId,
+        reviewerId: userId,
+        status: "IN_PROGRESS",
+        expiresAt: new Date(Date.now() + CLAIM_TTL_MS),
+      },
+      select: { id: true },
+    });
+    return { ok: true as const, reviewId: created.id };
+  });
+}
+
+export type QueueItem = {
+  id: string; // reportId — the review page claims a seat on open
+  trackTitle: string | null;
+  genre: string | null;
+  claimed: boolean; // already picked up by this reviewer (in progress)
+};
+
+// How many open tracks to surface at once. Capped so the queue reads like a
+// curated set of assignments rather than a bottomless pile.
+const QUEUE_AVAILABLE_LIMIT = 8;
+
+/**
+ * A reviewer's queue. Under the hood this is a claim pool, but it's presented as
+ * "their" tracks: anything they've already picked up (in progress) first, then
+ * open reports waiting for the room — oldest first so the backlog clears.
+ */
+export async function getScoreReviewQueue(userId: string): Promise<QueueItem[]> {
+  const me = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, ArtistProfile: { select: { id: true } } },
+  });
+  const myEmail = me?.email?.trim().toLowerCase() ?? null;
+  const myArtistId = me?.ArtistProfile?.id ?? null;
+  const now = new Date();
+
+  // 1) Tracks this reviewer has already claimed and not yet submitted.
+  const claimed = await prisma.scoreReview.findMany({
+    where: { reviewerId: userId, status: { in: ["ASSIGNED", "IN_PROGRESS"] }, expiresAt: { gt: now } },
     orderBy: { assignedAt: "asc" },
-    include: {
-      TrackScoreReport: {
-        select: { slug: true, trackTitle: true, trackUrl: true, genre: true, email: true },
+    select: { TrackScoreReport: { select: { id: true, trackTitle: true, genre: true } } },
+  });
+  const claimedItems: QueueItem[] = claimed
+    .filter((r) => r.TrackScoreReport)
+    .map((r) => ({ id: r.TrackScoreReport!.id, trackTitle: r.TrackScoreReport!.trackTitle, genre: r.TrackScoreReport!.genre, claimed: true }));
+  const claimedReportIds = new Set(claimedItems.map((c) => c.id));
+
+  // 2) Open reports waiting for the room: unlocked, room-eligible, not complete,
+  //    not their own, and not already reviewed/claimed by them.
+  const open = await prisma.trackScoreReport.findMany({
+    where: {
+      paidAt: { not: null },
+      humanRoomSkipped: false,
+      status: { not: "COMPLETED" },
+      ScoreReview: { none: { reviewerId: userId } },
+      ...(myArtistId ? { artistId: { not: myArtistId } } : {}),
+      ...(myEmail ? { NOT: { email: { equals: myEmail, mode: "insensitive" } } } : {}),
+    },
+    orderBy: { createdAt: "asc" },
+    take: 60,
+    select: {
+      id: true,
+      trackTitle: true,
+      genre: true,
+      humanReviewsRequested: true,
+      _count: {
+        select: {
+          ScoreReview: {
+            where: {
+              OR: [
+                { status: "COMPLETED" },
+                { status: { in: ["ASSIGNED", "IN_PROGRESS"] }, expiresAt: { gt: now } },
+              ],
+            },
+          },
+        },
       },
     },
   });
 
-  // Never show someone their own submission to review (covers any legacy self-assignments).
-  return myEmail
-    ? rows.filter((r) => (r.TrackScoreReport?.email ?? "").trim().toLowerCase() !== myEmail)
-    : rows;
+  const availableItems: QueueItem[] = open
+    .filter((r) => !claimedReportIds.has(r.id) && r._count.ScoreReview < r.humanReviewsRequested)
+    .slice(0, QUEUE_AVAILABLE_LIMIT)
+    .map((r) => ({ id: r.id, trackTitle: r.trackTitle, genre: r.genre, claimed: false }));
+
+  return [...claimedItems, ...availableItems];
 }
 
 /** A reviewer's own completed reactions, newest first — for their history view. */

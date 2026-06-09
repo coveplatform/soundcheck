@@ -151,6 +151,7 @@ export default async function ScoreReviewQueuePage() {
             <Link
               key={q.id}
               href={`/score-review/${q.id}`}
+              prefetch={false}
               className="group bg-[#0a0a0a] p-6 hover:bg-[#0e0e0e] transition-colors flex items-center gap-4"
             >
               <div
@@ -161,11 +162,11 @@ export default async function ScoreReviewQueuePage() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-lg font-extrabold truncate normal-case">
-                  {q.TrackScoreReport.trackTitle || "untitled track"}
+                  {q.trackTitle || "untitled track"}
                 </p>
                 <p className={`${mono.className} text-[12px] text-white/40 mt-1`}>
-                  {q.TrackScoreReport.genre || "—"}
-                  {q.status === "IN_PROGRESS" ? " · in progress" : ""}
+                  {q.genre || "—"}
+                  {q.claimed ? " · in progress" : ""}
                 </p>
               </div>
               <span className={`${mono.className} text-[11px] font-bold text-black px-2 py-1 shrink-0`} style={{ background: ACCENT }}>

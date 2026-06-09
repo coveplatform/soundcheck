@@ -41,11 +41,17 @@ export async function isScoreSubscribed(email: string | null | undefined): Promi
   return sub?.status === "active";
 }
 
-/** Unlock every still-gated report for this email (e.g. right after they subscribe). */
+/**
+ * Unlock every still-gated report for this email (e.g. right after they subscribe).
+ * These past free submissions become readable in full (AI read), but we don't
+ * retroactively hand each one a real room: humanRoomSkipped keeps them out of the
+ * reviewer claim pool and the monthly round count. Go-forward submissions earn
+ * rooms within the cap as normal.
+ */
 export async function unlockAllForEmail(email: string): Promise<number> {
   const res = await prisma.trackScoreReport.updateMany({
     where: { email: norm(email), paidAt: null },
-    data: { paidAt: new Date() },
+    data: { paidAt: new Date(), humanRoomSkipped: true },
   });
   return res.count;
 }

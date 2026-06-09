@@ -6,7 +6,6 @@ import { assignReviewersToTrack } from "@/lib/queue";
 import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email";
 import { finalizePaidCheckoutSession } from "@/lib/payments";
 import { activateSubscriber, updateSubscriberStatus } from "@/lib/score-subscription";
-import { assignScoreReviewers } from "@/lib/score-review";
 import { regenerateDeepReport } from "@/lib/score-report-ai";
 import type Stripe from "stripe";
 
@@ -152,22 +151,18 @@ async function handleScoreUnlockCheckout(session: Stripe.Checkout.Session) {
       return;
     }
 
+    // One-off unlock: mark paid + room-eligible. The room is a claim pool now —
+    // setting paidAt with humanRoomSkipped=false (the default) makes the track
+    // available for real reviewers to pick up; no push-assignment needed.
     await prisma.trackScoreReport.update({
       where: { id: reportId },
       data: {
         paidAt: new Date(),
         status: "IN_REVIEW",
         stripeSessionId: session.id,
+        humanRoomSkipped: false,
       },
     });
-
-    // The room is a paid feature — assign the 5 real listeners now that they've
-    // unlocked. They watch the reactions land on their report.
-    try {
-      await assignScoreReviewers(reportId);
-    } catch (err) {
-      console.error("Error assigning reviewers after unlock:", err);
-    }
 
     // Premium deep read: regenerate the prose on a stronger model now that
     // they've paid (score stays locked). Background — never blocks the webhook.

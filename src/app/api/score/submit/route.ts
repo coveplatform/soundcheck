@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateAndStoreReport } from "@/lib/score-report-ai";
-import { claimAndAssignRoom } from "@/lib/score-review";
+import { decideRoomEligibility } from "@/lib/score-review";
 import { isScoreSubscribed } from "@/lib/score-subscription";
 import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
 
@@ -90,14 +90,15 @@ export async function POST(request: Request) {
     //
     // It's also metered for subscribers: each gets SCORE_ROOM_CAP real-reviewer
     // rounds per 30-day cycle. Over the cap the report still unlocks with the
-    // full AI read, but we skip (and flag) the human room so payouts stay
-    // bounded. One-off payers always get their room (assigned via the webhook).
+    // full AI read, but the room is skipped (flagged) so it's excluded from the
+    // reviewer claim pool. Within the cap, an unlocked report becomes claimable
+    // automatically — reviewers pull tracks from the pool rather than us pushing.
     if (unlocked) {
       try {
         // Atomic: serializes per-subscriber so the monthly cap can't be raced.
-        await claimAndAssignRoom(effectiveEmail, report.id);
+        await decideRoomEligibility(effectiveEmail, report.id);
       } catch (err) {
-        console.error("[score/submit] reviewer assignment error:", err);
+        console.error("[score/submit] room eligibility error:", err);
       }
     }
 
