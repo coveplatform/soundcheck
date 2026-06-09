@@ -41,9 +41,12 @@ export default function BlogIndexPage() {
           <Link href="/">
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
-          <div className={`${mono.className} flex items-center gap-5 text-[13px]`}>
-            <Link href="/" className="text-white/55 hover:text-white transition-colors">
-              ← back
+          <div className={`${mono.className} flex items-center gap-4 sm:gap-5 text-[13px]`}>
+            <Link href="/dashboard" className="hidden sm:inline text-white/55 hover:text-white transition-colors">
+              dashboard
+            </Link>
+            <Link href="/score-review" className="hidden sm:inline text-white/55 hover:text-white transition-colors">
+              review queue
             </Link>
             <Link
               href="/#pricing"

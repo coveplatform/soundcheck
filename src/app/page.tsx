@@ -568,13 +568,18 @@ export default function ScorePage() {
 
       {/* ── HERO ── */}
       <section id="top" className="relative z-10 max-w-6xl mx-auto px-5 pt-14 sm:pt-20 pb-16 scroll-mt-16">
-        {/* quirky floating "get paid to listen" — bobs off to the right, scrolls to #earn */}
+        {/* quirky floating "get paid to listen" — bobs off to the right, scrolls to #earn.
+            z-[60] sits above the cookie banner (z-50); explicit scroll so the click always lands. */}
         <a
           href="#earn"
-          className="hidden sm:flex fixed right-5 bottom-6 z-40 items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[14px] px-4 py-3 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById("earn")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+          className="flex fixed right-4 bottom-5 sm:right-5 sm:bottom-6 z-[60] items-center gap-1.5 sm:gap-2 bg-[#6ee7ff] text-black font-extrabold text-[12px] sm:text-[14px] px-3 py-2.5 sm:px-4 sm:py-3 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           style={{ animation: "paidBob 2.6s ease-in-out infinite" }}
         >
-          <span aria-hidden className="text-base">🎧</span>
+          <span aria-hidden className="text-sm sm:text-base">🎧</span>
           get paid to listen
           <span aria-hidden>↓</span>
         </a>

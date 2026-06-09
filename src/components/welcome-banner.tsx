@@ -57,13 +57,13 @@ export function WelcomeBanner() {
         href="/the-new-mixreflect"
         className="block hover:bg-white transition-colors"
       >
-        <div className="max-w-6xl mx-auto px-4 py-2.5 pr-10 flex items-center justify-center gap-2.5 text-center text-[13px] flex-wrap">
+        <div className="max-w-6xl mx-auto px-4 py-2 pr-9 flex items-center justify-center gap-2 text-center text-[12px] sm:text-[13px]">
           <span aria-hidden>👋</span>
-          <span>
-            <strong>Welcome to the new MixReflect.</strong> Instant AI scores and a room of real
-            listeners — see how it works.
+          <span className="truncate sm:whitespace-normal">
+            <strong>Welcome to the new MixReflect.</strong>
+            <span className="hidden sm:inline"> Instant AI scores and a room of real listeners.</span>
           </span>
-          <span className="font-bold underline underline-offset-2">how it works →</span>
+          <span className="font-bold underline underline-offset-2 whitespace-nowrap shrink-0">how it works →</span>
         </div>
       </Link>
       <button
