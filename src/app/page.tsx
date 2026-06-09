@@ -655,7 +655,7 @@ export default function ScorePage() {
             href="/dashboard"
             className="flex items-center justify-center bg-[#6ee7ff] text-black font-extrabold text-[15px] py-3 hover:bg-white transition-colors"
           >
-            my reports
+            dashboard
           </Link>
         ) : (
           <div className="flex items-center gap-3">
@@ -698,7 +698,7 @@ export default function ScorePage() {
                 href="/dashboard"
                 className="bg-[#6ee7ff] text-black font-bold px-4 py-1.5 hover:bg-white transition-colors"
               >
-                my reports
+                dashboard
               </Link>
             ) : (
               <>
