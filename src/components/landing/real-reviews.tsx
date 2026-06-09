@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Headphones } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -61,20 +62,23 @@ export function RealReviews() {
               listened. Here&apos;s a taste, names off.
             </p>
 
-            {/* overlapping avatars */}
-            <div className="flex items-center gap-3 mt-7">
-              <div className="flex -space-x-2.5">
-                {TONES.slice(0, 5).map((t, i) => (
+            {/* listener glyphs — honest social proof, no fabricated identities */}
+            <div className="flex items-center gap-4 mt-7">
+              <div className="flex -space-x-2">
+                {Array.from({ length: 5 }).map((_, i) => (
                   <span
                     key={i}
-                    className={`${mono.className} w-9 h-9 flex items-center justify-center text-[12px] font-bold text-black border-2 border-[#0a0a0a]`}
-                    style={{ background: t }}
+                    className="w-10 h-10 flex items-center justify-center border-2 border-[#0a0a0a] bg-[#0f1416]"
+                    style={{ boxShadow: `inset 0 0 0 1px ${ACCENT}55, 0 0 18px ${ACCENT}22` }}
                   >
-                    {String.fromCharCode(65 + ((i * 7) % 26))}
+                    <Headphones className="w-4 h-4" style={{ color: ACCENT }} />
                   </span>
                 ))}
               </div>
-              <span className={`${mono.className} text-[12px] text-white/45 normal-case`}>+ thousands of listeners</span>
+              <p className="text-[16px] sm:text-[18px] font-extrabold tracking-tight leading-none">
+                <span style={{ color: ACCENT, textShadow: `0 0 20px ${ACCENT}66` }}>thousands</span>
+                <span className="text-white"> of real listeners</span>
+              </p>
             </div>
           </div>
 

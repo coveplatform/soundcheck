@@ -101,6 +101,8 @@ const HERO_REACTIONS: { name: string; lens: string; rating: number; headline: st
 
 // ── Recently read by the room (real artwork) ────────────────────────
 
+// Kept wide on purpose: each rendered copy must be wider than the viewport or
+// the seamless -50% marquee shows an empty gap before the loop catches up.
 const RECENT: { src: string; score: number }[] = [
   { src: "/activity-artwork/1.jpg", score: 82 },
   { src: "/activity-artwork/7.jpg", score: 74 },
@@ -114,6 +116,18 @@ const RECENT: { src: string; score: number }[] = [
   { src: "/activity-artwork/20.jpg", score: 90 },
   { src: "/activity-artwork/25.jpg", score: 77 },
   { src: "/activity-artwork/3.jpg", score: 83 },
+  { src: "/activity-artwork/15.jpg", score: 76 },
+  { src: "/activity-artwork/28.jpg", score: 87 },
+  { src: "/activity-artwork/6.jpg", score: 70 },
+  { src: "/activity-artwork/33.jpg", score: 92 },
+  { src: "/activity-artwork/11.jpg", score: 66 },
+  { src: "/activity-artwork/24.jpg", score: 81 },
+  { src: "/activity-artwork/2.jpg", score: 78 },
+  { src: "/activity-artwork/19.jpg", score: 84 },
+  { src: "/activity-artwork/30.jpg", score: 73 },
+  { src: "/activity-artwork/8.jpg", score: 89 },
+  { src: "/activity-artwork/16.jpg", score: 69 },
+  { src: "/activity-artwork/34.jpg", score: 86 },
 ];
 
 type Phase = "idle" | "running" | "done";
@@ -358,6 +372,7 @@ export default function ScorePage() {
   const [uploading, setUploading] = useState(false);
   const [uploadedName, setUploadedName] = useState("");
   const [dragging, setDragging] = useState(false);
+  const [scrolledPastHero, setScrolledPastHero] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
 
   // Upload an mp3 (anonymous-friendly): presign → PUT → use the file URL.
@@ -451,6 +466,14 @@ export default function ScorePage() {
   useEffect(() => {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
   }, [step, phase]);
+
+  // ── reveal the sticky CTA once the hero scrolls out of view ──
+  useEffect(() => {
+    const onScroll = () => setScrolledPastHero(window.scrollY > 560);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // ── esc closes the modal ──
   useEffect(() => {
@@ -614,13 +637,43 @@ export default function ScorePage() {
           e.preventDefault();
           document.getElementById("earn")?.scrollIntoView({ behavior: "smooth", block: "start" });
         }}
-        className="flex fixed right-4 bottom-5 sm:right-5 sm:bottom-6 z-[60] items-center gap-1.5 sm:gap-2 bg-[#6ee7ff] text-black font-extrabold text-[12px] sm:text-[14px] px-3 py-2.5 sm:px-4 sm:py-3 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+        className={`flex fixed right-4 ${scrolledPastHero ? "bottom-[88px]" : "bottom-5"} sm:right-5 sm:bottom-6 z-[60] items-center gap-1.5 sm:gap-2 bg-[#6ee7ff] text-black font-extrabold text-[12px] sm:text-[14px] px-3 py-2.5 sm:px-4 sm:py-3 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all`}
         style={{ animation: "paidBob 2.6s ease-in-out infinite" }}
       >
         <span aria-hidden className="text-sm sm:text-base">🎧</span>
         get paid to listen
         <span aria-hidden>↓</span>
       </a>
+
+      {/* mobile sticky CTA — slides up once you scroll past the hero.
+          Desktop keeps its persistent CTA in the sticky header above. */}
+      <div
+        className={`sm:hidden fixed inset-x-0 bottom-0 z-[55] border-t border-white/10 bg-[#0a0a0a]/95 backdrop-blur-md px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] transition-transform duration-300 ${scrolledPastHero ? "translate-y-0" : "translate-y-full"}`}
+      >
+        {session ? (
+          <Link
+            href="/dashboard"
+            className="flex items-center justify-center bg-[#6ee7ff] text-black font-extrabold text-[15px] py-3 hover:bg-white transition-colors"
+          >
+            my reports
+          </Link>
+        ) : (
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className={`${mono.className} text-[13px] text-white/60 hover:text-white px-2 shrink-0`}
+            >
+              log in
+            </Link>
+            <Link
+              href="/signup"
+              className="flex-1 flex items-center justify-center bg-[#6ee7ff] text-black font-extrabold text-[15px] py-3 hover:bg-white transition-colors"
+            >
+              sign up free
+            </Link>
+          </div>
+        )}
+      </div>
 
       {/* ── NAV ── */}
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
@@ -640,15 +693,26 @@ export default function ScorePage() {
             <Link href="/reviewer" className="hidden lg:inline text-white/55 hover:text-white transition-colors">
               review tracks
             </Link>
-            <Link href="/dashboard" className="hidden sm:inline text-white/55 hover:text-white transition-colors">
-              my reports
-            </Link>
-            <a
-              href="#top"
-              className="bg-[#6ee7ff] text-black font-bold px-4 py-1.5 hover:bg-white transition-colors"
-            >
-              score my track
-            </a>
+            {session ? (
+              <Link
+                href="/dashboard"
+                className="bg-[#6ee7ff] text-black font-bold px-4 py-1.5 hover:bg-white transition-colors"
+              >
+                my reports
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="hidden sm:inline text-white/55 hover:text-white transition-colors">
+                  log in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="bg-[#6ee7ff] text-black font-bold px-4 py-1.5 hover:bg-white transition-colors"
+                >
+                  sign up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -882,14 +946,14 @@ export default function ScorePage() {
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-12">
             paste. ai read. the room. verdict.
           </h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border border-white/10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border border-white/10">
             {[
               { n: "01", t: "paste your link", v: <PasteMock /> },
               { n: "02", t: "your instant read", v: <LogMock /> },
               { n: "03", t: "the real room", v: <RoomMock /> },
               { n: "04", t: "your verdict", v: <VerdictMock /> },
             ].map((s) => (
-              <div key={s.n} className="bg-[#0a0a0a] p-6 flex flex-col">
+              <div key={s.n} className="bg-[#0a0a0a] p-5 sm:p-6 flex flex-col">
                 <div className={`${mono.className} flex items-center gap-2 text-[12px] mb-5`}>
                   <span style={{ color: ACCENT }}>{s.n}</span>
                   <span className="text-white/55">{s.t}</span>
