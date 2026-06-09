@@ -279,11 +279,11 @@ export default async function AdminPage() {
         </Link>
         <Link
           href="/admin/announcement"
-          className="block rounded-xl border border-purple-200 bg-purple-50 p-5 hover:border-purple-400 transition-colors"
+          className="block rounded-xl border-2 border-[#6ee7ff] bg-[#6ee7ff]/10 p-5 hover:bg-[#6ee7ff]/20 transition-colors"
         >
-          <div className="text-xs font-semibold text-purple-600 uppercase tracking-wider">Blast</div>
-          <div className="mt-2 text-base font-bold text-neutral-950">Send Announcement</div>
-          <div className="text-xs text-neutral-400 mt-1">Preview &amp; send feature update to all users</div>
+          <div className="text-xs font-semibold text-cyan-700 uppercase tracking-wider">📣 Email Blast</div>
+          <div className="mt-2 text-base font-bold text-neutral-950">New MixReflect Announcement</div>
+          <div className="text-xs text-neutral-500 mt-1">Preview &amp; test-send the &ldquo;what&rsquo;s new&rdquo; email (test to Kris), then send to all</div>
         </Link>
         <Link
           href="/admin/recapture"
