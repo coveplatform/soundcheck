@@ -26,11 +26,23 @@ function shell(content: string): string {
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:${BG};">
     <tr><td align="center" style="padding:36px 18px;">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;">
-        <!-- wordmark -->
+        <!-- wordmark: cyan rounded-square mark with centered equaliser bars + Mix·Reflect -->
         <tr><td align="left" style="padding:0 4px 22px;">
           <table role="presentation" cellspacing="0" cellpadding="0"><tr>
-            <td style="vertical-align:middle;"><div style="width:22px;height:22px;background:${ACCENT};border-radius:5px;"></div></td>
-            <td style="vertical-align:middle;padding-left:10px;font-size:19px;font-weight:800;letter-spacing:-0.5px;color:${TEXT};">Mix<span style="color:${ACCENT};">Reflect</span></td>
+            <td style="vertical-align:middle;">
+              <table role="presentation" cellspacing="0" cellpadding="0" style="width:30px;height:30px;background:${ACCENT};border-radius:8px;"><tr>
+                <td align="center" style="vertical-align:middle;">
+                  <table role="presentation" cellspacing="0" cellpadding="0" align="center" style="height:30px;"><tr>
+                    <td style="vertical-align:middle;padding:0 1px;"><div style="width:3px;height:5px;background:${BG};border-radius:1px;line-height:5px;font-size:0;">&nbsp;</div></td>
+                    <td style="vertical-align:middle;padding:0 1px;"><div style="width:3px;height:10px;background:${BG};border-radius:1px;line-height:10px;font-size:0;">&nbsp;</div></td>
+                    <td style="vertical-align:middle;padding:0 1px;"><div style="width:3px;height:14px;background:${BG};border-radius:1px;line-height:14px;font-size:0;">&nbsp;</div></td>
+                    <td style="vertical-align:middle;padding:0 1px;"><div style="width:3px;height:8px;background:${BG};border-radius:1px;line-height:8px;font-size:0;">&nbsp;</div></td>
+                    <td style="vertical-align:middle;padding:0 1px;"><div style="width:3px;height:5px;background:${BG};border-radius:1px;line-height:5px;font-size:0;">&nbsp;</div></td>
+                  </tr></table>
+                </td>
+              </tr></table>
+            </td>
+            <td style="vertical-align:middle;padding-left:11px;font-size:20px;letter-spacing:-0.4px;color:${TEXT};"><span style="font-weight:800;">Mix</span><span style="font-weight:400;color:${MUTED};">Reflect</span></td>
           </tr></table>
         </td></tr>
         <!-- card -->
