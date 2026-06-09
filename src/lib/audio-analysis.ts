@@ -184,44 +184,54 @@ export async function acquireAudioFeatures(
   return workerFeatures(url);
 }
 
-/** Compact, model-friendly description of the measured audio. */
+// Turn a 0–1 signal into a plain-language band so the model describes the feel
+// rather than parroting a raw "/100" number into the read.
+function band(v: number, labels: [string, string, string, string]): string {
+  if (v < 0.3) return labels[0];
+  if (v < 0.5) return labels[1];
+  if (v < 0.75) return labels[2];
+  return labels[3];
+}
+
+function mmss(sec: number): string {
+  const s = Math.round(sec);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+/**
+ * Model-friendly description of the measured audio — INTERPRETED, not raw.
+ * Deliberately omits the analysed duration (it's a capped window, not the song
+ * length) and never emits bare "/100" scores, so the read reads like a listener
+ * instead of regurgitating telemetry.
+ */
 export function describeFeatures(f: AudioFeatures): string {
   const lines: string[] = [];
-  if (f.durationSec != null) lines.push(`duration: ${f.durationSec}s`);
-  if (f.tempo != null) lines.push(`tempo: ${f.tempo} BPM`);
+  if (f.tempo != null) lines.push(`tempo: ${Math.round(f.tempo)} BPM (${band(Math.min(1, f.tempo / 180), ["slow", "mid-tempo", "upbeat", "fast/driving"])})`);
   if (f.key) lines.push(`key: ${f.key}`);
-  if (f.loudnessLufs != null) lines.push(`integrated loudness: ${f.loudnessLufs} LUFS`);
-  if (f.dynamicRange != null) lines.push(`dynamic range: ${f.dynamicRange} dB`);
-  if (f.energy != null) lines.push(`overall energy: ${(f.energy * 100).toFixed(0)}/100`);
+  if (f.dynamicRange != null)
+    lines.push(`dynamics: ${band(Math.min(1, f.dynamicRange / 14), ["very compressed/flat", "fairly flat", "some light and shade", "wide, dynamic"])}`);
+  if (f.energy != null)
+    lines.push(`overall energy: ${band(f.energy, ["laid-back/low", "moderate", "moderate-to-high", "high, driving"])}`);
   if (f.spectral) {
     const s = f.spectral;
-    lines.push(
-      `spectral balance — sub ${(s.sub * 100).toFixed(0)}%, bass ${(s.bass * 100).toFixed(0)}%, low-mid ${(s.lowMid * 100).toFixed(0)}%, mid ${(s.mid * 100).toFixed(0)}%, high ${(s.high * 100).toFixed(0)}%`
-    );
+    const lowEnd = s.sub + s.bass;
+    lines.push(`low end: ${band(lowEnd, ["thin/light", "a touch light", "solid", "heavy/possibly boomy"])}; top end: ${band(s.high, ["dull/dark", "a little soft up top", "crisp", "bright/possibly harsh"])}`);
   }
-  if (f.introLiftSec != null)
-    lines.push(`first energy lift at: ${f.introLiftSec}s (intro length)`);
+  if (f.introLiftSec != null) {
+    const longIntro = f.introLiftSec > 20;
+    lines.push(`intro: ~${Math.round(f.introLiftSec)}s before the first real lift${longIntro ? " (on the long side — listeners may drift before the hook)" : ""}`);
+  }
   if (f.vocalPresence != null)
-    lines.push(`vocal presence: ${(f.vocalPresence * 100).toFixed(0)}/100`);
+    lines.push(`vocals: ${band(f.vocalPresence, ["barely present / likely instrumental", "sitting well back in the mix", "present and clear", "upfront"])}`);
   if (f.sections?.length) {
     lines.push(
-      `arrangement: ${f.sections
-        .map((s) => `${s.kind} ${s.startSec}-${s.endSec}s`)
-        .join(" → ")}`
+      `arrangement: ${f.sections.map((s) => `${s.kind} (${mmss(s.startSec)}–${mmss(s.endSec)})`).join(" → ")}`
     );
   }
   if (f.energyDips?.length) {
     lines.push(
-      `energy dips (where attention likely drops): ${f.energyDips
-        .map((d) => `${d.startSec}-${d.endSec}s (-${d.dropDb}dB)`)
-        .join(", ")}`
+      `attention likely dips around: ${f.energyDips.map((d) => mmss(d.startSec)).join(", ")}`
     );
-  }
-  if (f.gridConfidence) lines.push(`beat grid confidence: ${f.gridConfidence}`);
-  if (f.extra) {
-    for (const [k, v] of Object.entries(f.extra)) {
-      if (typeof v === "number") lines.push(`${k}: ${v.toFixed(2)}`);
-    }
   }
   return lines.join("\n");
 }

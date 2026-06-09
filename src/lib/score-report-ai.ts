@@ -110,13 +110,17 @@ function clamp(n: number, lo: number, hi: number): number {
 function buildPrompt(input: ReportInput): string {
   const title = input.trackTitle?.trim() || "(untitled)";
   const measured = input.features
-    ? `\n\nMEASURED AUDIO DATA (real DSP analysis of THIS track — treat as ground truth):\n${describeFeatures(input.features)}\n\nGround every concrete claim in this data — cite specific numbers and timestamps (e.g. intro length, the energy dips and which section they fall in, the arrangement spans, vocal presence). The "arrangement" and "energy dips" lines tell you exactly where the track pulls back — point to those moments by their timestamps. Do NOT invent technical issues the data doesn't support. For things the data can't measure (melody quality, lyrics, taste), make clear it's a judgement call.`
+    ? `\n\nMEASURED AUDIO (real DSP analysis of the OPENING of this track — treat as ground truth for what's actually there):\n${describeFeatures(input.features)}\n\nUse this to ground WHERE things happen: point to the arrangement spans and the moments attention dips by their timestamps (e.g. "it sags around 1:12", "the hook doesn't land till ~0:25"). Translate everything else into how it FEELS to a listener — write like a person, not a report. Hard rules: do NOT quote raw measurements, percentages, BPM/LUFS values or "x/100" scores in your prose; do NOT state the track's total length or duration (you've only analysed the opening window, so you don't know how long the full track is); do NOT invent technical issues the data doesn't support. For things the data can't measure (melody, lyrics, taste), say it's a judgement call.`
     : `\n\n(No audio measurements were available for this track. Give a careful read from the title, genre and notes only — do NOT fabricate specific technical claims like exact timestamps, loudness values, or "the intro drags". Keep concrete acoustic claims general and clearly hedged.)`;
   const artist = input.artist?.trim();
   const recognition = artist
     ? `\n\nThe title and artist above are real metadata. If you recognise this as a commercially released or well-known track (a charting single, a classic, an established artist), factor that in — professionally finished, widely-heard music belongs in the upper score bands (it already passed the bar this tool measures). Don't pretend a known hit is a rough demo. If you DON'T recognise it, judge it on its merits as below — most submissions are unknown independent artists, and that's fine.`
     : "";
-  return `You are an expert, brutally honest music analyst giving feedback on a track. You are NOT doing a technical mix audit — you read how it actually lands for a listener: attention, energy, what hooks, where it loses people, gut reaction. Give your takes from a few distinct angles (a producer, a casual listener, a playlist curator, a hook specialist).
+  return `You are a sharp, brutally honest A&R / producer giving an artist the real read on their track. You are NOT doing a technical mix audit — you read how it actually lands for a listener: attention, energy, what hooks, where it loses people, gut reaction.
+
+WRITING STYLE (this matters as much as the substance): write like a real person who knows music and is talking straight to the artist — vivid, confident, easy to read. Flowing prose with varied sentence length, not a checklist or a lab report. Be specific and concrete (use the timestamps), but NEVER clinical: avoid phrasings like "sets a moderate energy level", "maintains a consistent pace", "with an energy score of X", "the vocal presence is low" — say what a listener actually feels in plain, punchy language. No raw numbers/percentages in the prose. No generic filler advice ("add a stronger hook to engage listeners") — be pointed about what and where.
+
+Give your takes from a few distinct angles (a producer, a casual listener, a playlist curator, a hook specialist).
 
 TRACK: "${title}"
 ARTIST: ${artist || "(unknown)"}
@@ -135,7 +139,7 @@ Produce a reaction report as STRICT JSON (no markdown, no commentary, no code fe
     "commercial": { "score": <number 0-5>, "note": "<2 sentences on COMMERCIAL potential — playlist/sync/radio fit, who it's for, what caps its reach>" }
   },
   "summaryHeadline": "<one punchy sentence, max 12 words, the honest read>",
-  "aiSummary": "<a substantive 5-7 sentence read — this is the premium deliverable. Walk the track start to finish: the opening and whether it earns attention, how the energy arc moves, where it peaks and where it sags, the emotional throughline, and the single biggest thing standing between this and a release. Be specific and concrete, reference moments/sections. Talk about pacing, structure, energy, the emotional curve — NOT EQ/frequency jargon.>",
+  "aiSummary": "<a substantive 5-7 sentence read — the premium deliverable, and it MUST read well: natural, vivid, confident, like a sharp producer who actually listened and is leveling with the artist. Walk the track: does the opening earn attention, how the energy moves, where it peaks and where it sags (name the moments by timestamp), the emotional throughline, and the ONE biggest thing between this and a release. Human and flowing — vary sentence length, no clinical phrasing, no raw numbers, no duration/length claims, no EQ/frequency jargon, no vague filler advice.>",
   "reactions": [ exactly 6 objects:
     {
       "initial": "<single uppercase letter>",
