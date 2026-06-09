@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { headers } from "next/headers";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
@@ -7,7 +7,10 @@ import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email
 import { finalizePaidCheckoutSession } from "@/lib/payments";
 import { activateSubscriber, updateSubscriberStatus } from "@/lib/score-subscription";
 import { assignScoreReviewers } from "@/lib/score-review";
+import { regenerateDeepReport } from "@/lib/score-report-ai";
 import type Stripe from "stripe";
+
+export const maxDuration = 60;
 
 
 async function handleReleaseDecisionCheckout(session: Stripe.Checkout.Session) {
@@ -165,6 +168,12 @@ async function handleScoreUnlockCheckout(session: Stripe.Checkout.Session) {
     } catch (err) {
       console.error("Error assigning reviewers after unlock:", err);
     }
+
+    // Premium deep read: regenerate the prose on a stronger model now that
+    // they've paid (score stays locked). Background — never blocks the webhook.
+    after(() => regenerateDeepReport(reportId).catch((err) =>
+      console.error("Error generating deep report after unlock:", err)
+    ));
 
     console.log(`Unlocked score report ${reportId} (session ${session.id})`);
   } catch (error) {
@@ -346,7 +355,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     const newPeriodStart = periodStartSeconds ? new Date(periodStartSeconds * 1000) : new Date();
     const isActive = subscription.status === "active";
 
-    let artistProfile = await prisma.artistProfile.findFirst({
+    const artistProfile = await prisma.artistProfile.findFirst({
       where: { stripeCustomerId: customerId },
       select: { id: true, subscriptionCurrentPeriodStart: true },
     });

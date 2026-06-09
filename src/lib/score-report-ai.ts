@@ -92,6 +92,23 @@ const CATEGORY_LABELS: Record<CategoryScore["key"], string> = {
   commercial: "Commercial Potential",
 };
 
+/**
+ * Generation depth.
+ *  - "instant": the free read at submit (fast, cheaper model).
+ *  - "deep": the premium read regenerated AFTER purchase — a longer, richer
+ *    walk-through on a stronger model. The headline SCORE is locked (set at the
+ *    instant read); deep only deepens the prose, so a paid unlock never re-grades
+ *    the number out from under the artist.
+ */
+export type GenerateOpts = {
+  depth?: "instant" | "deep";
+  /** When deep: the already-assigned score + per-dimension scores, kept fixed. */
+  locked?: {
+    score: number;
+    categories: { key: CategoryScore["key"]; score: number }[];
+  };
+};
+
 const ROOM_SIZE = 20;
 
 function verdictForScore(score: number): ScoreVerdict {
@@ -107,7 +124,12 @@ function clamp(n: number, lo: number, hi: number): number {
 
 // ── Prompt ──────────────────────────────────────────────────────────
 
-function buildPrompt(input: ReportInput): string {
+function buildPrompt(input: ReportInput, opts: GenerateOpts = {}): string {
+  const deep = opts.depth === "deep";
+  const lockedBlock =
+    deep && opts.locked
+      ? `\n\nDEEP READ (this track was already scored ${opts.locked.score}/100 at the instant read, and that number plus the per-dimension scores are LOCKED — the artist has paid to unlock the full report, NOT to be re-graded). Rules for this pass:\n- Do NOT change the score or argue it should be different; write a read that is fully consistent with ${opts.locked.score}/100.\n- Echo the same numbers back in the JSON (score: ${opts.locked.score}, and the category scores you're given) — we keep them locked regardless of what you return.\n- This is the PREMIUM deliverable: go deeper and longer than a quick read. Walk the whole track start to finish, name specific moments by timestamp, trace the energy arc and the emotional throughline, and give the artist the kind of detailed, expert breakdown that's worth paying for. Expand the synthesis to 9-12 sentences, the per-dimension notes to 3-4 sentences each, and make each priority fix a concrete, step-by-step instruction.\n- Locked category scores: ${opts.locked.categories.map((c) => `${c.key}=${c.score}`).join(", ")}.`
+      : "";
   const title = input.trackTitle?.trim() || "(untitled)";
   const measured = input.features
     ? `\n\nMEASURED AUDIO (real DSP analysis of the OPENING of this track — treat as ground truth for what's actually there):\n${describeFeatures(input.features)}\n\nUse this to ground WHERE things happen: point to the arrangement spans and the moments attention dips by their timestamps (e.g. "it sags around 1:12", "the hook doesn't land till ~0:25"). Translate everything else into how it FEELS to a listener — write like a person, not a report. Hard rules: do NOT quote raw measurements, percentages, BPM/LUFS values or "x/100" scores in your prose; do NOT state the track's total length or duration (you've only analysed the opening window, so you don't know how long the full track is); do NOT invent technical issues the data doesn't support. For things the data can't measure (melody, lyrics, taste), say it's a judgement call.`
@@ -125,7 +147,7 @@ Give your takes from a few distinct angles (a producer, a casual listener, a pla
 TRACK: "${title}"
 ARTIST: ${artist || "(unknown)"}
 GENRE: ${input.genre}
-ARTIST'S NOTE: ${input.notes?.trim() || "(none)"}${recognition}${measured}
+ARTIST'S NOTE: ${input.notes?.trim() || "(none)"}${recognition}${measured}${lockedBlock}
 
 Produce a reaction report as STRICT JSON (no markdown, no commentary, no code fences). Shape:
 
@@ -440,12 +462,22 @@ function coerceReport(raw: unknown, input: ReportInput): GeneratedReport {
   };
 }
 
-export async function generateReport(input: ReportInput): Promise<GeneratedReport> {
+export async function generateReport(
+  input: ReportInput,
+  opts: GenerateOpts = {}
+): Promise<GeneratedReport> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     console.warn("[score-report] OPENAI_API_KEY not set, using fallback");
     return fallbackReport(input);
   }
+
+  const deep = opts.depth === "deep";
+  // Deep (post-purchase) read: stronger model + bigger budget for the longer,
+  // richer breakdown the artist paid for. Instant read keeps the cheaper model.
+  const model = deep
+    ? process.env.SCORE_REPORT_DEEP_MODEL || "gpt-4.1"
+    : process.env.SCORE_REPORT_MODEL || process.env.OPENAI_MODEL || "gpt-4o";
 
   try {
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -455,10 +487,10 @@ export async function generateReport(input: ReportInput): Promise<GeneratedRepor
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: process.env.SCORE_REPORT_MODEL || process.env.OPENAI_MODEL || "gpt-4o",
-        messages: [{ role: "user", content: buildPrompt(input) }],
+        model,
+        messages: [{ role: "user", content: buildPrompt(input, opts) }],
         response_format: { type: "json_object" },
-        max_tokens: 3000,
+        max_tokens: deep ? 5000 : 3000,
         // Lower temperature → steadier scores run-to-run (was 0.8, which bounced
         // the same track ±6 points). Still enough variety in the reactions.
         temperature: 0.4,
@@ -471,6 +503,9 @@ export async function generateReport(input: ReportInput): Promise<GeneratedRepor
         res.status,
         await res.text().catch(() => "")
       );
+      // Deep read runs on an ALREADY-GOOD report — never overwrite it with the
+      // generic fallback. Throw so the caller keeps the existing prose intact.
+      if (deep) throw new Error(`Deep generation failed: OpenAI ${res.status}`);
       return fallbackReport(input);
     }
 
@@ -483,6 +518,8 @@ export async function generateReport(input: ReportInput): Promise<GeneratedRepor
     return coerceReport(parsed, input);
   } catch (err) {
     console.error("[score-report] Generation failed, using fallback:", err);
+    // See above — for the deep pass, propagate so we don't clobber a paid report.
+    if (deep) throw err instanceof Error ? err : new Error(String(err));
     return fallbackReport(input);
   }
 }
@@ -494,7 +531,7 @@ export async function generateReport(input: ReportInput): Promise<GeneratedRepor
 export async function generateAndStoreReport(reportId: string): Promise<void> {
   const report = await prisma.trackScoreReport.findUnique({
     where: { id: reportId },
-    select: { id: true, trackTitle: true, genre: true, notes: true, trackUrl: true },
+    select: { id: true, trackTitle: true, genre: true, notes: true, trackUrl: true, paidAt: true },
   });
   if (!report) throw new Error(`TrackScoreReport ${reportId} not found`);
 
@@ -570,6 +607,94 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
       },
       priorityFixes: generated.priorityFixes,
       completedAt: new Date(),
+    },
+  });
+
+  // Already unlocked when the instant read landed (subscriber, or a one-off
+  // payer whose payment beat generation) → go straight to the premium deep read.
+  // Idempotent, so the unlock paths can also trigger it without double work.
+  if (report.paidAt) {
+    await regenerateDeepReport(reportId).catch((err) =>
+      console.error("[score-report] deep read after generation failed:", err)
+    );
+  }
+}
+
+/**
+ * Premium "deep read", regenerated AFTER purchase.
+ *
+ * Option A by design: the headline SCORE and per-dimension numbers are LOCKED
+ * (set at the instant read) — paying unlocks DEPTH, never a re-grade. This pass
+ * only rewrites the prose (synthesis, per-dimension notes, reactions, fixes) on
+ * a stronger model with a bigger budget, so the unlocked report reads markedly
+ * richer than the free teaser without the number moving.
+ *
+ * Idempotent: flags `reviewerQuotes.deep = true` and no-ops on re-entry. Safe to
+ * fire-and-forget from the unlock paths (webhook / subscriber auto-unlock).
+ */
+export async function regenerateDeepReport(reportId: string): Promise<void> {
+  const report = await prisma.trackScoreReport.findUnique({
+    where: { id: reportId },
+    select: {
+      id: true, trackTitle: true, genre: true, notes: true, trackUrl: true,
+      score: true, hookScore: true, productionScore: true, retentionScore: true,
+      emotionalScore: true, commercialScore: true, reviewerQuotes: true,
+    },
+  });
+  if (!report) return;
+
+  const quotes = (report.reviewerQuotes as Record<string, any> | null) ?? {};
+  // Need an instant read first; never deepen a too-short / invalid report; and
+  // don't redo it if we already have.
+  if (report.score == null) return;
+  if (quotes.invalid) return;
+  if (quotes.deep) return;
+
+  const [features, meta] = await Promise.all([
+    acquireAudioFeatures(report.trackUrl).catch(() => null),
+    fetchTrackMeta(report.trackUrl).catch(() => null),
+  ]);
+
+  const generated = await generateReport(
+    {
+      trackTitle: report.trackTitle || meta?.title || null,
+      artist: meta?.artist ?? null,
+      genre: report.genre ?? "Other",
+      notes: report.notes,
+      features,
+    },
+    {
+      depth: "deep",
+      locked: {
+        score: report.score,
+        categories: [
+          { key: "hook", score: report.hookScore ?? 0 },
+          { key: "production", score: report.productionScore ?? 0 },
+          { key: "retention", score: report.retentionScore ?? 0 },
+          { key: "emotional", score: report.emotionalScore ?? 0 },
+          { key: "commercial", score: report.commercialScore ?? 0 },
+        ],
+      },
+    }
+  );
+
+  // Prose-only update: score / percentile / verdict / category numbers are NOT
+  // touched — they stay exactly as the instant read set them.
+  await prisma.trackScoreReport.update({
+    where: { id: reportId },
+    data: {
+      aiSummary: generated.aiSummary,
+      reviewerQuotes: {
+        ...quotes,
+        headline: generated.summaryHeadline,
+        reactions: generated.reactions,
+        categoryNotes: Object.fromEntries(
+          generated.categories.map((c) => [c.key, c.note])
+        ),
+        grounded: features != null,
+        deep: true,
+      },
+      priorityFixes: generated.priorityFixes,
     },
   });
 }
