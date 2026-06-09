@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { sendScoreReviewLandedEmail, sendScoreRoomCompleteEmail } from "@/lib/email/score";
 
 /**
  * The "room of 5" — real human listeners on a score report.
@@ -155,17 +156,27 @@ export async function submitScoreReview(input: SubmitScoreReviewInput) {
   // If the whole room is in, mark the report complete.
   const report = await prisma.trackScoreReport.findUnique({
     where: { id: review.reportId },
-    select: { humanReviewsRequested: true, status: true },
+    select: { humanReviewsRequested: true, status: true, email: true, trackTitle: true, slug: true },
   });
   if (report) {
     const done = await prisma.scoreReview.count({
       where: { reportId: review.reportId, status: "COMPLETED" },
     });
-    if (done >= report.humanReviewsRequested && report.status !== "COMPLETED") {
+    const complete = done >= report.humanReviewsRequested;
+    if (complete && report.status !== "COMPLETED") {
       await prisma.trackScoreReport.update({
         where: { id: review.reportId },
         data: { status: "COMPLETED" },
       });
+    }
+    // Keep the artist in the loop — fire-and-forget so it never blocks the review.
+    if (report.email) {
+      const common = { to: report.email, trackTitle: report.trackTitle ?? "", slug: report.slug };
+      if (complete) {
+        void sendScoreRoomCompleteEmail({ ...common, total: report.humanReviewsRequested }).catch(() => {});
+      } else {
+        void sendScoreReviewLandedEmail({ ...common, completed: done, total: report.humanReviewsRequested }).catch(() => {});
+      }
     }
   }
   // +$0.40 — return the reviewer's updated balance for instant UI feedback.

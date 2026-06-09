@@ -1035,13 +1035,17 @@ export default function ScorePage() {
               </div>
               <div className="p-4 space-y-px bg-white/5">
                 {[
-                  ["untitled idea", "2:14"],
-                  ["new demo v3", "3:08"],
-                  ["late night bounce", "2:41"],
-                ].map(([title, len]) => (
-                  <div key={title} className="flex items-center gap-3 bg-[#0e0e0e] p-3">
-                    <span className="w-9 h-9 bg-white/5 border border-white/10 shrink-0 flex items-center justify-center">
-                      <Play className="h-3.5 w-3.5 text-white/45" />
+                  ["untitled idea", "2:14", "/activity-artwork/12.jpg"],
+                  ["new demo v3", "3:08", "/activity-artwork/22.jpg"],
+                  ["late night bounce", "2:41", "/activity-artwork/31.jpg"],
+                ].map(([title, len, art]) => (
+                  <div key={title} className="group flex items-center gap-3 bg-[#0e0e0e] p-3">
+                    <span className="relative w-9 h-9 shrink-0 overflow-hidden border border-white/10">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={art} alt="" className="w-full h-full object-cover" loading="lazy" />
+                      <span className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Play className="h-3.5 w-3.5 text-white" />
+                      </span>
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-[13.5px] font-bold truncate normal-case">{title}</p>

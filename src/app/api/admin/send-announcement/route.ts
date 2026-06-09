@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { buildDiscoverAnnouncementEmail, sendDiscoverAnnouncementEmail } from "@/lib/email/announcements";
+import { buildNewMixReflectAnnouncement, sendNewMixReflectAnnouncement } from "@/lib/email/score";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "").split(",").map((e) => e.trim().toLowerCase());
 
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
   }
 
   // Default: return preview HTML
-  const { html } = buildDiscoverAnnouncementEmail({ userName: "Test User" });
+  const { html } = buildNewMixReflectAnnouncement("Test User");
   return new Response(html, { headers: { "Content-Type": "text/html" } });
 }
 
@@ -64,19 +64,16 @@ export async function POST(request: Request) {
 
     // Send to a specific test email address (e.g. kris.engelhardt4@gmail.com)
     if (testEmail) {
-      const success = await sendDiscoverAnnouncementEmail({
-        to: testEmail,
-        userName: "Test User",
-      });
+      const success = await sendNewMixReflectAnnouncement(testEmail, "there");
       return NextResponse.json({ success, sent: 1, total: 1 });
     }
 
     // Send to the admin's own email
     if (testOnly) {
-      const success = await sendDiscoverAnnouncementEmail({
-        to: session.user.email,
-        userName: session.user.name || undefined,
-      });
+      const success = await sendNewMixReflectAnnouncement(
+        session.user.email,
+        session.user.name || undefined
+      );
       return NextResponse.json({ success, sent: 1, total: 1 });
     }
 
@@ -114,10 +111,7 @@ export async function POST(request: Request) {
       const batch = users.slice(i, i + BATCH_SIZE);
       const results = await Promise.allSettled(
         batch.map((user) =>
-          sendDiscoverAnnouncementEmail({
-            to: user.email!,
-            userName: user.name || undefined,
-          })
+          sendNewMixReflectAnnouncement(user.email!, user.name || undefined)
         )
       );
       for (let j = 0; j < results.length; j++) {

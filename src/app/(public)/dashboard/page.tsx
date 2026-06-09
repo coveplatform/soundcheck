@@ -4,6 +4,7 @@ import Link from "next/link";
 import { isScoreSubscribed } from "@/lib/score-subscription";
 import { ManageSubButton } from "./manage-sub-button";
 import { AccountMenu } from "./account-menu";
+import { DeleteReportButton } from "./delete-report-button";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -167,11 +168,12 @@ export default async function ReportsPage() {
               const pending = r.status === "PENDING" || r.score == null;
               const unlocked = r.paidAt != null;
               return (
-                <Link
-                  key={r.slug}
-                  href={`/report/${r.slug}`}
-                  className="group bg-[#0a0a0a] p-6 hover:bg-[#0e0e0e] transition-colors flex items-center gap-5"
-                >
+                <div key={r.slug} className="relative bg-[#0a0a0a]">
+                  <DeleteReportButton reportId={r.id} />
+                  <Link
+                    href={`/report/${r.slug}`}
+                    className="group bg-[#0a0a0a] p-6 hover:bg-[#0e0e0e] transition-colors flex items-center gap-5"
+                  >
                   {/* artwork + score */}
                   <div
                     className="relative w-16 h-16 shrink-0 border overflow-hidden bg-white/5"
@@ -233,7 +235,8 @@ export default async function ReportsPage() {
                   </div>
 
                   <ArrowRight className="h-4 w-4 text-white/25 group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0" />
-                </Link>
+                  </Link>
+                </div>
               );
             })}
           </div>
