@@ -18,17 +18,6 @@ const GENRES = [
   "Classical", "Country", "Latin", "Other",
 ];
 
-// Same instant-AI-read steps the landing shows (the room comes after unlock).
-const STEPS = [
-  "fetching your track",
-  "mapping the energy curve",
-  "checking the hook + structure",
-  "weighing it across 5 dimensions",
-  "scoring against released music",
-  "writing your instant read",
-  "almost there…",
-];
-
 type Meta = { title: string; artist: string | null; artworkUrl: string | null };
 
 export default function SubmitScorePage() {
@@ -40,7 +29,6 @@ export default function SubmitScorePage() {
   const [notes, setNotes] = useState("");
   const [email, setEmail] = useState(session?.user?.email ?? "");
   const [submitting, setSubmitting] = useState(false);
-  const [step, setStep] = useState(0);
   const [error, setError] = useState("");
 
   const [meta, setMeta] = useState<Meta | null>(null);
@@ -94,15 +82,6 @@ export default function SubmitScorePage() {
       setUploading(false);
     }
   };
-
-  // Advance the progress steps while the read is being generated. Hold on the
-  // last step until the redirect fires so it never looks finished early.
-  useEffect(() => {
-    if (!submitting) return;
-    if (step >= STEPS.length - 1) return;
-    const t = setTimeout(() => setStep((s) => s + 1), 650 + Math.random() * 350);
-    return () => clearTimeout(t);
-  }, [submitting, step]);
 
   const hasEmail = !!session?.user?.email || email.trim().length > 0;
   const isUrl = /^https?:\/\//i.test(trackUrl.trim());
@@ -187,7 +166,6 @@ export default function SubmitScorePage() {
     e.preventDefault();
     if (!isValid || submitting) return;
     setError("");
-    setStep(0);
     setSubmitting(true);
     try {
       // Finalize the report that started building at paste time (slug + claim
@@ -440,9 +418,15 @@ export default function SubmitScorePage() {
             disabled={!isValid || submitting}
             className="group w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-base py-4 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {submitting ? "analyzing…" : "get my read — free"}
-            {!submitting && (
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            {submitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" /> opening your report…
+              </>
+            ) : (
+              <>
+                get my read — free
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+              </>
             )}
           </button>
           <p className={`${mono.className} text-center text-[12px] text-white/50 normal-case`}>
@@ -460,45 +444,13 @@ export default function SubmitScorePage() {
         </div>
       </div>
 
-      {/* analyzing overlay — same step animation as the landing */}
+      {/* brief hand-off overlay — the report page owns the real progress now */}
       {submitting && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/85 backdrop-blur-md">
-          <div className="w-full max-w-lg bg-[#0e0e0e] border border-white/15 p-7">
-            <p className={`${mono.className} text-[13px] text-white/40 mb-3`}>
-              [ analyzing your track… ]
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-7 lowercase">
-              reading your track…
-            </h2>
-            <div
-              className={`${mono.className} bg-[#080808] border border-white/12 p-5 text-[13.5px] leading-7`}
-            >
-              {STEPS.map((s, i) => {
-                const state = i < step ? "done" : i === step ? "active" : "pending";
-                return (
-                  <div
-                    key={s}
-                    className={
-                      state === "pending"
-                        ? "text-white/20"
-                        : state === "active"
-                        ? "text-white"
-                        : "text-white/55"
-                    }
-                  >
-                    <span style={{ color: state === "pending" ? undefined : ACCENT }}>
-                      {state === "done" ? "✓" : state === "active" ? "▸" : "·"}
-                    </span>{" "}
-                    {s}
-                    {state === "active" && (
-                      <span className="inline-block w-2 h-4 ml-1 align-middle bg-[#6ee7ff] animate-pulse" />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            <p className={`${mono.className} text-[12px] text-white/45 mt-5 normal-case`}>
-              hang tight — this usually takes a few seconds.
+          <div className="text-center">
+            <Loader2 className="h-7 w-7 mx-auto animate-spin" style={{ color: ACCENT }} />
+            <p className={`${mono.className} text-[13px] text-white/60 mt-4`}>
+              opening your report…
             </p>
           </div>
         </div>

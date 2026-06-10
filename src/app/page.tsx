@@ -511,13 +511,16 @@ export default function ScorePage() {
   }, [trackUrl]);
 
   // ── drive the assignment log ──
+  // Paced to roughly match the real pipeline (~18s before the auth prompt):
+  // the actual DSP + read takes 20–60s, and racing through in 5s set up a
+  // "ready!" expectation that the report page then appeared to break.
   useEffect(() => {
     if (phase !== "running") return;
     if (step >= STEPS.length) {
       const t = setTimeout(() => setPhase("done"), 560);
       return () => clearTimeout(t);
     }
-    const t = setTimeout(() => setStep((s) => s + 1), 600 + Math.random() * 320);
+    const t = setTimeout(() => setStep((s) => s + 1), 2000 + Math.random() * 1100);
     return () => clearTimeout(t);
   }, [phase, step]);
 
@@ -587,6 +590,13 @@ export default function ScorePage() {
       return;
     }
     setError("");
+    // Logged in: there's no auth step to bridge, so skip the modal theater and
+    // go straight to the report page — it shows the REAL analysis progress
+    // (the modal's step list would just replay there a second time).
+    if (session?.user) {
+      void seeResults();
+      return;
+    }
     setStep(0);
     setPhase("running");
     // The paste handler usually fired this already — this is the fallback when
@@ -968,10 +978,19 @@ export default function ScorePage() {
 
               <button
                 type="submit"
-                className="group mt-3 w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black hover:bg-white font-extrabold text-base px-7 py-4 transition-colors shadow-[0_0_30px_-6px_rgba(110,231,255,0.7)]"
+                disabled={busy}
+                className="group mt-3 w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black hover:bg-white font-extrabold text-base px-7 py-4 transition-colors shadow-[0_0_30px_-6px_rgba(110,231,255,0.7)] disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                score my track — free
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                {busy ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> opening your report…
+                  </>
+                ) : (
+                  <>
+                    score my track — free
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                  </>
+                )}
               </button>
 
               {/* sources we can actually analyse */}
@@ -1553,11 +1572,11 @@ export default function ScorePage() {
             )}
 
             <p className={`${mono.className} text-[13px] text-white/40 mb-3`}>
-              {phase === "done" ? "[ analysis complete ]" : "[ analyzing your track… ]"}
+              {phase === "done" ? "[ wrapping up ]" : "[ analyzing your track… ]"}
             </p>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-7 lowercase">
               {phase === "done" ? (
-                <>your read is <span style={{ color: ACCENT }}>ready</span>.</>
+                <>your read is <span style={{ color: ACCENT }}>almost in</span>.</>
               ) : (
                 <>reading your track…</>
               )}
@@ -1586,14 +1605,24 @@ export default function ScorePage() {
                     </span>{" "}
                     {s}
                     {state === "active" && (
-                      <span className="inline-block w-2 h-4 ml-1 align-middle bg-[#6ee7ff] animate-pulse" />
+                      <span aria-hidden>
+                        {[0, 1, 2].map((d) => (
+                          <span
+                            key={d}
+                            className="animate-pulse"
+                            style={{ animationDelay: `${d * 250}ms` }}
+                          >
+                            .
+                          </span>
+                        ))}
+                      </span>
                     )}
                   </div>
                 );
               })}
               {phase === "done" && (
                 <div className="text-white mt-2 pt-2 border-t border-white/10">
-                  <span style={{ color: ACCENT }}>✓</span> done · your read is ready
+                  <span style={{ color: ACCENT }}>✓</span> done · sign in to open your report
                 </div>
               )}
             </div>
@@ -1617,7 +1646,7 @@ export default function ScorePage() {
                 ) : (
                   <div className="space-y-3">
                     <p className={`${mono.className} text-[12px] text-white/55 text-center normal-case`}>
-                      your read is ready — sign in to open it & keep it on your dashboard.
+                      sign in to open your report — it lands the moment it&apos;s done.
                     </p>
                     <button
                       onClick={continueWithGoogle}
