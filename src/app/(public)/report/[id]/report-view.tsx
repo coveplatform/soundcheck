@@ -243,7 +243,13 @@ export function ReportView({ data }: { data: ReportViewModel }) {
   };
 
   if (data.pending) {
-    return <PendingState slug={data.slug} trackTitle={data.trackTitle} />;
+    return (
+      <PendingState
+        slug={data.slug}
+        trackTitle={data.trackTitle}
+        artworkUrl={data.artworkUrl}
+      />
+    );
   }
 
   // Too short to be a real track — don't show a fabricated score.
@@ -813,38 +819,94 @@ what to fix first
 
 // ── pending ──────────────────────────────────────────────────────────
 
-function PendingState({ slug, trackTitle }: { slug: string; trackTitle: string }) {
-  const [stalled, setStalled] = useState(false);
+const PENDING_STEPS = [
+  "fetching your track",
+  "mapping the energy curve",
+  "checking the hook + structure",
+  "weighing it across 5 dimensions",
+  "scoring against released music",
+  "writing your instant read",
+];
 
-  // Self-heal + poll: kick generation (idempotent — no-op if the read is
-  // already in, re-runs it if submit timed out), then poll until it lands and
-  // reload into the full report. Falls back to a manual refresh if it stalls.
+function PendingState({
+  slug,
+  trackTitle,
+  artworkUrl,
+}: {
+  slug: string;
+  trackTitle: string;
+  artworkUrl: string | null;
+}) {
+  const [stalled, setStalled] = useState(false);
+  const [title, setTitle] = useState(trackTitle);
+  const [artwork, setArtwork] = useState<string | null>(artworkUrl);
+  const [analyzed, setAnalyzed] = useState(false);
+  const [step, setStep] = useState(0);
+
+  // Cosmetic ticker clamped by REAL progress: it sits on "checking the hook"
+  // until the DSP has actually finished listening (the slow part — can be a
+  // minute or two), then walks to "writing your instant read" and holds until
+  // the read lands.
+  useEffect(() => {
+    const cap = analyzed ? PENDING_STEPS.length - 1 : 2;
+    if (step >= cap) return;
+    const t = setTimeout(
+      () => setStep((s) => Math.min(s + 1, cap)),
+      1800 + Math.random() * 1200
+    );
+    return () => clearTimeout(t);
+  }, [step, analyzed]);
+
+  // Progress poll: title/artwork land within seconds (oEmbed staged write), the
+  // analyzed marker when the DSP finishes, then ready → reload into the full
+  // report. Self-heal: if no generation is running (the background kick was
+  // killed or never landed), re-kick via /generate — fire-and-forget, with a
+  // startup grace so we never race the kick that /start or /submit scheduled.
   useEffect(() => {
     let cancelled = false;
-    let attempts = 0;
+    let lastKick = 0;
+    const startedPolling = Date.now();
+    const MAX_POLL_MS = 6 * 60 * 1000;
 
     const tick = async () => {
-      attempts += 1;
       try {
-        const res = await fetch(`/api/score/${slug}/generate`, { method: "POST" });
-        const json = (await res.json().catch(() => null)) as { ready?: boolean } | null;
+        const res = await fetch(`/api/score/${slug}/status`);
+        const s = (await res.json().catch(() => null)) as {
+          ready?: boolean;
+          running?: boolean;
+          analyzed?: boolean;
+          trackTitle?: string | null;
+          artworkUrl?: string | null;
+        } | null;
         if (cancelled) return;
-        if (json?.ready) {
+        if (s?.ready) {
           window.location.reload();
           return;
         }
+        if (s) {
+          if (s.trackTitle) setTitle(s.trackTitle);
+          if (s.artworkUrl) setArtwork(s.artworkUrl);
+          if (s.analyzed) setAnalyzed(true);
+          const sinceStart = Date.now() - startedPolling;
+          if (!s.running && sinceStart > 8000 && Date.now() - lastKick > 60_000) {
+            lastKick = Date.now();
+            void fetch(`/api/score/${slug}/generate`, { method: "POST" }).catch(
+              () => {}
+            );
+          }
+        }
       } catch {
-        /* transient — keep trying */
+        /* transient — keep polling */
       }
       if (cancelled) return;
-      if (attempts >= 4) {
+      if (Date.now() - startedPolling > MAX_POLL_MS) {
         setStalled(true);
         return;
       }
-      setTimeout(tick, 4000);
+      setTimeout(tick, 3000);
     };
 
-    const t = setTimeout(tick, 1500);
+    const t = setTimeout(tick, 1200);
     return () => {
       cancelled = true;
       clearTimeout(t);
@@ -855,27 +917,68 @@ function PendingState({ slug, trackTitle }: { slug: string; trackTitle: string }
     <div
       className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] flex items-center justify-center px-5 lowercase`}
     >
-      <div className="text-center max-w-md">
-        <div
-          className="inline-flex items-center justify-center w-14 h-14 mb-6"
-          style={{ background: ACCENT }}
-        >
-          <Hourglass className="h-6 w-6 text-black animate-pulse" />
-        </div>
-        <p className={`${mono.className} text-[13px] text-white/40 mb-3`}>
-          [ analyzing your track ]
+      <div className="w-full max-w-lg bg-[#0e0e0e] border border-white/15 p-7">
+        <p className={`${mono.className} text-[13px] text-white/40 mb-5`}>
+          [ analyzing your track… ]
         </p>
-        <h1 className="text-3xl font-extrabold tracking-tight mb-3">
-          {trackTitle} is being analyzed
-        </h1>
-        <p className="text-white/50 mb-7 normal-case">
+
+        {/* track card — artwork + title fill in as the metadata lands */}
+        <div className="flex items-center gap-4 bg-[#141414] border border-white/15 p-3.5 mb-6">
+          <div className="w-14 h-14 bg-white/5 border border-white/10 shrink-0 overflow-hidden flex items-center justify-center">
+            {artwork ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={artwork} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <Hourglass className="h-5 w-5 text-white/40 animate-pulse" />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[16px] font-bold text-white truncate normal-case">
+              {title}
+            </p>
+            <p className={`${mono.className} text-[12px] text-white/55 mt-0.5`}>
+              {analyzed ? "writing your read…" : "listening through the full track…"}
+            </p>
+          </div>
+        </div>
+
+        {/* live progress log — advances with the actual pipeline */}
+        <div
+          className={`${mono.className} bg-[#080808] border border-white/12 p-5 text-[13.5px] leading-7`}
+        >
+          {PENDING_STEPS.map((s, i) => {
+            const state = i < step ? "done" : i === step ? "active" : "pending";
+            return (
+              <div
+                key={s}
+                className={
+                  state === "pending"
+                    ? "text-white/20"
+                    : state === "active"
+                    ? "text-white"
+                    : "text-white/55"
+                }
+              >
+                <span style={{ color: state === "pending" ? undefined : ACCENT }}>
+                  {state === "done" ? "✓" : state === "active" ? "▸" : "·"}
+                </span>{" "}
+                {s}
+                {state === "active" && (
+                  <span className="inline-block w-2 h-4 ml-1 align-middle bg-[#6ee7ff] animate-pulse" />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <p className={`${mono.className} text-[12px] text-white/45 mt-5 normal-case`}>
           {stalled
-            ? "This is taking longer than usual. Give it a moment and refresh."
-            : "Your read is being put together right now. This page updates on its own."}
+            ? "this is taking longer than usual — give it a moment and refresh."
+            : "your score lands here the moment it's done. no need to refresh."}
         </p>
         {stalled && (
           <Link href={`/report/${slug}`}>
-            <button className="inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-sm px-6 py-3">
+            <button className="mt-4 inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-sm px-6 py-3">
               refresh
               <ArrowRight className="h-4 w-4" />
             </button>

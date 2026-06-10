@@ -478,6 +478,9 @@ export default function ScorePage() {
     let cancelled = false;
     setMetaLoading(true);
     const t = setTimeout(async () => {
+      // Start the read building NOW — the DSP + AI read run in the background
+      // while the user is still looking at the form (and authing, if needed).
+      void ensureStarted(u);
       try {
         const res = await fetch("/api/metadata", {
           method: "POST",
@@ -546,36 +549,31 @@ export default function ScorePage() {
     setBusy(false);
   };
 
-  // The actual (slow) submit. Kicked off as soon as the animation starts so the
-  // read generates *during* the animation instead of after the user clicks.
-  const submitRef = useRef<Promise<{ slug?: string; error?: string } | null> | null>(null);
-  const fireSubmit = () => {
-    return fetch("/api/score/submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ trackUrl: normalizeTrackUrl(trackUrl), trackTitle: meta?.title?.trim() || undefined }),
-    })
-      .then((r) => r.json().catch(() => null))
-      .catch(() => null);
-  };
-
-  // Logged-OUT path: create the report and start generating it BEFORE we send
-  // the user to Google. The read then builds during the auth round-trip instead
-  // of after it. We carry the slug + claim token through login and redeem it on
-  // the way back (/score/finish → /api/score/claim).
-  const startRef = useRef<Promise<{ slug?: string; claimToken?: string } | null> | null>(null);
-  const fireStart = () => {
-    return fetch("/api/score/start", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ trackUrl: normalizeTrackUrl(trackUrl), trackTitle: meta?.title?.trim() || undefined }),
-    })
-      .then((r) => r.json().catch(() => null))
-      .catch(() => null);
-  };
-  const ensureStarted = () => {
-    if (!startRef.current) startRef.current = fireStart();
-    return startRef.current;
+  // Start-on-paste: the moment a supported link is in the box, create the
+  // report and kick the read off in the background (/api/score/start). By the
+  // time the user clicks the CTA — and auths, if they're logged out — the read
+  // is already building (often done). Keyed by the normalized URL: editing the
+  // link fires a fresh start and the old report is left for the
+  // abandoned-report GC to sweep.
+  const startRef = useRef<{
+    url: string;
+    promise: Promise<{ slug?: string; claimToken?: string } | null>;
+  } | null>(null);
+  const ensureStarted = (rawUrl: string) => {
+    const url = normalizeTrackUrl(rawUrl);
+    if (startRef.current?.url !== url) {
+      startRef.current = {
+        url,
+        promise: fetch("/api/score/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ trackUrl: url }),
+        })
+          .then((r) => r.json().catch(() => null))
+          .catch(() => null),
+      };
+    }
+    return startRef.current.promise;
   };
 
   const start = (e: React.FormEvent) => {
@@ -591,10 +589,9 @@ export default function ScorePage() {
     setError("");
     setStep(0);
     setPhase("running");
-    // Start generating now, in parallel with the animation — submit for
-    // logged-in users, the pre-auth start for everyone else.
-    if (session?.user) submitRef.current = fireSubmit();
-    else void ensureStarted();
+    // The paste handler usually fired this already — this is the fallback when
+    // the user submits before the debounce got a chance.
+    void ensureStarted(trackUrl);
   };
 
   // Where to land after auth. Preferred: claim the report we already started
@@ -608,7 +605,7 @@ export default function ScorePage() {
     );
   };
   const finishUrl = async () => {
-    const data = await ensureStarted();
+    const data = await ensureStarted(trackUrl);
     if (data?.slug && data.claimToken) {
       return `/score/finish?slug=${encodeURIComponent(data.slug)}&claim=${encodeURIComponent(data.claimToken)}`;
     }
@@ -652,9 +649,22 @@ export default function ScorePage() {
       return;
     }
     try {
-      // Await the submit that already started with the animation (or fire one now).
-      const data = await (submitRef.current ?? fireSubmit());
-      submitRef.current = null;
+      // Finalize the report that started building at paste time (slug + claim
+      // token attach it to this account); /submit falls back to a fresh create
+      // if the start never landed. Fast either way — generation runs in the
+      // background and the report page's pending view takes over.
+      const started = await ensureStarted(trackUrl);
+      const res = await fetch("/api/score/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          trackUrl: normalizeTrackUrl(trackUrl),
+          trackTitle: meta?.title?.trim() || undefined,
+          slug: started?.slug,
+          claimToken: started?.claimToken,
+        }),
+      });
+      const data = await res.json().catch(() => null);
       if (data?.slug) {
         router.push(`/report/${data.slug}`);
         return;

@@ -23,7 +23,7 @@ export async function POST(
 
     const report = await prisma.trackScoreReport.findUnique({
       where: { slug },
-      select: { id: true, score: true },
+      select: { id: true, score: true, reviewerQuotes: true },
     });
 
     if (!report) {
@@ -33,6 +33,17 @@ export async function POST(
     // Already populated — nothing to do.
     if (report.score != null) {
       return NextResponse.json({ ready: true });
+    }
+
+    // A generation is already running (started recently in the background by
+    // /start or /submit) — don't double-run it; the poller just keeps waiting.
+    // Past the staleness window we assume that run was killed and re-kick.
+    const progress = (report.reviewerQuotes as { progress?: { startedAt?: string } } | null)
+      ?.progress;
+    const startedAt = progress?.startedAt ? Date.parse(progress.startedAt) : NaN;
+    const STALE_MS = 5 * 60 * 1000;
+    if (Number.isFinite(startedAt) && Date.now() - startedAt < STALE_MS) {
+      return NextResponse.json({ ready: false, running: true });
     }
 
     try {

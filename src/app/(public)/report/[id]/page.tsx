@@ -188,6 +188,9 @@ export default async function ReportPage({
           pending: true,
           unlocked: false,
           trackTitle: report.trackTitle || "Your track",
+          // Real artwork if the oEmbed staged write already landed (never the
+          // demo's) — the pending view fills it in live otherwise.
+          artworkUrl: report.artworkUrl ?? null,
         }}
       />
     );

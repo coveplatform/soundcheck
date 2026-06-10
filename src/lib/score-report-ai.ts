@@ -626,9 +626,20 @@ async function findPriorVersion(
 export async function generateAndStoreReport(reportId: string): Promise<void> {
   const report = await prisma.trackScoreReport.findUnique({
     where: { id: reportId },
-    select: { id: true, email: true, trackTitle: true, genre: true, notes: true, trackUrl: true, paidAt: true },
+    select: { id: true, trackTitle: true, trackUrl: true },
   });
   if (!report) throw new Error(`TrackScoreReport ${reportId} not found`);
+
+  // Mark generation in-flight (`reviewerQuotes.progress`). The /generate
+  // self-heal endpoint reads this so a poll never double-runs a generation
+  // that's already going; the pending report page reads it to advance its
+  // progress honestly. The final write below replaces reviewerQuotes wholesale,
+  // which clears the marker on completion.
+  const startedAt = new Date().toISOString();
+  await prisma.trackScoreReport.update({
+    where: { id: reportId },
+    data: { reviewerQuotes: { progress: { startedAt } } },
+  });
 
   // In parallel: measure the audio (DSP grounding) and look up the track's
   // title/artist via oEmbed (so the model's knowledge of known music can inform
@@ -638,10 +649,59 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
   // free insight need stem-grade structure to land, and "we listened to the
   // whole thing" has to be true. The paid gate is the deep PROSE (gpt-4.1 in
   // regenerateDeepReport) + the human room, not the analysis.
+  //
+  // Staged write: title/artwork land on the row the moment oEmbed resolves, so
+  // the (polling) pending report page shows the real track card while the much
+  // slower DSP + LLM are still running.
+  const metaPromise = fetchTrackMeta(report.trackUrl).catch(() => null);
+  void metaPromise.then(async (m) => {
+    if (!m) return;
+    try {
+      if (m.artworkUrl) {
+        await prisma.trackScoreReport.update({
+          where: { id: reportId },
+          data: { artworkUrl: m.artworkUrl },
+        });
+      }
+      if (m.title) {
+        // Fill-if-empty: never clobber a title the artist typed at submit.
+        await prisma.trackScoreReport.updateMany({
+          where: { id: reportId, OR: [{ trackTitle: null }, { trackTitle: "" }] },
+          data: { trackTitle: m.title },
+        });
+      }
+    } catch {
+      /* cosmetic — never blocks generation */
+    }
+  });
+
   const [features, meta] = await Promise.all([
     acquireAudioFeatures(report.trackUrl, { deep: true }).catch(() => null),
-    fetchTrackMeta(report.trackUrl).catch(() => null),
+    metaPromise,
   ]);
+
+  // Analysis milestone for the pending page's progress steps.
+  try {
+    await prisma.trackScoreReport.update({
+      where: { id: reportId },
+      data: { reviewerQuotes: { progress: { startedAt, analyzed: true } } },
+    });
+  } catch {
+    /* cosmetic */
+  }
+
+  // Re-read the row: with start-on-paste, generation kicks off before the form
+  // is submitted, so genre/notes/title and the owner's email typically arrive
+  // (via the finalize patch) while the DSP is running. Read them now so the
+  // prompt and the prior-version lookup use what the artist actually submitted.
+  const fresh = await prisma.trackScoreReport.findUnique({
+    where: { id: reportId },
+    select: { trackTitle: true, genre: true, notes: true, email: true },
+  });
+  const trackTitle = fresh?.trackTitle || report.trackTitle || meta?.title || null;
+  const genre = fresh?.genre || "Other";
+  const notes = fresh?.notes ?? null;
+  const email = fresh?.email ?? "";
 
   // Guard 1: the worker measured a clip too short to be a real track (e.g. a
   // 2-second sound effect). Don't fabricate a full musical read — say so plainly.
@@ -651,7 +711,7 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
     await prisma.trackScoreReport.update({
       where: { id: reportId },
       data: {
-        ...(report.trackTitle ? {} : meta?.title ? { trackTitle: meta.title } : {}),
+        ...(trackTitle ? { trackTitle } : {}),
         ...(meta?.artworkUrl ? { artworkUrl: meta.artworkUrl } : {}),
         status: "IN_REVIEW",
         score: 0,
@@ -674,15 +734,15 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
   // Re-upload memory: if this artist has read this same track before, keep the
   // read consistent (or diff it against the prior version).
   const prior = features?.fingerprint
-    ? await findPriorVersion(report.email, features.fingerprint, report.id)
+    ? await findPriorVersion(email, features.fingerprint, report.id)
     : undefined;
 
   const generated = await generateReport(
     {
-      trackTitle: report.trackTitle || meta?.title || null,
+      trackTitle,
       artist: meta?.artist ?? null,
-      genre: report.genre ?? "Other",
-      notes: report.notes,
+      genre,
+      notes,
       features,
     },
     { prior }
@@ -692,7 +752,7 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
     where: { id: reportId },
     data: {
       // Backfill the title from oEmbed when the submitter didn't give one.
-      ...(report.trackTitle ? {} : meta?.title ? { trackTitle: meta.title } : {}),
+      ...(trackTitle ? { trackTitle } : {}),
       ...(meta?.artworkUrl ? { artworkUrl: meta.artworkUrl } : {}),
       ...(features?.fingerprint ? { fingerprint: features.fingerprint as object } : {}),
       status: "IN_REVIEW",
@@ -723,7 +783,14 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
   // Already unlocked when the instant read landed (subscriber, or a one-off
   // payer whose payment beat generation) → go straight to the premium deep read.
   // Idempotent, so the unlock paths can also trigger it without double work.
-  if (report.paidAt) {
+  // Re-read paidAt rather than trusting the value from entry: the unlock often
+  // lands DURING generation (claim/finalize or the Stripe webhook firing while
+  // the DSP runs), and the stale null would skip the deep read entirely.
+  const paid = await prisma.trackScoreReport.findUnique({
+    where: { id: reportId },
+    select: { paidAt: true },
+  });
+  if (paid?.paidAt) {
     await regenerateDeepReport(reportId).catch((err) =>
       console.error("[score-report] deep read after generation failed:", err)
     );

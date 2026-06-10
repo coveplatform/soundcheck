@@ -116,6 +116,33 @@ export default function SubmitScorePage() {
     /* not a url yet */
   }
 
+  // Start-on-paste: the moment a supported link is in the box (pasted or just
+  // uploaded), create the report and kick the read off in the background. By
+  // the time the user fills genre/notes and hits submit, the analysis is well
+  // underway — generation re-reads the row before building the LLM prompt, so
+  // the form fields still shape the read. Keyed by normalized URL: swapping
+  // the link fires a fresh start and the old one is swept by the GC.
+  const startRef = useRef<{
+    url: string;
+    promise: Promise<{ slug?: string; claimToken?: string } | null>;
+  } | null>(null);
+  const ensureStarted = (rawUrl: string) => {
+    const url = normalizeTrackUrl(rawUrl);
+    if (startRef.current?.url !== url) {
+      startRef.current = {
+        url,
+        promise: fetch("/api/score/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ trackUrl: url }),
+        })
+          .then((r) => r.json().catch(() => null))
+          .catch(() => null),
+      };
+    }
+    return startRef.current.promise;
+  };
+
   // ── debounced track preview (same as the landing) ──
   useEffect(() => {
     const u = trackUrl.trim();
@@ -127,6 +154,8 @@ export default function SubmitScorePage() {
     let cancelled = false;
     setMetaLoading(true);
     const t = setTimeout(async () => {
+      // Kick the analysis off now — it builds while the form is being filled.
+      void ensureStarted(u);
       try {
         const res = await fetch("/api/metadata", {
           method: "POST",
@@ -161,10 +190,23 @@ export default function SubmitScorePage() {
     setStep(0);
     setSubmitting(true);
     try {
+      // Finalize the report that started building at paste time (slug + claim
+      // token); /submit patches genre/notes/title onto it and returns right
+      // away — generation keeps running in the background and the report
+      // page's pending view takes over.
+      const started = await ensureStarted(trackUrl);
       const res = await fetch("/api/score/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ trackUrl: normalizeTrackUrl(trackUrl), trackTitle, genre, notes, email }),
+        body: JSON.stringify({
+          trackUrl: normalizeTrackUrl(trackUrl),
+          trackTitle,
+          genre,
+          notes,
+          email,
+          slug: started?.slug,
+          claimToken: started?.claimToken,
+        }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.slug) {
