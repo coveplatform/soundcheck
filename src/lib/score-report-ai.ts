@@ -644,11 +644,15 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
   // In parallel: measure the audio (DSP grounding) and look up the track's
   // title/artist via oEmbed (so the model's knowledge of known music can inform
   // the score instead of reading a "(untitled)" blob blind). Both degrade to null.
-  // `deep: true` runs the FULL DSP including stems even for the free instant
-  // read (~$0.02/track via Replicate) — the teaser's waveform, markers and
-  // free insight need stem-grade structure to land, and "we listened to the
-  // whole thing" has to be true. The paid gate is the deep PROSE (gpt-4.1 in
-  // regenerateDeepReport) + the human room, not the analysis.
+  //
+  // SHALLOW on purpose: the instant read gets the fast stemless pass — it still
+  // includes everything the live report consumes (sections, energy arc,
+  // waveform, fingerprint) at ~40-60s of worker time. Stems ride Replicate and
+  // a cold start there held the worker's single analysis slot for ~5 minutes,
+  // shedding concurrent uploads into ungrounded reads. Stems run on the deep
+  // pass (paid unlock), where their data is actually consumed. When the
+  // stem-grounded teaser markers ship, enrich ASYNC after the instant write —
+  // never block the first read on Replicate.
   //
   // Staged write: title/artwork land on the row the moment oEmbed resolves, so
   // the (polling) pending report page shows the real track card while the much
@@ -840,7 +844,7 @@ export async function regenerateDeepReport(reportId: string): Promise<void> {
 
   // Deep read runs the stem-separation pass (drums/bass/vocals/other balance).
   const [features, meta] = await Promise.all([
-    acquireAudioFeatures(report.trackUrl, { deep: true }).catch(() => null),
+    acquireAudioFeatures(report.trackUrl).catch(() => null),
     fetchTrackMeta(report.trackUrl).catch(() => null),
   ]);
 
