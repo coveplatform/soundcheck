@@ -174,7 +174,10 @@ async function workerFeatures(
   deep = false
 ): Promise<AudioFeatures | null> {
   const workerUrl = process.env.AUDIO_WORKER_URL;
-  if (!workerUrl) return null;
+  if (!workerUrl) {
+    console.warn("[audio-analysis] AUDIO_WORKER_URL not set — read will be ungrounded");
+    return null;
+  }
 
   try {
     const controller = new AbortController();
@@ -192,13 +195,23 @@ async function workerFeatures(
       signal: controller.signal,
     });
     clearTimeout(timeout);
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.warn(`[audio-analysis] worker /analyze HTTP ${res.status} (deep=${deep}) for ${url}`);
+      return null;
+    }
     // The worker replies with a `{ features }` envelope; null = "couldn't ground
     // this track" (bad link, download blocked) → fall back to the non-grounded read.
     const data = (await res.json()) as { features?: Partial<AudioFeatures> | null };
-    if (!data.features) return null;
+    if (!data.features) {
+      console.warn(`[audio-analysis] worker returned null features (deep=${deep}) for ${url}`);
+      return null;
+    }
     return { source: "worker", ...data.features } as AudioFeatures;
-  } catch {
+  } catch (err) {
+    console.warn(
+      `[audio-analysis] worker fetch failed (deep=${deep}) for ${url}:`,
+      err instanceof Error ? `${err.name}: ${err.message}` : err
+    );
     return null;
   }
 }
