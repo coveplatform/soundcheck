@@ -1,0 +1,10 @@
+import { chromium } from "playwright";
+const id = process.argv[2] || "cmn7b1010000204kvxg5zaj0d";
+const out = process.argv[3] || "scripts/_shots/rpage.png";
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 760, height: 1500 }, deviceScaleFactor: 2 });
+await p.goto(`http://localhost:3000/r/${id}`, { waitUntil: "networkidle" });
+await p.waitForTimeout(1500);
+await p.screenshot({ path: out, fullPage: true });
+await b.close();
+console.log("ok", out);

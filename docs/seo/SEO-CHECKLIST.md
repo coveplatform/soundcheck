@@ -23,9 +23,13 @@ Last updated: 2026-06-09
 - ✅ Vercel: `NEXT_PUBLIC_SITE_URL=https://www.mixreflect.com`
 - ✅ Vercel: apex → www redirect (try.mixreflect.com also redirects to www)
 - ✅ GSC: **Domain property** already exists (verified via DNS TXT, Apr 23)
-- ⏳ GSC: submit `https://www.mixreflect.com/sitemap.xml` (nudge a re-read with www URLs)
-- ⏳ Run `npm run indexnow` after deploy
-- ⏳ ~1 week out: GSC → Indexing → Pages → **Validate Fix** on "Duplicate without user-selected canonical"
+- ✅ GSC: submit `https://www.mixreflect.com/sitemap.xml` (done 2026-06-10)
+- ✅ Run `npm run indexnow` after deploy (done 2026-06-10)
+- ⏳ ~1 week out (≈2026-06-17): GSC → Indexing → Pages → **Validate Fix** on "Duplicate without user-selected canonical"
+
+## A2. Landing page (2026-06-10)
+- ✅ FAQ section on homepage with `FAQPage` JSON-LD (6 questions, AEO surface)
+- ✅ Footer link architecture: homepage now links 12 genre pages (`/feedback/*`), all 7 alternatives pages (`/alternatives/*`), blog, sample report, `/reviewer` — previously only blog/terms/privacy (genre + alternatives pages were sitemap-orphans)
 
 ## C. Content engine — 🔁 recurring · 🤖 automatable (NOT currently running)
 
