@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ScoreRing } from "@/components/score/score-ring";
-import { ReportWaveform } from "@/components/score/report-waveform";
+import { ReportWaveform, deriveWaveMoments } from "@/components/score/report-waveform";
 import { Logo } from "@/components/ui/logo";
 import { ArrowRight, Share2, Lock, Hourglass, User, Loader2 } from "lucide-react";
 
@@ -160,6 +160,8 @@ export function ReportView({ data }: { data: ReportViewModel }) {
   const [unlocking, setUnlocking] = useState(false);
   const [subscribing, setSubscribing] = useState<"monthly" | "annual" | null>(null);
   const locked = !data.unlocked;
+  // Measured moment markers, derived client-side from the stored waveform.
+  const waveMoments = data.waveform ? deriveWaveMoments(data.waveform) : [];
 
   // Just back from Stripe? The success redirect lands a beat before the webhook
   // flips `paidAt`, so the report can still read locked. Poll a refresh until the
@@ -558,18 +560,20 @@ export function ReportView({ data }: { data: ReportViewModel }) {
           </section>
         )}
 
-        {/* ── THE MEASURED WAVEFORM — paid feature, unlocked reports only ── */}
-        {!locked && data.waveform && (
+        {/* ── THE MEASURED WAVEFORM — locked reports get 1 open moment marker,
+            the rest blur their note (timestamps visible); unlocked opens all ── */}
+        {data.waveform && (
           <section>
             <Kicker>the read · measured from your audio</Kicker>
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
               we listened to it.
             </h2>
             <p className={`${mono.className} text-[13px] text-white/55 mb-7 normal-case`}>
-              Your track&apos;s real frequency-split waveform — bass body, mids, highs — straight
-              from the analysis the read is grounded in.
+              {locked && waveMoments.length > 0
+                ? "Your track's real frequency-split waveform, with moment markers from the read. One is unlocked — the rest open with the full read."
+                : "Your track's real frequency-split waveform — bass body, mids, highs — straight from the analysis the read is grounded in."}
             </p>
-            <ReportWaveform data={data.waveform} />
+            <ReportWaveform data={data.waveform} moments={waveMoments} sealed={locked} />
           </section>
         )}
 
