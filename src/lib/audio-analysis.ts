@@ -181,8 +181,12 @@ async function workerFeatures(
 
   try {
     const controller = new AbortController();
-    // Deep reads run stem separation (slow / GPU) — give them a longer ceiling.
-    const timeout = setTimeout(() => controller.abort(), deep ? 180_000 : 60_000);
+    // Budgets sized to the worker's real phases inside our 300s function cap:
+    // shallow = download + queue wait (≤45s) + local DSP (~60s); deep adds the
+    // bounded Replicate stem window (REPLICATE_TIMEOUT_SECS=150 on the worker).
+    // The old 180s deep ceiling sat BELOW a routine successful deep read
+    // (196.5s observed) — we paid for analyses and then aborted them.
+    const timeout = setTimeout(() => controller.abort(), deep ? 240_000 : 150_000);
     const res = await fetch(`${workerUrl.replace(/\/$/, "")}/analyze`, {
       method: "POST",
       headers: {
