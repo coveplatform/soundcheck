@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
 import { ArrowRight, Loader2, Music, X, Upload } from "lucide-react";
+import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -105,7 +106,8 @@ export default function SubmitScorePage() {
 
   const hasEmail = !!session?.user?.email || email.trim().length > 0;
   const isUrl = /^https?:\/\//i.test(trackUrl.trim());
-  const isValid = trackUrl.trim().length > 0 && hasEmail;
+  const isSupported = isUrl && isSupportedTrackUrl(trackUrl);
+  const isValid = isSupported && hasEmail;
 
   let host = "";
   try {
@@ -117,7 +119,7 @@ export default function SubmitScorePage() {
   // ── debounced track preview (same as the landing) ──
   useEffect(() => {
     const u = trackUrl.trim();
-    if (!/^https?:\/\//i.test(u)) {
+    if (!/^https?:\/\//i.test(u) || !isSupportedTrackUrl(u)) {
       setMeta(null);
       setMetaLoading(false);
       return;
@@ -162,7 +164,7 @@ export default function SubmitScorePage() {
       const res = await fetch("/api/score/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ trackUrl, trackTitle, genre, notes, email }),
+        body: JSON.stringify({ trackUrl: normalizeTrackUrl(trackUrl), trackTitle, genre, notes, email }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.slug) {
@@ -222,6 +224,16 @@ export default function SubmitScorePage() {
                   type="url"
                   value={trackUrl}
                   onChange={(e) => setTrackUrl(e.target.value)}
+                  onBlur={() => setTrackUrl((v) => normalizeTrackUrl(v))}
+                  onPaste={(e) => {
+                    // links pasted without a protocol still get the preview card
+                    const text = e.clipboardData.getData("text");
+                    const normalized = normalizeTrackUrl(text);
+                    if (normalized !== text) {
+                      e.preventDefault();
+                      setTrackUrl(normalized);
+                    }
+                  }}
                   placeholder="paste a soundcloud, youtube, bandcamp or mp3 link…"
                   className={inputCls}
                 />
@@ -255,7 +267,14 @@ export default function SubmitScorePage() {
             ) : (
               <div
                 className="flex items-center gap-4 bg-[#141414] border p-3.5"
-                style={{ borderColor: meta ? ACCENT : "rgba(255,255,255,0.2)", animation: "cardIn .25s ease" }}
+                style={{
+                  borderColor: !isSupported
+                    ? "rgba(248,113,113,0.6)"
+                    : meta
+                    ? ACCENT
+                    : "rgba(255,255,255,0.2)",
+                  animation: "cardIn .25s ease",
+                }}
               >
                 <div className="w-16 h-16 bg-white/5 border border-white/10 shrink-0 overflow-hidden flex items-center justify-center">
                   {meta?.artworkUrl ? (
@@ -280,6 +299,15 @@ export default function SubmitScorePage() {
                         {meta.artist ? `by ${meta.artist}` : "track found"}
                       </p>
                     </>
+                  ) : !isSupported ? (
+                    <>
+                      <p className="text-[15px] font-bold text-red-400 truncate">
+                        we can&apos;t read this link
+                      </p>
+                      <p className={`${mono.className} text-[12px] text-white/60 truncate mt-0.5`}>
+                        {SUPPORTED_TRACK_HINT}
+                      </p>
+                    </>
                   ) : (
                     <>
                       <p className="text-[15px] font-bold text-white truncate normal-case">
@@ -292,8 +320,11 @@ export default function SubmitScorePage() {
                   )}
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className={`${mono.className} text-[11px]`} style={{ color: ACCENT }}>
-                    {metaLoading && !meta ? "reading…" : "✓ ready"}
+                  <span
+                    className={`${mono.className} text-[11px]`}
+                    style={{ color: !isSupported ? "#f87171" : ACCENT }}
+                  >
+                    {!isSupported ? "✗ unsupported" : metaLoading && !meta ? "reading…" : "✓ ready"}
                   </span>
                   <button
                     type="button"

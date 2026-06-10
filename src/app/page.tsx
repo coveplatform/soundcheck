@@ -11,6 +11,7 @@ import { RealReviews } from "@/components/landing/real-reviews";
 import { RoomShowcase } from "@/components/landing/room-showcase";
 import { posts } from "@/lib/blog-posts";
 import { ArrowRight, ArrowDown, Music, Loader2, X, Zap, Users, Headphones, Play, Upload } from "lucide-react";
+import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -415,7 +416,7 @@ export default function ScorePage() {
   // ── debounced track preview ──
   useEffect(() => {
     const u = trackUrl.trim();
-    if (!/^https?:\/\//i.test(u)) {
+    if (!/^https?:\/\//i.test(u) || !isSupportedTrackUrl(u)) {
       setMeta(null);
       setMetaLoading(false);
       return;
@@ -498,7 +499,7 @@ export default function ScorePage() {
     return fetch("/api/score/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ trackUrl: trackUrl.trim(), trackTitle: meta?.title?.trim() || undefined }),
+      body: JSON.stringify({ trackUrl: normalizeTrackUrl(trackUrl), trackTitle: meta?.title?.trim() || undefined }),
     })
       .then((r) => r.json().catch(() => null))
       .catch(() => null);
@@ -513,7 +514,7 @@ export default function ScorePage() {
     return fetch("/api/score/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ trackUrl: trackUrl.trim(), trackTitle: meta?.title?.trim() || undefined }),
+      body: JSON.stringify({ trackUrl: normalizeTrackUrl(trackUrl), trackTitle: meta?.title?.trim() || undefined }),
     })
       .then((r) => r.json().catch(() => null))
       .catch(() => null);
@@ -544,7 +545,7 @@ export default function ScorePage() {
   const buildFinish = () => {
     const title = meta?.title?.trim() || "";
     return (
-      `/score/finish?u=${encodeURIComponent(trackUrl.trim())}` +
+      `/score/finish?u=${encodeURIComponent(normalizeTrackUrl(trackUrl))}` +
       (title ? `&t=${encodeURIComponent(title)}` : "")
     );
   };
@@ -583,6 +584,10 @@ export default function ScorePage() {
     }
     setAuthError("wrong email or password");
     setAuthBusy(false);
+    if (!isSupportedTrackUrl(trackUrl)) {
+      setError(`we can't read that link — ${SUPPORTED_TRACK_HINT}`);
+      return;
+    }
   };
 
   const seeResults = async () => {
@@ -692,6 +697,7 @@ export default function ScorePage() {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
+  const isSupported = isUrl && isSupportedTrackUrl(trackUrl);
               className={`${mono.className} text-[13px] text-white/60 hover:text-white px-2 shrink-0`}
             >
               log in
@@ -807,7 +813,11 @@ export default function ScorePage() {
                 <div
                   className="flex items-center gap-4 bg-[#141414] border p-3.5"
                   style={{
-                    borderColor: meta ? ACCENT : "rgba(255,255,255,0.15)",
+                    borderColor: !isSupported
+                      ? "rgba(248,113,113,0.6)"
+                      : meta
+                      ? ACCENT
+                      : "rgba(255,255,255,0.15)",
                     animation: "cardIn .25s ease",
                   }}
                 >
@@ -839,6 +849,16 @@ export default function ScorePage() {
                     ) : (
                       <>
                         <p className="text-[15px] font-bold text-white truncate normal-case">
+                    onBlur={() => setTrackUrl((v) => normalizeTrackUrl(v))}
+                    onPaste={(e) => {
+                      // links pasted without a protocol still get the preview card
+                      const text = e.clipboardData.getData("text");
+                      const normalized = normalizeTrackUrl(text);
+                      if (normalized !== text) {
+                        e.preventDefault();
+                        setTrackUrl(normalized);
+                      }
+                    }}
                           {uploadedName ? "uploaded" : "link added"}
                         </p>
                         <p className={`${mono.className} text-[12px] text-white/45 truncate normal-case mt-0.5`}>
@@ -848,8 +868,11 @@ export default function ScorePage() {
                     )}
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className={`${mono.className} text-[11px]`} style={{ color: ACCENT }}>
-                      {metaLoading && !meta ? "reading…" : "✓ ready"}
+                    <span
+                      className={`${mono.className} text-[11px]`}
+                      style={{ color: !isSupported ? "#f87171" : ACCENT }}
+                    >
+                      {!isSupported ? "✗ unsupported" : metaLoading && !meta ? "reading…" : "✓ ready"}
                     </span>
                     <button
                       type="button"
@@ -897,6 +920,15 @@ export default function ScorePage() {
               </span>
               <span className="text-white/20">·</span>
               <span>real listeners</span>
+                    ) : !isSupported ? (
+                      <>
+                        <p className="text-[15px] font-bold text-red-400 truncate">
+                          we can&apos;t read this link
+                        </p>
+                        <p className={`${mono.className} text-[12px] text-white/45 truncate mt-0.5`}>
+                          {SUPPORTED_TRACK_HINT}
+                        </p>
+                      </>
               <span className="text-white/20">·</span>
               <span>unbiased</span>
               <span className="text-white/20">·</span>
