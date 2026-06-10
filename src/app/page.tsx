@@ -4,14 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession, signIn } from "next-auth/react";
+import { useAuthModal } from "@/components/providers";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
 import { ScoreRing } from "@/components/score/score-ring";
 import { RealReviews } from "@/components/landing/real-reviews";
 import { RoomShowcase } from "@/components/landing/room-showcase";
 import { posts } from "@/lib/blog-posts";
-import { ArrowRight, ArrowDown, Music, Loader2, X, Zap, Users, Headphones, Play, Upload } from "lucide-react";
 import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
+import { ArrowRight, ArrowDown, Music, Loader2, X, Zap, Users, Headphones, Play, Upload } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -357,9 +358,62 @@ function audioDuration(file: File): Promise<number | null> {
   });
 }
 
+const FAQS: { q: string; a: string }[] = [
+  {
+    q: "How does the AI track score work?",
+    a: "Paste a link or upload your track and the AI listens to the whole thing, then scores it out of 100 across five dimensions: hook, production, retention, emotional impact and commercial pull. You also get a written verdict and the three most impactful fixes.",
+  },
+  {
+    q: "Who are the five listeners in the room?",
+    a: "Real, paid listeners — not bots and not playlist curators. Each track is heard by a room of five people who react honestly to what they hear. You see every reaction headline for free; the full reactions are part of the unlocked report.",
+  },
+  {
+    q: "Is MixReflect actually free?",
+    a: "Yes. Submitting a track is free and gets you your score out of 100, the verdict, the five-dimension breakdown, every reaction headline and your three fixes — no card needed. Unlocking the complete report for one track is a one-time $6.95, or $19.95/month for unlimited auto-unlocks.",
+  },
+  {
+    q: "What can I submit?",
+    a: "A SoundCloud, YouTube or direct link to your track, or just drag in an MP3 or WAV. Unreleased demos, rough mixes and finished masters are all fine — most people use it before they release.",
+  },
+  {
+    q: "How is this different from SubmitHub or Groover?",
+    a: "Those platforms pitch your music to playlists and curators. MixReflect tells you whether the track is ready in the first place — an honest score and real listener reactions before you spend money promoting it.",
+  },
+  {
+    q: "Do I keep my reports?",
+    a: "Yes. Every report stays on your dashboard, and anything you unlock is yours forever — even if you cancel a subscription.",
+  },
+];
+
+const FOOTER_GENRES: { slug: string; label: string }[] = [
+  { slug: "hip-hop", label: "hip-hop" },
+  { slug: "trap", label: "trap" },
+  { slug: "rnb", label: "r&b" },
+  { slug: "pop", label: "pop" },
+  { slug: "electronic", label: "electronic" },
+  { slug: "house", label: "house" },
+  { slug: "techno", label: "techno" },
+  { slug: "edm", label: "edm" },
+  { slug: "lo-fi", label: "lo-fi" },
+  { slug: "rock", label: "rock" },
+  { slug: "indie-pop", label: "indie pop" },
+  { slug: "singer-songwriter", label: "singer-songwriter" },
+];
+
+const FOOTER_ALTERNATIVES: { slug: string; label: string }[] = [
+  { slug: "submithub", label: "submithub" },
+  { slug: "groover", label: "groover" },
+  { slug: "playlist-push", label: "playlist push" },
+  { slug: "landr", label: "landr" },
+  { slug: "soundbetter", label: "soundbetter" },
+  { slug: "musosoup", label: "musosoup" },
+  { slug: "reverbnation", label: "reverbnation" },
+];
+
 export default function ScorePage() {
   const router = useRouter();
   const { data: session } = useSession();
+  const { open: openAuth } = useAuthModal();
 
   const [trackUrl, setTrackUrl] = useState("");
   const [meta, setMeta] = useState<Meta | null>(null);
@@ -530,6 +584,10 @@ export default function ScorePage() {
       setError("paste a link to your track first");
       return;
     }
+    if (!isSupportedTrackUrl(trackUrl)) {
+      setError(`we can't read that link — ${SUPPORTED_TRACK_HINT}`);
+      return;
+    }
     setError("");
     setStep(0);
     setPhase("running");
@@ -584,10 +642,6 @@ export default function ScorePage() {
     }
     setAuthError("wrong email or password");
     setAuthBusy(false);
-    if (!isSupportedTrackUrl(trackUrl)) {
-      setError(`we can't read that link — ${SUPPORTED_TRACK_HINT}`);
-      return;
-    }
   };
 
   const seeResults = async () => {
@@ -643,6 +697,7 @@ export default function ScorePage() {
   };
 
   const isUrl = /^https?:\/\//i.test(trackUrl.trim());
+  const isSupported = isUrl && isSupportedTrackUrl(trackUrl);
   let host = "";
   try {
     host = new URL(trackUrl.trim()).hostname.replace(/^www\./, "");
@@ -695,19 +750,20 @@ export default function ScorePage() {
           </Link>
         ) : (
           <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-  const isSupported = isUrl && isSupportedTrackUrl(trackUrl);
+            <button
+              type="button"
+              onClick={() => openAuth("signin")}
               className={`${mono.className} text-[13px] text-white/60 hover:text-white px-2 shrink-0`}
             >
               log in
-            </Link>
-            <Link
-              href="/signup"
+            </button>
+            <button
+              type="button"
+              onClick={() => openAuth("signup")}
               className="flex-1 flex items-center justify-center bg-[#6ee7ff] text-black font-extrabold text-[15px] py-3 hover:bg-white transition-colors"
             >
               sign up free
-            </Link>
+            </button>
           </div>
         )}
       </div>
@@ -739,15 +795,20 @@ export default function ScorePage() {
               </Link>
             ) : (
               <>
-                <Link href="/login" className="hidden sm:inline text-white/55 hover:text-white transition-colors">
+                <button
+                  type="button"
+                  onClick={() => openAuth("signin")}
+                  className="hidden sm:inline text-white/55 hover:text-white transition-colors"
+                >
                   log in
-                </Link>
-                <Link
-                  href="/signup"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openAuth("signup")}
                   className="bg-[#6ee7ff] text-black font-bold px-4 py-1.5 hover:bg-white transition-colors"
                 >
                   sign up
-                </Link>
+                </button>
               </>
             )}
           </div>
@@ -784,6 +845,16 @@ export default function ScorePage() {
                     type="url"
                     value={trackUrl}
                     onChange={(e) => setTrackUrl(e.target.value)}
+                    onBlur={() => setTrackUrl((v) => normalizeTrackUrl(v))}
+                    onPaste={(e) => {
+                      // links pasted without a protocol still get the preview card
+                      const text = e.clipboardData.getData("text");
+                      const normalized = normalizeTrackUrl(text);
+                      if (normalized !== text) {
+                        e.preventDefault();
+                        setTrackUrl(normalized);
+                      }
+                    }}
                     placeholder="paste a soundcloud, youtube or mp3 link…"
                     className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-5 py-4 text-[15px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
                   />
@@ -846,19 +917,18 @@ export default function ScorePage() {
                           {meta.artist ? `by ${meta.artist}` : "track found"}
                         </p>
                       </>
+                    ) : !isSupported ? (
+                      <>
+                        <p className="text-[15px] font-bold text-red-400 truncate">
+                          we can&apos;t read this link
+                        </p>
+                        <p className={`${mono.className} text-[12px] text-white/45 truncate mt-0.5`}>
+                          {SUPPORTED_TRACK_HINT}
+                        </p>
+                      </>
                     ) : (
                       <>
                         <p className="text-[15px] font-bold text-white truncate normal-case">
-                    onBlur={() => setTrackUrl((v) => normalizeTrackUrl(v))}
-                    onPaste={(e) => {
-                      // links pasted without a protocol still get the preview card
-                      const text = e.clipboardData.getData("text");
-                      const normalized = normalizeTrackUrl(text);
-                      if (normalized !== text) {
-                        e.preventDefault();
-                        setTrackUrl(normalized);
-                      }
-                    }}
                           {uploadedName ? "uploaded" : "link added"}
                         </p>
                         <p className={`${mono.className} text-[12px] text-white/45 truncate normal-case mt-0.5`}>
@@ -920,15 +990,6 @@ export default function ScorePage() {
               </span>
               <span className="text-white/20">·</span>
               <span>real listeners</span>
-                    ) : !isSupported ? (
-                      <>
-                        <p className="text-[15px] font-bold text-red-400 truncate">
-                          we can&apos;t read this link
-                        </p>
-                        <p className={`${mono.className} text-[12px] text-white/45 truncate mt-0.5`}>
-                          {SUPPORTED_TRACK_HINT}
-                        </p>
-                      </>
               <span className="text-white/20">·</span>
               <span>unbiased</span>
               <span className="text-white/20">·</span>
@@ -1365,16 +1426,101 @@ export default function ScorePage() {
         </div>
       </section>
 
+      {/* ── FAQ ── */}
+      <section id="faq" className="relative z-10 border-t border-white/10 scroll-mt-16">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: FAQS.map((f) => ({
+                "@type": "Question",
+                name: f.q,
+                acceptedAnswer: { "@type": "Answer", text: f.a },
+              })),
+            }),
+          }}
+        />
+        <div className="bg-[#6ee7ff] text-black">
+          <div className="max-w-6xl mx-auto px-5 py-20">
+            <p className={`${mono.className} text-[13px] text-black/55 mb-2`}>[ faq ]</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-12">
+              questions, answered.
+            </h2>
+            <div className="grid md:grid-cols-2 gap-px bg-black/15 border border-black/15">
+              {FAQS.map((f) => (
+                <details key={f.q} className="group bg-[#6ee7ff] open:bg-[#85ecff] transition-colors">
+                  <summary className="flex items-start justify-between gap-4 cursor-pointer list-none p-6 [&::-webkit-details-marker]:hidden">
+                    <h3 className="text-[15px] font-extrabold tracking-tight leading-snug lowercase">
+                      {f.q}
+                    </h3>
+                    <span
+                      className={`${mono.className} shrink-0 text-[15px] leading-snug font-bold group-open:rotate-45 transition-transform`}
+                      aria-hidden
+                    >
+                      +
+                    </span>
+                  </summary>
+                  <p className="px-6 pb-6 text-[13.5px] leading-relaxed text-black/70 normal-case">
+                    {f.a}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── FOOTER ── */}
       <footer className="relative z-10 border-t border-white/10">
-        <div className={`${mono.className} max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-white/40`}>
-          <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-6" />
-          <div className="flex items-center gap-6">
-            <Link href="/report/demo" className="hover:text-white transition-colors">sample report</Link>
-            <Link href="/terms" className="hover:text-white transition-colors">terms</Link>
-            <Link href="/privacy" className="hover:text-white transition-colors">privacy</Link>
+        <div className="max-w-6xl mx-auto px-5 pt-14 pb-10">
+          <div className="grid sm:grid-cols-[1.1fr_1.2fr_1fr] gap-10 sm:gap-8">
+            {/* product */}
+            <div>
+              <p className={`${mono.className} text-[12px] text-white/30 mb-4`}>[ product ]</p>
+              <ul className={`${mono.className} space-y-2.5 text-[13px] text-white/45`}>
+                <li><a href="#pricing" className="hover:text-white transition-colors">pricing</a></li>
+                <li><Link href="/report/demo" className="hover:text-white transition-colors">sample report</Link></li>
+                <li><Link href="/blog" className="hover:text-white transition-colors">the drop — blog</Link></li>
+                <li><Link href="/reviewer" className="hover:text-white transition-colors">become a listener</Link></li>
+              </ul>
+            </div>
+            {/* feedback by genre */}
+            <div>
+              <p className={`${mono.className} text-[12px] text-white/30 mb-4`}>[ feedback by genre ]</p>
+              <ul className={`${mono.className} grid grid-cols-2 gap-x-6 gap-y-2.5 text-[13px] text-white/45`}>
+                {FOOTER_GENRES.map((g) => (
+                  <li key={g.slug}>
+                    <Link href={`/feedback/${g.slug}`} className="hover:text-white transition-colors">
+                      {g.label} feedback
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* compare */}
+            <div>
+              <p className={`${mono.className} text-[12px] text-white/30 mb-4`}>[ compare ]</p>
+              <ul className={`${mono.className} space-y-2.5 text-[13px] text-white/45`}>
+                {FOOTER_ALTERNATIVES.map((a) => (
+                  <li key={a.slug}>
+                    <Link href={`/alternatives/${a.slug}`} className="hover:text-white transition-colors">
+                      {a.label} alternative
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <span>© {new Date().getFullYear()}</span>
+          <div className={`${mono.className} mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-white/40`}>
+            <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-6" />
+            <div className="flex items-center gap-6">
+              <Link href="/terms" className="hover:text-white transition-colors">terms</Link>
+              <Link href="/privacy" className="hover:text-white transition-colors">privacy</Link>
+            </div>
+            <span>© {new Date().getFullYear()}</span>
+          </div>
         </div>
       </footer>
 
