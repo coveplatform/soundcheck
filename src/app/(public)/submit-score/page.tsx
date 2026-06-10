@@ -415,7 +415,7 @@ export default function SubmitScorePage() {
 
           <button
             type="submit"
-            disabled={!isValid || submitting}
+            disabled={!isValid || submitting || uploading}
             className="group w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-base py-4 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {submitting ? (

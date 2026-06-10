@@ -978,12 +978,16 @@ export default function ScorePage() {
 
               <button
                 type="submit"
-                disabled={busy}
+                disabled={busy || uploading}
                 className="group mt-3 w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black hover:bg-white font-extrabold text-base px-7 py-4 transition-colors shadow-[0_0_30px_-6px_rgba(110,231,255,0.7)] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {busy ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" /> opening your report…
+                  </>
+                ) : uploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> uploading your track…
                   </>
                 ) : (
                   <>
