@@ -236,7 +236,10 @@ export async function acquireAudioFeatures(
   // Stems ride Replicate, and a cold start there can blow the whole budget.
   // Stems are an upgrade, not a dependency — retry without them so the read
   // still gets grounded (sections, waveform, fingerprint) instead of falling
-  // all the way back to a metadata-only score.
+  // all the way back to a metadata-only score. The pause matters: if the deep
+  // pass died because the worker itself crashed (e.g. OOM), an instant retry
+  // just hits the corpse — give the box a moment to come back.
+  await new Promise((r) => setTimeout(r, 8000));
   return workerFeatures(url, false);
 }
 
