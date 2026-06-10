@@ -6,8 +6,11 @@ import { generateAndStoreReport } from "@/lib/score-report-ai";
 import { decideRoomEligibility } from "@/lib/score-review";
 import { isScoreSubscribed } from "@/lib/score-subscription";
 import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
+import { isSupportedTrackUrl, normalizeTrackUrl } from "@/lib/track-url";
 
-export const maxDuration = 60;
+// Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
+// Replicate cold start. Needs Fluid compute / Pro for >60.
+export const maxDuration = 300;
 
 /**
  * Free submission. No payment up front.
@@ -36,6 +39,14 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!isSupportedTrackUrl(trackUrl)) {
+      return NextResponse.json(
+        { error: "We can't read that link. Paste a SoundCloud, YouTube, Bandcamp or direct MP3 link." },
+        { status: 400 }
+      );
+    }
+    const normalizedTrackUrl = normalizeTrackUrl(trackUrl);
+
     // Basic abuse guard: each submit triggers a paid LLM call, so cap how many
     // a single email can fire in a short window.
     const HOURLY_LIMIT = 8;
@@ -59,7 +70,7 @@ export async function POST(request: Request) {
     const report = await prisma.trackScoreReport.create({
       data: {
         email: effectiveEmail,
-        trackUrl: trackUrl.trim(),
+        trackUrl: normalizedTrackUrl,
         trackTitle: trackTitle?.trim() || null,
         genre: effectiveGenre,
         notes: notes?.trim() || null,
@@ -104,7 +115,7 @@ export async function POST(request: Request) {
 
     // Ping admin on every upload (fire-and-forget — never blocks the submit).
     void sendAdminNewScoreSubmissionEmail({
-      trackTitle: trackTitle?.trim() || trackUrl.trim(),
+      trackTitle: trackTitle?.trim() || normalizedTrackUrl,
       artistEmail: effectiveEmail,
       genre: effectiveGenre,
       reportSlug: report.slug,

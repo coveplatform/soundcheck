@@ -2,8 +2,11 @@ import { NextResponse, after } from "next/server";
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { generateAndStoreReport } from "@/lib/score-report-ai";
+import { isSupportedTrackUrl, normalizeTrackUrl } from "@/lib/track-url";
 
-export const maxDuration = 60;
+// Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
+// Replicate cold start. Needs Fluid compute / Pro for >60.
+export const maxDuration = 300;
 
 /**
  * Pre-auth submission ("start at click").
@@ -35,6 +38,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "A track link is required." }, { status: 400 });
     }
 
+    if (!isSupportedTrackUrl(trackUrl)) {
+      return NextResponse.json(
+        { error: "We can't read that link. Paste a SoundCloud, YouTube, Bandcamp or direct MP3 link." },
+        { status: 400 }
+      );
+    }
+
     // Abuse guard: each start fires a paid LLM call, and there's no email to key
     // off pre-auth, so cap per client IP in a short window.
     const ip =
@@ -57,7 +67,7 @@ export async function POST(request: Request) {
     const report = await prisma.trackScoreReport.create({
       data: {
         email: "", // unknown until /claim attaches the authenticated user
-        trackUrl: trackUrl.trim(),
+        trackUrl: normalizeTrackUrl(trackUrl),
         trackTitle: trackTitle?.trim() || null,
         genre: genre?.trim() || "Other",
         notes: notes?.trim() || null,

@@ -7,7 +7,9 @@ import { regenerateDeepReport } from "@/lib/score-report-ai";
 import { isScoreSubscribed } from "@/lib/score-subscription";
 import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
 
-export const maxDuration = 60;
+// Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
+// Replicate cold start. Needs Fluid compute / Pro for >60.
+export const maxDuration = 300;
 
 /**
  * Redeem a pre-auth report (created by /api/score/start) for the now

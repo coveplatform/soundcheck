@@ -218,7 +218,13 @@ export async function acquireAudioFeatures(
   // SoundCloud / YouTube / Bandcamp / direct → extraction worker. `deep` runs
   // the stem-separation pass — score reports request it for ALL reads now
   // (instant included); the paid gate is the deep prose, not the analysis.
-  return workerFeatures(url, opts.deep ?? false);
+  const feat = await workerFeatures(url, opts.deep ?? false);
+  if (feat || !opts.deep) return feat;
+  // Stems ride Replicate, and a cold start there can blow the whole budget.
+  // Stems are an upgrade, not a dependency — retry without them so the read
+  // still gets grounded (sections, waveform, fingerprint) instead of falling
+  // all the way back to a metadata-only score.
+  return workerFeatures(url, false);
 }
 
 // Turn a 0–1 signal into a plain-language band so the model describes the feel

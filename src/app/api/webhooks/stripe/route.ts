@@ -9,7 +9,9 @@ import { activateSubscriber, updateSubscriberStatus } from "@/lib/score-subscrip
 import { regenerateDeepReport } from "@/lib/score-report-ai";
 import type Stripe from "stripe";
 
-export const maxDuration = 60;
+// Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
+// Replicate cold start. Needs Fluid compute / Pro for >60.
+export const maxDuration = 300;
 
 
 async function handleReleaseDecisionCheckout(session: Stripe.Checkout.Session) {

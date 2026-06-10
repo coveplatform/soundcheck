@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateAndStoreReport } from "@/lib/score-report-ai";
 
-export const maxDuration = 60;
+// Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
+// Replicate cold start. Needs Fluid compute / Pro for >60.
+export const maxDuration = 300;
 
 /**
  * Idempotent generation / recovery endpoint. [id] is the report slug.
