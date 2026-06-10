@@ -1,164 +1,166 @@
 import Link from "next/link";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
 
-import { Button } from "@/components/ui/button";
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
+const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
+const ACCENT = "#6ee7ff";
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-white pt-[68px]">
+    <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black`}>
       {/* Header */}
-      <header className="border-b-2 border-black fixed top-0 left-0 right-0 z-50 bg-white">
-        <div className="max-w-3xl mx-auto px-4 py-4">
-          <Link href="/" className="flex items-center gap-2 w-fit">
-            <Logo />
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
+        <div className="max-w-3xl mx-auto px-5 h-16 flex items-center justify-between">
+          <Link href="/">
+            <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
+          </Link>
+          <Link href="/" className={`${mono.className} text-[13px] text-white/65 hover:text-white transition-colors`}>
+            ← back
           </Link>
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-4 py-12 space-y-6">
-        <div className="flex items-center justify-between gap-3">
-          <h1 className="text-3xl font-black">Terms of Service</h1>
-          <Link href="/">
-            <Button variant="outline">Home</Button>
-          </Link>
-        </div>
+      <div className="max-w-3xl mx-auto px-5 py-14">
+        <p className={`${mono.className} text-[13px] text-white/55 mb-3 lowercase`}>[ legal ]</p>
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-[-0.03em] lowercase">
+          terms of <span style={{ color: ACCENT }}>service</span>.
+        </h1>
+        <p className={`${mono.className} text-[12px] text-white/40 mt-4`}>Last updated: {new Date().toLocaleDateString()}</p>
 
-        <p className="text-sm text-neutral-600 font-mono">Last updated: {new Date().toLocaleDateString()}</p>
-
-        <div className="space-y-6 text-neutral-700 leading-7">
+        <div className="mt-10 space-y-10 text-white/60 leading-7 text-[15px]">
           <p>
-            MixReflect (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is a two-sided marketplace
-            that helps artists collect structured, expert feedback on their music and helps
-            reviewers earn money for completing high-quality reviews. MixReflect is operated by
-            MixReflect, based in Melbourne, Victoria, Australia. By creating an account or
-            using MixReflect, you agree to these terms.
+            MixReflect (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is a music feedback service.
+            Artists submit a track and receive an instant AI-generated read — a score, verdict and
+            breakdown — plus honest reactions from a panel of real, paid listeners. MixReflect is
+            operated by MixReflect, based in Melbourne, Victoria, Australia. By creating an account
+            or using MixReflect, you agree to these terms.
           </p>
 
           {/* ── 1. Accounts ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">1. Accounts and profiles</h2>
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">1. accounts and profiles</h2>
             <p>
               You must provide accurate information when creating your account. You are responsible
-              for keeping your login credentials secure. You may create an artist profile, a
-              reviewer profile, or both. Artist profiles include your artist name, genre preferences,
-              and optional bio. Reviewer profiles include your display name and payout details.
+              for keeping your login credentials secure. Artists create an account to submit tracks
+              and view reports. Listeners may additionally opt in to the paid listening panel, which
+              requires payout details to receive earnings.
             </p>
           </div>
 
           {/* ── 2. Track Submissions ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">2. Track submissions</h2>
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">2. track submissions</h2>
             <p>
-              Artists submit tracks by providing a link (SoundCloud, Spotify, YouTube, etc.) or by
-              uploading an audio file directly. Each submission includes a title, genre tags, an
-              optional artist note for reviewers, and a visibility setting.
+              You submit tracks by providing a link (SoundCloud, YouTube, etc.) or by uploading an
+              audio file directly. Submitting a track is free. Each submission is processed by
+              automated analysis (including third-party AI services) to generate your score report,
+              and may be played to members of our paid listening panel who provide reactions.
             </p>
-
-            <h3 className="font-bold mt-4 mb-1">Public vs. private visibility</h3>
+            <h3 className="font-bold text-white/85 mt-4 mb-1">Visibility</h3>
             <p>
-              You choose whether each track is <strong>public</strong> or <strong>private</strong> at
-              submission time. <strong>Public tracks</strong> may appear in the Weekly Discover
-              section, the 3D Discover experience, and the landing page — visible to all visitors.
-              This includes your track title, artist name, artwork, genre tags, play count, and an
-              embedded player or link to the audio source. <strong>Private tracks</strong> are only
-              accessible to you and the reviewers assigned to your track. You can change visibility
-              at any time from your track settings.
+              Tracks you submit and the reports generated for them are private to you and the
+              listeners assigned to your track. If a track is featured in any public section of the
+              site (for example a demo or discovery feature), this only happens for tracks marked
+              public, and you can change a track&apos;s visibility at any time.
             </p>
-
-            <h3 className="font-bold mt-4 mb-1">Slot limits</h3>
+            <h3 className="font-bold text-white/85 mt-4 mb-1">Legacy service (MixReflect Classic)</h3>
             <p>
-              Free accounts may have up to 1 active track in the review queue at a time. Pro
-              subscribers may have up to 3. A slot is considered active while the track is in
-              PENDING_PAYMENT, QUEUED, or IN_PROGRESS status.
+              Accounts created on the previous peer-to-peer version of MixReflect (&quot;MixReflect
+              Classic&quot;) remain subject to its mechanics while it is wound down, including review
+              credits and active-slot limits (1 slot free, 3 slots for Pro subscribers).
             </p>
           </div>
 
-          {/* ── 3. Reviews ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">3. Reviews and feedback</h2>
+          {/* ── 3. Listener reactions ── */}
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">3. listener reactions and feedback</h2>
             <p>
-              Reviewers are assigned tracks from the review queue and must listen for a minimum of
-              180 seconds before submitting feedback. Reviews include structured ratings, free-text
-              feedback, and optional timestamp annotations. Reviewers agree to provide honest,
-              constructive, and specific feedback. Low-quality or fraudulent reviews may be flagged
-              and removed.
+              Panel listeners must listen to a track before reacting and agree to provide honest,
+              constructive, specific feedback. Low-quality or fraudulent reactions may be flagged,
+              removed, and unpaid. AI-generated analysis is an automated opinion, not a guarantee of
+              quality or commercial outcome.
             </p>
             <p className="mt-3">
-              While listening, behavioural signals (play, pause, seek, volume, tab focus) are
+              While listening, behavioural signals (play, pause, seek, volume, tab focus) may be
               passively captured to improve feedback quality and provide artists with aggregate
               engagement insights. This data is never shared publicly.
             </p>
           </div>
 
           {/* ── 4. Payments ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">4. Payments</h2>
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">4. payments</h2>
 
-            <h3 className="font-bold mt-4 mb-1">Artist payments</h3>
+            <h3 className="font-bold text-white/85 mt-4 mb-1">Report unlocks</h3>
             <p>
-              Track submissions are paid for via Stripe Checkout. Prices are displayed at checkout
-              and depend on the feedback package selected. You are responsible for any taxes required
+              Submitting a track and viewing your teaser report is free. Unlocking a track&apos;s full
+              report is a one-time purchase ($6.95 at the time of writing) processed via Stripe
+              Checkout. Prices are displayed at checkout. You are responsible for any taxes required
               by your jurisdiction.
             </p>
 
-            <h3 className="font-bold mt-4 mb-1">Credits & Pro subscriptions</h3>
+            <h3 className="font-bold text-white/85 mt-4 mb-1">Unlimited subscription</h3>
             <p>
-              Review credits can be earned by reviewing other artists, purchased as a one-time
-              10-credit pack for $9.95, or included with MixReflect Pro. Credits do not expire.
-              MixReflect Pro is available at $24.95/month and includes 30 credits each billing
-              period, up to 10 reviews per track, 3 active slots, priority queue placement,
-              unlimited reviews per day, and early access to new features. You can manage your subscription and billing through
-              the Stripe Customer Portal. Pro subscriptions auto-renew unless cancelled.
+              The Unlimited plan ($19.95/month or $143.40/year at the time of writing) automatically
+              unlocks every track you submit, subject to the fair-use limits shown on the pricing
+              page. Subscriptions auto-renew unless cancelled. You can manage your subscription and
+              billing through the Stripe Customer Portal. If you cancel, access continues until the
+              end of the paid period and reports you have unlocked remain yours.
             </p>
 
-            <h3 className="font-bold mt-4 mb-1">Reviewer payouts</h3>
+            <h3 className="font-bold text-white/85 mt-4 mb-1">Listener earnings</h3>
             <p>
-              Reviewers earn money for each completed review. Earnings accrue as a pending balance
-              and can be withdrawn via Stripe Connect transfer. Reviewers must complete Stripe
-              Connect onboarding to receive payouts. MixReflect is not responsible for Stripe&apos;s
-              processing fees or payout schedules.
+              Panel listeners earn the per-reaction rate shown on the listener page. Earnings accrue
+              as a balance and can be withdrawn once the payout threshold ($10) is reached. Payout
+              requests are reviewed and processed by our team, subject to fraud review. We are not
+              responsible for payment processors&apos; fees or schedules.
+            </p>
+
+            <h3 className="font-bold text-white/85 mt-4 mb-1">Legacy credits and Pro subscriptions</h3>
+            <p>
+              Credits and Pro subscriptions purchased on MixReflect Classic continue to be honoured
+              while the legacy service is wound down, and remain manageable through the Stripe
+              Customer Portal.
             </p>
           </div>
 
           {/* ── 5. Refund Policy ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">5. Refund policy</h2>
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">5. refund policy</h2>
             <p>
-              Refunds may be available if no reviews have been started on your track. Once a
-              reviewer has been assigned and begun work, the submission is non-refundable. Refund
-              requests are handled by support on a case-by-case basis.
+              Report unlocks are digital purchases delivered immediately, so they are generally
+              non-refundable once the full report has been opened. Subscription renewals can be
+              cancelled any time before the next billing date. Refund requests are handled by
+              support on a case-by-case basis.
             </p>
           </div>
 
           {/* ── 6. Content Ownership ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">6. Content ownership</h2>
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">6. content ownership</h2>
             <p>
               You retain full ownership of your music and any content you submit to MixReflect. By
-              submitting a track, you grant MixReflect and assigned reviewers a limited,
-              non-exclusive licence to access and stream the track solely for the purpose of
-              providing feedback. If you mark a track as public, you additionally grant MixReflect
-              permission to display the track title, artwork, artist name, genre tags, and an
-              embedded player in public-facing sections of the site (Weekly Discover, landing page,
-              3D Discover experience). This licence terminates when you delete the track or set it
-              to private.
+              submitting a track, you grant MixReflect a limited, non-exclusive licence to access,
+              stream, and process the track — including automated and AI analysis — solely for the
+              purpose of generating your report, and grant assigned listeners access solely for the
+              purpose of providing feedback. This licence terminates when you delete the track.
             </p>
             <p className="mt-3">
-              Review content (text, ratings, timestamps) is owned by the reviewer who wrote it and
-              is licensed to MixReflect and the track owner for use within the platform, including
-              in aggregate feedback synthesis reports.
+              Reaction content (text, ratings) is licensed to MixReflect and the track owner for use
+              within the platform, including in your score report.
             </p>
           </div>
 
           {/* ── 7. Prohibited Conduct ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">7. Prohibited conduct</h2>
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">7. prohibited conduct</h2>
             <ul className="list-disc pl-5 space-y-2">
               <li>Submitting tracks you do not own or have rights to share.</li>
-              <li>Submitting fraudulent, plagiarised, or deliberately low-quality reviews.</li>
-              <li>Attempting to manipulate the review queue, play counts, or rating system.</li>
-              <li>Creating multiple accounts to circumvent slot limits or other restrictions.</li>
-              <li>Harassing, threatening, or abusing other users via reviews, notes, or support.</li>
+              <li>Submitting fraudulent, plagiarised, or deliberately low-quality reactions.</li>
+              <li>Attempting to manipulate scores, the listening panel, or the rating system.</li>
+              <li>Creating multiple accounts to circumvent limits or other restrictions.</li>
+              <li>Harassing, threatening, or abusing other users via reactions, notes, or support.</li>
               <li>Uploading malicious files or attempting to exploit the platform technically.</li>
             </ul>
             <p className="mt-3">
@@ -168,33 +170,33 @@ export default function TermsPage() {
           </div>
 
           {/* ── 8. Liability ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">8. Limitation of liability</h2>
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">8. limitation of liability</h2>
             <p>
               MixReflect is provided on an &quot;as is&quot; and &quot;as available&quot; basis. We
-              do not guarantee a specific outcome, placement, or commercial results from feedback.
-              We do not guarantee the accuracy, quality, or usefulness of any review. To the
-              maximum extent permitted by law, MixReflect shall not be liable for any indirect,
-              incidental, or consequential damages arising from your use of the service.
+              do not guarantee a specific outcome, placement, or commercial results from feedback or
+              scores. We do not guarantee the accuracy, quality, or usefulness of any reaction or
+              AI-generated analysis. To the maximum extent permitted by law, MixReflect shall not be
+              liable for any indirect, incidental, or consequential damages arising from your use of
+              the service.
             </p>
           </div>
 
           {/* ── 9. Termination ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">9. Termination</h2>
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">9. termination</h2>
             <p>
               You may delete your account at any time. We may suspend or terminate your account if
               you violate these terms. On termination, your personal data will be handled as
               described in our{" "}
-              <Link href="/privacy" className="underline font-bold">Privacy Policy</Link>.
-              Outstanding reviewer balances will be paid out per Stripe Connect terms, subject to
-              fraud review.
+              <Link href="/privacy" className="font-bold hover:text-white transition-colors" style={{ color: ACCENT }}>Privacy Policy</Link>.
+              Outstanding listener balances will be paid out subject to fraud review.
             </p>
           </div>
 
           {/* ── 10. Changes ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">10. Changes to these terms</h2>
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">10. changes to these terms</h2>
             <p>
               We may update these terms from time to time. Material changes will be communicated
               via email or an in-app notice. Continued use of MixReflect after changes constitutes
@@ -203,8 +205,8 @@ export default function TermsPage() {
           </div>
 
           {/* ── 11. Governing Law ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">11. Governing law</h2>
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">11. governing law</h2>
             <p>
               These Terms of Service are governed by the laws of Victoria, Australia. Any dispute
               arising out of or in connection with these terms that cannot be resolved informally
@@ -217,17 +219,31 @@ export default function TermsPage() {
           </div>
 
           {/* ── Contact ── */}
-          <div className="border-t-2 border-black pt-6">
-            <h2 className="text-xl font-black mb-3">Contact</h2>
+          <div className="border-t border-white/10 pt-8">
+            <h2 className="text-xl font-extrabold tracking-tight text-white mb-3 lowercase">contact</h2>
             <p>
               For support and policy questions, contact us at{" "}
-              <a href="mailto:support@mixreflect.com" className="underline font-bold">
+              <a href="mailto:support@mixreflect.com" className="font-bold hover:text-white transition-colors" style={{ color: ACCENT }}>
                 support@mixreflect.com
               </a>.
             </p>
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="border-t border-white/10 mt-6">
+        <div className={`${mono.className} max-w-3xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-white/40 lowercase`}>
+          <Link href="/">
+            <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-6" />
+          </Link>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy" className="hover:text-white transition-colors">privacy</Link>
+            <Link href="/support" className="hover:text-white transition-colors">contact</Link>
+          </div>
+          <span>© {new Date().getFullYear()}</span>
+        </div>
+      </footer>
     </div>
   );
 }

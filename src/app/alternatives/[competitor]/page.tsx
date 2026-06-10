@@ -1,13 +1,16 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ArrowRight, Check, X } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { AuthButtons } from "@/components/ui/auth-buttons";
-import { Button } from "@/components/ui/button";
-import { SignupLink } from "@/components/landing/signup-link";
 import { getAlternativePage, alternativePages } from "@/lib/alternatives";
 import { SITE_URL } from "@/lib/site";
+
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
+const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
+const ACCENT = "#6ee7ff";
 
 export function generateStaticParams() {
   return alternativePages.map((p) => ({ competitor: p.slug }));
@@ -69,7 +72,7 @@ export default async function AlternativePage({
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] text-neutral-950" style={{ paddingTop: "56px" }}>
+    <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
@@ -80,88 +83,81 @@ export default async function AlternativePage({
       />
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#faf8f5]/90 backdrop-blur-sm border-b border-neutral-100">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center justify-between h-14">
-            <Link href="/" className="flex items-center gap-2">
-              <Logo />
-            </Link>
-            <AuthButtons theme="light" />
-          </div>
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+          <Link href="/">
+            <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
+          </Link>
+          <AuthButtons theme="dark" />
         </div>
       </header>
 
       {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="max-w-4xl mx-auto px-4 pt-5 pb-2">
-        <ol className="flex items-center gap-2 text-xs text-neutral-400">
+      <nav aria-label="Breadcrumb" className="max-w-6xl mx-auto px-5 pt-6">
+        <ol className={`${mono.className} flex items-center gap-2 text-[12px] text-white/35`}>
           <li>
-            <Link href="/" className="hover:text-neutral-700 transition-colors">
-              Home
+            <Link href="/" className="hover:text-white transition-colors">
+              home
             </Link>
           </li>
           <li aria-hidden="true">/</li>
-          <li className="text-neutral-700 font-medium">{page.competitor} Alternative</li>
+          <li className="text-white/60">{page.competitor} alternative</li>
         </ol>
       </nav>
 
       {/* Hero */}
-      <section className="bg-gradient-to-b from-purple-50 to-[#faf8f5]">
-        <div className="max-w-4xl mx-auto px-4 py-14 sm:py-18 text-center">
-          <p className="text-[10px] font-black uppercase tracking-[0.25em] text-purple-500 mb-4">
-            {page.competitor} Alternative
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-neutral-950 leading-[1.05]">
-            {page.h1}
-          </h1>
-        </div>
+      <section className="relative z-10 max-w-6xl mx-auto px-5 pt-12 pb-16">
+        <p className={`${mono.className} text-[13px] text-white/55 mb-4`}>
+          [ {page.competitor.toLowerCase()} alternative ]
+        </p>
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] leading-[1.02] max-w-3xl">
+          {page.h1}
+        </h1>
       </section>
 
       {/* Verdict / TL;DR */}
-      <section className="py-10 bg-white">
-        <div className="max-w-3xl mx-auto px-4">
-          <div className="bg-[#faf8f5] border-l-4 border-purple-500 rounded-r-xl p-6">
-            <p className="text-xs font-black uppercase tracking-widest text-purple-500 mb-2">
-              The short version
-            </p>
-            <p className="text-neutral-700 leading-relaxed text-lg">{page.verdict}</p>
-          </div>
+      <section className="max-w-6xl mx-auto px-5 pb-16">
+        <div className="border border-white/10 border-l-2 bg-[#0e0e0e] p-7 max-w-3xl" style={{ borderLeftColor: ACCENT }}>
+          <p className={`${mono.className} text-[12px] text-white/40 mb-3`}>[ the short version ]</p>
+          <p className="text-white/75 leading-relaxed text-lg normal-case">{page.verdict}</p>
         </div>
       </section>
 
       {/* What the competitor is */}
-      <section className="py-12 bg-white">
-        <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-2xl font-black text-neutral-950 mb-4">
-            What {page.competitor} is — and what it&apos;s good at
+      <section className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-5 py-16">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-5">
+            what {page.competitor.toLowerCase()} is — and what it&apos;s good at
           </h2>
-          <p className="text-neutral-600 leading-relaxed mb-4">{page.competitorWhat}</p>
-          <p className="text-neutral-600 leading-relaxed">{page.competitorStrength}</p>
+          <div className="max-w-3xl space-y-4">
+            <p className="text-white/60 leading-relaxed normal-case">{page.competitorWhat}</p>
+            <p className="text-white/60 leading-relaxed normal-case">{page.competitorStrength}</p>
+          </div>
         </div>
       </section>
 
       {/* Comparison table */}
-      <section className="py-12 bg-[#faf8f5]">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-black text-neutral-950 mb-8 text-center">
-            MixReflect vs {page.competitor}
+      <section className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-5 py-16">
+          <p className={`${mono.className} text-[13px] text-white/55 mb-2`}>[ side by side ]</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-10">
+            mixreflect vs {page.competitor.toLowerCase()}
           </h2>
-          <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+          <div className="border border-white/10 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-200 bg-neutral-50">
-                  <th className="text-left px-4 py-4 font-black text-neutral-500 text-xs uppercase tracking-wider w-1/4">
-                    &nbsp;
-                  </th>
-                  <th className="text-left px-4 py-4 font-black text-purple-600">MixReflect</th>
-                  <th className="text-left px-4 py-4 font-black text-neutral-700">{page.competitor}</th>
+                <tr className={`${mono.className} border-b border-white/10 bg-[#0e0e0e] text-[12px]`}>
+                  <th className="text-left px-5 py-4 font-medium text-white/35 w-1/4">&nbsp;</th>
+                  <th className="text-left px-5 py-4 font-bold" style={{ color: ACCENT }}>mixreflect</th>
+                  <th className="text-left px-5 py-4 font-medium text-white/60">{page.competitor.toLowerCase()}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-white/10">
                 {page.rows.map((row, i) => (
                   <tr key={i} className="align-top">
-                    <td className="px-4 py-4 font-bold text-neutral-900">{row.feature}</td>
-                    <td className="px-4 py-4 text-neutral-700">{row.mixreflect}</td>
-                    <td className="px-4 py-4 text-neutral-500">{row.competitor}</td>
+                    <td className="px-5 py-4 font-bold text-white/85">{row.feature}</td>
+                    <td className="px-5 py-4 text-white/70 normal-case">{row.mixreflect}</td>
+                    <td className="px-5 py-4 text-white/45 normal-case">{row.competitor}</td>
                   </tr>
                 ))}
               </tbody>
@@ -171,59 +167,70 @@ export default async function AlternativePage({
       </section>
 
       {/* When to use which */}
-      <section className="py-12 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-black text-neutral-950 mb-8 text-center">
-            Which one should you use?
+      <section className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-5 py-16">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-10">
+            which one should you use?
           </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-purple-50 border border-purple-100 rounded-2xl p-6">
-              <h3 className="font-black text-purple-700 mb-4 flex items-center gap-2">
-                <Check className="h-5 w-5" /> Use MixReflect when
+          <div className="grid md:grid-cols-2 gap-px bg-white/10 border border-white/10">
+            <div className="bg-[#0a0a0a] p-7" style={{ boxShadow: `inset 0 2px 0 0 ${ACCENT}` }}>
+              <h3 className={`${mono.className} font-bold text-[13px] mb-5 flex items-center gap-2`} style={{ color: ACCENT }}>
+                <Check className="h-4 w-4" /> use mixreflect when
               </h3>
               <ul className="space-y-3">
                 {page.whenMixreflect.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-neutral-700 text-sm leading-relaxed">
-                    <Check className="h-4 w-4 text-purple-500 flex-shrink-0 mt-0.5" />
+                  <li key={i} className="flex items-start gap-2.5 text-white/70 text-[14px] leading-relaxed normal-case">
+                    <Check className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: ACCENT }} />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-6">
-              <h3 className="font-black text-neutral-700 mb-4 flex items-center gap-2">
-                <X className="h-5 w-5" /> Use {page.competitor} when
+            <div className="bg-[#0a0a0a] p-7">
+              <h3 className={`${mono.className} font-bold text-[13px] text-white/55 mb-5 flex items-center gap-2`}>
+                <X className="h-4 w-4" /> use {page.competitor.toLowerCase()} when
               </h3>
               <ul className="space-y-3">
                 {page.whenCompetitor.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-neutral-600 text-sm leading-relaxed">
-                    <ArrowRight className="h-4 w-4 text-neutral-400 flex-shrink-0 mt-0.5" />
+                  <li key={i} className="flex items-start gap-2.5 text-white/55 text-[14px] leading-relaxed normal-case">
+                    <ArrowRight className="h-4 w-4 text-white/30 flex-shrink-0 mt-0.5" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-          <p className="text-center text-neutral-500 mt-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-white/45 mt-8 max-w-2xl leading-relaxed normal-case">
             They&apos;re not really competitors — they&apos;re sequential steps. Use MixReflect to get the track right, then {page.competitor} to put it in front of the right people.
           </p>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="py-12 bg-[#faf8f5]">
-        <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-black text-neutral-950 mb-8">
-            {page.competitor} alternative — common questions
+      <section className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-5 py-16">
+          <p className={`${mono.className} text-[13px] text-white/55 mb-2`}>[ faq ]</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-10">
+            {page.competitor.toLowerCase()} alternative — common questions
           </h2>
-          <div className="space-y-0 rounded-2xl bg-white shadow-md overflow-hidden divide-y divide-neutral-100">
+          <div className="grid gap-px bg-white/10 border border-white/10 max-w-3xl">
             {page.faq.map((item, i) => (
-              <details key={i} className="p-5 group">
-                <summary className="font-extrabold cursor-pointer text-neutral-950 hover:text-neutral-700 list-none flex items-center justify-between gap-4">
-                  <span>{item.q}</span>
-                  <span className="text-purple-500 text-lg flex-shrink-0 group-open:rotate-45 transition-transform">+</span>
+              <details key={i} className="group bg-[#0a0a0a] open:bg-[#0e0e0e] transition-colors">
+                <summary className="flex items-start justify-between gap-4 cursor-pointer list-none p-6 [&::-webkit-details-marker]:hidden">
+                  <h3 className="text-[15px] font-extrabold tracking-tight leading-snug lowercase">
+                    {item.q}
+                  </h3>
+                  <span
+                    className={`${mono.className} shrink-0 text-[15px] leading-snug group-open:rotate-45 transition-transform`}
+                    style={{ color: ACCENT }}
+                    aria-hidden
+                  >
+                    +
+                  </span>
                 </summary>
-                <p className="mt-3 text-neutral-600 leading-relaxed">{item.a}</p>
+                <p className="px-6 pb-6 text-[13.5px] leading-relaxed text-white/55 normal-case">
+                  {item.a}
+                </p>
               </details>
             ))}
           </div>
@@ -231,79 +238,55 @@ export default async function AlternativePage({
       </section>
 
       {/* Related */}
-      <section className="py-10 bg-white border-t border-neutral-100">
-        <div className="max-w-4xl mx-auto px-4">
-          <p className="text-xs font-black uppercase tracking-widest text-neutral-400 mb-4">
-            Related reading
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/blog/best-music-feedback-platforms-2026"
-              className="text-sm text-purple-600 hover:text-purple-700 font-medium underline underline-offset-2"
-            >
-              Best music feedback platforms in 2026
+      <section className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-5 py-10">
+          <p className={`${mono.className} text-[12px] text-white/30 mb-4`}>[ related reading ]</p>
+          <div className={`${mono.className} flex flex-wrap gap-x-6 gap-y-2.5 text-[13px]`}>
+            <Link href="/blog/best-music-feedback-platforms-2026" className="text-white/55 hover:text-white transition-colors">
+              best music feedback platforms in 2026 →
             </Link>
-            <span className="text-neutral-300">·</span>
-            <Link
-              href="/blog/mixreflect-vs-submithub"
-              className="text-sm text-purple-600 hover:text-purple-700 font-medium underline underline-offset-2"
-            >
-              MixReflect vs SubmitHub: what&apos;s the difference
+            <Link href="/blog/mixreflect-vs-submithub" className="text-white/55 hover:text-white transition-colors">
+              mixreflect vs submithub →
             </Link>
-            <span className="text-neutral-300">·</span>
-            <Link
-              href="/blog/what-playlist-curators-look-for"
-              className="text-sm text-purple-600 hover:text-purple-700 font-medium underline underline-offset-2"
-            >
-              What playlist curators actually look for
+            <Link href="/blog/what-playlist-curators-look-for" className="text-white/55 hover:text-white transition-colors">
+              what playlist curators actually look for →
             </Link>
           </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 bg-purple-600">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">
-            Get your track right before you pitch it
+      <section className="bg-[#6ee7ff] text-black">
+        <div className="max-w-6xl mx-auto px-5 py-20">
+          <p className={`${mono.className} text-[13px] text-black/55 mb-3`}>[ before you pitch ]</p>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-[-0.03em] mb-4 max-w-2xl">
+            get your track right before you pitch it.
           </h2>
-          <p className="text-purple-200 mb-8 max-w-xl mx-auto">
+          <p className="text-black/70 mb-9 max-w-xl leading-relaxed normal-case">
             Paste your track and get an instant AI score plus honest reactions from a room of real listeners. Free to submit — no credit card required.
           </p>
-          <SignupLink>
-            <Button
-              size="lg"
-              className="bg-white text-purple-600 hover:bg-neutral-100 font-black border-2 border-white text-base px-8 py-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-            >
-              Score my track free <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </SignupLink>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 bg-black text-[#6ee7ff] font-extrabold text-base px-8 py-4 hover:bg-[#141414] transition-colors"
+          >
+            score my track free <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 bg-neutral-900 text-neutral-50 border-t border-neutral-800">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
-            <Link href="/">
-              <Logo className="text-white" />
-            </Link>
-            <p className="text-neutral-400">&copy; {new Date().getFullYear()} MixReflect</p>
-            <div className="flex items-center gap-4 text-neutral-300">
-              <Link href="/blog" className="hover:text-white font-medium transition-colors">
-                The Drop
-              </Link>
-              <Link href="/terms" className="hover:text-white font-medium transition-colors">
-                Terms
-              </Link>
-              <Link href="/privacy" className="hover:text-white font-medium transition-colors">
-                Privacy
-              </Link>
-              <Link href="/support" className="hover:text-white font-medium transition-colors">
-                Contact
-              </Link>
-            </div>
+      <footer className="border-t border-white/10">
+        <div className={`${mono.className} max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-white/40`}>
+          <Link href="/">
+            <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-6" />
+          </Link>
+          <div className="flex items-center gap-6">
+            <Link href="/blog" className="hover:text-white transition-colors">the drop</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">terms</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">privacy</Link>
+            <Link href="/support" className="hover:text-white transition-colors">contact</Link>
           </div>
+          <span>© {new Date().getFullYear()}</span>
         </div>
       </footer>
     </div>
