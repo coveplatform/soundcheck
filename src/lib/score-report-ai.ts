@@ -755,6 +755,17 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
       ...(trackTitle ? { trackTitle } : {}),
       ...(meta?.artworkUrl ? { artworkUrl: meta.artworkUrl } : {}),
       ...(features?.fingerprint ? { fingerprint: features.fingerprint as object } : {}),
+      // The 3-band waveform the worker measured — drawn on the unlocked report.
+      // Stored with the analysed/source durations so the UI can label the span.
+      ...(features?.waveform
+        ? {
+            waveform: {
+              ...features.waveform,
+              durationSec: features.durationSec ?? null,
+              sourceDurationSec: features.sourceDurationSec ?? null,
+            } as object,
+          }
+        : {}),
       status: "IN_REVIEW",
       score: generated.score,
       percentile: generated.percentile,
@@ -862,10 +873,20 @@ export async function regenerateDeepReport(reportId: string): Promise<void> {
   );
 
   // Prose-only update: score / percentile / verdict / category numbers are NOT
-  // touched — they stay exactly as the instant read set them.
+  // touched — they stay exactly as the instant read set them. The waveform IS
+  // refreshed (the deep pass may have measured it when the instant one missed).
   await prisma.trackScoreReport.update({
     where: { id: reportId },
     data: {
+      ...(features?.waveform
+        ? {
+            waveform: {
+              ...features.waveform,
+              durationSec: features.durationSec ?? null,
+              sourceDurationSec: features.sourceDurationSec ?? null,
+            } as object,
+          }
+        : {}),
       aiSummary: generated.aiSummary,
       reviewerQuotes: {
         ...quotes,

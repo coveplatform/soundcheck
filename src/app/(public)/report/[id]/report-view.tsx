@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ScoreRing } from "@/components/score/score-ring";
+import { ReportWaveform } from "@/components/score/report-waveform";
 import { Logo } from "@/components/ui/logo";
 import { ArrowRight, Share2, Lock, Hourglass, User, Loader2 } from "lucide-react";
 
@@ -75,6 +76,8 @@ export type ReportViewModel = {
   invalid?: { reason: string; durationSec?: number } | null;
   /** False when the read wasn't grounded in measured audio (title/metadata only). */
   grounded?: boolean;
+  /** The measured 3-band waveform (worker analysis) — drawn when unlocked. */
+  waveform?: import("@/components/score/report-waveform").ReportWaveformData | null;
 };
 
 /** Honest, score-derived standing — no fabricated population ranking. */
@@ -552,6 +555,21 @@ export function ReportView({ data }: { data: ReportViewModel }) {
                 </div>
               ))}
             </div>
+          </section>
+        )}
+
+        {/* ── THE MEASURED WAVEFORM — paid feature, unlocked reports only ── */}
+        {!locked && data.waveform && (
+          <section>
+            <Kicker>the read · measured from your audio</Kicker>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
+              we listened to it.
+            </h2>
+            <p className={`${mono.className} text-[13px] text-white/55 mb-7 normal-case`}>
+              Your track&apos;s real frequency-split waveform — bass body, mids, highs — straight
+              from the analysis the read is grounded in.
+            </p>
+            <ReportWaveform data={data.waveform} />
           </section>
         )}
 

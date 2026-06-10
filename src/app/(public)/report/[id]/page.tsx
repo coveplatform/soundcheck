@@ -284,6 +284,8 @@ export default async function ReportPage({
       : null,
     // Absent (old reports) → treat as grounded; only an explicit false flags it.
     grounded: quotes.grounded !== false,
+    // The measured 3-band waveform (worker `_report_waveform`) — unlocked only.
+    waveform: (report.waveform as ReportViewModel["waveform"]) ?? null,
   };
 
   return <ReportView data={data} />;
