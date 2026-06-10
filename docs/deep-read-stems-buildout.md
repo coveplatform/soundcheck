@@ -38,11 +38,13 @@ The user has **added `REPLICATE_API_TOKEN` to the Render worker and redeployed.*
 1. **Get the prod worker URL** (the Render service URL — not in the repo; it's a Vercel/Render env).
    Confirm `GET <worker>/health` → `"stemBackend": "replicate"`.
 2. **Two unknowns to confirm on the first live run** (couldn't verify without the token):
-   - **Model version SHA** — `stems.py:REPLICATE_DEMUCS_MODEL` is `cjwbw/demucs:<sha>`; the `<sha>`
-     is a placeholder. Verify the current version on the Replicate model page; override via
-     `REPLICATE_DEMUCS_MODEL` env if different.
+   - **Model version SHA** — ✅ VERIFIED 2026-06-10: the pinned `25a17310…d953` IS the current
+     latest version on the Replicate `cjwbw/demucs` page (next-newest is `abf8fe28…`, older). No
+     `REPLICATE_DEMUCS_MODEL` override needed.
    - **Output shape** — `_separate_replicate()` parses demucs output as `{vocals,drums,bass,other}`
      URLs with fallbacks + logging. Check worker logs on the first run; ~2-line tweak if the shape differs.
+     Code-reviewed 2026-06-10: parser handles dict keys (+ `.mp3`/`.wav` spellings), `FileOutput.url`,
+     and plain-string URLs, with logged fallback on mismatch — low risk.
 3. **Regenerate the two test tracks** routed through the prod worker (so stems come from Replicate).
 
 ### Test tracks (prod DB, subscriber riku.korkiamaki@gmail.com = unlimited)

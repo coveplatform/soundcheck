@@ -633,8 +633,13 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
   // In parallel: measure the audio (DSP grounding) and look up the track's
   // title/artist via oEmbed (so the model's knowledge of known music can inform
   // the score instead of reading a "(untitled)" blob blind). Both degrade to null.
+  // `deep: true` runs the FULL DSP including stems even for the free instant
+  // read (~$0.02/track via Replicate) — the teaser's waveform, markers and
+  // free insight need stem-grade structure to land, and "we listened to the
+  // whole thing" has to be true. The paid gate is the deep PROSE (gpt-4.1 in
+  // regenerateDeepReport) + the human room, not the analysis.
   const [features, meta] = await Promise.all([
-    acquireAudioFeatures(report.trackUrl).catch(() => null),
+    acquireAudioFeatures(report.trackUrl, { deep: true }).catch(() => null),
     fetchTrackMeta(report.trackUrl).catch(() => null),
   ]);
 

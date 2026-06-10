@@ -19,6 +19,9 @@
 export type AudioFeatures = {
   source: "spotify" | "worker";
   durationSec?: number;
+  /** Set when the worker's analysis window truncated a longer track: the FULL
+   * source length (durationSec is then just the analysed span). */
+  sourceDurationSec?: number;
   tempo?: number; // BPM
   key?: string; // e.g. "F# minor"
   /** Integrated loudness, LUFS (e.g. -9.2). */
@@ -45,7 +48,7 @@ export type AudioFeatures = {
   vocalPresence?: number;
   /** True when the deep (stem-separation) pass ran for this analysis. */
   stemsUsed?: boolean;
-  /** Per-stem balance from demucs/Replicate (deep reads only). */
+  /** Per-stem balance from demucs/Replicate (present when the stem pass ran). */
   stemMix?: {
     drums?: number;
     bass?: number;
@@ -55,6 +58,9 @@ export type AudioFeatures = {
   };
   /** Link-independent acoustic identity — for re-upload / version detection. */
   fingerprint?: AcousticFingerprint;
+  /** Compact 3-band waveform for the report page (worker `_report_waveform`):
+   * per-column LOW/MID/HIGH peaks + RMS body, base64 uint8, ~1200 columns. */
+  waveform?: { n: number; lo: string; mid: string; hi: string; amp: string };
   /** Confidence of the detected beatgrid ("high" | "low"). */
   gridConfidence?: string;
   /** Anything extra the worker returns. */
@@ -209,8 +215,9 @@ export async function acquireAudioFeatures(
     const sf = await spotifyFeatures(url);
     if (sf) return sf;
   }
-  // SoundCloud / YouTube / Bandcamp / direct → extraction worker. `deep` runs the
-  // stem-separation pass (paid reads only).
+  // SoundCloud / YouTube / Bandcamp / direct → extraction worker. `deep` runs
+  // the stem-separation pass — score reports request it for ALL reads now
+  // (instant included); the paid gate is the deep prose, not the analysis.
   return workerFeatures(url, opts.deep ?? false);
 }
 
@@ -236,6 +243,14 @@ function mmss(sec: number): string {
  */
 export function describeFeatures(f: AudioFeatures): string {
   const lines: string[] = [];
+  // Truncated read: the worker only analysed the first N seconds of a longer
+  // track. Say so explicitly — the model must never describe an ending (or a
+  // total runtime) it didn't hear.
+  if (f.sourceDurationSec && f.durationSec && f.sourceDurationSec > f.durationSec + 5) {
+    lines.push(
+      `IMPORTANT — PARTIAL ANALYSIS: only the first ${mmss(f.durationSec)} of a ${mmss(f.sourceDurationSec)} track was analysed. Everything below describes that opening span ONLY. Do NOT describe the ending, the back half, or the total runtime; do NOT treat the end of the analysed span as the end of the song.`
+    );
+  }
   if (f.tempo != null) lines.push(`tempo: ${Math.round(f.tempo)} BPM (${band(Math.min(1, f.tempo / 180), ["slow", "mid-tempo", "upbeat", "fast/driving"])})`);
   if (f.key) lines.push(`key: ${f.key}`);
   if (f.dynamicRange != null)
@@ -251,21 +266,27 @@ export function describeFeatures(f: AudioFeatures): string {
     const longIntro = f.introLiftSec > 20;
     lines.push(`intro: ~${Math.round(f.introLiftSec)}s before the first real lift${longIntro ? " (on the long side — listeners may drift before the hook)" : ""}`);
   }
+  // The separated "vocal" stem frequently captures synth leads, pads and FX on
+  // electronic/instrumental tracks (a known demucs failure mode) — so we never
+  // let the model assert SUNG vocals from this signal alone. It must corroborate
+  // with the genre/notes, and otherwise call it "the lead".
+  const vocalCaveat =
+    " (CAUTION: this comes from stem separation, which often mistakes synth leads/pads for vocals on electronic or instrumental tracks — only describe it as sung vocals if the genre/artist notes support that; otherwise call it the lead/top-line element, and never invent lyrics or a singer)";
   if (f.vocalPresence != null)
-    lines.push(`vocals: ${band(f.vocalPresence, ["barely present / likely instrumental", "sitting well back in the mix", "present and clear", "upfront"])}`);
+    lines.push(`vocal-stem presence: ${band(f.vocalPresence, ["barely present / likely instrumental", "sitting well back in the mix", "present and clear", "upfront"])}${vocalCaveat}`);
   // Stem separation (deep reads): how the parts actually sit against each other.
   if (f.stemMix) {
     const m = f.stemMix;
     const vvi = m.vocalVsInstruments;
     const vocalSit =
       vvi == null ? null
-      : vvi >= 1.15 ? "vocal sits clearly on top of the instruments"
-      : vvi <= 0.85 ? "vocal is tucked under the instruments"
-      : "vocal and instruments sit at a similar level";
+      : vvi >= 1.15 ? "the vocal/lead stem sits clearly on top of the instruments"
+      : vvi <= 0.85 ? "the vocal/lead stem is tucked under the instruments"
+      : "the vocal/lead stem and instruments sit at a similar level";
     const parts: string[] = [];
     if (m.drums != null) parts.push(`drums ${band(Math.min(1, m.drums), ["soft", "moderate", "strong", "dominant"])}`);
     if (m.bass != null) parts.push(`bass ${band(Math.min(1, m.bass), ["light", "moderate", "strong", "heavy"])}`);
-    lines.push(`stems (separated): ${parts.join(", ")}${vocalSit ? `; ${vocalSit}` : ""}`);
+    lines.push(`stems (separated): ${parts.join(", ")}${vocalSit ? `; ${vocalSit}` : ""}${f.vocalPresence == null && vocalSit ? vocalCaveat : ""}`);
   }
   if (f.sections?.length) {
     lines.push(
