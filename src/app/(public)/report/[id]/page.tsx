@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getReportHumanReviews, getScoreRoomQuota } from "@/lib/score-review";
 import { ReportView, type ReportViewModel, type Verdict } from "./report-view";
+// Real measured waveform for the demo (worker `_report_waveform` output,
+// borrowed from the demo-free prototype's sample track).
+import demoWaveRaw from "../demo-free/cutandrun-wave.json";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +34,21 @@ function asVerdict(v: string | null | undefined, score: number): Verdict {
 }
 
 // ── Demo sample (shown unlocked at /report/demo) ────────────────────
+
+// The prototype's JSON stores float columns; the report renderer takes
+// base64 uint8 — convert once at module load.
+const waveB64 = (cols: number[]) =>
+  Buffer.from(
+    cols.map((v) => Math.max(0, Math.min(255, Math.round(v * 255))))
+  ).toString("base64");
+
+const DEMO_WAVE: ReportViewModel["waveform"] = {
+  n: demoWaveRaw.lo.length,
+  lo: waveB64(demoWaveRaw.lo),
+  mid: waveB64(demoWaveRaw.mid),
+  hi: waveB64(demoWaveRaw.hi),
+  durationSec: 359, // the source track runs 5:59
+};
 
 const DEMO: ReportViewModel = {
   slug: "demo",
@@ -115,6 +133,7 @@ const DEMO: ReportViewModel = {
   ],
   humanReviewsIn: 3,
   humanReviewsTotal: 5,
+  waveform: DEMO_WAVE,
   humanReviews: [
     {
       rating: 4,
@@ -168,6 +187,23 @@ export default async function ReportPage({
 
   if (id === "demo") {
     return <ReportView data={DEMO} />;
+  }
+
+  // The same sample track in its pre-purchase state: sealed prose, the
+  // room-is-waiting pitch (with sample reaction), and the unlock gate.
+  if (id === "demo-locked") {
+    return (
+      <ReportView
+        data={{
+          ...DEMO,
+          slug: "demo-locked",
+          unlocked: false,
+          humanReviews: [],
+          humanReviewsIn: 0,
+          humanReviewsTotal: 0,
+        }}
+      />
+    );
   }
 
   const report = await prisma.trackScoreReport.findUnique({
