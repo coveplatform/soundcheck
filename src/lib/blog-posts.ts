@@ -20,6 +20,153 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "how-to-get-on-discover-weekly",
+    title: "How to Get on Spotify's Discover Weekly",
+    coverImage: "/blog/blog12.jpg",
+    excerpt:
+      "You can't pitch your way onto Discover Weekly — it's fully algorithmic and built fresh for every listener. You get on it by generating the signals the algorithm trusts: saves, repeat plays, full listens, and adds to playlists alongside similar artists. Here's how the playlist actually works and how to earn your way into it.",
+    category: "INDUSTRY",
+    date: "June 11, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "You can't pitch your way onto Discover Weekly. It's a fully algorithmic playlist, generated privately for each listener every Monday, so there's no editor to email and no submission form to fill out. You get on it by producing the listening signals the algorithm trusts: saves, repeat plays, full listens without skips, and adds to user-created playlists alongside artists who share your audience. The practical route in is to earn editorial and playlist placement first, then let the resulting listening data teach the algorithm to recommend you to people with similar taste.",
+      },
+      {
+        type: "paragraph",
+        text: "Almost everything written about Discover Weekly treats it like a door you can knock on. It isn't. There's no Discover Weekly pitch, no curator, no playlist owner with a public inbox. The playlist is a downstream effect of how real listeners behave around your track. That's frustrating because it means you can't shortcut it, but it's also good news: the things that get you onto Discover Weekly are the same things that make a release succeed everywhere else. Get those right and the algorithm follows.",
+      },
+      {
+        type: "h2",
+        text: "What is Discover Weekly, and how does it actually work?",
+      },
+      {
+        type: "paragraph",
+        text: "Discover Weekly is a personalized playlist of around 30 songs that Spotify builds for each user every Monday. The whole point is novelty: it surfaces tracks you haven't heard but are statistically likely to enjoy, based on how your listening compares to millions of other people's. No two listeners get the same one. It is not editorially curated, which is exactly why there's nobody to pitch.",
+      },
+      {
+        type: "paragraph",
+        text: "Underneath, it runs largely on collaborative filtering. The algorithm groups listeners with overlapping taste, then looks at what those neighbors are playing and saving that you haven't reached yet. If a cluster of people who love an artist you also love starts saving and replaying your track, the system reads that as a signal that everyone else in that cluster will probably like it too. Your song gets slotted into their Discover Weekly. So the question isn't \"how do I get on the playlist.\" It's \"how do I get the right listeners to behave like my track belongs next to artists they already trust.\"",
+      },
+      {
+        type: "h2",
+        text: "Can you pitch your way onto Discover Weekly?",
+      },
+      {
+        type: "paragraph",
+        text: "No. You cannot submit, pitch, or pay your way onto Discover Weekly directly, and anyone selling you a Discover Weekly placement is selling you nothing. What you can pitch is your unreleased track to Spotify's editorial team through Spotify for Artists, which is a separate system. Editorial placement matters here because it feeds the algorithm data. The relationship is indirect but real: editorial gets you in front of listeners, listener behavior trains the algorithm, and the algorithm is what runs Discover Weekly.",
+      },
+      {
+        type: "quote",
+        text: "There is no Discover Weekly inbox. The playlist isn't something you get into, it's something your listeners' behavior earns for you. Stop looking for the door and start generating the signal.",
+      },
+      {
+        type: "h2",
+        text: "What signals actually get you onto Discover Weekly?",
+      },
+      {
+        type: "paragraph",
+        text: "The algorithm watches how people interact with your track, and it weights active, intentional actions far more heavily than passive ones. A skip in the first ten seconds tells it your song doesn't belong. A save tells it the opposite. These are the signals that move the needle:",
+      },
+      {
+        type: "list",
+        items: [
+          "Saves and library adds — the single strongest signal. A listener actively choosing to keep your track tells the algorithm it's worth recommending to people like them.",
+          "Completion rate — finishing the song, or at least getting past the 30-second mark and not skipping, signals the track held attention. High skip rates are the fastest way to get suppressed.",
+          "Repeat listens — someone coming back to play it again is a strong sign of genuine resonance, not a one-time accident.",
+          "Adds to personal and user-made playlists — when listeners file your track into their own playlists next to established artists, you inherit the audience context of those artists.",
+          "Listener overlap with similar artists — being played and saved by the same people who stream artists in your lane tells the algorithm where you fit in the taste graph.",
+          "Follows from new listeners — people following you off the back of a single track signals the release converted, not just played.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Notice what's missing: raw stream count from bots or bought plays. Spotify's systems are built to discount artificial activity, and inflated numbers with terrible save and completion rates actively hurt you. The algorithm trusts behavior, not volume.",
+      },
+      {
+        type: "h2",
+        text: "How do you trigger the algorithm in the first place?",
+      },
+      {
+        type: "paragraph",
+        text: "Discover Weekly needs data before it can act, and a brand-new track with no history gives it nothing to work with. So your job in the first days of a release is to manufacture a burst of high-quality listening that the algorithm can learn from. That early data is what tips you into the algorithmic playlists, including Discover Weekly and its sibling, Release Radar. Here's the sequence that actually does it:",
+      },
+      {
+        type: "list",
+        items: [
+          "Pitch the unreleased track through Spotify for Artists at least a week before release — ideally three to four weeks. Even if you don't land an editorial slot, pitching makes your track eligible for Release Radar and signals the platform a release is coming.",
+          "Drive your own audience to it on day one — saves, full listens, and follows from real fans front-load the exact signals the algorithm rewards.",
+          "Get onto user-curated and independent playlists where listeners genuinely engage, not low-quality streaming-farm playlists that wreck your completion rate.",
+          "Encourage saves explicitly, not just streams — tell people to save the track, because a save is worth far more to the algorithm than a passive play.",
+          "Keep the release alive past week one with consistent promotion, so the engagement curve doesn't collapse the moment the launch buzz fades.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Why does the first week decide almost everything?",
+      },
+      {
+        type: "paragraph",
+        text: "The algorithm forms its read on a track early, and the first week of listening data carries outsized weight. A release that opens with strong saves and completion gets fed to more listeners, which generates more saves, which is the loop that lands you on Discover Weekly. A release that opens cold — low saves, high skips, people bailing in the first fifteen seconds — gets quietly throttled and rarely recovers, no matter how good the song actually is. The window is short and it doesn't reopen.",
+      },
+      {
+        type: "paragraph",
+        text: "Which is why the most overlooked Discover Weekly strategy has nothing to do with Spotify. It's making sure the track is genuinely ready before it goes live, because the first wave of listeners is voting with their skip button and you only get one shot at that vote. By the time you finish a track you've heard it hundreds of times and can't hear it honestly anymore. The buried vocal, the intro that drags, the chorus that doesn't land — those are exactly the things that cause early skips, and exactly the things you've gone deaf to. This is where structured outside feedback pays for itself. On a platform like MixReflect you get reactions from other artists in your genre hearing the track for the first time, in a format that forces them to name specific weaknesses instead of being polite. When several independent listeners flag the same drop in energy or the same weak intro, that's the skip you're about to get at scale, caught while you can still fix it. Fresh ears before release are the cheapest way to protect the save and completion rates that the algorithm is about to judge you on.",
+      },
+      {
+        type: "quote",
+        text: "Discover Weekly is decided by your skip rate, and your skip rate is decided before you upload. A track that loses listeners in the first fifteen seconds was losing them at the mix stage. Fix it there.",
+      },
+      {
+        type: "h2",
+        text: "Discover Weekly, Release Radar, and editorial playlists — what's the difference?",
+      },
+      {
+        type: "paragraph",
+        text: "People lump these together, but they run on different logic. Discover Weekly is algorithmic and recommends music you haven't heard from artists you don't follow, refreshed every Monday. Release Radar is also algorithmic but covers new releases from artists you already follow, which is why building a follower base directly feeds it. Editorial playlists — New Music Friday, Fresh Finds, genre flagships — are curated by Spotify's human editors and are the one place you can actually pitch, through Spotify for Artists. The smart play is to treat editorial as the on-ramp: a curated placement injects the listening data that pushes you into the algorithmic playlists you can't pitch.",
+      },
+      {
+        type: "h2",
+        text: "How long does it take to get on Discover Weekly?",
+      },
+      {
+        type: "paragraph",
+        text: "There's no fixed timeline, because it depends entirely on engagement, not time. A track with a strong save and completion rate can surface in listeners' Discover Weekly within a few weeks of release once the algorithm has enough data. A track with weak engagement may never appear, regardless of how long it's been out. Consistency helps: artists who release regularly and hold decent engagement give the algorithm a richer profile to work with, which compounds across releases rather than resetting each time.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How do you get your song on Spotify's Discover Weekly?",
+            a: "You can't submit to Discover Weekly directly because it's a fully algorithmic, personalized playlist with no human curator. You get on it by generating strong listening signals: saves, repeat plays, full listens without skips, and adds to user playlists alongside similar artists. The practical method is to pitch your unreleased track for editorial consideration through Spotify for Artists, drive real saves and follows in the first week, and get onto genuine user-curated playlists so the algorithm has high-quality engagement data to learn from.",
+          },
+          {
+            q: "Can you pay to get on Discover Weekly?",
+            a: "No. Discover Weekly placement cannot be bought, and any service claiming to sell it is a scam. The playlist is generated automatically from real listener behavior. Worse, buying bot streams actively hurts you, because fake plays come with terrible save and completion rates that signal to the algorithm your track doesn't resonate. The only legitimate path is real engagement from real listeners.",
+          },
+          {
+            q: "What is the difference between Discover Weekly and Release Radar?",
+            a: "Both are algorithmic playlists refreshed weekly, but they serve different purposes. Discover Weekly recommends music you haven't heard from artists you don't follow, based on listeners with taste similar to yours. Release Radar collects new releases from artists you already follow. This is why growing your follower count directly improves your Release Radar reach, while Discover Weekly depends more on how new listeners engage with your track.",
+          },
+          {
+            q: "How long does it take to get on Discover Weekly?",
+            a: "There's no set timeline. A track with strong saves and completion rates can appear in listeners' Discover Weekly within a few weeks of release once the algorithm has gathered enough engagement data. A track with weak engagement may never surface, no matter how long it's been out. It's driven by listener behavior, not by how much time has passed.",
+          },
+          {
+            q: "Does pitching to Spotify editorial help with Discover Weekly?",
+            a: "Indirectly, yes. You cannot pitch Discover Weekly itself, but pitching your unreleased track through Spotify for Artists can land you an editorial placement, and that exposure generates the saves, completion, and follows that train the algorithm. Editorial works as an on-ramp: it injects the listening data that pushes you into algorithmic playlists like Discover Weekly and Release Radar, which you can't access any other way.",
+          },
+          {
+            q: "Why isn't my music getting on Discover Weekly?",
+            a: "Usually because the engagement signals aren't there. If your track has a high skip rate, low save rate, or weak completion, the algorithm reads it as something listeners don't want and stops recommending it. This often traces back to the track itself: a slow intro or buried vocal causes early skips that throttle the release. Getting honest outside feedback before you release, so the first wave of listeners doesn't bail in the first fifteen seconds, is one of the most effective ways to protect the signals Discover Weekly depends on.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-to-mix-music-at-home",
     title: "How to Mix Music at Home: A Beginner's Guide",
     coverImage: "/blog/blog11.jpg",

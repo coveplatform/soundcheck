@@ -4,7 +4,7 @@ The weekly blog agent reads this file, picks the next PENDING item, writes the p
 The current highest cover image is tracked here — agent increments it after each post.
 
 ## Current image counter
-Last used: blog11 → next post uses blog12
+Last used: blog12 → next post uses blog13
 Cover images blog12.jpg–blog20.jpg are pre-uploaded in public/blog/ and ready to use.
 
 ## Blog post queue
@@ -23,7 +23,7 @@ Cover images blog12.jpg–blog20.jpg are pre-uploaded in public/blog/ and ready 
 | DONE | 2026-05-30 | MixReflect vs SubmitHub: What's the Difference | mixreflect vs submithub | |
 | DONE | 2026-06-06 | How to Release Music Independently in 2026 | how to release music independently | |
 | DONE | 2026-06-07 | How to Mix Music at Home: A Beginner's Guide | how to mix music at home | blog11.jpg |
-| PENDING | | How to Get on Spotify's Discover Weekly | how to get on discover weekly | High intent, specific — cover editorial pitch + save rate + listener behavior |
+| DONE | 2026-06-11 | How to Get on Spotify's Discover Weekly | how to get on discover weekly | blog12.jpg |
 | PENDING | | Music Release Checklist: What to Do Before You Drop | music release checklist | AEO gold — format as actual checklist, AI extracts this constantly |
 | PENDING | | How to Promote Your Music on Spotify (Without a Label) | how to promote music on spotify | High volume — playlists, editorial, social, pre-save |
 | PENDING | | How to Get Music Reviews Online (Honest, Useful Ones) | how to get music reviews online | Direct MixReflect keyword — compare options honestly |
