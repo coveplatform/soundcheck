@@ -11,22 +11,30 @@ export type TrackMeta = {
   artworkUrl: string | null;
 };
 
-export async function fetchTrackMeta(url: string): Promise<TrackMeta | null> {
+/** The oEmbed endpoint for a URL, or null when the host has none. Exported as
+ * a capability check: on these hosts a null oEmbed result means the track
+ * itself doesn't resolve (deleted/private/wrong link), not "host unsupported". */
+export function oembedUrlFor(url: string): string | null {
   let hostname: string;
   try {
     hostname = new URL(url).hostname.toLowerCase();
   } catch {
     return null;
   }
-
-  let oembedUrl: string | null = null;
   if (hostname.includes("soundcloud.com")) {
-    oembedUrl = `https://soundcloud.com/oembed?url=${encodeURIComponent(url)}&format=json`;
-  } else if (hostname.includes("bandcamp.com")) {
-    oembedUrl = `https://bandcamp.com/oembed?url=${encodeURIComponent(url)}&format=json`;
-  } else if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) {
-    oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+    return `https://soundcloud.com/oembed?url=${encodeURIComponent(url)}&format=json`;
   }
+  if (hostname.includes("bandcamp.com")) {
+    return `https://bandcamp.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+  }
+  if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) {
+    return `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+  }
+  return null;
+}
+
+export async function fetchTrackMeta(url: string): Promise<TrackMeta | null> {
+  const oembedUrl = oembedUrlFor(url);
   if (!oembedUrl) return null;
 
   try {

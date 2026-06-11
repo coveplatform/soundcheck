@@ -6,7 +6,7 @@ import {
   type AcousticFingerprint,
 } from "@/lib/audio-analysis";
 import { gradeTrack, type GradeResult } from "@/lib/score-engine";
-import { fetchTrackMeta } from "@/lib/track-metadata";
+import { fetchTrackMeta, oembedUrlFor } from "@/lib/track-metadata";
 
 /**
  * Score-report generation.
@@ -778,13 +778,15 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
     }
   });
 
-  const [acquired, meta] = await Promise.all([
+  const [acquired, metaFirst] = await Promise.all([
     // deep:false — dd07779 documented the shallow intent but flipped the flag
     // on regenerateDeepReport instead; this call kept stems-on-instant, putting
     // a 30-90s (cold start: minutes) Replicate wait inside EVERY live read.
     acquireAudioFeatures(report.trackUrl, { deep: false }).catch(() => null),
     metaPromise,
   ]);
+  // Reassigned by the dead-link guard below if its oEmbed retry succeeds.
+  let meta = metaFirst;
 
   // Analysis milestone for the pending page's progress steps.
   try {
@@ -865,6 +867,48 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
       },
     });
     return;
+  }
+
+  // Guard: dead link. The worker couldn't pull any audio AND oEmbed couldn't
+  // resolve the track — on oEmbed-capable hosts (SoundCloud/Bandcamp/YouTube)
+  // that combination means the link is deleted, private, or wrong, not that a
+  // service flaked. The ungrounded fallback exists for "track exists but the
+  // download was blocked"; scoring a track NOBODY can fetch would fabricate a
+  // confident read of audio nobody heard (observed: ctwav/meridian-v4, 404'd
+  // on both paths, shipped a 63 with notes about buried vocals). oEmbed can
+  // still flake transiently, so confirm with one retry before declaring it
+  // dead; a successful retry rescues the meta and falls through to the normal
+  // (ungrounded) read. Spotify/direct links have no oEmbed signal and keep
+  // today's fallback.
+  if (features == null && meta == null && oembedUrlFor(report.trackUrl)) {
+    const retried = await fetchTrackMeta(report.trackUrl).catch(() => null);
+    if (retried) {
+      meta = retried;
+    } else {
+      await prisma.trackScoreReport.update({
+        where: { id: reportId },
+        data: {
+          status: "IN_REVIEW",
+          score: 0,
+          percentile: 0,
+          verdict: "NOT_READY",
+          aiSummary:
+            "We couldn't reach this track — the link looks deleted, private, or wrong, so there's nothing to listen to. Check it plays in a private browser window, then submit it again for a real read.",
+          reviewerQuotes: {
+            invalid: { reason: "unavailable" },
+            grounded: false,
+            headline: "",
+            reactions: [],
+          },
+          priorityFixes: [],
+          // Never enters the reviewer pool: the room can't listen to a dead
+          // link either, even if a payment somehow lands on this report.
+          humanRoomSkipped: true,
+          completedAt: new Date(),
+        },
+      });
+      return;
+    }
   }
 
   // Re-upload memory: if this artist has read this same track before, keep the

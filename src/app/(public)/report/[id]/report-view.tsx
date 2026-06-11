@@ -306,10 +306,12 @@ export function ReportView({ data }: { data: ReportViewModel }) {
     );
   }
 
-  // Not scoreable as one track — too short (a clip) or too long (a set/mix/
-  // podcast). Don't show a fabricated score; say which and what to do.
+  // Not scoreable — too short (a clip), too long (a set/mix/podcast), or the
+  // link itself is dead (deleted/private/wrong → nothing to listen to). Don't
+  // show a fabricated score; say which and what to do.
   if (data.invalid) {
     const tooLong = data.invalid.reason === "too_long";
+    const unavailable = data.invalid.reason === "unavailable";
     const mins =
       tooLong && data.invalid.durationSec != null
         ? Math.round(data.invalid.durationSec / 60)
@@ -319,20 +321,25 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         <div className="max-w-md w-full border border-white/12 bg-[#101010] p-8 text-center">
           <div className="mx-auto w-12 h-12 flex items-center justify-center text-2xl mb-5" style={{ background: ACCENT, color: "#000" }}>!</div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
-            {tooLong ? "that's more than one track" : "that's not a full track"}
+            {unavailable
+              ? "we couldn't reach that track"
+              : tooLong
+                ? "that's more than one track"
+                : "that's not a full track"}
           </h1>
           <p className="text-white/65 normal-case leading-relaxed mb-7">
-            {tooLong
-              ? `${mins ? `This runs about ${mins} minutes — ` : "This is "}longer than a single song, so one score wouldn't be honest. `
-              : data.invalid.durationSec != null
-                ? `We measured only ${data.invalid.durationSec}s of audio — too short to score. `
-                : "This clip is too short to score as a track. "}
-            {tooLong
-              ? "Submit one track (under 13 minutes) and we'll give it a real read."
-              : "Submit the complete song and we'll give you a real read."}
+            {unavailable
+              ? "The link looks deleted, private, or wrong — we couldn't pull any audio from it. Check the track plays in a private browser window, then submit it again and we'll give it a real read."
+              : tooLong
+                ? `${mins ? `This runs about ${mins} minutes — ` : "This is "}longer than a single song, so one score wouldn't be honest. Submit one track (under 13 minutes) and we'll give it a real read.`
+                : `${
+                    data.invalid.durationSec != null
+                      ? `We measured only ${data.invalid.durationSec}s of audio — too short to score. `
+                      : "This clip is too short to score as a track. "
+                  }Submit the complete song and we'll give you a real read.`}
           </p>
           <Link href="/" className="inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] px-6 py-3.5 hover:bg-white transition-colors">
-            {tooLong ? "score one track →" : "score a full track →"}
+            {unavailable ? "submit a working link →" : tooLong ? "score one track →" : "score a full track →"}
           </Link>
         </div>
       </div>
