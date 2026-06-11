@@ -181,7 +181,8 @@ async function spotifyFeatures(url: string): Promise<AudioFeatures | null> {
 
 async function workerFeatures(
   url: string,
-  deep = false
+  deep = false,
+  timeoutMs?: number
 ): Promise<AudioFeatures | TooLongResult | null> {
   const workerUrl = process.env.AUDIO_WORKER_URL;
   if (!workerUrl) {
@@ -196,7 +197,11 @@ async function workerFeatures(
     // bounded Replicate stem window (REPLICATE_TIMEOUT_SECS=150 on the worker).
     // The old 180s deep ceiling sat BELOW a routine successful deep read
     // (196.5s observed) — we paid for analyses and then aborted them.
-    const timeout = setTimeout(() => controller.abort(), deep ? 240_000 : 150_000);
+    // `timeoutMs` overrides for callers on a tighter budget (the burst retry).
+    const timeout = setTimeout(
+      () => controller.abort(),
+      timeoutMs ?? (deep ? 240_000 : 150_000)
+    );
     const res = await fetch(`${workerUrl.replace(/\/$/, "")}/analyze`, {
       method: "POST",
       headers: {
@@ -249,7 +254,7 @@ async function workerFeatures(
  */
 export async function acquireAudioFeatures(
   url: string,
-  opts: { deep?: boolean } = {}
+  opts: { deep?: boolean; timeoutMs?: number } = {}
 ): Promise<AudioFeatures | TooLongResult | null> {
   if (detectSpotify(url)) {
     const sf = await spotifyFeatures(url);
@@ -258,7 +263,7 @@ export async function acquireAudioFeatures(
   // SoundCloud / YouTube / Bandcamp / direct → extraction worker. `deep` runs
   // the stem-separation pass — score reports request it for ALL reads now
   // (instant included); the paid gate is the deep prose, not the analysis.
-  const feat = await workerFeatures(url, opts.deep ?? false);
+  const feat = await workerFeatures(url, opts.deep ?? false, opts.timeoutMs);
   if (feat || !opts.deep) return feat;
   // Stems ride Replicate, and a cold start there can blow the whole budget.
   // Stems are an upgrade, not a dependency — retry without them so the read
@@ -267,7 +272,7 @@ export async function acquireAudioFeatures(
   // pass died because the worker itself crashed (e.g. OOM), an instant retry
   // just hits the corpse — give the box a moment to come back.
   await new Promise((r) => setTimeout(r, 8000));
-  return workerFeatures(url, false);
+  return workerFeatures(url, false, opts.timeoutMs);
 }
 
 // Turn a 0–1 signal into a plain-language band so the model describes the feel

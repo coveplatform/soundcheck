@@ -187,6 +187,10 @@ Return STRICT JSON:
 
 // ── OpenAI plumbing ──────────────────────────────────────────────────
 
+// A hung connection here would otherwise pin the serverless invocation until
+// the platform kills it at maxDuration — bound every call.
+const JSON_CALL_TIMEOUT_MS = 60_000;
+
 async function jsonCall(
   apiKey: string,
   model: string,
@@ -194,6 +198,8 @@ async function jsonCall(
   temperature: number,
   maxTokens: number
 ): Promise<Record<string, unknown> | null> {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), JSON_CALL_TIMEOUT_MS);
   try {
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -205,6 +211,7 @@ async function jsonCall(
         max_tokens: maxTokens,
         temperature,
       }),
+      signal: controller.signal,
     });
     if (!res.ok) {
       console.warn(`[score-engine] OpenAI ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
@@ -216,6 +223,8 @@ async function jsonCall(
   } catch (err) {
     console.warn("[score-engine] call failed:", err instanceof Error ? err.message : err);
     return null;
+  } finally {
+    clearTimeout(t);
   }
 }
 

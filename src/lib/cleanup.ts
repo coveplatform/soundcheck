@@ -94,10 +94,12 @@ export async function cleanupAbandonedTracks() {
  * for people who never came back.
  *
  * Threshold is deliberately generous: a claim only takes the auth round-trip
- * (seconds), so anything still unclaimed after an hour was abandoned.
+ * (seconds), so anything still unclaimed after six hours was abandoned. (Six,
+ * not one: a user whose claim POST failed still holds a working report URL —
+ * deleting it an hour later turns a transient network blip into a 404.)
  */
 export async function cleanupAbandonedScoreReports() {
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
 
   try {
     const abandoned = await prisma.trackScoreReport.findMany({
@@ -105,7 +107,7 @@ export async function cleanupAbandonedScoreReports() {
         claimedAt: null,
         claimToken: { not: null }, // only ever set on pre-auth /start reports
         paidAt: null, // never paid (claim is a prerequisite to pay)
-        createdAt: { lt: oneHourAgo },
+        createdAt: { lt: sixHoursAgo },
       },
       select: { id: true, slug: true, createdAt: true },
     });

@@ -67,6 +67,7 @@ export function ReviewExperience({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState<{ earnedCents: number; balanceCents: number } | null>(null);
+  const [flagging, setFlagging] = useState(false);
 
   // ── listen state ──
   const [isPlaying, setIsPlaying] = useState(false);
@@ -182,6 +183,29 @@ export function ReviewExperience({
     }
   };
 
+  // Dead/private links happen (artists delete or privatize after submitting).
+  // Without an exit, the reviewer's options are a made-up reaction or sitting
+  // on the seat until it expires — this releases it and flags the track.
+  const cantPlay = async () => {
+    if (flagging) return;
+    if (!window.confirm("Flag this track as unplayable? It'll be removed from your queue — only do this if the link really won't load or play.")) return;
+    setFlagging(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/score-review/${reviewId}/cant-play`, { method: "POST" });
+      if (res.ok) {
+        router.push("/score-review");
+        router.refresh();
+        return;
+      }
+      const data = await res.json().catch(() => null);
+      setError(data?.error ?? "Couldn't flag the track. Try again.");
+    } catch {
+      setError("Couldn't flag the track. Try again.");
+    }
+    setFlagging(false);
+  };
+
   const inputCls = `${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-4 py-3.5 text-[14px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`;
   const isDirect = source === "DIRECT";
   const needsManual = source === "BANDCAMP" || (isDirect && !/\.(mp3|wav|m4a|ogg|flac)(\?|$)/i.test(trackUrl));
@@ -260,6 +284,14 @@ export function ReviewExperience({
             open the track ↗
           </a>
         )}
+        <button
+          type="button"
+          onClick={cantPlay}
+          disabled={flagging}
+          className={`${mono.className} mt-3 text-[12px] text-white/35 hover:text-white/70 transition-colors disabled:opacity-50`}
+        >
+          {flagging ? "flagging…" : "track won't load or play? flag it →"}
+        </button>
       </div>
 
       {/* ── listen gate ── */}

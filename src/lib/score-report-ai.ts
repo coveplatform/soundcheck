@@ -588,6 +588,8 @@ async function generateViaPrompt(
 ): Promise<GeneratedReport> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
+    // No key at all = a non-prod environment by definition; the canned report
+    // keeps local dev working without burning API credit.
     console.warn("[score-report] OPENAI_API_KEY not set, using fallback");
     return fallbackReport(input);
   }
@@ -599,49 +601,59 @@ async function generateViaPrompt(
     ? process.env.SCORE_REPORT_DEEP_MODEL || "gpt-4.1"
     : process.env.SCORE_REPORT_MODEL || process.env.OPENAI_MODEL || "gpt-4o";
 
-  try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: "user", content: buildPrompt(input, opts) }],
-        response_format: { type: "json_object" },
-        max_tokens: deep ? 5000 : 3000,
-        // Lower temperature → steadier scores run-to-run (was 0.8, which bounced
-        // the same track ±6 points). Still enough variety in the reactions.
-        temperature: 0.4,
-      }),
-    });
+  // One in-call retry absorbs the common transient failures (a 429/5xx, a
+  // malformed-JSON flake). Past that, THROW — for the deep pass so we never
+  // clobber a paid report, and for the instant pass so a runtime API failure
+  // never persists the canned fallback as a real score (an outage would have
+  // silently shipped fiction to every submitter in it). An unscored report
+  // stays pending and the pending page's self-heal retries the whole read.
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), deep ? 180_000 : 120_000);
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "user", content: buildPrompt(input, opts) }],
+          response_format: { type: "json_object" },
+          max_tokens: deep ? 5000 : 3000,
+          // Lower temperature → steadier scores run-to-run (was 0.8, which bounced
+          // the same track ±6 points). Still enough variety in the reactions.
+          temperature: 0.4,
+        }),
+        signal: controller.signal,
+      });
 
-    if (!res.ok) {
+      if (!res.ok) {
+        throw new Error(
+          `OpenAI ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`
+        );
+      }
+
+      const data = (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+      };
+      const text = (data.choices?.[0]?.message?.content ?? "").trim();
+      const json = text.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+      const parsed = JSON.parse(json);
+      return coerceReport(parsed, input);
+    } catch (err) {
+      lastErr = err;
       console.error(
-        "[score-report] OpenAI error",
-        res.status,
-        await res.text().catch(() => "")
+        `[score-report] generation attempt ${attempt} failed (deep=${deep}):`,
+        err instanceof Error ? err.message : err
       );
-      // Deep read runs on an ALREADY-GOOD report — never overwrite it with the
-      // generic fallback. Throw so the caller keeps the existing prose intact.
-      if (deep) throw new Error(`Deep generation failed: OpenAI ${res.status}`);
-      return fallbackReport(input);
+    } finally {
+      clearTimeout(t);
     }
-
-    const data = (await res.json()) as {
-      choices?: { message?: { content?: string } }[];
-    };
-    const text = (data.choices?.[0]?.message?.content ?? "").trim();
-    const json = text.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
-    const parsed = JSON.parse(json);
-    return coerceReport(parsed, input);
-  } catch (err) {
-    console.error("[score-report] Generation failed, using fallback:", err);
-    // See above — for the deep pass, propagate so we don't clobber a paid report.
-    if (deep) throw err instanceof Error ? err : new Error(String(err));
-    return fallbackReport(input);
   }
+  throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
 }
 
 // ── Re-upload / version detection (track identity) ──────────────────
@@ -729,16 +741,56 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
   });
   if (!report) throw new Error(`TrackScoreReport ${reportId} not found`);
 
-  // Mark generation in-flight (`reviewerQuotes.progress`). The /generate
-  // self-heal endpoint reads this so a poll never double-runs a generation
-  // that's already going; the pending report page reads it to advance its
-  // progress honestly. The final write below replaces reviewerQuotes wholesale,
-  // which clears the marker on completion.
+  // Atomic in-flight claim (`reviewerQuotes.progress`): exactly one generation
+  // runs per report. The pending page's self-heal fires /generate when the
+  // marker looks stale, but a slow run (YouTube download + a cold start) can
+  // legitimately outlive the staleness window — without this conditional
+  // write, both runs race the whole pipeline (double DSP + double LLM spend,
+  // racing final writes). ISO-8601 UTC strings compare lexicographically, so
+  // the stale check is a plain string compare. The final write replaces
+  // reviewerQuotes wholesale, clearing the marker on completion; the /generate
+  // route reads it so a poll never double-kicks a live run; the pending page
+  // reads it to advance its progress honestly.
   const startedAt = new Date().toISOString();
-  await prisma.trackScoreReport.update({
-    where: { id: reportId },
-    data: { reviewerQuotes: { progress: { startedAt } } },
-  });
+  const STALE_MS = 5 * 60 * 1000;
+  const staleBefore = new Date(Date.now() - STALE_MS).toISOString();
+  const claimed = await prisma.$executeRaw`
+    UPDATE "TrackScoreReport"
+    SET "reviewerQuotes" = jsonb_set(
+      COALESCE("reviewerQuotes", '{}'::jsonb),
+      '{progress}',
+      jsonb_build_object('startedAt', ${startedAt}::text)
+    )
+    WHERE id = ${reportId}
+      AND score IS NULL
+      AND (
+        "reviewerQuotes"->'progress'->>'startedAt' IS NULL
+        OR "reviewerQuotes"->'progress'->>'startedAt' < ${staleBefore}
+      )
+  `;
+  if (claimed === 0) return; // already scored, or another run is live
+
+  try {
+    await runGeneration(reportId, report, startedAt);
+  } catch (err) {
+    // Failed run: release the claim so the self-heal can retry on its next
+    // poll instead of waiting out the staleness window. Best-effort — if this
+    // write also fails, the staleness window still unblocks the retry.
+    await prisma
+      .$executeRaw`UPDATE "TrackScoreReport" SET "reviewerQuotes" = COALESCE("reviewerQuotes", '{}'::jsonb) - 'progress' WHERE id = ${reportId} AND score IS NULL`
+      .catch(() => {});
+    throw err;
+  }
+}
+
+async function runGeneration(
+  reportId: string,
+  report: { id: string; trackTitle: string | null; trackUrl: string },
+  startedAt: string
+): Promise<void> {
+  // Wall-clock anchor for budget-aware decisions below (the whole invocation
+  // dies at the platform's maxDuration, so late retries must be skipped).
+  const t0 = Date.now();
 
   // In parallel: measure the audio (DSP grounding) and look up the track's
   // title/artist via oEmbed (so the model's knowledge of known music can inform
@@ -839,35 +891,7 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
     });
     return;
   }
-  const features = acquired;
-
-  // Guard 1: the worker measured a clip too short to be a real track (e.g. a
-  // 2-second sound effect). Don't fabricate a full musical read — say so plainly.
-  const MIN_TRACK_SEC = 30;
-  if (features?.durationSec != null && features.durationSec < MIN_TRACK_SEC) {
-    const secs = Math.round(features.durationSec);
-    await prisma.trackScoreReport.update({
-      where: { id: reportId },
-      data: {
-        ...(trackTitle ? { trackTitle } : {}),
-        ...(meta?.artworkUrl ? { artworkUrl: meta.artworkUrl } : {}),
-        status: "IN_REVIEW",
-        score: 0,
-        percentile: 0,
-        verdict: "NOT_READY",
-        aiSummary: `This is only ${secs}s of audio — too short to score as a track. Submit the full song for a real read.`,
-        reviewerQuotes: {
-          invalid: { reason: "too_short", durationSec: secs },
-          grounded: true,
-          headline: "",
-          reactions: [],
-        },
-        priorityFixes: [],
-        completedAt: new Date(),
-      },
-    });
-    return;
-  }
+  let features: AudioFeatures | null = acquired;
 
   // Guard: dead link. The worker couldn't pull any audio AND oEmbed couldn't
   // resolve the track — on oEmbed-capable hosts (SoundCloud/Bandcamp/YouTube)
@@ -909,6 +933,53 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
       });
       return;
     }
+  }
+
+  // Burst shed rescue: no features, but the track demonstrably exists (oEmbed
+  // resolved). Under concurrent submissions the worker's queue wait can blow
+  // the budget and shed an innocent track into a metadata-only read — one
+  // short retry rescues most of those into a grounded read. Budget-aware: if
+  // the first attempt already burned deep into the 300s function window
+  // (i.e. it died at its own abort ceiling, not quickly), skip — better an
+  // ungrounded read than the platform killing the whole run mid-write.
+  if (features == null && meta != null && Date.now() - t0 < 120_000) {
+    console.warn(
+      `[score-report] no features but track resolves — short retry for ${report.trackUrl}`
+    );
+    await new Promise((r) => setTimeout(r, 5000));
+    const retried = await acquireAudioFeatures(report.trackUrl, {
+      deep: false,
+      timeoutMs: 60_000,
+    }).catch(() => null);
+    features = retried && !("tooLong" in retried) ? retried : null;
+  }
+
+  // Guard 1: the worker measured a clip too short to be a real track (e.g. a
+  // 2-second sound effect). Don't fabricate a full musical read — say so plainly.
+  const MIN_TRACK_SEC = 30;
+  if (features?.durationSec != null && features.durationSec < MIN_TRACK_SEC) {
+    const secs = Math.round(features.durationSec);
+    await prisma.trackScoreReport.update({
+      where: { id: reportId },
+      data: {
+        ...(trackTitle ? { trackTitle } : {}),
+        ...(meta?.artworkUrl ? { artworkUrl: meta.artworkUrl } : {}),
+        status: "IN_REVIEW",
+        score: 0,
+        percentile: 0,
+        verdict: "NOT_READY",
+        aiSummary: `This is only ${secs}s of audio — too short to score as a track. Submit the full song for a real read.`,
+        reviewerQuotes: {
+          invalid: { reason: "too_short", durationSec: secs },
+          grounded: true,
+          headline: "",
+          reactions: [],
+        },
+        priorityFixes: [],
+        completedAt: new Date(),
+      },
+    });
+    return;
   }
 
   // Re-upload memory: if this artist has read this same track before, keep the

@@ -4,6 +4,11 @@ import {
   cleanupExpiredCheckouts,
   cleanupAbandonedScoreReports,
 } from "@/lib/cleanup";
+import { sweepMissingDeepReads, alertStuckPaidRooms } from "@/lib/score-sweep";
+
+// The deep-read sweep re-runs full deep analyses (Replicate stems + LLM) —
+// minutes per report. Same ceiling as the generation routes.
+export const maxDuration = 300;
 
 /**
  * Cron endpoint for cleaning up abandoned tracks.
@@ -41,18 +46,31 @@ export async function POST(request: Request) {
 
     console.log("[Cleanup] Starting cleanup job...");
 
-    // Run all cleanup tasks
-    const [abandonedResult, expiredResult, abandonedReportsResult] = await Promise.all([
-      cleanupAbandonedTracks(),
-      cleanupExpiredCheckouts(),
-      cleanupAbandonedScoreReports(),
-    ]);
+    // Run all cleanup tasks. Watchdogs are best-effort: a failure there must
+    // never block the deletes (and vice versa).
+    const [abandonedResult, expiredResult, abandonedReportsResult, stuckRooms] =
+      await Promise.all([
+        cleanupAbandonedTracks(),
+        cleanupExpiredCheckouts(),
+        cleanupAbandonedScoreReports(),
+        alertStuckPaidRooms().catch((err) => {
+          console.error("[Cleanup] stuck-room alert failed:", err);
+          return { alerted: 0 };
+        }),
+      ]);
+
+    // Sequential and last: each repair is minutes of DSP + LLM, so it gets
+    // whatever remains of the invocation budget after the quick tasks.
+    const deepSweep = await sweepMissingDeepReads().catch((err) => {
+      console.error("[Cleanup] deep-read sweep failed:", err);
+      return { missing: 0, repaired: 0, attempted: [] as string[] };
+    });
 
     const totalDeleted =
       abandonedResult.deleted + expiredResult.deleted + abandonedReportsResult.deleted;
 
     console.log(
-      `[Cleanup] Job complete. Deleted ${totalDeleted} total (${abandonedResult.deleted} abandoned tracks, ${expiredResult.deleted} expired, ${abandonedReportsResult.deleted} abandoned score reports)`
+      `[Cleanup] Job complete. Deleted ${totalDeleted} total (${abandonedResult.deleted} abandoned tracks, ${expiredResult.deleted} expired, ${abandonedReportsResult.deleted} abandoned score reports); deep sweep repaired ${deepSweep.repaired}/${deepSweep.missing}; stuck-room alerts ${stuckRooms.alerted}`
     );
 
     return NextResponse.json({
@@ -69,6 +87,8 @@ export async function POST(request: Request) {
         deleted: abandonedReportsResult.deleted,
         reports: abandonedReportsResult.reports,
       },
+      deepSweep,
+      stuckRooms,
       total: totalDeleted,
       timestamp: new Date().toISOString(),
     });
