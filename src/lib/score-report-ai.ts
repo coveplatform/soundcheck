@@ -779,7 +779,10 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
   });
 
   const [features, meta] = await Promise.all([
-    acquireAudioFeatures(report.trackUrl, { deep: true }).catch(() => null),
+    // deep:false — dd07779 documented the shallow intent but flipped the flag
+    // on regenerateDeepReport instead; this call kept stems-on-instant, putting
+    // a 30-90s (cold start: minutes) Replicate wait inside EVERY live read.
+    acquireAudioFeatures(report.trackUrl, { deep: false }).catch(() => null),
     metaPromise,
   ]);
 
@@ -944,9 +947,11 @@ export async function regenerateDeepReport(reportId: string): Promise<void> {
   if (quotes.invalid) return;
   if (quotes.deep) return;
 
-  // Deep read runs the stem-separation pass (drums/bass/vocals/other balance).
+  // Deep read runs the stem-separation pass (drums/bass/vocals/other balance) —
+  // nobody is waiting on this path, and the premium prose is what consumes the
+  // stem data. (Restored: dd07779 accidentally made this the shallow one.)
   const [features, meta] = await Promise.all([
-    acquireAudioFeatures(report.trackUrl).catch(() => null),
+    acquireAudioFeatures(report.trackUrl, { deep: true }).catch(() => null),
     fetchTrackMeta(report.trackUrl).catch(() => null),
   ]);
 
