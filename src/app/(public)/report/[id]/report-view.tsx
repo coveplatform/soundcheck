@@ -6,6 +6,14 @@ import Link from "next/link";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ScoreRing } from "@/components/score/score-ring";
 import { ReportWaveform, deriveWaveMoments } from "@/components/score/report-waveform";
+import {
+  CreepingBar,
+  EqBars,
+  RotatingLine,
+  Elapsed,
+  LISTEN_FLAVOR,
+  WRITE_FLAVOR,
+} from "@/components/score/analyzing-bits";
 import { Logo } from "@/components/ui/logo";
 import { scoreConversions } from "@/lib/score-conversions";
 import type { SubPlan } from "@/lib/score-pricing";
@@ -1017,18 +1025,25 @@ function PendingState({
       className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] flex items-center justify-center px-5 lowercase`}
     >
       <div className="w-full max-w-lg bg-[#0e0e0e] border border-white/15 p-7">
-        <p className={`${mono.className} text-[13px] text-white/40 mb-5`}>
-          [ analyzing your track… ]
-        </p>
+        <div className="flex items-center justify-between mb-5">
+          <p className={`${mono.className} text-[13px] text-white/40`}>
+            [ analyzing your track… ]
+          </p>
+          <Elapsed className={`${mono.className} text-[12px] text-white/35`} />
+        </div>
 
         {/* track card — artwork + title fill in as the metadata lands */}
-        <div className="flex items-center gap-4 bg-[#141414] border border-white/15 p-3.5 mb-6">
-          <div className="w-14 h-14 bg-white/5 border border-white/10 shrink-0 overflow-hidden flex items-center justify-center">
+        <div className="flex items-center gap-4 bg-[#141414] border border-white/15 p-3.5 mb-5">
+          <div className="relative w-14 h-14 bg-white/5 border border-white/10 shrink-0 overflow-hidden flex items-center justify-center">
             {artwork ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={artwork} alt="" className="w-full h-full object-cover" />
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={artwork} alt="" className="w-full h-full object-cover" />
+                <div className="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/70 to-transparent" />
+                <EqBars className="absolute bottom-1 left-1.5 h-3.5" />
+              </>
             ) : (
-              <Hourglass className="h-5 w-5 text-white/40 animate-pulse" />
+              <EqBars className="h-5" />
             )}
           </div>
           <div className="min-w-0 flex-1">
@@ -1039,6 +1054,12 @@ function PendingState({
               {analyzed ? "writing your read…" : "listening through the full track…"}
             </p>
           </div>
+        </div>
+
+        {/* always-moving progress — creeps through the listen, jumps when the
+            DSP hands off to the read */}
+        <div className="mb-5">
+          <CreepingBar target={analyzed ? 94 : 76} monoClass={mono.className} />
         </div>
 
         {/* live progress log — advances with the actual pipeline */}
@@ -1058,12 +1079,20 @@ function PendingState({
                     : "text-white/55"
                 }
               >
-                <span style={{ color: state === "pending" ? undefined : ACCENT }}>
+                <span
+                  className={state === "done" ? "inline-block animate-[fade-in_300ms_ease-out]" : undefined}
+                  style={{ color: state === "pending" ? undefined : ACCENT }}
+                >
                   {state === "done" ? "✓" : state === "active" ? "▸" : "·"}
                 </span>{" "}
                 {s}
                 {state === "active" && (
                   <span className="inline-block w-2 h-4 ml-1 align-middle bg-[#6ee7ff] animate-pulse" />
+                )}
+                {state === "active" && (
+                  <div className="text-white/35 text-[12px] pl-5 leading-5 pb-1">
+                    <RotatingLine lines={analyzed ? WRITE_FLAVOR : LISTEN_FLAVOR} />
+                  </div>
                 )}
               </div>
             );

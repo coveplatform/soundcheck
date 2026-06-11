@@ -12,6 +12,7 @@ import { RealReviews } from "@/components/landing/real-reviews";
 import { RoomShowcase } from "@/components/landing/room-showcase";
 import { posts } from "@/lib/blog-posts";
 import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
+import { CreepingBar, EqBars, Elapsed } from "@/components/score/analyzing-bits";
 import { scoreConversions } from "@/lib/score-conversions";
 import { ArrowRight, ArrowDown, Music, Loader2, X, Zap, Users, Headphones, Play, Upload } from "lucide-react";
 
@@ -1578,16 +1579,50 @@ export default function ScorePage() {
               </button>
             )}
 
-            <p className={`${mono.className} text-[13px] text-white/40 mb-3`}>
-              {phase === "done" ? "[ wrapping up ]" : "[ analyzing your track… ]"}
+            <p className={`${mono.className} text-[13px] text-white/40 mb-3 flex items-center gap-3`}>
+              <span>{phase === "done" ? "[ wrapping up ]" : "[ analyzing your track… ]"}</span>
+              {phase !== "done" && <Elapsed className="text-[12px] text-white/30" />}
             </p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-7 lowercase">
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-6 lowercase">
               {phase === "done" ? (
                 <>your read is <span style={{ color: ACCENT }}>almost in</span>.</>
               ) : (
                 <>reading your track…</>
               )}
             </h2>
+
+            {/* track card — proof we grabbed the right song, with the eq
+                dancing so the wait reads as listening, not loading */}
+            <div className="flex items-center gap-4 bg-[#141414] border border-white/15 p-3.5 mb-5">
+              <div className="relative w-14 h-14 bg-white/5 border border-white/10 shrink-0 overflow-hidden flex items-center justify-center">
+                {meta?.artworkUrl ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={meta.artworkUrl} alt="" className="w-full h-full object-cover" />
+                    <div className="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/70 to-transparent" />
+                    <EqBars className="absolute bottom-1 left-1.5 h-3.5" />
+                  </>
+                ) : (
+                  <EqBars className="h-5" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-bold text-white truncate normal-case">
+                  {meta?.title || "your track"}
+                </p>
+                <p className={`${mono.className} text-[12px] text-white/55 mt-0.5`}>
+                  {phase === "done" ? "read incoming…" : "listening through the full track…"}
+                </p>
+              </div>
+            </div>
+
+            {/* always-moving progress bar — the strongest "not frozen" signal */}
+            <div className="mb-4">
+              <CreepingBar
+                target={phase === "done" ? 96 : 12 + step * 11}
+                monoClass={mono.className}
+              />
+            </div>
 
             <div
               ref={logRef}
@@ -1607,7 +1642,10 @@ export default function ScorePage() {
                         : "text-white/55"
                     }
                   >
-                    <span style={{ color: state === "pending" ? undefined : ACCENT }}>
+                    <span
+                      className={state === "done" ? "inline-block animate-[fade-in_300ms_ease-out]" : undefined}
+                      style={{ color: state === "pending" ? undefined : ACCENT }}
+                    >
                       {state === "done" ? "✓" : state === "active" ? "▸" : "·"}
                     </span>{" "}
                     {s}

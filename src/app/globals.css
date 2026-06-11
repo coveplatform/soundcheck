@@ -211,6 +211,28 @@ details:not(.details-no-marker)[open] summary::before {
   display: none;
 }
 
+/* Analyzing waits (homepage modal + report pending): equalizer bars and the
+   shimmer that sweeps the progress fill. Constant motion is the point — these
+   waits are real and a static panel reads as a hang. */
+@keyframes eq-bounce {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+.eq-bar {
+  transform-origin: bottom;
+  animation: eq-bounce 0.9s ease-in-out infinite;
+}
+@keyframes bar-shimmer {
+  from { transform: translateX(-120%); }
+  to { transform: translateX(420%); }
+}
+.analyzing-shimmer {
+  animation: bar-shimmer 1.8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar, .analyzing-shimmer { animation: none; }
+}
+
 /* Speaker buddy idle bob */
 @keyframes speaker-idle {
   0%, 100% { transform: translateY(0); }
