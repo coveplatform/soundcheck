@@ -17,7 +17,8 @@ export async function POST(request: Request) {
       returnTo?: string;
       plan?: "monthly" | "annual";
     };
-    const price = scoreSubPrice(plan === "annual" ? "annual" : "monthly");
+    const planKey = plan === "annual" ? "annual" : "monthly";
+    const price = scoreSubPrice(planKey);
 
     const effectiveEmail = (email || session?.user?.email || "").trim();
     if (!effectiveEmail) {
@@ -58,7 +59,8 @@ export async function POST(request: Request) {
           quantity: 1,
         },
       ],
-      success_url: `${appUrl}${success}?subscribed=1`,
+      // `plan` lets the success page report the right conversion value to ad pixels.
+      success_url: `${appUrl}${success}?subscribed=1&plan=${planKey}`,
       cancel_url: `${appUrl}${success}`,
       metadata: { type: "score_subscription", email: effectiveEmail },
       subscription_data: {

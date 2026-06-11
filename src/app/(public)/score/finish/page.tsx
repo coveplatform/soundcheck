@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { scoreConversions } from "@/lib/score-conversions";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -50,6 +51,7 @@ function FinishInner() {
           });
           const data = await res.json().catch(() => null);
           if (data?.slug) {
+            scoreConversions.submitTrack(data.slug);
             router.replace(`/report/${data.slug}`);
             return;
           }
@@ -69,6 +71,7 @@ function FinishInner() {
         });
         const data = await res.json().catch(() => null);
         if (data?.slug) {
+          scoreConversions.submitTrack(data.slug);
           router.replace(`/report/${data.slug}`);
           return;
         }

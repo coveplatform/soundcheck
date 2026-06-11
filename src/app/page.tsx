@@ -12,6 +12,7 @@ import { RealReviews } from "@/components/landing/real-reviews";
 import { RoomShowcase } from "@/components/landing/room-showcase";
 import { posts } from "@/lib/blog-posts";
 import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
+import { scoreConversions } from "@/lib/score-conversions";
 import { ArrowRight, ArrowDown, Music, Loader2, X, Zap, Users, Headphones, Play, Upload } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -676,6 +677,7 @@ export default function ScorePage() {
       });
       const data = await res.json().catch(() => null);
       if (data?.slug) {
+        scoreConversions.submitTrack(data.slug);
         router.push(`/report/${data.slug}`);
         return;
       }
@@ -707,6 +709,7 @@ export default function ScorePage() {
         return;
       }
       if (data?.url) {
+        scoreConversions.startSubscribeCheckout(plan);
         window.location.href = data.url;
         return;
       }

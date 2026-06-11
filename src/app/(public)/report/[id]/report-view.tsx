@@ -7,6 +7,8 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ScoreRing } from "@/components/score/score-ring";
 import { ReportWaveform, deriveWaveMoments } from "@/components/score/report-waveform";
 import { Logo } from "@/components/ui/logo";
+import { scoreConversions } from "@/lib/score-conversions";
+import type { SubPlan } from "@/lib/score-pricing";
 import { ArrowRight, Share2, Lock, Hourglass, User, Loader2 } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -80,13 +82,27 @@ export type ReportViewModel = {
   waveform?: import("@/components/score/report-waveform").ReportWaveformData | null;
 };
 
-/** Honest, score-derived standing — no fabricated population ranking. */
-function scoreStanding(score: number): string {
-  if (score >= 85) return "a standout score";
-  if (score >= 70) return "a strong score";
-  if (score >= 50) return "a solid score";
-  return "an early-days score";
-}
+/** Verdict-specific standing + the line pointing at the locked "why".
+    Honest by construction: the read really does contain the specifics. */
+const VERDICT_LINES: Record<Verdict, { standing: string; tease: string }> = {
+  RELEASE_READY: {
+    standing: "a release-ready score",
+    tease:
+      "the read breaks down what's carrying it — and the one thing that could still hold it back.",
+  },
+  ALMOST_THERE: {
+    standing: "close, one push from ready",
+    tease: "the read found what's holding it back. it's specific, and it's fixable.",
+  },
+  NEEDS_WORK: {
+    standing: "a fixable score",
+    tease: "something specific is dragging this down — the read pinpoints exactly what.",
+  },
+  NOT_READY: {
+    standing: "an early-days score",
+    tease: "the read maps where to start — the biggest win is in the breakdown.",
+  },
+};
 
 const VERDICTS: Record<Verdict, { label: string; ink: string }> = {
   RELEASE_READY: { label: "release ready", ink: "#7cffc4" },
@@ -163,6 +179,20 @@ export function ReportView({ data }: { data: ReportViewModel }) {
   // Measured moment markers, derived client-side from the stored waveform.
   const waveMoments = data.waveform ? deriveWaveMoments(data.waveform) : [];
 
+  // Back from Stripe with a success param: report the conversion to the ad
+  // pixels. Runs regardless of lock state (the webhook may beat the redirect);
+  // the helper dedupes via localStorage so refreshes don't double-fire.
+  useEffect(() => {
+    if (data.isDemo) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("unlocked")) {
+      scoreConversions.unlockPurchased(data.slug);
+    } else if (params.has("subscribed")) {
+      const plan: SubPlan = params.get("plan") === "annual" ? "annual" : "monthly";
+      scoreConversions.subscribed(plan);
+    }
+  }, [data.isDemo, data.slug]);
+
   // Just back from Stripe? The success redirect lands a beat before the webhook
   // flips `paidAt`, so the report can still read locked. Poll a refresh until the
   // unlock lands (or we give up) instead of stranding a paying customer on the
@@ -217,7 +247,10 @@ export function ReportView({ data }: { data: ReportViewModel }) {
       const res = await fetch(`/api/score/${data.slug}/unlock`, { method: "POST" });
       const json = await res.json().catch(() => null);
       if (json?.alreadyUnlocked) return window.location.reload();
-      if (json?.url) return (window.location.href = json.url);
+      if (json?.url) {
+        scoreConversions.startUnlockCheckout(data.slug);
+        return (window.location.href = json.url);
+      }
       setUnlocking(false);
     } catch {
       setUnlocking(false);
@@ -239,7 +272,10 @@ export function ReportView({ data }: { data: ReportViewModel }) {
       });
       const json = await res.json().catch(() => null);
       if (json?.alreadySubscribed) return window.location.reload();
-      if (json?.url) return (window.location.href = json.url);
+      if (json?.url) {
+        scoreConversions.startSubscribeCheckout(plan);
+        return (window.location.href = json.url);
+      }
       // not signed in / no email on file → send them to sign in
       window.location.href = `/login?callbackUrl=${encodeURIComponent(`/report/${data.slug}`)}`;
     } catch {
@@ -270,9 +306,9 @@ export function ReportView({ data }: { data: ReportViewModel }) {
               : "This clip is too short to score as a track. "}
             Submit the complete song and we&apos;ll give you a real read.
           </p>
-          <a href="/" className="inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] px-6 py-3.5 hover:bg-white transition-colors">
+          <Link href="/" className="inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] px-6 py-3.5 hover:bg-white transition-colors">
             score a full track →
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -401,10 +437,15 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         </div>
 
         <p className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-          that&apos;s {scoreStanding(data.score)} —{" "}
+          that&apos;s {VERDICT_LINES[data.verdict].standing} —{" "}
           <span style={{ color: ACCENT }}>{data.score}</span>
           <span className="text-white/35"> / 100</span>
         </p>
+        {locked && (
+          <p className={`${mono.className} text-[12.5px] mt-3 normal-case max-w-sm mx-auto`} style={{ color: ACCENT }}>
+            {VERDICT_LINES[data.verdict].tease}
+          </p>
+        )}
         <div className="w-56 sm:w-72 mx-auto mt-5">
           <div className="h-1.5 bg-white/10 overflow-hidden">
             <div
@@ -421,7 +462,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
 
       <div className="relative z-10 max-w-3xl mx-auto px-5 pb-16 space-y-14">
         {/* ── THE ROOM IS WAITING (locked, before payment) ── */}
-        {locked && !data.isDemo && data.humanReviewsTotal === 0 && (
+        {locked && data.humanReviewsTotal === 0 && !data.roomSkipped && (
           <section className="border-2 bg-[#0c0c0c] p-6 sm:p-8" style={{ borderColor: "rgba(110,231,255,0.45)" }}>
             <div className="flex items-center gap-2.5 mb-4">
               <span className="relative flex h-2.5 w-2.5">
@@ -440,6 +481,36 @@ export function ReportView({ data }: { data: ReportViewModel }) {
               of <strong className="text-white">5 real people</strong> — they listen end to end and
               leave honest, specific reactions. You&apos;ll watch each one land right here.
             </p>
+
+            {/* a real reaction, shown in full — proof of what a seat delivers */}
+            <p className={`${mono.className} text-[11px] text-white/45 mb-2.5 normal-case`}>
+              here&apos;s what one looks like, from another artist&apos;s room:
+            </p>
+            <div className="relative max-w-md bg-[#0a0a0a] border border-white/12 p-5 flex flex-col gap-3 mb-7">
+              <span
+                className={`${mono.className} absolute -top-2 right-4 text-[10px] font-bold text-black px-2 py-0.5`}
+                style={{ background: "#b8a4ff" }}
+              >
+                sample
+              </span>
+              <div className="flex items-center justify-between">
+                <span
+                  className={`${mono.className} inline-flex items-center gap-1 text-[10px] font-bold text-black px-1.5 py-0.5`}
+                  style={{ background: ACCENT }}
+                >
+                  <User className="h-2.5 w-2.5" /> real listener
+                </span>
+                <Meter count={4} />
+              </div>
+              <p className="text-[15px] font-bold text-white leading-snug">
+                “Hook stuck with me after one listen”
+              </p>
+              <p className="text-[14px] text-white/70 leading-relaxed normal-case">
+                Played it twice back to back. The drop has real bounce and the hook is sticky.
+                Middle sagged a touch for me but honestly its close to done.
+              </p>
+            </div>
+
             <div className="flex items-center gap-2 mb-7 flex-wrap">
               {[0, 1, 2, 3, 4].map((i) => (
                 <span
@@ -451,7 +522,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
                 </span>
               ))}
               <span className={`${mono.className} text-[12px] text-white/45 ml-2 normal-case`}>
-                5 seats ready &amp; waiting
+                your 5 seats, ready &amp; waiting
               </span>
             </div>
             <a
@@ -753,7 +824,7 @@ what to fix first
                   $6.95<span className="text-base text-white/45 font-medium"> once</span>
                 </p>
                 <p className={`${mono.className} text-[12px] text-white/55 mt-1 normal-case`}>
-                  full read + 5 real listeners react — yours forever
+                  5 real listeners hear it + the complete written read — yours forever
                 </p>
                 <button
                   onClick={handleUnlock}
@@ -800,7 +871,13 @@ what to fix first
                 </button>
               </div>
             </div>
-            <p className={`${mono.className} text-[12px] text-white/40 mt-6 text-center normal-case`}>
+            <p className={`${mono.className} text-[12px] text-white/50 mt-6 text-center normal-case`}>
+              want to see exactly what you get?{" "}
+              <Link href="/report/demo" className="font-bold hover:brightness-110 transition" style={{ color: ACCENT }}>
+                view a full sample report →
+              </Link>
+            </p>
+            <p className={`${mono.className} text-[12px] text-white/40 mt-2 text-center normal-case`}>
               one-time or subscription · cancel anytime · secured by stripe
             </p>
           </section>

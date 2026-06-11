@@ -7,6 +7,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
 import { ArrowRight, Loader2, Music, X, Upload } from "lucide-react";
 import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
+import { scoreConversions } from "@/lib/score-conversions";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -192,6 +193,7 @@ export default function SubmitScorePage() {
         setSubmitting(false);
         return;
       }
+      scoreConversions.submitTrack(data.slug);
       window.location.href = `/report/${data.slug}`;
     } catch {
       setError("Failed to submit. Try again.");

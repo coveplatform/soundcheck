@@ -10,6 +10,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Logo } from "@/components/ui/logo";
+import { SubscribeConversionPing } from "@/components/score/subscribe-conversion-ping";
 import { ArrowRight, Lock, Plus } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -91,6 +92,7 @@ export default async function ReportsPage() {
     <div
       className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase`}
     >
+      <SubscribeConversionPing />
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
         <div className="max-w-4xl mx-auto px-5 h-16 flex items-center justify-between">
           <Link href="/">
