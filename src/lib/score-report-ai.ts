@@ -778,7 +778,7 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
     }
   });
 
-  const [features, meta] = await Promise.all([
+  const [acquired, meta] = await Promise.all([
     // deep:false — dd07779 documented the shallow intent but flipped the flag
     // on regenerateDeepReport instead; this call kept stems-on-instant, putting
     // a 30-90s (cold start: minutes) Replicate wait inside EVERY live read.
@@ -808,6 +808,36 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
   const genre = fresh?.genre || "Other";
   const notes = fresh?.notes ?? null;
   const email = fresh?.email ?? "";
+
+  // Guard 0: the source is longer than anything we score as one track (a DJ
+  // set, podcast or full album — worker MAX_SOURCE_SECS refused it). Tell the
+  // artist honestly instead of scoring a partial listen or metadata.
+  if (acquired && "tooLong" in acquired) {
+    const secs = Math.round(acquired.sourceDurationSec ?? 0);
+    const mins = secs ? Math.round(secs / 60) : null;
+    await prisma.trackScoreReport.update({
+      where: { id: reportId },
+      data: {
+        ...(trackTitle ? { trackTitle } : {}),
+        ...(meta?.artworkUrl ? { artworkUrl: meta.artworkUrl } : {}),
+        status: "IN_REVIEW",
+        score: 0,
+        percentile: 0,
+        verdict: "NOT_READY",
+        aiSummary: `${mins ? `This runs about ${mins} minutes — ` : "This is "}longer than a single track, so we can't give it one honest score. Submit one song (under 13 minutes) for a real read.`,
+        reviewerQuotes: {
+          invalid: { reason: "too_long", ...(secs ? { durationSec: secs } : {}) },
+          grounded: true,
+          headline: "",
+          reactions: [],
+        },
+        priorityFixes: [],
+        completedAt: new Date(),
+      },
+    });
+    return;
+  }
+  const features = acquired;
 
   // Guard 1: the worker measured a clip too short to be a real track (e.g. a
   // 2-second sound effect). Don't fabricate a full musical read — say so plainly.
@@ -950,10 +980,15 @@ export async function regenerateDeepReport(reportId: string): Promise<void> {
   // Deep read runs the stem-separation pass (drums/bass/vocals/other balance) —
   // nobody is waiting on this path, and the premium prose is what consumes the
   // stem data. (Restored: dd07779 accidentally made this the shallow one.)
-  const [features, meta] = await Promise.all([
+  const [acquiredDeep, meta] = await Promise.all([
     acquireAudioFeatures(report.trackUrl, { deep: true }).catch(() => null),
     fetchTrackMeta(report.trackUrl).catch(() => null),
   ]);
+  // The instant read already passed the length cap, so tooLong here means the
+  // cap was tightened since — degrade to an ungrounded deep read, never fail
+  // a paid unlock over it.
+  const features =
+    acquiredDeep && !("tooLong" in acquiredDeep) ? acquiredDeep : null;
 
   const prior = features?.fingerprint
     ? await findPriorVersion(report.email, features.fingerprint, report.id)

@@ -306,21 +306,33 @@ export function ReportView({ data }: { data: ReportViewModel }) {
     );
   }
 
-  // Too short to be a real track — don't show a fabricated score.
+  // Not scoreable as one track — too short (a clip) or too long (a set/mix/
+  // podcast). Don't show a fabricated score; say which and what to do.
   if (data.invalid) {
+    const tooLong = data.invalid.reason === "too_long";
+    const mins =
+      tooLong && data.invalid.durationSec != null
+        ? Math.round(data.invalid.durationSec / 60)
+        : null;
     return (
       <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] flex items-center justify-center px-5 lowercase`}>
         <div className="max-w-md w-full border border-white/12 bg-[#101010] p-8 text-center">
           <div className="mx-auto w-12 h-12 flex items-center justify-center text-2xl mb-5" style={{ background: ACCENT, color: "#000" }}>!</div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">that&apos;s not a full track</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
+            {tooLong ? "that's more than one track" : "that's not a full track"}
+          </h1>
           <p className="text-white/65 normal-case leading-relaxed mb-7">
-            {data.invalid.durationSec != null
-              ? `We measured only ${data.invalid.durationSec}s of audio — too short to score. `
-              : "This clip is too short to score as a track. "}
-            Submit the complete song and we&apos;ll give you a real read.
+            {tooLong
+              ? `${mins ? `This runs about ${mins} minutes — ` : "This is "}longer than a single song, so one score wouldn't be honest. `
+              : data.invalid.durationSec != null
+                ? `We measured only ${data.invalid.durationSec}s of audio — too short to score. `
+                : "This clip is too short to score as a track. "}
+            {tooLong
+              ? "Submit one track (under 13 minutes) and we'll give it a real read."
+              : "Submit the complete song and we'll give you a real read."}
           </p>
           <Link href="/" className="inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] px-6 py-3.5 hover:bg-white transition-colors">
-            score a full track →
+            {tooLong ? "score one track →" : "score a full track →"}
           </Link>
         </div>
       </div>

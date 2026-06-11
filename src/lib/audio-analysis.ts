@@ -72,6 +72,11 @@ export type AudioFeatures = {
   extra?: Record<string, unknown>;
 };
 
+/** The worker refused the source: longer than the product cap (a DJ set, full
+ * album or podcast — not a single track). Carries the measured length so the
+ * UI can say how long it actually was. */
+export type TooLongResult = { tooLong: true; sourceDurationSec?: number };
+
 /** Compact descriptor the worker derives so we can recognise the same song
  * across different links / re-encodes (see worker `_acoustic_fingerprint`). */
 export type AcousticFingerprint = {
@@ -177,7 +182,7 @@ async function spotifyFeatures(url: string): Promise<AudioFeatures | null> {
 async function workerFeatures(
   url: string,
   deep = false
-): Promise<AudioFeatures | null> {
+): Promise<AudioFeatures | TooLongResult | null> {
   const workerUrl = process.env.AUDIO_WORKER_URL;
   if (!workerUrl) {
     console.warn("[audio-analysis] AUDIO_WORKER_URL not set — read will be ungrounded");
@@ -210,7 +215,20 @@ async function workerFeatures(
     }
     // The worker replies with a `{ features }` envelope; null = "couldn't ground
     // this track" (bad link, download blocked) → fall back to the non-grounded read.
-    const data = (await res.json()) as { features?: Partial<AudioFeatures> | null };
+    const data = (await res.json()) as {
+      features?: Partial<AudioFeatures> | null;
+      tooLong?: boolean;
+      sourceDurationSec?: number;
+    };
+    // Product cap (worker MAX_SOURCE_SECS): the source isn't a single track.
+    // Distinct from a failure — the caller writes an honest "too long" result
+    // instead of falling back to a metadata-only score.
+    if (data.tooLong) {
+      console.warn(
+        `[audio-analysis] worker refused over-cap source (${data.sourceDurationSec ?? "?"}s) for ${url}`
+      );
+      return { tooLong: true, sourceDurationSec: data.sourceDurationSec };
+    }
     if (!data.features) {
       console.warn(`[audio-analysis] worker returned null features (deep=${deep}) for ${url}`);
       return null;
@@ -232,7 +250,7 @@ async function workerFeatures(
 export async function acquireAudioFeatures(
   url: string,
   opts: { deep?: boolean } = {}
-): Promise<AudioFeatures | null> {
+): Promise<AudioFeatures | TooLongResult | null> {
   if (detectSpotify(url)) {
     const sf = await spotifyFeatures(url);
     if (sf) return sf;

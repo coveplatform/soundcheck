@@ -76,8 +76,15 @@ async function featuresFor(t: GoldenTrack, fresh: boolean) {
   const { acquireAudioFeatures } = await import("@/lib/audio-analysis");
   process.stdout.write(`  fetching features via worker… `);
   const t0 = Date.now();
-  const features = await acquireAudioFeatures(t.url, { deep: false });
-  console.log(features ? `ok (${Math.round((Date.now() - t0) / 1000)}s)` : "FAILED (ungrounded)");
+  const acquired = await acquireAudioFeatures(t.url, { deep: false });
+  const features = acquired && !("tooLong" in acquired) ? acquired : null;
+  console.log(
+    acquired && "tooLong" in acquired
+      ? "REFUSED (over the length cap)"
+      : features
+        ? `ok (${Math.round((Date.now() - t0) / 1000)}s)`
+        : "FAILED (ungrounded)"
+  );
   if (features) {
     fs.mkdirSync(CACHE_DIR, { recursive: true });
     fs.writeFileSync(cachePath, JSON.stringify(features));
