@@ -5,6 +5,7 @@ import {
   type AudioFeatures,
   type AcousticFingerprint,
 } from "@/lib/audio-analysis";
+import { gradeTrack, type GradeResult } from "@/lib/score-engine";
 import { fetchTrackMeta } from "@/lib/track-metadata";
 
 /**
@@ -73,6 +74,15 @@ export type GeneratedReport = {
   aiSummary: string;
   reactions: ReviewerReaction[];
   priorityFixes: PriorityFix[];
+  /** Engine-v2 evidence trail (listen findings, priors, findings sheet) —
+   * persisted in reviewerQuotes for debugging + the harness. No audio payloads. */
+  evidence?: {
+    listen: GradeResult["evidence"]["listen"];
+    priors: GradeResult["evidence"]["priors"];
+    normLines: string[];
+    findingsText: string;
+    gradeSamples: GradeResult["evidence"]["gradeSamples"];
+  } | null;
 };
 
 export type ReportInput = {
@@ -116,6 +126,9 @@ export type GenerateOpts = {
     summary: string;
     score: number;
   };
+  /** Engine v2: the findings sheet (measured + heard evidence) the prose pass
+   * must ground itself in. Present together with `locked` on instant v2 reads. */
+  findingsText?: string;
 };
 
 const ROOM_SIZE = 20;
@@ -135,10 +148,17 @@ function clamp(n: number, lo: number, hi: number): number {
 
 function buildPrompt(input: ReportInput, opts: GenerateOpts = {}): string {
   const deep = opts.depth === "deep";
-  const lockedBlock =
-    deep && opts.locked
+  const lockedBlock = opts.locked
+    ? deep
       ? `\n\nDEEP READ (this track was already scored ${opts.locked.score}/100 at the instant read, and that number plus the per-dimension scores are LOCKED — the artist has paid to unlock the full report, NOT to be re-graded). Rules for this pass:\n- Do NOT change the score or argue it should be different; write a read that is fully consistent with ${opts.locked.score}/100.\n- Echo the same numbers back in the JSON (score: ${opts.locked.score}, and the category scores you're given) — we keep them locked regardless of what you return.\n- This is the PREMIUM deliverable: go deeper and longer than a quick read. Walk the whole track start to finish, name specific moments by timestamp, trace the energy arc and the emotional throughline, and give the artist the kind of detailed, expert breakdown that's worth paying for. Expand the synthesis to 9-12 sentences, the per-dimension notes to 3-4 sentences each, and make each priority fix a concrete, step-by-step instruction.\n- Locked category scores: ${opts.locked.categories.map((c) => `${c.key}=${c.score}`).join(", ")}.`
-      : "";
+      : `\n\nSCORES ARE SET (the grading engine has already scored this track ${opts.locked.score}/100, dimensions: ${opts.locked.categories.map((c) => `${c.key}=${c.score}`).join(", ")} — these numbers are LOCKED). Your job is the WRITTEN read only:\n- Write prose fully consistent with those numbers — where a dimension graded low, your read says why plainly; where it graded high, the read owns that confidently. Never mention scores, grades, or an "engine" in the prose.\n- Echo the same numbers back in the JSON; they are kept regardless of what you return.`
+    : "";
+  // Engine v2: the findings sheet (measured + heard evidence). The prose must
+  // ground itself here — especially the "heard" lines, which come from a model
+  // that actually listened to the audio.
+  const evidenceBlock = opts.findingsText
+    ? `\n\nEVIDENCE SHEET (what the engine measured and HEARD — your prose must agree with this, and the [heard/...] lines outrank anything you'd otherwise infer):\n${opts.findingsText}`
+    : "";
   // Re-upload memory: keep the read consistent with (or an explicit diff against)
   // a prior read of the same track, so the same song never gets contradictory feedback.
   const priorBlock = opts.prior
@@ -168,7 +188,7 @@ Give your takes from a few distinct angles (a producer, a casual listener, a pla
 TRACK: "${title}"
 ARTIST: ${artist || "(unknown)"}
 GENRE: ${input.genre}
-ARTIST'S NOTE: ${input.notes?.trim() || "(none)"}${recognition}${measured}${lockedBlock}${priorBlock}
+ARTIST'S NOTE: ${input.notes?.trim() || "(none)"}${recognition}${measured}${evidenceBlock}${lockedBlock}${priorBlock}
 
 Produce a reaction report as STRICT JSON (no markdown, no commentary, no code fences). Shape:
 
@@ -483,7 +503,86 @@ function coerceReport(raw: unknown, input: ReportInput): GeneratedReport {
   };
 }
 
+/**
+ * Generate a report. Engine v2 (default): the NUMBERS come from the two-pass
+ * grading engine (findings sheet → anchored rubric, median-of-3, measured-prior
+ * clamps, weighted overall) and the prose pass writes a read consistent with
+ * them. `SCORE_ENGINE=v1` reverts to the legacy single-prompt path; any v2
+ * failure also falls back to v1 — a report always comes back.
+ *
+ * Deep reads are untouched: numbers were locked at the instant read.
+ */
 export async function generateReport(
+  input: ReportInput,
+  opts: GenerateOpts = {}
+): Promise<GeneratedReport> {
+  const useV2 =
+    opts.depth !== "deep" &&
+    !opts.locked &&
+    process.env.SCORE_ENGINE !== "v1" &&
+    Boolean(process.env.OPENAI_API_KEY) &&
+    // The engine grades EVIDENCE; with no measured audio there is none, and it
+    // would grade the absence (observed: blanket 2.0s → score 40 for an innocent
+    // track whose analysis shed). Ungrounded reads keep v1's cautious path.
+    input.features != null;
+
+  if (useV2) {
+    try {
+      const graded = await gradeTrack({
+        trackTitle: input.trackTitle,
+        artist: input.artist,
+        genre: input.genre,
+        notes: input.notes,
+        features: input.features ?? null,
+      });
+      if (graded) {
+        // Prose pass: same voice rules, numbers locked to the engine's grade,
+        // grounded in the findings sheet (incl. what the listen pass heard).
+        const prose = await generateViaPrompt(input, {
+          ...opts,
+          locked: {
+            score: graded.score,
+            categories: (
+              ["hook", "production", "retention", "emotional", "commercial"] as const
+            ).map((key) => ({ key, score: graded.dims[key] })),
+          },
+          findingsText: graded.findingsText,
+        });
+        const dims = graded.dims;
+        return {
+          ...prose,
+          score: graded.score,
+          percentile: clamp(100 - graded.score + 8, 3, 95),
+          verdict: verdictForScore(graded.score),
+          categories: prose.categories.map((c) => ({
+            ...c,
+            score: dims[c.key],
+            pct: Math.round((dims[c.key] / 5) * 100),
+          })),
+          hookScore: dims.hook,
+          productionScore: dims.production,
+          retentionScore: dims.retention,
+          emotionalScore: dims.emotional,
+          commercialScore: dims.commercial,
+          evidence: {
+            listen: graded.evidence.listen,
+            priors: graded.evidence.priors,
+            normLines: graded.evidence.normLines,
+            findingsText: graded.findingsText,
+            gradeSamples: graded.evidence.gradeSamples,
+          },
+        };
+      }
+      console.warn("[score-report] engine v2 unavailable — falling back to v1");
+    } catch (err) {
+      console.warn("[score-report] engine v2 failed — falling back to v1:", err);
+    }
+  }
+
+  return generateViaPrompt(input, opts);
+}
+
+async function generateViaPrompt(
   input: ReportInput,
   opts: GenerateOpts = {}
 ): Promise<GeneratedReport> {
@@ -789,6 +888,9 @@ export async function generateAndStoreReport(reportId: string): Promise<void> {
         // Guard 2: was this read grounded in real measured audio, or did the
         // worker fail / not run (→ scored from title + metadata only)?
         grounded: features != null,
+        // Engine-v2 evidence trail (listen findings, priors, findings sheet) —
+        // debugging + harness inspection; absent on v1/fallback reads.
+        ...(generated.evidence ? { evidence: generated.evidence } : {}),
       },
       priorityFixes: generated.priorityFixes,
       completedAt: new Date(),

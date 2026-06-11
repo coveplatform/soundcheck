@@ -63,6 +63,11 @@ export type AudioFeatures = {
   waveform?: { n: number; lo: string; mid: string; hi: string; amp: string };
   /** Confidence of the detected beatgrid ("high" | "low"). */
   gridConfidence?: string;
+  /** Crest factor (peak − RMS, dB) — low = squashed master. Worker rev excerpt-1+. */
+  crestDb?: number;
+  /** Base64 mp3 of the track's opening (~90s) for the listen pass. NEVER
+   * persisted — consumed by the score engine and dropped. Worker rev excerpt-1+. */
+  excerpt?: { b64: string; format?: string; durationSec?: number };
   /** Anything extra the worker returns. */
   extra?: Record<string, unknown>;
 };
@@ -281,6 +286,8 @@ export function describeFeatures(f: AudioFeatures): string {
   if (f.key) lines.push(`key: ${f.key}`);
   if (f.dynamicRange != null)
     lines.push(`dynamics: ${band(Math.min(1, f.dynamicRange / 14), ["very compressed/flat", "fairly flat", "some light and shade", "wide, dynamic"])}`);
+  if (f.crestDb != null)
+    lines.push(`crest factor: ${Math.round(f.crestDb * 10) / 10}dB peak-over-RMS (${band(Math.min(1, f.crestDb / 16), ["squashed / limited hard", "tight modern master", "healthy punch", "very wide — dynamic or unmastered-quiet"])})`);
   if (f.energy != null)
     lines.push(`overall energy: ${band(f.energy, ["laid-back/low", "moderate", "moderate-to-high", "high, driving"])}`);
   if (f.spectral) {
