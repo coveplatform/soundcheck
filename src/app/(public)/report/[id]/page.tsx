@@ -230,6 +230,8 @@ export default async function ReportPage({
           // Real genre (or none): drives the pending screen's genre picker —
           // the DEMO spread's "Electronic" would wrongly hide it.
           genre: report.genre ?? "",
+          // An existing prediction hides the pending screen's predictor.
+          scoreGuess: report.scoreGuess ?? null,
         }}
       />
     );
@@ -317,6 +319,7 @@ export default async function ReportPage({
     humanReviewsTotal: humanTotal,
     roomSkipped,
     roomResetsAt,
+    scoreGuess: report.scoreGuess ?? null,
     priorityFixes: fixes,
     invalid: quotes.invalid?.reason
       ? { reason: quotes.invalid.reason, durationSec: quotes.invalid.durationSec }

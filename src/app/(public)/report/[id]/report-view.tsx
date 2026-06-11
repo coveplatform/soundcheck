@@ -83,6 +83,8 @@ export type ReportViewModel = {
   /** When their real-reviewer rounds refresh (formatted), for the skipped notice. */
   roomResetsAt?: string | null;
   priorityFixes: { label: string; detail: string; count: number }[];
+  /** The artist's pre-reveal prediction (pending-screen widget), if they made one. */
+  scoreGuess?: number | null;
   /** Set when the clip was too short to score as a real track. */
   invalid?: { reason: string; durationSec?: number } | null;
   /** False when the read wasn't grounded in measured audio (title/metadata only). */
@@ -299,6 +301,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         trackTitle={data.trackTitle}
         artworkUrl={data.artworkUrl}
         genre={data.genre}
+        scoreGuess={data.scoreGuess}
       />
     );
   }
@@ -451,6 +454,18 @@ export function ReportView({ data }: { data: ReportViewModel }) {
           <span style={{ color: ACCENT }}>{data.score}</span>
           <span className="text-white/35"> / 100</span>
         </p>
+        {/* the prediction reveal — they called it on the pending screen */}
+        {data.scoreGuess != null && (
+          <p className={`${mono.className} text-[13px] text-white/60 mt-3 normal-case`}>
+            {Math.abs(data.score - data.scoreGuess) <= 3 ? (
+              <>you called <span className="font-bold text-white">{data.scoreGuess}</span> — dead on. you know this track.</>
+            ) : data.score > data.scoreGuess ? (
+              <>you called <span className="font-bold text-white">{data.scoreGuess}</span> — the read came in <span className="font-bold" style={{ color: ACCENT }}>{data.score - data.scoreGuess} higher</span>.</>
+            ) : (
+              <>you called <span className="font-bold text-white">{data.scoreGuess}</span> — the read says <span className="font-bold" style={{ color: ACCENT }}>{data.scoreGuess - data.score} lower</span>. the why is below.</>
+            )}
+          </p>
+        )}
         {locked && (
           <p className={`${mono.className} text-[12.5px] mt-3 normal-case max-w-sm mx-auto`} style={{ color: ACCENT }}>
             {VERDICT_LINES[data.verdict].tease}
@@ -942,11 +957,13 @@ function PendingState({
   trackTitle,
   artworkUrl,
   genre,
+  scoreGuess,
 }: {
   slug: string;
   trackTitle: string;
   artworkUrl: string | null;
   genre?: string | null;
+  scoreGuess?: number | null;
 }) {
   const [stalled, setStalled] = useState(false);
   const [title, setTitle] = useState(trackTitle);
@@ -973,6 +990,26 @@ function PendingState({
         if (r.status === 409) setGenreLocked(true);
       })
       .catch(() => {});
+  };
+
+  // Score predictor — call the number before the read lands. One shot, stored
+  // server-side only while score is null (you can't "predict" a score you've
+  // seen). Revealed after a beat so the screen unfolds instead of dumping
+  // every widget at once; the reveal on the report compares guess vs read.
+  const [guess, setGuess] = useState(75);
+  const [guessLocked, setGuessLocked] = useState(scoreGuess != null);
+  const [showPredictor, setShowPredictor] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setShowPredictor(true), 6000);
+    return () => clearTimeout(t);
+  }, []);
+  const lockGuess = () => {
+    setGuessLocked(true);
+    void fetch(`/api/score/${slug}/details`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scoreGuess: guess }),
+    }).catch(() => {});
   };
 
   // Cosmetic ticker clamped by REAL progress: it sits on "checking the hook"
@@ -1105,6 +1142,53 @@ function PendingState({
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* the score predictor — call it before the read does */}
+        {showPredictor && (
+          <div
+            className="mb-5 border border-white/12 bg-[#101010] p-4"
+            style={{ animation: "fade-in 400ms ease-out" }}
+          >
+            {guessLocked ? (
+              <p className={`${mono.className} text-[12px] text-white/55 normal-case`}>
+                <span style={{ color: ACCENT }}>✓ locked in: {scoreGuess ?? guess}.</span>{" "}
+                we&apos;ll see what the read says.
+              </p>
+            ) : (
+              <>
+                <div className="flex items-baseline justify-between mb-2.5">
+                  <p className={`${mono.className} text-[12px] text-white/55 normal-case`}>
+                    call it — what does your gut say this scores?
+                  </p>
+                  <span className={`${mono.className} text-[20px] font-bold`} style={{ color: ACCENT }}>
+                    {guess}
+                    <span className="text-[11px] text-white/30 font-normal"> /100</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={1}
+                    max={100}
+                    value={guess}
+                    onChange={(e) => setGuess(Number(e.target.value))}
+                    className="flex-1 h-1.5 cursor-pointer"
+                    style={{ accentColor: ACCENT }}
+                    aria-label="your score prediction"
+                  />
+                  <button
+                    type="button"
+                    onClick={lockGuess}
+                    className={`${mono.className} shrink-0 text-[12px] font-bold text-black px-3 py-1.5 hover:brightness-110 transition`}
+                    style={{ background: ACCENT }}
+                  >
+                    lock it in
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 

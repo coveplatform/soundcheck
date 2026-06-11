@@ -884,6 +884,9 @@ model TrackScoreReport {
   claimedAt        DateTime?
   // Client IP at creation — abuse cap for pre-auth /start (no email to key on).
   createdByIp      String?
+  // The artist's own pre-reveal score prediction (pending-screen widget).
+  // Settable once, only while score is null — never shown to the model.
+  scoreGuess       Int?
   humanReviewsRequested Int          @default(5)
   // Subscriber submitted past their monthly real-reviewer-round allowance:
   // full AI read still delivered, but no human room assigned for this one.

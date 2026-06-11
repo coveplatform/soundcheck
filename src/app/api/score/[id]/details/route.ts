@@ -20,17 +20,44 @@ export async function POST(
 ) {
   try {
     const { id: slug } = await params;
-    const body = (await request.json().catch(() => null)) as { genre?: string } | null;
+    const body = (await request.json().catch(() => null)) as {
+      genre?: string;
+      scoreGuess?: number;
+    } | null;
+
     const genre = body?.genre;
-    if (!isScoreGenre(genre)) {
+    const rawGuess = body?.scoreGuess;
+    const guess =
+      typeof rawGuess === "number" && Number.isFinite(rawGuess)
+        ? Math.round(Math.max(1, Math.min(100, rawGuess)))
+        : null;
+
+    if (genre !== undefined && !isScoreGenre(genre)) {
       return NextResponse.json({ error: "Unknown genre" }, { status: 400 });
     }
+    if (genre === undefined && guess == null) {
+      return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+    }
 
-    const updated = await prisma.trackScoreReport.updateMany({
-      where: { slug, score: null },
-      data: { genre },
-    });
-    if (updated.count === 0) {
+    let patched = 0;
+    if (genre !== undefined) {
+      const r = await prisma.trackScoreReport.updateMany({
+        where: { slug, score: null },
+        data: { genre },
+      });
+      patched += r.count;
+    }
+    // The prediction is one-shot and only before the score exists — once the
+    // number is visible (or a guess is locked), "predicting" is meaningless.
+    if (guess != null) {
+      const r = await prisma.trackScoreReport.updateMany({
+        where: { slug, score: null, scoreGuess: null },
+        data: { scoreGuess: guess },
+      });
+      patched += r.count;
+    }
+
+    if (patched === 0) {
       // Missing slug or the read already landed — either way, not patchable.
       return NextResponse.json({ ok: false, locked: true }, { status: 409 });
     }
