@@ -18,7 +18,7 @@ import { Logo } from "@/components/ui/logo";
 import { SCORE_GENRES } from "@/lib/score-genres";
 import { scoreConversions } from "@/lib/score-conversions";
 import type { SubPlan } from "@/lib/score-pricing";
-import { ArrowRight, Share2, Lock, Hourglass, User, Loader2 } from "lucide-react";
+import { ArrowRight, Share2, Lock, Hourglass, User, Loader2, Check } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -27,6 +27,7 @@ const jakarta = Plus_Jakarta_Sans({
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
 
 const ACCENT = "#6ee7ff";
+const GREEN = "#7cffc4";
 const LENSES = [
   "the producer",
   "a casual listener",
@@ -342,6 +343,348 @@ export function ReportView({ data }: { data: ReportViewModel }) {
             {unavailable ? "submit a working link →" : tooLong ? "score one track →" : "score a full track →"}
           </Link>
         </div>
+      </div>
+    );
+  }
+
+  // ── LOCKED REPORT (pre-purchase) ─────────────────────────────────────
+  // A deliberately lean three-beat page so cold traffic isn't buried: (1) the
+  // SEALED score + a prose verdict — the number is the thing they came for, so
+  // it's the thing we gate; (2) one proof block — the measured waveform + a
+  // sealed teaser of the real read; (3) one decision — what unlock delivers +
+  // pricing. The full breakdown, the six AI lenses and every fix detail render
+  // only on the UNLOCKED report below; we don't render-then-blur the whole
+  // thing here. One CTA target (#unlock), one label.
+  if (locked) {
+    const sorted = [...data.categories].sort((a, b) => b.score - a.score);
+    const strongest = sorted[0];
+    const weakest = sorted[sorted.length - 1];
+    const topFix = data.priorityFixes[0];
+    // One complete, readable free sentence (no squinting at half-blurred prose).
+    const firstSentence =
+      (data.aiSummary || "").trim().split(/(?<=[.!?])\s+/)[0] || data.summaryHeadline;
+    const summaryWords = (data.aiSummary || "").trim().split(/\s+/).filter(Boolean).length;
+    // What's behind the seal, as a clean scannable manifest — the free signal
+    // (strongest/weakest dimension, the #1 fix label, the word count) lives in
+    // readable sub-lines, not in blurred text you have to strain to parse.
+    const readRows: { label: string; sub: string }[] = [
+      { label: "the full written read", sub: `${summaryWords} words on what's landing and what isn't` },
+      {
+        label: "all 5 dimensions, scored + explained",
+        sub: `strongest: ${strongest.label.toLowerCase()} · most to gain: ${weakest.label.toLowerCase()}`,
+      },
+      ...(topFix ? [{ label: "3 fixes, ranked by impact", sub: `#1 — ${topFix.label}` }] : []),
+      { label: "the same track heard from 6 angles", sub: "producer · curator · casual listener + 3 more" },
+    ];
+
+    return (
+      <div
+        className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase scroll-smooth`}
+      >
+        {/* grain */}
+        <div
+          className="fixed inset-0 pointer-events-none opacity-[0.05] z-0 mix-blend-screen"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+          }}
+        />
+
+        {/* nav */}
+        <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
+          <div className="max-w-2xl mx-auto px-5 h-16 flex items-center justify-between">
+            <Link href="/">
+              <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
+            </Link>
+            <div className={`${mono.className} flex items-center gap-3 text-[13px]`}>
+              {data.isDemo && <span className="text-white/40">[ sample ]</span>}
+              <a href="#unlock" className="text-white/35 hover:text-white/60 transition-colors">
+                🔒 unlock
+              </a>
+            </div>
+          </div>
+        </header>
+
+        {/* ── BEAT 1 · the sealed score + prose verdict ── */}
+        <section className="relative z-10 max-w-2xl mx-auto px-5 pt-14 pb-12 text-center">
+          <Kicker>your read is in</Kicker>
+          <div className={`flex items-center gap-4 sm:gap-5 mb-9 ${data.artworkUrl ? "justify-center text-left" : "justify-center text-center flex-col gap-0"}`}>
+            {data.artworkUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={data.artworkUrl}
+                alt=""
+                className="w-20 h-20 sm:w-24 sm:h-24 object-cover border border-white/15 shrink-0"
+              />
+            )}
+            <div className={data.artworkUrl ? "min-w-0" : ""}>
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-[-0.03em] mb-1 break-words">
+                {data.trackTitle}
+              </h1>
+              <p className={`${mono.className} text-[13px] text-white/40`}>
+                {data.genre} · ai feedback · {data.scoredAt}
+              </p>
+            </div>
+          </div>
+
+          <p className={`${mono.className} text-[12px] text-white/40 mb-3`}>resonance score</p>
+          {/* the score, sealed: real ring, blurred, with a single reveal pill */}
+          <div className="relative inline-block">
+            <div className="blur-[12px] opacity-60 pointer-events-none select-none" aria-hidden>
+              <ScoreRing score={data.score} size="xl" dark animate={false} />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <a
+                href="#unlock"
+                className={`${mono.className} inline-flex items-center gap-1.5 text-[12px] text-black px-3 py-1.5 hover:brightness-110 transition`}
+                style={{ background: ACCENT }}
+              >
+                <Lock className="h-3 w-3" />
+                reveal your score
+              </a>
+            </div>
+          </div>
+
+          {data.grounded === false && !data.isDemo && (
+            <p className={`${mono.className} text-[11px] text-amber-300/80 text-center normal-case mt-4 max-w-sm mx-auto`}>
+              ⚠ scored from the title &amp; metadata — we couldn&apos;t analyse the audio this time, so treat the number as a rough read.
+            </p>
+          )}
+
+          <p className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-7 max-w-xl mx-auto">
+            the read says it&apos;s{" "}
+            <span style={{ color: ACCENT }}>{VERDICT_LINES[data.verdict].standing}</span>.
+          </p>
+          <p className={`${mono.className} text-[12.5px] mt-3 normal-case max-w-sm mx-auto`} style={{ color: ACCENT }}>
+            {VERDICT_LINES[data.verdict].tease}
+          </p>
+          {data.scoreGuess != null && (
+            <p className={`${mono.className} text-[13px] text-white/55 mt-3 normal-case`}>
+              you called <span className="font-bold text-white">{data.scoreGuess}</span> — unlock to see how close you were.
+            </p>
+          )}
+
+          <a
+            href="#unlock"
+            className="group inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] px-6 py-3.5 mt-9 hover:bg-white transition-colors"
+          >
+            unlock the score, the read &amp; the room
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+          </a>
+          <p className={`${mono.className} text-[11px] text-white/30 mt-4 normal-case`}>
+            one scroll, one unlock — here&apos;s what&apos;s under the seal.
+          </p>
+        </section>
+
+        <div className="relative z-10 max-w-2xl mx-auto px-5 pb-16 space-y-12">
+          {/* ── BEAT 2 · the proof — measured waveform + a sealed read teaser ── */}
+          {data.waveform && (
+            <section>
+              <Kicker>we listened · measured from your audio</Kicker>
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
+                we listened to the whole thing.
+              </h2>
+              <p className={`${mono.className} text-[13px] text-white/55 mb-7 normal-case`}>
+                Your track&apos;s real frequency-split waveform, marked where the read found its
+                moments. One is open — the rest unlock with the full read.
+              </p>
+              <ReportWaveform data={data.waveform} moments={waveMoments} sealed />
+            </section>
+          )}
+
+          <section>
+            <Kicker>the honest read</Kicker>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-4">
+              {data.summaryHeadline}
+            </h2>
+            {/* one complete, readable free line — proof the read is real & specific */}
+            <p
+              className="text-lg sm:text-xl leading-relaxed text-white/85 normal-case border-l-2 pl-5"
+              style={{ borderColor: ACCENT }}
+            >
+              {firstSentence}
+            </p>
+
+            {/* what's behind the seal — a clean checklist, scannable in one glance */}
+            <p className={`${mono.className} text-[12px] text-white/45 mt-8 mb-3 normal-case`}>
+              unlocking opens the rest:
+            </p>
+            <div className="border border-white/10">
+              {readRows.map((row) => (
+                <div
+                  key={row.label}
+                  className="flex items-start gap-3 p-4 border-b border-white/10 last:border-b-0"
+                >
+                  <Lock className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
+                  <div className="min-w-0">
+                    <p className="text-[15px] font-bold text-white leading-snug">{row.label}</p>
+                    <p className={`${mono.className} text-[12px] text-white/45 mt-0.5 normal-case`}>
+                      {row.sub}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* ── BEAT 3 · one decision — what unlock does + pricing ── */}
+          <section id="unlock" className="scroll-mt-20 border border-white/12 bg-[#101010] p-7 sm:p-10">
+            {finalizing && (
+              <div
+                className="mb-7 flex items-center justify-center gap-3 border p-4 text-center"
+                style={{ borderColor: "rgba(110,231,255,0.4)", background: "rgba(110,231,255,0.06)" }}
+              >
+                <Hourglass className="h-4 w-4 animate-pulse" style={{ color: ACCENT }} />
+                <p className="text-[14px] normal-case" style={{ color: ACCENT }}>
+                  payment received — finalizing your unlock…
+                </p>
+              </div>
+            )}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-12 h-12 mb-5" style={{ background: ACCENT }}>
+                <Lock className="h-5 w-5 text-black" />
+              </div>
+              <Kicker>unlock — here&apos;s exactly what happens</Kicker>
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
+                unlock &amp; send it to the room
+              </h2>
+              <p className="text-white/65 text-[14px] max-w-md mx-auto normal-case leading-relaxed">
+                The score and read are instant AI. The room is{" "}
+                <strong className="text-white">5 real people</strong> — actual humans who listen to
+                your track and write back.
+              </p>
+            </div>
+
+            {/* what unlock does — a VERTICAL sequence (steps, top to bottom) so it
+                reads as a timeline and never mirrors the two price cards below */}
+            <div className="max-w-xl mx-auto mb-9 border border-white/10 divide-y divide-white/10">
+              <div className="flex items-start gap-3.5 p-4">
+                <span
+                  className={`${mono.className} flex-shrink-0 w-7 h-7 flex items-center justify-center text-[13px] font-bold text-black`}
+                  style={{ background: ACCENT }}
+                >
+                  1
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[14px] font-bold text-white normal-case leading-snug">
+                    instantly — your score reveals &amp; the full read opens
+                  </p>
+                  <p className={`${mono.className} text-[12px] text-white/50 mt-0.5 normal-case`}>
+                    every dimension, the why behind each, and the 3 ranked fixes
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3.5 p-4">
+                <span
+                  className={`${mono.className} flex-shrink-0 w-7 h-7 flex items-center justify-center text-[13px] font-bold text-black`}
+                  style={{ background: GREEN }}
+                >
+                  2
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[14px] font-bold text-white normal-case leading-snug">
+                    over the next hours — 5 real people react
+                  </p>
+                  <p className={`${mono.className} text-[12px] text-white/50 mt-0.5 normal-case`}>
+                    actual humans, not AI — they listen end to end and write honest feedback, landing
+                    here seat by seat
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p className={`${mono.className} text-[12px] text-white/45 text-center mb-4 normal-case`}>
+              both plans get you everything above — pick how you pay:
+            </p>
+
+            <div className="grid sm:grid-cols-2 gap-4 max-w-xl mx-auto items-stretch">
+              {/* one-time */}
+              <div className="border border-white/15 bg-[#0a0a0a] p-6 flex flex-col">
+                <p className={`${mono.className} text-[13px] text-white/60`}>just this track</p>
+                <p className="text-4xl font-extrabold mt-2">
+                  $6.95<span className="text-base text-white/45 font-medium"> once</span>
+                </p>
+                <ul className={`${mono.className} text-[12.5px] text-white/65 normal-case mt-5 space-y-2.5 flex-1`}>
+                  <li className="flex gap-2">
+                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
+                    <span>this track&apos;s full report — score + written read</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
+                    <span>5 real people review this track</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
+                    <span>yours forever · no subscription</span>
+                  </li>
+                </ul>
+                <button
+                  onClick={handleUnlock}
+                  disabled={unlocking}
+                  className="group mt-6 w-full inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-extrabold text-[15px] py-3.5 transition-colors disabled:opacity-60"
+                >
+                  {unlocking ? "opening…" : "unlock this track"}
+                  {!unlocking && <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />}
+                </button>
+              </div>
+
+              {/* unlimited — highlighted */}
+              <div className="border-2 bg-[#0a0a0a] p-6 flex flex-col relative" style={{ borderColor: ACCENT }}>
+                <span
+                  className={`${mono.className} absolute -top-2.5 left-6 text-[10px] font-bold text-black px-2 py-0.5`}
+                  style={{ background: ACCENT }}
+                >
+                  BEST VALUE
+                </span>
+                <p className={`${mono.className} text-[13px]`} style={{ color: ACCENT }}>unlimited</p>
+                <p className="text-4xl font-extrabold mt-2">
+                  $19.95<span className="text-base text-white/45 font-medium">/mo</span>
+                </p>
+                <ul className={`${mono.className} text-[12.5px] text-white/65 normal-case mt-5 space-y-2.5 flex-1`}>
+                  <li className="flex gap-2">
+                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
+                    <span><strong className="text-white">unlimited</strong> full reports — submit as many tracks as you want</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
+                    <span>5 real people review <strong className="text-white">3 tracks</strong> each month</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
+                    <span>cancel anytime</span>
+                  </li>
+                </ul>
+                <button
+                  onClick={() => handleSubscribe("monthly")}
+                  disabled={subscribing !== null}
+                  className="group mt-6 w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] py-3.5 hover:bg-white transition-colors disabled:opacity-70 disabled:cursor-wait"
+                >
+                  {subscribing === "monthly" ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> opening checkout…</>
+                  ) : (
+                    <>go unlimited <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" /></>
+                  )}
+                </button>
+              </div>
+            </div>
+            <p className={`${mono.className} text-[12px] text-white/50 mt-6 text-center normal-case`}>
+              want to see a full unlocked report first?{" "}
+              <Link href="/report/demo" className="font-bold hover:brightness-110 transition" style={{ color: ACCENT }}>
+                view a sample →
+              </Link>
+            </p>
+            <p className={`${mono.className} text-[12px] text-white/40 mt-2 text-center normal-case`}>
+              one-time or subscription · cancel anytime · secured by stripe
+            </p>
+          </section>
+        </div>
+
+        <footer className="relative z-10 border-t border-white/10">
+          <div className={`${mono.className} max-w-2xl mx-auto px-5 py-8 flex items-center justify-between text-[13px] text-white/40`}>
+            <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-6" />
+            <span>© {new Date().getFullYear()}</span>
+          </div>
+        </footer>
       </div>
     );
   }
