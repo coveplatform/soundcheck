@@ -15,6 +15,7 @@ import {
   WRITE_FLAVOR,
 } from "@/components/score/analyzing-bits";
 import { Logo } from "@/components/ui/logo";
+import { SCORE_GENRES } from "@/lib/score-genres";
 import { scoreConversions } from "@/lib/score-conversions";
 import type { SubPlan } from "@/lib/score-pricing";
 import { ArrowRight, Share2, Lock, Hourglass, User, Loader2 } from "lucide-react";
@@ -297,6 +298,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         slug={data.slug}
         trackTitle={data.trackTitle}
         artworkUrl={data.artworkUrl}
+        genre={data.genre}
       />
     );
   }
@@ -939,16 +941,39 @@ function PendingState({
   slug,
   trackTitle,
   artworkUrl,
+  genre,
 }: {
   slug: string;
   trackTitle: string;
   artworkUrl: string | null;
+  genre?: string | null;
 }) {
   const [stalled, setStalled] = useState(false);
   const [title, setTitle] = useState(trackTitle);
   const [artwork, setArtwork] = useState<string | null>(artworkUrl);
   const [analyzed, setAnalyzed] = useState(false);
   const [step, setStep] = useState(0);
+
+  // Genre picker — the landing flow collects no genre (everything lands as
+  // "Other"), and generation re-reads genre right before writing the prompt,
+  // so a tap during the DSP wait still shapes the read (genre norms,
+  // repetition tolerance, the listen pass). Hidden once the read consumed it.
+  const [pickedGenre, setPickedGenre] = useState<string | null>(null);
+  const [genreLocked, setGenreLocked] = useState(false);
+  const showGenrePicker =
+    !genreLocked && (!genre || genre === "Other" || genre === "—");
+  const pickGenre = (g: string) => {
+    setPickedGenre(g);
+    void fetch(`/api/score/${slug}/details`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ genre: g }),
+    })
+      .then((r) => {
+        if (r.status === 409) setGenreLocked(true);
+      })
+      .catch(() => {});
+  };
 
   // Cosmetic ticker clamped by REAL progress: it sits on "checking the hook"
   // until the DSP has actually finished listening (the slow part — can be a
@@ -1055,6 +1080,33 @@ function PendingState({
             </p>
           </div>
         </div>
+
+        {/* one-tap genre while they wait — shapes the read that's being written */}
+        {showGenrePicker && (
+          <div className="mb-5">
+            <p className={`${mono.className} text-[12px] text-white/45 mb-2 normal-case`}>
+              {pickedGenre
+                ? "noted — the read will judge it by that genre's standards."
+                : "what genre is this? one tap sharpens the read —"}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {SCORE_GENRES.filter((g) => g !== "Other").map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() => pickGenre(g)}
+                  className={`${mono.className} text-[11.5px] px-2.5 py-1 border transition-colors ${
+                    pickedGenre === g
+                      ? "bg-[#6ee7ff] text-black border-[#6ee7ff] font-bold"
+                      : "border-white/15 text-white/55 hover:border-[#6ee7ff] hover:text-white"
+                  }`}
+                >
+                  {g.toLowerCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* always-moving progress — creeps through the listen, jumps when the
             DSP hands off to the read */}

@@ -227,6 +227,9 @@ export default async function ReportPage({
           // Real artwork if the oEmbed staged write already landed (never the
           // demo's) — the pending view fills it in live otherwise.
           artworkUrl: report.artworkUrl ?? null,
+          // Real genre (or none): drives the pending screen's genre picker —
+          // the DEMO spread's "Electronic" would wrongly hide it.
+          genre: report.genre ?? "",
         }}
       />
     );
