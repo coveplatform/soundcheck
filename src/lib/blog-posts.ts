@@ -20,6 +20,152 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "music-release-checklist",
+    title: "Music Release Checklist: Everything to Do Before You Drop",
+    coverImage: "/blog/blog15.jpg",
+    excerpt:
+      "Most independent releases fail not because the music is bad, but because artists skip steps or do them in the wrong order. Here's the complete checklist, in the sequence that actually works.",
+    category: "GUIDE",
+    date: "June 12, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "A complete music release checklist runs about 20 items across four weeks: get the track finished, mixed, and mastered; quality-check it with fresh ears before anyone else hears it; submit to your distributor at least three to four weeks before the release date; pitch Spotify editorial through Spotify for Artists; set up your cover art, metadata, and artist profiles; and roll out on social before release day, not after. The order matters as much as the items. Skip the distributor lead time and you lose your only shot at the Spotify editorial window. Skip the quality check and you release a version of the track that wasn't ready — and that first impression is burned.",
+      },
+      {
+        type: "paragraph",
+        text: "Most independent releases that underperform don't fail because the music is bad. They fail because the rollout was rushed, steps were done out of order, or the track went out before it was genuinely ready. Work through the list below every time, in this sequence.",
+      },
+      {
+        type: "h2",
+        text: "How far in advance should you start preparing a release?",
+      },
+      {
+        type: "paragraph",
+        text: "Four weeks minimum, and that's a tight four weeks, not a generous one. The real constraint is Spotify for Artists, which requires you to pitch an unreleased track at least seven days before the release date to be considered by their editorial team. Most artists submit to their distributor and pick the earliest available date, which makes the editorial pitch impossible before it starts. Work backwards from your release date and you'll see why four weeks fills up fast.",
+      },
+      {
+        type: "list",
+        items: [
+          "4 weeks out: Track finalized and quality-checked with fresh ears. Mastering complete. Cover art at 3000×3000px ready.",
+          "3-4 weeks out: Submitted to distributor (DistroKid, TuneCore, CD Baby). Metadata entered — artist name, title, genre, ISRC codes. Spotify for Artists editorial pitch submitted.",
+          "2-3 weeks out: Independent playlist and blog pitching via SubmitHub and direct curator outreach. Pre-save link live if you have one.",
+          "1 week out: Social rollout begins — posts, short-form video content, any press or interview placements timed to land around release day.",
+          "Release day: All assets live. Link-in-bio updated. Email list notified. Reply to every comment.",
+          "2 weeks after release: Keep posting. Check Spotify for Artists for save rate, completion rate, listener geography, and playlist pickups.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Is your track actually ready to release — and how do you know?",
+      },
+      {
+        type: "paragraph",
+        text: "This is the step most artists skip, and it's the one that costs the most. By the time a track is finished, you've heard it hundreds of times. You've gone deaf to it. The buried vocal sounds normal because you already know what it's saying. The mid-section that loses energy doesn't register because you know what's coming next. A first-time listener hears only what's in the file — no context, no familiarity, no forgiveness.",
+      },
+      {
+        type: "paragraph",
+        text: "The first week of a release carries disproportionate weight with the algorithm. Early saves, completion rates, and skip behavior in the opening days shape whether a track gets pushed to more listeners or quietly throttled. A track that wasn't ready, going out to its opening audience, can permanently cap a release's ceiling. The cheapest fix is getting fresh ears on it before you submit to your distributor.",
+      },
+      {
+        type: "quote",
+        text: "You can't hear your own track anymore. That's not a failure of attention — it's what 200 listens does to everyone. Fresh ears before release are worth more than any plugin.",
+      },
+      {
+        type: "paragraph",
+        text: "What you're looking for in pre-release feedback is patterns, not opinions. One listener flagging something might be their taste. Three listeners independently flagging the same thing — the intro drags, the vocal's buried, the energy drops after the second chorus — is a real signal. This is where MixReflect is built to help: submit your track before release, get reactions from a room of real listeners who respond without seeing each other's answers, and an instant AI read scores hook, production, retention, and commercial pull. When several listeners converge on the same note, you know exactly what to fix before the track goes anywhere near a distributor.",
+      },
+      {
+        type: "h2",
+        text: "What does your track need before you submit to a distributor?",
+      },
+      {
+        type: "list",
+        items: [
+          "Audio file: WAV or FLAC, 44.1kHz / 24-bit minimum. Most distributors won't accept MP3.",
+          "Mastered to streaming standards: target around -14 LUFS integrated, true peak ceiling of -1 dBTP. Spotify normalizes to roughly -14 LUFS on playback, so louder isn't better past that point.",
+          "Cover art: 3000×3000px JPEG or PNG. No streaming platform logos, no explicit content without the correct flag.",
+          "Artist name: exactly matching your Spotify for Artists profile name. Inconsistencies split your listener data across multiple Spotify profiles.",
+          "Track title: exactly how it should appear, including featuring credits and version tags (Radio Edit, Remix, Acoustic, etc.).",
+          "Genre: accurate, not aspirational. Genre affects which editorial playlists can realistically consider your track.",
+          "ISRC code: one per track, generated automatically by most distributors. Keep a record — you'll need it for royalty tracking.",
+          "Release date: far enough out for the Spotify editorial pitch window (at least 7 days out, ideally 21-28 days).",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Should you pitch Spotify editorial for every release?",
+      },
+      {
+        type: "paragraph",
+        text: "Yes, every release — even if you don't expect to land a placement. Pitching through Spotify for Artists makes your track eligible for Release Radar and signals the platform that a release is coming. You submit once per release, for one track, at least seven days before it goes live. The pitch form asks for genre, mood, instruments, and a description of the song. Fill it out properly rather than recycling your bio.",
+      },
+      {
+        type: "paragraph",
+        text: "Getting an editorial slot is unlikely for most independent artists without a track record on the platform, but that's not the point. Editorial placements inject real listening data — saves, completion, follows — that trains the algorithm and pushes you into Discover Weekly and Release Radar for listeners who've never heard you. The editorial pitch is the on-ramp into that loop. Missing it means starting with no data at all.",
+      },
+      {
+        type: "h2",
+        text: "What should your pre-release social rollout look like?",
+      },
+      {
+        type: "paragraph",
+        text: "Release day isn't the start of promotion — it's the midpoint. The goal of pre-release social content is to build context so that when the track drops, people have a reason to care beyond a link in your bio. Three to four posts in the two weeks before release is enough for most artists: something that introduces the sound or the story, something that shows the process, and something that directly announces the release date.",
+      },
+      {
+        type: "paragraph",
+        text: "The mistake most artists make is treating pre-release content as a countdown instead of context-building. A post that says 'NEW MUSIC FRIDAY' gives a listener nothing to attach to the release. A post that shows the moment the track came together, or explains what the song is actually about, gives them a story. Stories share. Countdowns don't.",
+      },
+      {
+        type: "quote",
+        text: "Release day should feel like a moment, not a cold drop. Three posts before it goes live is enough to make it feel like one.",
+      },
+      {
+        type: "h2",
+        text: "What should you do in the week after release?",
+      },
+      {
+        type: "paragraph",
+        text: "Keep going. The week after release is when most independent artists go quiet — the launch energy has faded, the initial response has landed, and they don't know what to do next. That's also the window where the algorithm is still forming its read on the track. Consistent engagement in the days after release extends the window the algorithm is watching and gives it more high-quality data to work with.",
+      },
+      {
+        type: "paragraph",
+        text: "Open Spotify for Artists and look at three numbers: save rate (above 20% is strong; below 10% usually means the hook isn't landing or the wrong audience is finding it), completion rate (high early skip rates point to an intro problem), and playlist placements (which curators picked it up, and what that tells you about where your real audience is). These three numbers tell you more about a release than any stream count.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "What should be on a music release checklist?",
+            a: "A complete music release checklist covers: finishing, mixing, and mastering the track; getting pre-release feedback from fresh ears before submitting anywhere; preparing cover art (3000×3000px JPEG or PNG) and metadata; submitting to your distributor at least 3-4 weeks before the release date; pitching Spotify for Artists editorial; running independent playlist and blog pitching in weeks 2-3; building a pre-release social rollout the week before drop; and keeping up promotion for at least two weeks after. The sequence matters — miss the distributor window and the Spotify editorial pitch becomes impossible.",
+          },
+          {
+            q: "How far in advance should you plan a music release?",
+            a: "At minimum four weeks before the release date. The hard constraint is the Spotify for Artists editorial pitch, which requires submission at least seven days before the track goes live — but more lead time meaningfully improves your odds. Less than three weeks and you're likely missing the editorial window and going out without pre-release momentum from playlist or blog pitching.",
+          },
+          {
+            q: "Do you need to master a track before releasing it?",
+            a: "Yes. Streaming platforms normalize playback to around -14 LUFS, so an unmastered track typically sounds noticeably quieter and thinner than surrounding tracks in a playlist. Target -14 LUFS integrated with a -1 dBTP true peak ceiling. If you're mastering at home, A/B your master against a commercial track in your genre, level-matched, and close the gap you hear — usually low-end weight and overall level.",
+          },
+          {
+            q: "Should I pitch Spotify editorial for every release?",
+            a: "Yes. Pitching through Spotify for Artists makes your track eligible for Release Radar and costs nothing beyond ten minutes of your time. You can only pitch before the track goes live, not after. Fill out the form with accurate genre, mood, and instrument tags, and a genuine description of what the song is about. Whether or not you land an editorial slot, the pitch signals the platform that a release is incoming.",
+          },
+          {
+            q: "How do I know if my track is ready to release?",
+            a: "The most reliable indicator is pattern feedback from multiple independent listeners. Get fresh ears on the track — people who haven't heard it — without them seeing each other's responses. If several listeners independently flag the same issue (buried vocals, an intro that runs too long, an energy dip in the second half), that's something to fix before release. If they all flag different things, the track is likely ready. After hundreds of listens you can no longer evaluate it the way a first-time listener does — that's why independent, structured feedback is the one pre-release step worth taking seriously.",
+          },
+          {
+            q: "What file format should I submit to a music distributor?",
+            a: "WAV or FLAC at 44.1kHz / 24-bit minimum. Most major distributors — DistroKid, TuneCore, CD Baby — require a lossless file and will not accept MP3. Cover art must be at least 3000×3000px as a JPEG or PNG, with no streaming platform logos and no explicit imagery unless you set the explicit content flag.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-to-get-on-discover-weekly",
     title: "How to Get on Spotify's Discover Weekly",
     coverImage: "/blog/blog12.jpg",

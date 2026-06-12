@@ -36,7 +36,7 @@ Last updated: 2026-06-09
 ### Blog posts (weekly cadence) — next in queue
 | Status | Title | Target keyword |
 |---|---|---|
-| ⏳ | Music Release Checklist: Everything to Do Before You Drop | music release checklist |
+| ✅ | Music Release Checklist: Everything to Do Before You Drop | music release checklist |
 | ⏳ | Is Your Mix Good? 7 Ways to Tell Before You Release | how to know if your mix is good |
 | ⏳ | How to Get on Spotify's Discover Weekly | how to get on discover weekly |
 | ⏳ | How to Promote Your Music on Spotify Without a Label | how to promote music on spotify |
