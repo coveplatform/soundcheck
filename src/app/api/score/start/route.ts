@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { generateAndStoreReport } from "@/lib/score-report-ai";
 import { isSupportedTrackUrl, normalizeTrackUrl } from "@/lib/track-url";
+import { resolveShortUrl } from "@/lib/metadata";
 
 // Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
 // Replicate cold start. Needs Fluid compute / Pro for >60.
@@ -64,11 +65,15 @@ export async function POST(request: Request) {
     }
 
 
+    // on.soundcloud.com share shortlinks must be expanded here: the reviewer-side
+    // SoundCloud widget embed can't resolve them (dead player → "can't play"
+    // flags), even though the audio worker follows redirects fine. /submit
+    // resolves identically — its pre-start match compares URLs exactly.
     const claimToken = randomUUID();
     const report = await prisma.trackScoreReport.create({
       data: {
         email: "", // unknown until /claim attaches the authenticated user
-        trackUrl: normalizeTrackUrl(trackUrl),
+        trackUrl: await resolveShortUrl(normalizeTrackUrl(trackUrl)),
         trackTitle: trackTitle?.trim() || null,
         genre: genre?.trim() || "Other",
         notes: notes?.trim() || null,

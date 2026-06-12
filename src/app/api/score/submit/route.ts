@@ -8,6 +8,7 @@ import { isScoreSubscribed } from "@/lib/score-subscription";
 import { freeReadUsed } from "@/lib/score-free-cap";
 import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
 import { isSupportedTrackUrl, normalizeTrackUrl } from "@/lib/track-url";
+import { resolveShortUrl } from "@/lib/metadata";
 
 // Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
 // Replicate cold start. Needs Fluid compute / Pro for >60.
@@ -60,7 +61,11 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const normalizedTrackUrl = normalizeTrackUrl(trackUrl);
+    // Expand on.soundcloud.com shortlinks exactly like /start does — the
+    // pre-start match below compares this against the stored URL, so the two
+    // endpoints must normalize identically. (Shortlinks break the reviewer-side
+    // widget embed; see /api/score/start.)
+    const normalizedTrackUrl = await resolveShortUrl(normalizeTrackUrl(trackUrl));
 
     // Free-tier ladder (open-read model only): an email past its lifetime free
     // read still submits fine — the track generates normally but will render

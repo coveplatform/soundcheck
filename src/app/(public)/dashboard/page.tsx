@@ -69,6 +69,7 @@ export default async function ReportsPage() {
       verdict: true,
       paidAt: true,
       humanRoomSkipped: true,
+      humanReviewsRequested: true,
       createdAt: true,
     },
   });
@@ -77,7 +78,10 @@ export default async function ReportsPage() {
   const subscribed = await isScoreSubscribed(email);
   const roomQuota = subscribed ? await getScoreRoomQuota(email) : null;
 
-  // Human "room" progress per report: completed vs assigned.
+  // Human "room" progress per report. Any ScoreReview row means the room is
+  // active (pre-room reports have none → row hidden), but the denominator is
+  // the promised room size — NOT the row count, which also includes released
+  // and expired seats and would climb as reviewers churn.
   const reportIds = reports.map((r) => r.id);
   const [assignedGroups, completedGroups] = reportIds.length
     ? await Promise.all([
@@ -233,7 +237,7 @@ export default async function ReportsPage() {
                     </p>
                     {(assignedBy.get(r.id) ?? 0) > 0 ? (
                       <p className={`${mono.className} text-[11px] mt-1`} style={{ color: ACCENT }}>
-                        ♫ {completedBy.get(r.id) ?? 0}/{assignedBy.get(r.id)} listeners in
+                        ♫ {completedBy.get(r.id) ?? 0}/{r.humanReviewsRequested} listeners in
                       </p>
                     ) : r.humanRoomSkipped ? (
                       <p className={`${mono.className} text-[11px] mt-1 text-white/35`}>

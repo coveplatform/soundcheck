@@ -292,12 +292,15 @@ export default async function ReportPage({
     note: notes[key] ?? "",
   });
 
-  // Real human reactions ("room of 5"). Total = reviewers actually assigned to
-  // THIS report (0 for reports created before the room existed → section hidden).
-  const [humanRows, humanTotal] = await Promise.all([
+  // Real human reactions ("room of 5"). Any ScoreReview row means the room is
+  // active for this report (0 rows = created before the room existed → section
+  // hidden), but the shown total is the promised room size — the raw row count
+  // also includes released/expired seats and climbs as reviewers churn.
+  const [humanRows, seatRows] = await Promise.all([
     getReportHumanReviews(report.id),
     prisma.scoreReview.count({ where: { reportId: report.id } }),
   ]);
+  const humanTotal = seatRows > 0 ? report.humanReviewsRequested : 0;
   const humanReviews = humanRows.map((h) => ({
     rating: Math.max(1, Math.min(5, Math.round(h.rating ?? 3))),
     headline: h.headline || "",
