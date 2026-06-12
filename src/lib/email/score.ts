@@ -1,4 +1,5 @@
 import { getAppUrl, sendEmail } from "./templates";
+import { UNLOCK_PRICE_CENTS, scoreSubPrice } from "@/lib/score-pricing";
 
 /**
  * Score-product emails (the new MixReflect): dark, icy-cyan brand to match the
@@ -147,4 +148,93 @@ export function buildNewMixReflectAnnouncement(userName?: string | null): { subj
 export async function sendNewMixReflectAnnouncement(to: string, userName?: string | null): Promise<boolean> {
   const { subject, html } = buildNewMixReflectAnnouncement(userName);
   return sendEmail({ to, subject, html });
+}
+
+// ── Win-back offer: 50% off the first month of Unlimited ───────────
+// Manual send (admin) to free signups who never converted. The CTA hits
+// /api/score/subscribe/offer which applies the coupon and 302s into checkout.
+export function buildUnlimitedOfferEmail(args: {
+  email: string;
+  userName?: string | null;
+}): { subject: string; html: string } {
+  const app = getAppUrl();
+  const name = args.userName ? args.userName.split(" ")[0] : null;
+  const monthly = scoreSubPrice("monthly").amount;
+  const full = `$${(monthly / 100).toFixed(2)}`;
+  const half = `$${(Math.floor(monthly / 2) / 100).toFixed(2)}`;
+  const claimUrl = `${app}/api/score/subscribe/offer?email=${encodeURIComponent(args.email)}`;
+
+  const row = (text: string) => `
+    <tr><td style="padding:10px 0;border-top:1px solid rgba(255,255,255,0.08);">
+      <p style="margin:0;font-size:14px;line-height:1.6;color:${MUTED};"><span style="color:${ACCENT};">✓</span>&nbsp; ${text}</p>
+    </td></tr>`;
+
+  const content = `
+    ${kicker("unlimited · 50% off your first month")}
+    ${h1(`${name ? `Hey ${name} — your` : "Your"} first month, half price 🎧`)}
+    ${p(`You scored a track on MixReflect, then it went quiet. So here&rsquo;s a reason to come back: <strong style="color:${TEXT};">Unlimited at 50% off your first month</strong>.`)}
+    ${p(`Unlimited means every track you submit gets the full treatment:`)}
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:4px 0 8px;">
+      ${row(`Every report fully unlocked — score out of 100, verdict, and the full breakdown`)}
+      ${row(`A room of real listeners on every track — honest reactions from real ears`)}
+      ${row(`Submit as many tracks as you want while you&rsquo;re subscribed`)}
+    </table>
+    <div style="background:${BG};border:1px solid ${BORDER};border-radius:10px;padding:16px;margin:10px 0 4px;">
+      <span style="font-size:15px;color:${MUTED};text-decoration:line-through;">${full}</span>
+      <span style="font-size:20px;font-weight:800;color:${ACCENT};">&nbsp;${half}</span>
+      <span style="font-size:14px;color:${MUTED};"> your first month — then ${full}/mo, cancel anytime.</span>
+    </div>
+    ${button("Claim 50% off →", claimUrl)}
+    <p style="margin:14px 0 0;font-size:13px;line-height:1.6;color:${MUTED};">
+      The link applies the discount automatically at checkout — no code to type. Monthly plan only.
+    </p>`;
+
+  return { subject: "your first month of unlimited — 50% off 🎧", html: shell(content) };
+}
+
+export async function sendUnlimitedOfferEmail(args: {
+  to: string;
+  userName?: string | null;
+}): Promise<boolean> {
+  const { subject, html } = buildUnlimitedOfferEmail({ email: args.to, userName: args.userName });
+  return sendEmail({ to: args.to, subject, html });
+}
+
+// ── Sealed-report reminder: scored but never unlocked ───────────────
+// Nudge for submitters whose report finished but who never paid. Reminds them
+// the read is done + sealed, and upsells the room of real listeners.
+export function buildReportReminderEmail(args: {
+  trackTitle?: string | null;
+  slug: string;
+}): { subject: string; html: string } {
+  const app = getAppUrl();
+  const title = args.trackTitle || "your track";
+  const url = `${app}/report/${args.slug}`;
+  const unlock = `$${(UNLOCK_PRICE_CENTS / 100).toFixed(2)}`;
+  const monthly = `$${(scoreSubPrice("monthly").amount / 100).toFixed(2)}`;
+
+  const content = `
+    ${kicker("your report · still sealed")}
+    ${h1("The read on your track is done. It&rsquo;s just sealed.")}
+    ${p(`We ran the full read on <strong style="color:${TEXT};">${title}</strong> — a score out of 100, a verdict, what&rsquo;s working, and the first thing to fix. It&rsquo;s all sitting in your report, sealed until you open it.`)}
+    ${p(`Unlocking also puts <strong style="color:${TEXT};">${title}</strong> in front of a room of real listeners — actual people, paid to listen, whose honest reactions land in your report as they come in. Not just the machine&rsquo;s opinion.`)}
+    <div style="background:${BG};border:1px solid ${BORDER};border-radius:10px;padding:16px;margin:6px 0 4px;">
+      <p style="margin:0 0 6px;font-size:14px;color:${MUTED};"><span style="font-size:17px;font-weight:800;color:${ACCENT};">${unlock}</span> one-time — unlock this report in full</p>
+      <p style="margin:0;font-size:14px;color:${MUTED};"><span style="font-size:17px;font-weight:800;color:${TEXT};">${monthly}/mo</span> unlimited — every track you submit, fully unlocked</p>
+    </div>
+    ${button("Open your report →", url)}
+    <p style="margin:14px 0 0;font-size:13px;line-height:1.6;color:${MUTED};">
+      Your report doesn&rsquo;t expire — but the longer the track sits, the longer you&rsquo;re guessing.
+    </p>`;
+
+  return { subject: `the read on ${title} is done — still sealed`, html: shell(content) };
+}
+
+export async function sendReportReminderEmail(args: {
+  to: string;
+  trackTitle?: string | null;
+  slug: string;
+}): Promise<boolean> {
+  const { subject, html } = buildReportReminderEmail(args);
+  return sendEmail({ to: args.to, subject, html });
 }

@@ -18,6 +18,12 @@ import { generateReleaseDecisionReport } from "@/lib/release-decision-report";
 import { sendWeeklyDigestEmail } from "@/lib/email/digest";
 import { sendCreditsNudgeEmail } from "@/lib/email/nudge";
 import { sendTotdWeeklyEmail, sendTotdDailyEmail } from "@/lib/email/totd-digest";
+import {
+  buildUnlimitedOfferEmail,
+  sendUnlimitedOfferEmail,
+  buildReportReminderEmail,
+  sendReportReminderEmail,
+} from "@/lib/email/score";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "").split(",").map((e) => e.trim().toLowerCase());
 
@@ -310,6 +316,10 @@ function buildPreviewHtml(type: string): string {
       `;
       return emailWrapper(content);
     }
+    case "unlimited-offer":
+      return buildUnlimitedOfferEmail({ email: "artist@example.com", userName: "Test Artist" }).html;
+    case "report-reminder":
+      return buildReportReminderEmail({ trackTitle: "Summer Nights (Demo)", slug: "demo-full" }).html;
     default:
       return emailWrapper(`<p>Unknown email type: ${type}</p>`);
   }
@@ -400,6 +410,12 @@ export async function POST(request: Request) {
           dateLabel: "Thursday, May 29",
           pick: { title: "Low Tide", artistName: "Niko Vale", genre: "Lo-fi", editorNote: "There's a stillness to this one that feels deliberate — the way the kick sits back in the mix instead of leading, letting the chords breathe. Worth your full attention." },
         });
+        break;
+      case "unlimited-offer":
+        await sendUnlimitedOfferEmail({ to: recipientEmail, userName: "Test Artist" });
+        break;
+      case "report-reminder":
+        await sendReportReminderEmail({ to: recipientEmail, trackTitle: "Summer Nights (Demo)", slug: "demo-full" });
         break;
       default:
         return NextResponse.json({ error: `Unknown type: ${type}` }, { status: 400 });

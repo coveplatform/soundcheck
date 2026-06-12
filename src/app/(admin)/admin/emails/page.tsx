@@ -14,6 +14,8 @@ const EMAIL_TYPES = [
   { id: "weekly-digest", name: "Weekly Digest", description: "Monday recap — credits, reviews, queue activity", category: "Marketing" },
   { id: "credits-nudge", name: "Credits Nudge", description: "Wednesday nudge for free users with idle credits", category: "Marketing" },
   { id: "totd-digest", name: "Track of the Day", description: "Daily email announcing yesterday's featured track with editor note", category: "Marketing" },
+  { id: "unlimited-offer", name: "Unlimited 50% Off (Win-back)", description: "50% off first month of Unlimited — for free signups who never converted. CTA applies the coupon and goes straight to checkout.", category: "Marketing" },
+  { id: "report-reminder", name: "Sealed Report Reminder", description: "Scored but never unlocked — reminds them the read is done + sealed, pitches the room of real listeners and the one-time unlock.", category: "Marketing" },
   { id: "tier-change", name: "Tier Change", description: "Reviewer promoted to new tier", category: "Reviewer" },
   { id: "password-reset", name: "Password Reset", description: "Password reset link", category: "Auth" },
   { id: "admin-new-track", name: "Admin: New Track", description: "Admin notification for new submission", category: "Admin" },
@@ -135,6 +137,8 @@ const EMAIL_OVERVIEW = [
   { name: "Weekly Digest", recipient: "Free users active in last 30 days", trigger: "Cron — every Monday 9am UTC", frequency: "Weekly", status: "live" },
   { name: "Credits Nudge", recipient: "Free users with 3+ idle credits", trigger: "Cron — every Wednesday 10am UTC", frequency: "Weekly (max 1/month per user)", status: "live" },
   { name: "Track of the Day", recipient: "All users", trigger: "Cron — daily 10am UTC", frequency: "Daily", status: "live" },
+  { name: "Unlimited 50% Off (Win-back)", recipient: "Free signups who never converted", trigger: "Manual — admin send", frequency: "One-off campaign", status: "live" },
+  { name: "Sealed Report Reminder", recipient: "Submitters with an unpaid finished report", trigger: "Manual for now — cron not wired yet", frequency: "Max 1 per report", status: "live" },
 ];
 
 export default function AdminEmailsPage() {
