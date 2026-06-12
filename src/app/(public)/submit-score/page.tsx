@@ -8,6 +8,8 @@ import { Logo } from "@/components/ui/logo";
 import { ArrowRight, Loader2, Music, X, Upload } from "lucide-react";
 import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
 import { scoreConversions } from "@/lib/score-conversions";
+import { FreeReadUpsell } from "@/components/score/free-read-upsell";
+import { FREE_FULL_READ } from "@/lib/score-free-tier";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -31,6 +33,8 @@ export default function SubmitScorePage() {
   const [email, setEmail] = useState(session?.user?.email ?? "");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  // Free read already used: pause on the sealed-report upsell before the report.
+  const [capUpsell, setCapUpsell] = useState<{ slug: string } | null>(null);
 
   const [meta, setMeta] = useState<Meta | null>(null);
   const [metaLoading, setMetaLoading] = useState(false);
@@ -194,6 +198,12 @@ export default function SubmitScorePage() {
         return;
       }
       scoreConversions.submitTrack(data.slug);
+      if (data.freeReadUsed) {
+        // free read already used — set the sealed expectation before the report
+        setSubmitting(false);
+        setCapUpsell({ slug: data.slug });
+        return;
+      }
       window.location.href = `/report/${data.slug}`;
     } catch {
       setError("Failed to submit. Try again.");
@@ -230,8 +240,9 @@ export default function SubmitScorePage() {
           get an honest <span style={{ color: ACCENT }}>read</span>.
         </h1>
         <p className="text-white/70 text-lg mb-10 normal-case max-w-md leading-relaxed">
-          An instant, honest read on your track. Free to submit — unlock the
-          full report whenever you like.
+          {FREE_FULL_READ
+            ? "Your first full report is free — score, written read, fixes, the lot. After that it's $6.95 a track, or unlimited for $19.95/mo."
+            : "An instant, honest read on your track. Free to submit — unlock the full report whenever you like."}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -432,7 +443,9 @@ export default function SubmitScorePage() {
             )}
           </button>
           <p className={`${mono.className} text-center text-[12px] text-white/50 normal-case`}>
-            no card to submit · unlock the full read for $6.95
+            {FREE_FULL_READ
+              ? "no card needed · first report free · then $6.95 a track or unlimited"
+              : "no card to submit · unlock the full read for $6.95"}
           </p>
         </form>
 
@@ -445,6 +458,14 @@ export default function SubmitScorePage() {
           </Link>
         </div>
       </div>
+
+      {capUpsell && (
+        <FreeReadUpsell
+          continueHref={`/report/${capUpsell.slug}`}
+          onContinue={() => (window.location.href = `/report/${capUpsell.slug}`)}
+          email={session?.user?.email ?? email}
+        />
+      )}
 
       {/* brief hand-off overlay — the report page owns the real progress now */}
       {submitting && (

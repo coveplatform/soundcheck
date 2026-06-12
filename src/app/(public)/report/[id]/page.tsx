@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getReportHumanReviews, getScoreRoomQuota } from "@/lib/score-review";
+import { isFreeOpenRead } from "@/lib/score-free-cap";
 import { ReportView, type ReportViewModel, type Verdict } from "./report-view";
 // Real measured waveform for the demo (worker `_report_waveform` output,
 // borrowed from the demo-free prototype's sample track).
@@ -189,6 +190,25 @@ export default async function ReportPage({
     return <ReportView data={DEMO} />;
   }
 
+  // The open-read (free-tier) model: the full AI read rendered free — score,
+  // prose, every dimension note, fixes and waveform all open — with the human
+  // room + deep read as the paid upgrade. The prototype for FREE_FULL_READ.
+  if (id === "demo-open") {
+    return (
+      <ReportView
+        data={{
+          ...DEMO,
+          slug: "demo-open",
+          unlocked: false,
+          openRead: true,
+          humanReviews: [],
+          humanReviewsIn: 0,
+          humanReviewsTotal: 0,
+        }}
+      />
+    );
+  }
+
   // The same sample track in its pre-purchase state: sealed prose, the
   // room-is-waiting pitch (with sample reaction), and the unlock gate.
   if (id === "demo-locked") {
@@ -291,11 +311,20 @@ export default async function ReportPage({
     ? fmtDate((await getScoreRoomQuota(report.email)).resetsAt)
     : null;
 
+  // The free-tier ladder: an unpaid report renders open only if it's this
+  // email's lifetime free read (their earliest valid report) — every later
+  // track renders sealed and opens via the existing $6.95 unlock. Paid skips
+  // the lookup. No-op while FREE_FULL_READ is off.
+  const openRead =
+    report.paidAt == null &&
+    (await isFreeOpenRead({ id: report.id, email: report.email }));
+
   const data: ReportViewModel = {
     slug: report.slug,
     isDemo: false,
     pending: false,
     unlocked: report.paidAt != null,
+    openRead,
     trackTitle: report.trackTitle || "Your track",
     genre: report.genre || "—",
     scoredAt: fmtDate(report.completedAt ?? report.createdAt),

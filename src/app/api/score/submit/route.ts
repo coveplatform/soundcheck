@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { generateAndStoreReport, regenerateDeepReport } from "@/lib/score-report-ai";
 import { decideRoomEligibility } from "@/lib/score-review";
 import { isScoreSubscribed } from "@/lib/score-subscription";
+import { freeReadUsed } from "@/lib/score-free-cap";
 import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
 import { isSupportedTrackUrl, normalizeTrackUrl } from "@/lib/track-url";
 
@@ -60,6 +61,13 @@ export async function POST(request: Request) {
       );
     }
     const normalizedTrackUrl = normalizeTrackUrl(trackUrl);
+
+    // Free-tier ladder (open-read model only): an email past its lifetime free
+    // read still submits fine — the track generates normally but will render
+    // SEALED (the $6.95 unlock opens it). Computed BEFORE the report below
+    // exists so the new submission doesn't count against itself; the client
+    // uses the flag to set expectations (sealed-report upsell).
+    const usedFreeRead = await freeReadUsed(effectiveEmail);
 
     const artistId = session?.user?.id
       ? await prisma.artistProfile
@@ -122,6 +130,13 @@ export async function POST(request: Request) {
         );
       }
 
+      // Record the client IP on fresh creates too (the pre-start path already
+      // does) — the free-tier daily IP cap counts both.
+      const ip =
+        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        request.headers.get("x-real-ip") ||
+        "unknown";
+
       report = await prisma.trackScoreReport.create({
         data: {
           email: effectiveEmail,
@@ -131,6 +146,7 @@ export async function POST(request: Request) {
           notes: notes?.trim() || null,
           artistId,
           status: "PENDING",
+          createdByIp: ip,
         },
         select: { id: true, slug: true },
       });
@@ -199,7 +215,7 @@ export async function POST(request: Request) {
       unlocked,
     }).catch((err) => console.error("[score/submit] admin notify error:", err));
 
-    return NextResponse.json({ slug: report.slug });
+    return NextResponse.json({ slug: report.slug, freeReadUsed: usedFreeRead });
   } catch (error) {
     console.error("Score submit error:", error);
     return NextResponse.json(

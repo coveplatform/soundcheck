@@ -6,6 +6,7 @@ import { assignReviewersToTrack } from "@/lib/queue";
 import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email";
 import { finalizePaidCheckoutSession } from "@/lib/payments";
 import { activateSubscriber, updateSubscriberStatus } from "@/lib/score-subscription";
+import { decideRoomEligibility } from "@/lib/score-review";
 import { regenerateDeepReport } from "@/lib/score-report-ai";
 import type Stripe from "stripe";
 
@@ -194,6 +195,33 @@ async function handleScoreSubscriptionCheckout(session: Stripe.Checkout.Session)
           ? session.subscription
           : session.subscription?.id ?? null,
     });
+
+    // Subscribed FROM a specific report (the slug rides in checkout metadata):
+    // that track gets the full subscriber treatment — the back-unlock above
+    // deliberately skips rooms for the whole backlog, but the report they were
+    // sold on earns a real room (within the monthly cap) + the deep read.
+    // decideRoomEligibility only ever denies, so un-skip first; it re-skips if
+    // the cycle's rounds are spent.
+    const fromReport = session.metadata?.fromReport;
+    if (fromReport) {
+      const report = await prisma.trackScoreReport.findUnique({
+        where: { slug: fromReport },
+        select: { id: true, email: true },
+      });
+      if (report && report.email.trim().toLowerCase() === email.trim().toLowerCase()) {
+        await prisma.trackScoreReport.update({
+          where: { id: report.id },
+          data: { humanRoomSkipped: false, status: "IN_REVIEW" },
+        });
+        await decideRoomEligibility(email, report.id);
+        after(() =>
+          regenerateDeepReport(report.id).catch((err) =>
+            console.error("Error generating deep report after subscribe:", err)
+          )
+        );
+      }
+    }
+
     console.log(`Activated score subscription for ${email} (session ${session.id})`);
   } catch (error) {
     console.error("Error handling score subscription checkout:", error);

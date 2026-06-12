@@ -63,6 +63,7 @@ export async function POST(request: Request) {
       );
     }
 
+
     const claimToken = randomUUID();
     const report = await prisma.trackScoreReport.create({
       data: {

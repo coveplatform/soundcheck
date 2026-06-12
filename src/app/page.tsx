@@ -14,6 +14,8 @@ import { posts } from "@/lib/blog-posts";
 import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
 import { CreepingBar, EqBars, Elapsed } from "@/components/score/analyzing-bits";
 import { scoreConversions } from "@/lib/score-conversions";
+import { FreeReadUpsell } from "@/components/score/free-read-upsell";
+import { FREE_FULL_READ } from "@/lib/score-free-tier";
 import { ArrowRight, ArrowDown, Music, Loader2, X, Zap, Users, Headphones, Play, Upload } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -367,11 +369,15 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Who are the five listeners in the room?",
-    a: "Real, paid listeners — not bots and not playlist curators. Each track is heard by a room of five people who react honestly to what they hear. You see every reaction headline for free; the full reactions are part of the unlocked report.",
+    a: FREE_FULL_READ
+      ? "Real, paid listeners — not bots and not playlist curators. The room joins when you unlock a track ($6.95) or subscribe: five people hear your track end to end and you watch each honest reaction land live on your report."
+      : "Real, paid listeners — not bots and not playlist curators. Each track is heard by a room of five people who react honestly to what they hear. You see every reaction headline for free; the full reactions are part of the unlocked report.",
   },
   {
     q: "Is MixReflect actually free?",
-    a: "Yes. Submitting a track is free and gets you your score out of 100, the verdict, the five-dimension breakdown, every reaction headline and your three fixes — no card needed. Unlocking the complete report for one track is a one-time $6.95, or $19.95/month for unlimited auto-unlocks.",
+    a: FREE_FULL_READ
+      ? "Your first track is — the complete report, free: score out of 100, the full written read, all three fixes and the measured waveform, no card needed. After that, each track's report opens for a one-time $6.95 (which also sends it to the room of five real listeners), or $19.95/month for unlimited."
+      : "Yes. Submitting a track is free and gets you your score out of 100, the verdict, the five-dimension breakdown, every reaction headline and your three fixes — no card needed. Unlocking the complete report for one track is a one-time $6.95, or $19.95/month for unlimited auto-unlocks.",
   },
   {
     q: "What can I submit?",
@@ -426,6 +432,8 @@ export default function ScorePage() {
   const [busy, setBusy] = useState(false);
   const [subscribing, setSubscribing] = useState<"monthly" | "annual" | null>(null);
   const [error, setError] = useState("");
+  // Free read already used: pause on the sealed-report upsell before the report.
+  const [capUpsell, setCapUpsell] = useState<{ slug: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadedName, setUploadedName] = useState("");
   const [dragging, setDragging] = useState(false);
@@ -679,6 +687,12 @@ export default function ScorePage() {
       const data = await res.json().catch(() => null);
       if (data?.slug) {
         scoreConversions.submitTrack(data.slug);
+        if (data.freeReadUsed) {
+          // free read already used — set the sealed expectation before the report
+          setBusy(false);
+          setCapUpsell({ slug: data.slug });
+          return;
+        }
         router.push(`/report/${data.slug}`);
         return;
       }
@@ -734,6 +748,13 @@ export default function ScorePage() {
       className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase scroll-smooth`}
     >
       <style>{`@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}@keyframes paidBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}`}</style>
+
+      {capUpsell && (
+        <FreeReadUpsell
+          continueHref={`/report/${capUpsell.slug}`}
+          onContinue={() => router.push(`/report/${capUpsell.slug}`)}
+        />
+      )}
 
       {/* grain */}
       <div
@@ -1341,7 +1362,9 @@ export default function ScorePage() {
             one plan. no noise.
           </h2>
           <p className="text-white/60 text-lg mb-12 normal-case max-w-md">
-            Submitting and your teaser are free.
+            {FREE_FULL_READ
+              ? "Your first full report is free. After that, $6.95 a track — or go unlimited."
+              : "Submitting and your teaser are free."}
           </p>
           <div className="grid md:grid-cols-3 gap-px bg-white/10 border border-white/10">
             {/* free */}
@@ -1352,7 +1375,10 @@ export default function ScorePage() {
                 no card needed
               </p>
               <ul className={`${mono.className} mt-7 space-y-2.5 text-[13.5px] text-white/55 normal-case`}>
-                {["your score out of 100", "verdict + 5-dimension breakdown", "every reaction headline", "the three things to fix"].map((x) => (
+                {(FREE_FULL_READ
+                  ? ["your first track's FULL report", "score, verdict + the complete written read", "all three fixes, in full", "the measured waveform"]
+                  : ["your score out of 100", "verdict + 5-dimension breakdown", "every reaction headline", "the three things to fix"]
+                ).map((x) => (
                   <li key={x} className="flex gap-2"><span style={{ color: ACCENT }}>+</span>{x}</li>
                 ))}
               </ul>
@@ -1373,7 +1399,10 @@ export default function ScorePage() {
                 one track · yours forever
               </p>
               <ul className={`${mono.className} mt-7 space-y-2.5 text-[13.5px] text-white/70 normal-case`}>
-                {["everything in free", "every reaction in full", "the complete written read", "the detail behind all three fixes"].map((x) => (
+                {(FREE_FULL_READ
+                  ? ["every track after your first", "the full report, unsealed", "the room — 5 real people react", "the deep stem-level mix read"]
+                  : ["everything in free", "every reaction in full", "the complete written read", "the detail behind all three fixes"]
+                ).map((x) => (
                   <li key={x} className="flex gap-2"><span style={{ color: ACCENT }}>+</span>{x}</li>
                 ))}
               </ul>
@@ -1381,7 +1410,7 @@ export default function ScorePage() {
                 href="#top"
                 className="mt-7 block w-full text-center bg-white/10 hover:bg-white/20 text-white font-extrabold py-3.5 transition-colors"
               >
-                start free →
+                {FREE_FULL_READ ? "score a track →" : "start free →"}
               </a>
             </div>
             {/* unlimited — solid blue */}

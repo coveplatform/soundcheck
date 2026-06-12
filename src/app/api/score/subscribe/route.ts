@@ -41,6 +41,10 @@ export async function POST(request: Request) {
 
     const success = returnTo?.startsWith("/") ? returnTo : "/dashboard";
 
+    // Subscribing from a report page: pass the slug to the webhook so THAT
+    // track gets the room + deep read (the backlog back-unlock skips rooms).
+    const fromReport = /^\/report\/([\w-]+)$/.exec(success)?.[1];
+
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
@@ -62,7 +66,11 @@ export async function POST(request: Request) {
       // `plan` lets the success page report the right conversion value to ad pixels.
       success_url: `${appUrl}${success}?subscribed=1&plan=${planKey}`,
       cancel_url: `${appUrl}${success}`,
-      metadata: { type: "score_subscription", email: effectiveEmail },
+      metadata: {
+        type: "score_subscription",
+        email: effectiveEmail,
+        ...(fromReport ? { fromReport } : {}),
+      },
       subscription_data: {
         metadata: { type: "score_subscription", email: effectiveEmail },
       },

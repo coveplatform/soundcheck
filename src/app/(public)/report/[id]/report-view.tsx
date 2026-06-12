@@ -16,6 +16,7 @@ import {
 } from "@/components/score/analyzing-bits";
 import { Logo } from "@/components/ui/logo";
 import { SCORE_GENRES } from "@/lib/score-genres";
+import { FREE_FULL_READ } from "@/lib/score-free-tier";
 import { scoreConversions } from "@/lib/score-conversions";
 import type { SubPlan } from "@/lib/score-pricing";
 import { ArrowRight, Share2, Lock, Hourglass, User, Loader2, Check } from "lucide-react";
@@ -51,6 +52,9 @@ export type ReportViewModel = {
   isDemo: boolean;
   pending: boolean;
   unlocked: boolean;
+  /** Open-read (free-tier) model: the full AI read renders without payment —
+      `unlocked` then gates only the human room + deep read. */
+  openRead?: boolean;
   trackTitle: string;
   artworkUrl: string | null;
   genre: string;
@@ -187,7 +191,43 @@ export function ReportView({ data }: { data: ReportViewModel }) {
   const [copied, setCopied] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const [subscribing, setSubscribing] = useState<"monthly" | "annual" | null>(null);
-  const locked = !data.unlocked;
+  // openRead: the read is free in full — nothing seals, and `locked` (which
+  // drives the sealed-teaser page + every blur) never engages. Payment then
+  // only buys the room + deep read, gated off `data.unlocked` directly.
+  const openRead = Boolean(data.openRead);
+  const locked = !data.unlocked && !openRead;
+
+  // Open-read page furniture: a numbered section index (hero nav + kickers) so
+  // the long page reads as a guided report, plus shared card styling that
+  // chunks each section visually.
+  const toc = openRead
+    ? [
+        ...(data.waveform ? [{ id: "listen", label: "the listen" }] : []),
+        { id: "breakdown", label: "the breakdown" },
+        { id: "read", label: "the read" },
+        { id: "seats", label: "every seat" },
+        { id: "fixes", label: "the fixes" },
+      ]
+    : [];
+  const secNum = (id: string) => {
+    const i = toc.findIndex((s) => s.id === id);
+    return i >= 0 ? `${String(i + 1).padStart(2, "0")} · ` : "";
+  };
+  const sectionCard = openRead
+    ? "scroll-mt-24 border border-white/10 bg-[#0c0c0c] p-6 sm:p-8"
+    : "";
+
+  // Sticky buy bar (open-read, room not purchased) — hides while the pricing
+  // section itself is on screen so it never doubles the CTA.
+  const [buyBarHidden, setBuyBarHidden] = useState(false);
+  useEffect(() => {
+    if (!openRead || data.unlocked) return;
+    const el = document.getElementById("unlock");
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const obs = new IntersectionObserver(([e]) => setBuyBarHidden(e.isIntersecting));
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [openRead, data.unlocked]);
   // Measured moment markers, derived client-side from the stored waveform.
   const waveMoments = data.waveform ? deriveWaveMoments(data.waveform) : [];
 
@@ -206,12 +246,13 @@ export function ReportView({ data }: { data: ReportViewModel }) {
   }, [data.isDemo, data.slug]);
 
   // Just back from Stripe? The success redirect lands a beat before the webhook
-  // flips `paidAt`, so the report can still read locked. Poll a refresh until the
-  // unlock lands (or we give up) instead of stranding a paying customer on the
-  // paywall. `finalizing` drives a "finalizing your unlock…" state over the gate.
+  // flips `paidAt`, so the report can still read unpaid. Poll a refresh until
+  // the unlock lands (or we give up) instead of stranding a paying customer on
+  // the paywall. Keyed off `data.unlocked` (not `locked`) — an open-read report
+  // is never `locked`, but a room purchase on it still needs this poll.
   const [finalizing, setFinalizing] = useState(false);
   useEffect(() => {
-    if (data.isDemo || !locked) return;
+    if (data.isDemo || data.unlocked) return;
     const params = new URLSearchParams(window.location.search);
     if (!params.has("unlocked") && !params.has("subscribed")) return;
     setFinalizing(true);
@@ -226,7 +267,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
       router.refresh();
     }, 2000);
     return () => clearInterval(t);
-  }, [data.isDemo, locked, router]);
+  }, [data.isDemo, data.unlocked, router]);
 
   // Live room: while listeners are still coming in, quietly re-fetch so new
   // reactions appear without a manual refresh.
@@ -458,6 +499,12 @@ export function ReportView({ data }: { data: ReportViewModel }) {
           <p className={`${mono.className} text-[12.5px] mt-3 normal-case max-w-sm mx-auto`} style={{ color: ACCENT }}>
             {VERDICT_LINES[data.verdict].tease}
           </p>
+          {FREE_FULL_READ && !data.isDemo && (
+            <p className={`${mono.className} text-[12px] text-white/40 mt-3 normal-case max-w-sm mx-auto`}>
+              your first track&apos;s report was free — this one opens with a one-time
+              unlock, or go unlimited and never see a seal again.
+            </p>
+          )}
           {data.scoreGuess != null && (
             <p className={`${mono.className} text-[13px] text-white/55 mt-3 normal-case`}>
               you called <span className="font-bold text-white">{data.scoreGuess}</span> — unlock to see how close you were.
@@ -766,7 +813,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
 
       {/* ── VERDICT HERO ── */}
       <section className="relative z-10 max-w-3xl mx-auto px-5 pt-14 pb-12 text-center">
-        <Kicker>an honest read on your track</Kicker>
+        <Kicker>{openRead ? "your full read — free, nothing sealed" : "an honest read on your track"}</Kicker>
         <div className={`flex items-center gap-4 sm:gap-5 mb-9 ${data.artworkUrl ? "justify-center text-left" : "justify-center text-center flex-col gap-0"}`}>
           {data.artworkUrl && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -833,95 +880,50 @@ export function ReportView({ data }: { data: ReportViewModel }) {
             {VERDICT_LINES[data.verdict].tease}
           </p>
         )}
-        <div className="w-56 sm:w-72 mx-auto mt-5">
-          <div className="h-1.5 bg-white/10 overflow-hidden">
-            <div
-              className="h-full"
-              style={{ width: `${data.score}%`, background: ACCENT }}
-            />
+        {!openRead && (
+          <div className="w-56 sm:w-72 mx-auto mt-5">
+            <div className="h-1.5 bg-white/10 overflow-hidden">
+              <div
+                className="h-full"
+                style={{ width: `${data.score}%`, background: ACCENT }}
+              />
+            </div>
+            <div className={`${mono.className} flex justify-between mt-1.5 text-[10px] text-white/25`}>
+              <span>0</span>
+              <span>100</span>
+            </div>
           </div>
-          <div className={`${mono.className} flex justify-between mt-1.5 text-[10px] text-white/25`}>
-            <span>0</span>
-            <span>100</span>
-          </div>
-        </div>
-      </section>
-
-      <div className="relative z-10 max-w-3xl mx-auto px-5 pb-16 space-y-14">
-        {/* ── THE ROOM IS WAITING (locked, before payment) ── */}
-        {locked && data.humanReviewsTotal === 0 && !data.roomSkipped && (
-          <section className="border-2 bg-[#0c0c0c] p-6 sm:p-8" style={{ borderColor: "rgba(110,231,255,0.45)" }}>
-            <div className="flex items-center gap-2.5 mb-4">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: ACCENT }} />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: ACCENT }} />
-              </span>
-              <span className={`${mono.className} text-[12px] tracking-wide`} style={{ color: ACCENT }}>
-                the room · standing by
-              </span>
-            </div>
-            <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
-              5 real listeners are <span style={{ color: ACCENT }}>waiting</span> to hear this.
-            </h3>
-            <p className="text-white/70 normal-case leading-relaxed mb-6 max-w-lg">
-              The score above is your instant AI read. Unlock and your track goes straight to a room
-              of <strong className="text-white">5 real people</strong> — they listen end to end and
-              leave honest, specific reactions. You&apos;ll watch each one land right here.
-            </p>
-
-            {/* a real reaction, shown in full — proof of what a seat delivers */}
-            <p className={`${mono.className} text-[11px] text-white/45 mb-2.5 normal-case`}>
-              here&apos;s what one looks like, from another artist&apos;s room:
-            </p>
-            <div className="relative max-w-md bg-[#0a0a0a] border border-white/12 p-5 flex flex-col gap-3 mb-7">
-              <span
-                className={`${mono.className} absolute -top-2 right-4 text-[10px] font-bold text-black px-2 py-0.5`}
-                style={{ background: "#b8a4ff" }}
-              >
-                sample
-              </span>
-              <div className="flex items-center justify-between">
-                <span
-                  className={`${mono.className} inline-flex items-center gap-1 text-[10px] font-bold text-black px-1.5 py-0.5`}
-                  style={{ background: ACCENT }}
-                >
-                  <User className="h-2.5 w-2.5" /> real listener
-                </span>
-                <Meter count={4} />
-              </div>
-              <p className="text-[15px] font-bold text-white leading-snug">
-                “Hook stuck with me after one listen”
-              </p>
-              <p className="text-[14px] text-white/70 leading-relaxed normal-case">
-                Played it twice back to back. The drop has real bounce and the hook is sticky.
-                Middle sagged a touch for me but honestly its close to done.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 mb-7 flex-wrap">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <span
-                  key={i}
-                  className={`${mono.className} w-10 h-10 flex items-center justify-center text-[14px] border border-dashed`}
-                  style={{ borderColor: "rgba(110,231,255,0.4)", color: "rgba(255,255,255,0.35)" }}
-                >
-                  ?
-                </span>
-              ))}
-              <span className={`${mono.className} text-[12px] text-white/45 ml-2 normal-case`}>
-                your 5 seats, ready &amp; waiting
-              </span>
-            </div>
-            <a
-              href="#unlock"
-              className="group inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] px-6 py-3.5 hover:bg-white transition-colors"
-            >
-              unlock &amp; send it to the room
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-            </a>
-          </section>
         )}
 
+        {/* the report's index — one glance says what's here and where to go */}
+        {openRead && toc.length > 0 && (
+          <nav
+            className={`${mono.className} flex flex-wrap items-center justify-center gap-x-5 gap-y-2.5 mt-10 pt-6 border-t border-white/10 text-[12px]`}
+          >
+            {toc.map((s, i) => (
+              <a
+                key={s.id}
+                href={`#${s.id}`}
+                className="text-white/45 hover:text-white transition-colors"
+              >
+                <span style={{ color: ACCENT }}>{String(i + 1).padStart(2, "0")}</span>{" "}
+                {s.label}
+              </a>
+            ))}
+            {!data.unlocked && (
+              <a href="#unlock" className="font-bold hover:brightness-110 transition" style={{ color: ACCENT }}>
+                → the room
+              </a>
+            )}
+          </nav>
+        )}
+      </section>
+
+      <div
+        className={`relative z-10 max-w-3xl mx-auto px-5 space-y-14 ${
+          openRead && !data.unlocked ? "pb-32" : "pb-16"
+        }`}
+      >
         {/* ── ROOM SKIPPED (subscriber over their monthly rounds) ── */}
         {!locked && !data.isDemo && data.humanReviewsTotal === 0 && data.roomSkipped && (
           <section className="border border-white/12 bg-[#0c0c0c] p-6 sm:p-7">
@@ -1021,8 +1023,8 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         {/* ── THE MEASURED WAVEFORM — locked reports get 1 open moment marker,
             the rest blur their note (timestamps visible); unlocked opens all ── */}
         {data.waveform && (
-          <section>
-            <Kicker>the read · measured from your audio</Kicker>
+          <section id="listen" className={sectionCard}>
+            <Kicker>{secNum("listen")}the read · measured from your audio</Kicker>
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
               we listened to it.
             </h2>
@@ -1036,8 +1038,8 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         )}
 
         {/* ── BREAKDOWN ── */}
-        <section>
-          <Kicker>the breakdown</Kicker>
+        <section id="breakdown" className={sectionCard}>
+          <Kicker>{secNum("breakdown")}the breakdown</Kicker>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-7">
             how it scored, dimension by dimension
           </h2>
@@ -1077,8 +1079,8 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         </section>
 
         {/* ── SYNTHESIS ── */}
-        <section>
-          <Kicker>the honest read</Kicker>
+        <section id="read" className={sectionCard}>
+          <Kicker>{secNum("read")}the honest read</Kicker>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-6">
             {data.summaryHeadline}
           </h2>
@@ -1092,8 +1094,8 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         </section>
 
         {/* ── REACTIONS ── */}
-        <section>
-          <Kicker>from a few angles</Kicker>
+        <section id="seats" className={sectionCard}>
+          <Kicker>{secNum("seats")}from a few angles</Kicker>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">
             how it reads from every seat
           </h2>
@@ -1135,8 +1137,8 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         </section>
 
         {/* ── FIXES ── */}
-        <section>
-          <Kicker>if you change three things</Kicker>
+        <section id="fixes" className={sectionCard}>
+          <Kicker>{secNum("fixes")}if you change three things</Kicker>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-7">
 what to fix first
           </h2>
@@ -1171,9 +1173,14 @@ what to fix first
           </div>
         </section>
 
-        {/* ── UNLOCK / SHARE ── */}
-        {locked ? (
-          <section id="unlock" className="scroll-mt-20 border border-white/12 bg-[#101010] p-7 sm:p-10">
+        {/* ── SEND TO THE ROOM / SHARE — in the open-read model the read is
+            already free in full; the purchase is the human room + deep read ── */}
+        {!data.unlocked ? (
+          <section
+            id="unlock"
+            className="scroll-mt-20 border-2 bg-[#0c0c0c] p-7 sm:p-10"
+            style={{ borderColor: "rgba(110,231,255,0.45)" }}
+          >
             {finalizing && (
               <div
                 className="mb-7 flex items-center justify-center gap-3 border p-4 text-center"
@@ -1190,17 +1197,64 @@ what to fix first
                 className="inline-flex items-center justify-center w-12 h-12 mb-5"
                 style={{ background: ACCENT }}
               >
-                <Lock className="h-5 w-5 text-black" />
+                <User className="h-5 w-5 text-black" />
               </div>
-              <Kicker>the full read + the room</Kicker>
+              <Kicker>the room — the one thing the machine can&apos;t do</Kicker>
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
-                unlock &amp; send it to the room
+                you&apos;ve read the machine.{" "}
+                <span style={{ color: ACCENT }}>now hear the humans.</span>
               </h2>
               <p className="text-white/70 text-[15px] max-w-md mx-auto normal-case leading-relaxed">
-                Unlock the complete breakdown — and <strong className="text-white">5 real
-                listeners</strong> start reacting to your track, honestly and in full. You watch
-                every take land here.
+                Everything above was your free read. The room is{" "}
+                <strong className="text-white">5 real people</strong> — they listen end to end
+                and write back honestly, plus your mix gets the deeper stem-level read. You watch
+                every reaction land on this page.
               </p>
+            </div>
+
+            {/* proof: one real reaction + the 5 empty seats */}
+            <div className="max-w-md mx-auto mb-9">
+              <p className={`${mono.className} text-[11px] text-white/45 mb-2.5 normal-case text-center`}>
+                here&apos;s what one seat delivers, from another artist&apos;s room:
+              </p>
+              <div className="relative bg-[#0a0a0a] border border-white/12 p-5 flex flex-col gap-3">
+                <span
+                  className={`${mono.className} absolute -top-2 right-4 text-[10px] font-bold text-black px-2 py-0.5`}
+                  style={{ background: "#b8a4ff" }}
+                >
+                  sample
+                </span>
+                <div className="flex items-center justify-between">
+                  <span
+                    className={`${mono.className} inline-flex items-center gap-1 text-[10px] font-bold text-black px-1.5 py-0.5`}
+                    style={{ background: ACCENT }}
+                  >
+                    <User className="h-2.5 w-2.5" /> real listener
+                  </span>
+                  <Meter count={4} />
+                </div>
+                <p className="text-[15px] font-bold text-white leading-snug">
+                  “Hook stuck with me after one listen”
+                </p>
+                <p className="text-[14px] text-white/70 leading-relaxed normal-case">
+                  Played it twice back to back. The drop has real bounce and the hook is sticky.
+                  Middle sagged a touch for me but honestly its close to done.
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <span
+                    key={i}
+                    className={`${mono.className} w-9 h-9 flex items-center justify-center text-[14px] border border-dashed`}
+                    style={{ borderColor: "rgba(110,231,255,0.4)", color: "rgba(255,255,255,0.35)" }}
+                  >
+                    ?
+                  </span>
+                ))}
+                <span className={`${mono.className} text-[12px] text-white/45 ml-2 normal-case`}>
+                  your 5 seats, ready &amp; waiting
+                </span>
+              </div>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
@@ -1211,14 +1265,14 @@ what to fix first
                   $6.95<span className="text-base text-white/45 font-medium"> once</span>
                 </p>
                 <p className={`${mono.className} text-[12px] text-white/55 mt-1 normal-case`}>
-                  5 real listeners hear it + the complete written read — yours forever
+                  5 real people review this track + the deep stem read — yours forever
                 </p>
                 <button
                   onClick={handleUnlock}
                   disabled={unlocking}
                   className="group mt-auto pt-6 w-full inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-extrabold text-[15px] py-3.5 transition-colors disabled:opacity-60"
                 >
-                  {unlocking ? "opening…" : "unlock this track"}
+                  {unlocking ? "opening…" : "send it to the room"}
                   {!unlocking && <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />}
                 </button>
               </div>
@@ -1236,7 +1290,7 @@ what to fix first
                   $19.95<span className="text-base text-white/45 font-medium">/mo</span>
                 </p>
                 <p className={`${mono.className} text-[12px] text-white/55 mt-1 normal-case`}>
-                  every track auto-unlocked · real room on 3 a month
+                  full reads on every track you make · the room on 3 a month
                 </p>
                 <button
                   onClick={() => handleSubscribe("monthly")}
@@ -1259,9 +1313,9 @@ what to fix first
               </div>
             </div>
             <p className={`${mono.className} text-[12px] text-white/50 mt-6 text-center normal-case`}>
-              want to see exactly what you get?{" "}
+              want to see what the room delivers?{" "}
               <Link href="/report/demo" className="font-bold hover:brightness-110 transition" style={{ color: ACCENT }}>
-                view a full sample report →
+                view a sample with all 5 seats in →
               </Link>
             </p>
             <p className={`${mono.className} text-[12px] text-white/40 mt-2 text-center normal-case`}>
@@ -1292,6 +1346,25 @@ what to fix first
           </section>
         )}
       </div>
+
+      {/* ── sticky buy bar (open-read, room not bought) — one persistent,
+          unmissable path to the purchase; hides while #unlock is on screen ── */}
+      {openRead && !data.unlocked && !buyBarHidden && (
+        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-white/15 bg-[#0a0a0a]/95 backdrop-blur-md">
+          <div className="max-w-3xl mx-auto px-5 py-3 flex items-center justify-between gap-4">
+            <p className={`${mono.className} text-[12px] text-white/55 normal-case hidden sm:block`}>
+              this read was free · the room of <span className="text-white font-bold">5 real people</span> is the upgrade
+            </p>
+            <a
+              href="#unlock"
+              className="group flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[14px] px-5 py-2.5 hover:bg-white transition-colors"
+            >
+              send it to the room · $6.95
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            </a>
+          </div>
+        </div>
+      )}
 
       <footer className="relative z-10 border-t border-white/10">
         <div className={`${mono.className} max-w-3xl mx-auto px-5 py-8 flex items-center justify-between text-[13px] text-white/40`}>

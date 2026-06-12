@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { scoreConversions } from "@/lib/score-conversions";
+import { FreeReadUpsell } from "@/components/score/free-read-upsell";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -22,6 +23,8 @@ function FinishInner() {
   const claim = params.get("claim") || "";
   const started = useRef(false);
   const [error, setError] = useState("");
+  // Free read already used: pause on the sealed-report upsell before the report.
+  const [capUpsell, setCapUpsell] = useState<{ slug: string } | null>(null);
 
   useEffect(() => {
     if (status === "loading" || started.current) return;
@@ -52,6 +55,10 @@ function FinishInner() {
           const data = await res.json().catch(() => null);
           if (data?.slug) {
             scoreConversions.submitTrack(data.slug);
+            if (data.freeReadUsed) {
+              setCapUpsell({ slug: data.slug });
+              return;
+            }
             router.replace(`/report/${data.slug}`);
             return;
           }
@@ -72,6 +79,10 @@ function FinishInner() {
         const data = await res.json().catch(() => null);
         if (data?.slug) {
           scoreConversions.submitTrack(data.slug);
+          if (data.freeReadUsed) {
+            setCapUpsell({ slug: data.slug });
+            return;
+          }
           router.replace(`/report/${data.slug}`);
           return;
         }
@@ -86,6 +97,12 @@ function FinishInner() {
     <div
       className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] flex items-center justify-center px-5 lowercase`}
     >
+      {capUpsell && (
+        <FreeReadUpsell
+          continueHref={`/report/${capUpsell.slug}`}
+          onContinue={() => router.replace(`/report/${capUpsell.slug}`)}
+        />
+      )}
       <div className="text-center">
         <div className="flex items-center justify-center gap-1.5 mb-6">
           {[0, 1, 2].map((i) => (

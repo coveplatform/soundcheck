@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { decideRoomEligibility } from "@/lib/score-review";
 import { regenerateDeepReport } from "@/lib/score-report-ai";
 import { isScoreSubscribed } from "@/lib/score-subscription";
+import { freeReadUsed } from "@/lib/score-free-cap";
 import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
 
 // Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
@@ -59,6 +60,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid claim token." }, { status: 403 });
     }
 
+    // Free-tier ladder (open-read model only): same flag as /submit — claiming
+    // past the lifetime free read is fine, the report just renders sealed.
+    // Computed BEFORE the email attaches so this claim doesn't count itself.
+    const usedFreeRead = await freeReadUsed(email);
+
     const artistId = await prisma.artistProfile
       .findUnique({ where: { userId: session.user.id }, select: { id: true } })
       .then((p) => p?.id ?? null);
@@ -105,7 +111,7 @@ export async function POST(request: Request) {
       unlocked,
     }).catch((err) => console.error("[score/claim] admin notify error:", err));
 
-    return NextResponse.json({ slug: report.slug });
+    return NextResponse.json({ slug: report.slug, freeReadUsed: usedFreeRead });
   } catch (error) {
     console.error("Score claim error:", error);
     return NextResponse.json({ error: "Failed to claim your report." }, { status: 500 });
