@@ -94,10 +94,11 @@ export default function TermsPage() {
 
             <h3 className="font-bold text-white/85 mt-4 mb-1">Report unlocks</h3>
             <p>
-              Submitting a track and viewing your teaser report is free. Unlocking a track&apos;s full
-              report is a one-time purchase ($6.95 at the time of writing) processed via Stripe
-              Checkout. Prices are displayed at checkout. You are responsible for any taxes required
-              by your jurisdiction.
+              Submitting a track is free. Your first track&apos;s full report is free (one per
+              account, lifetime); reports for later tracks display in sealed form until unlocked.
+              Unlocking a track&apos;s full report is a one-time purchase ($6.95 at the time of
+              writing) processed via Stripe Checkout. Prices are displayed at checkout. You are
+              responsible for any taxes required by your jurisdiction.
             </p>
 
             <h3 className="font-bold text-white/85 mt-4 mb-1">Unlimited subscription</h3>

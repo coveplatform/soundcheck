@@ -7,6 +7,7 @@ import { ChangeoverBanner } from "@/components/changeover-banner";
 import { WelcomeBanner } from "@/components/welcome-banner";
 import { headers } from "next/headers";
 import { SITE_URL } from "@/lib/site";
+import { FREE_FULL_READ } from "@/lib/score-free-tier";
 import "./globals.css";
 
 const GDPR_COUNTRIES = new Set([
@@ -118,7 +119,9 @@ const jsonLd = {
           price: "0",
           priceCurrency: "USD",
           name: "Free",
-          description: "Submit a track and get your instant AI score, verdict and a teaser of the full report.",
+          description: FREE_FULL_READ
+            ? "Your first track's complete report is free — score out of 100, the full written read, all three fixes and the measured waveform. No card needed."
+            : "Submit a track and get your instant AI score, verdict and a teaser of the full report.",
         },
         {
           "@type": "Offer",

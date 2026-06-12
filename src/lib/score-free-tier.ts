@@ -11,7 +11,7 @@
  * unlocked). Flip to true to launch: report openness, the submit-flow upsell
  * and all pricing copy key off this one constant.
  */
-export const FREE_FULL_READ = false;
+export const FREE_FULL_READ = true;
 
 /** Free full reads per email, lifetime. */
 export const FREE_READS_LIFETIME = 1;

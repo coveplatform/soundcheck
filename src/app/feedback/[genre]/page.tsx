@@ -8,6 +8,7 @@ import { AuthButtons } from "@/components/ui/auth-buttons";
 import { getGenrePage, genrePages } from "@/lib/genre-pages";
 import { getGenreDetail } from "@/lib/genre-pages-detail";
 import { SITE_URL } from "@/lib/site";
+import { FREE_FULL_READ } from "@/lib/score-free-tier";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -85,7 +86,9 @@ export default async function GenreFeedbackPage({
       "@type": "Offer",
       price: "0",
       priceCurrency: "USD",
-      description: "Free to submit — get your instant AI score and a teaser of the full report",
+      description: FREE_FULL_READ
+        ? "Your first track's complete report is free — score, full written read and all three fixes"
+        : "Free to submit — get your instant AI score and a teaser of the full report",
     },
   };
 

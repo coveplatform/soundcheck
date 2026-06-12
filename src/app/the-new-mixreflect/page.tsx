@@ -121,7 +121,7 @@ export default function TheNewMixReflectPage() {
         <p className={`${mono.className} text-[12px] text-white/45 mb-4 text-center`}>simple pricing</p>
         <div className="grid sm:grid-cols-3 gap-px bg-white/10 border border-white/10">
           {[
-            { p: "free", s: "submit + your score, verdict & teaser" },
+            { p: "free", s: "your first track's full report — free" },
             { p: "$6.95", s: "unlock one full report — yours forever" },
             { p: "$19.95/mo", s: "unlimited — every track auto-unlocked", hot: true },
           ].map((t) => (
