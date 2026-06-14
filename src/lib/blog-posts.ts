@@ -20,6 +20,184 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "music-release-checklist",
+    title: "Music Release Checklist: What to Do Before You Drop",
+    coverImage: "/blog/blog13.jpg",
+    excerpt:
+      "A music release checklist is the set of steps you complete before a song goes live: confirm the track is actually finished, get it distributed and registered, build the assets, and line up the launch. Here's the full checklist, in the order you should work through it.",
+    category: "GUIDE",
+    date: "June 14, 2026",
+    readTime: "9 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "A music release checklist covers four things, in order: confirming the track is genuinely finished, getting it distributed and registered so you get paid and credited, building the assets that surround the song, and lining up the launch so it doesn't go out to silence. Most independent artists rush the first step and skip straight to picking a release date, which is exactly why so many releases land flat. The checklist below is the full version, sequenced the way you should actually work through it, starting four to six weeks before the date you have in mind.",
+      },
+      {
+        type: "paragraph",
+        text: "None of this is gatekeeping. A release is just a project with a deadline, and like any project it goes better when the unglamorous parts are done early. The artists who seem to have effortless rollouts are not more talented at marketing. They started sooner and they worked off a list. Here is the list.",
+      },
+      {
+        type: "h2",
+        text: "What is on a complete music release checklist?",
+      },
+      {
+        type: "paragraph",
+        text: "At the highest level, every release breaks into the same five buckets. If you can tick all of these, you are ready to drop.",
+      },
+      {
+        type: "list",
+        items: [
+          "The track is finished: mixed, mastered, and confirmed ready by someone other than you.",
+          "Distribution is set up: uploaded to a distributor with at least three to four weeks of lead time.",
+          "Rights and metadata are handled: songwriter splits agreed, ISRC assigned, PRO and publishing registered.",
+          "Assets are built: cover art, canvas, social clips, a pre-save link, and a press or pitch one-pager.",
+          "The launch is planned: editorial pitch submitted, audience warmed up, and a release-day plan written down.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "How far in advance should you plan a release?",
+      },
+      {
+        type: "paragraph",
+        text: "Four to six weeks is the realistic minimum, and the single biggest reason is Spotify editorial: you have to pitch an unreleased track through Spotify for Artists at least seven days before release, and earlier is better. Miss that window and you forfeit your best shot at playlist placement and the algorithmic momentum that follows it. Work backwards from your release date like this.",
+      },
+      {
+        type: "list",
+        items: [
+          "6 weeks out: lock the final master. Get outside feedback and fix anything that needs fixing while there is still time.",
+          "4 weeks out: upload to your distributor and set the release date. Confirm splits and metadata with any collaborators.",
+          "3 weeks out: pitch the track to Spotify editorial through Spotify for Artists. Set up your pre-save link.",
+          "2 weeks out: finish cover art, Canvas, and short video clips. Schedule your announcement posts.",
+          "1 week out: tease the release, push pre-saves, and email anyone who has agreed to support it.",
+          "Release week: publish, share, and engage with everyone who reacts in the first 48 hours.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "How do you know the track itself is actually ready?",
+      },
+      {
+        type: "paragraph",
+        text: "This is the step people skip, and it is the one that decides whether the rest of the checklist was worth doing. A polished rollout cannot rescue a track that loses listeners in the first fifteen seconds. Before you spend a single hour on art or pitching, run the song through a readiness check.",
+      },
+      {
+        type: "list",
+        items: [
+          "The intro earns attention fast. There is a reason to keep listening inside the first ten to fifteen seconds.",
+          "The vocal or lead sits clearly in the mix and is not buried under the instrumental.",
+          "The low end is controlled. It translates on phone speakers and earbuds, not just your studio monitors.",
+          "The arrangement holds. There are no dead sections where energy sags and attention drifts.",
+          "It is loud and balanced enough next to released music in the same genre, without sounding crushed.",
+          "Someone who is not you has heard it and told you, honestly, that it is ready.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "That last point is where most artists are flying blind. After weeks on a track you stop hearing it the way a new listener does, and friends rarely give you the unvarnished version. This is exactly the gap MixReflect closes: paste your link and you get an instant AI read scored out of 100 across hook, production, retention, emotional impact, and commercial pull, then real reactions from a room of five listeners who tell you where they would have skipped. It is a feedback step that fits between the final master and the release date, so you find the problems while you can still fix them rather than after the song is public.",
+      },
+      {
+        type: "quote",
+        text: "The release plan you spend three weeks building is only as good as the fifteen seconds that decide whether anyone stays.",
+      },
+      {
+        type: "h2",
+        text: "What rights and metadata do you need to sort out before release?",
+      },
+      {
+        type: "paragraph",
+        text: "This is the boring half of the checklist and the half that costs you money if you skip it. Handle it before you upload, not after, because some of it is painful to fix retroactively.",
+      },
+      {
+        type: "list",
+        items: [
+          "Songwriter splits: agree in writing who owns what percentage of the song before release. Verbal deals between friends are how friendships end.",
+          "ISRC code: your distributor assigns this unique track ID automatically. Make sure every release has one so streams are counted to you.",
+          "PRO registration: register the song with your performing rights organization so you collect performance royalties.",
+          "Publishing administration: sign up with a publishing admin to collect mechanical and publishing royalties most artists never claim.",
+          "Credits and metadata: spell the artist name, track title, and featured artists exactly the same everywhere. Inconsistent metadata splits your stats and your payouts.",
+          "Cover or sample clearance: if you used a sample or are releasing a cover, clear it. Uncleared tracks get pulled.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What assets do you need built before the release date?",
+      },
+      {
+        type: "paragraph",
+        text: "Assets are everything that surrounds the song. You do not need all of them to be elaborate, but you do need them done before release day so you are not scrambling while the track is live.",
+      },
+      {
+        type: "list",
+        items: [
+          "Cover art that meets distributor specs (3000x3000 px, no blurry logos or web URLs).",
+          "A Spotify Canvas: a short looping video for the now-playing screen.",
+          "Two or three short vertical video clips for Reels, TikTok, and Shorts.",
+          "A pre-save link so fans can save the track before it drops, which boosts day-one numbers.",
+          "A one-paragraph pitch describing the track for editorial and playlist curators.",
+          "Updated profile assets: bio, artist photo, and links, so a new listener who clicks through sees something current.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What should you actually do on release day?",
+      },
+      {
+        type: "paragraph",
+        text: "Release day is not the finish line, it is the start of the window that matters most. The first 48 hours of save rate and completion data tell the streaming algorithms whether to keep pushing your track. Treat the day as active work, not a moment to post once and walk away.",
+      },
+      {
+        type: "list",
+        items: [
+          "Post the announcement everywhere you have an audience, with the link easy to find.",
+          "Personally message the people who said they would support it and remind them today is the day.",
+          "Reply to every comment, repost, and story mention. Early engagement compounds.",
+          "Add the track to your own public playlists and pin it on your profiles.",
+          "Watch your saves and completion rate, not just stream count. Those are the signals that drive playlisting.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What is the most common release mistake?",
+      },
+      {
+        type: "paragraph",
+        text: "Releasing on a deadline instead of on readiness. Artists pick a date, tell everyone, and then ship whatever state the track is in when the date arrives, even when they quietly know the mix is off or the intro drags. A release date is a tool, not a promise carved in stone. If the song is not ready, move the date. A great track released two weeks late will always beat a flawed one released on time, because the late one keeps earning listeners long after launch week while the rushed one quietly disappears. The whole point of a checklist is to make readiness a decision you make on purpose, not something you find out about from your skip rate.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "What should I do before releasing a song?",
+            a: "Before releasing a song, confirm the track is finished and has been checked by someone other than you, upload it to a distributor at least three to four weeks early, sort out songwriter splits, ISRC, and PRO and publishing registration, build your assets (cover art, Canvas, video clips, pre-save link), and pitch it to Spotify editorial at least seven days ahead. Then plan how you will promote it on release day rather than posting once and hoping.",
+          },
+          {
+            q: "How long before release should I distribute my music?",
+            a: "Upload to your distributor at least three to four weeks before your release date. This gives you enough lead time to pitch Spotify editorial through Spotify for Artists, which requires at least seven days but rewards earlier submissions, and to set up a pre-save campaign. Distributing only a few days out forfeits your best shot at playlist placement.",
+          },
+          {
+            q: "Do I need to register my song before releasing it?",
+            a: "Yes. Register the song with your performing rights organization (PRO) to collect performance royalties, and sign up with a publishing administrator to collect mechanical and publishing royalties most independent artists never claim. Your distributor assigns the ISRC automatically. Handling rights and splits before release saves you from painful and sometimes impossible fixes later.",
+          },
+          {
+            q: "How do I know if my song is ready to release?",
+            a: "A song is ready when the intro earns attention in the first ten to fifteen seconds, the vocal sits clearly in the mix, the low end translates on phones and earbuds, the arrangement holds without dead sections, and it sits at a competitive level next to released music in its genre. The reliable way to confirm this is honest outside feedback. Tools like MixReflect give you an AI score out of 100 plus reactions from real listeners, so you find the problems before the track is public.",
+          },
+          {
+            q: "What is the best day to release music?",
+            a: "Friday is the standard release day because it aligns with how Spotify's New Music Friday and Release Radar refresh, and it gives you a full week of data before the next cycle. That said, consistency and readiness matter far more than the specific day. A track released when it is genuinely finished will outperform one rushed out to hit an arbitrary Friday.",
+          },
+          {
+            q: "What is the most common mistake artists make when releasing music?",
+            a: "Releasing on a deadline instead of on readiness. Many artists commit to a date, announce it, and then ship the track in whatever state it is in even when they sense the mix or arrangement is not there yet. A release date is a tool you can move. A strong track released slightly late keeps earning listeners long after launch week, while a flawed one released on time quietly fades.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-to-get-on-discover-weekly",
     title: "How to Get on Spotify's Discover Weekly",
     coverImage: "/blog/blog12.jpg",
