@@ -5,6 +5,7 @@ import { randomInt } from "crypto";
 
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -87,6 +88,10 @@ export async function POST(request: Request) {
 
       return null;
     });
+
+    void sendWelcomeEmail({ to: normalizedEmail, name: normalizedArtistName }).catch((err) =>
+      console.error("[trial-signup] welcome email failed:", err)
+    );
 
     return NextResponse.json({
       success: true,

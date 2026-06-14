@@ -68,10 +68,10 @@ export async function sendWeeklyDigestEmail(params: {
     </tr>
   ` : "";
 
-  const ctaUrl = trackId ? `${appUrl}/tracks/${trackId}` : `${appUrl}/classic/dashboard`;
+  const ctaUrl = trackId ? `${appUrl}/tracks/${trackId}` : `${appUrl}/dashboard`;
   const primaryCta = reviewsReceived > 0
     ? emailButton("Read your reviews →", ctaUrl)
-    : emailButton("Go to dashboard →", `${appUrl}/classic/dashboard`);
+    : emailButton("Go to dashboard →", `${appUrl}/dashboard`);
 
   const earnCta = genreTrackCount > 0 ? `
     <p style="margin: 20px 0 8px; font-size: 14px; color: ${COLORS.gray}; text-align: center;">

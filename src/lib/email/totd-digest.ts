@@ -43,17 +43,17 @@ export async function sendTotdDailyEmail(params: {
       </p>
     </div>
 
-    ${emailButton("Listen now →", `${appUrl}/breakthrough`)}
+    ${emailButton("Read today's pick →", `${appUrl}/today`)}
 
     <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 18px 20px; margin-top: 28px;">
       <p style="margin: 0 0 4px; font-size: 13px; font-weight: 700; color: ${COLORS.black};">
         Want your track here?
       </p>
       <p style="margin: 0 0 12px; font-size: 13px; color: ${COLORS.gray}; line-height: 1.6;">
-        Submit your track to the daily chart — artists vote, the top track each day wins the featured spot and gets sent to the whole community.
+        Score your track on MixReflect — the best-reviewed tracks get the daily spotlight and a write-up sent to the whole community.
       </p>
-      <a href="${appUrl}/submit" style="font-size: 13px; font-weight: 700; color: ${COLORS.purple}; text-decoration: none;">
-        Submit a track →
+      <a href="${appUrl}/" style="font-size: 13px; font-weight: 700; color: ${COLORS.purple}; text-decoration: none;">
+        Score your track →
       </a>
     </div>
 
@@ -118,17 +118,17 @@ export async function sendTotdWeeklyEmail(params: {
 
     ${pickRows}
 
-    ${emailButton("Listen on MixReflect →", `${appUrl}/classic/dashboard`)}
+    ${emailButton("See today's pick →", `${appUrl}/today`)}
 
     <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 18px; margin-top: 24px; text-align: center;">
       <p style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: ${COLORS.black};">
         Want your track featured?
       </p>
       <p style="margin: 0 0 12px; font-size: 13px; color: ${COLORS.gray}; line-height: 1.6;">
-        Submit your track to the daily chart. Artists vote — the top track each day earns the featured spot and gets sent to the whole community.
+        Score your track on MixReflect — the best-reviewed tracks earn the daily spotlight and a write-up sent to the whole community.
       </p>
-      <a href="${appUrl}/submit" style="font-size: 13px; font-weight: 700; color: ${COLORS.purple}; text-decoration: none;">
-        Submit a track →
+      <a href="${appUrl}/" style="font-size: 13px; font-weight: 700; color: ${COLORS.purple}; text-decoration: none;">
+        Score your track →
       </a>
     </div>
 

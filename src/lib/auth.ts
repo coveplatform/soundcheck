@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 import { checkRateLimit, RATE_LIMITS } from "./rate-limit";
+import { sendWelcomeEmail } from "./email";
 
 // Cross-subdomain auth: when COOKIE_DOMAIN is set (e.g. ".mixreflect.com"), the
 // session cookie is shared across the apex and any subdomain (try.mixreflect.com)
@@ -105,6 +106,19 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
+  },
+  events: {
+    // Fires once when the adapter creates a brand-new user — i.e. first-time
+    // Google sign-ups. (Credentials sign-ups create the user directly and are
+    // welcomed in /api/auth/signup, so this never double-sends.)
+    async createUser({ user }) {
+      if (!user.email) return;
+      try {
+        await sendWelcomeEmail({ to: user.email, name: user.name });
+      } catch (err) {
+        console.error("[auth] welcome email failed:", err);
+      }
+    },
   },
   pages: {
     signIn: "/login",

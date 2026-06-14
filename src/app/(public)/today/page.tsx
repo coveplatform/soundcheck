@@ -1,21 +1,23 @@
 import Link from "next/link";
 import Image from "next/image";
-import { notFound } from "next/navigation";
-import { Caveat } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { prisma } from "@/lib/prisma";
-import { Logo } from "@/components/ui/logo";
+import { SiteNav } from "@/components/landing/site-nav";
 import { SignupLink } from "@/components/landing/signup-link";
-import { Squiggle } from "@/components/landing/doodles";
+import { Logo } from "@/components/ui/logo";
 import { ArrowRight, ExternalLink, Music, Headphones } from "lucide-react";
 
-const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
+const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
+
+const ACCENT = "#6ee7ff";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 600;
 
 export const metadata = {
   title: "Track of the Day — MixReflect",
-  description: "A new track every day, picked by producers, written up by the editors. Music criticism for people who make music.",
+  description: "A new track every day, picked by producers, written up by the editors. Honest music criticism for people who make music.",
 };
 
 async function getFeaturedSubmission() {
@@ -88,64 +90,44 @@ export default async function TrackOfTheDayPage() {
   const genres = submission.Track?.Genre?.map((g: any) => g.name) || [];
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] text-neutral-950">
+    <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black`}>
+      {/* grain */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.05] z-0 mix-blend-screen"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+        }}
+      />
 
-      {/* ── Header ───────────────────────────────────────────────── */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#faf8f5]/90 backdrop-blur-sm border-b border-black/6">
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Logo />
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/today/archive" className="text-sm font-bold text-black/50 hover:text-black transition-colors hidden sm:block">
-              Archive
-            </Link>
-            <SignupLink className="bg-black text-white text-sm font-black px-4 py-2 rounded-xl border-2 border-black hover:bg-neutral-800 transition-colors">
-              Submit a track
-            </SignupLink>
+      <div className="relative z-10">
+        <SiteNav />
+
+        {/* ── Masthead ─────────────────────────────────────────────── */}
+        <section className="relative border-b border-white/10 overflow-hidden">
+          <div
+            className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[400px] opacity-25 blur-3xl pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${ACCENT}, transparent 70%)` }}
+          />
+          <div className="relative max-w-3xl mx-auto px-5 pt-16 pb-12 text-center">
+            <p className={`${mono.className} text-[13px] lowercase tracking-tight mb-4`} style={{ color: ACCENT }}>
+              [ today on mixreflect ]
+            </p>
+            <h1 className="text-5xl sm:text-7xl font-extrabold tracking-[-0.04em] leading-[0.95]">
+              Track of the Day
+            </h1>
+            <p className={`${mono.className} mt-5 text-[12px] lowercase tracking-[0.3em] text-white/40`}>
+              {formatDate(new Date(submission.chartDate))}
+            </p>
           </div>
-        </div>
-      </header>
+        </section>
 
-      <div className="pt-14">
+        {/* ── The pick ─────────────────────────────────────────────── */}
+        <article className="border-b border-white/10">
+          <div className="max-w-3xl mx-auto px-5 py-12 sm:py-16">
 
-        {/* ── Hero illustration banner ─────────────────────────────── */}
-        <div className="relative bg-black border-b-2 border-black overflow-hidden">
-          <div className="max-w-5xl mx-auto">
-            <div className="relative aspect-[1135/834] sm:aspect-[1135/700] md:aspect-[1135/600] w-full">
-              <Image
-                src="/today-hero.png"
-                alt="MixReflect Track of the Day"
-                fill
-                priority
-                className="object-cover object-center"
-                sizes="(max-width: 1024px) 100vw, 1024px"
-              />
-              {/* Bottom gradient for masthead readability */}
-              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black/80 to-transparent" />
-
-              {/* Masthead text overlay */}
-              <div className="absolute inset-x-0 bottom-0 px-4 sm:px-8 pb-8 sm:pb-12 text-center">
-                <p className={`${caveat.className} text-xl sm:text-2xl text-lime-300 mb-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]`}>
-                  today on mixreflect
-                </p>
-                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1] drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]">
-                  Track of the Day
-                </h1>
-                <p className="mt-4 text-[11px] sm:text-xs font-black uppercase tracking-[0.3em] text-white/60">
-                  {formatDate(new Date(submission.chartDate))}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Hero artwork + meta ──────────────────────────────────── */}
-        <article className="bg-white border-b-2 border-black">
-          <div className="max-w-3xl mx-auto px-4 py-10 sm:py-16">
-
-            {/* Big square artwork */}
-            <div className="aspect-square relative rounded-3xl overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-neutral-100 max-w-md mx-auto mb-10">
+            {/* artwork */}
+            <div className="aspect-square relative overflow-hidden border border-white/12 bg-[#0e0e0e] max-w-md mx-auto mb-10 shadow-[0_40px_100px_-40px_rgba(0,0,0,0.95)]">
               {submission.artworkUrl ? (
                 <Image
                   src={submission.artworkUrl}
@@ -156,20 +138,23 @@ export default async function TrackOfTheDayPage() {
                   priority
                 />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-100 to-lime-100">
-                  <Music className="h-24 w-24 text-black/20" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Music className="h-24 w-24 text-white/15" />
                 </div>
               )}
+              {/* cyan accent edge */}
+              <div className="absolute inset-x-0 top-0 h-1" style={{ background: `linear-gradient(90deg, ${ACCENT}, #a78bfa)` }} />
             </div>
 
-            {/* Title block */}
+            {/* title block */}
             <div className="text-center mb-10 max-w-2xl mx-auto">
               {genres.length > 0 && (
                 <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
                   {genres.slice(0, 3).map((g: string) => (
                     <span
                       key={g}
-                      className="inline-block bg-black text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full"
+                      className={`${mono.className} inline-block text-[10px] font-bold lowercase tracking-wider px-2.5 py-1 text-black`}
+                      style={{ background: ACCENT }}
                     >
                       {g}
                     </span>
@@ -177,10 +162,10 @@ export default async function TrackOfTheDayPage() {
                 </div>
               )}
 
-              <h2 className="text-4xl sm:text-6xl font-black tracking-tight text-black leading-[1.05] mb-3">
+              <h2 className="text-4xl sm:text-6xl font-extrabold tracking-[-0.03em] leading-[1.02] mb-3">
                 {submission.title}
               </h2>
-              <p className="text-xl sm:text-2xl font-bold text-black/50">
+              <p className="text-xl sm:text-2xl font-semibold text-white/45 normal-case">
                 by {submission.ArtistProfile?.artistName || "Unknown Artist"}
               </p>
 
@@ -188,53 +173,53 @@ export default async function TrackOfTheDayPage() {
                 href={submission.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 mt-6 bg-lime-400 hover:bg-lime-300 active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-black font-black border-2 border-black px-6 py-3 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
+                className="inline-flex items-center gap-2 mt-7 bg-[#6ee7ff] hover:bg-white text-black font-extrabold px-7 py-3.5 transition-colors shadow-[0_0_30px_-6px_rgba(110,231,255,0.7)]"
               >
-                <Headphones className="h-4 w-4" /> Press play
+                <Headphones className="h-4 w-4" /> press play
               </a>
             </div>
 
-            {/* Editor's note */}
+            {/* editor's note */}
             {editorNote ? (
               <div className="max-w-2xl mx-auto">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="h-px flex-1 bg-black/10" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40">
+                  <div className="h-px flex-1 bg-white/10" />
+                  <p className={`${mono.className} text-[10px] font-bold uppercase tracking-[0.3em] text-white/40`}>
                     Editor&rsquo;s note
                   </p>
-                  <div className="h-px flex-1 bg-black/10" />
+                  <div className="h-px flex-1 bg-white/10" />
                 </div>
 
                 <p
-                  className="text-lg sm:text-xl leading-[1.7] text-black/85 font-serif"
+                  className="text-lg sm:text-xl leading-[1.7] text-white/80"
                   style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
                 >
                   {editorNote}
                 </p>
 
-                <p className={`${caveat.className} text-lg text-black/40 mt-6 text-right`}>
+                <p className={`${mono.className} text-[13px] lowercase text-white/35 mt-6 text-right`}>
                   — {byline}
                 </p>
               </div>
             ) : (
-              <div className="max-w-2xl mx-auto text-center text-sm text-black/40 italic">
-                Editor&rsquo;s note coming soon.
+              <div className={`${mono.className} max-w-2xl mx-auto text-center text-[13px] text-white/35 lowercase`}>
+                editor&rsquo;s note coming soon.
               </div>
             )}
 
-            {/* Reviewer quotes */}
+            {/* reviewer quotes */}
             {reviewerQuotes.length > 0 && (
-              <div className="max-w-2xl mx-auto mt-14 pt-10 border-t-2 border-black/8">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 mb-6 text-center">
+              <div className="max-w-2xl mx-auto mt-14 pt-10 border-t border-white/10">
+                <p className={`${mono.className} text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-6 text-center`}>
                   What producers said
                 </p>
-                <div className="space-y-5">
+                <div className="space-y-4">
                   {reviewerQuotes.map((q: any, i: number) => (
-                    <div key={i} className="bg-[#faf8f5] rounded-2xl border-2 border-black/10 p-5">
-                      <p className="text-base text-black/80 leading-relaxed mb-3 italic">
+                    <div key={i} className="bg-[#0e0e0e] border border-white/10 p-5">
+                      <p className="text-base text-white/75 leading-relaxed mb-3 italic">
                         &ldquo;{q.quote}&rdquo;
                       </p>
-                      <p className="text-xs font-black text-black/40 uppercase tracking-wider">
+                      <p className={`${mono.className} text-[11px] font-bold text-white/40 uppercase tracking-wider`}>
                         — {q.name}
                       </p>
                     </div>
@@ -243,15 +228,15 @@ export default async function TrackOfTheDayPage() {
               </div>
             )}
 
-            {/* Listen link */}
+            {/* listen link */}
             <div className="max-w-2xl mx-auto mt-10 text-center">
               <a
                 href={submission.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-bold text-black/60 hover:text-black transition-colors"
+                className={`${mono.className} inline-flex items-center gap-2 text-[13px] lowercase text-white/55 hover:text-white transition-colors`}
               >
-                Listen on {submission.sourceType?.toLowerCase().replace("_", " ") || "platform"}
+                listen on {submission.sourceType?.toLowerCase().replace("_", " ") || "platform"}
                 <ExternalLink className="h-3.5 w-3.5" />
               </a>
             </div>
@@ -259,43 +244,45 @@ export default async function TrackOfTheDayPage() {
         </article>
 
         {/* ── Submit your own ──────────────────────────────────────── */}
-        <section className="bg-black py-16 sm:py-20 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
-
-          <Squiggle className="pointer-events-none absolute top-10 right-[6%] w-16 h-16 text-purple-400 opacity-30 hidden sm:block" />
-
-          <div className="max-w-2xl mx-auto px-4 text-center relative">
-            <p className={`${caveat.className} text-lime-400 text-2xl mb-3`}>your track here</p>
-            <h2 className="text-3xl sm:text-5xl font-black text-white leading-tight mb-5">
+        <section className="relative py-16 sm:py-20 overflow-hidden border-b border-white/10">
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "24px 24px" }}
+          />
+          <div className="relative max-w-2xl mx-auto px-5 text-center">
+            <p className={`${mono.className} text-[13px] lowercase mb-3`} style={{ color: ACCENT }}>
+              [ your track here ]
+            </p>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-[-0.03em] leading-tight mb-5">
               Tomorrow&rsquo;s Track of the Day<br />could be yours.
             </h2>
-            <p className="text-white/50 text-base sm:text-lg font-medium mb-8 max-w-xl mx-auto">
-              Submit your track. Producers in your genre listen, vote, and the top track gets the daily spotlight + an editor&rsquo;s write-up.
+            <p className="text-white/50 text-base sm:text-lg mb-8 max-w-xl mx-auto normal-case">
+              Score your track on MixReflect — an instant AI read out of 100, then real
+              reactions from a room of five listeners. The best-reviewed tracks get the daily spotlight.
             </p>
-            <SignupLink className="inline-flex items-center gap-2 bg-lime-400 hover:bg-lime-300 active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-black font-black border-2 border-black px-6 py-3.5 rounded-2xl shadow-[4px_4px_0px_0px_rgba(255,255,255,0.15)] transition-all">
-              Submit your track <ArrowRight className="h-4 w-4" />
+            <SignupLink className="inline-flex items-center gap-2 bg-[#6ee7ff] hover:bg-white text-black font-extrabold px-7 py-4 transition-colors shadow-[0_0_30px_-6px_rgba(110,231,255,0.7)]">
+              score your track <ArrowRight className="h-4 w-4" />
             </SignupLink>
-            <p className="text-white/30 text-xs mt-5 font-medium">
-              Free to submit · Public tracks only · Reviewed by genre-matched producers
+            <p className={`${mono.className} text-white/30 text-[12px] mt-5 lowercase`}>
+              free first read · no card · honest feedback before you release
             </p>
           </div>
         </section>
 
         {/* ── Footer ───────────────────────────────────────────────── */}
-        <footer className="border-t-2 border-black/8 py-8 bg-[#faf8f5]">
-          <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-black/40">
+        <footer className="py-8">
+          <div className={`${mono.className} max-w-6xl mx-auto px-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] lowercase text-white/40`}>
             <div className="flex items-center gap-2">
-              <Logo />
-              <span>MixReflect — Track of the Day</span>
+              <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-6" />
+              <span>— track of the day</span>
             </div>
             <div className="flex items-center gap-6">
-              <Link href="/today/archive" className="hover:text-black transition-colors">Archive</Link>
-              <Link href="/privacy" className="hover:text-black transition-colors">Privacy</Link>
-              <a href="mailto:support@mixreflect.com" className="hover:text-black transition-colors">Contact</a>
+              <Link href="/today/archive" className="hover:text-white transition-colors">archive</Link>
+              <Link href="/privacy" className="hover:text-white transition-colors">privacy</Link>
+              <a href="mailto:support@mixreflect.com" className="hover:text-white transition-colors">contact</a>
             </div>
           </div>
         </footer>
-
       </div>
     </div>
   );
@@ -305,21 +292,29 @@ export default async function TrackOfTheDayPage() {
 
 function EmptyState() {
   return (
-    <div className="min-h-screen bg-[#faf8f5] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md text-center space-y-6">
-        <div className="mx-auto h-20 w-20 rounded-2xl bg-white border-2 border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <Music className="h-10 w-10 text-black/30" />
+    <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black`}>
+      <div className="relative z-10">
+        <SiteNav />
+        <div className="min-h-[70vh] flex items-center justify-center px-5 py-12">
+          <div className="max-w-md text-center space-y-6">
+            <div className="mx-auto h-20 w-20 border border-white/12 bg-[#0e0e0e] flex items-center justify-center">
+              <Music className="h-10 w-10 text-white/25" />
+            </div>
+            <p className={`${mono.className} text-[13px] lowercase`} style={{ color: ACCENT }}>
+              [ coming soon ]
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.03em] leading-tight">
+              Today&rsquo;s pick is brewing
+            </h1>
+            <p className="text-white/50 leading-relaxed normal-case">
+              We feature one track a day, voted up by producers and written up by the editors.
+              Check back soon — or score yours and you might be next.
+            </p>
+            <SignupLink className="inline-flex items-center gap-2 bg-[#6ee7ff] hover:bg-white text-black font-extrabold px-6 py-3 transition-colors shadow-[0_0_30px_-6px_rgba(110,231,255,0.7)]">
+              score your track <ArrowRight className="h-4 w-4" />
+            </SignupLink>
+          </div>
         </div>
-        <p className={`${caveat.className} text-2xl text-purple-600`}>coming soon</p>
-        <h1 className="text-3xl sm:text-4xl font-black text-black leading-tight">
-          Today&rsquo;s pick is brewing
-        </h1>
-        <p className="text-black/50 leading-relaxed">
-          We feature one track a day, voted up by producers and written up by the editors. Check back soon — or submit yours and you might be next.
-        </p>
-        <SignupLink className="inline-flex items-center gap-2 bg-lime-400 hover:bg-lime-300 text-black font-black border-2 border-black px-6 py-3 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          Submit your track <ArrowRight className="h-4 w-4" />
-        </SignupLink>
       </div>
     </div>
   );

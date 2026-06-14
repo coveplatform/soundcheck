@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { PASSWORD_REGEX, PASSWORD_ERROR_MESSAGE } from "@/lib/password";
 import { checkRateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
+import { sendWelcomeEmail } from "@/lib/email";
 export const runtime = "nodejs";
 
 const signupSchema = z.object({
@@ -76,6 +77,12 @@ export async function POST(request: Request) {
         isReviewer: true,
       },
     });
+
+    // Welcome the new artist — fire-and-forget so a slow/failed email never
+    // breaks signup. (Google sign-ups are welcomed via events.createUser in auth.ts.)
+    void sendWelcomeEmail({ to: normalizedEmail, name: user.name }).catch((err) =>
+      console.error("[signup] welcome email failed:", err)
+    );
 
     return NextResponse.json(
       {
