@@ -20,6 +20,162 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "how-to-promote-your-music-on-spotify",
+    title: "How to Promote Your Music on Spotify (Without a Label)",
+    coverImage: "/blog/blog14.jpg",
+    excerpt:
+      "Promoting music on Spotify without a label means doing four things well: pitching the unreleased track to editorial, getting onto independent playlists, using social to drive real saves in the first week, and making sure the track is actually ready before any of it starts. Here is the full playbook for each.",
+    category: "GUIDE",
+    date: "June 14, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "Promoting your music on Spotify without a label comes down to four channels: the Spotify editorial pitch (the only one with a hard deadline), independent playlist placement, social content that drives saves in the first week, and a pre-save campaign to front-load day-one numbers. None of these require a label, a budget, or industry connections. They all require one thing first: a track that holds up to a first-time listen, because promotion that brings people to a weak track just accelerates algorithmic suppression.",
+      },
+      {
+        type: "paragraph",
+        text: "Most Spotify promotion advice focuses on what to do after a release. The artists who actually build momentum on the platform mostly do the opposite: they line up editorial pitches, independent playlist submissions, and social rollout before the track goes live, and they only start any of that after confirming the track is ready. That sequencing matters more than any individual tactic.",
+      },
+      {
+        type: "h2",
+        text: "What does Spotify actually reward for independent artists?",
+      },
+      {
+        type: "paragraph",
+        text: "Spotify's algorithm does not reward streams. It rewards engagement: saves, repeats, full listens, and adds to personal playlists. A track that plays a million times with 3% saves and a 40% skip rate gets quietly buried. A track that plays ten thousand times with 25% saves and 90% completion gets fed to more people. The algorithm is designed to surface what listeners genuinely respond to, not what gets the most clicks. Every promotion tactic here is aimed at producing the kind of listening the platform treats as a signal worth amplifying.",
+      },
+      {
+        type: "h2",
+        text: "How do you pitch to Spotify editorial playlists?",
+      },
+      {
+        type: "paragraph",
+        text: "Spotify editorial is the one promotional channel on the platform with a hard deadline. You pitch an unreleased track through Spotify for Artists at least seven days before the release date, and that pitch is the only way to be considered for editorial playlists like New Music Friday or genre flagships. Once the track is live, the window closes. There is no retroactive editorial pitch.",
+      },
+      {
+        type: "list",
+        items: [
+          "Upload the track to your distributor at least three to four weeks before the release date so you have time to pitch while still having runway before it goes live.",
+          "Open Spotify for Artists, navigate to the upcoming release, and find the pitch tool. It only appears before the release date.",
+          "Fill out the pitch form completely: genre, mood, instrumentation, language, the story behind the track, and whether it is the first release of an upcoming project. Partial pitches are weak pitches.",
+          "Pick the single most accurate genre. Do not pick a genre you aspire to; pick the one that best describes the track's actual sound. Mismatched genre tags send the pitch to editors who cannot place it.",
+          "Submit early rather than at the seven-day minimum. Earlier pitches give editors more time and tend to perform better in the queue.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Why do most editorial pitches get rejected?",
+      },
+      {
+        type: "paragraph",
+        text: "Spotify editorial receives more pitches than any playlist team can place, and most rejections are not about the quality of the song. They are about fit, timing, and preparation. A pitch submitted five days before release with a vague description and a mismatched genre is a rejection waiting to happen. A pitch submitted three weeks out with a complete profile, an accurate genre, and a genuine story about the track has a real shot even from an unknown artist. The difference is entirely in the execution, not the artist's profile size.",
+      },
+      {
+        type: "quote",
+        text: "Editorial placement is not a lottery. It is a pitch, and pitches get better when you treat them like a pitch: complete, accurate, and submitted with enough lead time that the editors actually have room to act.",
+      },
+      {
+        type: "h2",
+        text: "How do you get onto independent Spotify playlists?",
+      },
+      {
+        type: "paragraph",
+        text: "Independent playlists are run by bloggers, music journalists, genre fans, and curators on platforms like SubmitHub. They are smaller than editorial, but they are also the part of Spotify promotion fully in your control, and placement on the right independent playlists is often what gives the algorithm enough data to start pushing you wider. The key is targeting playlists where your track actually fits, not the ones with the biggest follower counts.",
+      },
+      {
+        type: "list",
+        items: [
+          "Listen to five to ten tracks on every playlist before submitting. If your track would not slot naturally between them in terms of energy, tempo, and production quality, do not submit.",
+          "Use SubmitHub to pitch to independent curators. Read each curator's submission notes carefully; curators who specify their requirements accept at higher rates than those who don't.",
+          "Submit before the release date when possible. Curators are more likely to feature a track they have time to schedule than one that is already a week old.",
+          "Pitch blogs and music sites alongside playlists. A write-up or premiere drives referral traffic that converts to Spotify streams at a higher rate than passive playlist placement.",
+          "Follow up on any placement with a thank-you and a share. Curators who feel appreciated tend to keep an eye on your next releases.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What social content actually drives Spotify streams and saves?",
+      },
+      {
+        type: "paragraph",
+        text: "Social content drives Spotify promotion when it gives people a reason to save the track, not just stream it once. A save is worth more algorithmically than a stream, and saves come from people who feel something about the song, not just people who clicked a link. The content that generates saves shows the making of the track, explains the story behind it, or gives someone a reason to share it with a person they think needs to hear it. A static promotional post with cover art and a link generates passive streams at best.",
+      },
+      {
+        type: "list",
+        items: [
+          "Short vertical video clips from the studio, the writing process, or a raw vocal take outperform polished promotional graphics on every platform.",
+          "Ask explicitly for saves, not just streams. Most listeners do not know that saving a track matters to the algorithm, and when you explain it, they actually do it.",
+          "Post consistently for the two weeks before and after release, not just on release day. The algorithm watches engagement over time, not just the launch spike.",
+          "Reply to every comment on every platform in the first 48 hours. Early engagement signals to the platforms that the post is worth pushing, which feeds back into track promotion.",
+          "Show the emotion or context behind the song, not just the product. People save tracks that mean something to them, and that connection comes from the story.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Is a pre-save campaign worth setting up?",
+      },
+      {
+        type: "paragraph",
+        text: "Pre-saves are worth setting up but not worth obsessing over. They front-load day-one saves and follows, which gives the algorithm a stronger opening signal, and they let fans mark the release before it is live. The realistic impact is modest for most independent artists: pre-save counts tend to be a fraction of actual stream counts, and the marginal difference in algorithmic outcomes between 50 and 200 pre-saves is small. Set it up through a tool like Toneden or Hypeddit because it costs almost nothing, and because every real save on day one matters, but do not build your whole release plan around it.",
+      },
+      {
+        type: "h2",
+        text: "Why promoting a weak track is worse than not promoting at all",
+      },
+      {
+        type: "paragraph",
+        text: "Every Spotify promotion tactic is pointless if the track produces bad listening signals when people arrive. A high skip rate on the intro, a low save rate, and poor completion tell the algorithm the track does not deserve to reach more people, and it acts accordingly. Editorial placement does not override this. Independent playlist features do not override this. More social posts do not override this. The algorithm will suppress a track with weak engagement regardless of how it got there.",
+      },
+      {
+        type: "paragraph",
+        text: "This is the step that comes before any promotion: confirming the track actually works for a first-time listener. By the time you finish a song you have heard it too many times to evaluate it honestly. The intro that feels fast to you took thirty listens to feel that way. The buried vocal stopped bothering you because you know every word. A first-time listener gets none of that context, and the skip button is right there. MixReflect closes this gap: paste your link and get an instant AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus honest reactions from a room of five real listeners who have never heard the track before. When several of them flag the same intro as slow or the same section as weak, that is the skip you are about to serve to Spotify at scale. Fix it first, then promote.",
+      },
+      {
+        type: "quote",
+        text: "Promotion does not fix a weak track. It just brings more people to the moment they decide to skip it.",
+      },
+      {
+        type: "h2",
+        text: "How do you track whether Spotify promotion is actually working?",
+      },
+      {
+        type: "paragraph",
+        text: "Spotify for Artists gives you the numbers that actually matter: save rate, listener-to-stream ratio, playlist placements, and listener geography. A save rate above 20% is strong and suggests the algorithm is likely to keep pushing the track. Below 10% usually means the hook is not landing or the wrong listeners are finding it. Listener geography tells you where your audience is clustering, which is useful for targeting social content or tour routing later. Check these weekly in the month after release, not just on release day, because algorithmic traction builds gradually rather than all at once.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How do you promote music on Spotify without a label?",
+            a: "Pitch the unreleased track to Spotify editorial through Spotify for Artists at least seven days before release, target independent playlists via SubmitHub and direct outreach, use social content that generates saves and tells the story behind the track, and set up a pre-save campaign to front-load day-one numbers. Before any of that, confirm the track works for a first-time listener, because promotion that drives traffic to a weak track just accelerates algorithmic suppression.",
+          },
+          {
+            q: "How do you pitch to Spotify editorial playlists?",
+            a: "Use the pitch tool inside Spotify for Artists, available only before a release goes live. Submit at least seven days before the release date, and earlier if possible. Fill the pitch form out completely: genre, mood, instrumentation, the story behind the track. Pick the genre that most accurately describes the song, not the one you want to be associated with. Incomplete pitches and mismatched genres are the most common reasons submissions never get reviewed.",
+          },
+          {
+            q: "Do pre-saves help Spotify promotion?",
+            a: "Modestly. Pre-saves convert into day-one saves and follows, which gives the algorithm a stronger opening signal. The realistic impact for most independent artists is incremental rather than transformative, but a pre-save campaign costs almost nothing to set up and every real save on launch day matters. Set it up, promote it during the two weeks before release, and treat it as one part of the rollout rather than the main strategy.",
+          },
+          {
+            q: "What social content works best for promoting music on Spotify?",
+            a: "Content that generates saves rather than passive streams: behind-the-scenes clips, the story behind the song, short vertical video from the studio or writing session, and explicit asks for saves with an explanation of why they matter algorithmically. Static promotional posts with cover art and a link tend to produce one-time streams from people with no emotional investment. Content that shows the human side of the track converts listeners into followers and savers.",
+          },
+          {
+            q: "How do you get onto Spotify playlists without a label?",
+            a: "Use two channels: pitch Spotify editorial through Spotify for Artists before the release date, and pitch independent curators through SubmitHub or direct outreach. For independent playlists, listen to five to ten tracks on every playlist before submitting to confirm your track fits naturally, and submit before the release date whenever possible. Genre fit and production quality relative to the playlist's existing sound matter more than your follower count.",
+          },
+          {
+            q: "How do you know if your Spotify promotion is working?",
+            a: "Check Spotify for Artists weekly after release. A save rate above 20% suggests strong algorithmic momentum. Below 10% usually means the intro is not converting or the wrong listeners are finding the track. Also look at playlist placements driving streams, listener geography, and the listener-to-stream ratio. Algorithmic traction builds over the weeks after a release rather than all at once, so give it at least a month before drawing conclusions.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "music-release-checklist",
     title: "Music Release Checklist: What to Do Before You Drop",
     coverImage: "/blog/blog13.jpg",
