@@ -20,6 +20,125 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "is-your-mix-good",
+    title: "Is Your Mix Good? 6 Ways to Know Before You Release",
+    coverImage: "/blog/blog16.jpg",
+    excerpt:
+      "To know if your mix is good before you release, run it through six checks: does it translate across systems, is the vocal clear without being pushed, can every element be heard in the first thirty seconds, does the low end hold at volume, can a stranger follow it cold, and does it still hold up the next morning. Most mixes that feel finished fail at least two of these. Here is how to run each check.",
+    category: "GUIDE",
+    date: "June 17, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "To know if your mix is good before you release, run it through six checks: does it translate across earbuds, speakers, and a car stereo without falling apart; is the vocal clear without being pushed to an unnatural level; can you identify every element in the first thirty seconds; does the low end hold together at high volume rather than turning to mud; can a stranger who has never heard the track follow it without you explaining anything; and does it still hold up the next morning after you listen back cold. A mix that passes all six is ready. Most mixes that feel finished fail at least two.",
+      },
+      {
+        type: "h2",
+        text: "Why is it so hard to judge your own mix?",
+      },
+      {
+        type: "paragraph",
+        text: "Ear fatigue is the obvious reason, but the deeper problem is familiarity. After hours in a session you stop hearing the mix and start hearing your memory of it. The vocal that gets swallowed at the chorus no longer registers because you know the lyric and your brain fills it in. The harsh frequency around 3kHz that would make a fresh listener wince has become background noise. You can take a break and come back, reference against a commercial track, and still miss it, because the track itself has trained you to expect it. This is why every mixing engineer worth listening to insists on outside ears before a final decision. Not because they lack confidence, but because they know what familiarity costs.",
+      },
+      {
+        type: "h2",
+        text: "What are the 6 ways to know if your mix is good?",
+      },
+      {
+        type: "list",
+        items: [
+          "Translation test: play the mix on at least three systems: earbuds, a Bluetooth or laptop speaker, and a car stereo or hi-fi. A finished mix holds its balance across all three. If the bass vanishes on earbuds or the vocal disappears on laptop speakers, the mix is not ready.",
+          "Vocal clarity test: drop the volume to a conversational level and try to follow the lyrics without knowing them in advance. If you lose words at that volume, the vocal is too far back. If the vocal is the only thing you can hear clearly, it is too far forward.",
+          "30-second element check: from a cold listen at the start of the track, every significant element should be identifiable within thirty seconds. If you have to wait for a section or strain to hear an instrument, something is buried or masked.",
+          "Low-end stability test: push the volume up higher than you normally mix and listen to the bass and kick. Do they hold together and stay controlled, or do they start colliding and muddying? A mix with low-end problems almost always reveals them at volume.",
+          "Stranger test: play thirty seconds to someone who has never heard the track and ask them what they think it sounds like, not whether they like it. If they cannot describe the genre, the mood, or the main instrument, the mix is not communicating what you think it is.",
+          "Sleep test: export the mix, leave it overnight, and listen back cold the next morning on fresh ears. Whatever bothers you in the first sixty seconds of that listen is real. Whatever still sounds right is real too. This is the closest thing to hearing it the way a new listener will.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "How do you run a proper translation check?",
+      },
+      {
+        type: "paragraph",
+        text: "Translation means the mix sounds like a version of itself on every system, not that it sounds identical. Bass-heavy earbuds will always emphasize low end. Laptop speakers will always thin it out. What you are checking is whether the core balance survives: the vocal should stay present, the elements should stay in their relative positions, and nothing should suddenly dominate or disappear. If something fundamental changes between systems, fix it in the mix before release, not in the mastering.",
+      },
+      {
+        type: "list",
+        items: [
+          "Start on the system you mixed on, then move to the furthest thing from it: laptop speakers or phone speakers are a good first contrast.",
+          "Check a car stereo if you can. Car speakers are where a huge proportion of music listening happens, and they reveal low-mid buildup and vocal clarity issues that studio monitors hide.",
+          "Listen on earbuds last. Earbuds exaggerate stereo width and low end, so they surface problems that headphones or speakers swallow.",
+          "On each system, note what changed rather than what you like. You are diagnosing, not enjoying.",
+          "If the mix translates well but feels thin on certain systems, that is a mastering note. If the balance shifts, that is a mix note. Fix mix problems in the mix.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What should a good mix sound like against reference tracks?",
+      },
+      {
+        type: "paragraph",
+        text: "Reference tracking is the fastest way to recalibrate your ears. Pick two or three released tracks in a similar genre that sound the way you want your track to sound, and A/B between them and your mix on the same system at the same volume. The gaps become obvious in a way they never are when you listen to your mix in isolation. The reference does not have to be a chart hit. It just has to be a track where the mix sounds finished to you, because that is exactly what finished feels like from the outside, and your ears have lost track of what that is after a long session.",
+      },
+      {
+        type: "quote",
+        text: "Most mixes that feel finished are finished for the person who made them. Whether they are finished for the person hearing them for the first time is a different question, and the only way to answer it is to put a stranger in front of them.",
+      },
+      {
+        type: "h2",
+        text: "Why do outside ears catch what yours miss?",
+      },
+      {
+        type: "paragraph",
+        text: "A stranger hearing your track for the first time has none of your assumptions. They do not know that the kick is supposed to sit back in that section, or that the instrumental breakdown before the final chorus is intentional. They just hear what is there. That cold listen, without context, without familiarity, without goodwill toward the artist, is the most accurate simulation of what your track will sound like to the people it needs to reach. Getting that feedback before release is the difference between fixing something and releasing it hoping no one notices.",
+      },
+      {
+        type: "paragraph",
+        text: "This is exactly what MixReflect is built for. You paste your link and get an AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, which gives you an instant baseline read on where the mix actually sits. Then five real listeners who have never heard the track react to it cold, naming what lands and what does not, pointing at the exact moments where something works or stops working. Because you get five independent reactions, patterns surface naturally: if four of them flag the same moment the energy drops or the same section where the vocal gets muddy, that is not a matter of taste, it is a fix waiting to happen. You find out before the track is live, not after.",
+      },
+      {
+        type: "h2",
+        text: "When should you stop tweaking and release?",
+      },
+      {
+        type: "paragraph",
+        text: "When the six checks pass and outside feedback stops producing new notes. There is a version of this process that becomes its own trap: chasing perfection through infinite tweaks until the track no longer sounds like itself. The goal is not a technically flawless mix. It is a mix that communicates what the track is supposed to communicate to a first-time listener. When multiple people hear it cold and respond the way you intended, you are done. When they keep flagging the same things, you are not. The six checks tell you which situation you are in.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How do I know if my mix is good enough to release?",
+            a: "Run six checks before releasing: confirm it translates across at least three different playback systems, verify the vocal is clear at normal listening volume, check that every element is audible in the first thirty seconds, push the volume up to test whether the low end holds or muddies, play it to a stranger cold and see if they can describe the genre and mood, and sleep on it before making a final call. A mix that passes all six is ready. A mix that keeps failing the same check is not.",
+          },
+          {
+            q: "What is the translation test for a mix?",
+            a: "A translation test means playing your mix on multiple different playback systems and checking whether the core balance holds across all of them. At minimum, test on your mixing system, a laptop or phone speaker, and a car stereo or Bluetooth speaker. If the vocal disappears on one system, or the bass takes over on another, the mix needs work before mastering. Translation issues are mix problems, not mastering problems.",
+          },
+          {
+            q: "Why does my mix sound good in my DAW but bad everywhere else?",
+            a: "Because your studio monitors or headphones are tuned to help you hear the mix accurately. Most consumer speakers, earbuds, and car stereos are not flat; they emphasize bass, cut mids, or boost treble in ways that reveal imbalances your mixing system hides. The fix is to check translation on multiple systems as part of your mix process, not as an afterthought after you have bounced the final file.",
+          },
+          {
+            q: "How do I test my mix on different speakers?",
+            a: "Export a draft mix and play it back on your phone speaker, laptop speaker, earbuds, a Bluetooth speaker, and a car stereo if possible. On each one, listen for what changed relative to your studio reference: does the vocal stay present, does the low end hold together, does anything suddenly dominate that was balanced before? Take notes on each system rather than trying to remember later. If you hear the same problem on two or more different systems, it is a mix problem. If it only appears on one, it is that system.",
+          },
+          {
+            q: "What is ear fatigue and how does it affect mixing?",
+            a: "Ear fatigue is the gradual desensitization of your hearing after extended exposure to loud or complex audio. After a long session, your ears start normalizing quirks they would have caught in the first hour. Familiarity compounds it, because you stop hearing the mix objectively and start hearing your expectations of it. The practical fix is to mix in shorter sessions with breaks, reference against finished tracks, and get outside ears on the mix before making final decisions.",
+          },
+          {
+            q: "How many people should listen to my mix before I release it?",
+            a: "Around three to five independent listeners who have never heard the track. A single listener gives you one opinion, which is easy to dismiss or over-correct for. When three or more listeners flag the same thing, that is a signal worth acting on. When only one does, file it and move on. The goal is to find where reactions converge, because that convergence predicts how a new listener on Spotify will actually hear the mix.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-to-get-music-reviews-online",
     title: "How to Get Music Reviews Online (Honest, Useful Ones)",
     coverImage: "/blog/blog15.png",
