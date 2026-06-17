@@ -4,10 +4,9 @@ The daily blog agent reads this file, picks the next PENDING item, writes the po
 The current highest cover image is tracked here — agent increments it after each post.
 
 ## Current image counter
-Last used: blog14 → next post uses blog15
-Cover images blog15 and blog16 are pre-uploaded in public/blog/ and ready to use.
-⚠️ Watch the extension: **blog15.png** (PNG, not jpg!), blog16.jpg. Reference the exact filename in coverImage.
-⚠️ Pre-upload blog17.jpg–blog20.jpg before they run out (≈2 posts of runway).
+Last used: blog15 → next post uses blog16
+Cover image blog16.jpg is pre-uploaded in public/blog/ and ready to use.
+⚠️ blog16.jpg is the last pre-uploaded image — pre-upload blog17.jpg–blog20.jpg before the next post runs (≈1 post of runway).
 
 ## Blog post queue
 
@@ -28,7 +27,7 @@ Cover images blog15 and blog16 are pre-uploaded in public/blog/ and ready to use
 | DONE | 2026-06-11 | How to Get on Spotify's Discover Weekly | how to get on discover weekly | blog12.jpg |
 | DONE | 2026-06-14 | Music Release Checklist: What to Do Before You Drop | music release checklist | blog13.jpg — AEO checklist format |
 | DONE | 2026-06-14 | How to Promote Your Music on Spotify (Without a Label) | how to promote music on spotify | blog14.jpg |
-| PENDING | | How to Get Music Reviews Online (Honest, Useful Ones) | how to get music reviews online | Direct MixReflect keyword — compare options honestly |
+| DONE | 2026-06-17 | How to Get Music Reviews Online (Honest, Useful Ones) | how to get music reviews online | blog15.png — compares Reddit/Discord/SubmitHub/friends honestly |
 | PENDING | | Is Your Mix Good? 6 Ways to Know Before You Release | how to know if your mix is good | Strong AEO format — numbered list with clear yes/no signals |
 | PENDING | | How to Master Music at Home (And When to Hire Out) | how to master music at home | High volume — cover basics then when to hand off |
 | PENDING | | How to Build a Fanbase as an Independent Artist | how to build a fanbase | Top of funnel — social, live, release cadence |
