@@ -5,7 +5,9 @@ The current highest cover image is tracked here — agent increments it after ea
 
 ## Current image counter
 Last used: blog14 → next post uses blog15
-⚠️ blog14 was the last pre-uploaded image — pre-upload blog15.jpg–blog20.jpg before the next post runs (0 posts of runway).
+Cover images blog15 and blog16 are pre-uploaded in public/blog/ and ready to use.
+⚠️ Watch the extension: **blog15.png** (PNG, not jpg!), blog16.jpg. Reference the exact filename in coverImage.
+⚠️ Pre-upload blog17.jpg–blog20.jpg before they run out (≈2 posts of runway).
 
 ## Blog post queue
 
