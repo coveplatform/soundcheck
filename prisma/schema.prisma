@@ -891,6 +891,9 @@ model TrackScoreReport {
   // Subscriber submitted past their monthly real-reviewer-round allowance:
   // full AI read still delivered, but no human room assigned for this one.
   humanRoomSkipped Boolean           @default(false)
+  // Behavioral lifecycle-email dedupe (set by /api/cron/score-lifecycle).
+  reminderEmailedAt    DateTime? // segment A: report-reminder upsell sent (scored, never unlocked)
+  secondTrackEmailedAt DateTime? // segment B: "run another back" sent (unlocked once, never returned)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   ArtistProfile    ArtistProfile?    @relation(fields: [artistId], references: [id])

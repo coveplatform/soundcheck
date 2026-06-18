@@ -238,3 +238,38 @@ export async function sendReportReminderEmail(args: {
   const { subject, html } = buildReportReminderEmail(args);
   return sendEmail({ to: args.to, subject, html });
 }
+
+// ── Second-track nudge: unlocked once, never came back ───────────────
+// For submitters who paid to unlock a report but never submitted another.
+// Reminds them how it works and points them back to score a new track.
+export function buildSecondTrackEmail(args: {
+  name?: string | null;
+  trackTitle?: string | null;
+}): { subject: string; html: string } {
+  const app = getAppUrl();
+  const name = args.name ? args.name.split(" ")[0] : null;
+  const title = args.trackTitle || "your track";
+  const url = `${app}/submit-score`;
+  const monthly = `$${(scoreSubPrice("monthly").amount / 100).toFixed(2)}`;
+
+  const content = `
+    ${kicker("got another one?")}
+    ${h1("Got another track? Run it back.")}
+    ${p(`${name ? `Hey ${name}, you` : "You"} ran <strong style="color:${TEXT};">${title}</strong> through MixReflect, unlocked the full read, and put it in front of the room of five. Hope it was useful.`)}
+    ${p(`Got another one in the works? You know how it goes: paste the link, get the score, and hear what real listeners think before you release.`)}
+    ${button("Score another track →", url)}
+    <p style="margin:14px 0 0;font-size:13px;line-height:1.6;color:${MUTED};">
+      Shipping a few? Unlimited at ${monthly}/mo unlocks every track you submit.
+    </p>`;
+
+  return { subject: "got another track? run it back", html: shell(content) };
+}
+
+export async function sendSecondTrackEmail({ to, name, trackTitle }: {
+  to: string;
+  name?: string | null;
+  trackTitle?: string | null;
+}): Promise<boolean> {
+  const { subject, html } = buildSecondTrackEmail({ name, trackTitle });
+  return sendEmail({ to, subject, html });
+}
