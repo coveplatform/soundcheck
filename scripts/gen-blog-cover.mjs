@@ -42,38 +42,31 @@ if (!key) {
 
 // --- Deterministic variety: pick scene elements from N so covers differ ---
 const pick = (arr) => arr[N % arr.length];
-const instrument = pick([
-  "an electric guitar",
-  "an acoustic guitar",
-  "a small synthesizer / keyboard",
-  "an electric guitar, with a microphone on a stand nearby",
+const scene = pick([
+  "two or three young musicians jamming together — one on guitar, one at a keyboard, one with headphones",
+  "a small group of people dancing loosely at a house party, a mirrored disco ball spinning overhead",
+  "a lone figure sitting cross-legged on a rug with big headphones, beside a record player and a stack of vinyl",
+  "a band rehearsing in a warm lamp-lit room crammed with gear, cables snaking across the floor",
 ]);
-const window = pick([
-  "a large window letting in soft morning light",
-  "an arched window showing a calm sky and distant rooftops",
-  "a window with a leafy green view and warm afternoon light",
-  "a tall window with a pale sunset beyond it",
+const backdrop = pick([
+  "a night scene through an arched window with a crescent moon and tiny stars",
+  "warm dusk light through a tall window with city rooftops beyond",
+  "an interior glowing with lamps and a bubbling lava lamp",
+  "a sunset-orange glow spilling across the floorboards",
 ]);
-const accent = pick([
-  "mustard yellow, dusty teal and coral pink",
-  "warm orange, sky blue and soft pink",
-  "ochre yellow, sage green and terracotta",
-  "teal, blush pink and golden yellow",
-]);
-const poster = pick([
-  "TRUST YOUR EARS",
-  "FINISH THE SONG",
-  "PLAY IT LOUD",
-  "ONE MORE TAKE",
-  "KEEP IT HONEST",
+const palette = pick([
+  "violet, lavender and hot pink dominant, with coral-orange pops",
+  "cobalt blue and purple dominant, with teal-green and pink pops",
+  "magenta and indigo dominant, with warm orange and lime accents",
+  "purple and periwinkle dominant, with coral and turquoise accents",
 ]);
 
-const prompt = `A painterly editorial illustration in a calm mid-century modern style, part of a consistent series of music-blog cover art.
-Subject: a single young musician with messy black hair, seated on a wooden stool, absorbed in playing ${instrument}.
-Setting: a warm, sunlit home studio with cream and off-white textured walls, ${window}, a hanging pendant globe light, a few leafy potted plants, a small guitar amp/speaker, a crate of vinyl records, and a pedalboard with a cable curling across the floor. Geometric pastel rugs on the floor.
-Wall decor: a few flat abstract geometric shapes (circles, squares, half-moons) and one small taped poster with the short hand-lettered phrase "${poster}".
-Color palette: muted pastels — soft cream base with accents of ${accent} — and confident black silhouettes with ink line accents.
-Style: gouache / acrylic painterly texture, flat shapes, generous negative space, gentle warm lighting, editorial illustration, slightly imperfect hand-painted feel. Wide landscape composition. No text other than the small poster phrase, no camera, no watermark, no logos.${
+const prompt = `A hand-drawn editorial illustration in OIL PASTEL and COLORED PENCIL, risograph print style — part of a consistent series of music-blog cover art with a loose, energetic, slightly weird hand-made feel.
+Scene: ${scene}, inside a warm, cluttered, cozy room. ${backdrop}.
+Scattered details around the room: leafy potted plants, a chunky speaker or amp, vinyl records and a turntable, a striped woven rug, and a few abstract squiggles and shapes taped on the walls.
+Texture and technique (most important): heavy VISIBLE crayon and colored-pencil strokes, dense directional hatching and scribble filling the background, grainy cream / off-white paper showing through the marks. Loose, wobbly, imperfect hand-drawn linework. Naive folk-art / indie zine feel — a little weird and edgy. NOT clean, NOT flat vector, NOT smooth, NOT glossy digital art.
+Palette: limited vibrant risograph colours — ${palette} — over a cream paper base.
+Wide landscape composition, flat playful perspective, lots of small hand-drawn details. No text, no lettering, no watermark, no logos.${
   topic ? `\nMood should loosely suit a blog post about: ${topic}.` : ""
 }`;
 
@@ -111,5 +104,5 @@ for (let attempt = 1; attempt <= 4; attempt++) {
 }
 
 const out = path.resolve(`public/blog/blog${N}.jpg`);
-await sharp(pngBuf).jpeg({ quality: 82, mozjpeg: true }).toFile(out);
+await sharp(pngBuf).jpeg({ quality: 74, mozjpeg: true }).toFile(out);
 console.log(`wrote ${out} (${fs.statSync(out).size} bytes)`);

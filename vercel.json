@@ -1,4 +1,5 @@
 {
+  "regions": ["iad1"],
   "crons": [
     {
       "path": "/api/cron/expire-queue",
@@ -11,14 +12,6 @@
     {
       "path": "/api/cron/chart-finalize",
       "schedule": "1 0 * * *"
-    },
-    {
-      "path": "/api/cron/weekly-digest",
-      "schedule": "0 9 * * 1"
-    },
-    {
-      "path": "/api/cron/credits-nudge",
-      "schedule": "0 10 * * 3"
     },
     {
       "path": "/api/cron/totd-digest",
