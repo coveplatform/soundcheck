@@ -20,6 +20,145 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "how-to-master-music-at-home",
+    title: "How to Master Music at Home (And When to Hire Out)",
+    coverImage: "/blog/blog17.jpg",
+    excerpt:
+      "Mastering at home is straightforward: EQ for frequency balance, optional saturation for density, a limiter to hit streaming loudness targets. The real question is whether the mix is ready for mastering in the first place. Here is the full process, and the honest cases where hiring out is worth it.",
+    category: "GUIDE",
+    date: "June 18, 2026",
+    readTime: "7 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "Mastering music at home means running your final mix through a short chain: a broad EQ pass to balance the overall frequency curve, optional saturation or gentle compression to add density and glue, and a limiter at the end to hit the streaming loudness target of around -14 LUFS integrated with a true peak ceiling of -1 dBTP. Any modern DAW and its stock plugins can do this. The important constraint is that mastering works with what the mix gives it. It enhances a solid mix but cannot fix one. If the mix has a buried vocal, muddy low end, or weak arrangement, mastering makes those problems more permanent, not less. That is the line between doing it yourself and knowing when to hire out.",
+      },
+      {
+        type: "h2",
+        text: "What does mastering actually do to a track?",
+      },
+      {
+        type: "paragraph",
+        text: "Mastering is the final step between a finished mix and a released record, and its job is narrower than most people think. It sets the output level to a standard loudness for streaming platforms, applies broad frequency shaping to make the track sit well next to other commercial releases, and adds density and cohesion that makes a finished mix feel like a record rather than a rough. It does not fix mix problems. A buried vocal does not get clearer in mastering. Muddy low end does not get cleaned up. Those are mixing problems and they have to be solved at the mix stage. Mastering applied to a mix with unfixed problems just makes them permanent.",
+      },
+      {
+        type: "h2",
+        text: "What do you need to master music at home?",
+      },
+      {
+        type: "list",
+        items: [
+          "A good mix first. This is not a tool or a plugin. It is the prerequisite. If your mix translates on multiple systems and fresh ears are not flagging consistent problems, you have something worth mastering.",
+          "A reference track. A commercially released song in your genre, level-matched to your mix for comparison. This is free and more useful than any plugin.",
+          "A limiter. Your DAW ships with one. Dedicated options like FabFilter Pro-L or iZotope Ozone are better, but the stock limiter works for starting out.",
+          "A broad EQ. Not for surgical mixing moves. For gentle overall shaping of the master bus: low-shelf adjustments, a high-shelf air boost, nothing more than 2-3 dB.",
+          "A LUFS metering plugin. You need to see your integrated LUFS and true peak values to hit the streaming target accurately. Youlean Loudness Meter is free and accurate.",
+          "Time away from the session. Export the master, leave it overnight, and check it fresh the next morning. Your ears normalize to whatever you are working on; a break resets that.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "How do you master a track step by step at home?",
+      },
+      {
+        type: "paragraph",
+        text: "The chain runs in a fixed order: EQ first for frequency balance, optional saturation or gentle compression for density, then the limiter last to set the output level. Work at subtle levels throughout and listen to what each step does before adding more. Most home masters are not ruined by bad tools. They are ruined by too much of each step, stacked.",
+      },
+      {
+        type: "list",
+        items: [
+          "Import a reference track into a separate channel. Level-match it to your mix and A/B between them throughout. You are listening for how your track's frequency balance and density compare, not loudness.",
+          "Apply a gentle broad EQ pass. Fix obvious imbalances: if the low end feels thin against the reference, lift a low shelf a couple of dB. If the top sounds dull, a small high-shelf boost. Keep moves under 3 dB.",
+          "Add saturation or harmonic excitement only if the track sounds thin or lifeless next to the reference. A small amount adds density and warmth. More than that adds distortion.",
+          "In your limiter, set the output ceiling to -1 dBTP. This prevents inter-sample peaks from distorting on streaming encoders before you set the loudness target.",
+          "Bring in the limiter threshold slowly. Watch the gain reduction meter. You want 1-3 dB of limiting on average, with peaks reaching 4-6 dB at most. More than that and you are compressing the life out of the master.",
+          "Check the integrated LUFS on your metering plugin. Target around -14 LUFS. Being a few tenths louder or quieter does not matter; streaming platforms normalize playback anyway.",
+          "Compare to the reference one final time, levels matched. If your track holds up without feeling noticeably thinner, duller, or more fatiguing, the master is done. If it does not, find what is different before you commit.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What loudness target should you hit for streaming platforms?",
+      },
+      {
+        type: "paragraph",
+        text: "The target is around -14 LUFS integrated, with a true peak ceiling of -1 dBTP. Spotify, Apple Music, and YouTube all normalize playback to similar targets, which means tracks submitted louder than -14 LUFS get turned down on playback, not given an advantage. Chasing extreme loudness beyond the streaming target gains you nothing on the platform and costs you dynamics and punch in the process. The common mistake is treating loudness as the goal. On streaming platforms, it is not.",
+      },
+      {
+        type: "quote",
+        text: "A loud master does not play louder on Spotify. It plays at the same volume as everything else, with the dynamics crushed out of it. Chase level and you lose the punch that made the mix worth mastering.",
+      },
+      {
+        type: "h2",
+        text: "How do you know if your master is actually good?",
+      },
+      {
+        type: "paragraph",
+        text: "Compare it level-matched against a reference in your genre and ask whether it holds up: does the frequency balance feel similar, does it feel like a finished record, does it translate on phone speakers and earbuds without collapsing. If yes to all three, it is done. The wrong question is whether it is loud.",
+      },
+      {
+        type: "paragraph",
+        text: "There is a step before this that many artists skip: confirming the mix is genuinely ready before the mastering session starts. By the time you are ready to master, you have heard the song too many times to evaluate it honestly. A buried vocal, a muddy low end, a section that drags — these become invisible after enough listens. Mastering over a mix with unfixed problems locks them in. This is where getting outside feedback before you master pays for itself. On MixReflect, paste your link and get structured reactions from five listeners hearing the track for the first time. The patterns they surface — the same moment flagged by three or four of them independently — are exactly the things mastering cannot fix. Get those right at the mix stage, and the mastering session becomes straightforward.",
+      },
+      {
+        type: "h2",
+        text: "When should you hire a professional mastering engineer instead?",
+      },
+      {
+        type: "paragraph",
+        text: "Home mastering works for most independent releases, especially early in a career when budget is the constraint. Hiring out makes sense in specific situations where a professional engineer returns something home mastering cannot.",
+      },
+      {
+        type: "list",
+        items: [
+          "When the release is commercially significant: a debut album, a major sync pitch, or anything where the gap between good and excellent has real consequences.",
+          "When the mix has frequency or dynamics problems you can no longer identify after repeated listens. A good mastering engineer will tell you if the mix needs more work before they can do their job. That diagnostic alone is often worth the fee.",
+          "When you need vinyl mastering. Cutting for vinyl requires specific phase corrections and frequency decisions that software tools handle poorly without deep knowledge of the format.",
+          "When you have done multiple passes and the master still sounds noticeably thinner or more fatiguing than a commercial reference. Sometimes a fresh set of ears and monitors finds in an hour what you could not hear after weeks.",
+          "When the track has never been heard by anyone outside your immediate circle. That is a mix feedback problem, not a mastering problem, and it should be solved before the mastering conversation starts.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What is the difference between AI mastering services and a human engineer?",
+      },
+      {
+        type: "paragraph",
+        text: "Services like LANDR and eMastered use machine learning to apply an automatic mastering chain. They work reasonably well on mixes that are already balanced and need mostly loudness targeting and light polish. They struggle when the mix has real problems: the algorithm applies a generic treatment to a specific issue, and the result is a slightly louder version of whatever the mix already had. A human engineer listens to the track in context, identifies specific issues, and can tell you when the mix is not ready for mastering. The AI cannot do that last part. If budget is the constraint, AI mastering is better than nothing for a simple release. It is not a substitute for a human ear when the stakes are higher or the mix is not in clean shape.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "Can you master your own music at home?",
+            a: "Yes. Any modern DAW and its stock plugins can produce a release-ready master. The process is: a broad EQ pass for frequency balance, optional saturation for density, then a limiter set to -1 dBTP true peak with enough gain reduction to hit around -14 LUFS integrated. The constraint is that mastering works best when the mix is solid to begin with. If the mix has real problems, home mastering will not fix them and may make them harder to correct later.",
+          },
+          {
+            q: "What loudness should I target when mastering for Spotify?",
+            a: "Target around -14 LUFS integrated with a true peak ceiling of -1 dBTP. Spotify normalizes playback to roughly -14 LUFS, which means tracks mastered louder simply get turned down. Chasing extreme loudness above that target costs you dynamics and punch without making your track sound louder on the platform.",
+          },
+          {
+            q: "What plugins do I need to master at home?",
+            a: "At minimum: a limiter, a broad EQ, and a LUFS metering plugin. Your DAW ships with the first two. Youlean Loudness Meter is free and accurate for LUFS monitoring. Dedicated mastering tools like iZotope Ozone and FabFilter Pro-L make the process easier but are not required to get a release-ready master. A level-matched reference track in your genre does more for the quality of your master than any single plugin.",
+          },
+          {
+            q: "When should I hire a mastering engineer instead of doing it myself?",
+            a: "Hire a mastering engineer when the release is commercially significant, when you need vinyl mastering, or when multiple home mastering passes have not closed the gap between your master and a commercial reference. Also worth it when the mix has frequency or dynamics problems you can no longer identify after extended work on the session: a good engineer will diagnose those and tell you whether the mix needs more work first.",
+          },
+          {
+            q: "Does mastering fix problems in the mix?",
+            a: "No. Mastering enhances a finished mix but cannot fix one. A buried vocal, muddy low end, weak arrangement, or frequency clashes all have to be resolved at the mix stage. Mastering over a mix with those problems makes them more permanent. Get the mix confirmed by fresh ears before the mastering session starts.",
+          },
+          {
+            q: "What is the difference between mixing and mastering?",
+            a: "Mixing is the process of balancing individual tracks, applying EQ and compression to each element, and building the overall sound of a song from its component parts. Mastering is the final step after a finished mix: it shapes the overall frequency balance of the stereo master, adds density and cohesion, sets the output level to the streaming loudness target, and produces the final file that goes to distribution. They are different stages with different tools and different goals.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "is-your-mix-good",
     title: "Is Your Mix Good? 6 Ways to Know Before You Release",
     coverImage: "/blog/blog16.jpg",
