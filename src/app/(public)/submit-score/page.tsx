@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
-import { ArrowRight, Loader2, Music, X, Upload } from "lucide-react";
+import { ArrowRight, Loader2, Music, X, Upload, ChevronDown, Check } from "lucide-react";
 import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
 import { scoreConversions } from "@/lib/score-conversions";
 import { FreeReadUpsell } from "@/components/score/free-read-upsell";
@@ -383,16 +383,7 @@ export default function SubmitScorePage() {
           </Field>
 
           <Field label="genre" optional>
-            <select
-              value={genre}
-              onChange={(e) => setGenre(e.target.value)}
-              className={inputCls}
-            >
-              <option value="">pick a genre</option>
-              {GENRES.map((g) => (
-                <option key={g} value={g}>{g}</option>
-              ))}
-            </select>
+            <GenreDropdown value={genre} onChange={setGenre} options={GENRES} />
           </Field>
 
           {session?.user?.email ? (
@@ -479,7 +470,7 @@ export default function SubmitScorePage() {
         </div>
       )}
 
-      <style>{`@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}`}</style>
+      <style>{`@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes ddIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}`}</style>
     </div>
   );
 }
@@ -503,6 +494,85 @@ function Field({
         {optional && <span className="text-white/30"> (optional)</span>}
       </label>
       {children}
+    </div>
+  );
+}
+
+function GenreDropdown({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={`${mono.className} w-full flex items-center justify-between gap-2 bg-[#141414] border px-4 py-3.5 text-[15px] focus:outline-none transition-colors normal-case ${
+          open ? "border-[#6ee7ff]" : "border-white/20"
+        } ${value ? "text-white" : "text-white/35"}`}
+      >
+        <span>{value || "pick a genre"}</span>
+        <ChevronDown
+          className={`h-4 w-4 shrink-0 text-white/45 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && (
+        <div
+          role="listbox"
+          className="absolute z-20 mt-1.5 w-full max-h-64 overflow-auto border border-white/15 bg-[#141414] shadow-xl shadow-black/50"
+          style={{ animation: "ddIn 0.12s ease-out" }}
+        >
+          {options.map((g) => {
+            const selected = g === value;
+            return (
+              <button
+                key={g}
+                type="button"
+                role="option"
+                aria-selected={selected}
+                onClick={() => {
+                  onChange(g);
+                  setOpen(false);
+                }}
+                className={`${mono.className} w-full flex items-center justify-between gap-2 px-4 py-2.5 text-left text-[14px] normal-case transition-colors ${
+                  selected
+                    ? "text-[#6ee7ff] bg-[#6ee7ff]/10"
+                    : "text-white/80 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                {g}
+                {selected && <Check className="h-3.5 w-3.5" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
