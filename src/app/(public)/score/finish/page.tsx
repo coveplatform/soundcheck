@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { scoreConversions } from "@/lib/score-conversions";
-import { FreeReadUpsell } from "@/components/score/free-read-upsell";
+import { SealedPaywall } from "@/components/score/sealed-paywall";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -23,8 +23,13 @@ function FinishInner() {
   const claim = params.get("claim") || "";
   const started = useRef(false);
   const [error, setError] = useState("");
-  // Free read already used: pause on the sealed-report upsell before the report.
-  const [capUpsell, setCapUpsell] = useState<{ slug: string } | null>(null);
+  // Free read already used → the hard pay-to-continue wall. `slug` = a row exists
+  // (claim path, generated pre-auth); `track` = no row yet (legacy fresh submit).
+  const [paywall, setPaywall] = useState<
+    | { mode: "track"; url: string; title?: string }
+    | { mode: "slug"; slug: string }
+    | null
+  >(null);
 
   useEffect(() => {
     if (status === "loading" || started.current) return;
@@ -56,7 +61,8 @@ function FinishInner() {
           if (data?.slug) {
             scoreConversions.submitTrack(data.slug);
             if (data.freeReadUsed) {
-              setCapUpsell({ slug: data.slug });
+              // Row exists (generated pre-auth) — wall by slug; unlock opens it.
+              setPaywall({ mode: "slug", slug: data.slug });
               return;
             }
             router.replace(`/report/${data.slug}`);
@@ -77,10 +83,15 @@ function FinishInner() {
           }),
         });
         const data = await res.json().catch(() => null);
+        // Fresh-path wall: submit refused to generate (no row created).
+        if (data?.sealed) {
+          setPaywall({ mode: "track", url: trackUrl, title: trackTitle || undefined });
+          return;
+        }
         if (data?.slug) {
           scoreConversions.submitTrack(data.slug);
           if (data.freeReadUsed) {
-            setCapUpsell({ slug: data.slug });
+            setPaywall({ mode: "slug", slug: data.slug });
             return;
           }
           router.replace(`/report/${data.slug}`);
@@ -97,10 +108,13 @@ function FinishInner() {
     <div
       className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] flex items-center justify-center px-5 lowercase`}
     >
-      {capUpsell && (
-        <FreeReadUpsell
-          continueHref={`/report/${capUpsell.slug}`}
-          onContinue={() => router.replace(`/report/${capUpsell.slug}`)}
+      {paywall && (
+        <SealedPaywall
+          {...(paywall.mode === "slug"
+            ? { slug: paywall.slug }
+            : { track: { url: paywall.url, title: paywall.title }, trackTitle: paywall.title })}
+          email={session?.user?.email ?? undefined}
+          dismissHref="/"
         />
       )}
       <div className="text-center">

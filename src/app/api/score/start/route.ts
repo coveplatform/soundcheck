@@ -1,7 +1,10 @@
 import { NextResponse, after } from "next/server";
 import { randomUUID } from "crypto";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateAndStoreReport } from "@/lib/score-report-ai";
+import { freeReadUsed } from "@/lib/score-free-cap";
 import { isSupportedTrackUrl, normalizeTrackUrl } from "@/lib/track-url";
 import { resolveShortUrl } from "@/lib/metadata";
 
@@ -44,6 +47,18 @@ export async function POST(request: Request) {
         { error: "We can't read that link. Paste a SoundCloud, YouTube, Bandcamp or direct MP3 link." },
         { status: 400 }
       );
+    }
+
+    // Hard free-tier wall: a signed-in artist past their lifetime free read gets
+    // NOTHING generated on paste — no row, no LLM call. We just flag the client
+    // so it shows the pay-to-continue wall at submit (the $6.95 / unlimited
+    // checkout creates the report only once they commit). Anonymous pasters have
+    // no session to key off, so they always start (it may be their free read);
+    // the wall re-checks at /claim or /submit once an email is attached.
+    const session = await getServerSession(authOptions);
+    const sessionEmail = session?.user?.email?.trim();
+    if (sessionEmail && (await freeReadUsed(sessionEmail))) {
+      return NextResponse.json({ sealed: true });
     }
 
     // Abuse guard: each start fires a paid LLM call, and there's no email to key

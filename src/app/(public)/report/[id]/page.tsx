@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getReportHumanReviews, getScoreRoomQuota } from "@/lib/score-review";
 import { isFreeOpenRead } from "@/lib/score-free-cap";
+import { SealedPaywall } from "@/components/score/sealed-paywall";
 import { ReportView, type ReportViewModel, type Verdict } from "./report-view";
 // Real measured waveform for the demo (worker `_report_waveform` output,
 // borrowed from the demo-free prototype's sample track).
@@ -181,8 +182,10 @@ type DbReactions = {
 
 export default async function ReportPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { id } = await params;
 
@@ -231,6 +234,29 @@ export default async function ReportPage({
   });
 
   if (!report) notFound();
+
+  // Hard free-tier wall: a SEALED report (created by the pay-to-continue
+  // checkout) has no read until payment lands. Show the pay-gate instead of the
+  // pending/self-heal screen so it never generates for free. Exception: if they
+  // just came back from Stripe (?unlocked / ?subscribed), fall through to the
+  // pending screen — paidAt may lag the redirect, and generation is already
+  // firing from the webhook.
+  const sp = await searchParams;
+  const justPaid = sp.unlocked != null || sp.subscribed != null;
+  const sealedAwaiting =
+    (report.reviewerQuotes as { sealed?: boolean } | null)?.sealed === true &&
+    report.score == null &&
+    report.paidAt == null;
+  if (sealedAwaiting && !justPaid) {
+    return (
+      <SealedPaywall
+        slug={report.slug}
+        email={report.email || undefined}
+        trackTitle={report.trackTitle || undefined}
+        dismissHref="/"
+      />
+    );
+  }
 
   const pending = report.status === "PENDING" || report.score == null;
 

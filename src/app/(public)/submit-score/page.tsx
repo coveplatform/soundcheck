@@ -8,7 +8,7 @@ import { Logo } from "@/components/ui/logo";
 import { ArrowRight, Loader2, Music, X, Upload, ChevronDown, Check } from "lucide-react";
 import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
 import { scoreConversions } from "@/lib/score-conversions";
-import { FreeReadUpsell } from "@/components/score/free-read-upsell";
+import { SealedPaywall } from "@/components/score/sealed-paywall";
 import { FREE_FULL_READ } from "@/lib/score-free-tier";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
@@ -33,8 +33,13 @@ export default function SubmitScorePage() {
   const [email, setEmail] = useState(session?.user?.email ?? "");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  // Free read already used: pause on the sealed-report upsell before the report.
-  const [capUpsell, setCapUpsell] = useState<{ slug: string } | null>(null);
+  // Free read already used: the hard pay-to-continue wall. `track` mode = no row
+  // yet (the common path), `slug` mode = a pre-started row already exists.
+  const [paywall, setPaywall] = useState<
+    | { mode: "track"; url: string; title?: string; genre?: string; notes?: string }
+    | { mode: "slug"; slug: string }
+    | null
+  >(null);
 
   const [meta, setMeta] = useState<Meta | null>(null);
   const [metaLoading, setMetaLoading] = useState(false);
@@ -108,7 +113,7 @@ export default function SubmitScorePage() {
   // the link fires a fresh start and the old one is swept by the GC.
   const startRef = useRef<{
     url: string;
-    promise: Promise<{ slug?: string; claimToken?: string } | null>;
+    promise: Promise<{ slug?: string; claimToken?: string; sealed?: boolean } | null>;
   } | null>(null);
   const ensureStarted = (rawUrl: string) => {
     const url = normalizeTrackUrl(rawUrl);
@@ -178,6 +183,13 @@ export default function SubmitScorePage() {
       // away — generation keeps running in the background and the report
       // page's pending view takes over.
       const started = await ensureStarted(trackUrl);
+      // Hard wall: /start already told us this artist is past their free read, so
+      // nothing was generated — go straight to pay-to-continue, no /submit call.
+      if (started?.sealed) {
+        setSubmitting(false);
+        setPaywall({ mode: "track", url: normalizeTrackUrl(trackUrl), title: trackTitle, genre, notes });
+        return;
+      }
       const res = await fetch("/api/score/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -192,6 +204,12 @@ export default function SubmitScorePage() {
         }),
       });
       const data = await res.json().catch(() => null);
+      // Fresh-path wall (no pre-started row): submit refused to generate.
+      if (data?.sealed) {
+        setSubmitting(false);
+        setPaywall({ mode: "track", url: normalizeTrackUrl(trackUrl), title: trackTitle, genre, notes });
+        return;
+      }
       if (!res.ok || !data?.slug) {
         setError(data?.error ?? "Something went wrong. Try again.");
         setSubmitting(false);
@@ -199,9 +217,10 @@ export default function SubmitScorePage() {
       }
       scoreConversions.submitTrack(data.slug);
       if (data.freeReadUsed) {
-        // free read already used — set the sealed expectation before the report
+        // A pre-started row exists (generated before we knew the email) — wall it
+        // by slug; unlock opens what's already there.
         setSubmitting(false);
-        setCapUpsell({ slug: data.slug });
+        setPaywall({ mode: "slug", slug: data.slug });
         return;
       }
       window.location.href = `/report/${data.slug}`;
@@ -450,11 +469,21 @@ export default function SubmitScorePage() {
         </div>
       </div>
 
-      {capUpsell && (
-        <FreeReadUpsell
-          continueHref={`/report/${capUpsell.slug}`}
-          onContinue={() => (window.location.href = `/report/${capUpsell.slug}`)}
+      {paywall && (
+        <SealedPaywall
+          {...(paywall.mode === "slug"
+            ? { slug: paywall.slug }
+            : {
+                track: {
+                  url: paywall.url,
+                  title: paywall.title,
+                  genre: paywall.genre,
+                  notes: paywall.notes,
+                },
+                trackTitle: paywall.title,
+              })}
           email={session?.user?.email ?? email}
+          dismissHref="/"
         />
       )}
 

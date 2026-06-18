@@ -120,6 +120,16 @@ export async function POST(request: Request) {
 
     // ── Path 2: fresh submit ───────────────────────────────────────────
     if (!report) {
+      // Hard free-tier wall: an email past its lifetime free read that reaches a
+      // FRESH create (no pre-started report to finalize — i.e. the legacy submit
+      // path) gets nothing generated and no row created. The client shows the
+      // pay-to-continue wall; the $6.95 / unlimited checkout creates the report
+      // only once they commit. (The pre-started path above keeps its row — it was
+      // created at /start before we could know the email.)
+      if (usedFreeRead) {
+        return NextResponse.json({ sealed: true });
+      }
+
       // Basic abuse guard: each submit triggers a paid LLM call, so cap how many
       // a single email can fire in a short window. (Pre-started reports were
       // already IP-capped at /start, so this only guards the fresh path.)

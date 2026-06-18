@@ -23,7 +23,7 @@ export async function POST(
 
     const report = await prisma.trackScoreReport.findUnique({
       where: { slug },
-      select: { id: true, score: true, reviewerQuotes: true },
+      select: { id: true, score: true, paidAt: true, reviewerQuotes: true },
     });
 
     if (!report) {
@@ -33,6 +33,15 @@ export async function POST(
     // Already populated — nothing to do.
     if (report.score != null) {
       return NextResponse.json({ ready: true });
+    }
+
+    // SEALED, awaiting payment (pay-to-continue wall): never auto-generate — the
+    // read is pay-gated. Generation fires from the Stripe webhook once paidAt is
+    // set; until then this self-heal poll must not build the read for free.
+    const sealed =
+      (report.reviewerQuotes as { sealed?: boolean } | null)?.sealed === true;
+    if (sealed && report.paidAt == null) {
+      return NextResponse.json({ ready: false, sealed: true });
     }
 
     // A generation is already running (started recently in the background by

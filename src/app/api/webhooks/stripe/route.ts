@@ -7,7 +7,7 @@ import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email
 import { finalizePaidCheckoutSession } from "@/lib/payments";
 import { activateSubscriber, updateSubscriberStatus } from "@/lib/score-subscription";
 import { decideRoomEligibility } from "@/lib/score-review";
-import { regenerateDeepReport } from "@/lib/score-report-ai";
+import { generateAndStoreReport, regenerateDeepReport } from "@/lib/score-report-ai";
 import type Stripe from "stripe";
 
 // Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
@@ -167,11 +167,22 @@ async function handleScoreUnlockCheckout(session: Stripe.Checkout.Session) {
       },
     });
 
-    // Premium deep read: regenerate the prose on a stronger model now that
-    // they've paid (score stays locked). Background — never blocks the webhook.
-    after(() => regenerateDeepReport(reportId).catch((err) =>
-      console.error("Error generating deep report after unlock:", err)
-    ));
+    // Build the read now that they've paid. Two cases, both idempotent:
+    //  • SEALED report (pay-to-continue wall): score is null — generateAndStoreReport
+    //    runs the full instant read, then auto-chains the deep read (it re-reads
+    //    paidAt on completion, which we just set above).
+    //  • Already-generated report (the report-page unlock): generateAndStoreReport
+    //    no-ops on the in-flight claim, so the explicit deep read below runs.
+    after(async () => {
+      try {
+        await generateAndStoreReport(reportId);
+      } catch (err) {
+        console.error("Error generating report after unlock:", err);
+      }
+      await regenerateDeepReport(reportId).catch((err) =>
+        console.error("Error generating deep report after unlock:", err)
+      );
+    });
 
     console.log(`Unlocked score report ${reportId} (session ${session.id})`);
   } catch (error) {
@@ -214,11 +225,20 @@ async function handleScoreSubscriptionCheckout(session: Stripe.Checkout.Session)
           data: { humanRoomSkipped: false, status: "IN_REVIEW" },
         });
         await decideRoomEligibility(email, report.id);
-        after(() =>
-          regenerateDeepReport(report.id).catch((err) =>
+        // activateSubscriber above back-unlocked all their reports (set paidAt),
+        // so a SEALED row (pay-to-continue → went unlimited) now generates here:
+        // generateAndStoreReport builds the instant read and auto-chains the deep
+        // read (it sees paidAt set). No-ops if the read already landed.
+        after(async () => {
+          try {
+            await generateAndStoreReport(report.id);
+          } catch (err) {
+            console.error("Error generating report after subscribe:", err);
+          }
+          await regenerateDeepReport(report.id).catch((err) =>
             console.error("Error generating deep report after subscribe:", err)
-          )
-        );
+          );
+        });
       }
     }
 
