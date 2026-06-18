@@ -4,8 +4,8 @@ The daily blog agent reads this file, picks the next PENDING item, writes the po
 The current highest cover image is tracked here — agent increments it after each post.
 
 ## Current image counter
-Last used: blog16 → next post uses blog17
-⚠️ blog17.jpg onward still need to be uploaded — pre-upload blog17.jpg–blog20.jpg before the next post runs (no runway remaining).
+Last used: blog17 → next post uses blog18
+⚠️ blog18.jpg onward still need to be uploaded — pre-upload blog18.jpg–blog20.jpg before the next post runs.
 
 ## Blog post queue
 
@@ -28,7 +28,7 @@ Last used: blog16 → next post uses blog17
 | DONE | 2026-06-14 | How to Promote Your Music on Spotify (Without a Label) | how to promote music on spotify | blog14.jpg |
 | DONE | 2026-06-17 | How to Get Music Reviews Online (Honest, Useful Ones) | how to get music reviews online | blog15.png — compares Reddit/Discord/SubmitHub/friends honestly |
 | DONE | 2026-06-17 | Is Your Mix Good? 6 Ways to Know Before You Release | how to know if your mix is good | blog16.jpg — Strong AEO format — numbered list with clear yes/no signals |
-| PENDING | | How to Master Music at Home (And When to Hire Out) | how to master music at home | High volume — cover basics then when to hand off |
+| DONE | 2026-06-18 | How to Master Music at Home (And When to Hire Out) | how to master music at home | High volume — cover basics then when to hand off |
 | PENDING | | How to Build a Fanbase as an Independent Artist | how to build a fanbase | Top of funnel — social, live, release cadence |
 | PENDING | | How to Copyright Your Music (What Artists Actually Need to Know) | how to copyright music | High volume, question-based — demystify PROs, ISRC, copyright registration |
 
