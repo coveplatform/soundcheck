@@ -40,7 +40,10 @@ export default async function ReportsPage() {
     redirect("/login?callbackUrl=/dashboard");
   }
 
-  const [profile, me] = await Promise.all([
+  const email = session.user.email ?? "";
+
+  // These three depend only on the session — fetch them in one round trip.
+  const [profile, me, subscribed] = await Promise.all([
     prisma.artistProfile.findUnique({
       where: { userId: session.user.id },
       select: { id: true },
@@ -49,34 +52,37 @@ export default async function ReportsPage() {
       where: { id: session.user.id },
       select: { isScoreReviewer: true },
     }),
+    isScoreSubscribed(email),
   ]);
 
-  const email = session.user.email ?? "";
-  const reports = await prisma.trackScoreReport.findMany({
-    where: {
-      OR: [...(profile ? [{ artistId: profile.id }] : []), { email }],
-    },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      slug: true,
-      trackTitle: true,
-      artworkUrl: true,
-      genre: true,
-      status: true,
-      score: true,
-      percentile: true,
-      verdict: true,
-      paidAt: true,
-      humanRoomSkipped: true,
-      humanReviewsRequested: true,
-      createdAt: true,
-    },
-  });
+  // reports needs `profile`; roomQuota needs `subscribed` — both ready now, so
+  // run them together rather than chaining a fourth and fifth round trip.
+  const [reports, roomQuota] = await Promise.all([
+    prisma.trackScoreReport.findMany({
+      where: {
+        OR: [...(profile ? [{ artistId: profile.id }] : []), { email }],
+      },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        slug: true,
+        trackTitle: true,
+        artworkUrl: true,
+        genre: true,
+        status: true,
+        score: true,
+        percentile: true,
+        verdict: true,
+        paidAt: true,
+        humanRoomSkipped: true,
+        humanReviewsRequested: true,
+        createdAt: true,
+      },
+    }),
+    subscribed ? getScoreRoomQuota(email) : Promise.resolve(null),
+  ]);
 
   const unlockedCount = reports.filter((r) => r.paidAt != null).length;
-  const subscribed = await isScoreSubscribed(email);
-  const roomQuota = subscribed ? await getScoreRoomQuota(email) : null;
 
   // Human "room" progress per report. Any ScoreReview row means the room is
   // active (pre-room reports have none → row hidden), but the denominator is
