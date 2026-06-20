@@ -1,117 +1,113 @@
 # MixReflect
 
-> A free peer-to-peer music feedback marketplace. Artists upload tracks, review others in their genre, and earn credits for structured honest feedback. Genre-matched, artist-to-artist.
+> Honest music feedback for your track: a room of five real, paid listeners react to your song, backed by an instant AI score out of 100. Paste a link, get heard. Free to start.
 
-MixReflect is a two-sided marketplace where music producers and artists exchange structured feedback on each other's tracks. The platform uses a credit system: every review you write earns one credit, which you spend to receive a review on your own music.
+MixReflect gets your track genuinely heard. You paste a link to your song and a room of five real, paid listeners hears it end to end and reacts honestly — the kind of unbiased, human feedback artists actually want before they release. Alongside the human room, an instant AI read gives you a score out of 100, a verdict, and a breakdown so you have a fast, objective baseline while the real reactions land.
+
+The product is built around two things, in this order: real human listeners first, AI score second. The AI is there to make feedback instant and measurable; the room of real people is the heart of it.
 
 ## How It Works
 
-1. Sign up free — you receive 1 credit, no credit card required
-2. Upload a track to the review queue
-3. Genre-matched artists on the platform claim and review your track
-4. Reviews are gated: reviewers must listen for a minimum of 3 minutes, meet a word count, and include specific, actionable signals before submitting
-5. Patterns across multiple reviews surface consistent issues (e.g. if 4 out of 5 reviewers flag the same problem, it shows up as a pattern — not just one opinion)
-6. Reviewers are rated after each review; low-quality reviewers lose access
+1. Paste a link to your track (or upload it) — no account needed to start
+2. Get an instant AI read: a score out of 100, a verdict, a five-dimension breakdown, and three concrete fixes
+3. Unlock the full report to send your track to the room — five real, paid listeners hear it end to end
+4. Watch each honest reaction land on your report: real people, not bots and not playlist curators
+5. Use the combined human reactions + AI read to decide if the track is ready to release
+
+## What Makes It Different
+
+- **Real, paid human listeners** — five people actually hear your track end to end and react. Not AI pretending to be people, not bots, not playlist curators looking to upsell placement.
+- **Human feedback first, AI second** — the AI score is an instant baseline; the real room is the point.
+- **Instant AI score out of 100** across five dimensions: hook, production, retention, emotional impact, and commercial pull.
+- **Three concrete fixes** with every read — specific, actionable, not vague.
+- **A measured waveform** — the AI read is grounded in your track's real frequency-split analysis, not guesswork.
+- **No account needed to start** — paste a link and get your score.
 
 ## Pricing
 
-- **Free (forever)**: 1 track in review queue at a time, earn unlimited credits by reviewing others, full analytics dashboard, public track sharing page. No credit card required.
-- **Credit pack — $9.95 (one-time)**: 10 review credits, never expire.
-- **Pro — $24.95/month**: 30 credits every month, 3 tracks in review queue at once, up to 10 reviews per track, priority queue placement. Cancel anytime.
+- **First report — free (forever)**: your first track's complete report is free — the score out of 100, the full written read, all three fixes, and the measured waveform. No credit card required.
+- **Unlock — $6.95 (one-time)**: opens a single track's full report — the complete breakdown plus every reaction from the room of five real listeners. Yours forever.
+- **Unlimited — $19.95/month**: every track you submit is auto-unlocked, with unlimited full reports and the real-listener room each time. Cancel anytime.
 
 There are no other paid tiers.
 
-## Key Features
+## Who It Is For
 
-- Genre-matched peer reviews — reviewers are matched by genre, not randomly assigned
-- Minimum 3-minute listen enforced via heartbeat API before review submission is allowed
-- Structured feedback with quality gates: word count, specific signal detection, timestamps
-- Pattern detection across multiple reviews to identify consistent issues
-- Public track pages for sharing and discovery (each track gets its own shareable URL)
-- 3D music discovery space at /discover — tracks appear as floating album art in a navigable space
-- A/B track testing — artists can submit two versions of a track and compare feedback
-- Daily chart with community voting
-- Full analytics dashboard for all users including free tier
+Music producers, beatmakers, singers, songwriters, and independent artists who want honest, structured feedback from real people before they release — plus a fast, objective AI score to back it up. Genre-agnostic: hip-hop, electronic, pop, indie, rock, R&B, and many more are all active.
 
 ## What It Is Not
 
-- MixReflect is not a playlist pitching service (unlike SubmitHub or Groover)
-- Reviewers are not paid curators or industry professionals — they are genre-matched peers and artists
-- There is no "Save Rate" or "Replay Value" metric — these features do not exist on the platform
-- The Pro plan does not include track monetization or sales features
-
-## Who It Is For
-
-Music producers, beatmakers, and independent artists who want honest, structured feedback from genre-matched peers. The platform is genre-agnostic — electronic, hip-hop, indie, pop, and other genres are all active on the platform.
+- Not a playlist pitching service (unlike SubmitHub, Groover, or Playlist Push) — the listeners react honestly, they do not sell placement.
+- Not AI-only feedback — real humans are part of every unlocked report.
+- Not a peer-to-peer credit-swap — you do not have to review other people's tracks to get feedback on yours.
 
 ## Key Pages
 
-- Homepage: https://mixreflect.com
-- Blog (The Drop): https://mixreflect.com/blog
-- Review queue: https://mixreflect.com/review
-- Discover (3D music space): https://mixreflect.com/discover
-- Breakthrough (daily featured track): https://mixreflect.com/breakthrough
-- Pricing: https://mixreflect.com/#pricing
-- Contact / Support: https://mixreflect.com/support
-- Terms: https://mixreflect.com/terms
-- Privacy: https://mixreflect.com/privacy
+- Homepage: https://www.mixreflect.com
+- Blog (The Drop): https://www.mixreflect.com/blog
+- Discover (3D music space): https://www.mixreflect.com/discover
+- Breakthrough (daily featured track): https://www.mixreflect.com/breakthrough
+- Pricing: https://www.mixreflect.com/#pricing
+- Support: https://www.mixreflect.com/support
+- Terms: https://www.mixreflect.com/terms
+- Privacy: https://www.mixreflect.com/privacy
 
 ## Blog posts (The Drop)
 
-- https://mixreflect.com/blog/how-to-master-music-at-home
-- https://mixreflect.com/blog/how-to-get-on-discover-weekly
-- https://mixreflect.com/blog/how-to-mix-music-at-home
-- https://mixreflect.com/blog/how-to-release-music-independently
-- https://mixreflect.com/blog/why-does-my-music-sound-amateur
-- https://mixreflect.com/blog/why-your-vocals-sound-buried-in-the-mix
-- https://mixreflect.com/blog/what-playlist-curators-look-for
-- https://mixreflect.com/blog/how-to-know-if-your-song-is-ready-to-release
-- https://mixreflect.com/blog/how-to-get-feedback-on-music-before-releasing
-- https://mixreflect.com/blog/best-way-to-get-honest-feedback-on-a-beat
-- https://mixreflect.com/blog/how-music-producers-get-their-tracks-reviewed
-- https://mixreflect.com/blog/what-multiple-listeners-tell-you-that-one-person-cant
-- https://mixreflect.com/blog/best-music-feedback-platforms-2026
-- https://mixreflect.com/blog/mixreflect-vs-submithub
+- https://www.mixreflect.com/blog/how-to-master-music-at-home
+- https://www.mixreflect.com/blog/how-to-get-on-discover-weekly
+- https://www.mixreflect.com/blog/how-to-mix-music-at-home
+- https://www.mixreflect.com/blog/how-to-release-music-independently
+- https://www.mixreflect.com/blog/why-does-my-music-sound-amateur
+- https://www.mixreflect.com/blog/why-your-vocals-sound-buried-in-the-mix
+- https://www.mixreflect.com/blog/what-playlist-curators-look-for
+- https://www.mixreflect.com/blog/how-to-know-if-your-song-is-ready-to-release
+- https://www.mixreflect.com/blog/how-to-get-feedback-on-music-before-releasing
+- https://www.mixreflect.com/blog/best-way-to-get-honest-feedback-on-a-beat
+- https://www.mixreflect.com/blog/how-music-producers-get-their-tracks-reviewed
+- https://www.mixreflect.com/blog/what-multiple-listeners-tell-you-that-one-person-cant
+- https://www.mixreflect.com/blog/best-music-feedback-platforms-2026
+- https://www.mixreflect.com/blog/mixreflect-vs-submithub
 
 ## Comparison pages (MixReflect vs alternatives)
 
-- https://mixreflect.com/alternatives/submithub
-- https://mixreflect.com/alternatives/groover
-- https://mixreflect.com/alternatives/playlist-push
-- https://mixreflect.com/alternatives/landr
-- https://mixreflect.com/alternatives/soundbetter
-- https://mixreflect.com/alternatives/musosoup
-- https://mixreflect.com/alternatives/reverbnation
+- https://www.mixreflect.com/alternatives/submithub
+- https://www.mixreflect.com/alternatives/groover
+- https://www.mixreflect.com/alternatives/playlist-push
+- https://www.mixreflect.com/alternatives/landr
+- https://www.mixreflect.com/alternatives/soundbetter
+- https://www.mixreflect.com/alternatives/musosoup
+- https://www.mixreflect.com/alternatives/reverbnation
 
 ## Genre feedback pages
 
-- https://mixreflect.com/feedback/hip-hop
-- https://mixreflect.com/feedback/trap
-- https://mixreflect.com/feedback/boom-bap
-- https://mixreflect.com/feedback/drill
-- https://mixreflect.com/feedback/rnb
-- https://mixreflect.com/feedback/electronic
-- https://mixreflect.com/feedback/house
-- https://mixreflect.com/feedback/deep-house
-- https://mixreflect.com/feedback/techno
-- https://mixreflect.com/feedback/lo-fi
-- https://mixreflect.com/feedback/edm
-- https://mixreflect.com/feedback/ambient
-- https://mixreflect.com/feedback/synthwave
-- https://mixreflect.com/feedback/pop
-- https://mixreflect.com/feedback/indie-pop
-- https://mixreflect.com/feedback/indie-rock
-- https://mixreflect.com/feedback/rock
-- https://mixreflect.com/feedback/alternative
-- https://mixreflect.com/feedback/singer-songwriter
-- https://mixreflect.com/feedback/folk
-- https://mixreflect.com/feedback/soul
-- https://mixreflect.com/feedback/metal
-- https://mixreflect.com/feedback/drum-and-bass
-- https://mixreflect.com/feedback/dubstep
-- https://mixreflect.com/feedback/future-bass
-- https://mixreflect.com/feedback/progressive-house
-- https://mixreflect.com/feedback/trance
-- https://mixreflect.com/feedback/jazz
-- https://mixreflect.com/feedback/funk
-- https://mixreflect.com/feedback/punk
+- https://www.mixreflect.com/feedback/hip-hop
+- https://www.mixreflect.com/feedback/trap
+- https://www.mixreflect.com/feedback/boom-bap
+- https://www.mixreflect.com/feedback/drill
+- https://www.mixreflect.com/feedback/rnb
+- https://www.mixreflect.com/feedback/electronic
+- https://www.mixreflect.com/feedback/house
+- https://www.mixreflect.com/feedback/deep-house
+- https://www.mixreflect.com/feedback/techno
+- https://www.mixreflect.com/feedback/lo-fi
+- https://www.mixreflect.com/feedback/edm
+- https://www.mixreflect.com/feedback/ambient
+- https://www.mixreflect.com/feedback/synthwave
+- https://www.mixreflect.com/feedback/pop
+- https://www.mixreflect.com/feedback/indie-pop
+- https://www.mixreflect.com/feedback/indie-rock
+- https://www.mixreflect.com/feedback/rock
+- https://www.mixreflect.com/feedback/alternative
+- https://www.mixreflect.com/feedback/singer-songwriter
+- https://www.mixreflect.com/feedback/folk
+- https://www.mixreflect.com/feedback/soul
+- https://www.mixreflect.com/feedback/metal
+- https://www.mixreflect.com/feedback/drum-and-bass
+- https://www.mixreflect.com/feedback/dubstep
+- https://www.mixreflect.com/feedback/future-bass
+- https://www.mixreflect.com/feedback/progressive-house
+- https://www.mixreflect.com/feedback/trance
+- https://www.mixreflect.com/feedback/jazz
+- https://www.mixreflect.com/feedback/funk
+- https://www.mixreflect.com/feedback/punk
