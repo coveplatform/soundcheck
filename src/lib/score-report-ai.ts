@@ -18,20 +18,26 @@ import { fetchTrackMeta, oembedUrlFor } from "@/lib/track-metadata";
  * pointing at.
  *
  * Humans are the main event; this AI pass is the "sprinkle" that scores the
- * track and synthesises the room. Reviewer reactions are written in the
- * MixReflect natural voice (conversational, warm, honest, the occasional
- * genuine typo) so they read like real people, not a model.
+ * track and synthesises the room. The per-angle reads ("lenses") are written
+ * as plain analysis — third person, about the track, no first-person voice —
+ * so they read as one machine's read broken into angles, not as a chorus of
+ * people (the real listeners are the paid human room).
  */
 
 export type ReviewerReaction = {
-  initial: string;
+  /** Which analytical angle this read takes (producer, mix, hook, …). */
+  lens: string;
   genre: string;
-  rating: number; // 1-5
-  /** One-line headline — always shown (the gate teaser). */
+  /** One-line finding from this angle — always shown (the gate teaser). */
   headline: string;
-  /** Full reaction — gated until unlock. */
+  /** The analytical read for this angle (third person) — gated until unlock. */
   quote: string;
+  /** Short chips summarising what this angle flags (e.g. "lead buried"). */
+  tags: string[];
   positive: boolean;
+  /** @deprecated legacy fields kept so stored rows still parse; not rendered. */
+  initial?: string;
+  rating?: number;
 };
 
 export type PriorityFix = {
@@ -133,6 +139,17 @@ export type GenerateOpts = {
 
 const ROOM_SIZE = 20;
 
+// The six analytical angles the read is broken into (fallback lens label when
+// the model doesn't echo one). Mirrors LENSES in report-view.tsx.
+const LENS_FALLBACK = [
+  "producer's read",
+  "casual first listen",
+  "playlist curator",
+  "hook check",
+  "arrangement & energy",
+  "mix lens",
+];
+
 function verdictForScore(score: number): ScoreVerdict {
   if (score >= 85) return "RELEASE_READY";
   if (score >= 70) return "ALMOST_THERE";
@@ -183,7 +200,7 @@ function buildPrompt(input: ReportInput, opts: GenerateOpts = {}): string {
 
 WRITING STYLE (this matters as much as the substance): write like a real person who knows music and is talking straight to the artist — vivid, confident, easy to read. Flowing prose with varied sentence length, not a checklist or a lab report. Be specific and concrete (use the timestamps), but NEVER clinical: avoid phrasings like "sets a moderate energy level", "maintains a consistent pace", "with an energy score of X", "the vocal presence is low" — say what a listener actually feels in plain, punchy language. No raw numbers/percentages in the prose. No generic filler advice ("add a stronger hook to engage listeners") — be pointed about what and where. When you point to a moment, use a natural, rounded time ("around 0:20", "about twenty seconds in", "the back third") — NEVER decimal-second precision like "21.9 seconds"; no one writes an intro to the tenth of a second, so round and speak like a human.
 
-Give your takes from a few distinct angles (a producer, a casual listener, a playlist curator, a hook specialist).
+Break your read into six analytical angles — a producer's read, a casual first listen, a playlist curator, a hook check, arrangement & energy, and the mix. Each angle weighs the SAME track by a different priority; they are lenses on your one analysis, NOT six different people reacting.
 
 TRACK: "${title}"
 ARTIST: ${artist || "(unknown)"}
@@ -203,14 +220,14 @@ Produce a reaction report as STRICT JSON (no markdown, no commentary, no code fe
   },
   "summaryHeadline": "<one punchy sentence, max 12 words, the honest read>",
   "aiSummary": "<a substantive 5-7 sentence read — the premium deliverable, and it MUST read well: natural, vivid, confident, like a sharp producer who actually listened and is leveling with the artist. Walk the track: does the opening earn attention, how the energy moves, where it peaks and where it sags (name the moments by timestamp), the emotional throughline, and the ONE biggest thing between this and a release. Human and flowing — vary sentence length, no clinical phrasing, no raw numbers, no duration/length claims, no EQ/frequency jargon, no vague filler advice.>",
-  "reactions": [ exactly 6 objects:
+  "reactions": [ exactly 6 objects — the SAME read broken into 6 analytical angles (these are LENSES on your one analysis, NOT six people reacting):
     {
-      "initial": "<single uppercase letter>",
+      "lens": "<the angle, lowercase, one of: 'producer's read', 'casual first listen', 'playlist curator', 'hook check', 'arrangement & energy', 'mix lens'>",
       "genre": "<a genre or two, e.g. 'Indie · Pop'>",
-      "rating": <integer 1-5>,
-      "headline": "<one short line, max 10 words, the gist of their reaction>",
-      "quote": "<2-4 sentences in a natural, conversational voice — like a real person texting a friend. Warm but honest. Each reviewer has a distinct personality (some brief, some chatty, some use '...'). Include the OCCASIONAL natural typo (e.g. 'burried', 'everthing', 'noticeabley'). Get straight to the point, no preamble. Talk about how it FELT and where attention went, not technical frequencies.>",
-      "positive": <true if mostly positive, false if mostly critical>
+      "headline": "<one short line, max 9 words — the finding from this angle, stated plainly. NOT a spoken quote, no 'I'. e.g. 'hook lands fast, but the intro stalls it'>",
+      "quote": "<2-3 sentences, THIRD PERSON and analytical: describe what this angle finds IN THE TRACK and what to do about it ('the lead sits too far back to carry the section…', 'the hook arrives late, so the first listen drifts before it lands…'). NEVER write as a person reacting ('I drifted off', 'this slaps', 'kept me hooked'). No first person, no 'I', no texting-a-friend voice, no typos, no quotation marks.>",
+      "tags": ["<1–3 very short chips, max 3 words each, lowercase, e.g. 'lead buried', 'intro too long', 'playlist-ready'>"],
+      "positive": <true if this angle is net positive, false if it's mainly a critique>
     }
   ],
   "priorityFixes": [ 3 objects, ranked by how many of the room flagged it:
@@ -244,7 +261,7 @@ CALIBRATION EXAMPLES (how the same scale should land):
 
 Rules:
 - Be honest and specific to the genre.
-- Reactions should disagree with each other a little, like a real room does.
+- The angles can emphasise different things (one flags the hook, another the mix), but they describe the SAME track — don't invent contradictory facts between them.
 - Reference energy lulls, pacing, structural feel, the emotional arc, hooks, where people drifted. NOT mixing/EQ/frequency jargon.
 - Return ONLY the JSON object.`;
 }
@@ -264,75 +281,75 @@ function hashString(s: string): number {
 // land on identical reports when the API is unavailable.
 const FALLBACK_REACTIONS: ReviewerReaction[] = [
   {
-    initial: "J",
+    lens: "producer's read",
     genre: "Indie",
-    rating: 4,
-    headline: "Good vibe, lost me a bit in the middle",
+    headline: "Tight groove, but the lead sits back",
     quote:
-      "I liked where this was going. The start pulls you in and the idea is clear. For me it dipped a little around the middle, felt like it sat in one place too long. Still, theres something here.",
+      "The rhythm section is locked and the groove carries the first stretch. The lead element sits too far back to own the section, so the energy plateaus instead of building. Pushing it forward would give the back half something to climb toward.",
+    tags: ["lead buried", "plateaus"],
     positive: true,
   },
   {
-    initial: "M",
+    lens: "casual first listen",
     genre: "Pop",
-    rating: 3,
-    headline: "Solid but wanted more payoff",
+    headline: "Holds early, then drifts mid-track",
     quote:
-      "Decent listen. I kept waiting for it to lift off and it sort of stayed level. Not a bad thing, just left me wanting a bigger moment. Production feels clean though.",
+      "The opening earns attention and the first idea reads clearly. Around the middle the track sits on one idea a beat too long, which is the most likely spot for a first-time listener to drift. A change-up there keeps them in.",
+    tags: ["mid-track dip"],
     positive: false,
   },
   {
-    initial: "S",
+    lens: "playlist curator",
     genre: "Electronic",
-    rating: 5,
-    headline: "Hooked me early, replayed it",
+    headline: "Clear lane, missing one quotable moment",
     quote:
-      "Honestly really into this. Caught the hook straight away and went back to hear it again. Felt warm and real. Talented!",
+      "It slots cleanly into its genre and the tone stays consistent enough to sequence. What caps its reach is the absence of a single standout moment to anchor a save or a share. One undeniable peak would lift it from fit to feature.",
+    tags: ["playlist-ready", "no standout"],
     positive: true,
   },
   {
-    initial: "A",
+    lens: "hook check",
     genre: "Hip-Hop",
-    rating: 3,
-    headline: "Took a while to get going",
+    headline: "Hook is there but arrives late",
     quote:
-      "The intro dragged for me a touch, I wanted to be in it sooner. Once it landed I was on board though. Theres a good song under here.",
+      "There's a real hook in the material, but it takes too long to land, so the first listen nearly passes before it hits. Bringing it forward, or teasing it sooner, would let it do its job. Right now the intro spends goodwill the hook hasn't earned yet.",
+    tags: ["hook late", "trim intro"],
     positive: false,
   },
   {
-    initial: "R",
+    lens: "arrangement & energy",
     genre: "R&B / Soul",
-    rating: 4,
-    headline: "Warm, easy to sit with",
+    headline: "Solid structure, the peak stays flat",
     quote:
-      "Nice feel to this. It washed over me in a good way and the tone is lovely. The ending came up a bit quick on me, would love a little more wind down.",
+      "The sections are distinct and the track moves with intent. The energy holds steady rather than climbing to a clear high point, so the payoff lands softer than it could. Pulling elements before the final section would let it lift.",
+    tags: ["flat peak"],
     positive: true,
   },
   {
-    initial: "K",
+    lens: "mix lens",
     genre: "Rock",
-    rating: 4,
-    headline: "Strong idea, could be tighter",
+    headline: "Clean balance, low end a touch polite",
     quote:
-      "Theres a real hook in here and the energy is there. Felt like a couple of sections ran a bit long. Trim those and this really moves.",
+      "Nothing reads as amateur — the elements sit together and the highs are controlled. The low end is a little reserved for the genre, so a touch more weight underneath would make it feel finished. The lead could also sit a hair more forward.",
+    tags: ["clean mix", "more low-end"],
     positive: true,
   },
   {
-    initial: "T",
+    lens: "producer's read",
     genre: "Lo-Fi",
-    rating: 2,
-    headline: "Didn't quite grab me",
+    headline: "Good idea, a few sections run long",
     quote:
-      "Honestly it sat a little flat for me. The pieces are fine but I never got the moment that made me lean in. Not bad, just didnt pull me.",
+      "The core idea is strong and the sound is cohesive. A couple of sections outstay their welcome, which softens the momentum the track keeps building. Trimming them would tighten the whole arc.",
+    tags: ["runs long", "tighten"],
     positive: false,
   },
   {
-    initial: "L",
+    lens: "casual first listen",
     genre: "Singer-Songwriter",
-    rating: 5,
-    headline: "Felt something, that's rare",
+    headline: "Genuine feel, could lean in harder",
     quote:
-      "This actually got me. The emotion comes through and it feels honest. Kept my attention the whole way. Really nice work.",
+      "There's an honest warmth here that connects when it lands. The track holds back at the moment it could open up, so the emotional peak reads softer than the writing deserves. Leaning into that peak would deepen it.",
+    tags: ["honest", "holds back"],
     positive: true,
   },
 ];
@@ -464,12 +481,14 @@ function coerceReport(raw: unknown, input: ReportInput): GeneratedReport {
   ];
 
   const reactions: ReviewerReaction[] = Array.isArray(obj.reactions)
-    ? obj.reactions.slice(0, 8).map((r: any) => ({
-        initial: String(r.initial ?? "?").slice(0, 1).toUpperCase(),
+    ? obj.reactions.slice(0, 8).map((r: any, i: number) => ({
+        lens: String(r.lens ?? "").trim() || LENS_FALLBACK[i % LENS_FALLBACK.length]!,
         genre: String(r.genre ?? input.genre),
-        rating: clamp(Math.round(Number(r.rating)), 1, 5),
         headline: String(r.headline ?? "").trim(),
         quote: String(r.quote ?? "").trim(),
+        tags: Array.isArray(r.tags)
+          ? r.tags.slice(0, 3).map((t: any) => String(t).trim()).filter(Boolean)
+          : [],
         positive: Boolean(r.positive),
       }))
     : [];

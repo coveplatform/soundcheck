@@ -77,39 +77,39 @@ const DEMO: ReportViewModel = {
     "The opening grabbed people fast — most of the room was locked in by the first hook. Energy held strong through the first drop, then a few listeners drifted in the mid-section where the track sits in one idea a beat too long. The back half pulls it back and the emotional read stays warm throughout. Get people to the hook a little sooner and this holds the whole room.",
   reactions: [
     {
-      initial: "S",
+      lens: "producer's read",
       genre: "Electronic · Pop",
-      rating: 4,
-      headline: "Hook caught me straight away",
+      headline: "Hook lands fast, the intro slightly delays it",
       quote:
-        "Really liked this. The hook lands early and I caught myself humming it after. The drop has a nice bounce to it. For me the only thing was the middle felt a tiny bit long, but honestly its close.",
+        "The first vocal phrase is the strongest moment and it arrives early enough to catch the room. Trimming a few seconds off the intro would let it hit sooner and carry the energy straight into the drop.",
+      tags: ["strong hook", "trim intro"],
       positive: true,
     },
     {
-      initial: "M",
-      genre: "Hip-Hop · R&B",
-      rating: 5,
-      headline: "Felt release-ready to me",
-      quote:
-        "This one is clean. Everthing sits nicely and it kept my attention the whole way. Would happily hear this on a playlist. Talented!",
-      positive: true,
-    },
-    {
-      initial: "A",
+      lens: "mix lens",
       genre: "Electronic",
-      rating: 3,
-      headline: "Intro dragged a little for me",
+      headline: "Clean and confident, low end a touch polite",
       quote:
-        "Solid track but the intro took a while to get going. I wanted to hit the hook sooner. Once it kicked in I was into it though.",
+        "Nothing reads as amateur — the balance is controlled and the highs are crisp. The sub sits politely for the genre, so a little more weight under the drop would make it feel fully finished.",
+      tags: ["clean mix", "more low-end"],
+      positive: true,
+    },
+    {
+      lens: "casual first listen",
+      genre: "Pop",
+      headline: "Locked in early, a dip around the middle",
+      quote:
+        "The opening pulls you in and the first drop keeps it moving. Around the 1:10 mark the track sits on one idea a beat too long, which is where a first-time listener is most likely to drift before the back half pulls it back.",
+      tags: ["mid-track dip"],
       positive: false,
     },
     {
-      initial: "J",
+      lens: "playlist curator",
       genre: "Indie",
-      rating: 4,
-      headline: "Warm and easy to sit with",
+      headline: "Strong late-night fit, needs one quotable moment",
       quote:
-        "Nice vibe. It felt warm and I liked where it went. The ending came up a bit quick on me, would love a little more of a wind down.",
+        "It slots naturally into a late-night electronic playlist and the warmth reads as honest rather than manufactured. What caps its reach is the absence of one undeniable moment to anchor a share or a save.",
+      tags: ["playlist-ready", "no standout"],
       positive: true,
     },
   ],
@@ -164,12 +164,15 @@ const DEMO: ReportViewModel = {
 type DbReactions = {
   headline?: string;
   reactions?: Array<{
-    initial?: string;
+    lens?: string;
     genre?: string;
-    rating?: number;
     headline?: string;
     quote?: string;
+    tags?: string[];
     positive?: boolean;
+    // Legacy fields on older stored rows — tolerated, not rendered.
+    initial?: string;
+    rating?: number;
   }>;
   categoryNotes?: Partial<
     Record<"hook" | "production" | "retention" | "emotional" | "commercial", string>
@@ -285,12 +288,12 @@ export default async function ReportPage({
 
   const score = report.score ?? 0;
   const quotes = (report.reviewerQuotes as unknown as DbReactions | null) ?? {};
-  const reactions = (quotes.reactions ?? []).map((r, i) => ({
-    initial: (r.initial || "?").slice(0, 1).toUpperCase(),
+  const reactions = (quotes.reactions ?? []).map((r) => ({
+    lens: r.lens || "",
     genre: r.genre || report.genre || "",
-    rating: Math.max(1, Math.min(5, Math.round(r.rating ?? 3))),
     headline: r.headline || "",
     quote: r.quote || "",
+    tags: Array.isArray(r.tags) ? r.tags.slice(0, 3).map(String) : [],
     positive: Boolean(r.positive),
   }));
 

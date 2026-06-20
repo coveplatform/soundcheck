@@ -74,14 +74,14 @@ function smooth(v: number[], win: number): number[] {
 }
 
 /**
- * Measured moment markers, derived from the waveform's RMS body (no AI, no
- * extra storage — works for every report that has a waveform): the first real
- * lift out of the intro, the fullest stretch (the free marker), the deepest
- * energy dip after the lift, and where the outro starts winding down.
+ * The smoothed, peak-normalised energy envelope (0–1) over the analysed span —
+ * the shared basis for both the moment markers below and the retention curve.
+ * Returns null for clips too short to read structure from (or undecodable
+ * columns), so callers degrade to "no curve / no markers" identically.
  */
-export function deriveWaveMoments(data: ReportWaveformData): WaveMoment[] {
+export function buildEnvelope(data: ReportWaveformData): { norm: number[]; dur: number } | null {
   const dur = data.durationSec ?? null;
-  if (!dur || dur < 45) return [];
+  if (!dur || dur < 45) return null;
 
   const amp = data.amp ? b64ToBytes(data.amp) : null;
   let env: number[];
@@ -91,7 +91,7 @@ export function deriveWaveMoments(data: ReportWaveformData): WaveMoment[] {
     const lo = b64ToBytes(data.lo);
     const mid = b64ToBytes(data.mid);
     const hi = b64ToBytes(data.hi);
-    if (!lo || !mid || !hi || lo.length < 64) return [];
+    if (!lo || !mid || !hi || lo.length < 64) return null;
     env = Array.from(lo, (v, i) => Math.max(v, mid[i] ?? 0, hi[i] ?? 0) / 255);
   }
 
@@ -99,8 +99,22 @@ export function deriveWaveMoments(data: ReportWaveformData): WaveMoment[] {
   // ~3s smoothing window so kicks don't read as structure
   const norm = smooth(env, Math.max(2, Math.round((3 / dur) * n)));
   const peak = Math.max(...norm);
-  if (peak <= 0.01) return [];
+  if (peak <= 0.01) return null;
   for (let i = 0; i < n; i++) norm[i] = norm[i]! / peak;
+  return { norm, dur };
+}
+
+/**
+ * Measured moment markers, derived from the waveform's RMS body (no AI, no
+ * extra storage — works for every report that has a waveform): the first real
+ * lift out of the intro, the fullest stretch (the free marker), the deepest
+ * energy dip after the lift, and where the outro starts winding down.
+ */
+export function deriveWaveMoments(data: ReportWaveformData): WaveMoment[] {
+  const built = buildEnvelope(data);
+  if (!built) return [];
+  const { norm, dur } = built;
+  const n = norm.length;
 
   const sec = (i: number) => (i / (n - 1)) * dur;
   const truncated =

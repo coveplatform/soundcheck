@@ -6,6 +6,8 @@ import Link from "next/link";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ScoreRing } from "@/components/score/score-ring";
 import { ReportWaveform, deriveWaveMoments } from "@/components/score/report-waveform";
+import { ScoreRadar } from "@/components/score/score-radar";
+import { RetentionCurve } from "@/components/score/retention-curve";
 import {
   CreepingBar,
   EqBars,
@@ -30,12 +32,12 @@ const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] 
 const ACCENT = "#6ee7ff";
 const GREEN = "#7cffc4";
 const LENSES = [
-  "the producer",
-  "a casual listener",
-  "a playlist curator",
-  "the hook check",
-  "a fellow artist",
-  "the mix lens",
+  "producer's read",
+  "casual first listen",
+  "playlist curator",
+  "hook check",
+  "arrangement & energy",
+  "mix lens",
 ];
 const IMPACT = ["high", "medium", "low"];
 
@@ -67,11 +69,15 @@ export type ReportViewModel = {
   summaryHeadline: string;
   aiSummary: string;
   reactions: {
-    initial: string;
+    /** Which analytical angle this read takes (falls back to LENSES by order). */
+    lens?: string;
     genre: string;
-    rating: number;
+    /** One-line finding — always shown. */
     headline: string;
+    /** The analytical read for this angle — gated until unlock. */
     quote: string;
+    /** Short chips summarising what this angle flags. */
+    tags?: string[];
     positive: boolean;
   }[];
   /** Real human listeners ("room of 5"). */
@@ -205,7 +211,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
         ...(data.waveform ? [{ id: "listen", label: "the listen" }] : []),
         { id: "breakdown", label: "the breakdown" },
         { id: "read", label: "the read" },
-        { id: "seats", label: "every seat" },
+        { id: "angles", label: "the angles" },
         { id: "fixes", label: "the fixes" },
       ]
     : [];
@@ -1034,6 +1040,12 @@ export function ReportView({ data }: { data: ReportViewModel }) {
                 : "Your track's real frequency-split waveform — bass body, mids, highs — straight from the analysis the read is grounded in."}
             </p>
             <ReportWaveform data={data.waveform} moments={waveMoments} sealed={locked} />
+
+            {/* the energy / attention arc, from the same measured envelope as
+                the markers above — where the track builds and where it dips */}
+            <div className="mt-9">
+              <RetentionCurve data={data.waveform} moments={waveMoments} />
+            </div>
           </section>
         )}
 
@@ -1043,7 +1055,14 @@ export function ReportView({ data }: { data: ReportViewModel }) {
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-7">
             how it scored, dimension by dimension
           </h2>
-          <div className="space-y-7">
+          <div className="grid md:grid-cols-[280px_1fr] gap-8 lg:gap-10 items-center mb-2">
+            <div className="mx-auto w-full max-w-[320px] order-first md:order-none">
+              <ScoreRadar categories={data.categories} />
+              <p className={`${mono.className} text-[11px] text-white/40 text-center mt-1 normal-case`}>
+                the shape of the read — further out is stronger
+              </p>
+            </div>
+            <div className="space-y-7">
             {data.categories.map((cat) => (
               <div key={cat.label}>
                 <div className="flex items-center justify-between mb-2">
@@ -1070,6 +1089,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
                 )}
               </div>
             ))}
+            </div>
           </div>
           {locked && (
             <p className={`${mono.className} text-[12px] text-white/45 mt-4 normal-case`}>
@@ -1093,46 +1113,67 @@ export function ReportView({ data }: { data: ReportViewModel }) {
           </div>
         </section>
 
-        {/* ── REACTIONS ── */}
-        <section id="seats" className={sectionCard}>
-          <Kicker>{secNum("seats")}from a few angles</Kicker>
+        {/* ── ANGLES — AI lenses on the one read (NOT people; the real
+            listeners are the paid human room below) ── */}
+        <section id="angles" className={sectionCard}>
+          <Kicker>{secNum("angles")}from a few angles</Kicker>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">
-            how it reads from every seat
+            the read, broken into six angles
           </h2>
           <p className={`${mono.className} text-[13px] text-white/55 mb-7 normal-case`}>
-            your track through different ai lenses.
-            {locked && " headlines are free — unlock to read the rest."}
+            one AI read, weighed six ways — each lens looks for a different thing
+            (hook, mix, playlist fit). these are angles on the analysis, not six listeners.
+            {locked && " findings are free — unlock the detail."}
           </p>
 
           <div className="grid sm:grid-cols-2 gap-px bg-white/10 border border-white/10">
-            {data.reactions.map((r, i) => (
-              <div key={i} className="bg-[#0a0a0a] p-5 flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      className={`${mono.className} text-[10px] font-bold text-black px-1.5 py-0.5`}
-                      style={{ background: r.positive ? ACCENT : "#b8a4ff" }}
+            {data.reactions.map((r, i) => {
+              const lens = r.lens || LENSES[i % LENSES.length];
+              return (
+                <div key={i} className="bg-[#0a0a0a] p-5 flex flex-col gap-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p
+                      className={`${mono.className} text-[12px] font-bold uppercase tracking-wide`}
+                      style={{ color: r.positive ? ACCENT : "#b8a4ff" }}
                     >
-                      ai
-                    </span>
-                    <p className={`${mono.className} text-[12px] text-white/70`}>
-                      {LENSES[i % LENSES.length]}
+                      {lens}
                     </p>
+                    <span
+                      className={`${mono.className} inline-flex items-center gap-1.5 text-[10px] text-white/40 whitespace-nowrap`}
+                    >
+                      <span
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{ background: r.positive ? ACCENT : "#b8a4ff" }}
+                      />
+                      {r.positive ? "strength" : "watch-out"}
+                    </span>
                   </div>
-                  <Meter count={r.rating} />
-                </div>
 
-                <p className="text-[15px] font-bold text-white leading-snug">
-                  “{r.headline}”
-                </p>
-
-                <Sealed locked={locked} label="unlock">
-                  <p className="text-[14px] text-white/70 leading-relaxed normal-case">
-                    {r.quote}
+                  <p className="text-[15px] font-bold text-white leading-snug">
+                    {r.headline}
                   </p>
-                </Sealed>
-              </div>
-            ))}
+
+                  <Sealed locked={locked} label="unlock the detail">
+                    <p className="text-[14px] text-white/70 leading-relaxed normal-case">
+                      {r.quote}
+                    </p>
+                  </Sealed>
+
+                  {r.tags && r.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-auto pt-1">
+                      {r.tags.map((t, j) => (
+                        <span
+                          key={j}
+                          className={`${mono.className} text-[10px] text-white/55 border border-white/15 px-1.5 py-0.5 normal-case`}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
 
