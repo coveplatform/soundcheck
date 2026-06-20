@@ -37,11 +37,11 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "MixReflect — Get Your Track Scored by AI + a Room of Real Listeners",
+    default: "MixReflect — Get Your Track Heard by Real Listeners + AI Score",
     template: "%s | MixReflect",
   },
   description:
-    "Paste a link to your track and get an instant AI read — a score out of 100, a verdict and a breakdown — plus honest reactions from a room of real, paid listeners. Free to submit.",
+    "Get your track heard by a room of real, paid listeners — honest reactions — plus an instant AI read: a score out of 100, a verdict and a breakdown. Just paste a link. Free to submit.",
   alternates: { canonical: "/" },
   keywords: [
     "music feedback",
@@ -63,23 +63,23 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: siteUrl,
     siteName: "MixReflect",
-    title: "MixReflect — Get Your Track Scored by AI + a Room of Real Listeners",
+    title: "MixReflect — Get Your Track Heard by Real Listeners + AI Score",
     description:
-      "Paste a link, get an instant AI read — score, verdict and breakdown — plus honest reactions from a room of real, paid listeners. Free to submit.",
+      "Honest reactions from a room of real, paid listeners — plus an instant AI read: score, verdict and breakdown. Paste a link. Free to submit.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "MixReflect — instant track score + a room of real listeners",
+        alt: "MixReflect — a room of real listeners + an instant track score",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MixReflect — Get Your Track Scored by AI + a Room of Real Listeners",
+    title: "MixReflect — Get Your Track Heard by Real Listeners + AI Score",
     description:
-      "Paste a link, get an instant AI read plus honest reactions from a room of real, paid listeners. Free to submit.",
+      "Honest reactions from a room of real, paid listeners, plus an instant AI read. Paste a link. Free to submit.",
     images: ["/og-image.png"],
     creator: "@mixreflect",
   },
@@ -112,7 +112,7 @@ const jsonLd = {
       url: SITE_URL,
       applicationCategory: "MusicApplication",
       operatingSystem: "Web",
-      description: "Paste a link to your track and get an instant AI read — a score out of 100, a verdict and a breakdown across hook, production, retention, emotion and commercial pull — plus honest reactions from a room of real, paid listeners. Free to submit.",
+      description: "Get honest reactions from a room of real, paid listeners — plus an instant AI read: a score out of 100, a verdict and a breakdown across hook, production, retention, emotion and commercial pull. Just paste a link to your track. Free to submit.",
       offers: [
         {
           "@type": "Offer",
@@ -144,7 +144,7 @@ const jsonLd = {
       name: "MixReflect",
       url: SITE_URL,
       logo: `${SITE_URL}/logo.png`,
-      description: "Instant AI track scoring plus honest reactions from a room of real, paid listeners. Free to submit.",
+      description: "A room of real, paid listeners plus instant AI track scoring — honest feedback. Free to submit.",
       sameAs: ["https://twitter.com/mixreflect"],
       contactPoint: {
         "@type": "ContactPoint",
@@ -156,7 +156,7 @@ const jsonLd = {
       "@type": "WebSite",
       name: "MixReflect",
       url: SITE_URL,
-      description: "Instant AI track scoring plus a room of real listeners — honest feedback before you release.",
+      description: "A room of real listeners plus instant AI track scoring — honest feedback before you release.",
       potentialAction: {
         "@type": "SearchAction",
         target: `${SITE_URL}/feedback/{search_term_string}`,
