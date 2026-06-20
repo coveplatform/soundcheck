@@ -34,6 +34,80 @@ function fmt(d: Date): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+// Subtle, deterministic cover tints so a track without artwork still gets a
+// distinct, on-brand tile instead of an empty box. All dark, so they sit
+// quietly behind the white title and cyan accent.
+const COVER_TINTS = ["#13283f", "#1b1233", "#07231e", "#241016", "#1f1c08"];
+
+function coverTintIndex(seed: string): number {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return h % COVER_TINTS.length;
+}
+
+// Every report tile gets a cover: real artwork when we have it, otherwise a
+// branded fallback — the equaliser mark from the logo over a tinted wash.
+function ReportCover({
+  artworkUrl,
+  slug,
+  score,
+  pending,
+}: {
+  artworkUrl: string | null;
+  slug: string;
+  score: number | null;
+  pending: boolean;
+}) {
+  const tint = COVER_TINTS[coverTintIndex(slug)];
+  return (
+    <div
+      className="relative w-20 h-20 shrink-0 border overflow-hidden bg-[#0a0a0a]"
+      style={{ borderColor: pending ? "rgba(255,255,255,0.12)" : ACCENT }}
+    >
+      {artworkUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={artworkUrl} alt="" className="w-full h-full object-cover" />
+      ) : (
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          style={{ background: `linear-gradient(135deg, ${tint} 0%, #0a0a0a 70%)` }}
+        >
+          <span className="flex items-end gap-[3px]" aria-hidden>
+            {[14, 24, 17, 28, 19].map((h, i) => (
+              <span
+                key={i}
+                style={{
+                  width: "3px",
+                  height: `${h}px`,
+                  background: ACCENT,
+                  opacity: pending ? 0.4 : 0.85,
+                }}
+              />
+            ))}
+          </span>
+        </div>
+      )}
+
+      {pending ? (
+        <span className="absolute top-1.5 left-1.5 flex h-2 w-2">
+          <span
+            className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping"
+            style={{ background: ACCENT }}
+          />
+          <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: ACCENT }} />
+        </span>
+      ) : score != null ? (
+        <span
+          className={`${mono.className} absolute bottom-0 right-0 text-[11px] font-bold text-black px-1 leading-tight`}
+          style={{ background: ACCENT }}
+        >
+          {score}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 export default async function ReportsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -212,44 +286,17 @@ export default async function ReportsPage() {
                   <DeleteReportButton reportId={r.id} />
                   <Link
                     href={`/report/${r.slug}`}
-                    className="group bg-[#0a0a0a] p-6 hover:bg-[#0e0e0e] transition-colors flex items-center gap-5"
+                    className="group bg-[#0a0a0a] p-4 sm:p-5 hover:bg-[#0e0e0e] transition-colors flex items-center gap-4"
                   >
-                  {/* artwork + score */}
-                  <div
-                    className="relative w-16 h-16 shrink-0 border overflow-hidden bg-white/5"
-                    style={{
-                      borderColor: pending ? "rgba(255,255,255,0.12)" : ACCENT,
-                    }}
-                  >
-                    {r.artworkUrl ? (
-                      <>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={r.artworkUrl} alt="" className="w-full h-full object-cover" />
-                        {!pending && (
-                          <span
-                            className={`${mono.className} absolute bottom-0 right-0 text-[11px] font-bold text-black px-1 leading-tight`}
-                            style={{ background: ACCENT }}
-                          >
-                            {r.score}
-                          </span>
-                        )}
-                      </>
-                    ) : pending ? (
-                      <span className={`${mono.className} absolute inset-0 flex items-center justify-center text-[11px] text-white/40`}>
-                        …
-                      </span>
-                    ) : (
-                      <span className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-2xl font-extrabold leading-none" style={{ color: ACCENT }}>
-                          {r.score}
-                        </span>
-                        <span className={`${mono.className} text-[9px] text-white/35`}>/ 100</span>
-                      </span>
-                    )}
-                  </div>
+                  <ReportCover
+                    artworkUrl={r.artworkUrl}
+                    slug={r.slug}
+                    score={r.score}
+                    pending={pending}
+                  />
 
                   <div className="min-w-0 flex-1">
-                    <p className="text-lg font-extrabold truncate normal-case">
+                    <p className="text-[17px] font-extrabold truncate normal-case leading-tight">
                       {r.trackTitle || "untitled track"}
                     </p>
                     <p className={`${mono.className} text-[12px] text-white/40 mt-1`}>
