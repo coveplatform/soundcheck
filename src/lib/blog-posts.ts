@@ -20,6 +20,122 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "how-to-copyright-your-music",
+    title: "How to Copyright Your Music (What Artists Actually Need to Know)",
+    coverImage: "/blog/blog19.jpg",
+    excerpt:
+      "Your music is copyrighted the moment you record it. Registration with the US Copyright Office and signing up with a PRO are separate steps that determine whether you can enforce that protection and collect the royalties it generates. Here is what each step actually does and which ones you cannot afford to skip.",
+    category: "GUIDE",
+    date: "June 20, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "Your music is copyrighted the moment you record it. In the US, copyright attaches automatically when a work is fixed in a tangible form, which means the session file sitting on your hard drive is already protected. Registration with the US Copyright Office and signing up with a performing rights organization are separate steps that determine whether you can actually enforce that protection and collect the royalties it generates.",
+      },
+      {
+        type: "h2",
+        text: "Does music copyright automatically, or do you have to register?",
+      },
+      {
+        type: "paragraph",
+        text: "Automatically. The moment you record an original piece of music, US copyright law protects it. No registration required, no notice required, no fee. This has been true since the Copyright Act of 1976. The confusion usually comes from conflating automatic copyright protection with the practical steps you need to actually use that protection: registration, PRO membership, and proper split documentation. The right exists without any paperwork. Enforcing and monetizing it requires the paperwork.",
+      },
+      {
+        type: "h2",
+        text: "What does registering with the US Copyright Office actually get you?",
+      },
+      {
+        type: "paragraph",
+        text: "Registration unlocks three things that automatic copyright does not: the legal right to sue for infringement in US federal court, the possibility of statutory damages (up to $150,000 per infringement for willful cases, instead of having to prove actual damages), and a public record that establishes the date of your claim. You can still own unregistered music. But if someone steals it and you have not registered, your options are limited to actual damages, which are usually hard to prove and rarely large enough to justify the cost of a lawsuit.",
+      },
+      {
+        type: "list",
+        items: [
+          "The right to sue in federal court for infringement. Unregistered works can only be sued over after the fact registration, and you lose eligibility for statutory damages if you did not register before the infringement occurred.",
+          "Statutory damages up to $150,000 per work for willful infringement, without having to prove what the theft actually cost you in lost revenue.",
+          "A public, date-stamped record establishing when your claim was created. This matters in disputes that come down to who created something first.",
+          "Attorney fees: courts can award your legal costs in a successful infringement case, but only for registered works.",
+          "Group registration: the Copyright Office allows registering up to 10 unpublished works in one filing at a reduced fee, so you can batch register unreleased material cheaply.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What is a PRO and which one should you join?",
+      },
+      {
+        type: "paragraph",
+        text: "A performing rights organization collects royalties when your music is performed publicly: broadcast on radio, played in a venue, licensed for a TV sync, or streamed in a way that generates a public performance royalty. The three US PROs are ASCAP, BMI, and SESAC. ASCAP and BMI are the main options for independent artists; SESAC is invitation only. ASCAP charges a one-time $50 signup fee for songwriters; BMI is free. You register your songs in their catalog, they collect public performance royalties on your behalf, and pay them out quarterly. Joining a PRO is separate from copyright registration. You need both.",
+      },
+      {
+        type: "h2",
+        text: "What is an ISRC code, and does every track need one?",
+      },
+      {
+        type: "paragraph",
+        text: "An ISRC (International Standard Recording Code) is a 12-character identifier assigned to a specific recording of a song. It tracks plays and streams across digital platforms globally and is how royalties get attributed to the right master recording. Most distributors assign ISRC codes automatically when you upload a release. If you self-distribute or license music directly to a sync client, you can get your own ISRC issuer prefix from USISRC.org. Every distinct version needs its own code: a remix, a live version, and the studio original are three separate recordings that need three separate ISRCs.",
+      },
+      {
+        type: "h2",
+        text: "What is a split sheet, and when should you sign one?",
+      },
+      {
+        type: "paragraph",
+        text: "A split sheet is a written agreement between everyone who contributed to a song that specifies what percentage of the copyright each person owns. Most artists put it off until a conflict arises. That is the wrong order. Get it signed before the song is finished, while everyone is in agreement and the working relationship is still good. A verbal agreement about splits is not enforceable. A signed written one protects everyone when a sync licensing deal comes in and someone suddenly remembers their contribution differently than you do.",
+      },
+      {
+        type: "h2",
+        text: "How does the song copyright differ from the sound recording copyright?",
+      },
+      {
+        type: "paragraph",
+        text: "There are two separate copyrights in any piece of recorded music, and independent artists often own both without realizing they are distinct. The composition copyright covers the underlying work: the melody and lyrics, registered with the Copyright Office as a 'PA' (Performing Arts) work. The sound recording copyright covers the specific recorded performance of that composition: the actual audio file, registered as an 'SR' (Sound Recording) work. A cover song creates a new sound recording copyright for the person who recorded it, but they do not own the underlying song. If you wrote the track and recorded it, you own both. If you recorded someone else's song, you own only the master.",
+      },
+      {
+        type: "quote",
+        text: "Your music is copyrighted the moment you record it. But a right you cannot afford to enforce and royalties you have not registered to collect are not much practical use.",
+      },
+      {
+        type: "h2",
+        text: "What should you do before you register and release a track?",
+      },
+      {
+        type: "paragraph",
+        text: "Copyright registration and PRO registration are straightforward once you have a finished song worth releasing. The step that happens first, and that most artists underinvest in, is confirming the song is actually ready. By the time you are about to register, you have heard the track hundreds of times and cannot tell whether the hook lands in the first 15 seconds or whether the production sounds dated compared to what is charting in your genre. On MixReflect, paste a link and get an instant score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a room of five real listeners hearing it cold. If the feedback surfaces consistent patterns, a verse that loses people or a mix that sounds thin, fix those before you put the song into the public record and start building a campaign around it. You can always release a better version of a song. You cannot un-release a forgettable one.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "Does music copyright automatically in the United States?",
+            a: "Yes. Copyright attaches the moment an original work is fixed in a tangible medium, which in practice means the moment you record it. No registration is required for the copyright to exist. Registration is a separate step that gives you the ability to sue for infringement in federal court and collect statutory damages. The automatic protection exists from the moment of recording, but it does not give you those enforcement tools.",
+          },
+          {
+            q: "How do I register my music with the US Copyright Office?",
+            a: "Go to copyright.gov, create an account, and file under the appropriate category: SR (Sound Recording) for the master recording, PA (Performing Arts) for the underlying composition, or both if you own both. The standard electronic filing fee is $65 per work, with a reduced rate of $45 for a single-author, single-work application. For unreleased recordings, a group registration covers up to 10 works for one fee. Registration is effective as of the filing date, so filing early protects you even while the application is processing.",
+          },
+          {
+            q: "What is the difference between ASCAP and BMI for independent artists?",
+            a: "Both collect public performance royalties for songwriters and publishers when your music is broadcast, streamed, or performed publicly. ASCAP charges a one-time $50 membership fee and is owned by its members. BMI is free to join and is a for-profit company that distributes royalties to songwriters and publishers. In practice, the royalty rates and payout schedules are similar enough that the choice often comes down to which dashboard you prefer or which PRO your collaborators use. You can only be a member of one US PRO at a time.",
+          },
+          {
+            q: "What is a mechanical royalty and how do I collect it?",
+            a: "A mechanical royalty is paid every time a copy of a song is reproduced, which in the streaming era means every on-demand stream on a platform like Spotify or Apple Music. In the US, on-demand streaming platforms pay these royalties through the Mechanical Licensing Collective (MLC). Register your songs at themlc.com to claim any royalties attributed to your work. Most distributors handle the master-side streaming income, but the mechanical royalty flows through the MLC to the songwriter and publisher separately, and it requires its own registration.",
+          },
+          {
+            q: "Do you need a split sheet if you made the whole song yourself?",
+            a: "No, but you still need one the moment a collaborator is involved, no matter how small their contribution seems. If a producer sent you a beat, a vocalist added a hook, or a friend suggested the bridge, document the split before the session ends. The time to agree on percentages is before anyone knows whether the song will matter. After a sync placement or a viral moment, everyone's memory of their contribution tends to get more generous.",
+          },
+          {
+            q: "How long does music copyright last?",
+            a: "For works created after January 1, 1978, copyright lasts for the life of the author plus 70 years. For works with multiple authors, it runs from the death of the last surviving author. Works made for hire are protected for 95 years from publication or 120 years from creation, whichever expires first. After the copyright term ends, the work enters the public domain and can be used by anyone without permission or payment.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-to-build-a-fanbase",
     title: "How to Build a Fanbase as an Independent Artist",
     coverImage: "/blog/blog18.jpg",
