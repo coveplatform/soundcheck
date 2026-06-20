@@ -146,7 +146,7 @@ export default async function ScoreReviewQueuePage() {
       </div>
 
       {queue.length > 0 ? (
-        <div className="grid sm:grid-cols-2 gap-px bg-white/10 border border-white/10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-white/10 border border-white/10">
           {queue.map((q) => (
             <Link
               key={q.id}
@@ -218,6 +218,19 @@ function Shell({ email, children }: { email: string; children: React.ReactNode }
             <AccountMenu email={email} />
           </div>
         </div>
+
+        {/* Mobile nav — the desktop links above are hidden on phones, so surface
+            them here as a tappable row instead of leaving no way to navigate. */}
+        <nav className={`${mono.className} sm:hidden border-t border-white/10`}>
+          <div className="max-w-4xl mx-auto px-5 h-11 flex items-center gap-6 text-[13px]">
+            <Link href="/dashboard" className="text-white/55 hover:text-white transition-colors">
+              dashboard
+            </Link>
+            <Link href="/score-review" className="text-white">
+              review queue
+            </Link>
+          </div>
+        </nav>
       </header>
       <div className="max-w-4xl mx-auto px-5 py-12">{children}</div>
     </div>
