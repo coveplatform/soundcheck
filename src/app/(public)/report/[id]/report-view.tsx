@@ -21,7 +21,7 @@ import { SCORE_GENRES } from "@/lib/score-genres";
 import { FREE_FULL_READ } from "@/lib/score-free-tier";
 import { scoreConversions } from "@/lib/score-conversions";
 import type { SubPlan } from "@/lib/score-pricing";
-import { ArrowRight, Share2, Lock, Hourglass, User, Loader2, Check } from "lucide-react";
+import { ArrowRight, Share2, Lock, Hourglass, User, Loader2 } from "lucide-react";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -184,9 +184,104 @@ function Sealed({
 
 function Kicker({ children }: { children: React.ReactNode }) {
   return (
-    <p className={`${mono.className} text-[13px] text-white/55 mb-3`}>
+    <p className={`${mono.className} text-[12px] tracking-[0.08em] text-white/45 mb-3`}>
       [ {children} ]
     </p>
+  );
+}
+
+// ── shared upsell pricing — one offer, told one way everywhere ─────────
+// Both the sealed (cold-traffic) report and the open-read (free first report)
+// upsell render THIS, so the price, the plans and the one-time-vs-unlimited
+// boundary never read two different ways. Body copy is sans (not mono) and
+// high-contrast so the offer is actually readable.
+function PricingCards({
+  onUnlock,
+  unlocking,
+  onSubscribe,
+  subscribing,
+  oneTimeCta,
+}: {
+  onUnlock: () => void;
+  unlocking: boolean;
+  onSubscribe: (plan: "monthly" | "annual") => void;
+  subscribing: "monthly" | "annual" | null;
+  oneTimeCta: string;
+}) {
+  return (
+    <div className="max-w-2xl mx-auto">
+      <div className="grid sm:grid-cols-2 gap-4 items-stretch">
+        {/* one-time */}
+        <div className="border border-white/15 bg-[#0a0a0a] p-6 flex flex-col">
+          <p className={`${mono.className} text-[11px] tracking-[0.12em] text-white/50`}>
+            JUST THIS TRACK
+          </p>
+          <p className="text-4xl font-extrabold mt-2 tracking-tight normal-case">
+            $6.95<span className="text-base text-white/45 font-medium"> once</span>
+          </p>
+          <p className="text-[14px] text-white/70 leading-relaxed normal-case mt-3 flex-1">
+            5 real people review this track and you get the deeper stem-level read.
+            Yours forever, no subscription.
+          </p>
+          <button
+            onClick={onUnlock}
+            disabled={unlocking}
+            className="group mt-6 w-full inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-extrabold text-[15px] py-3.5 transition-colors disabled:opacity-60"
+          >
+            {unlocking ? "opening…" : oneTimeCta}
+            {!unlocking && <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />}
+          </button>
+        </div>
+
+        {/* unlimited — highlighted */}
+        <div className="border-2 bg-[#0a0a0a] p-6 flex flex-col relative" style={{ borderColor: ACCENT }}>
+          <span
+            className={`${mono.className} absolute -top-2.5 left-6 text-[10px] font-bold text-black px-2 py-0.5`}
+            style={{ background: ACCENT }}
+          >
+            BEST VALUE
+          </span>
+          <p className={`${mono.className} text-[11px] tracking-[0.12em]`} style={{ color: ACCENT }}>
+            UNLIMITED
+          </p>
+          <p className="text-4xl font-extrabold mt-2 tracking-tight normal-case">
+            $19.95<span className="text-base text-white/45 font-medium">/mo</span>
+          </p>
+          <p className="text-[14px] text-white/70 leading-relaxed normal-case mt-3 flex-1">
+            A full report on every track you submit, plus the room of 5 real
+            people on 3 tracks each month.
+          </p>
+          <button
+            onClick={() => onSubscribe("monthly")}
+            disabled={subscribing !== null}
+            className="group mt-6 w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] py-3.5 hover:bg-white transition-colors disabled:opacity-70 disabled:cursor-wait"
+          >
+            {subscribing === "monthly" ? (
+              <><Loader2 className="h-4 w-4 animate-spin" /> opening checkout…</>
+            ) : (
+              <>go unlimited <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" /></>
+            )}
+          </button>
+          <button
+            onClick={() => onSubscribe("annual")}
+            disabled={subscribing !== null}
+            className="mt-2 text-[12px] text-white/55 hover:text-white transition-colors disabled:opacity-70 disabled:cursor-wait normal-case"
+          >
+            {subscribing === "annual" ? "opening checkout…" : "or $143.40/yr — save 40%"}
+          </button>
+        </div>
+      </div>
+
+      {/* the one line that resolves which plan is which */}
+      <p className="text-[13.5px] text-white/65 leading-relaxed normal-case text-center mt-6 max-w-md mx-auto">
+        <strong className="text-white">$6.95</strong> is just this track, forever.{" "}
+        <strong className="text-white">$19.95/mo</strong> is unlimited reads, with the
+        room on 3 tracks a month.
+      </p>
+      <p className={`${mono.className} text-[12px] text-white/40 mt-3 text-center normal-case`}>
+        cancel anytime · secured by stripe
+      </p>
+    </div>
   );
 }
 
@@ -512,7 +607,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
             </p>
           )}
           {data.scoreGuess != null && (
-            <p className={`${mono.className} text-[13px] text-white/55 mt-3 normal-case`}>
+            <p className="text-[13.5px] text-white/60 leading-relaxed mt-3 normal-case">
               you called <span className="font-bold text-white">{data.scoreGuess}</span> — unlock to see how close you were.
             </p>
           )}
@@ -537,7 +632,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
                 we listened to the whole thing.
               </h2>
-              <p className={`${mono.className} text-[13px] text-white/55 mb-7 normal-case`}>
+              <p className="text-[14px] text-white/65 leading-relaxed mb-7 normal-case">
                 Your track&apos;s real frequency-split waveform, marked where the read found its
                 moments. One is open — the rest unlock with the full read.
               </p>
@@ -571,7 +666,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
                   <Lock className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
                   <div className="min-w-0">
                     <p className="text-[15px] font-bold text-white leading-snug">{row.label}</p>
-                    <p className={`${mono.className} text-[12px] text-white/45 mt-0.5 normal-case`}>
+                    <p className="text-[13px] text-white/60 leading-relaxed mt-1 normal-case">
                       {row.sub}
                     </p>
                   </div>
@@ -622,7 +717,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
                   <p className="text-[14px] font-bold text-white normal-case leading-snug">
                     instantly — your score reveals &amp; the full read opens
                   </p>
-                  <p className={`${mono.className} text-[12px] text-white/50 mt-0.5 normal-case`}>
+                  <p className="text-[13px] text-white/65 leading-relaxed mt-1 normal-case">
                     every dimension, the why behind each, and the 3 ranked fixes
                   </p>
                 </div>
@@ -638,7 +733,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
                   <p className="text-[14px] font-bold text-white normal-case leading-snug">
                     over the next hours — 5 real people react
                   </p>
-                  <p className={`${mono.className} text-[12px] text-white/50 mt-0.5 normal-case`}>
+                  <p className="text-[13px] text-white/65 leading-relaxed mt-1 normal-case">
                     actual humans, not AI — they listen end to end and write honest feedback, landing
                     here seat by seat
                   </p>
@@ -646,88 +741,18 @@ export function ReportView({ data }: { data: ReportViewModel }) {
               </div>
             </div>
 
-            <p className={`${mono.className} text-[12px] text-white/45 text-center mb-4 normal-case`}>
-              both plans get you everything above — pick how you pay:
-            </p>
-
-            <div className="grid sm:grid-cols-2 gap-4 max-w-xl mx-auto items-stretch">
-              {/* one-time */}
-              <div className="border border-white/15 bg-[#0a0a0a] p-6 flex flex-col">
-                <p className={`${mono.className} text-[13px] text-white/60`}>just this track</p>
-                <p className="text-4xl font-extrabold mt-2">
-                  $6.95<span className="text-base text-white/45 font-medium"> once</span>
-                </p>
-                <ul className={`${mono.className} text-[12.5px] text-white/65 normal-case mt-5 space-y-2.5 flex-1`}>
-                  <li className="flex gap-2">
-                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
-                    <span>this track&apos;s full report — score + written read</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
-                    <span>5 real people review this track</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
-                    <span>yours forever · no subscription</span>
-                  </li>
-                </ul>
-                <button
-                  onClick={handleUnlock}
-                  disabled={unlocking}
-                  className="group mt-6 w-full inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-extrabold text-[15px] py-3.5 transition-colors disabled:opacity-60"
-                >
-                  {unlocking ? "opening…" : "unlock this track"}
-                  {!unlocking && <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />}
-                </button>
-              </div>
-
-              {/* unlimited — highlighted */}
-              <div className="border-2 bg-[#0a0a0a] p-6 flex flex-col relative" style={{ borderColor: ACCENT }}>
-                <span
-                  className={`${mono.className} absolute -top-2.5 left-6 text-[10px] font-bold text-black px-2 py-0.5`}
-                  style={{ background: ACCENT }}
-                >
-                  BEST VALUE
-                </span>
-                <p className={`${mono.className} text-[13px]`} style={{ color: ACCENT }}>unlimited</p>
-                <p className="text-4xl font-extrabold mt-2">
-                  $19.95<span className="text-base text-white/45 font-medium">/mo</span>
-                </p>
-                <ul className={`${mono.className} text-[12.5px] text-white/65 normal-case mt-5 space-y-2.5 flex-1`}>
-                  <li className="flex gap-2">
-                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
-                    <span><strong className="text-white">unlimited</strong> full reports — submit as many tracks as you want</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
-                    <span>5 real people review <strong className="text-white">3 tracks</strong> each month</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: ACCENT }} />
-                    <span>cancel anytime</span>
-                  </li>
-                </ul>
-                <button
-                  onClick={() => handleSubscribe("monthly")}
-                  disabled={subscribing !== null}
-                  className="group mt-6 w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] py-3.5 hover:bg-white transition-colors disabled:opacity-70 disabled:cursor-wait"
-                >
-                  {subscribing === "monthly" ? (
-                    <><Loader2 className="h-4 w-4 animate-spin" /> opening checkout…</>
-                  ) : (
-                    <>go unlimited <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" /></>
-                  )}
-                </button>
-              </div>
-            </div>
+            <PricingCards
+              onUnlock={handleUnlock}
+              unlocking={unlocking}
+              onSubscribe={handleSubscribe}
+              subscribing={subscribing}
+              oneTimeCta="unlock this track"
+            />
             <p className={`${mono.className} text-[12px] text-white/50 mt-6 text-center normal-case`}>
               want to see a full unlocked report first?{" "}
               <Link href="/report/demo" className="font-bold hover:brightness-110 transition" style={{ color: ACCENT }}>
                 view a sample →
               </Link>
-            </p>
-            <p className={`${mono.className} text-[12px] text-white/40 mt-2 text-center normal-case`}>
-              one-time or subscription · cancel anytime · secured by stripe
             </p>
           </section>
         </div>
@@ -977,7 +1002,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">
               real listeners are reviewing your track
             </h2>
-            <p className={`${mono.className} text-[13px] text-white/55 mb-6 normal-case`}>
+            <p className="text-[14px] text-white/65 leading-relaxed mb-6 normal-case">
               {data.humanReviewsIn < data.humanReviewsTotal
                 ? "reactions land here live as each listener finishes."
                 : "the whole room has weighed in."}
@@ -1034,7 +1059,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
               we listened to it.
             </h2>
-            <p className={`${mono.className} text-[13px] text-white/55 mb-7 normal-case`}>
+            <p className="text-[14px] text-white/65 leading-relaxed mb-7 normal-case">
               {locked && waveMoments.length > 0
                 ? "Your track's real frequency-split waveform, with moment markers from the read. One is unlocked — the rest open with the full read."
                 : "Your track's real frequency-split waveform — bass body, mids, highs — straight from the analysis the read is grounded in."}
@@ -1092,7 +1117,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
             </div>
           </div>
           {locked && (
-            <p className={`${mono.className} text-[12px] text-white/45 mt-4 normal-case`}>
+            <p className="text-[13px] text-white/55 leading-relaxed mt-4 normal-case">
               scores are free — unlock to read why each dimension landed where it did.
             </p>
           )}
@@ -1120,7 +1145,7 @@ export function ReportView({ data }: { data: ReportViewModel }) {
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">
             the read, broken into six angles
           </h2>
-          <p className={`${mono.className} text-[13px] text-white/55 mb-7 normal-case`}>
+          <p className="text-[14px] text-white/65 leading-relaxed mb-7 normal-case">
             one AI read, weighed six ways — each lens looks for a different thing
             (hook, mix, playlist fit). these are angles on the analysis, not six listeners.
             {locked && " findings are free — unlock the detail."}
@@ -1298,69 +1323,18 @@ what to fix first
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-              {/* this track */}
-              <div className="border border-white/15 bg-[#0a0a0a] p-6 flex flex-col">
-                <p className={`${mono.className} text-[13px] text-white/60`}>this track</p>
-                <p className="text-4xl font-extrabold mt-2">
-                  $6.95<span className="text-base text-white/45 font-medium"> once</span>
-                </p>
-                <p className={`${mono.className} text-[12px] text-white/55 mt-1 normal-case`}>
-                  5 real people review this track + the deep stem read — yours forever
-                </p>
-                <button
-                  onClick={handleUnlock}
-                  disabled={unlocking}
-                  className="group mt-auto pt-6 w-full inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-extrabold text-[15px] py-3.5 transition-colors disabled:opacity-60"
-                >
-                  {unlocking ? "opening…" : "send it to the room"}
-                  {!unlocking && <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />}
-                </button>
-              </div>
-
-              {/* unlimited — highlighted */}
-              <div className="border-2 bg-[#0a0a0a] p-6 flex flex-col relative" style={{ borderColor: ACCENT }}>
-                <span
-                  className={`${mono.className} absolute -top-2.5 left-6 text-[10px] font-bold text-black px-2 py-0.5`}
-                  style={{ background: ACCENT }}
-                >
-                  BEST VALUE
-                </span>
-                <p className={`${mono.className} text-[13px]`} style={{ color: ACCENT }}>unlimited</p>
-                <p className="text-4xl font-extrabold mt-2">
-                  $19.95<span className="text-base text-white/45 font-medium">/mo</span>
-                </p>
-                <p className={`${mono.className} text-[12px] text-white/55 mt-1 normal-case`}>
-                  full reads on every track you make · the room on 3 a month
-                </p>
-                <button
-                  onClick={() => handleSubscribe("monthly")}
-                  disabled={subscribing !== null}
-                  className="group mt-auto pt-6 w-full inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] py-3.5 hover:bg-white transition-colors disabled:opacity-70 disabled:cursor-wait"
-                >
-                  {subscribing === "monthly" ? (
-                    <><Loader2 className="h-4 w-4 animate-spin" /> opening checkout…</>
-                  ) : (
-                    <>go unlimited <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" /></>
-                  )}
-                </button>
-                <button
-                  onClick={() => handleSubscribe("annual")}
-                  disabled={subscribing !== null}
-                  className={`${mono.className} mt-2 text-[12px] text-white/55 hover:text-white transition-colors disabled:opacity-70 disabled:cursor-wait`}
-                >
-                  {subscribing === "annual" ? "opening checkout…" : "or $143.40/yr (save 40%)"}
-                </button>
-              </div>
-            </div>
+            <PricingCards
+              onUnlock={handleUnlock}
+              unlocking={unlocking}
+              onSubscribe={handleSubscribe}
+              subscribing={subscribing}
+              oneTimeCta="send it to the room"
+            />
             <p className={`${mono.className} text-[12px] text-white/50 mt-6 text-center normal-case`}>
               want to see what the room delivers?{" "}
               <Link href="/report/demo" className="font-bold hover:brightness-110 transition" style={{ color: ACCENT }}>
                 view a sample with all 5 seats in →
               </Link>
-            </p>
-            <p className={`${mono.className} text-[12px] text-white/40 mt-2 text-center normal-case`}>
-              one-time or subscription · cancel anytime · secured by stripe
             </p>
           </section>
         ) : (
