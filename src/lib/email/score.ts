@@ -150,6 +150,50 @@ export async function sendNewMixReflectAnnouncement(to: string, userName?: strin
   return sendEmail({ to, subject, html });
 }
 
+// ── "New MixReflect + why Unlimited" announcement blast ──────────────
+// A warm reminder that MixReflect is rebuilt, leading into the case for
+// going Unlimited. Full-price (no coupon) — for the whole user base.
+export function buildUnlimitedAnnouncement(userName?: string | null): { subject: string; html: string } {
+  const app = getAppUrl();
+  const name = userName ? userName.split(" ")[0] : null;
+  const monthly = `$${(scoreSubPrice("monthly").amount / 100).toFixed(2)}`;
+  const annual = `$${(scoreSubPrice("annual").amount / 100).toFixed(2)}`;
+  const unlock = `$${(UNLOCK_PRICE_CENTS / 100).toFixed(2)}`;
+
+  const check = (text: string) => `
+    <tr><td style="padding:10px 0;border-top:1px solid rgba(255,255,255,0.08);">
+      <p style="margin:0;font-size:14px;line-height:1.6;color:${MUTED};"><span style="color:${ACCENT};">✓</span>&nbsp; ${text}</p>
+    </td></tr>`;
+
+  const content = `
+    ${kicker("mixreflect · new + unlimited")}
+    ${h1("The new MixReflect &mdash; and why Unlimited&rsquo;s worth it 🎧")}
+    ${p(`${name ? `Hey ${name}, if` : "If"} you haven&rsquo;t been back in a bit, MixReflect is a different thing now. Same idea &mdash; honest feedback before you release &mdash; but it&rsquo;s <strong style="color:${TEXT};">instant</strong>, and it comes from <strong style="color:${TEXT};">real ears</strong>.`)}
+    ${p(`Paste a link and you get a score out of 100 with a verdict and a full breakdown in seconds. Then a room of real, paid listeners reacts to your track with honest, specific takes that land in your report as they come in. No grinding for credits, no waiting days.`)}
+    ${p(`Your first report&rsquo;s on us. After that, here&rsquo;s the thing about going <strong style="color:${TEXT};">Unlimited</strong>:`)}
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:4px 0 8px;">
+      ${check(`Every report fully unlocked &mdash; score, verdict, and the full breakdown, no seal`)}
+      ${check(`A room of real listeners on every track you submit`)}
+      ${check(`Submit as many tracks as you want while you&rsquo;re subscribed`)}
+      ${check(`Go annual and it works out to about 40% less per month`)}
+    </table>
+    <div style="background:${BG};border:1px solid ${BORDER};border-radius:10px;padding:16px;margin:10px 0 4px;">
+      <p style="margin:0 0 6px;font-size:14px;color:${MUTED};"><span style="font-size:17px;font-weight:800;color:${TEXT};">${unlock}</span> one-time &mdash; unlock a single report</p>
+      <p style="margin:0;font-size:14px;color:${MUTED};"><span style="font-size:17px;font-weight:800;color:${ACCENT};">${monthly}/mo</span> unlimited &mdash; or ${annual}/yr, save ~40%</p>
+    </div>
+    ${button("Go Unlimited →", `${app}/#pricing`)}
+    <p style="margin:14px 0 0;font-size:13px;line-height:1.6;color:${MUTED};">
+      Not ready? Just <a href="${app}" style="color:${ACCENT};text-decoration:none;">score a track free →</a> and see what the room says.
+    </p>`;
+
+  return { subject: "The new MixReflect — and why Unlimited's worth it 🎧", html: shell(content) };
+}
+
+export async function sendUnlimitedAnnouncement(to: string, userName?: string | null): Promise<boolean> {
+  const { subject, html } = buildUnlimitedAnnouncement(userName);
+  return sendEmail({ to, subject, html });
+}
+
 // ── Win-back offer: 50% off the first month of Unlimited ───────────
 // Manual send (admin) to free signups who never converted. The CTA hits
 // /api/score/subscribe/offer which applies the coupon and 302s into checkout.
