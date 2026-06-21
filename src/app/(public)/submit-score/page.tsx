@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
 import { ArrowRight, Loader2, Music, X, Upload, ChevronDown, Check } from "lucide-react";
-import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
+import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT, unsupportedReason } from "@/lib/track-url";
 import { scoreConversions } from "@/lib/score-conversions";
 import { SealedPaywall } from "@/components/score/sealed-paywall";
 import { FREE_FULL_READ } from "@/lib/score-free-tier";
@@ -96,6 +96,8 @@ export default function SubmitScorePage() {
   const hasEmail = !!session?.user?.email || email.trim().length > 0;
   const isUrl = /^https?:\/\//i.test(trackUrl.trim());
   const isSupported = isUrl && isSupportedTrackUrl(trackUrl);
+  // A specific "this exact host won't work" message (Dropbox/Drive/etc.), else null.
+  const blockReason = isUrl ? unsupportedReason(trackUrl) : null;
   const isValid = isSupported && hasEmail;
 
   let host = "";
@@ -354,10 +356,10 @@ export default function SubmitScorePage() {
                   ) : !isSupported ? (
                     <>
                       <p className="text-[15px] font-bold text-red-400 truncate">
-                        we can&apos;t read this link
+                        {blockReason ? "this link won’t work" : "we can’t read this link"}
                       </p>
-                      <p className={`${mono.className} text-[12px] text-white/60 truncate mt-0.5`}>
-                        {SUPPORTED_TRACK_HINT}
+                      <p className={`${mono.className} text-[12px] text-white/60 mt-0.5 ${blockReason ? "normal-case" : "truncate"}`}>
+                        {blockReason ?? SUPPORTED_TRACK_HINT}
                       </p>
                     </>
                   ) : (

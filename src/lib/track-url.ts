@@ -14,6 +14,48 @@ export const SUPPORTED_TRACK_HINT =
   "paste a soundcloud, youtube, bandcamp or direct mp3 link";
 
 /**
+ * Hosts whose links *look* like a file (often ending in .mp3) but actually serve
+ * an HTML preview/landing page — so the analyzer pulls markup, not audio, and the
+ * report comes back ungrounded (no waveform, "Untitled"). We block these up front
+ * and tell the user why instead of generating a junk report. Mapped to a friendly
+ * label for the message. (Dropbox's real CDN, dropboxusercontent.com, is NOT here
+ * — that one serves the actual bytes and analyses fine.)
+ */
+const PREVIEW_ONLY_HOSTS: Record<string, string> = {
+  "dropbox.com": "dropbox",
+  "drive.google.com": "google drive",
+  "docs.google.com": "google drive",
+  "wetransfer.com": "wetransfer",
+  "we.tl": "wetransfer",
+  "box.com": "box",
+  "onedrive.live.com": "onedrive",
+  "1drv.ms": "onedrive",
+};
+
+function previewOnlyLabel(host: string): string | null {
+  for (const domain in PREVIEW_ONLY_HOSTS) {
+    if (host === domain || host.endsWith(`.${domain}`)) return PREVIEW_ONLY_HOSTS[domain];
+  }
+  return null;
+}
+
+/**
+ * A specific, human reason a link can't be used — currently the preview-page
+ * hosts above. null means "no special reason" (fall back to SUPPORTED_TRACK_HINT).
+ */
+export function unsupportedReason(raw: string): string | null {
+  let url: URL;
+  try {
+    url = new URL(normalizeTrackUrl(raw));
+  } catch {
+    return null;
+  }
+  const label = previewOnlyLabel(url.hostname.toLowerCase());
+  if (!label) return null;
+  return `${label} links don't work here — they open a preview page, not the file. paste a soundcloud, youtube or bandcamp link, or a direct mp3.`;
+}
+
+/**
  * Links pasted without a protocol ("soundcloud.com/artist/track",
  * "www.youtube.com/watch?v=…") get https:// prepended so they validate and
  * fetch like a full URL. Anything that doesn't look like a domain is returned
@@ -36,6 +78,9 @@ export function isSupportedTrackUrl(raw: string): boolean {
   if (url.protocol !== "http:" && url.protocol !== "https:") return false;
 
   const host = url.hostname.toLowerCase();
+  // Preview-page hosts (Dropbox share links, Google Drive, …) masquerade as
+  // direct files — reject before the audio-extension check below catches them.
+  if (previewOnlyLabel(host)) return false;
   const isOrSub = (domain: string) =>
     host === domain || host.endsWith(`.${domain}`);
   // A real track link always has a path (bare homepages don't point at audio).

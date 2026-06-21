@@ -11,7 +11,7 @@ import { ScoreRing } from "@/components/score/score-ring";
 import { RealReviews } from "@/components/landing/real-reviews";
 import { RoomShowcase } from "@/components/landing/room-showcase";
 import { posts } from "@/lib/blog-posts";
-import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT } from "@/lib/track-url";
+import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT, unsupportedReason } from "@/lib/track-url";
 import { CreepingBar, EqBars, Elapsed } from "@/components/score/analyzing-bits";
 import { scoreConversions } from "@/lib/score-conversions";
 import { SealedPaywall } from "@/components/score/sealed-paywall";
@@ -602,7 +602,7 @@ export default function ScorePage() {
       return;
     }
     if (!isSupportedTrackUrl(trackUrl)) {
-      setError(`we can't read that link — ${SUPPORTED_TRACK_HINT}`);
+      setError(unsupportedReason(trackUrl) ?? `we can't read that link — ${SUPPORTED_TRACK_HINT}`);
       return;
     }
     setError("");
@@ -987,10 +987,10 @@ export default function ScorePage() {
                     ) : !isSupported ? (
                       <>
                         <p className="text-[15px] font-bold text-red-400 truncate">
-                          we can&apos;t read this link
+                          {unsupportedReason(trackUrl) ? "this link won’t work" : "we can’t read this link"}
                         </p>
-                        <p className={`${mono.className} text-[12px] text-white/45 truncate mt-0.5`}>
-                          {SUPPORTED_TRACK_HINT}
+                        <p className={`${mono.className} text-[12px] text-white/45 mt-0.5 ${unsupportedReason(trackUrl) ? "normal-case" : "truncate"}`}>
+                          {unsupportedReason(trackUrl) ?? SUPPORTED_TRACK_HINT}
                         </p>
                       </>
                     ) : (
