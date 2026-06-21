@@ -59,3 +59,9 @@ public/ableton-projects/
 
 # seed data
 /seed-tracks/
+
+# local debug / one-off scripts (kept on disk, never committed). Already-tracked
+# scripts/archive/_* stay tracked; this only stops NEW _-prefixed junk from
+# showing up as untracked and getting swept into a commit.
+scripts/_*
+scripts/**/_*
