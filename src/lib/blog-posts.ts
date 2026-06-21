@@ -20,6 +20,130 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "distrokid-alternative",
+    title: "DistroKid Alternatives: The Best Music Distribution Options in 2026",
+    coverImage: "/blog/blog20.jpg",
+    excerpt:
+      "DistroKid is not the only option for independent music distribution. TuneCore, CD Baby, UnitedMasters, Amuse, and RouteNote each offer different pricing models and feature sets that suit different release patterns. Here is how each one compares, and which makes sense depending on how often you release.",
+    category: "INDUSTRY",
+    date: "June 21, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "The main DistroKid alternatives are TuneCore, CD Baby, UnitedMasters, Amuse, Ditto, and RouteNote. DistroKid charges a flat annual fee starting at $22.99 for unlimited releases, which suits artists who release frequently, but the alternatives carry different pricing models and feature sets that make them a better fit depending on how often you release and what else you need from a distributor.",
+      },
+      {
+        type: "h2",
+        text: "What does DistroKid actually offer, and where does it fall short?",
+      },
+      {
+        type: "paragraph",
+        text: "DistroKid does one thing well: fast, affordable, unlimited distribution for a flat annual fee. Tracks typically go live on Spotify, Apple Music, and most major platforms within one to five business days. Artists keep 100% of royalties. That is a genuinely good deal for prolific artists who release several tracks a year and never need help when something breaks. The weaknesses show up when you do need help. DistroKid's support runs through a help center rather than human representatives, which frustrates artists dealing with a disputed release, a split payment issue, or a mistaken takedown. The annual renewal model also means your music stays up only as long as your subscription stays active. Miss a payment and your tracks come down from every platform they are on.",
+      },
+      {
+        type: "h2",
+        text: "Why do artists look for a DistroKid alternative?",
+      },
+      {
+        type: "list",
+        items: [
+          "They release once or twice a year and an annual subscription is a poor deal compared to a one-time fee per release.",
+          "They need to split royalties cleanly with collaborators, and DistroKid's split handling has historically been clunkier than competitors.",
+          "They want human customer support when something breaks, which DistroKid's model does not provide.",
+          "They need physical distribution or sync licensing pitching, which DistroKid does not offer but CD Baby does.",
+          "They want a free tier for early releases before their tracks are generating meaningful income.",
+          "They are worried about what happens to their music if they stop paying the annual renewal.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What are the best DistroKid alternatives?",
+      },
+      {
+        type: "paragraph",
+        text: "Every major distributor gets your tracks to Spotify and Apple Music. The differences that actually matter are pricing model, royalty split, customer support, and feature set. Here is how the main alternatives stack up.",
+      },
+      {
+        type: "list",
+        items: [
+          "TuneCore: annual fee model similar to DistroKid, starting around $14.99 per single or $29.99 per album per year, with artists keeping 100% of royalties. Human customer support is the main differentiator from DistroKid.",
+          "CD Baby: one-time fee per release ($9.95 for a single, $29.95 for an album) plus a 9% royalty cut. No annual renewal means your music stays up permanently once uploaded. Also handles physical distribution and sync licensing pitching.",
+          "UnitedMasters: free tier takes 10% of royalties; paid tier at $35 per year keeps 100%. Geared toward streaming-native artists and includes brand partnership integrations some artists find valuable.",
+          "Amuse: free tier for basic distribution, paid tiers for faster delivery and more features. Useful if you release infrequently and want zero upfront cost. Free tier is slower and more limited than paid options.",
+          "RouteNote: free tier with a 15% royalty split, paid tier for 100% and faster distribution. One of the cleaner free options for artists who are not yet generating meaningful income.",
+          "Ditto: $19 per year for unlimited releases, 100% royalties, and generally better-reviewed customer support than DistroKid. The closest pricing alternative for high-volume releasers.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "How does TuneCore compare to DistroKid?",
+      },
+      {
+        type: "paragraph",
+        text: "TuneCore is the closest like-for-like alternative: both charge fees annually, both let you keep 100% of royalties, and both distribute to all major platforms. TuneCore's pricing is structured per release rather than one flat fee for unlimited releases, which can add up for artists releasing frequently but is more predictable for artists with small catalogs. The practical difference most artists notice is support. TuneCore provides human customer service; DistroKid does not. For artists who have never needed to contact support, the difference is invisible. For artists who have dealt with a disputed release, a content ID claim, or a split payment going sideways, it matters enormously. DistroKid is faster for uncomplicated releases. TuneCore is better the moment you need someone to fix something.",
+      },
+      {
+        type: "quote",
+        text: "Most artists spend more time picking a distributor than confirming the track is ready to distribute. The distributor choice rarely decides whether a release succeeds. The track does.",
+      },
+      {
+        type: "h2",
+        text: "Is CD Baby a better option than DistroKid?",
+      },
+      {
+        type: "paragraph",
+        text: "CD Baby works on a different model: you pay once per release and the track stays distributed permanently. That makes it cheaper than DistroKid for artists releasing one or two tracks a year and more expensive for artists releasing ten or more. CD Baby takes a 9% royalty cut on top of the one-time fee, which compounds on meaningful streaming income. What you get in return is broader: physical distribution for artists selling CDs or vinyl, sync licensing pitching, and catalog management tools built over decades. The royalty cut is the main objection. Once your tracks generate consistent streaming income, that 9% can exceed what DistroKid or Ditto would cost annually. If your tracks are generating modest income and you want no renewal risk, the one-time fee model is worth considering.",
+      },
+      {
+        type: "h2",
+        text: "Are free distribution options actually worth using?",
+      },
+      {
+        type: "paragraph",
+        text: "Free tiers from RouteNote, Amuse, and UnitedMasters work, but the royalty split is the real cost. RouteNote takes 15%, UnitedMasters' free tier takes 10%, and Amuse's free tier takes a cut. For an artist releasing their first track with no listener base, the royalty cut on near-zero revenue is near-zero cost, and free tiers make genuine sense. The moment your tracks generate consistent streaming income the math shifts: a 15% cut on $500 per month is $75 per month, or $900 per year, versus $22.99 for DistroKid. At that point, upgrading to a paid distributor with 100% royalty retention pays for itself immediately. Free tiers also tend to be slower to distribute, have narrower store reach, and offer minimal support.",
+      },
+      {
+        type: "h2",
+        text: "What should you do before uploading to any distributor?",
+      },
+      {
+        type: "paragraph",
+        text: "The distributor choice matters far less than whether the track is ready before it goes live. Once you upload, the track gets an ISRC, lands on every major platform, and starts accumulating skip rate data the moment anyone finds it. Pulling a release to fix a mix problem or a structural issue is possible but painful: you lose the streaming history, any playlist placements, and the algorithmic momentum the release had started to build. The better move is to confirm the track is genuinely ready before you upload anything. On MixReflect, paste a link and get an instant AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a room of five real listeners hearing it cold. The patterns they surface before the track is live are exactly the problems that will drive early skips after it is. A slow intro that sounds natural to you after a hundred listens is the fifteen seconds that will spike your skip rate on Spotify. Find it before the ISRC is assigned, not after.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "What is the best alternative to DistroKid for independent artists?",
+            a: "The best alternative depends on your release frequency. For prolific artists who want unlimited distribution for a flat annual fee, Ditto at $19 per year is the closest match. For artists releasing once or twice a year who want no renewal risk, CD Baby's one-time fee model is usually cheaper overall. For artists who need human customer support, TuneCore is the most consistent upgrade. All major distributors get your tracks to Spotify and Apple Music; the differences are in price structure, support, and features beyond basic distribution.",
+          },
+          {
+            q: "Does DistroKid take a percentage of royalties?",
+            a: "No. DistroKid keeps 0% of royalties and charges a flat annual subscription fee instead, starting at $22.99 per year for unlimited releases. You keep 100% of what streaming platforms pay. The downside of that model is that your music stays available only as long as you keep renewing the subscription. Miss a payment and your tracks come down.",
+          },
+          {
+            q: "What happens to my music if I stop paying DistroKid?",
+            a: "If you do not renew your DistroKid subscription, your tracks are eventually removed from all streaming platforms. This is one of the main reasons artists look at alternatives with a one-time fee model like CD Baby, where a single payment keeps your music distributed permanently. A lapse in your DistroKid subscription can disrupt playlist placements and algorithmic momentum you have built up on those tracks.",
+          },
+          {
+            q: "Is TuneCore or DistroKid better?",
+            a: "DistroKid is faster and cheaper for unlimited releases, particularly for artists with large catalogs. TuneCore provides human customer support, which DistroKid does not, and its per-release pricing is more predictable for small catalogs. Both keep 100% of royalties. The decision usually comes down to whether you have ever needed to contact a distributor to fix a problem. If you have, TuneCore's support is worth the difference. If not, DistroKid's speed and pricing are hard to beat.",
+          },
+          {
+            q: "Can I use a free music distributor instead of DistroKid?",
+            a: "Yes. RouteNote, Amuse, and UnitedMasters all offer free distribution tiers that take a royalty percentage rather than an upfront fee. These work particularly well for artists who are early in their career and cannot predict whether a release will generate income worth protecting. Once your tracks generate consistent streaming income, a paid distributor with 100% royalty retention usually becomes cheaper than the ongoing royalty cut from a free tier.",
+          },
+          {
+            q: "Can I switch distributors without losing my streams?",
+            a: "No. Switching distributors means taking down the existing release and re-uploading through the new distributor, which creates a new track on every platform. Streaming history, playlist placements, and algorithmic data do not transfer. This is one of the strongest reasons to choose the right distributor before your first release, and to confirm the track is genuinely ready before uploading, since a re-release after fixing a problem means starting the streaming history from zero.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-to-copyright-your-music",
     title: "How to Copyright Your Music (What Artists Actually Need to Know)",
     coverImage: "/blog/blog19.jpg",
