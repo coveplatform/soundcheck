@@ -4,8 +4,7 @@ The daily blog agent reads this file, picks the next PENDING item, writes the po
 The current highest cover image is tracked here — agent increments it after each post.
 
 ## Current image counter
-Last used: blog20 → next post uses blog21
-⚠️ blog21.jpg onward still need to be uploaded — pre-upload blog21.jpg before the next post runs. (gen-blog-cover.mjs requires OPENAI_API_KEY in the routine env; if it is missing, reuse an existing /blog/blogN.jpg rather than blocking the post.)
+Last used: blog21 → next post uses blog22
 
 ## Blog post queue
 
@@ -44,7 +43,7 @@ Last used: blog20 → next post uses blog21
 | DONE | 2026-06-06 | /alternatives/musosoup | Musosoup |
 | DONE | 2026-06-06 | /alternatives/reverbnation | ReverbNation |
 | DONE | 2026-06-21 | /alternatives/distrokid | DistroKid — distribution; "distrokid alternative" is massive volume — blog20.jpg |
-| PENDING | | /alternatives/splice | Splice — sample library + some collab; different product but huge search |
+| DONE | 2026-06-22 | /alternatives/splice | Splice — sample library + some collab; different product but huge search — blog21.jpg |
 | PENDING | | /alternatives/soundcloud | SoundCloud — discovery/distribution; broad but massive |
 
 ## Blog post format rules
