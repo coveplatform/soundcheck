@@ -4,7 +4,7 @@ The daily blog agent reads this file, picks the next PENDING item, writes the po
 The current highest cover image is tracked here — agent increments it after each post.
 
 ## Current image counter
-Last used: blog21 → next post uses blog22
+Last used: blog22 → next post uses blog23
 
 ## Blog post queue
 
@@ -44,7 +44,7 @@ Last used: blog21 → next post uses blog22
 | DONE | 2026-06-06 | /alternatives/reverbnation | ReverbNation |
 | DONE | 2026-06-21 | /alternatives/distrokid | DistroKid — distribution; "distrokid alternative" is massive volume — blog20.jpg |
 | DONE | 2026-06-22 | /alternatives/splice | Splice — sample library + some collab; different product but huge search — blog21.jpg |
-| PENDING | | /alternatives/soundcloud | SoundCloud — discovery/distribution; broad but massive |
+| DONE | 2026-06-23 | /alternatives/soundcloud | SoundCloud — discovery/distribution; broad but massive — blog22.jpg |
 
 ## Blog post format rules
 
