@@ -33,17 +33,33 @@ Last updated: 2026-06-09
 
 ## C. Content engine — 🔁 recurring · 🤖 automatable (NOT currently running)
 
-### Blog posts (weekly cadence) — next in queue
+### Blog posts (daily cadence, ~23:00 UTC) — next in queue
+Agent picks the TOP `⏳` item, writes it, marks it `✅`. Keep these
+bottom-funnel and product-aligned (each maps to a score dimension or a
+high-intent "is my track good / ready" query) — those convert best.
+
 | Status | Title | Target keyword |
 |---|---|---|
-| ⏳ | Music Release Checklist: Everything to Do Before You Drop | music release checklist |
-| ⏳ | Is Your Mix Good? 7 Ways to Tell Before You Release | how to know if your mix is good |
-| ⏳ | How to Get on Spotify's Discover Weekly | how to get on discover weekly |
-| ⏳ | How to Promote Your Music on Spotify Without a Label | how to promote music on spotify |
-| ⏳ | How to Master Music at Home (and When to Hire Out) | how to master music at home |
+| ✅ | Best AI Tools for Music Feedback in 2026 | ai music feedback | (June 24) |
+| ⏳ | How Do I Know When a Song Is Finished? | when is a song finished |
+| ⏳ | Why Do Listeners Skip My Song in the First 30 Seconds? | why do people skip my song |
+| ⏳ | What Makes a Song Catchy? The Anatomy of a Hook That Sticks | what makes a song catchy |
+| ⏳ | How Much Does It Cost to Get Your Music Reviewed in 2026? | cost to get music reviewed |
+| ⏳ | Why Does Nobody Listen to My Music? | why does nobody listen to my music |
 | ⏳ | Is My Mix Too Loud? Loudness, LUFS and the Streaming Norm | is my mix too loud |
-| ⏳ | How to Build a Fanbase as an Independent Artist | how to build a fanbase |
-| ⏳ | How to Copyright Your Music | how to copyright music |
+| ⏳ | How to Get More Spotify Streams (Without Buying Them) | how to get more spotify streams |
+| ⏳ | Song Structure: How to Arrange a Track That Holds Attention | how to structure a song |
+| ⏳ | How to Make Your Chorus Hit Harder | how to make a chorus hit |
+| ⏳ | Is My Song Good? An Honest Way to Tell Before You Release | is my song good |
+
+**Already published (do not re-queue):** how-to-release-music-independently,
+how-to-mix-music-at-home, how-to-get-on-discover-weekly, music-release-checklist,
+how-to-promote-your-music-on-spotify, how-to-get-music-reviews-online,
+is-your-mix-good, how-to-master-music-at-home, how-to-build-a-fanbase,
+how-to-copyright-your-music, why-does-my-music-sound-amateur,
+why-your-vocals-sound-buried-in-the-mix, what-playlist-curators-look-for,
+distrokid-alternative, splice-alternative, soundcloud-alternative,
+best-ai-music-feedback-tools.
 
 *(Format rules live in memory `project_seo_plan.md`: answer-first opener, H2s as
 questions, ≥1 FAQ block, quote + list blocks, CTA, natural tie-in.)*
