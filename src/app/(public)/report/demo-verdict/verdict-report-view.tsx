@@ -246,7 +246,7 @@ export function VerdictReportView() {
 
   return (
     <div
-      className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase scroll-smooth`}
+      className={`${jakarta.className} min-h-screen overflow-x-hidden bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase scroll-smooth`}
     >
       {/* grain */}
       <div
@@ -263,10 +263,10 @@ export function VerdictReportView() {
           <Link href="/">
             <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
           </Link>
-          <div className={`${mono.className} flex items-center gap-3 text-[13px]`}>
-            <span className="text-white/40">[ demo · release verdict ]</span>
-            <Link href="/report/demo-full" className="text-white/35 hover:text-white/60 transition-colors">
-              compare: old report →
+          <div className={`${mono.className} flex items-center gap-3 text-[12px] sm:text-[13px] min-w-0`}>
+            <span className="hidden sm:inline text-white/40 shrink-0">[ demo · release verdict ]</span>
+            <Link href="/report/demo-full" className="text-white/35 hover:text-white/60 transition-colors whitespace-nowrap shrink-0">
+              compare: old →
             </Link>
           </div>
         </div>
@@ -300,13 +300,13 @@ export function VerdictReportView() {
             return (
               <div
                 key={l.key}
-                className="flex-1 py-2.5 px-1 text-center"
+                className="flex-1 min-w-0 py-2 px-1 flex items-center justify-center text-center"
                 style={{
                   background: on ? l.ink : "#0a0a0a",
                   color: on ? "#000" : "rgba(255,255,255,0.35)",
                 }}
               >
-                <span className={`${mono.className} text-[10px] sm:text-[11px] font-bold`}>
+                <span className={`${mono.className} block text-[9px] sm:text-[11px] font-bold leading-tight tracking-tight`}>
                   {l.label}
                 </span>
               </div>
@@ -346,10 +346,10 @@ export function VerdictReportView() {
         <div className="mt-9">
           <a
             href="#bar"
-            className="group inline-flex items-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] px-6 py-3.5 hover:bg-white transition-colors"
+            className="group inline-flex items-center justify-center gap-2 max-w-full bg-[#6ee7ff] text-black font-extrabold text-[13.5px] sm:text-[15px] px-5 sm:px-6 py-3.5 hover:bg-white transition-colors text-center leading-snug"
           >
             see what&apos;s between this and release
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
           </a>
         </div>
       </section>
@@ -373,14 +373,14 @@ export function VerdictReportView() {
               return (
                 <div key={a.label}>
                   <div className="flex items-center justify-between gap-3 mb-2">
-                    <span className="text-[15px] text-white/90 font-bold">{a.label}</span>
-                    <span className={`${mono.className} flex items-center gap-1.5 text-[12px]`} style={{ color: s.ink }}>
-                      <s.Icon className="h-3.5 w-3.5" />
+                    <span className="text-[14px] sm:text-[15px] text-white/90 font-bold min-w-0">{a.label}</span>
+                    <span className={`${mono.className} flex items-center gap-1.5 text-[12px] shrink-0`} style={{ color: s.ink }}>
+                      <s.Icon className="h-3.5 w-3.5 shrink-0" />
                       {a.measured}
                     </span>
                   </div>
                   {/* the bar: release band + your marker */}
-                  <div className="relative h-7 bg-white/[0.05] border border-white/10">
+                  <div className="relative h-7 overflow-hidden bg-white/[0.05] border border-white/10">
                     {/* release envelope */}
                     <div
                       className="absolute inset-y-0"
@@ -394,7 +394,7 @@ export function VerdictReportView() {
                     />
                     {/* "released tracks" label inside the band */}
                     <span
-                      className={`${mono.className} absolute inset-y-0 flex items-center text-[9px] tracking-wide text-white/35 pl-2`}
+                      className={`${mono.className} absolute inset-y-0 hidden sm:flex items-center text-[9px] tracking-wide text-white/35 pl-2 whitespace-nowrap pointer-events-none`}
                       style={{ left: `${a.zone[0]}%` }}
                     >
                       released tracks
