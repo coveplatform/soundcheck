@@ -14,12 +14,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "hip-hop",
     name: "Hip-Hop",
-    metaTitle: "Get Honest Feedback on Your Hip-Hop Track | MixReflect",
+    metaTitle: "Hip-Hop Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your hip-hop track from real listeners. Find out what's landing, what to fix, and whether it's ready to release.",
+      "Get a release-ready verdict on your hip-hop track from real listeners. Find out what's landing, what to fix, and whether it's ready to release.",
     h1: "Hip-hop feedback from producers who actually make hip-hop",
     intro:
-      "MixReflect is a structured music feedback platform where independent hip-hop artists upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners — producers and MCs who actively make hip-hop. You find out what's landing, what's not, and what to fix before you release.",
+      "MixReflect is a structured music feedback platform where independent hip-hop artists upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners — producers and MCs who actively make hip-hop. You find out what's landing, what's not, and what to fix before you release.",
     reviewerBlurb:
       "For hip-hop, your track gets heard by producers and artists who understand 808 weight, pocket, bar structure, and mix balance from the inside — not from a passive listening perspective.",
     catchItems: [
@@ -51,12 +51,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "trap",
     name: "Trap",
-    metaTitle: "Get Honest Feedback on Your Trap Track | MixReflect",
+    metaTitle: "Trap Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your trap beats and tracks from real listeners. Find out if the 808s hit, the hi-hats work, and what to fix before you drop.",
+      "Get a release-ready verdict on your trap beats and tracks from real listeners. Find out if the 808s hit, the hi-hats work, and what to fix before you drop.",
     h1: "Trap beat feedback from producers who know the genre",
     intro:
-      "MixReflect is a structured music feedback platform where trap artists and beatmakers upload unreleased tracks and get honest, detailed reviews from real listeners. You find out whether the 808s are hitting, the vocal mix is right, and what to fix before you release.",
+      "MixReflect tells trap artists and beatmakers whether an unreleased track is ready to release — an instant, genre-aware verdict — then backs it with honest, detailed reviews from a room of real listeners. You find out whether the 808s are hitting, the vocal mix is right, and what to fix before you release.",
     reviewerBlurb:
       "Trap listeners on MixReflect understand 808 weight and sub balance, hi-hat programming, trap vocal production, and what separates a trap beat that locks in from one that doesn't.",
     catchItems: [
@@ -88,12 +88,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "boom-bap",
     name: "Boom Bap",
-    metaTitle: "Get Honest Feedback on Your Boom Bap Track | MixReflect",
+    metaTitle: "Boom Bap Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your boom bap beats from producers who know the genre. Drum punch, sample chops, low end — find out what's working before you release.",
+      "Get a release-ready verdict on your boom bap beats from producers who know the genre. Drum punch, sample chops, low end — find out what's working before you release.",
     h1: "Boom bap feedback from producers who grew up on the genre",
     intro:
-      "MixReflect is a music feedback platform where boom bap beatmakers upload unreleased beats and receive structured, honest reviews from real listeners. Find out whether the drums are punching, the samples are chopped right, and the overall vibe lands before you release.",
+      "MixReflect tells boom bap beatmakers whether an unreleased beat is ready to release — an instant, genre-aware verdict — then backs it with structured, honest reviews from a room of real listeners. Find out whether the drums are punching, the samples are chopped right, and the overall vibe lands before you release.",
     reviewerBlurb:
       "Boom bap listeners understand drum punch, sample texture, loop construction, and the specific aesthetic the genre demands — the difference between a boom bap beat that hits and one that just sounds like the right era.",
     catchItems: [
@@ -121,12 +121,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "drill",
     name: "Drill",
-    metaTitle: "Get Honest Feedback on Your Drill Track | MixReflect",
+    metaTitle: "Drill Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your drill track from real listeners. UK drill, Chicago drill, NY drill — find out what's landing before you release.",
+      "Get a release-ready verdict on your drill track from real listeners. UK drill, Chicago drill, NY drill — find out what's landing before you release.",
     h1: "Drill feedback from producers who know the sound",
     intro:
-      "MixReflect is a structured music feedback platform where drill artists and producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. UK drill, Chicago drill, NY drill — listeners are matched to your specific sound, not just the parent genre.",
+      "MixReflect is a structured music feedback platform where drill artists and producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. UK drill, Chicago drill, NY drill — listeners are matched to your specific sound, not just the parent genre.",
     reviewerBlurb:
       "Drill listeners understand the dark atmosphere, slide bass movement, vocal cadence, and production texture that define the genre — and can tell you whether your track is hitting that standard or falling short of it.",
     catchItems: [
@@ -154,12 +154,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "rnb",
     name: "R&B",
-    metaTitle: "Get Honest Feedback on Your R&B Track | MixReflect",
+    metaTitle: "R&B Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your R&B track from real listeners. Vocals, production, emotional arc — find out what's landing before you release.",
+      "Get a release-ready verdict on your R&B track from real listeners. Vocals, production, emotional arc — find out what's landing before you release.",
     h1: "R&B feedback from artists who understand the genre",
     intro:
-      "MixReflect is a structured music feedback platform where R&B artists upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. R&B is detail work — vocal runs, chord resolution, emotional arc — and feedback from artists who understand the genre is the only kind worth acting on.",
+      "MixReflect is a structured music feedback platform where R&B artists upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. R&B is detail work — vocal runs, chord resolution, emotional arc — and feedback from artists who understand the genre is the only kind worth acting on.",
     reviewerBlurb:
       "R&B listeners on MixReflect understand vocal production, chord progressions, the emotional arc of an R&B track, and what the genre's production standard sounds like in 2026 — across both contemporary and neo-soul directions.",
     catchItems: [
@@ -172,7 +172,7 @@ export const genrePages: GenrePage[] = [
     faq: [
       {
         q: "Where can I get honest feedback on my R&B track?",
-        a: "MixReflect matches R&B tracks with real listeners who react to it, covering first impression, vocal performance, production quality, and what to fix before release. R&B feedback specifically requires listeners who understand vocal production, chord movement, and the genre's emotional expectations — casual listeners can feel when something's off but often can't say why. That AI read plus real listeners gives you feedback that's specific enough to act on.",
+        a: "MixReflect matches R&B tracks with real listeners who react to it, covering first impression, vocal performance, production quality, and what to fix before release. R&B feedback specifically requires listeners who understand vocal production, chord movement, and the genre's emotional expectations — casual listeners can feel when something's off but often can't say why. That instant release verdict plus real listeners gives you feedback that's specific enough to act on.",
       },
       {
         q: "How do I know if my R&B vocals are mixed correctly?",
@@ -187,12 +187,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "electronic",
     name: "Electronic",
-    metaTitle: "Get Honest Feedback on Your Electronic Track | MixReflect",
+    metaTitle: "Electronic Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your electronic music from real listeners. Arrangement, mixdown, sound design — find out what to fix before you release.",
+      "Get a release-ready verdict on your electronic music from real listeners. Arrangement, mixdown, sound design — find out what to fix before you release.",
     h1: "Electronic music feedback from producers who know the craft",
     intro:
-      "MixReflect is a structured music feedback platform where electronic music producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Whether you're making house, techno, ambient, or anything in between, listeners are matched to your specific sound within the electronic umbrella.",
+      "MixReflect is a structured music feedback platform where electronic music producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Whether you're making house, techno, ambient, or anything in between, listeners are matched to your specific sound within the electronic umbrella.",
     reviewerBlurb:
       "Electronic music listeners understand arrangement structure, sound design quality, mixdown clarity, and whether a track achieves what it sets out to do — from the first synth to the final fade.",
     catchItems: [
@@ -220,12 +220,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "house",
     name: "House",
-    metaTitle: "Get Honest Feedback on Your House Track | MixReflect",
+    metaTitle: "House Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your house music from real listeners. Groove, mix, arrangement — find out if your track would actually work on a dance floor.",
+      "Get a release-ready verdict on your house music from real listeners. Groove, mix, arrangement — find out if your track would actually work on a dance floor.",
     h1: "House music feedback from producers who play and make it",
     intro:
-      "MixReflect is a structured music feedback platform where house producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. House is groove, feel, and function — feedback from other house producers is the only feedback that tells you whether it actually works.",
+      "MixReflect is a structured music feedback platform where house producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. House is groove, feel, and function — feedback from other house producers is the only feedback that tells you whether it actually works.",
     reviewerBlurb:
       "House listeners on MixReflect understand groove, kick-bass pocket, chord movement, and what makes a track function on a dance floor versus just sounding like house music.",
     catchItems: [
@@ -253,12 +253,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "deep-house",
     name: "Deep House",
-    metaTitle: "Get Honest Feedback on Your Deep House Track | MixReflect",
+    metaTitle: "Deep House Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your deep house track from real listeners. Atmosphere, groove, warmth — find out if the vibe is landing before you release.",
+      "Get a release-ready verdict on your deep house track from real listeners. Atmosphere, groove, warmth — find out if the vibe is landing before you release.",
     h1: "Deep house feedback from producers who understand the vibe",
     intro:
-      "MixReflect is a structured music feedback platform where deep house producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Deep house is atmosphere, subtlety, and feel — the kind of feedback that matters comes from producers who understand the genre deeply, not just listeners who like the sound.",
+      "MixReflect is a structured music feedback platform where deep house producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Deep house is atmosphere, subtlety, and feel — the kind of feedback that matters comes from producers who understand the genre deeply, not just listeners who like the sound.",
     reviewerBlurb:
       "Deep house listeners understand the warmth, chord complexity, and atmospheric texture the genre demands — and can tell you whether your track genuinely achieves that or just sounds adjacent to it.",
     catchItems: [
@@ -286,12 +286,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "techno",
     name: "Techno",
-    metaTitle: "Get Honest Feedback on Your Techno Track | MixReflect",
+    metaTitle: "Techno Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your techno track from real listeners. Drive, mix, arrangement — find out whether your track holds up before you release.",
+      "Get a release-ready verdict on your techno track from real listeners. Drive, mix, arrangement — find out whether your track holds up before you release.",
     h1: "Techno feedback from producers who make it",
     intro:
-      "MixReflect is a structured music feedback platform where techno producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Techno is function — does it drive, does it hold, does it build? Feedback from other techno producers is the only kind that answers those questions accurately.",
+      "MixReflect is a structured music feedback platform where techno producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Techno is function — does it drive, does it hold, does it build? Feedback from other techno producers is the only kind that answers those questions accurately.",
     reviewerBlurb:
       "Techno listeners understand drive, tension, low-end weight, and what it means for a track to function over a 10-minute play in a club environment — not just sound correct in headphones.",
     catchItems: [
@@ -319,12 +319,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "lo-fi",
     name: "Lo-Fi",
-    metaTitle: "Get Honest Feedback on Your Lo-Fi Track | MixReflect",
+    metaTitle: "Lo-Fi Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your lo-fi track from real listeners. Texture, warmth, vibe — find out if the atmosphere is landing before you release.",
+      "Get a release-ready verdict on your lo-fi track from real listeners. Texture, warmth, vibe — find out if the atmosphere is landing before you release.",
     h1: "Lo-fi feedback from producers who know what the vibe actually is",
     intro:
-      "MixReflect is a structured music feedback platform where lo-fi producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Lo-fi is texture, warmth, and mood — and the difference between lo-fi that works and lo-fi that misses is subtle enough that you need feedback from producers who are genuinely inside the genre.",
+      "MixReflect is a structured music feedback platform where lo-fi producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Lo-fi is texture, warmth, and mood — and the difference between lo-fi that works and lo-fi that misses is subtle enough that you need feedback from producers who are genuinely inside the genre.",
     reviewerBlurb:
       "Lo-fi listeners understand vinyl texture, drum feel, chord atmosphere, and what makes a lo-fi beat feel lived-in versus produced — the specific quality that separates lo-fi that works from lo-fi that just sounds like lo-fi.",
     catchItems: [
@@ -337,7 +337,7 @@ export const genrePages: GenrePage[] = [
     faq: [
       {
         q: "Where can I get feedback on my lo-fi beats?",
-        a: "MixReflect matches lo-fi beats with real listeners who react to it. Lo-fi has a very specific quality that's hard to evaluate from outside the genre — the warmth, the texture, the looseness of the drums. An instant AI read plus real listeners gives you notes specific enough to act on. Lo-fi communities on Reddit and Discord exist but feedback is usually brief reactions rather than structured critique.",
+        a: "MixReflect matches lo-fi beats with real listeners who react to it. Lo-fi has a very specific quality that's hard to evaluate from outside the genre — the warmth, the texture, the looseness of the drums. An instant release verdict plus real listeners gives you notes specific enough to act on. Lo-fi communities on Reddit and Discord exist but feedback is usually brief reactions rather than structured critique.",
       },
       {
         q: "What makes lo-fi music feel authentic?",
@@ -356,12 +356,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "edm",
     name: "EDM",
-    metaTitle: "Get Honest Feedback on Your EDM Track | MixReflect",
+    metaTitle: "EDM Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your EDM track from real listeners. Drop, build, energy — find out what's working before you release.",
+      "Get a release-ready verdict on your EDM track from real listeners. Drop, build, energy — find out what's working before you release.",
     h1: "EDM feedback from producers who know whether the drop actually hits",
     intro:
-      "MixReflect is a structured music feedback platform where EDM producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Drop, build, energy — listeners evaluate your track against the standard of the genre and tell you exactly what's landing and what isn't.",
+      "MixReflect is a structured music feedback platform where EDM producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Drop, build, energy — listeners evaluate your track against the standard of the genre and tell you exactly what's landing and what isn't.",
     reviewerBlurb:
       "EDM listeners understand build structure, drop design, mix width, and what it takes for a track to hold up in a festival context — not just sound good in a studio.",
     catchItems: [
@@ -389,12 +389,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "ambient",
     name: "Ambient",
-    metaTitle: "Get Honest Feedback on Your Ambient Track | MixReflect",
+    metaTitle: "Ambient Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your ambient music from real listeners. Texture, space, emotional arc — find out if it's working before you release.",
+      "Get a release-ready verdict on your ambient music from real listeners. Texture, space, emotional arc — find out if it's working before you release.",
     h1: "Ambient music feedback from producers who understand the form",
     intro:
-      "MixReflect is a structured music feedback platform where ambient producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Ambient lives or dies on texture, space, and emotional arc — and only listeners who understand the genre can tell you whether it's genuinely transporting or just filling space.",
+      "MixReflect is a structured music feedback platform where ambient producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Ambient lives or dies on texture, space, and emotional arc — and only listeners who understand the genre can tell you whether it's genuinely transporting or just filling space.",
     reviewerBlurb:
       "Ambient listeners understand textural depth, dynamic space, emotional arc, and what separates ambient that genuinely transports a listener from ambient that sounds like background noise.",
     catchItems: [
@@ -422,12 +422,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "synthwave",
     name: "Synthwave",
-    metaTitle: "Get Honest Feedback on Your Synthwave Track | MixReflect",
+    metaTitle: "Synthwave Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your synthwave track from real listeners. Aesthetic, production, emotional arc — find out if it's hitting before you release.",
+      "Get a release-ready verdict on your synthwave track from real listeners. Aesthetic, production, emotional arc — find out if it's hitting before you release.",
     h1: "Synthwave feedback from producers who live in the aesthetic",
     intro:
-      "MixReflect is a structured music feedback platform where synthwave producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Synthwave is aesthetic, mood, and production style — feedback from producers who understand the genre tells you whether your track nails it or misses the mark.",
+      "MixReflect is a structured music feedback platform where synthwave producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Synthwave is aesthetic, mood, and production style — feedback from producers who understand the genre tells you whether your track nails it or misses the mark.",
     reviewerBlurb:
       "Synthwave listeners understand the production aesthetic, the cinematic quality the genre demands, and the specific balance between nostalgia and originality that makes a synthwave track work in 2026.",
     catchItems: [
@@ -455,12 +455,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "pop",
     name: "Pop",
-    metaTitle: "Get Honest Feedback on Your Pop Track | MixReflect",
+    metaTitle: "Pop Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your pop song from real listeners. Hook, production, vocal mix — find out if it's ready to release.",
+      "Get a release-ready verdict on your pop song from real listeners. Hook, production, vocal mix — find out if it's ready to release.",
     h1: "Pop music feedback from artists who know what makes a song land",
     intro:
-      "MixReflect is a structured music feedback platform where pop artists upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Pop is hook, feel, and commercial clarity — and the only way to know if your song has those things is to hear from listeners who haven't already heard it 300 times in production.",
+      "MixReflect is a structured music feedback platform where pop artists upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Pop is hook, feel, and commercial clarity — and the only way to know if your song has those things is to hear from listeners who haven't already heard it 300 times in production.",
     reviewerBlurb:
       "Pop listeners understand hook strength, chorus payoff, vocal mix, production clarity, and what the genre's release standard sounds like — across mainstream pop, indie pop, and bedroom pop directions.",
     catchItems: [
@@ -492,12 +492,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "indie-pop",
     name: "Indie Pop",
-    metaTitle: "Get Honest Feedback on Your Indie Pop Track | MixReflect",
+    metaTitle: "Indie Pop Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your indie pop track from real listeners. Hook, personality, production — find out what's working before you release.",
+      "Get a release-ready verdict on your indie pop track from real listeners. Hook, personality, production — find out what's working before you release.",
     h1: "Indie pop feedback from artists who understand the balance",
     intro:
-      "MixReflect is a structured music feedback platform where indie pop artists upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Indie pop balances commercial hooks with artistic personality — and that balance is exactly what makes it hard to self-evaluate after weeks in the studio.",
+      "MixReflect is a structured music feedback platform where indie pop artists upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Indie pop balances commercial hooks with artistic personality — and that balance is exactly what makes it hard to self-evaluate after weeks in the studio.",
     reviewerBlurb:
       "Indie pop listeners understand what makes the genre feel fresh versus generic, how much polish is too much, and whether your track has the personality and hook quality to stand out.",
     catchItems: [
@@ -525,12 +525,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "indie-rock",
     name: "Indie Rock",
-    metaTitle: "Get Honest Feedback on Your Indie Rock Track | MixReflect",
+    metaTitle: "Indie Rock Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your indie rock track from real listeners. Energy, mix, arrangement — find out what's landing before you release.",
+      "Get a release-ready verdict on your indie rock track from real listeners. Energy, mix, arrangement — find out what's landing before you release.",
     h1: "Indie rock feedback from artists who know the sound",
     intro:
-      "MixReflect is a structured music feedback platform where indie rock artists upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Indie rock lives in the energy, the arrangement, and whether the song has something to say — and getting honest feedback on all three is exactly what the platform is built for.",
+      "MixReflect is a structured music feedback platform where indie rock artists upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Indie rock lives in the energy, the arrangement, and whether the song has something to say — and getting honest feedback on all three is exactly what the platform is built for.",
     reviewerBlurb:
       "Indie rock listeners understand guitar mix, band dynamics, song structure, and the specific quality that makes an indie rock track feel like it has something behind it rather than just the right sounds.",
     catchItems: [
@@ -558,12 +558,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "rock",
     name: "Rock",
-    metaTitle: "Get Honest Feedback on Your Rock Track | MixReflect",
+    metaTitle: "Rock Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your rock track from real listeners. Mix, arrangement, energy — find out what's working before you release.",
+      "Get a release-ready verdict on your rock track from real listeners. Mix, arrangement, energy — find out what's working before you release.",
     h1: "Rock music feedback from artists who know the genre",
     intro:
-      "MixReflect is a structured music feedback platform where rock artists upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Whether you're making classic rock, modern rock, or anything in between, get feedback on your mix, your arrangement, and whether the energy lands the way you intend.",
+      "MixReflect is a structured music feedback platform where rock artists upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Whether you're making classic rock, modern rock, or anything in between, get feedback on your mix, your arrangement, and whether the energy lands the way you intend.",
     reviewerBlurb:
       "Rock listeners on MixReflect understand guitar tone, rhythm section balance, vocal presence, and what it takes for a rock track to have the energy and impact the genre demands.",
     catchItems: [
@@ -591,12 +591,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "alternative",
     name: "Alternative",
-    metaTitle: "Get Honest Feedback on Your Alternative Track | MixReflect",
+    metaTitle: "Alternative Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your alternative track from real listeners. Find out if your sound is landing and what to fix before you release.",
+      "Get a release-ready verdict on your alternative track from real listeners. Find out if your sound is landing and what to fix before you release.",
     h1: "Alternative music feedback from artists who get it",
     intro:
-      "MixReflect is a structured music feedback platform where alternative artists upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Alternative covers a lot of ground — what matters is whether your specific sound has the identity and impact you're going for, and that's exactly what structured peer feedback tells you.",
+      "MixReflect is a structured music feedback platform where alternative artists upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Alternative covers a lot of ground — what matters is whether your specific sound has the identity and impact you're going for, and that's exactly what structured peer feedback tells you.",
     reviewerBlurb:
       "Alternative listeners understand sonic identity, emotional intensity, and what separates alternative music that stands out from music that sits safely in the middle of its genre.",
     catchItems: [
@@ -620,12 +620,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "singer-songwriter",
     name: "Singer-Songwriter",
-    metaTitle: "Get Honest Feedback on Your Singer-Songwriter Track | MixReflect",
+    metaTitle: "Singer-Songwriter Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your singer-songwriter music from real listeners. Lyrics, melody, arrangement — find out if it's connecting before you release.",
+      "Get a release-ready verdict on your singer-songwriter music from real listeners. Lyrics, melody, arrangement — find out if it's connecting before you release.",
     h1: "Singer-songwriter feedback from artists who understand the format",
     intro:
-      "MixReflect is a structured music feedback platform where singer-songwriters upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Singer-songwriter tracks live on lyrics, melody, and emotional truth — and after weeks in the studio, you've completely lost the ability to hear whether yours is achieving that.",
+      "MixReflect is a structured music feedback platform where singer-songwriters upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Singer-songwriter tracks live on lyrics, melody, and emotional truth — and after weeks in the studio, you've completely lost the ability to hear whether yours is achieving that.",
     reviewerBlurb:
       "Singer-songwriter listeners understand vocal performance, lyrical arc, arrangement balance, and whether the emotional core of a song is landing — things that casual listeners feel but often can't articulate.",
     catchItems: [
@@ -657,12 +657,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "folk",
     name: "Folk",
-    metaTitle: "Get Honest Feedback on Your Folk Track | MixReflect",
+    metaTitle: "Folk Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your folk music from real listeners. Authenticity, arrangement, vocal — find out if it's landing before you release.",
+      "Get a release-ready verdict on your folk music from real listeners. Authenticity, arrangement, vocal — find out if it's landing before you release.",
     h1: "Folk music feedback from artists who understand the tradition",
     intro:
-      "MixReflect is a structured music feedback platform where folk artists upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Folk is about authenticity, story, and feel — and the feedback that matters is from artists who can hear whether yours is genuinely achieving that.",
+      "MixReflect is a structured music feedback platform where folk artists upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Folk is about authenticity, story, and feel — and the feedback that matters is from artists who can hear whether yours is genuinely achieving that.",
     reviewerBlurb:
       "Folk listeners understand authenticity, storytelling, instrumental arrangement, and the specific quality that makes folk music feel lived-in versus performed.",
     catchItems: [
@@ -675,7 +675,7 @@ export const genrePages: GenrePage[] = [
     faq: [
       {
         q: "Where can I get feedback on my folk music?",
-        a: "MixReflect matches folk tracks with real listeners who react to it. Folk feedback specifically requires listeners who understand authenticity and storytelling — the things that make folk work are often the same things that are hard to evaluate from inside the production process. That AI read plus real listeners gives you notes from artists who can tell you whether your track feels genuine.",
+        a: "MixReflect matches folk tracks with real listeners who react to it. Folk feedback specifically requires listeners who understand authenticity and storytelling — the things that make folk work are often the same things that are hard to evaluate from inside the production process. That instant release verdict plus real listeners gives you notes from artists who can tell you whether your track feels genuine.",
       },
       {
         q: "How do I know if my folk track sounds authentic?",
@@ -686,12 +686,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "soul",
     name: "Soul",
-    metaTitle: "Get Honest Feedback on Your Soul Track | MixReflect",
+    metaTitle: "Soul Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your soul music from real listeners. Vocal, groove, emotion — find out if it's hitting before you release.",
+      "Get a release-ready verdict on your soul music from real listeners. Vocal, groove, emotion — find out if it's hitting before you release.",
     h1: "Soul music feedback from artists who understand the feeling",
     intro:
-      "MixReflect is a structured music feedback platform where soul artists upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Soul is feeling, groove, and vocal truth — and after making a track, you need feedback from artists who know the difference between a soul track that moves people and one that just sounds like soul.",
+      "MixReflect is a structured music feedback platform where soul artists upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Soul is feeling, groove, and vocal truth — and after making a track, you need feedback from artists who know the difference between a soul track that moves people and one that just sounds like soul.",
     reviewerBlurb:
       "Soul listeners understand vocal performance, rhythmic pocket, arrangement space, and what the genre demands in terms of emotional commitment — both from the performer and the production.",
     catchItems: [
@@ -715,12 +715,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "metal",
     name: "Metal",
-    metaTitle: "Get Honest Feedback on Your Metal Track | MixReflect",
+    metaTitle: "Metal Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your metal track from real listeners. Mix, performance, arrangement — find out what's working before you release.",
+      "Get a release-ready verdict on your metal track from real listeners. Mix, performance, arrangement — find out what's working before you release.",
     h1: "Metal feedback from artists who know the standard",
     intro:
-      "MixReflect is a structured music feedback platform where metal artists upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Metal is about impact, clarity, and intention — and the only way to know if your mix, performance, and arrangement actually deliver is through feedback from listeners who understand the genre.",
+      "MixReflect is a structured music feedback platform where metal artists upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Metal is about impact, clarity, and intention — and the only way to know if your mix, performance, and arrangement actually deliver is through feedback from listeners who understand the genre.",
     reviewerBlurb:
       "Metal listeners understand guitar tone, low-end clarity, vocal presence in a dense mix, and what the genre's production standard actually sounds like — across subgenres from thrash to doom.",
     catchItems: [
@@ -748,12 +748,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "drum-and-bass",
     name: "Drum & Bass",
-    metaTitle: "Get Honest Feedback on Your Drum & Bass Track | MixReflect",
+    metaTitle: "Drum & Bass Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your drum and bass track from real listeners. Energy, mix, arrangement — find out if it's hitting before you release.",
+      "Get a release-ready verdict on your drum and bass track from real listeners. Energy, mix, arrangement — find out if it's hitting before you release.",
     h1: "Drum and bass feedback from producers who know the genre",
     intro:
-      "MixReflect is a structured music feedback platform where DnB producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. DnB is energy, movement, and mix clarity at high speeds — and only feedback from producers who understand the genre tells you whether yours is genuinely hitting.",
+      "MixReflect is a structured music feedback platform where DnB producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. DnB is energy, movement, and mix clarity at high speeds — and only feedback from producers who understand the genre tells you whether yours is genuinely hitting.",
     reviewerBlurb:
       "DnB listeners understand break programming, bass design, low-end clarity, and what makes a drum and bass track function at the energy level the genre demands.",
     catchItems: [
@@ -777,12 +777,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "dubstep",
     name: "Dubstep",
-    metaTitle: "Get Honest Feedback on Your Dubstep Track | MixReflect",
+    metaTitle: "Dubstep Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your dubstep track from real listeners. Bass design, drop impact, mix — find out if it's working before you release.",
+      "Get a release-ready verdict on your dubstep track from real listeners. Bass design, drop impact, mix — find out if it's working before you release.",
     h1: "Dubstep feedback from producers who know whether the drop hits",
     intro:
-      "MixReflect is a structured music feedback platform where dubstep producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Dubstep is bass design, energy, and drop impact — and the feedback that matters tells you specifically whether yours is achieving all three.",
+      "MixReflect is a structured music feedback platform where dubstep producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Dubstep is bass design, energy, and drop impact — and the feedback that matters tells you specifically whether yours is achieving all three.",
     reviewerBlurb:
       "Dubstep listeners understand bass design, build tension, drop impact, and what makes a dubstep track hit in the way the genre demands — not just sound like dubstep.",
     catchItems: [
@@ -806,12 +806,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "future-bass",
     name: "Future Bass",
-    metaTitle: "Get Honest Feedback on Your Future Bass Track | MixReflect",
+    metaTitle: "Future Bass Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your future bass track from real listeners. Emotion, sound design, drop energy — find out if it's landing before you release.",
+      "Get a release-ready verdict on your future bass track from real listeners. Emotion, sound design, drop energy — find out if it's landing before you release.",
     h1: "Future bass feedback from producers who know the feel",
     intro:
-      "MixReflect is a structured music feedback platform where future bass producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Future bass is emotion, sound design, and drop energy — and feedback from producers who understand those elements is what tells you whether yours is working.",
+      "MixReflect is a structured music feedback platform where future bass producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Future bass is emotion, sound design, and drop energy — and feedback from producers who understand those elements is what tells you whether yours is working.",
     reviewerBlurb:
       "Future bass listeners understand chordal emotion, vocal chop production, drop design, and the specific feel the genre demands — the euphoric, emotionally saturated quality that defines it.",
     catchItems: [
@@ -835,12 +835,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "progressive-house",
     name: "Progressive House",
-    metaTitle: "Get Honest Feedback on Your Progressive House Track | MixReflect",
+    metaTitle: "Progressive House Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your progressive house track from real listeners. Build, arrangement, mixdown — find out if it's working before you release.",
+      "Get a release-ready verdict on your progressive house track from real listeners. Build, arrangement, mixdown — find out if it's working before you release.",
     h1: "Progressive house feedback from producers who build journeys",
     intro:
-      "MixReflect is a structured music feedback platform where progressive house producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Progressive house is journey, tension, and release — and the feedback that matters evaluates your arrangement and build the way a listener inside a set would experience it.",
+      "MixReflect is a structured music feedback platform where progressive house producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Progressive house is journey, tension, and release — and the feedback that matters evaluates your arrangement and build the way a listener inside a set would experience it.",
     reviewerBlurb:
       "Progressive house listeners understand long-form arrangement, tension building, melodic development, and what it takes for a 7-10 minute track to justify its runtime.",
     catchItems: [
@@ -864,12 +864,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "trance",
     name: "Trance",
-    metaTitle: "Get Honest Feedback on Your Trance Track | MixReflect",
+    metaTitle: "Trance Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your trance track from real listeners. Melody, build, emotional impact — find out if it's working before you release.",
+      "Get a release-ready verdict on your trance track from real listeners. Melody, build, emotional impact — find out if it's working before you release.",
     h1: "Trance feedback from producers who understand the journey",
     intro:
-      "MixReflect is a structured music feedback platform where trance producers upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Trance lives on tension, release, and melodic impact — and getting feedback from producers who understand the genre tells you whether your track achieves the emotional journey it needs to.",
+      "MixReflect is a structured music feedback platform where trance producers upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Trance lives on tension, release, and melodic impact — and getting feedback from producers who understand the genre tells you whether your track achieves the emotional journey it needs to.",
     reviewerBlurb:
       "Trance listeners understand lead melody quality, emotional build structure, breakdown impact, and what the genre demands in terms of the feeling it creates — the specific euphoria or transcendence that defines the best trance.",
     catchItems: [
@@ -893,12 +893,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "jazz",
     name: "Jazz",
-    metaTitle: "Get Honest Feedback on Your Jazz Track | MixReflect",
+    metaTitle: "Jazz Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get structured feedback on your jazz music from real listeners. Feel, interaction, mix — find out if it's landing before you release.",
+      "Get a release-ready verdict on your jazz music from real listeners. Feel, interaction, mix — find out if it's landing before you release.",
     h1: "Jazz feedback from musicians who understand the conversation",
     intro:
-      "MixReflect is a structured music feedback platform where jazz musicians upload unreleased recordings and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Jazz is interaction, feel, and musical conversation — and the feedback that tells you whether yours is working comes from musicians who live in the genre.",
+      "MixReflect is a structured music feedback platform where jazz musicians upload unreleased recordings and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Jazz is interaction, feel, and musical conversation — and the feedback that tells you whether yours is working comes from musicians who live in the genre.",
     reviewerBlurb:
       "Jazz listeners understand rhythmic feel, ensemble interaction, solo development, mix balance, and what separates jazz that genuinely swings from jazz that's technically proficient but missing the conversation.",
     catchItems: [
@@ -922,12 +922,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "funk",
     name: "Funk",
-    metaTitle: "Get Honest Feedback on Your Funk Track | MixReflect",
+    metaTitle: "Funk Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your funk track from real listeners. Groove, pocket, arrangement — find out if it's moving people before you release.",
+      "Get a release-ready verdict on your funk track from real listeners. Groove, pocket, arrangement — find out if it's moving people before you release.",
     h1: "Funk feedback from musicians who know whether the groove locks",
     intro:
-      "MixReflect is a structured music feedback platform where funk musicians upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Funk is groove, pocket, and feel — and the only feedback worth acting on is from musicians who can tell you whether it makes them want to move.",
+      "MixReflect is a structured music feedback platform where funk musicians upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Funk is groove, pocket, and feel — and the only feedback worth acting on is from musicians who can tell you whether it makes them want to move.",
     reviewerBlurb:
       "Funk listeners understand rhythmic pocket, bass and drum interaction, syncopation, and the quality that makes funk actually make people move — as opposed to just sounding like funk.",
     catchItems: [
@@ -951,12 +951,12 @@ export const genrePages: GenrePage[] = [
   {
     slug: "punk",
     name: "Punk",
-    metaTitle: "Get Honest Feedback on Your Punk Track | MixReflect",
+    metaTitle: "Punk Feedback: Is Your Track Ready to Release? | MixReflect",
     metaDescription:
-      "Get honest feedback on your punk track from real listeners. Energy, rawness, impact — find out if it's hitting before you release.",
+      "Get a release-ready verdict on your punk track from real listeners. Energy, rawness, impact — find out if it's hitting before you release.",
     h1: "Punk feedback from artists who know whether the energy is real",
     intro:
-      "MixReflect is a structured music feedback platform where punk artists upload unreleased tracks and get an instant, genre-aware AI read plus honest reactions from a room of real listeners. Punk is energy, attitude, and raw impact — and the feedback worth having comes from artists who know whether yours is genuine or going through the motions.",
+      "MixReflect is a structured music feedback platform where punk artists upload unreleased tracks and get an instant, genre-aware verdict on whether it's ready to release — then honest reactions from a room of real listeners. Punk is energy, attitude, and raw impact — and the feedback worth having comes from artists who know whether yours is genuine or going through the motions.",
     reviewerBlurb:
       "Punk listeners understand raw energy, rhythm section tightness, vocal urgency, and the specific quality that makes punk feel like it has something to say rather than just being loud.",
     catchItems: [

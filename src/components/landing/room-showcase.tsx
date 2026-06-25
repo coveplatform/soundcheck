@@ -65,14 +65,14 @@ export function RoomShowcase() {
         {/* header */}
         <div className="flex flex-wrap items-end justify-between gap-5 mb-12">
           <div className="max-w-xl">
-            <p className={`${mono.className} text-[13px] text-white/55 mb-3`}>[ what actually happens ]</p>
+            <p className={`${mono.className} text-[13px] text-white/55 mb-3`}>[ the human layer ]</p>
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-[-0.02em] leading-[1.0]">
-              played for a room of<br />
+              the verdict, backed by<br />
               <span style={{ color: ACCENT }}>real listeners</span>.
             </h2>
             <p className="text-white/55 text-base sm:text-lg mt-5 normal-case leading-relaxed">
-              An instant AI read lands first. Then your track is handed to 5 real people who actually
-              listen and react — you watch their takes come in.
+              The measured verdict lands instantly. Then the same track goes to 5 real people who
+              actually listen and react — so the call has human ears behind it, not just the numbers.
             </p>
           </div>
           <Link
@@ -208,7 +208,7 @@ export function RoomShowcase() {
 
             {/* fixes */}
             <div className="border border-white/12 bg-[#0e0e0e] p-6">
-              <p className={`${mono.className} text-[12px] text-white/55 mb-4`}>do these 3 and the score moves ↑</p>
+              <p className={`${mono.className} text-[12px] text-white/55 mb-4`}>close these 3 and the verdict moves ↑</p>
               <div className="space-y-2.5">
                 {FIXES.map((f, i) => (
                   <div key={f} className="flex items-start gap-3">

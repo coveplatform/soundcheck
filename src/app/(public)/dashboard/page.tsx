@@ -12,6 +12,14 @@ import { prisma } from "@/lib/prisma";
 import { Logo } from "@/components/ui/logo";
 import { SubscribeConversionPing } from "@/components/score/subscribe-conversion-ping";
 import { ArrowRight, Lock, Plus } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Your Tracks — Verdicts & Reports",
+  description:
+    "Your MixReflect dashboard: every track's release verdict, the report behind it, and the room of listeners weighing in. Submit a new track or re-check after edits.",
+  robots: { index: false, follow: false },
+};
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],

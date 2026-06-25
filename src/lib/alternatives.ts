@@ -28,7 +28,7 @@ export type AlternativePage = {
 };
 
 const FREE_MODEL =
-  "Free to submit — you get an instant AI score and a teaser of the full report. Unlock a track's complete breakdown and every listener reaction for $6.95, or go unlimited for $19.95/month.";
+  "Free to submit — you get an instant release verdict and a teaser of the full report. Unlock a track's complete breakdown and every listener reaction for $6.95, or go unlimited for $19.95/month.";
 
 export const alternativePages: AlternativePage[] = [
   {
@@ -52,12 +52,12 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "What you get back",
-        mixreflect: "An AI score out of 100, a verdict and a breakdown — plus reactions from a room of real listeners",
+        mixreflect: "A release verdict — is it ready? — backed by a score out of 100 and a breakdown, plus reactions from a room of real listeners",
         competitor: "A mastered audio file and distribution to streaming platforms",
       },
       {
         feature: "Who evaluates the track",
-        mixreflect: "An instant AI read plus a room of real listeners",
+        mixreflect: "An instant release verdict plus a room of real listeners",
         competitor: "An AI mastering algorithm — no human feedback on the music itself",
       },
       {
@@ -101,7 +101,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         q: "Is MixReflect cheaper than LANDR?",
-        a: `${FREE_MODEL} LANDR's pricing depends on the mastering tier and distribution plan — costs vary by subscription level and release volume. MixReflect's core read doesn't require a subscription — you submit and get an instant AI score for free.`,
+        a: `${FREE_MODEL} LANDR's pricing depends on the mastering tier and distribution plan — costs vary by subscription level and release volume. MixReflect's core read doesn't require a subscription — you submit and get an instant release verdict for free.`,
       },
     ],
   },
@@ -121,7 +121,7 @@ export const alternativePages: AlternativePage[] = [
     rows: [
       {
         feature: "Primary purpose",
-        mixreflect: "An AI score plus real-listener feedback — find what's wrong before spending money",
+        mixreflect: "A release verdict plus real-listener feedback — find what's wrong before spending money",
         competitor: "Hire professional engineers, producers, and musicians",
       },
       {
@@ -131,7 +131,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Who responds",
-        mixreflect: "An instant AI read plus honest reactions from real listeners",
+        mixreflect: "An instant release verdict plus honest reactions from real listeners",
         competitor: "Hired professionals executing a specific brief",
       },
       {
@@ -171,7 +171,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         q: "Is MixReflect cheaper than SoundBetter?",
-        a: `MixReflect's core read is free — you submit a track and get an instant AI score. ${FREE_MODEL} SoundBetter charges per project: prices vary by professional and scope, from budget options to high-end engineers at several hundred dollars per mix. They serve different functions: MixReflect for finding what to fix, SoundBetter for hiring someone to fix it.`,
+        a: `MixReflect's core read is free — you submit a track and get an instant release verdict. ${FREE_MODEL} SoundBetter charges per project: prices vary by professional and scope, from budget options to high-end engineers at several hundred dollars per mix. They serve different functions: MixReflect for finding what to fix, SoundBetter for hiring someone to fix it.`,
       },
       {
         q: "How do I know if my track is ready to hire a professional mix engineer?",
@@ -195,7 +195,7 @@ export const alternativePages: AlternativePage[] = [
     rows: [
       {
         feature: "Primary purpose",
-        mixreflect: "Improve the track before release — AI score plus real listeners",
+        mixreflect: "Improve the track before release — release verdict plus real listeners",
         competitor: "Pitch a finished track to blogs, playlists, and press",
       },
       {
@@ -240,7 +240,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         q: "Is MixReflect cheaper than Musosoup?",
-        a: `${FREE_MODEL} Musosoup charges credits per submission — costs vary by curator type and how many you target. MixReflect is free to submit: you get an instant AI score, and only pay if you unlock the full report.`,
+        a: `${FREE_MODEL} Musosoup charges credits per submission — costs vary by curator type and how many you target. MixReflect is free to submit: you get an instant release verdict, and only pay if you unlock the full report.`,
       },
     ],
   },
@@ -260,7 +260,7 @@ export const alternativePages: AlternativePage[] = [
     rows: [
       {
         feature: "Primary purpose",
-        mixreflect: "An instant AI score plus real-listener reactions, pre-release",
+        mixreflect: "An instant release verdict plus real-listener reactions, pre-release",
         competitor: "General music promotion — artist pages, fan tools, opportunities marketplace",
       },
       {
@@ -270,7 +270,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Feedback quality",
-        mixreflect: "Instant AI score plus independent listener reactions — patterns emerge across the room",
+        mixreflect: "Instant release verdict plus independent listener reactions — patterns emerge across the room",
         competitor: "Fan reactions and general community engagement; not structured critique",
       },
       {
@@ -340,7 +340,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Who responds",
-        mixreflect: "An instant AI read plus a room of real listeners",
+        mixreflect: "An instant release verdict plus a room of real listeners",
         competitor: "Curators evaluating fit for their audience or playlist",
       },
       {
@@ -376,7 +376,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         q: "Is MixReflect cheaper than SubmitHub?",
-        a: `MixReflect is free to submit — you get an instant AI score with no per-submission fee. ${FREE_MODEL} SubmitHub charges credits per submission, and costs add up quickly with regular use, especially for premium curators.`,
+        a: `MixReflect is free to submit — you get an instant release verdict with no per-submission fee. ${FREE_MODEL} SubmitHub charges credits per submission, and costs add up quickly with regular use, especially for premium curators.`,
       },
       {
         q: "Should I use MixReflect or SubmitHub?",
@@ -454,7 +454,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         q: "Is MixReflect cheaper than Groover?",
-        a: `MixReflect is free to submit — you get an instant AI score with no per-track fee. ${FREE_MODEL} Groover charges per curator you reach, so the cost scales with how many contacts you want and how often you submit.`,
+        a: `MixReflect is free to submit — you get an instant release verdict with no per-track fee. ${FREE_MODEL} Groover charges per curator you reach, so the cost scales with how many contacts you want and how often you submit.`,
       },
     ],
   },
@@ -484,7 +484,7 @@ export const alternativePages: AlternativePage[] = [
       },
       {
         feature: "Who responds",
-        mixreflect: "An instant AI read plus a room of real listeners",
+        mixreflect: "An instant release verdict plus a room of real listeners",
         competitor: "Playlist curators and TikTok creators evaluating for placement",
       },
       {

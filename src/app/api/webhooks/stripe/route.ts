@@ -15,55 +15,6 @@ import type Stripe from "stripe";
 export const maxDuration = 300;
 
 
-async function handleReleaseDecisionCheckout(session: Stripe.Checkout.Session) {
-  try {
-    const metadata = session.metadata!;
-    const trackId = metadata.trackId;
-    const userId = metadata.userId;
-    const reviewCount = parseInt(metadata.reviewCount);
-
-    if (!trackId || !userId) {
-      console.error("Missing trackId or userId in Release Decision metadata");
-      return;
-    }
-
-    // Update track to Release Decision package
-    await prisma.track.update({
-      where: { id: trackId },
-      data: {
-        packageType: "RELEASE_DECISION",
-        reviewsRequested: reviewCount,
-        status: "QUEUED",
-        paidAt: new Date(),
-      },
-    });
-
-    // Assign expert reviewers
-    const { assignExpertReviewersToTrack } = await import("@/lib/queue");
-    await assignExpertReviewersToTrack(trackId);
-
-    // Send confirmation email
-    const track = await prisma.track.findUnique({
-      where: { id: trackId },
-      include: {
-        ArtistProfile: {
-          include: { User: true },
-        },
-      },
-    });
-
-    if (track) {
-      await sendTrackQueuedEmail(
-        track.ArtistProfile.User.email,
-        track.title
-      );
-    }
-  } catch (error) {
-    console.error("Error handling Release Decision checkout:", error);
-  }
-}
-
-
 export async function POST(request: Request) {
   const body = await request.text();
   const headersList = await headers();
@@ -256,11 +207,6 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
   if (session.metadata?.type === "score_subscription") {
     await handleScoreSubscriptionCheckout(session);
-    return;
-  }
-
-  if (session.metadata?.type === "release_decision") {
-    await handleReleaseDecisionCheckout(session);
     return;
   }
 

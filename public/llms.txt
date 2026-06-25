@@ -1,45 +1,45 @@
 # MixReflect
 
-> Honest music feedback for your track: a room of five real, paid listeners react to your song, backed by an instant AI score out of 100. Paste a link, get heard. Free to start.
+> Know if your track is ready to release. MixReflect gives you an instant, measured verdict — not ready, needs work, almost there, or release ready — then puts your track in front of a room of real listeners. Paste a link, get the verdict. Free to start.
 
-MixReflect gets your track genuinely heard. You paste a link to your song and a room of five real, paid listeners hears it end to end and reacts honestly — the kind of unbiased, human feedback artists actually want before they release. Alongside the human room, an instant AI read gives you a score out of 100, a verdict, and a breakdown so you have a fast, objective baseline while the real reactions land.
+MixReflect tells you whether your track is ready to release. You paste a link to your song and get an instant verdict — measured against the bar that released tracks clear — that names exactly what stands between this track and release. The /100 score is the evidence behind the verdict, not the headline. Then your track goes in front of a room of real, genre-matched listeners who react honestly, so the call isn't just a machine's.
 
-The product is built around two things, in this order: real human listeners first, AI score second. The AI is there to make feedback instant and measurable; the room of real people is the heart of it.
+The product is built around two co-equal pillars: the verdict first (instant, measured, ships every time), and the room second (real listeners who back it up). The verdict tells you where you stand; the room tells you how real people hear it.
 
 ## How It Works
 
 1. Paste a link to your track (or upload it) — no account needed to start
-2. Get an instant AI read: a score out of 100, a verdict, a five-dimension breakdown, and three concrete fixes
-3. Unlock the full report to send your track to the room — five real, paid listeners hear it end to end
-4. Watch each honest reaction land on your report: real people, not bots and not playlist curators
-5. Use the combined human reactions + AI read to decide if the track is ready to release
+2. Get an instant verdict on whether it's ready to release, with the blockers between you and the release bar and three concrete fixes
+3. See the evidence: a score out of 100 and a five-dimension breakdown behind the verdict
+4. Unlock the full report to send your track to the room — real, genre-matched listeners hear it end to end and react honestly
+5. Use the verdict plus the room's reactions to decide if the track is ready to release
 
 ## What Makes It Different
 
-- **Real, paid human listeners** — five people actually hear your track end to end and react. Not AI pretending to be people, not bots, not playlist curators looking to upsell placement.
-- **Human feedback first, AI second** — the AI score is an instant baseline; the real room is the point.
-- **Instant AI score out of 100** across five dimensions: hook, production, retention, emotional impact, and commercial pull.
-- **Three concrete fixes** with every read — specific, actionable, not vague.
-- **A measured waveform** — the AI read is grounded in your track's real frequency-split analysis, not guesswork.
-- **No account needed to start** — paste a link and get your score.
+- **A release verdict, not just a number** — an instant, measured call (not ready / needs work / almost there / release ready) on whether the track is ready, with the specific blockers in the way.
+- **Measured against released tracks** — the verdict is grounded in the bar that tracks which actually got released clear, not vibes. (The reference corpus is in progress and illustrative numbers are flagged honestly.)
+- **A room of real listeners** — genre-matched people actually hear your track end to end and react. Not AI pretending to be people, not bots, not playlist curators looking to upsell placement. The verdict ships instantly; the room follows.
+- **The score is the evidence** — a /100 score across five dimensions (hook, production, retention, emotional impact, commercial pull) backs the verdict instead of being the point.
+- **Three concrete fixes** with every report — specific, actionable, not vague.
+- **No account needed to start** — paste a link and get your verdict.
 
 ## Pricing
 
 - **First report — free (forever)**: your first track's complete report is free — the score out of 100, the full written read, all three fixes, and the measured waveform. No credit card required.
-- **Unlock — $6.95 (one-time)**: opens a single track's full report — the complete breakdown plus every reaction from the room of five real listeners. Yours forever.
+- **Unlock — $6.95 (one-time)**: opens a single track's full report — the complete release-readiness breakdown plus every reaction from the room of real listeners. Yours forever.
 - **Unlimited — $19.95/month**: every track you submit is auto-unlocked, with unlimited full reports and the real-listener room each time. Cancel anytime.
 
 There are no other paid tiers.
 
 ## Who It Is For
 
-Music producers, beatmakers, singers, songwriters, and independent artists who want honest, structured feedback from real people before they release — plus a fast, objective AI score to back it up. Genre-agnostic: hip-hop, electronic, pop, indie, rock, R&B, and many more are all active.
+Music producers, beatmakers, singers, songwriters, and independent artists who need to know whether a track is ready to release — an instant, measured verdict plus honest reactions from a room of real listeners to back it up. Genre-agnostic: hip-hop, electronic, pop, indie, rock, R&B, and many more are all active.
 
 ## What It Is Not
 
 - Not a playlist pitching service (unlike SubmitHub, Groover, or Playlist Push) — the listeners react honestly, they do not sell placement.
-- Not AI-only feedback — real humans are part of every unlocked report.
-- Not a peer-to-peer credit-swap — you do not have to review other people's tracks to get feedback on yours.
+- Not AI-only feedback — real listeners back every unlocked verdict.
+- Not a peer-to-peer credit-swap — you do not have to review other people's tracks to get the verdict on yours.
 
 ## Key Pages
 
@@ -54,7 +54,16 @@ Music producers, beatmakers, singers, songwriters, and independent artists who w
 
 ## Blog posts (The Drop)
 
+- https://www.mixreflect.com/blog/soundcloud-alternative
+- https://www.mixreflect.com/blog/splice-alternative
+- https://www.mixreflect.com/blog/distrokid-alternative
+- https://www.mixreflect.com/blog/how-to-copyright-your-music
+- https://www.mixreflect.com/blog/how-to-build-a-fanbase
 - https://www.mixreflect.com/blog/how-to-master-music-at-home
+- https://www.mixreflect.com/blog/is-your-mix-good
+- https://www.mixreflect.com/blog/how-to-get-music-reviews-online
+- https://www.mixreflect.com/blog/how-to-promote-your-music-on-spotify
+- https://www.mixreflect.com/blog/music-release-checklist
 - https://www.mixreflect.com/blog/how-to-get-on-discover-weekly
 - https://www.mixreflect.com/blog/how-to-mix-music-at-home
 - https://www.mixreflect.com/blog/how-to-release-music-independently

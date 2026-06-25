@@ -25,7 +25,7 @@ export async function generateMetadata({
   const post = getPost(slug);
   if (!post) return {};
   return {
-    title: `${post.title} — The Drop`,
+    title: `${post.title} — The Drop | MixReflect`,
     description: post.excerpt,
     alternates: { canonical: `${SITE_URL}/blog/${post.slug}` },
     openGraph: {
@@ -33,15 +33,16 @@ export async function generateMetadata({
       description: post.excerpt,
       type: "article",
       publishedTime: post.date,
+      // falls back to the generated root opengraph-image when no cover image
       images: post.coverImage
         ? [{ url: post.coverImage, width: 1200, height: 630, alt: post.title }]
-        : [{ url: "/og-image.png", width: 1200, height: 630, alt: "MixReflect" }],
+        : undefined,
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.excerpt,
-      images: post.coverImage ? [post.coverImage] : ["/og-image.png"],
+      images: post.coverImage ? [post.coverImage] : undefined,
     },
   };
 }

@@ -20,8 +20,8 @@ export async function sendCreditsNudgeEmail(params: {
     : "Submit your first track →";
 
   const bodyText = trackTitle
-    ? `You've got <strong style="color: ${COLORS.black};">${credits} credits</strong> sitting unused. Queue up "${trackTitle}" and get real ears on it — each credit gets you one structured review back.`
-    : `You've got <strong style="color: ${COLORS.black};">${credits} credit${credits === 1 ? "" : "s"}</strong> sitting unused. Each credit gets you one structured review — scores, written feedback, and a release verdict.`;
+    ? `You've got <strong style="color: ${COLORS.black};">${credits} credits</strong> sitting unused. Queue up "${trackTitle}" and find out if it's ready to release — a measured verdict, then real ears from the room.`
+    : `You've got <strong style="color: ${COLORS.black};">${credits} credit${credits === 1 ? "" : "s"}</strong> sitting unused. Each one gets you a release verdict on a track — is it ready or not — backed by a score and honest written feedback.`;
 
   const headerImageUrl = `${appUrl}/blog/blog2.jpg`;
 
@@ -38,22 +38,22 @@ export async function sendCreditsNudgeEmail(params: {
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
         <tr>
           <td style="padding: 10px 0; border-bottom: 1px solid ${COLORS.border};">
-            <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ Production score</p>
+            <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ A release verdict — is it ready or not</p>
           </td>
         </tr>
         <tr>
           <td style="padding: 10px 0; border-bottom: 1px solid ${COLORS.border};">
-            <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ Written feedback from a real artist</p>
+            <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ A production score, measured</p>
           </td>
         </tr>
         <tr>
           <td style="padding: 10px 0; border-bottom: 1px solid ${COLORS.border};">
-            <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ Listener intent data (would they share it?)</p>
+            <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ Written feedback from a real listener</p>
           </td>
         </tr>
         <tr>
           <td style="padding: 10px 0;">
-            <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ Release verdict</p>
+            <p style="margin: 0; font-size: 13px; color: ${COLORS.gray};">✓ Honest reactions from the room</p>
           </td>
         </tr>
       </table>

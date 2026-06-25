@@ -80,15 +80,15 @@ export default async function GenreFeedbackPage({
     "@type": "SoftwareApplication",
     name: "MixReflect",
     applicationCategory: "MusicApplication",
-    description: `MixReflect scores your ${page.name.toLowerCase()} track instantly with AI — a rating out of 100, a verdict and a breakdown across hook, production, retention, emotion and commercial pull — plus honest reactions from a room of real listeners.`,
+    description: `MixReflect tells you whether your ${page.name.toLowerCase()} track is ready to release — an instant verdict, backed by a score out of 100 and a breakdown across hook, production, retention, emotion and commercial pull — plus honest reactions from a room of real listeners.`,
     url: SITE_URL,
     offers: {
       "@type": "Offer",
       price: "0",
       priceCurrency: "USD",
       description: FREE_FULL_READ
-        ? "Your first track's complete report is free — score, full written read and all three fixes"
-        : "Free to submit — get your instant AI score and a teaser of the full report",
+        ? "Your first track's complete report is free — the release verdict, full written read and all three fixes"
+        : "Free to submit — get your instant release verdict and a teaser of the full report",
     },
   };
 
@@ -116,8 +116,8 @@ export default async function GenreFeedbackPage({
     {
       icon: <BarChart3 className="h-5 w-5" style={{ color: ACCENT }} />,
       step: "2",
-      title: "get your instant AI read",
-      body: `In seconds you get a score out of 100, a verdict, and a breakdown across hook, production, retention, emotion and commercial pull — tuned to what matters in ${page.name.toLowerCase()}.`,
+      title: "get your release verdict",
+      body: `In seconds you get the verdict — is it ready to release? — backed by a score out of 100 and a breakdown across hook, production, retention, emotion and commercial pull, tuned to what matters in ${page.name.toLowerCase()}.`,
     },
     {
       icon: <Users className="h-5 w-5" style={{ color: ACCENT }} />,
@@ -196,7 +196,7 @@ export default async function GenreFeedbackPage({
             score my track free <ArrowRight className="h-4 w-4" />
           </Link>
           <p className={`${mono.className} mt-4 text-[12px] text-white/40 normal-case`}>
-            Free to submit · Instant AI score + real listeners · No credit card required
+            Free to submit · Instant release verdict + real listeners · No credit card required
           </p>
         </div>
       </section>
@@ -378,7 +378,7 @@ export default async function GenreFeedbackPage({
             ready to find out what&apos;s actually working?
           </h2>
           <p className="text-black/70 mb-9 max-w-xl leading-relaxed normal-case">
-            Paste your {page.name.toLowerCase()} track and get an instant AI score plus honest reactions from a room of real listeners. Free to submit — no credit card required.
+            Paste your {page.name.toLowerCase()} track and get an instant verdict on whether it&apos;s ready to release — backed by honest reactions from a room of real listeners. Free to submit — no credit card required.
           </p>
           <Link
             href="/"

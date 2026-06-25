@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import { TrackStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { DiscoverScene, type DiscoverTrackData } from "./discover-scene";
+
+export const metadata: Metadata = {
+  title: "Discover — Tracks That Cleared the Release Bar",
+  description:
+    "Explore tracks artists have run through MixReflect — see what a release-ready verdict looks like and how a room of real listeners reacted. Then get the verdict on yours.",
+  alternates: { canonical: "/discover" },
+};
 
 export const dynamic = "force-dynamic";
 

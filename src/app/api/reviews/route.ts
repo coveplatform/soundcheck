@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { updateReviewerTier, getTierRateCents, updateReviewerAverageRating, isPeerReviewerPro, TIER_RATES } from "@/lib/queue";
-import { sendReviewProgressEmail, sendListenerIntentEmail } from "@/lib/email";
+import { sendReviewProgressEmail } from "@/lib/email";
 import { FREE_DAILY_REVIEW_LIMIT } from "@/lib/pricing";
 import { randomBytes } from "crypto";
 
@@ -99,9 +99,6 @@ const submitReviewSchema = z.object({
   expectedPlacement: z.enum(["EDITORIAL", "SOUNDCLOUD_TRENDING", "CLUB", "COFFEE_SHOP", "VIDEO_GAME", "AD", "NOWHERE"]).optional().nullable(),
   qualityLevel: z.enum(["NOT_READY", "DEMO_STAGE", "ALMOST_THERE", "RELEASE_READY", "PROFESSIONAL"]).optional().nullable(),
 
-  // Release Decision fields
-  releaseVerdict: z.enum(["RELEASE_NOW", "FIX_FIRST", "NEEDS_WORK"]).optional().nullable(),
-  releaseReadinessScore: z.number().min(0).max(100).optional().nullable(),
   topFixRank1: z.string().optional().nullable(),
   topFixRank1Impact: z.enum(["HIGH", "MEDIUM", "LOW"]).optional().nullable(),
   topFixRank1TimeMin: z.number().optional().nullable(),
@@ -384,9 +381,6 @@ export async function POST(request: Request) {
               expectedPlacement: data.expectedPlacement,
               qualityLevel: data.qualityLevel,
 
-              // Release Decision fields
-              releaseVerdict: data.releaseVerdict,
-              releaseReadinessScore: data.releaseReadinessScore,
               topFixRank1: data.topFixRank1,
               topFixRank1Impact: data.topFixRank1Impact,
               topFixRank1TimeMin: data.topFixRank1TimeMin,
@@ -631,65 +625,12 @@ export async function POST(request: Request) {
 
     await updateReviewerTier(review.reviewerId);
 
-    // Auto-trigger Release Decision report generation if all reviews are complete
-    if (review.Track.packageType === "RELEASE_DECISION" && result.updatedReview) {
-      // Count completed Release Decision reviews with verdict and score
-      const completedReleaseDecisionReviews = await prisma.review.count({
-        where: {
-          trackId: review.trackId,
-          status: "COMPLETED",
-          releaseVerdict: { not: null },
-          releaseReadinessScore: { not: null },
-        },
-      });
-
-      // If we have 8+ reviews (threshold) and report hasn't been generated yet
-      if (completedReleaseDecisionReviews >= 8 && !review.Track.releaseDecisionGeneratedAt) {
-        console.log(`[Release Decision] ${completedReleaseDecisionReviews}/10 reviews complete for track ${review.trackId}. Triggering report generation...`);
-
-        // Trigger report generation (fire-and-forget to avoid blocking review submission)
-        const reportUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/tracks/${review.trackId}/generate-release-decision-report`;
-        fetch(reportUrl, { method: 'POST' })
-          .then(() => console.log(`[Release Decision] Report generation triggered for track ${review.trackId}`))
-          .catch(err => console.error(`[Release Decision] Failed to trigger report for track ${review.trackId}:`, err));
-      }
-    }
-
-    const LISTENER_INTENT_THRESHOLD = 3;
     const milestoneHalf = Math.ceil(result.Track.reviewsRequested / 2);
     const milestoneFull = result.Track.reviewsRequested;
     const prevCompleted = result.completedReviews - 1;
 
-    const crossedIntentThreshold = prevCompleted < LISTENER_INTENT_THRESHOLD && result.completedReviews >= LISTENER_INTENT_THRESHOLD;
     const crossedHalf = prevCompleted < milestoneHalf && result.completedReviews >= milestoneHalf;
     const crossedFull = prevCompleted < milestoneFull && result.completedReviews >= milestoneFull;
-
-    // Listener intent email — fires exactly once when 3rd review comes in
-    if (result.Track.artistEmail && crossedIntentThreshold) {
-      try {
-        const intentReviews = await prisma.review.findMany({
-          where: { trackId: result.trackId, status: "COMPLETED", countsTowardAnalytics: true },
-          select: { wouldAddToPlaylist: true, wouldShare: true, wouldFollow: true, wouldListenAgain: true },
-        });
-        const pct = (field: "wouldAddToPlaylist" | "wouldShare" | "wouldFollow" | "wouldListenAgain") => {
-          const vals = intentReviews.filter((r) => r[field] !== null);
-          if (vals.length === 0) return null;
-          return Math.round((vals.filter((r) => r[field] === true).length / vals.length) * 100);
-        };
-        await sendListenerIntentEmail({
-          artistEmail: result.Track.artistEmail,
-          trackTitle: result.Track.title,
-          trackId: result.trackId,
-          reviewCount: result.completedReviews,
-          playlistPct: pct("wouldAddToPlaylist"),
-          sharePct: pct("wouldShare"),
-          followPct: pct("wouldFollow"),
-          listenAgainPct: pct("wouldListenAgain"),
-        });
-      } catch (err) {
-        console.error("Failed to send listener intent email", err);
-      }
-    }
 
     if (
       result.Track.artistEmail &&

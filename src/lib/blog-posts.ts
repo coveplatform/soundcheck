@@ -228,7 +228,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "Every platform you upload to starts accumulating engagement data from the first listener. On SoundCloud or Bandcamp, that means plays, likes, and comments. On Audiomack or YouTube, it means listener retention and skip behavior. The track's first impression is set the moment it is public, and it is harder to recover from a weak start than to make a strong one. The practical question before any upload is whether the track is actually ready to be heard cold. By the time you are deciding which platform to put it on, you have heard it too many times to evaluate the hook, the intro, or whether the production sits where it needs to. On MixReflect, paste a link and get an instant AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a room of five real listeners who have never heard it before. If four of five flag the intro as slow or the chorus as anticlimactic, that is the signal to fix before the upload, not after. The platform choice matters far less than whether the track earns a second listen from the first stranger who finds it.",
+        text: "Every platform you upload to starts accumulating engagement data from the first listener. On SoundCloud or Bandcamp, that means plays, likes, and comments. On Audiomack or YouTube, it means listener retention and skip behavior. The track's first impression is set the moment it is public, and it is harder to recover from a weak start than to make a strong one. The practical question before any upload is whether the track is actually ready to be heard cold. By the time you are deciding which platform to put it on, you have heard it too many times to evaluate the hook, the intro, or whether the production sits where it needs to. On MixReflect, paste a link and get an instant verdict on whether it's ready to release, backed by a score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a room of five real listeners who have never heard it before. If four of five flag the intro as slow or the chorus as anticlimactic, that is the signal to fix before the upload, not after. The platform choice matters far less than whether the track earns a second listen from the first stranger who finds it.",
       },
       {
         type: "faq",
@@ -353,7 +353,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "Sample-based tracks carry a risk that original production does not: every Splice or Loopcloud sample potentially appears in dozens of other producers' released tracks, which means the distinctive element of your song could already be in someone else's release. The more a track depends on a single recognizable loop, the more valuable it is to get honest feedback on whether the production feels generic or distinctive before it goes live. On MixReflect, paste a link and get an instant AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a room of five real listeners hearing it cold. If the feedback consistently flags that the production sounds familiar or the hook does not land cleanly, that signal is cheaper to act on before the ISRC is assigned than after the campaign has started. A track that sounds like ten other releases built on the same pack is not a release problem; it is a production problem, and it is fixable before the drop.",
+        text: "Sample-based tracks carry a risk that original production does not: every Splice or Loopcloud sample potentially appears in dozens of other producers' released tracks, which means the distinctive element of your song could already be in someone else's release. The more a track depends on a single recognizable loop, the more valuable it is to get honest feedback on whether the production feels generic or distinctive before it goes live. On MixReflect, paste a link and get an instant verdict on whether it's ready to release, backed by a score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a room of five real listeners hearing it cold. If the feedback consistently flags that the production sounds familiar or the hook does not land cleanly, that signal is cheaper to act on before the ISRC is assigned than after the campaign has started. A track that sounds like ten other releases built on the same pack is not a release problem; it is a production problem, and it is fixable before the drop.",
       },
       {
         type: "faq",
@@ -477,7 +477,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "The distributor choice matters far less than whether the track is ready before it goes live. Once you upload, the track gets an ISRC, lands on every major platform, and starts accumulating skip rate data the moment anyone finds it. Pulling a release to fix a mix problem or a structural issue is possible but painful: you lose the streaming history, any playlist placements, and the algorithmic momentum the release had started to build. The better move is to confirm the track is genuinely ready before you upload anything. On MixReflect, paste a link and get an instant AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a room of five real listeners hearing it cold. The patterns they surface before the track is live are exactly the problems that will drive early skips after it is. A slow intro that sounds natural to you after a hundred listens is the fifteen seconds that will spike your skip rate on Spotify. Find it before the ISRC is assigned, not after.",
+        text: "The distributor choice matters far less than whether the track is ready before it goes live. Once you upload, the track gets an ISRC, lands on every major platform, and starts accumulating skip rate data the moment anyone finds it. Pulling a release to fix a mix problem or a structural issue is possible but painful: you lose the streaming history, any playlist placements, and the algorithmic momentum the release had started to build. The better move is to confirm the track is genuinely ready before you upload anything. On MixReflect, paste a link and get an instant verdict on whether it's ready to release, backed by a score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a room of five real listeners hearing it cold. The patterns they surface before the track is live are exactly the problems that will drive early skips after it is. A slow intro that sounds natural to you after a hundred listens is the fifteen seconds that will spike your skip rate on Spotify. Find it before the ISRC is assigned, not after.",
       },
       {
         type: "faq",
@@ -593,7 +593,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "Copyright registration and PRO registration are straightforward once you have a finished song worth releasing. The step that happens first, and that most artists underinvest in, is confirming the song is actually ready. By the time you are about to register, you have heard the track hundreds of times and cannot tell whether the hook lands in the first 15 seconds or whether the production sounds dated compared to what is charting in your genre. On MixReflect, paste a link and get an instant score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a room of five real listeners hearing it cold. If the feedback surfaces consistent patterns, a verse that loses people or a mix that sounds thin, fix those before you put the song into the public record and start building a campaign around it. You can always release a better version of a song. You cannot un-release a forgettable one.",
+        text: "Copyright registration and PRO registration are straightforward once you have a finished song worth releasing. The step that happens first, and that most artists underinvest in, is confirming the song is actually ready. By the time you are about to register, you have heard the track hundreds of times and cannot tell whether the hook lands in the first 15 seconds or whether the production sounds dated compared to what is charting in your genre. On MixReflect, paste a link and get an instant verdict on whether it's ready to release, backed by a score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a room of five real listeners hearing it cold. If the feedback surfaces consistent patterns, a verse that loses people or a mix that sounds thin, fix those before you put the song into the public record and start building a campaign around it. You can always release a better version of a song. You cannot un-release a forgettable one.",
       },
       {
         type: "faq",
@@ -969,7 +969,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "This is exactly what MixReflect is built for. You paste your link and get an AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, which gives you an instant baseline read on where the mix actually sits. Then five real listeners who have never heard the track react to it cold, naming what lands and what does not, pointing at the exact moments where something works or stops working. Because you get five independent reactions, patterns surface naturally: if four of them flag the same moment the energy drops or the same section where the vocal gets muddy, that is not a matter of taste, it is a fix waiting to happen. You find out before the track is live, not after.",
+        text: "This is exactly what MixReflect is built for. You paste your link and get an instant verdict on whether it's ready to release, backed by a score out of 100 across hook, production, retention, emotional impact, and commercial pull that shows where the mix actually sits. Then five real listeners who have never heard the track react to it cold, naming what lands and what does not, pointing at the exact moments where something works or stops working. Because you get five independent reactions, patterns surface naturally: if four of them flag the same moment the energy drops or the same section where the vocal gets muddy, that is not a matter of taste, it is a fix waiting to happen. You find out before the track is live, not after.",
       },
       {
         type: "h2",
@@ -1094,7 +1094,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "This is the gap MixReflect was built to close. You paste your link and get two things back. First, an instant AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, so you have a baseline read in seconds. Then a room of five real listeners who have never heard the track hear it for the first time and tell you what landed and what did not, in plain language, naming the moments. Because it is five people and not one, the patterns surface on their own: when several of them flag the same slow intro or the same weak section, that is not an opinion you can argue with, it is the exact thing a first-time listener on Spotify is about to feel. It is the honest, multi-listener review the free communities and paid curators are each missing half of.",
+        text: "This is the gap MixReflect was built to close. You paste your link and get two things back. First, an instant verdict on whether it's ready to release, backed by a score out of 100 across hook, production, retention, emotional impact, and commercial pull, in seconds. Then a room of five real listeners who have never heard the track hear it for the first time and tell you what landed and what did not, in plain language, naming the moments. Because it is five people and not one, the patterns surface on their own: when several of them flag the same slow intro or the same weak section, that is not an opinion you can argue with, it is the exact thing a first-time listener on Spotify is about to feel. It is the honest, multi-listener review the free communities and paid curators are each missing half of.",
       },
       {
         type: "quote",
@@ -1250,7 +1250,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "This is the step that comes before any promotion: confirming the track actually works for a first-time listener. By the time you finish a song you have heard it too many times to evaluate it honestly. The intro that feels fast to you took thirty listens to feel that way. The buried vocal stopped bothering you because you know every word. A first-time listener gets none of that context, and the skip button is right there. MixReflect closes this gap: paste your link and get an instant AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus honest reactions from a room of five real listeners who have never heard the track before. When several of them flag the same intro as slow or the same section as weak, that is the skip you are about to serve to Spotify at scale. Fix it first, then promote.",
+        text: "This is the step that comes before any promotion: confirming the track actually works for a first-time listener. By the time you finish a song you have heard it too many times to evaluate it honestly. The intro that feels fast to you took thirty listens to feel that way. The buried vocal stopped bothering you because you know every word. A first-time listener gets none of that context, and the skip button is right there. MixReflect closes this gap: paste your link and get an instant verdict on whether it's ready to release, backed by a score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus honest reactions from a room of five real listeners who have never heard the track before. When several of them flag the same intro as slow or the same section as weak, that is the skip you are about to serve to Spotify at scale. Fix it first, then promote.",
       },
       {
         type: "quote",
@@ -1372,7 +1372,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "That last point is where most artists are flying blind. After weeks on a track you stop hearing it the way a new listener does, and friends rarely give you the unvarnished version. This is exactly the gap MixReflect closes: paste your link and you get an instant AI read scored out of 100 across hook, production, retention, emotional impact, and commercial pull, then real reactions from a room of five listeners who tell you where they would have skipped. It is a feedback step that fits between the final master and the release date, so you find the problems while you can still fix them rather than after the song is public.",
+        text: "That last point is where most artists are flying blind. After weeks on a track you stop hearing it the way a new listener does, and friends rarely give you the unvarnished version. This is exactly the gap MixReflect closes: paste your link and you get an instant verdict on whether it's ready to release, backed by a score out of 100 across hook, production, retention, emotional impact, and commercial pull, then real reactions from a room of five listeners who tell you where they would have skipped. It is a feedback step that fits between the final master and the release date, so you find the problems while you can still fix them rather than after the song is public.",
       },
       {
         type: "quote",
@@ -1459,7 +1459,7 @@ const _posts: BlogPost[] = [
           },
           {
             q: "How do I know if my song is ready to release?",
-            a: "A song is ready when the intro earns attention in the first ten to fifteen seconds, the vocal sits clearly in the mix, the low end translates on phones and earbuds, the arrangement holds without dead sections, and it sits at a competitive level next to released music in its genre. The reliable way to confirm this is honest outside feedback. Tools like MixReflect give you an AI score out of 100 plus reactions from real listeners, so you find the problems before the track is public.",
+            a: "A song is ready when the intro earns attention in the first ten to fifteen seconds, the vocal sits clearly in the mix, the low end translates on phones and earbuds, the arrangement holds without dead sections, and it sits at a competitive level next to released music in its genre. The reliable way to confirm this is honest outside feedback. Tools like MixReflect give you a verdict on whether it's ready to release — backed by a score out of 100 — plus reactions from real listeners, so you find the problems before the track is public.",
           },
           {
             q: "What is the best day to release music?",
@@ -2109,7 +2109,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "This is what MixReflect is built for. You upload a track before release and a room of real listeners react independently after an instant AI read — covering first impression, production quality, arrangement, what's working, and the main thing to fix. Because listeners respond without seeing each other's answers, the patterns are real: when several people land on the same note, that's the gap between your track and a professional one, spelled out. Fix what they converge on and the \"amateur\" feeling disappears.",
+        text: "This is what MixReflect is built for. You upload a track before release and a room of real listeners react independently after an instant release verdict — covering first impression, production quality, arrangement, what's working, and the main thing to fix. Because listeners respond without seeing each other's answers, the patterns are real: when several people land on the same note, that's the gap between your track and a professional one, spelled out. Fix what they converge on and the \"amateur\" feeling disappears.",
       },
       {
         type: "faq",
@@ -2225,7 +2225,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "This is exactly what MixReflect is built for. You upload a track before release and a room of real listeners react independently after an instant AI read — including whether the vocals cut through or sit under the mix. When several listeners flag the same buried vocal, you know it's real and worth fixing. When they don't, you know your balance is landing and you can release with confidence.",
+        text: "This is exactly what MixReflect is built for. You upload a track before release and a room of real listeners react independently after an instant release verdict — including whether the vocals cut through or sit under the mix. When several listeners flag the same buried vocal, you know it's real and worth fixing. When they don't, you know your balance is landing and you can release with confidence.",
       },
       {
         type: "faq",
@@ -2354,7 +2354,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "MixReflect is built for this gap. Upload a track before you release it and a room of real listeners react independently after an instant AI read — covering first impression, production quality, what's working, and what to fix. When several listeners flag the same thing, you know it's real. When they don't, the track is ready to pitch.",
+        text: "MixReflect is built for this gap. Upload a track before you release it and a room of real listeners react independently after an instant release verdict — covering first impression, production quality, what's working, and what to fix. When several listeners flag the same thing, you know it's real. When they don't, the track is ready to pitch.",
       },
       {
         type: "faq",
@@ -2603,7 +2603,7 @@ const _posts: BlogPost[] = [
           },
           {
             q: "Where can I get honest feedback on my music online?",
-            a: "MixReflect is designed specifically for honest pre-release feedback — an instant AI read scores your track and real listeners react independently, so you can see where multiple people converge on the same issue. Reddit communities (r/WeAreTheMusicMakers, r/makinghiphop) and genre-specific Discord servers are free alternatives, though feedback quality is inconsistent and not independent.",
+            a: "MixReflect is designed specifically for honest pre-release feedback — an instant release verdict lands on your track and real listeners react independently, so you can see where multiple people converge on the same issue. Reddit communities (r/WeAreTheMusicMakers, r/makinghiphop) and genre-specific Discord servers are free alternatives, though feedback quality is inconsistent and not independent.",
           },
         ],
       },
@@ -2768,7 +2768,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "The advantages over other methods: it's instant (an AI read scores the track in seconds), it's structured (the breakdown addresses specific elements like hook, production and retention), it scales (you can get feedback across multiple tracks over time), and a room of real listeners react with honest, specific takes rather than vague positivity.",
+        text: "The advantages over other methods: it's instant (a release verdict lands in seconds), it's structured (the breakdown addresses specific elements like hook, production and retention), it scales (you can get feedback across multiple tracks over time), and a room of real listeners react with honest, specific takes rather than vague positivity.",
       },
       {
         type: "h2",
@@ -2889,7 +2889,7 @@ const _posts: BlogPost[] = [
           },
           {
             q: "How do I get producers to review my beats?",
-            a: "MixReflect works well for this — paste a beat and an instant AI read scores it, then a room of real listeners react. Because the read is genre-aware, the feedback is musically informed. Reddit's r/makinghiphop has feedback threads, and genre-specific Discord servers often have dedicated critique channels, though the quality and depth varies significantly.",
+            a: "MixReflect works well for this — paste a beat and get an instant release verdict, then a room of real listeners react. Because the read is genre-aware, the feedback is musically informed. Reddit's r/makinghiphop has feedback threads, and genre-specific Discord servers often have dedicated critique channels, though the quality and depth varies significantly.",
           },
           {
             q: "Should I trust feedback from one person on my beat?",
@@ -2984,7 +2984,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "MixReflect is a structured feedback platform built specifically for pre-release feedback. You upload a track before you release it, and an instant AI read scores it and a room of real listeners react independently. The structured format covers first impression, what's working, the main weakness, and production quality.",
+        text: "MixReflect is a structured feedback platform built specifically for pre-release feedback. You upload a track before you release it, and an instant release verdict lands and a room of real listeners react independently. The structured format covers first impression, what's working, the main weakness, and production quality.",
       },
       {
         type: "paragraph",
@@ -2992,7 +2992,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "It's free to submit: an instant AI read scores every track, then a room of real listeners react. It scales in a way paid critique doesn't, and the AI read is genre-aware, so the feedback has a relevant reference rather than being one random reaction.",
+        text: "It's free to submit: an instant release verdict lands on every track, then a room of real listeners react. It scales in a way paid critique doesn't, and the verdict is genre-aware, so the feedback has a relevant reference rather than being one random reaction.",
       },
       {
         type: "h2",
@@ -3020,7 +3020,7 @@ const _posts: BlogPost[] = [
           },
           {
             q: "Is MixReflect free?",
-            a: "Yes. MixReflect is free to submit — no credit card required. You get an instant AI score and a teaser of the full report on every track. Unlock a track's full report for $6.95, or go unlimited for $19.95/month.",
+            a: "Yes. MixReflect is free to submit — no credit card required. You get an instant release verdict and a teaser of the full report on every track. Unlock a track's full report for $6.95, or go unlimited for $19.95/month.",
           },
           {
             q: "What is the difference between MixReflect and SubmitHub?",
@@ -3067,7 +3067,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "MixReflect is a structured feedback platform for pre-release tracks. You paste a track before it goes out, an instant AI read scores it, and a room of real listeners react — covering first impression, what's working, the main weakness, and production quality. Listeners respond independently, without seeing each other's answers.",
+        text: "MixReflect is a structured feedback platform for pre-release tracks. You paste a track before it goes out, an instant release verdict lands, and a room of real listeners react — covering first impression, what's working, the main weakness, and production quality. Listeners respond independently, without seeing each other's answers.",
       },
       {
         type: "paragraph",
@@ -3111,7 +3111,7 @@ const _posts: BlogPost[] = [
       },
       {
         type: "paragraph",
-        text: "MixReflect is free to submit: you get an instant AI score on every track, with no per-submission fee. You only pay if you want to unlock a track's full report — $6.95 once, or $19.95/month for unlimited.",
+        text: "MixReflect is free to submit: you get an instant release verdict on every track, with no per-submission fee. You only pay if you want to unlock a track's full report — $6.95 once, or $19.95/month for unlimited.",
       },
       {
         type: "h2",
@@ -3143,11 +3143,11 @@ const _posts: BlogPost[] = [
           },
           {
             q: "Is MixReflect free to use?",
-            a: "Yes. MixReflect is free to sign up and free to submit — no credit card required. You get an instant AI score on every track, with no per-submission fee.",
+            a: "Yes. MixReflect is free to sign up and free to submit — no credit card required. You get an instant release verdict on every track, with no per-submission fee.",
           },
           {
             q: "How much does SubmitHub cost compared to MixReflect?",
-            a: "SubmitHub charges per submission using a credit system — costs vary by curator type and volume, but regular use adds up quickly. MixReflect's core read is free: you get an instant AI score on every track. Unlocking a track's full report is $6.95, or $19.95/month for unlimited.",
+            a: "SubmitHub charges per submission using a credit system — costs vary by curator type and volume, but regular use adds up quickly. MixReflect's core read is free: you get an instant release verdict on every track. Unlocking a track's full report is $6.95, or $19.95/month for unlimited.",
           },
         ],
       },

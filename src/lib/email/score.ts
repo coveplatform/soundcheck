@@ -53,7 +53,7 @@ function shell(content: string): string {
         <!-- footer -->
         <tr><td align="center" style="padding:22px 0 8px;">
           <p style="margin:0 0 6px;font-size:12px;color:${MUTED};font-family:${MONO};">
-            instant ai scores · a room of real listeners
+            is your track ready to release? · measured + a room of real listeners
           </p>
           <p style="margin:0;font-size:12px;color:${MUTED};">
             <a href="${app}" style="color:${ACCENT};text-decoration:none;">mixreflect.com</a>
@@ -114,8 +114,8 @@ export async function sendScoreRoomCompleteEmail(args: {
   const content = `
     ${kicker("the room · complete")}
     ${h1("The room&rsquo;s in ✓")}
-    ${p(`All <strong style="color:${TEXT};">${args.total}</strong> listeners have reacted to <strong style="color:${TEXT};">${title}</strong>. Your full read is ready.`)}
-    ${button("See the room's verdict →", url)}`;
+    ${p(`All <strong style="color:${TEXT};">${args.total}</strong> real listeners have reacted to <strong style="color:${TEXT};">${title}</strong>. Their honest takes now sit alongside your release verdict — the full picture of where this track stands.`)}
+    ${button("See the verdict + the room →", url)}`;
   return sendEmail({ to: args.to, subject: `✓ the room's in on ${title}`, html: shell(content) });
 }
 
@@ -130,19 +130,19 @@ export function buildNewMixReflectAnnouncement(userName?: string | null): { subj
     </td></tr>`;
   const content = `
     ${kicker("mixreflect is changing")}
-    ${h1("MixReflect just got a big upgrade 🎧")}
-    ${p(`${name ? `Hey ${name}, we&rsquo;ve` : "We&rsquo;ve"} rebuilt MixReflect from the ground up. Same idea — honest feedback before you release — but now it&rsquo;s <strong style="color:${TEXT};">instant</strong>, and it comes from <strong style="color:${TEXT};">real ears</strong>.`)}
+    ${h1("MixReflect now tells you if your track is ready to release 🎧")}
+    ${p(`${name ? `Hey ${name}, we&rsquo;ve` : "We&rsquo;ve"} rebuilt MixReflect from the ground up. Same idea — honest feedback before you release — but now you get a straight <strong style="color:${TEXT};">verdict</strong>: not ready, needs work, almost there, or release ready. Measured against tracks that actually got released.`)}
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:8px 0;">
-      ${row("⚡", "An instant AI read", "Paste a link, get a score out of 100 with a verdict and a full breakdown across hook, production, retention, emotion and commercial pull — in seconds.")}
-      ${row("👥", "A room of real listeners", "Real, paid listeners react to your track with honest, specific takes that land in your report as they come in. No grinding for credits, no waiting days.")}
+      ${row("✅", "A measured release verdict", "Paste a link and get the call — release ready or not — in seconds. Backed by a score out of 100 and a full breakdown across hook, production, retention, emotion and commercial pull, so you see exactly what stands between this track and release.")}
+      ${row("👥", "A room of real listeners", "Then five real, paid listeners react to your track with honest, specific takes that land in your report as they come in. The verdict ships instantly; the room follows. No grinding for credits, no waiting days.")}
       ${row("💸", "Get paid to listen", "Want to earn? Hear unreleased tracks first and get $0.40 for every honest two-minute reaction. Cash out at $10.")}
     </table>
-    ${button("Score a track free →", app)}
+    ${button("Get your verdict free →", app)}
     <p style="margin:14px 0 0;font-size:13px;line-height:1.6;color:${MUTED};">
       Already a MixReflect Pro? Your unlimited access carried straight over — nothing to do.
       Want to earn instead? <a href="${app}/reviewer" style="color:${ACCENT};text-decoration:none;">Get paid to review →</a>
     </p>`;
-  return { subject: "MixReflect just got a big upgrade 🎧", html: shell(content) };
+  return { subject: "MixReflect now tells you if your track's ready to release 🎧", html: shell(content) };
 }
 
 export async function sendNewMixReflectAnnouncement(to: string, userName?: string | null): Promise<boolean> {
@@ -168,11 +168,11 @@ export function buildUnlimitedAnnouncement(userName?: string | null): { subject:
   const content = `
     ${kicker("mixreflect · new + unlimited")}
     ${h1("The new MixReflect &mdash; and why Unlimited&rsquo;s worth it 🎧")}
-    ${p(`${name ? `Hey ${name}, if` : "If"} you haven&rsquo;t been back in a bit, MixReflect is a different thing now. Same idea &mdash; honest feedback before you release &mdash; but it&rsquo;s <strong style="color:${TEXT};">instant</strong>, and it comes from <strong style="color:${TEXT};">real ears</strong>.`)}
-    ${p(`Paste a link and you get a score out of 100 with a verdict and a full breakdown in seconds. Then a room of real, paid listeners reacts to your track with honest, specific takes that land in your report as they come in. No grinding for credits, no waiting days.`)}
+    ${p(`${name ? `Hey ${name}, if` : "If"} you haven&rsquo;t been back in a bit, MixReflect is a different thing now. Same idea &mdash; honest feedback before you release &mdash; but now you get a straight <strong style="color:${TEXT};">release verdict</strong>: not ready, needs work, almost there, or release ready.`)}
+    ${p(`Paste a link and you get the call in seconds &mdash; measured against tracks that actually got released &mdash; backed by a score out of 100 and a full breakdown of what stands between this track and release. Then a room of real, paid listeners reacts with honest, specific takes that land in your report as they come in. No grinding for credits, no waiting days.`)}
     ${p(`Your first report&rsquo;s on us. After that, here&rsquo;s the thing about going <strong style="color:${TEXT};">Unlimited</strong>:`)}
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:4px 0 8px;">
-      ${check(`Every report fully unlocked &mdash; score, verdict, and the full breakdown, no seal`)}
+      ${check(`Every report fully unlocked &mdash; the verdict, the score, and the full breakdown, no seal`)}
       ${check(`A room of real listeners on every track you submit`)}
       ${check(`Submit as many tracks as you want while you&rsquo;re subscribed`)}
       ${check(`Go annual and it works out to about 40% less per month`)}
@@ -183,7 +183,7 @@ export function buildUnlimitedAnnouncement(userName?: string | null): { subject:
     </div>
     ${button("Go Unlimited →", `${app}/#pricing`)}
     <p style="margin:14px 0 0;font-size:13px;line-height:1.6;color:${MUTED};">
-      Not ready? Just <a href="${app}" style="color:${ACCENT};text-decoration:none;">score a track free →</a> and see what the room says.
+      Not ready to commit? Just <a href="${app}" style="color:${ACCENT};text-decoration:none;">get your verdict free →</a> and see where your track stands.
     </p>`;
 
   return { subject: "The new MixReflect — and why Unlimited's worth it 🎧", html: shell(content) };
@@ -216,10 +216,11 @@ export function buildUnlimitedOfferEmail(args: {
   const content = `
     ${kicker("unlimited · 50% off your first month")}
     ${h1(`${name ? `Hey ${name} — your` : "Your"} first month, half price 🎧`)}
-    ${p(`You scored a track on MixReflect, then it went quiet. So here&rsquo;s a reason to come back: <strong style="color:${TEXT};">Unlimited at 50% off your first month</strong>.`)}
+    ${p(`You got a verdict on MixReflect, then it went quiet. So here&rsquo;s a reason to come back: <strong style="color:${TEXT};">Unlimited at 50% off your first month</strong>.`)}
     ${p(`Unlimited means every track you submit gets the full treatment:`)}
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:4px 0 8px;">
-      ${row(`Every report fully unlocked — score out of 100, verdict, and the full breakdown`)}
+      ${row(`A measured release verdict on every track — not ready, needs work, almost there, or release ready`)}
+      ${row(`Every report fully unlocked — the verdict, the score out of 100, and the full breakdown`)}
       ${row(`A room of real listeners on every track — honest reactions from real ears`)}
       ${row(`Submit as many tracks as you want while you&rsquo;re subscribed`)}
     </table>
@@ -259,9 +260,9 @@ export function buildReportReminderEmail(args: {
 
   const content = `
     ${kicker("your report · still sealed")}
-    ${h1("The read on your track is done. It&rsquo;s just sealed.")}
-    ${p(`We ran the full read on <strong style="color:${TEXT};">${title}</strong> — a score out of 100, a verdict, what&rsquo;s working, and the first thing to fix. It&rsquo;s all sitting in your report, sealed until you open it.`)}
-    ${p(`Unlocking also puts <strong style="color:${TEXT};">${title}</strong> in front of a room of real listeners — actual people, paid to listen, whose honest reactions land in your report as they come in. Not just the machine&rsquo;s opinion.`)}
+    ${h1("Your verdict on this track is done. It&rsquo;s just sealed.")}
+    ${p(`We called it on <strong style="color:${TEXT};">${title}</strong> — release ready or not — backed by a score out of 100, what&rsquo;s working, and the first thing standing between this track and release. It&rsquo;s all sitting in your report, sealed until you open it.`)}
+    ${p(`Unlocking also puts <strong style="color:${TEXT};">${title}</strong> in front of a room of real listeners — actual people, paid to listen, whose honest reactions land in your report as they come in. The verdict, then the room.`)}
     <div style="background:${BG};border:1px solid ${BORDER};border-radius:10px;padding:16px;margin:6px 0 4px;">
       <p style="margin:0 0 6px;font-size:14px;color:${MUTED};"><span style="font-size:17px;font-weight:800;color:${ACCENT};">${unlock}</span> one-time — unlock this report in full</p>
       <p style="margin:0;font-size:14px;color:${MUTED};"><span style="font-size:17px;font-weight:800;color:${TEXT};">${monthly}/mo</span> unlimited — every track you submit, fully unlocked</p>
@@ -271,7 +272,7 @@ export function buildReportReminderEmail(args: {
       Your report doesn&rsquo;t expire — but the longer the track sits, the longer you&rsquo;re guessing.
     </p>`;
 
-  return { subject: `the read on ${title} is done — still sealed`, html: shell(content) };
+  return { subject: `the verdict on ${title} is done — still sealed`, html: shell(content) };
 }
 
 export async function sendReportReminderEmail(args: {

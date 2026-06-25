@@ -7,6 +7,7 @@ import {
 } from "@/lib/audio-analysis";
 import { gradeTrack, type GradeResult } from "@/lib/score-engine";
 import { fetchTrackMeta, oembedUrlFor } from "@/lib/track-metadata";
+import { buildVerdictPayload } from "@/lib/score-verdict";
 
 /**
  * Score-report generation.
@@ -1018,6 +1019,12 @@ async function runGeneration(
     { prior }
   );
 
+  // Decision-report (verdict) payload: the release bar (measured craft vs the
+  // genre's release envelope) + ranked blockers, plus a verdict that can't read
+  // "ready" with a measured blocker. Null when nothing measured grounds it →
+  // the report renders the legacy view (backward-compatible).
+  const verdictPayload = buildVerdictPayload(generated, features, genre);
+
   await prisma.trackScoreReport.update({
     where: { id: reportId },
     data: {
@@ -1025,6 +1032,12 @@ async function runGeneration(
       ...(trackTitle ? { trackTitle } : {}),
       ...(meta?.artworkUrl ? { artworkUrl: meta.artworkUrl } : {}),
       ...(features?.fingerprint ? { fingerprint: features.fingerprint as object } : {}),
+      ...(verdictPayload
+        ? {
+            releaseBar: verdictPayload.releaseBar as object,
+            blockers: verdictPayload.blockers as object,
+          }
+        : {}),
       // The 3-band waveform the worker measured — drawn on the unlocked report.
       // Stored with the analysed/source durations so the UI can label the span.
       ...(features?.waveform
@@ -1039,7 +1052,9 @@ async function runGeneration(
       status: "IN_REVIEW",
       score: generated.score,
       percentile: generated.percentile,
-      verdict: generated.verdict,
+      // The release-bar-aware verdict (a measured blocker caps "release ready");
+      // falls back to the engine's verdict when there's no measured bar.
+      verdict: verdictPayload?.verdict ?? generated.verdict,
       hookScore: generated.hookScore,
       productionScore: generated.productionScore,
       retentionScore: generated.retentionScore,

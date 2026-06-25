@@ -26,7 +26,7 @@ const createTrackSchema = z.object({
   feedbackAreas: z.array(
     z.enum(["OVERALL_VIBE", "MIXING", "ARRANGEMENT", "SONGWRITING", "SOUND_DESIGN", "RELEASE_READINESS"])
   ).min(1).max(3).optional(),
-  packageType: z.enum(["PEER", "RELEASE_DECISION"]).optional(),
+  packageType: z.enum(["PEER"]).optional(),
   reviewsRequested: z.number().int().min(1).max(50).optional(),
   allowPurchase: z.boolean().optional(),
   isPublic: z.boolean().optional(),
