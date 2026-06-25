@@ -41,23 +41,40 @@ function mmss(sec: number): string {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
+/** Which side(s) of the band are genuinely release-blocking when exceeded.
+ *  Several axes are only bad in ONE direction: a master can be too squashed
+ *  (bad) but never "too dynamic" (that's upside); a sparse arrangement can be
+ *  lighter on low end than a full mix without that being a reason it gets
+ *  passed on. An axis outside the band on a non-blocking side reads "edge"
+ *  (worth a note) — never "out" (a verdict-capping blocker). */
+type BlockingSide = "both" | "low" | "high";
+
 /** Place a measured value on a 0-100 axis given the band's [lo,hi] real range,
  *  with `pad` of headroom either side so an in-band value sits inside the shaded
- *  zone and an out-of-band value reads visibly outside it. */
+ *  zone and an out-of-band value reads visibly outside it. `blocks` says which
+ *  direction(s) actually block release — the other side caps out at "edge". */
 function placeOnAxis(
   value: number,
   bandLo: number,
   bandHi: number,
   axisLo: number,
-  axisHi: number
+  axisHi: number,
+  blocks: BlockingSide = "both"
 ): { pos: number; status: ReleaseAxis["status"] } {
   const span = axisHi - axisLo || 1;
   const pos = clamp(((value - axisLo) / span) * 100, 2, 98);
   const margin = (bandHi - bandLo) * 0.15;
   let status: ReleaseAxis["status"];
-  if (value < bandLo - margin || value > bandHi + margin) status = "out";
-  else if (value < bandLo || value > bandHi) status = "edge";
-  else status = "in";
+  if (value >= bandLo && value <= bandHi) {
+    status = "in";
+  } else {
+    const side: "low" | "high" = value < bandLo ? "low" : "high";
+    const hard = value < bandLo - margin || value > bandHi + margin;
+    const blocking = blocks === "both" || blocks === side;
+    // Hard-outside on a blocking side is a real release blocker; anything else
+    // outside the band (soft margin, or the non-blocking direction) is "edge".
+    status = hard && blocking ? "out" : "edge";
+  }
   return { pos: Math.round(pos), status };
 }
 
@@ -119,7 +136,9 @@ export function buildReleaseBar(
     const [lo, hi] = nm.crestDb;
     const axisLo = Math.max(0, lo - 5);
     const axisHi = hi + 5;
-    const { pos, status } = placeOnAxis(crest, lo, hi, axisLo, axisHi);
+    // Only the squashed (low) side blocks release — being MORE dynamic than the
+    // genre ceiling is upside (a live solo, an acoustic take), not a fault.
+    const { pos, status } = placeOnAxis(crest, lo, hi, axisLo, axisHi, "low");
     axes.push({
       label: "dynamic range",
       measured: `${r1(crest)} dB`,
@@ -134,30 +153,39 @@ export function buildReleaseBar(
           ? "it breathes — not a wall of limiter."
           : crest < lo
             ? "squashed flatter than released tracks in the genre."
-            : "very wide — dynamic, but may read unfinished at genre loudness.",
+            : "wider than the genre's release window — reads as dynamic, not a fault. only worth flattening if it feels unfinished next to released tracks.",
     });
   }
 
   // ── time to hook (intro lift) ──
   if (features.introLiftSec != null) {
     const [median, long] = nm.introLiftSec;
+    // The genre long-side is a streaming-era yardstick (hook fast or lose them)
+    // that doesn't fit long-form music — a 7-minute track earns a longer runway
+    // than a 3-minute single. Scale the release window with the track's own
+    // length: a hook inside roughly the first quarter of the song is structural,
+    // not a release blocker (Comfortably Numb's 1:43 intro on a ~7-min track is
+    // the form, not a fault). Short tracks fall back to the genre long-side.
+    const trackLen = features.sourceDurationSec ?? features.durationSec ?? null;
+    const effLong = trackLen ? Math.max(long, Math.round(0.25 * trackLen)) : long;
     const axisLo = 0;
-    const axisHi = long + 30;
-    // The "release band" for time-to-hook is from 0 up to the genre's long-side.
-    const { pos, status } = placeOnAxis(features.introLiftSec, 0, long, axisLo, axisHi);
+    const axisHi = effLong + 30;
+    // The "release band" runs from 0 up to that length-aware long-side; only
+    // landing the hook LATE blocks release — arriving early never does.
+    const { pos, status } = placeOnAxis(features.introLiftSec, 0, effLong, axisLo, axisHi, "high");
     axes.push({
       label: "time to hook",
       measured: mmss(features.introLiftSec),
-      band: `0:00 to ${mmss(long)}`,
+      band: `0:00 to ${mmss(effLong)}`,
       ends: ["earlier", "later"],
-      zone: bandToZone(0, long, axisLo, axisHi),
+      zone: bandToZone(0, effLong, axisLo, axisHi),
       pos,
       status,
       estimated: true,
       note:
         status === "in"
-          ? `gets moving inside the genre's patience window (median ~${mmss(median)}).`
-          : `released tracks land it by ~${mmss(long)} — yours waits longer, so the first listen risks drifting first.`,
+          ? `gets moving inside the window for a track this length (genre median ~${mmss(median)}).`
+          : `released tracks this length land it by ~${mmss(effLong)} — yours waits longer, so the first listen risks drifting first.`,
     });
   }
 
@@ -169,7 +197,10 @@ export function buildReleaseBar(
     const hi = 0.55;
     const axisLo = 0;
     const axisHi = 0.85;
-    const { pos, status } = placeOnAxis(lowEnd, lo, hi, axisLo, axisHi);
+    // Only a heavy/muddy low end (high side) blocks release — a light low end is
+    // usually instrumentation (a guitar-and-drums take, an acoustic song), not a
+    // fault that gets a track passed on.
+    const { pos, status } = placeOnAxis(lowEnd, lo, hi, axisLo, axisHi, "high");
     axes.push({
       label: "low-end balance",
       measured: `${Math.round(lowEnd * 100)}% of spectrum`,
@@ -184,7 +215,7 @@ export function buildReleaseBar(
           ? "low end sits where released tracks tend to."
           : lowEnd > hi
             ? "heavier low end than the genre median — worth a check on bigger systems."
-            : "lighter low end than released tracks — may want more weight underneath.",
+            : "lighter low end than released tracks — often just the instrumentation (no bass instrument), not a fault. add weight underneath only if it feels thin.",
     });
   }
 
@@ -212,30 +243,79 @@ export function deriveVerdict(
   return order[clamp(idx, 0, 3)];
 }
 
+// Each release-bar axis maps to a concrete fix + the keywords that mean an AI
+// priority-fix is already talking about the same thing (so we don't list the
+// blocker twice — once measured, once as the model's prose).
+const AXIS_FIX: Record<string, { label: string; keywords: string[] }> = {
+  "master loudness": {
+    label: "get the master to release level",
+    keywords: ["loud", "master", "level", "lufs", "volume", "quiet"],
+  },
+  "dynamic range": {
+    label: "ease the compression back",
+    keywords: ["dynamic", "compress", "limiter", "squash", "punch", "crush"],
+  },
+  "time to hook": {
+    label: "get to the hook sooner",
+    keywords: ["intro", "hook", "sooner", "front", "drop", "vocal", "trim"],
+  },
+  "low-end balance": {
+    label: "balance the low end",
+    keywords: ["low end", "low-end", "bass", "sub", "mud", "boom", "weight"],
+  },
+};
+
 /**
- * Rank the priority fixes into release blockers. The fix flagged by the most of
- * the room becomes rank 1; an out-of-band release-bar axis (a real measured
- * blocker) is surfaced as the weight on rank 1 when one exists.
+ * Build the ranked release blockers as ONE coherent list. Measured out-of-band
+ * axes come first — these are the grounded, verdict-driving blockers, so the
+ * hero's "N blockers to release" count (the out-of-band axis count) always lines
+ * up with the top N entries here. The model's priority fixes fill the remaining
+ * slots, minus any that just restate a measured blocker.
  */
 export function buildBlockers(
   generated: Pick<GeneratedReport, "priorityFixes">,
   releaseBar: ReleaseAxis[]
 ): Blocker[] {
-  const outOfBand = releaseBar.filter((a) => a.status === "out").length;
-  const fixes = [...generated.priorityFixes].sort((a, b) => (b.count ?? 0) - (a.count ?? 0));
-  return fixes.slice(0, 3).map((f, i) => ({
+  const outAxes = releaseBar.filter((a) => a.status === "out");
+  const outOfBand = outAxes.length;
+
+  // Grounded blockers from the measured bar — each carries its real number.
+  const measured = outAxes.map((a) => {
+    const m = AXIS_FIX[a.label];
+    return {
+      label: m?.label ?? a.label,
+      detail: `your ${a.label} measured ${a.measured} against a release window of ${a.band} — ${a.note}`,
+      keywords: m?.keywords ?? [],
+    };
+  });
+  const usedKeywords = measured.flatMap((m) => m.keywords);
+
+  // AI fixes, most-flagged first, dropping any that just restate a measured one.
+  const aiFixes = [...generated.priorityFixes]
+    .sort((a, b) => (b.count ?? 0) - (a.count ?? 0))
+    .filter((f) => {
+      const hay = `${f.label} ${f.detail}`.toLowerCase();
+      return !usedKeywords.some((k) => hay.includes(k));
+    })
+    .map((f) => ({ label: f.label, detail: f.detail }));
+
+  const combined = [...measured, ...aiFixes].slice(0, 3);
+
+  return combined.map((b, i) => ({
     rank: i + 1,
-    weight:
-      i === 0
-        ? outOfBand > 0
-          ? "the one that's holding the verdict"
-          : "worth doing before you ship"
-        : i === 1
-          ? "worth doing before you ship"
-          : "polish, not a blocker",
-    label: f.label,
-    detail: f.detail,
+    weight: weightFor(i, combined.length, outOfBand),
+    label: b.label,
+    detail: b.detail,
   }));
+}
+
+/** Weight label by position: the first `outOfBand` items are real release
+ *  blockers; everything after is pre-ship polish. */
+function weightFor(i: number, total: number, outOfBand: number): string {
+  if (i < outOfBand) return i === 0 ? "the one that's holding the verdict" : "also blocking release";
+  if (i === 0) return "worth doing before you ship";
+  if (i === total - 1) return "polish, not a blocker";
+  return "worth doing before you ship";
 }
 
 /** Build the full verdict payload, or null when there's nothing to ground it. */

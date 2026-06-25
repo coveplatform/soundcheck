@@ -13,7 +13,15 @@
  * findings pass treats absence as "no listen evidence", never an error.
  */
 
+import { SCORE_GENRES, isScoreGenre } from "@/lib/score-genres";
+
 export type ListenFindings = {
+  /** Genre heard, constrained to the product's genre list (or null if unsure).
+   *  The listen pass is the only stage that actually hears audio, so it's the
+   *  best place to classify — used to pick genre norms when the artist didn't. */
+  detectedGenre: string | null;
+  /** How sure the model is of the genre — gates whether we override "Other". */
+  genreConfidence: "low" | "medium" | "high";
   vocals: {
     present: boolean;
     sung: boolean;
@@ -46,12 +54,18 @@ function listenPrompt(input: ListenInput): string {
   const span = input.excerpt.durationSec
     ? `the opening ~${Math.round(input.excerpt.durationSec)} seconds`
     : "the opening of the track";
-  return `You are a brutally honest senior A&R / producer. LISTEN to this audio (${span} of "${input.trackTitle || "an untitled track"}", genre: ${input.genre || "unknown"}) and report exactly what you hear. You only hear the opening — never claim anything about the ending or total length.
+  const stated = input.genre?.trim();
+  const statedKnown = stated && stated.toLowerCase() !== "other" && stated.toLowerCase() !== "unknown";
+  return `You are a brutally honest senior A&R / producer. LISTEN to this audio (${span} of "${input.trackTitle || "an untitled track"}"${statedKnown ? `, the artist tagged it "${stated}"` : ", the artist did not specify a genre"}) and report exactly what you hear. You only hear the opening — never claim anything about the ending or total length.
 
 Be specific and honest — this feeds a scoring system, so flattery corrupts it. If the vocal is pitchy, say so. If the melody is generic, say so. If it's genuinely excellent, say that with confidence.
 
+Classify the GENRE from what you actually hear — instrumentation, rhythm, production style — independently of any tag the artist gave (their tag may be missing or wrong). Pick the single best fit from this list: ${SCORE_GENRES.join(", ")}. Use "Other" only when nothing genuinely fits, and set genreConfidence honestly (a sparse acoustic guitar take is "Singer-Songwriter" with high confidence; an ambiguous beat may be "low").
+
 Return STRICT JSON only:
 {
+  "detectedGenre": <one of: ${SCORE_GENRES.join(", ")}>,
+  "genreConfidence": "low"|"medium"|"high",
   "vocals": { "present": <bool — any vocal at all>, "sung": <bool — actual sung/rapped human vocal, not a chop/sample texture>, "performance": <string or null — if sung: pitch accuracy, delivery, conviction, where it sits in the mix> },
   "hookMelody": { "strength": "weak"|"decent"|"strong"|"exceptional", "note": "<what the main hook/melody/lead actually is and whether it sticks>" },
   "mixCharacter": "<2-3 sentences: what the mix actually sounds like — clarity, balance, low end, top end, anything audibly off (mud, harshness, buried elements, clipping)>",
@@ -69,6 +83,8 @@ function coerceFindings(raw: unknown): ListenFindings | null {
   const oneOf = <T extends string>(v: unknown, allowed: T[], dflt: T): T =>
     allowed.includes(v as T) ? (v as T) : dflt;
   return {
+    detectedGenre: isScoreGenre(o.detectedGenre) ? o.detectedGenre : null,
+    genreConfidence: oneOf(o.genreConfidence, ["low", "medium", "high"], "low"),
     vocals: {
       present: Boolean(o.vocals?.present),
       sung: Boolean(o.vocals?.sung),
@@ -203,6 +219,9 @@ export async function listenToTrack(input: ListenInput): Promise<ListenFindings 
 export function describeListenFindings(lf: ListenFindings): string {
   const lines: string[] = [
     `HEARD (an expert listener heard the opening excerpt — this is direct listening evidence, weight it above inference):`,
+    ...(lf.detectedGenre
+      ? [`- genre heard: ${lf.detectedGenre} (${lf.genreConfidence} confidence)`]
+      : []),
     `- vocals: ${lf.vocals.sung ? `sung/rapped vocal present${lf.vocals.performance ? ` — ${lf.vocals.performance}` : ""}` : lf.vocals.present ? "vocal textures present but nothing clearly sung" : "instrumental (no vocals heard)"}`,
     `- hook/melody: ${lf.hookMelody.strength}${lf.hookMelody.note ? ` — ${lf.hookMelody.note}` : ""}`,
     `- mix: ${lf.mixCharacter}`,
