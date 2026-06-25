@@ -81,6 +81,12 @@ export type GeneratedReport = {
   aiSummary: string;
   reactions: ReviewerReaction[];
   priorityFixes: PriorityFix[];
+  /** The genre the engine actually graded against — set by engine v2 when the
+   *  listen pass classified a genre the artist hadn't. The caller persists it so
+   *  the report header + the release bar's norms reflect the real genre. Absent
+   *  (v1 / fallback / artist-specified) → the caller keeps the stated genre. */
+  genre?: string;
+  genreFromListen?: boolean;
   /** Engine-v2 evidence trail (listen findings, priors, findings sheet) —
    * persisted in reviewerQuotes for debugging + the harness. No audio payloads. */
   evidence?: {
@@ -558,19 +564,26 @@ export async function generateReport(
       if (graded) {
         // Prose pass: same voice rules, numbers locked to the engine's grade,
         // grounded in the findings sheet (incl. what the listen pass heard).
-        const prose = await generateViaPrompt(input, {
-          ...opts,
-          locked: {
-            score: graded.score,
-            categories: (
-              ["hook", "production", "retention", "emotional", "commercial"] as const
-            ).map((key) => ({ key, score: graded.dims[key] })),
-          },
-          findingsText: graded.findingsText,
-        });
+        // Use the engine's RESOLVED genre so the prose talks about the genre the
+        // track actually is, not the "Other" default.
+        const prose = await generateViaPrompt(
+          { ...input, genre: graded.genre },
+          {
+            ...opts,
+            locked: {
+              score: graded.score,
+              categories: (
+                ["hook", "production", "retention", "emotional", "commercial"] as const
+              ).map((key) => ({ key, score: graded.dims[key] })),
+            },
+            findingsText: graded.findingsText,
+          }
+        );
         const dims = graded.dims;
         return {
           ...prose,
+          genre: graded.genre,
+          genreFromListen: graded.genreFromListen,
           score: graded.score,
           percentile: clamp(100 - graded.score + 8, 3, 95),
           verdict: verdictForScore(graded.score),
@@ -1019,17 +1032,27 @@ async function runGeneration(
     { prior }
   );
 
+  // Genre the engine actually graded against: the artist's pick when they gave
+  // one, otherwise what the listen pass heard. Drives the release-bar norms and
+  // the report header — persisted below only when detection changed it, so a
+  // human pick is never clobbered.
+  const resolvedGenre = generated.genre ?? genre;
+  const genreChanged = generated.genreFromListen === true && resolvedGenre !== genre;
+
   // Decision-report (verdict) payload: the release bar (measured craft vs the
   // genre's release envelope) + ranked blockers, plus a verdict that can't read
   // "ready" with a measured blocker. Null when nothing measured grounds it →
   // the report renders the legacy view (backward-compatible).
-  const verdictPayload = buildVerdictPayload(generated, features, genre);
+  const verdictPayload = buildVerdictPayload(generated, features, resolvedGenre);
 
   await prisma.trackScoreReport.update({
     where: { id: reportId },
     data: {
       // Backfill the title from oEmbed when the submitter didn't give one.
       ...(trackTitle ? { trackTitle } : {}),
+      // Persist the heard genre when the artist left it unspecified, so the
+      // header and any re-runs (deep read) use the real genre.
+      ...(genreChanged ? { genre: resolvedGenre } : {}),
       ...(meta?.artworkUrl ? { artworkUrl: meta.artworkUrl } : {}),
       ...(features?.fingerprint ? { fingerprint: features.fingerprint as object } : {}),
       ...(verdictPayload

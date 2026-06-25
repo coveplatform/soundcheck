@@ -42,6 +42,13 @@ export type GradedDimensions = {
 export type GradeResult = {
   score: number;
   dims: GradedDimensions;
+  /** The genre the engine actually graded against — the artist's pick when they
+   *  gave one, otherwise the genre the listen pass heard (when confident). The
+   *  caller persists this so the report + norms reflect what the track really is
+   *  instead of the "Other" default. */
+  genre: string;
+  /** True when `genre` came from the listen pass rather than the artist. */
+  genreFromListen: boolean;
   /** The findings sheet (pass-1 output) — fed to the prose pass as evidence. */
   findingsText: string;
   /** What the engine knew, for debugging/persistence (no audio payloads). */
@@ -74,6 +81,30 @@ const WEIGHTS: GradedDimensions = {
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const r1 = (v: number) => Math.round(v * 10) / 10;
+
+/**
+ * Resolve the genre to grade against. The artist's explicit pick always wins;
+ * only when they left it unspecified ("Other"/empty) do we adopt what the listen
+ * pass heard — and only when it's confident and not itself "Other". A wrong or
+ * low-confidence guess never overrides; we keep the cautious default instead.
+ */
+export function resolveGenre(
+  stated: string | null | undefined,
+  detected: string | null,
+  confidence: "low" | "medium" | "high" | undefined
+): { genre: string; fromListen: boolean } {
+  const s = (stated ?? "").trim();
+  const statedIsSpecific = s !== "" && s.toLowerCase() !== "other";
+  if (statedIsSpecific) return { genre: s, fromListen: false };
+  if (
+    detected &&
+    detected.toLowerCase() !== "other" &&
+    (confidence === "medium" || confidence === "high")
+  ) {
+    return { genre: detected, fromListen: true };
+  }
+  return { genre: s || "Other", fromListen: false };
+}
 
 function median(xs: number[]): number {
   const s = [...xs].sort((a, b) => a - b);
@@ -251,12 +282,10 @@ export async function gradeTrack(input: GradeInput): Promise<GradeResult | null>
   if (!apiKey) return null;
   const model = process.env.SCORE_REPORT_MODEL || process.env.OPENAI_MODEL || "gpt-4o";
 
-  // Evidence assembly (cheap, deterministic).
+  // The listen pass runs FIRST — it's the only stage that actually hears audio,
+  // so it also classifies the genre. When the artist left genre unspecified we
+  // grade against what the track really is, not the "Other" default.
   const stats = waveformStats(input.features?.waveform ?? null);
-  const normLines = input.features ? normDeltaLines(input.features, input.genre, stats) : [];
-  const priors = computePriors(input.features, input.genre, stats);
-
-  // The listen pass — the only stage that actually hears audio.
   const excerpt = (input.features as { excerpt?: { b64: string; format?: string; durationSec?: number } } | null)
     ?.excerpt;
   const listen = excerpt
@@ -268,11 +297,24 @@ export async function gradeTrack(input: GradeInput): Promise<GradeResult | null>
     : null;
   const listenText = listen ? describeListenFindings(listen) : null;
 
+  // Resolve genre (artist pick > confident listen detection > "Other"), then
+  // assemble all genre-relative evidence against THAT genre.
+  const { genre: resolvedGenre, fromListen: genreFromListen } = resolveGenre(
+    input.genre,
+    listen?.detectedGenre ?? null,
+    listen?.genreConfidence
+  );
+  const gi: GradeInput = { ...input, genre: resolvedGenre };
+
+  // Evidence assembly (cheap, deterministic) — genre-relative.
+  const normLines = gi.features ? normDeltaLines(gi.features, resolvedGenre, stats) : [];
+  const priors = computePriors(gi.features, resolvedGenre, stats);
+
   // Pass 1 — findings.
   const findingsRaw = await jsonCall(
     apiKey,
     model,
-    findingsPrompt(input, normLines, listenText),
+    findingsPrompt(gi, normLines, listenText),
     0.2,
     1600
   );
@@ -290,12 +332,12 @@ export async function gradeTrack(input: GradeInput): Promise<GradeResult | null>
   const findingsText = renderFindings(sheet);
 
   // Pass 2 — grade 3× in parallel, median per dimension.
-  const f = input.features;
+  const f = gi.features;
   const spanNote =
     f?.sourceDurationSec && f.durationSec && f.sourceDurationSec > f.durationSec + 5
       ? `SPAN: only the opening ${Math.round(f.durationSec)}s of a ${Math.round(f.sourceDurationSec)}s track was analysed and heard — the payoff may live beyond the evidence.`
       : null;
-  const prompt = gradingPrompt(input, findingsText, priors, spanNote);
+  const prompt = gradingPrompt(gi, findingsText, priors, spanNote);
   const samples = (
     await Promise.all([
       jsonCall(apiKey, model, prompt, 0.7, 400),
@@ -324,6 +366,8 @@ export async function gradeTrack(input: GradeInput): Promise<GradeResult | null>
   return {
     score,
     dims,
+    genre: resolvedGenre,
+    genreFromListen,
     findingsText,
     evidence: { listen, priors, normLines, gradeSamples: samples },
   };

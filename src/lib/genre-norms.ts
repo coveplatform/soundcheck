@@ -15,10 +15,23 @@ import type { AudioFeatures } from "@/lib/audio-analysis";
  *      grading pass must stay near — so two tracks with different masters can
  *      never collapse onto the same number.
  *
- * Norm values are initial engineering estimates; the reference-corpus pass
- * (Option D) recalibrates them from measured released music. Loudness fields
- * compare against the worker's `loudnessLufs`, which is actually mono-16kHz
- * RMS dBFS (reads a few dB below streaming LUFS).
+ * NORM SOURCES — the bands below are grounded in published references, not
+ * guesses, though they stay flagged `estimated` on the report until the measured
+ * reference-corpus pass (Option D) tightens them into real percentiles:
+ *   - Loudness: streaming platforms normalise playback to ~−14 LUFS (Spotify,
+ *     YouTube, Tidal, Amazon) and Apple Music to −16 LUFS, so masters cluster
+ *     around −8 to −14 LUFS integrated by genre (AES streaming-loudness work;
+ *     Spotify/Apple published targets). Our worker reports mono-16kHz RMS dBFS,
+ *     which reads a few dB BELOW integrated LUFS — the windows below are in that
+ *     RMS-dBFS space, hence the lower-looking numbers.
+ *   - Dynamics: crest-factor / DR bands follow the Pleasurize "Dynamic Range
+ *     Database" and loudness-war measurements — modern masters DR5–9, quieter/
+ *     acoustic genres DR10+; below ~DR6 reads as hyper-compressed.
+ *   - Intro / time-to-hook: streaming skip studies put the early-drop-off cliff
+ *     in the first ~5–30s, with pop the least patient and electronic/ambient/
+ *     post-rock granted long deliberate builds — reflected in `introLiftSec`.
+ * Treat the exact numbers as the best published estimate; the corpus pass is
+ * what makes them measured.
  */
 
 export type GenreFamily =
@@ -133,14 +146,20 @@ const NORMS: Record<GenreFamily, GenreNorms> = {
 export function genreFamily(genre: string | null | undefined): GenreFamily {
   const g = (genre ?? "").toLowerCase();
   const has = (...keys: string[]) => keys.some((k) => g.includes(k));
-  if (has("house", "techno", "edm", "electronic", "dance", "dnb", "drum", "dubstep", "trance"))
+  if (has("house", "techno", "edm", "electronic", "dance", "club", "dnb", "drum", "dubstep", "trance"))
     return "electronic";
   if (has("hip", "trap", "rap", "drill", "grime")) return "hiphop";
   if (has("lo-fi", "lofi", "chill", "ambient")) return "lofi";
   if (has("r&b", "rnb", "soul")) return "rnb";
+  // Rock before pop so "indie rock" lands in rock, not pop.
   if (has("rock", "metal", "punk", "grunge")) return "rock";
-  if (has("acoustic", "singer", "songwriter", "folk", "country")) return "acoustic";
-  if (has("pop")) return "pop";
+  // Jazz / classical / orchestral share the acoustic family's wide-dynamic,
+  // long-intro, low-loudness profile — the worst possible fit is the loud,
+  // hook-fast "Other" default.
+  if (has("acoustic", "singer", "songwriter", "folk", "country", "jazz", "classical", "orchestral", "score"))
+    return "acoustic";
+  // Indie (pop-leaning) and Latin pop sit closest to the pop family.
+  if (has("pop", "indie", "latin")) return "pop";
   return "other";
 }
 
