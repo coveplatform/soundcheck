@@ -263,7 +263,7 @@ export default async function AlternativePage({
             get your track right before you pitch it.
           </h2>
           <p className="text-black/70 mb-9 max-w-xl leading-relaxed normal-case">
-            Paste your track and get an instant AI score plus honest reactions from a room of real listeners. Free to submit — no credit card required.
+            Paste your track and get an instant verdict on whether it&apos;s ready to release — backed by honest reactions from a room of real listeners. Free to submit — no credit card required.
           </p>
           <Link
             href="/"

@@ -1,14 +1,28 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getReportHumanReviews, getScoreRoomQuota } from "@/lib/score-review";
 import { isFreeOpenRead } from "@/lib/score-free-cap";
 import { SealedPaywall } from "@/components/score/sealed-paywall";
 import { ReportView, type ReportViewModel, type Verdict } from "./report-view";
+import {
+  VerdictReportView,
+  type VerdictReportData,
+} from "@/components/score/verdict-report-view";
+import type { ReleaseAxis, Blocker } from "@/components/score/verdict-types";
 // Real measured waveform for the demo (worker `_report_waveform` output,
 // borrowed from the demo-free prototype's sample track).
 import demoWaveRaw from "../demo-free/cutandrun-wave.json";
 
 export const dynamic = "force-dynamic";
+
+// User reports are private to the artist and shouldn't be indexed.
+export const metadata: Metadata = {
+  title: "Your Track Report",
+  description:
+    "Your track's release verdict and the report behind it — measured craft versus the release bar, plus reactions from a room of real listeners.",
+  robots: { index: false, follow: false },
+};
 
 const ROOM_SIZE = 20;
 
@@ -390,6 +404,50 @@ export default async function ReportPage({
     // The measured 3-band waveform (worker `_report_waveform`) — unlocked only.
     waveform: (report.waveform as ReportViewModel["waveform"]) ?? null,
   };
+
+  // ── Decision-report (verdict) layout ──
+  // Render the verdict view ONLY when the report carries a generated release bar
+  // (set by score-report-ai for newly-measured tracks). Existing reports — and
+  // any report whose generation couldn't ground a bar (e.g. metadata-only reads)
+  // — have null releaseBar and render the legacy ReportView unchanged. The
+  // sealed / open-read / unlocked states + the real human room carry through.
+  const releaseBar = (report.releaseBar as ReleaseAxis[] | null) ?? null;
+  if (releaseBar && releaseBar.length > 0 && !data.invalid) {
+    const blockers = (report.blockers as Blocker[] | null) ?? [];
+    // Surface the strongest dimension on the craft check (cosmetic tag).
+    const strongest = data.categories.reduce(
+      (best, c) => (c.score > best.score ? c : best),
+      data.categories[0]
+    );
+    const verdictData: VerdictReportData = {
+      slug: data.slug,
+      trackTitle: data.trackTitle,
+      artworkUrl: data.artworkUrl,
+      genre: data.genre,
+      scoredAt: data.scoredAt,
+      isDemo: false,
+      unlocked: data.unlocked,
+      openRead: data.openRead,
+      verdict: data.verdict,
+      releaseBar,
+      blockers,
+      score: data.score,
+      aiSummary: data.aiSummary,
+      summaryHeadline: data.summaryHeadline,
+      categories: data.categories.map((c) => ({
+        label: c.label,
+        score: c.score,
+        tag: c === strongest ? "strongest" : null,
+      })),
+      waveform: data.waveform,
+      humanReviews: data.humanReviews,
+      humanReviewsIn: data.humanReviewsIn,
+      humanReviewsTotal: data.humanReviewsTotal,
+      roomSkipped: data.roomSkipped,
+      roomResetsAt: data.roomResetsAt,
+    };
+    return <VerdictReportView data={verdictData} />;
+  }
 
   return <ReportView data={data} />;
 }

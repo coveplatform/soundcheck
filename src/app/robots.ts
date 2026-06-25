@@ -6,8 +6,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      // Keep crawlers out of the app, auth, API and the sunsetting Classic
-      // product. Only the public marketing surface should be indexed.
+      // Keep crawlers out of the app, auth, API and the legacy peer-review
+      // dashboard. Only the public marketing surface should be indexed.
       disallow: [
         "/dashboard",
         "/admin",
@@ -25,6 +25,7 @@ export default function robots(): MetadataRoute.Robots {
         "/support/tickets",
         "/score-review/",
         "/r/",
+        "/report/",
         "/classic",
       ],
     },

@@ -186,7 +186,6 @@ export default async function AdminPage() {
         <ToolCard href="/submit-score" tag="Product" title="Submit Score Form" subtitle="View the track submission + checkout page" />
         <ToolCard href="/admin/emails" tag="Tool" title="Email Templates" subtitle="Preview and test-send all email templates" />
         <ToolCard href="/admin/announcement" tag="📣 Email Blast" title="MixReflect Announcement" subtitle="Preview, test-send, then blast the what's-new email" accent />
-        <ToolCard href="/admin/recapture" tag="Win-back" title="Recapture Campaign" subtitle="Email lapsed users + add free credits" />
         <WelcomeEmailTestCard />
         <ToolCard href="/admin/track-of-the-day" tag="Editorial" title="Track of the Day" subtitle="Edit the daily editor's note & pick winner" />
         <ToolCard href="/admin/reviewer-profile-demo" tag="Preview" title="Reviewer Profile" subtitle="What artists see when they view a reviewer" />

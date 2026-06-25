@@ -17,6 +17,14 @@ import { PayoutButton } from "./payout-button";
 import { ReviewHistory } from "./review-history";
 import { AccountMenu } from "../dashboard/account-menu";
 import { ArrowRight, Headphones, Plus, Zap, Wallet, Clock } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Listener Queue — Tracks Waiting for the Room",
+  description:
+    "Your MixReflect listener queue: genre-matched tracks waiting on your honest reaction before release. Listen, react, and track your earnings.",
+  robots: { index: false, follow: false },
+};
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });

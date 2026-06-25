@@ -54,9 +54,9 @@ const STEPS = [
   "fetching your track",
   "mapping the energy curve",
   "checking the hook + structure",
+  "measuring it against released tracks",
   "weighing it across 5 dimensions",
-  "scoring against released music",
-  "writing your instant read",
+  "calling the release verdict",
   "almost there…",
 ];
 
@@ -211,15 +211,23 @@ function ReportPreview() {
           </span>
         </div>
 
-        {/* score with a glowing halo */}
-        <div className="relative flex flex-col items-center text-center px-6 pt-7 pb-6 border-b border-white/10">
+        {/* the verdict — the headline; the score sits beside it as evidence */}
+        <div className="relative flex items-center justify-center gap-6 px-6 pt-7 pb-6 border-b border-white/10">
           <div
             className="absolute left-1/2 top-1/2 w-44 h-44 -translate-x-1/2 -translate-y-1/3 rounded-full blur-3xl pointer-events-none"
             style={{ background: ACCENT, opacity: 0.5, animation: "ringGlow 3s ease-in-out infinite" }}
           />
-          <p className={`${mono.className} relative text-[11px] text-white/40 mb-4`}>resonance score</p>
-          <div className="relative">
-            <ScoreRing score={SAMPLE.score} size="md" dark animate />
+          <div className="relative text-left">
+            <p className={`${mono.className} text-[11px] text-white/40 mb-1.5`}>the verdict</p>
+            <p className="text-3xl font-extrabold leading-none tracking-tight" style={{ color: ACCENT }}>
+              almost there
+            </p>
+            <p className={`${mono.className} text-[11px] text-white/45 normal-case mt-2`}>
+              one fix from release ready
+            </p>
+          </div>
+          <div className="relative shrink-0">
+            <ScoreRing score={SAMPLE.score} size="sm" dark animate />
           </div>
         </div>
 
@@ -288,7 +296,7 @@ function PasteMock() {
 
 /** Step 2 — the analysis terminal, finished (real app log). */
 function LogMock() {
-  const lines = ["fetching track", "energy curve", "hook + structure", "5 dimensions", "your read"];
+  const lines = ["fetching track", "energy curve", "hook + structure", "vs released tracks", "the verdict"];
   return (
     <div className={`${mono.className} bg-[#080808] border border-white/12 p-4 text-[11.5px] leading-6`}>
       {lines.map((s) => (
@@ -364,8 +372,8 @@ function audioDuration(file: File): Promise<number | null> {
 
 const FAQS: { q: string; a: string }[] = [
   {
-    q: "How does the AI track score work?",
-    a: "Paste a link or upload your track and the AI listens to the whole thing, then scores it out of 100 across five dimensions: hook, production, retention, emotional impact and commercial pull. You also get a written verdict and the three most impactful fixes.",
+    q: "How does the release verdict work?",
+    a: "Paste a link or upload your track and the AI listens to the whole thing, then calls it on a four-state ladder — release ready, almost there, needs work or not ready — measured against what actually gets released in your genre. You also get a score out of 100 as supporting evidence, a written read across five dimensions, and the three fixes that close the gap.",
   },
   {
     q: "Who are the five listeners in the room?",
@@ -376,8 +384,8 @@ const FAQS: { q: string; a: string }[] = [
   {
     q: "Is MixReflect actually free?",
     a: FREE_FULL_READ
-      ? "Your first track is — the complete report, free: score out of 100, the full written read, all three fixes and the measured waveform, no card needed. After that, each track's report opens for a one-time $6.95 (which also sends it to the room of five real listeners), or $19.95/month for unlimited."
-      : "Yes. Submitting a track is free and gets you your score out of 100, the verdict, the five-dimension breakdown, every reaction headline and your three fixes — no card needed. Unlocking the complete report for one track is a one-time $6.95, or $19.95/month for unlimited auto-unlocks.",
+      ? "Your first track is — the complete report, free: the release verdict, score out of 100, the full written read, all three fixes and the measured waveform, no card needed. After that, each track's report opens for a one-time $6.95 (which also sends it to the room of five real listeners), or $19.95/month for unlimited."
+      : "Yes. Submitting a track is free and gets you the release verdict, your score out of 100, the five-dimension breakdown, every reaction headline and your three fixes — no card needed. Unlocking the complete report for one track is a one-time $6.95, or $19.95/month for unlimited auto-unlocks.",
   },
   {
     q: "What can I submit?",
@@ -385,7 +393,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "How is this different from SubmitHub or Groover?",
-    a: "Those platforms pitch your music to playlists and curators. MixReflect tells you whether the track is ready in the first place — an honest score and real listener reactions before you spend money promoting it.",
+    a: "Those platforms pitch your music to playlists and curators. MixReflect tells you whether the track is ready to release in the first place — a measured verdict and real listener reactions before you spend a cent promoting it.",
   },
   {
     q: "Do I keep my reports?",
@@ -888,17 +896,41 @@ export default function ScorePage() {
           {/* left — copy + paste box */}
           <div>
             <p className={`${mono.className} text-[13px] tracking-tight text-white/40 mb-6`}>
-              [ honest feedback before you release ]
+              [ the release verdict ]
             </p>
-            <h1 className="text-[14vw] sm:text-[64px] lg:text-[76px] leading-[0.9] tracking-[-0.04em] font-extrabold">
-              your track,
+            <h1 className="text-[12.5vw] sm:text-[58px] lg:text-[70px] leading-[0.9] tracking-[-0.04em] font-extrabold">
+              know if it&apos;s
               <br />
-              heard for <span style={{ color: ACCENT }}>real</span>.
+              ready to <span style={{ color: ACCENT }}>release</span>.
             </h1>
             <p className="text-lg text-white/55 mt-7 max-w-md normal-case">
-              Honest music feedback and an instant track score — an AI read out
-              of 100, then real reactions from a room of five listeners.
+              Paste a track and get the verdict — release ready, almost there,
+              needs work or not ready — measured against what actually gets
+              released. Then a room of five real listeners hears it too.
             </p>
+
+            {/* the four-state verdict ladder — the hero's promise, made literal */}
+            <div className="mt-6 flex items-stretch gap-px bg-white/10 border border-white/10 max-w-md overflow-hidden">
+              {[
+                ["not ready", "#ff7a90"],
+                ["needs work", "#b8a4ff"],
+                ["almost there", ACCENT],
+                ["release ready", "#7cffc4"],
+              ].map(([label, ink], i) => (
+                <div
+                  key={label}
+                  className="flex-1 min-w-0 py-2 px-1 flex items-center justify-center text-center"
+                  style={{
+                    background: i === 2 ? (ink as string) : "#0a0a0a",
+                    color: i === 2 ? "#000" : "rgba(255,255,255,0.3)",
+                  }}
+                >
+                  <span className={`${mono.className} block text-[9.5px] sm:text-[11px] font-bold leading-tight tracking-tight`}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
 
             {/* paste box + preview card */}
             <form onSubmit={start} className="mt-8 max-w-xl">
@@ -1038,7 +1070,7 @@ export default function ScorePage() {
                   </>
                 ) : (
                   <>
-                    score my track — free
+                    get my verdict — free
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                   </>
                 )}
@@ -1066,12 +1098,12 @@ export default function ScorePage() {
             {/* trust tags */}
             <div className={`${mono.className} mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-white/50`}>
               <span className="inline-flex items-center gap-1.5" style={{ color: ACCENT }}>
-                <Zap className="h-3.5 w-3.5" /> instant read
+                <Zap className="h-3.5 w-3.5" /> instant verdict
               </span>
               <span className="text-white/20">·</span>
-              <span>real listeners</span>
+              <span>a room of real listeners</span>
               <span className="text-white/20">·</span>
-              <span>unbiased</span>
+              <span>measured, not guessed</span>
               <span className="text-white/20">·</span>
               <span>no card</span>
             </div>
@@ -1141,21 +1173,18 @@ export default function ScorePage() {
         </div>
       </section>
 
-      {/* ── PLAYED FOR THE ROOM (what you get — real listeners + AI read) ── */}
-      <RoomShowcase />
-
       {/* ── HOW IT WORKS (visual flow) ── */}
       <section id="how" className="relative z-10 border-t border-white/10 scroll-mt-16">
         <div className="max-w-6xl mx-auto px-5 py-20">
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-12">
-            paste. ai read. the room. verdict.
+            paste. measured verdict. the room. release call.
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border border-white/10">
             {[
               { n: "01", t: "paste your link", v: <PasteMock /> },
-              { n: "02", t: "your instant read", v: <LogMock /> },
-              { n: "03", t: "the real room", v: <RoomMock /> },
-              { n: "04", t: "your verdict", v: <VerdictMock /> },
+              { n: "02", t: "measured against released tracks", v: <LogMock /> },
+              { n: "03", t: "the real room hears it", v: <RoomMock /> },
+              { n: "04", t: "your release verdict", v: <VerdictMock /> },
             ].map((s) => (
               <div key={s.n} className="bg-[#0a0a0a] p-5 sm:p-6 flex flex-col">
                 <div className={`${mono.className} flex items-center gap-2 text-[12px] mb-5`}>
@@ -1169,13 +1198,13 @@ export default function ScorePage() {
             ))}
           </div>
 
-          {/* verdict spectrum — solid colour blocks */}
+          {/* the four-state verdict ladder — solid colour blocks, not ready → ready */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/10 border border-white/10 mt-px">
             {[
-              ["release ready", "#7cffc4"],
-              ["almost there", ACCENT],
-              ["needs work", "#b8a4ff"],
               ["not ready", "#ff7a90"],
+              ["needs work", "#b8a4ff"],
+              ["almost there", ACCENT],
+              ["release ready", "#7cffc4"],
             ].map(([label, ink]) => (
               <div
                 key={label}
@@ -1189,7 +1218,7 @@ export default function ScorePage() {
 
           {/* what we check — pills, no prose */}
           <div className="flex flex-wrap items-center gap-2.5 mt-10">
-            <span className={`${mono.className} text-[12px] text-white/40 mr-1`}>graded on</span>
+            <span className={`${mono.className} text-[12px] text-white/40 mr-1`}>the verdict weighs</span>
             {CHECKS.map((c) => (
               <span
                 key={c.t}
@@ -1205,13 +1234,13 @@ export default function ScorePage() {
       {/* ── TWO-STAGE READ (solid blue) ── */}
       <section id="why" className="relative z-10 border-t border-white/10 bg-[#6ee7ff] text-black lowercase scroll-mt-16">
         <div className="max-w-6xl mx-auto px-5 py-20">
-          <p className={`${mono.className} text-[13px] text-black/50 mb-4`}>[ how the read works ]</p>
+          <p className={`${mono.className} text-[13px] text-black/50 mb-4`}>[ two pillars, one track ]</p>
           <h2 className="text-4xl sm:text-6xl font-extrabold tracking-[-0.03em] leading-[0.9] max-w-2xl">
-            an instant read. then real ears.
+            the instant verdict. then real ears.
           </h2>
           <p className="text-black/70 text-lg mt-6 max-w-lg normal-case">
-            Two reads on one track — the deep analysis lands now, real listeners
-            land after.
+            The measured verdict lands now — and the same track goes to a room
+            of real listeners, so the call has human ears behind it too.
           </p>
 
           <div className="grid md:grid-cols-[1fr_auto_1fr] items-stretch gap-6 mt-12">
@@ -1223,10 +1252,11 @@ export default function ScorePage() {
                 </span>
                 <Zap className="h-6 w-6" style={{ color: ACCENT }} />
               </div>
-              <h3 className="text-2xl font-extrabold tracking-tight">instant deep analysis</h3>
+              <h3 className="text-2xl font-extrabold tracking-tight">the measured verdict</h3>
               <p className="text-white/55 text-[14.5px] leading-relaxed normal-case mt-2 mb-6">
-                ai listens to the actual audio and scores it across five
-                dimensions — with the fixes that matter most.
+                ai listens to the actual audio, measures it against released
+                tracks, and calls it — ready, almost, or not — with the fixes
+                that close the gap.
               </p>
               <div className="mt-auto flex items-center gap-5">
                 <ScoreRing score={SAMPLE.score} size="sm" dark animate />
@@ -1288,6 +1318,9 @@ export default function ScorePage() {
           </div>
         </div>
       </section>
+
+      {/* ── PLAYED FOR THE ROOM (the co-pillar — real listeners, below the verdict) ── */}
+      <RoomShowcase />
 
       {/* ── BECOME A REVIEWER ── */}
       <section id="earn" className="relative z-10 border-t border-white/10 scroll-mt-16">
@@ -1398,8 +1431,8 @@ export default function ScorePage() {
               </p>
               <ul className={`${mono.className} mt-7 space-y-2.5 text-[13.5px] text-white/55 normal-case`}>
                 {(FREE_FULL_READ
-                  ? ["your first track's FULL report", "score, verdict + the complete written read", "all three fixes, in full", "the measured waveform"]
-                  : ["your score out of 100", "verdict + 5-dimension breakdown", "every reaction headline", "the three things to fix"]
+                  ? ["your first track's FULL report", "the release verdict + score, in full", "the complete written read + all 3 fixes", "the measured waveform"]
+                  : ["the release verdict", "score out of 100 + 5-dimension read", "every reaction headline", "the three things to fix"]
                 ).map((x) => (
                   <li key={x} className="flex gap-2"><span style={{ color: ACCENT }}>+</span>{x}</li>
                 ))}

@@ -8,6 +8,14 @@ import { Logo } from "@/components/ui/logo";
 import { OptInButton } from "../score-review/opt-in-button";
 import { SCORE_REVIEW_RATE_CENTS, SCORE_PAYOUT_THRESHOLD_CENTS } from "@/lib/score-review";
 import { ArrowRight, Headphones, Wallet, Zap } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Become a Listener — Get Paid to Be the Room",
+  description:
+    "Join the room of real listeners that backs every MixReflect verdict. Hear genre-matched tracks before release, leave honest reactions, and get paid for your ears.",
+  alternates: { canonical: "/reviewer" },
+};
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });

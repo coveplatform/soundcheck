@@ -149,25 +149,6 @@ export async function fetchTrackMetadata(url: string): Promise<TrackMetadata | n
 
 // Package configuration
 export const PACKAGES = {
-  RELEASE_DECISION: {
-    name: "Release Decision",
-    reviews: 10, // 10-12 expert reviews
-    minProReviews: 10, // All must be PRO tier
-    price: 995, // $9.95 cash only - premium service
-    creditsRequired: 0, // Cash only - no credit option
-    description: "Expert panel verdict: Should you release this track? Get a clear Go/No-Go with actionable fixes",
-    mix: "10-12 expert reviewers (100+ reviews, 4.5+ rating)",
-    features: [
-      "Clear Go/No-Go verdict from expert panel",
-      "Release readiness score (0-100)",
-      "Top 3 fixes ranked by impact & time estimate",
-      "Competitive genre benchmarking",
-      "Strongest elements & biggest risks identified",
-      "Compiled technical analysis report",
-      "Compiled actionable report delivered to email",
-      "24-hour delivery guarantee",
-    ],
-  },
   PEER: {
     name: "General Feedback",
     reviews: 0, // dynamic - set by user
@@ -230,6 +211,6 @@ export const PACKAGES = {
   },
 } as const;
 
-export const ACTIVE_PACKAGE_TYPES = ["RELEASE_DECISION", "PEER"] as const;
+export const ACTIVE_PACKAGE_TYPES = ["PEER"] as const;
 
 export type PackageType = keyof typeof PACKAGES;

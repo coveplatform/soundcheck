@@ -10,7 +10,6 @@ export type EditorNoteInput = {
     productionScore: number | null;
     vocalScore: number | null;
     originalityScore: number | null;
-    releaseVerdict: string | null;
     firstImpression: string | null;
     strongestElement: string | null;
     biggestRisk: string | null;
@@ -28,7 +27,6 @@ function buildPrompt(input: EditorNoteInput): string {
     ? "(No peer reviews yet — write from the track metadata alone.)"
     : reviews.slice(0, 6).map((r, i) => {
         const parts: string[] = [];
-        if (r.releaseVerdict) parts.push(`verdict: ${r.releaseVerdict}`);
         if (r.firstImpression) parts.push(`first impression: "${r.firstImpression}"`);
         if (r.strongestElement) parts.push(`strongest: "${r.strongestElement}"`);
         if (r.biggestRisk) parts.push(`weakness: "${r.biggestRisk}"`);
@@ -104,7 +102,6 @@ export async function generateEditorNoteForSubmission(submissionId: string): Pro
               productionScore: true,
               vocalScore: true,
               originalityScore: true,
-              releaseVerdict: true,
               firstImpression: true,
               strongestElement: true,
               biggestRisk: true,

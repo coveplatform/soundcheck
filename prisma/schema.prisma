@@ -246,8 +246,6 @@ model Review {
   vocalClarity            VocalClarity?
   biggestRisk             String?
   competitiveBenchmark    String?
-  releaseReadinessScore   Int?
-  releaseVerdict          ReleaseVerdict?
   strongestElement        String?
   topFixRank1             String?
   topFixRank1Impact       FixImpact?
@@ -428,8 +426,6 @@ model Track {
   requestedProReviewers      Boolean              @default(false)
   rushDelivery               Boolean              @default(false)
   rushDeliveryDeadline       DateTime?
-  releaseDecisionGeneratedAt DateTime?
-  releaseDecisionReport      Json?
   AddOnPayment               AddOnPayment[]
   ExternalPurchase           ExternalPurchase[]
   Payment                    Payment?
@@ -681,7 +677,6 @@ enum PackageType {
   PRO
   DEEP_DIVE
   PEER
-  RELEASE_DECISION
 }
 
 enum PaymentStatus {
@@ -748,12 +743,6 @@ enum TrackStatus {
   COMPLETED
   CANCELLED
   UPLOADED
-}
-
-enum ReleaseVerdict {
-  RELEASE_NOW
-  FIX_FIRST
-  NEEDS_WORK
 }
 
 enum FixImpact {
@@ -865,6 +854,13 @@ model TrackScoreReport {
   aiSummary        String?
   reviewerQuotes   Json?
   priorityFixes    Json?
+  // Decision-report (verdict) payload — NULLABLE, backward-compatible. When
+  // `releaseBar` is set the report renders the verdict layout; null falls back
+  // to the legacy ReportView. (`verdict` already exists above.)
+  //   releaseBar: per-axis { label, measured, band, ends, zone, pos, status, note, estimated }[]
+  //   blockers:   ranked    { rank, weight, label, detail }[]
+  releaseBar       Json?
+  blockers         Json?
   // Link-independent acoustic identity (duration/tempo/key/spectral/energy +
   // arrangement shape) from the audio worker. Lets us recognise re-uploads and
   // new versions of the same track across different links, so the read stays

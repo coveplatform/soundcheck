@@ -81,7 +81,7 @@ src/lib/
     index.ts           # Re-exports all email functions
     templates.ts       # Shared HTML helpers, sendEmail(), brand constants
     auth.ts            # Password reset email
-    reviews.ts         # Track queued, progress, intent, tier change, invalid link, release decision
+    reviews.ts         # Track queued, progress, intent, tier change, invalid link
     payments.ts        # Purchase confirmation email
     admin.ts           # Admin new track notification
     announcements.ts   # Blast/announcement emails
@@ -90,7 +90,6 @@ src/lib/
   stripe.ts            # Stripe client
   dashboard-helpers.ts # Dashboard stats, "what's next" guidance
   analytics-helpers.ts # Feedback word analysis
-  release-decision-report.ts # Report compilation
 
 src/app/api/           # All API routes
 src/app/(dashboard)/   # All protected pages (unified — no role split)
@@ -132,7 +131,6 @@ Stripe Price IDs configured via env vars (see below). Subscription lifecycle han
 | Type | Model | Notes |
 |---|---|---|
 | `PEER` | Freemium — 1 credit per review | Active |
-| `RELEASE_DECISION` | Expert panel — $9.95 cash | Active |
 | `STARTER`, `STANDARD`, `PRO`, `DEEP_DIVE` | Legacy paid packages | Deprecated — keep in schema, old DB rows reference them |
 
 ### Removed Features (do not re-add)
@@ -151,7 +149,7 @@ Stripe Price IDs configured via env vars (see below). Subscription lifecycle han
 |---|---|---|
 | v1 | Legacy only (no active UI) | `bestPart`, `weakestPart`, `productionScore` |
 | v2 | Active peer reviews | + technical checks, `qualityLevel`, `biggestWeaknessSpecific` |
-| v3 | Release Decision | + `releaseVerdict`, `releaseReadinessScore`, `topFixRank1/2/3` |
+| v3 | Extended peer reviews | + `topFixRank1/2/3`, `strongestElement`, `biggestRisk` |
 
 **Derived fields** — inject scripts must match the form logic (see MEMORY.md):
 - `productionScore` from `qualityLevel` enum

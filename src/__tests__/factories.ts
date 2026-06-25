@@ -152,8 +152,6 @@ export function createMockTrack(overrides: Partial<Track> = {}): Track {
     rushDelivery: false,
     rushDeliveryDeadline: null,
     cashAddOnTotal: 0,
-    releaseDecisionReport: null,
-    releaseDecisionGeneratedAt: null,
     ...overrides,
   }
 }
@@ -217,9 +215,7 @@ export function createMockReview(overrides: Partial<Review> = {}): Review {
     expectedPlacement: null,
     qualityLevel: null,
     reviewerExpertise: null,
-    // v3 release decision fields
-    releaseVerdict: null,
-    releaseReadinessScore: null,
+    // v3 top-fix fields
     topFixRank1: null,
     topFixRank1Impact: null,
     topFixRank1TimeMin: null,
