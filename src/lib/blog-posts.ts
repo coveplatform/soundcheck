@@ -2694,10 +2694,10 @@ const _posts: BlogPost[] = [
   },
   {
     slug: "how-music-producers-get-their-tracks-reviewed",
-    title: "How Music Producers Get Their Tracks Reviewed",
+    title: "How Music Producers Get Their Tracks Reviewed in 2026",
     coverImage: "/blog/blog2.jpg",
     excerpt:
-      "From blog submissions to peer platforms — the different ways producers get ears on their work, and what each one is actually good for.",
+      "How do producers actually get honest feedback on a track? The real options: peer review sites, blog and playlist submission, Discord, Reddit and paid critiques, with what each one does and when it's worth it.",
     category: "INDUSTRY",
     date: "May 26, 2026",
     readTime: "5 min read",
@@ -2902,10 +2902,10 @@ const _posts: BlogPost[] = [
   },
   {
     slug: "best-music-feedback-platforms-2026",
-    title: "Best Music Feedback Platforms in 2026",
+    title: "Best Music Feedback Platforms in 2026, Compared",
     coverImage: "/blog/blog5.jpg",
     excerpt:
-      "From Reddit threads to peer review platforms — here's what every major option is actually good for, and when to use each one.",
+      "Want honest feedback on your music in 2026? Here's how SubmitHub, Reddit, Discord, peer review sites and MixReflect compare, what each is actually good for, and which one to use when.",
     category: "GUIDE",
     date: "May 29, 2026",
     readTime: "6 min read",

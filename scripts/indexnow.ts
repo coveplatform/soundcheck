@@ -10,6 +10,8 @@ const HOST = new URL(SITE_URL).host;
 const urls = [
   BASE_URL,
   `${BASE_URL}/blog`,
+  `${BASE_URL}/feedback`,
+  `${BASE_URL}/alternatives`,
   `${BASE_URL}/discover`,
   `${BASE_URL}/breakthrough`,
   ...posts.map((p) => `${BASE_URL}/blog/${p.slug}`),

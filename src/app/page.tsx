@@ -1675,6 +1675,11 @@ export default function ScorePage() {
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <Link href="/feedback" className="text-white/70 hover:text-white transition-colors">
+                    all genres →
+                  </Link>
+                </li>
               </ul>
             </div>
             {/* compare */}
@@ -1688,6 +1693,11 @@ export default function ScorePage() {
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <Link href="/alternatives" className="text-white/70 hover:text-white transition-colors">
+                    all comparisons →
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
