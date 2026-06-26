@@ -671,7 +671,15 @@ export default function ScorePage() {
         const d = await r.json().catch(() => null);
         if (cancelled) return;
         if (d?.ready && typeof d.score === "number") {
+          // Brief verdict flash in the modal, then hand off to the real report.
           setDoneVerdict({ score: d.score, verdict: d.verdict ?? "" });
+          // Reveal on the real report page: the verdict + the locked report,
+          // with the signup panel popped over the dimmed page (?signup=1). The
+          // claim token finalizes the report once they create the account.
+          const claim = started?.claimToken
+            ? `&claim=${encodeURIComponent(started.claimToken)}`
+            : "";
+          window.location.assign(`/report/${slug}?signup=1${claim}`);
           return;
         }
       } catch {
@@ -1770,7 +1778,7 @@ export default function ScorePage() {
             {/* always-moving progress bar — the strongest "not frozen" signal */}
             <div className="mb-4">
               <CreepingBar
-                target={phase === "done" ? 96 : 12 + step * 11}
+                target={phase === "done" ? 100 : 12 + step * 11}
                 monoClass={mono.className}
               />
             </div>
