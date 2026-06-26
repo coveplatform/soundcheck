@@ -20,6 +20,108 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "when-is-a-song-finished",
+    title: "How Do I Know When a Song Is Finished?",
+    coverImage: "/blog/blog24.jpg",
+    excerpt:
+      "A song is finished when the next change you make is driven by anxiety rather than improvement. Most artists overshoot or undershoot that line because they are listening to a track they have heard a hundred times with no external signal to anchor them. The test that actually works is fresh ears: put the song in front of people who have never heard it and see what happens.",
+    category: "GUIDE",
+    date: "June 26, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "A song is finished when the next change you make is driven by anxiety rather than improvement. Most artists overshoot or undershoot that line because they have nothing to anchor them except their own ears on a track they have heard a hundred times. The test that actually cuts through is simple: put the song in front of people who have never heard it. If they connect with it, the song is done. If they tune out or get confused, you have a real problem to fix, not just a feeling.",
+      },
+      {
+        type: "h2",
+        text: "Why is it so hard to know when a song is done?",
+      },
+      {
+        type: "paragraph",
+        text: "The problem is exposure. After thirty, fifty, a hundred listens, you stop hearing the song and start hearing your memory of it. Your brain fills in the chorus you meant to write, the energy you imagined was there, the lyric that sounded sharper in your head. You lose the ability to hear the actual thing, which means you lose the ability to judge it. This is not a skill gap or a confidence issue. It is a physiological one. Familiarity rewires perception. Every working professional in music knows this and compensates for it deliberately, usually by leaving the track alone for a week or sending it to someone who has never heard it. Independent artists rarely have either luxury, which is why so many releases go out too rough or get buried in revision for months past the point of usefulness.",
+      },
+      {
+        type: "h2",
+        text: "What are the signs a song is actually finished?",
+      },
+      {
+        type: "paragraph",
+        text: "These are not feelings. They are concrete things you can check.",
+      },
+      {
+        type: "list",
+        items: [
+          "You can say in one sentence what the song is about and why someone should care. If you cannot, the concept is not finished.",
+          "Every section earns its place. If you could cut the bridge or the second pre-chorus without losing anything, it should probably go.",
+          "The hook is the loudest and clearest thing in the track, not buried two minutes in.",
+          "You have tested it on a system you do not control: a phone speaker, a car, earbuds. If it only sounds right on studio monitors, it is not done.",
+          "Fresh listeners can follow the song without an explanation from you beforehand.",
+          "The technical level is within range of what you hear in your genre. Not identical, but not a tier below.",
+          "You have no specific fix in mind. Just a vague sense of unease about nothing in particular. That is the sign of a finished song, not an unfinished one.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "How long should you spend on a song?",
+      },
+      {
+        type: "paragraph",
+        text: "There is no correct number. Prolific artists who release constantly tend to ship faster and improve faster. Perfectionists who labor over one track for a year often end up with a song that is technically polished but emotionally cold, because the energy that animated the original idea has long since been overwritten. The more useful question is not how long, but what are you still changing and why. If your changes are specific responses to concrete feedback, keep going. If you are adjusting things because you cannot stand sitting still, the song was done three sessions ago.",
+      },
+      {
+        type: "quote",
+        text: "You cannot hear your own song anymore. That is not weakness, it is physics. The only way out is another pair of ears that has no history with the track.",
+      },
+      {
+        type: "h2",
+        text: "Does releasing too early actually hurt you?",
+      },
+      {
+        type: "paragraph",
+        text: "Yes, but not the way most artists fear. A rough release does not destroy a career. What it does is waste the window. You only get one first impression on any platform. The algorithm surfaces a new song to a slice of your potential audience once. If the song does not hook them in the first fifteen seconds, that audience does not come back for the same track. There is no resubmit once Spotify has decided your song is middling. The cost of releasing too early is not embarrassment. It is spending the attention you will never get back on a version of the song that was not ready.",
+      },
+      {
+        type: "h2",
+        text: "What is the fastest honest test for whether a song is ready?",
+      },
+      {
+        type: "paragraph",
+        text: "Play it to someone who does not care about your feelings and has no reason to be kind. Watch their face. That is the honest test, and most artists do not have that person on call. What you can do is send it through MixReflect: paste a link and get an instant AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus three specific fixes, alongside reactions from a panel of five real listeners hearing the track for the first time. The listeners tell you what they actually felt; the AI flags the measurable gaps. Together they are the closest thing to that honest outside ear, fast enough to use before you finalize the master. The first report is free.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How do you know when a song is finished?",
+            a: "A song is finished when your changes are no longer responses to specific problems and have become driven by restlessness. The clearest external test is fresh listeners: if people who have never heard the track connect with it without any explanation from you, it is done. If they are confused or tune out before the hook, there is still real work to do.",
+          },
+          {
+            q: "Is it possible to over-produce a song?",
+            a: "Yes, and it is extremely common. Over-production usually sounds like a track that is technically dense but emotionally inert. Each layer made sense in isolation but together they leave no space for the listener to feel anything. The test is subtraction: mute elements and see if the song breathes better. If it does, you have been adding when you should have been removing.",
+          },
+          {
+            q: "What if I keep changing my mind about whether the song is done?",
+            a: "That is a sign you need external input, not more time alone with the track. The circular revision loop happens when an artist has no anchor outside their own judgment. Get a reaction from someone with no stake in the outcome. When that reaction gives you something concrete to fix, fix it. When the reaction is positive and you still want to keep changing things, the song is done and the anxiety is yours to manage, not the track's problem to solve.",
+          },
+          {
+            q: "Should I wait until my mix is perfect before releasing?",
+            a: "No. The mix should be good enough, meaning within range of your genre standard and technically clean. Perfect is a trap because it has no definition you can verify from inside the project. A song with a slightly imperfect mix that connects emotionally will always outperform a technically flawless track that does not hold attention. Fix the things that are genuinely wrong. Leave the rest alone.",
+          },
+          {
+            q: "How do professional artists know when a song is done?",
+            a: "Most professionals use a combination of time away from the track and trusted outside ears. Producers and engineers play rough mixes on different systems in different contexts to simulate how a real listener will experience it. Many artists set a hard deadline and release the best version available by that date, because revision without a deadline is just anxiety with a guitar.",
+          },
+          {
+            q: "What makes an intro too long?",
+            a: "An intro is too long when nothing happens before the hook that a new listener would care about. On streaming platforms you have about fifteen seconds before a casual listener skips. If your intro builds atmosphere for thirty seconds before the vocal or the hook arrives, you are testing patience that most listeners will not extend. The industry standard on new releases is to reach the hook by eight to twelve seconds, or have something specific enough to hold attention while you build.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "best-ai-music-feedback-tools",
     title: "Best AI Tools for Music Feedback in 2026",
     coverImage: "/blog/blog23.jpg",

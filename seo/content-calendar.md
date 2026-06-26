@@ -24,13 +24,13 @@ Real numbers pulled from the production DB this date:
   regenerated in the new grittier art style.
 
 ## Current image counter
-Last used: blog23 → next post uses blog24
+Last used: blog24 → next post uses blog25
 
 ## Blog post queue
 
 | Status | Date Done | Title | Target Keyword | Notes |
 |--------|-----------|-------|---------------|-------|
-| PENDING | | How Do I Know When a Song Is Finished? | when is a song finished | maps to "is it ready" intent |
+| DONE | 2026-06-26 | How Do I Know When a Song Is Finished? | when is a song finished | blog24.jpg |
 | PENDING | | Why Do Listeners Skip My Song in the First 30 Seconds? | why do people skip my song | retention score dim |
 | PENDING | | What Makes a Song Catchy? The Anatomy of a Hook That Sticks | what makes a song catchy | hook score dim |
 | PENDING | | How Much Does It Cost to Get Your Music Reviewed in 2026? | cost to get music reviewed | bottom-funnel / pricing intent |
