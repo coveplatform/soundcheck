@@ -8,7 +8,7 @@ import {
   scoreSubPrice,
   UNLOCK_PRICE_CENTS,
 } from "@/lib/score-subscription";
-import { isSupportedTrackUrl, normalizeTrackUrl } from "@/lib/track-url";
+import { isSupportedTrackUrl, isPrivateSoundcloudUrl, normalizeTrackUrl, PRIVATE_SOUNDCLOUD_REASON } from "@/lib/track-url";
 import { resolveShortUrl } from "@/lib/metadata";
 
 /**
@@ -61,6 +61,13 @@ export async function POST(request: Request) {
     }
 
     const normalizedTrackUrl = await resolveShortUrl(normalizeTrackUrl(trackUrl));
+
+    // Private share shortlinks only reveal their /s-<token> after expansion —
+    // reject before taking payment for a track reviewers can't play.
+    if (isPrivateSoundcloudUrl(normalizedTrackUrl)) {
+      return NextResponse.json({ error: PRIVATE_SOUNDCLOUD_REASON }, { status: 400 });
+    }
+
     const userId = session?.user?.id;
     const artistId = userId
       ? await prisma.artistProfile

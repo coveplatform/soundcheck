@@ -10,6 +10,7 @@ import {
   type VerdictReportData,
 } from "@/components/score/verdict-report-view";
 import type { ReleaseAxis, Blocker } from "@/components/score/verdict-types";
+import { buildBlockers } from "@/lib/score-verdict";
 // Real measured waveform for the demo (worker `_report_waveform` output,
 // borrowed from the demo-free prototype's sample track).
 import demoWaveRaw from "../demo-free/cutandrun-wave.json";
@@ -411,9 +412,16 @@ export default async function ReportPage({
   // any report whose generation couldn't ground a bar (e.g. metadata-only reads)
   // — have null releaseBar and render the legacy ReportView unchanged. The
   // sealed / open-read / unlocked states + the real human room carry through.
-  const releaseBar = (report.releaseBar as ReleaseAxis[] | null) ?? null;
-  if (releaseBar && releaseBar.length > 0 && !data.invalid) {
-    const blockers = (report.blockers as Blocker[] | null) ?? [];
+  // Verdict-first: render the decision layout for every valid report. New reports
+  // carry a measured releaseBar; reports generated before it shipped render the
+  // same layout with the bar omitted and "what to work on" derived from the
+  // stored priority fixes. Invalid reads keep the legacy explainer view.
+  const releaseBar = (report.releaseBar as ReleaseAxis[] | null) ?? [];
+  if (!data.invalid) {
+    let blockers = (report.blockers as Blocker[] | null) ?? [];
+    if (blockers.length === 0 && data.priorityFixes.length > 0) {
+      blockers = buildBlockers({ priorityFixes: data.priorityFixes }, releaseBar);
+    }
     // Surface the strongest dimension on the craft check (cosmetic tag).
     const strongest = data.categories.reduce(
       (best, c) => (c.score > best.score ? c : best),

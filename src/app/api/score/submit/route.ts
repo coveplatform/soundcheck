@@ -7,7 +7,7 @@ import { decideRoomEligibility } from "@/lib/score-review";
 import { isScoreSubscribed } from "@/lib/score-subscription";
 import { freeReadUsed } from "@/lib/score-free-cap";
 import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
-import { isSupportedTrackUrl, normalizeTrackUrl } from "@/lib/track-url";
+import { isSupportedTrackUrl, isPrivateSoundcloudUrl, normalizeTrackUrl, PRIVATE_SOUNDCLOUD_REASON } from "@/lib/track-url";
 import { resolveShortUrl } from "@/lib/metadata";
 
 // Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
@@ -66,6 +66,12 @@ export async function POST(request: Request) {
     // endpoints must normalize identically. (Shortlinks break the reviewer-side
     // widget embed; see /api/score/start.)
     const normalizedTrackUrl = await resolveShortUrl(normalizeTrackUrl(trackUrl));
+
+    // Private share shortlinks only reveal their /s-<token> after expansion —
+    // catch them here so they never reach the reviewer-side embed (dead player).
+    if (isPrivateSoundcloudUrl(normalizedTrackUrl)) {
+      return NextResponse.json({ error: PRIVATE_SOUNDCLOUD_REASON }, { status: 400 });
+    }
 
     // Free-tier ladder (open-read model only): an email past its lifetime free
     // read still submits fine — the track generates normally but will render

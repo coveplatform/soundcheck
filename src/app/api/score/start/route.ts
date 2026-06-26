@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateAndStoreReport } from "@/lib/score-report-ai";
 import { freeReadUsed } from "@/lib/score-free-cap";
-import { isSupportedTrackUrl, normalizeTrackUrl } from "@/lib/track-url";
+import { isSupportedTrackUrl, isPrivateSoundcloudUrl, normalizeTrackUrl, PRIVATE_SOUNDCLOUD_REASON } from "@/lib/track-url";
 import { resolveShortUrl } from "@/lib/metadata";
 
 // Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
@@ -84,11 +84,19 @@ export async function POST(request: Request) {
     // SoundCloud widget embed can't resolve them (dead player → "can't play"
     // flags), even though the audio worker follows redirects fine. /submit
     // resolves identically — its pre-start match compares URLs exactly.
+    const resolvedTrackUrl = await resolveShortUrl(normalizeTrackUrl(trackUrl));
+
+    // A private share shortlink only reveals its /s-<token> after expansion, so
+    // re-check here — these embed as a dead player on the reviewer side.
+    if (isPrivateSoundcloudUrl(resolvedTrackUrl)) {
+      return NextResponse.json({ error: PRIVATE_SOUNDCLOUD_REASON }, { status: 400 });
+    }
+
     const claimToken = randomUUID();
     const report = await prisma.trackScoreReport.create({
       data: {
         email: "", // unknown until /claim attaches the authenticated user
-        trackUrl: await resolveShortUrl(normalizeTrackUrl(trackUrl)),
+        trackUrl: resolvedTrackUrl,
         trackTitle: trackTitle?.trim() || null,
         genre: genre?.trim() || "Other",
         notes: notes?.trim() || null,

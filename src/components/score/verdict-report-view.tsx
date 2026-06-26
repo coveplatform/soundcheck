@@ -383,13 +383,22 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
           </p>
         )}
 
-        {/* the evidence behind the call — three glanceable tiles, score demoted */}
-        <div className="grid grid-cols-3 gap-px bg-white/10 border border-white/10 max-w-xl mx-auto mt-8 normal-case">
-          {[
-            { v: `${D.score}`, suffix: "/100", l: "resonance score", ink: "#f4f4ef" },
-            { v: axes.length ? `${inBand} / ${axes.length}` : "—", l: "craft axes in-band or close", ink: GREEN },
-            { v: `${outOfBand}`, l: outOfBand === 1 ? "blocker to release" : "blockers to release", ink: outOfBand ? WARN : GREEN },
-          ].map((s) => (
+        {/* the evidence behind the call — glanceable tiles, score demoted. When
+            no measured bar exists yet (reports generated before it shipped), drop
+            the measured tiles and show the honest count of things to address. */}
+        <div
+          className={`grid ${axes.length ? "grid-cols-3" : "grid-cols-2"} gap-px bg-white/10 border border-white/10 max-w-xl mx-auto mt-8 normal-case`}
+        >
+          {((axes.length
+            ? [
+                { v: `${D.score}`, suffix: "/100", l: "resonance score", ink: "#f4f4ef" },
+                { v: `${inBand} / ${axes.length}`, l: "craft axes in-band or close", ink: GREEN },
+                { v: `${outOfBand}`, l: outOfBand === 1 ? "blocker to release" : "blockers to release", ink: outOfBand ? WARN : GREEN },
+              ]
+            : [
+                { v: `${D.score}`, suffix: "/100", l: "resonance score", ink: "#f4f4ef" },
+                { v: `${blockers.length}`, l: blockers.length === 1 ? "thing to address" : "things to address", ink: ACCENT },
+              ]) as { v: string; suffix?: string; l: string; ink: string }[]).map((s) => (
             <div key={s.l} className="bg-[#0a0a0a] px-3 py-4">
               <p className="text-2xl sm:text-3xl font-extrabold leading-none" style={{ color: s.ink }}>
                 {s.v}
@@ -404,10 +413,10 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
 
         <div className="mt-9">
           <a
-            href="#bar"
+            href={axes.length ? "#bar" : blockers.length ? "#next" : "#read"}
             className="group inline-flex items-center justify-center gap-2 max-w-full bg-[#6ee7ff] text-black font-extrabold text-[13.5px] sm:text-[15px] px-5 sm:px-6 py-3.5 hover:bg-white transition-colors text-center leading-snug"
           >
-            see what&apos;s between this and release
+            {axes.length ? "see what's between this and release" : "see what to work on"}
             <ArrowRight className="h-4 w-4 shrink-0 group-hover:translate-x-0.5 transition-transform" />
           </a>
         </div>
@@ -605,7 +614,7 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
 
         {/* ── WHAT STANDS BETWEEN THIS AND RELEASE ── */}
         {blockers.length > 0 && (
-          <SectionCard>
+          <SectionCard id="next">
             <SectionHead
               n="02"
               kicker="what stands between this and release"
@@ -710,7 +719,7 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
 
         {/* ── THE FULL READ — gated synthesis (open on unlock / open-read) ── */}
         {D.aiSummary && (
-          <SectionCard>
+          <SectionCard id="read">
             <SectionHead
               n="05"
               kicker="the read · the full synthesis"

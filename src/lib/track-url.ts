@@ -40,10 +40,45 @@ function previewOnlyLabel(host: string): string | null {
 }
 
 /**
- * A specific, human reason a link can't be used — currently the preview-page
- * hosts above. null means "no special reason" (fall back to SUPPORTED_TRACK_HINT).
+ * SoundCloud "private share" links carry a secret token — either a trailing
+ * /s-<token> path segment or a ?secret_token=<token> query param. They open fine
+ * for the owner (they're signed in, or the browser honors the token), but
+ * SoundCloud's embed widget refuses to play them inside our reviewer iframe, so
+ * reviewers get a dead player and flag the track "unplayable". Block them up
+ * front and tell the artist to make the track public.
+ *
+ * The token is always the final path segment, appended after the full
+ * user/track (or user/sets/playlist) path — so we only treat /s-… as a token
+ * when there are at least 3 segments, never on a 2-segment public track whose
+ * slug happens to start with "s-".
+ */
+export const PRIVATE_SOUNDCLOUD_REASON =
+  "That's a private SoundCloud link — reviewers can't play it in our player. On SoundCloud, set the track to Public, then paste the public link.";
+
+export function isPrivateSoundcloudUrl(raw: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(normalizeTrackUrl(raw));
+  } catch {
+    return false;
+  }
+  const host = url.hostname.toLowerCase();
+  if (host !== "soundcloud.com" && !host.endsWith(".soundcloud.com")) return false;
+
+  if (url.searchParams.has("secret_token")) return true;
+
+  const segments = url.pathname.split("/").filter(Boolean);
+  const last = segments[segments.length - 1] ?? "";
+  return segments.length >= 3 && /^s-[A-Za-z0-9]+$/.test(last);
+}
+
+/**
+ * A specific, human reason a link can't be used — preview-page hosts above and
+ * private SoundCloud share links. null means "no special reason" (fall back to
+ * SUPPORTED_TRACK_HINT).
  */
 export function unsupportedReason(raw: string): string | null {
+  if (isPrivateSoundcloudUrl(raw)) return PRIVATE_SOUNDCLOUD_REASON.toLowerCase();
   let url: URL;
   try {
     url = new URL(normalizeTrackUrl(raw));
@@ -86,7 +121,12 @@ export function isSupportedTrackUrl(raw: string): boolean {
   // A real track link always has a path (bare homepages don't point at audio).
   const hasPath = url.pathname.length > 1;
 
-  if (isOrSub("soundcloud.com") || host === "snd.sc") return hasPath;
+  if (isOrSub("soundcloud.com") || host === "snd.sc") {
+    // Private share links (…/s-<token>) play for the owner but die in the
+    // reviewer-side embed widget — keep them out of the pipeline.
+    if (isPrivateSoundcloudUrl(raw)) return false;
+    return hasPath;
+  }
   if (isOrSub("youtube.com") || host === "youtu.be") {
     return hasPath || url.searchParams.has("v");
   }
