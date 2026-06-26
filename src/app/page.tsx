@@ -1022,7 +1022,7 @@ export default function ScorePage() {
                       }
                     }}
                     placeholder="paste a soundcloud, youtube or mp3 link…"
-                    className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-5 py-4 text-[15px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
+                    className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-5 py-4 text-[16px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
                   />
                   <label
                     className={`${mono.className} mt-2.5 flex items-center justify-center gap-2 border border-dashed py-3.5 text-[13px] cursor-pointer transition-colors ${
@@ -1722,12 +1722,13 @@ export default function ScorePage() {
 
       {/* ── ASSIGNMENT MODAL (stays in place, page behind) ── */}
       {phase !== "idle" && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/85 backdrop-blur-md"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) cancel();
-          }}
-        >
+        <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-black/85 backdrop-blur-md">
+          <div
+            className="flex min-h-full items-center justify-center p-5"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) cancel();
+            }}
+          >
           <div className="w-full max-w-lg bg-[#0e0e0e] border border-white/15 p-7 relative">
             {phase !== "done" && (
               <button
@@ -1899,7 +1900,7 @@ export default function ScorePage() {
                         onChange={(e) => setAuthEmail(e.target.value)}
                         placeholder="email"
                         required
-                        className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
+                        className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-4 py-3 text-[16px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
                       />
                       <input
                         type="password"
@@ -1907,7 +1908,7 @@ export default function ScorePage() {
                         onChange={(e) => setAuthPassword(e.target.value)}
                         placeholder="password"
                         required
-                        className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
+                        className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-4 py-3 text-[16px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
                       />
                       <button
                         type="submit"
@@ -1931,6 +1932,7 @@ export default function ScorePage() {
                 <p className={`${mono.className} text-[13px] text-white/40`}>hang tight…</p>
               )}
             </div>
+          </div>
           </div>
         </div>
       )}

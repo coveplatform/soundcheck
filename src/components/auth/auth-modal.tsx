@@ -93,6 +93,10 @@ function AuthDialog({
   const router = useRouter();
   const isSignup = mode === "signup";
   const dest = callbackUrl && callbackUrl !== "/" ? callbackUrl : "/dashboard";
+  // Triggered mid-flow (e.g. after submitting a track), the callbackUrl points
+  // at the report/finish route — explain *why* the modal appeared instead of a
+  // bare "create your account".
+  const forReport = !!callbackUrl && /\/(score\/finish|report)\b/.test(callbackUrl);
 
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [email, setEmail] = useState("");
@@ -194,10 +198,20 @@ function AuthDialog({
       >
         <div className="font-sans">
           <DialogTitle className="text-2xl font-extrabold tracking-tight lowercase">
-            {isSignup ? "create your account" : "welcome back"}
+            {forReport
+              ? isSignup
+                ? "sign up to see your report"
+                : "log in to see your report"
+              : isSignup
+              ? "create your account"
+              : "welcome back"}
           </DialogTitle>
           <p className="mt-1 text-sm text-white/50">
-            {isSignup
+            {forReport
+              ? isSignup
+                ? "your verdict’s ready — create your free account to open the full report. no card required."
+                : "sign in and we’ll open the report you just started."
+              : isSignup
               ? "score your track, free — no card required."
               : "sign in to your account."}
           </p>
@@ -250,7 +264,7 @@ function AuthDialog({
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoFocus
-                className="w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-3.5 py-2.5 text-[15px] text-white placeholder:text-white/30 focus:outline-none rounded-md transition-colors"
+                className="w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-3.5 py-2.5 text-[16px] text-white placeholder:text-white/30 focus:outline-none rounded-md transition-colors"
               />
             </div>
 
@@ -265,7 +279,7 @@ function AuthDialog({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-3.5 py-2.5 text-[15px] text-white placeholder:text-white/30 focus:outline-none rounded-md transition-colors"
+                className="w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-3.5 py-2.5 text-[16px] text-white placeholder:text-white/30 focus:outline-none rounded-md transition-colors"
               />
               {isSignup && (
                 <div className="mt-2">
