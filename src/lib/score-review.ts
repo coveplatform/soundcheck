@@ -306,6 +306,31 @@ export type QueueItem = {
 const QUEUE_AVAILABLE_LIMIT = 8;
 
 /**
+ * Prisma fragment: score reports NOT owned by this reviewer. A report is "owned"
+ * if it's linked to the reviewer's artist profile (`artistId`) OR was submitted
+ * under their email — a reviewer must never be offered their own track.
+ *
+ * NULL-SAFE BY DESIGN: `artistId` is optional, and SQL `artistId <> x` evaluates
+ * to UNKNOWN (not TRUE) when artistId is NULL — so a naive `{ artistId: { not } }`
+ * silently hides EVERY unlinked submission from EVERY profiled reviewer. We
+ * include NULLs explicitly so only a genuine profile match excludes a track.
+ * `email` is non-nullable, so its compare is always clean.
+ */
+function notOwnedBy(
+  myArtistId: string | null,
+  myEmail: string | null
+): Prisma.TrackScoreReportWhereInput {
+  const clauses: Prisma.TrackScoreReportWhereInput[] = [];
+  if (myArtistId) {
+    clauses.push({ OR: [{ artistId: null }, { artistId: { not: myArtistId } }] });
+  }
+  if (myEmail) {
+    clauses.push({ NOT: { email: { equals: myEmail, mode: "insensitive" } } });
+  }
+  return clauses.length ? { AND: clauses } : {};
+}
+
+/**
  * A reviewer's queue. Under the hood this is a claim pool, but it's presented as
  * "their" tracks: anything they've already picked up (in progress) first, then
  * open reports waiting for the room — oldest first so the backlog clears.
@@ -338,8 +363,7 @@ export async function getScoreReviewQueue(userId: string): Promise<QueueItem[]> 
       humanRoomSkipped: false,
       status: { not: "COMPLETED" },
       ScoreReview: { none: { reviewerId: userId } },
-      ...(myArtistId ? { artistId: { not: myArtistId } } : {}),
-      ...(myEmail ? { NOT: { email: { equals: myEmail, mode: "insensitive" } } } : {}),
+      ...notOwnedBy(myArtistId, myEmail),
     },
     orderBy: { createdAt: "asc" },
     take: 60,
