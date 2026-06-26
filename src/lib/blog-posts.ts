@@ -20,6 +20,123 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "why-do-listeners-skip-my-song",
+    title: "Why Do Listeners Skip My Song in the First 30 Seconds?",
+    coverImage: "/blog/blog25.jpg",
+    excerpt:
+      "Listeners skip in the first 30 seconds because the hook has not arrived, the intro asks for patience they will not give, or the production quality signals this is not worth their time. Most skips happen in the first 8 to 15 seconds. The fix is not just a shorter intro — it is understanding exactly where your song loses people and why.",
+    category: "GUIDE",
+    date: "June 26, 2026",
+    readTime: "7 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "Listeners skip a song in the first 30 seconds because the hook has not arrived yet, the intro is asking for patience they will not give, or the production quality signals this is not worth their time. Most skips are decided in the first 8 to 15 seconds — by the time 30 seconds have passed, a listener who is still there has already committed. The problem is almost never the song itself. It is the opening 10 seconds and whether they give a new listener any reason to care.",
+      },
+      {
+        type: "h2",
+        text: "Why do people skip songs before the hook even arrives?",
+      },
+      {
+        type: "paragraph",
+        text: "On every major streaming platform, skipping costs nothing. Spotify, Apple Music, and YouTube serve the next song with a single tap. The cost of staying is patience, which listeners do not owe you. The default state of a new listener is not interest — it is indifference. Something in those first 8 seconds has to shift that. If nothing does, they leave. This is not a rejection of your artistry. You had no hook in the window where the decision gets made, so the decision went against you.",
+      },
+      {
+        type: "h2",
+        text: "What actually causes skips in the first 30 seconds?",
+      },
+      {
+        type: "paragraph",
+        text: "The causes are almost always one of these, and most have nothing to do with how good the song is underneath.",
+      },
+      {
+        type: "list",
+        items: [
+          "The intro runs past 15 seconds before the vocal or central hook appears. Atmosphere builds patience you have not yet earned.",
+          "The opening mix quality drops below genre standard. A weak kick, thin production, or amateur vocal sound signals the listener to bail before the song has a chance.",
+          "Nothing changes in the first section. A static chord loop or held pad with no development gives a listener no reason to wonder what comes next.",
+          "The energy starts too low and climbs too slowly. A song that opens at a 3 and builds to an 8 will lose people who expect to be grabbed, not warmed up.",
+          "The fade-in or long reverb tail from a previous section means the song effectively starts in silence. Some platforms cut these.",
+          "The vocal enters too late or sits too quiet in the opening. There is nothing human to connect with.",
+          "Genre expectations are violated in a way that reads as a mistake rather than a choice, before the listener has any reason to trust you.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Does genre change how long your intro can be?",
+      },
+      {
+        type: "paragraph",
+        text: "Yes, but not as much as most artists think. Every genre has a retention norm, and tolerance for a slow build is almost always shorter than you believe. Ambient music can sustain longer intros because the listener choosing that genre is already opting into texture and patience. Pop, hip-hop, and R&B have almost no tolerance — the hook should arrive by 8 to 12 seconds for a cold listener. Rock and indie sit somewhere in between, with 15 to 20 seconds as the practical ceiling. The contrarian note: a great build can absolutely hold attention past 30 seconds, but it requires something happening every few seconds, not just sustained atmosphere. Each micro-moment of development earns a few more seconds.",
+      },
+      {
+        type: "quote",
+        text: "The listener who skips at 10 seconds is not being impatient. They are telling you nothing happened in the window where something needed to.",
+      },
+      {
+        type: "h2",
+        text: "How do you write an opening that keeps people from skipping?",
+      },
+      {
+        type: "paragraph",
+        text: "The principle is simple even when the execution is not: lead with your most interesting thing. That might be the hook, a distinctive production choice, a lyric that creates a question, or a sound that is genuinely unusual for your genre. What it cannot be is a warm-up. The intro is not for you. It is not where you settle into the song. It is the moment a stranger decides whether the next four minutes are worth their time. The most reliable fix is to cut the intro to its minimum. Start where something is already happening. If your song has 16 bars of build before the first verse, try starting at bar 8, then bar 4, then at the verse itself. Listen to how much atmosphere survives each cut. Usually more than you expected.",
+      },
+      {
+        type: "h2",
+        text: "What can you actually do to fix it?",
+      },
+      {
+        type: "list",
+        items: [
+          "Cut your intro by half and check if the song still makes sense. In most cases it does, and the energy improves immediately.",
+          "Get something human — a vocal, a recognisable melody, a lyric — within the first 15 seconds at the absolute latest.",
+          "Check your opening mix on earbuds and a phone speaker. If it reads thin or muddy on those, you lose the listener before they even hear what the song is about.",
+          "Add a micro-hook in the first 4 bars: one distinctive sound, a lyric that sparks curiosity, or a production moment that signals something interesting is on the way.",
+          "Start with the chorus if it is your strongest section. Pre-chorus intros are standard in pop for exactly this reason.",
+          "Test the first 30 seconds on someone who has never heard it and watch what they do, not what they say. Attention drift before the hook is the answer.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "How do you find out exactly where your song is losing people?",
+      },
+      {
+        type: "paragraph",
+        text: "Platform analytics can show you average completion rates, but they will not tell you why listeners dropped. For that you need people hearing the song cold and reacting in real time. MixReflect does this: paste a link and get an AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a panel of five real listeners hearing it for the first time. They say exactly when and why the song held or lost them. The retention score specifically flags where drop-off happens and what is likely driving it — whether you need to cut the intro, fix the opening mix, or move the hook earlier. First report is free.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "Why do people skip my song so fast?",
+            a: "The most common reason is that nothing has happened yet in the window where a new listener makes their decision — roughly 8 to 15 seconds. If your hook, vocal, or any genuinely compelling moment has not arrived by then, the default is to skip. Not because they dislike your music, but because they have no signal yet that there is anything worth staying for.",
+          },
+          {
+            q: "How long should a song intro be on Spotify?",
+            a: "The practical target is 8 to 12 seconds for pop, hip-hop, and R&B; up to 20 seconds for rock and indie if something is actively developing throughout; longer is viable for ambient and atmospheric music where the texture itself is the point. Spotify data consistently shows intros longer than 15 seconds drive significantly higher skip rates from cold listeners. When in doubt, cut.",
+          },
+          {
+            q: "Does starting with the chorus help with retention?",
+            a: "Yes, and it is one of the most reliable retention techniques in commercial music. If your chorus is your strongest section — which it should be — leading with it gives a new listener an immediate hook before they have had a chance to disengage. The rest of the song then functions as a payoff for the promise the chorus already made. Artists often resist this because it feels structurally wrong, but from a retention standpoint it is usually the right call.",
+          },
+          {
+            q: "Can a bad mix cause people to skip early?",
+            a: "Absolutely. Poor production quality in the opening seconds signals amateur before the listener has consciously decided anything, and that signal almost always results in a skip. A thin kick, buried vocals, or muddy low end in the intro creates an immediate impression that the rest of the track is not worth the time. Fixing the mix on the first 10 seconds specifically, and making sure it translates on phone speakers, can meaningfully improve retention even when the song is strong.",
+          },
+          {
+            q: "Does skipping a song hurt the artist on Spotify?",
+            a: "Yes. High skip rates signal to the algorithm that the track is not resonating, which reduces its likelihood of appearing in Radio, Discover Weekly, and Release Radar. A song with poor retention in its first week gets far fewer algorithmic appearances than one that holds listeners through at least 30 seconds. Fixing retention before you release is more valuable than any promotional push you run after.",
+          },
+          {
+            q: "What is a good skip rate for a new song?",
+            a: "Spotify does not publish skip rate benchmarks, but artists and distributors report that a skip rate above 40 to 50 percent in the first 30 seconds is worth investigating. Below 20 percent in that window is strong. The more useful number is average stream length: if listeners who do not immediately skip are staying through the chorus and beyond, the opening is the problem. If they are leaving even after the hook, the song itself needs work.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "when-is-a-song-finished",
     title: "How Do I Know When a Song Is Finished?",
     coverImage: "/blog/blog24.jpg",
