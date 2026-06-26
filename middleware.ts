@@ -28,17 +28,12 @@ export async function middleware(request: NextRequest) {
   const isArtistPath = pathname === "/artist" || pathname.startsWith("/artist/");
   const isAccountPath = pathname === "/account" || pathname.startsWith("/account/");
   const isApiAdminPath = pathname.startsWith("/api/admin/") || pathname === "/api/admin";
-  // Submitting another track is a signed-in action — logged-out visitors belong
-  // in the acquisition funnel at "/", not on the email-only submit form.
-  const isSubmitScorePath =
-    pathname === "/submit-score" || pathname.startsWith("/submit-score/");
 
   if (
     !isAdminPath &&
     !isArtistPath &&
     !isAccountPath &&
-    !isApiAdminPath &&
-    !isSubmitScorePath
+    !isApiAdminPath
   ) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
@@ -97,6 +92,5 @@ export const config = {
     "/artist/:path*",
     "/account/:path*",
     "/api/admin/:path*",
-    "/submit-score/:path*",
   ],
 };

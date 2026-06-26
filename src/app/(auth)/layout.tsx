@@ -1,6 +1,13 @@
 import Link from "next/link";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
-import { SpeakerBuddies } from "@/components/ui/speaker-buddies";
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
+const ACCENT = "#6ee7ff";
 
 export default function AuthLayout({
   children,
@@ -8,69 +15,70 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#f7f7f5] text-neutral-950">
-      {/* Left side — Auth form */}
+    <div
+      className={`${jakarta.className} min-h-screen flex flex-col lg:flex-row bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black`}
+    >
+      {/* Left — auth form */}
       <div className="flex-1 flex flex-col min-h-screen lg:min-h-0">
-        {/* Header */}
-        <header className="border-b border-neutral-200 bg-[#f7f7f5]/90 backdrop-blur-sm lg:border-b-0">
+        <header className="border-b border-white/10">
           <div className="px-6 sm:px-10">
-            <div className="flex items-center h-14">
-              <Link href="/" className="flex items-center gap-2 w-fit">
-                <Logo />
+            <div className="flex items-center h-16">
+              <Link href="/" className="w-fit">
+                <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
               </Link>
             </div>
           </div>
         </header>
 
-        {/* Form content */}
         <div className="flex-1 flex items-center justify-center px-6 sm:px-10 py-10 sm:py-16">
           <div className="w-full max-w-md">{children}</div>
         </div>
       </div>
 
-      {/* Right side — Marketing promo (hidden on mobile) */}
-      <div className="hidden lg:flex lg:w-[480px] xl:w-[520px] bg-purple-600 text-white relative overflow-hidden flex-col justify-between p-10 xl:p-14">
-        {/* Ambient gradient blobs */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-32 -right-32 w-80 h-80 bg-purple-500/30 rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-400/20 rounded-full blur-3xl" />
-        </div>
+      {/* Right — the product pitch (desktop only) */}
+      <div className="hidden lg:flex lg:w-[480px] xl:w-[520px] relative overflow-hidden flex-col justify-between p-10 xl:p-14 border-l border-white/10 bg-[#0c0c0c]">
+        <div
+          className="absolute -top-32 -right-32 w-80 h-80 rounded-full blur-3xl pointer-events-none"
+          style={{ background: "rgba(110,231,255,0.12)" }}
+        />
+        <div
+          className="absolute -bottom-24 -left-24 w-64 h-64 rounded-full blur-3xl pointer-events-none"
+          style={{ background: "rgba(110,231,255,0.06)" }}
+        />
 
-        {/* Interactive speaker buddies */}
-        <SpeakerBuddies />
-
-        {/* Content */}
         <div className="relative z-10 flex-1 flex flex-col justify-center">
-          {/* Big headline */}
-          <div className="mb-10">
-            <h2 className="text-3xl xl:text-4xl font-black tracking-tight leading-tight">
-              Get heard.<br />
-              Get feedback.<br />
-              Get better.
-            </h2>
-            <p className="mt-4 text-purple-100 text-sm leading-relaxed max-w-sm">
-              Join 1,200+ artists giving each other honest, genre-matched feedback. Upload your track, review others, earn credits.
-            </p>
-          </div>
+          <p className={`${mono.className} text-[12px] tracking-[0.2em] uppercase text-white/45 mb-5`}>
+            the release decision
+          </p>
+          <h2 className="text-3xl xl:text-4xl font-extrabold tracking-tight leading-[1.1]">
+            an honest <span style={{ color: ACCENT }}>verdict</span> on your track.
+            <br />
+            then a room of real listeners.
+          </h2>
+          <p className="mt-5 text-white/65 text-[15px] leading-relaxed max-w-sm">
+            measured straight from your audio, not guessed — is it ready to release, and the one
+            thing standing between it and there.
+          </p>
 
-          {/* Stats row */}
-          <div className="grid grid-cols-2 gap-4 mb-10">
-            <div className="bg-purple-700/60 rounded-xl p-4">
-              <div className="text-2xl xl:text-3xl font-black text-white">2,847</div>
-              <div className="text-xs text-purple-100 font-semibold mt-1">Tracks reviewed</div>
-            </div>
-            <div className="bg-purple-700/60 rounded-xl p-4">
-              <div className="text-2xl xl:text-3xl font-black text-white">&lt;4hrs</div>
-              <div className="text-xs text-purple-100 font-semibold mt-1">Avg turnaround</div>
-            </div>
-          </div>
-
+          <ul className={`${mono.className} mt-8 space-y-3 text-[13px] text-white/70`}>
+            <li className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 shrink-0" style={{ background: ACCENT }} /> the release
+              verdict + score
+            </li>
+            <li className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 shrink-0" style={{ background: ACCENT }} /> 5 real
+              listeners on your track
+            </li>
+            <li className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 shrink-0" style={{ background: ACCENT }} /> first report
+              free — no card
+            </li>
+          </ul>
         </div>
 
-        {/* Bottom tagline */}
         <div className="relative z-10 pt-6 border-t border-white/10">
-          <p className="text-xs text-purple-200 font-semibold">
-            No credit card required · Pay as you go
+          <p className={`${mono.className} text-[11px] text-white/40`}>
+            first report free · no credit card
           </p>
         </div>
       </div>

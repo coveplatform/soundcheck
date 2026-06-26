@@ -683,7 +683,6 @@ export default function ScorePage() {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, session]);
 
   const continueWithGoogle = async () => {
@@ -737,7 +736,10 @@ export default function ScorePage() {
     if (busy) return;
     setBusy(true);
     if (!session?.user) {
-      router.push(`/login?callbackUrl=${encodeURIComponent(await finishUrl())}`);
+      // In-context: pop the auth panel instead of bouncing to a full page —
+      // success lands on /score/finish (claims the report) → the report.
+      openAuth("signup", await finishUrl());
+      setBusy(false);
       return;
     }
     try {
@@ -792,8 +794,7 @@ export default function ScorePage() {
   const handleSubscribe = async (plan: "monthly" | "annual" = "monthly") => {
     if (subscribing) return;
     if (!session?.user?.email) {
-      setSubscribing(plan);
-      router.push(`/login?callbackUrl=${encodeURIComponent("/#pricing")}`);
+      openAuth("signup", "/#pricing");
       return;
     }
     setSubscribing(plan);

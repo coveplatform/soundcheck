@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { ArrowRight, Check, Loader2, Lock } from "lucide-react";
 import { scoreConversions } from "@/lib/score-conversions";
+import { useAuthModal } from "@/components/providers";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -48,6 +49,7 @@ export function SealedPaywall({
   trackTitle?: string;
 }) {
   const [busy, setBusy] = useState<"unlock" | "unlimited" | null>(null);
+  const { open: openAuth } = useAuthModal();
 
   const go = async (choice: "unlock" | "unlimited") => {
     if (busy) return;
@@ -107,10 +109,10 @@ export function SealedPaywall({
         return;
       }
 
-      // Not signed in / no email on file → send them to sign in, back to here.
-      window.location.href = `/login?callbackUrl=${encodeURIComponent(
-        slug ? `/report/${slug}` : "/submit-score"
-      )}`;
+      // Not signed in / no email on file → pop the auth panel in place, back to
+      // here once they're in (then they pick a plan again).
+      setBusy(null);
+      openAuth("signup", slug ? `/report/${slug}` : "/submit-score");
     } catch {
       setBusy(null);
     }

@@ -10,6 +10,7 @@ import { isSupportedTrackUrl, normalizeTrackUrl, SUPPORTED_TRACK_HINT, unsupport
 import { scoreConversions } from "@/lib/score-conversions";
 import { SealedPaywall } from "@/components/score/sealed-paywall";
 import { FREE_FULL_READ } from "@/lib/score-free-tier";
+import { useAuthModal } from "@/components/providers";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
@@ -24,7 +25,15 @@ const GENRES = [
 type Meta = { title: string; artist: string | null; artworkUrl: string | null };
 
 export default function SubmitScorePage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const { open: openAuth } = useAuthModal();
+
+  // Submitting another track is a signed-in action. Rather than bounce to a full
+  // /login page, pop the auth panel in place; the gated screen below is the
+  // fallback if they dismiss it.
+  useEffect(() => {
+    if (status === "unauthenticated") openAuth("signup", "/submit-score");
+  }, [status, openAuth]);
 
   const [trackUrl, setTrackUrl] = useState("");
   const [trackTitle, setTrackTitle] = useState("");
@@ -234,6 +243,54 @@ export default function SubmitScorePage() {
 
   const inputCls =
     `${mono.className} w-full bg-[#141414] border border-white/20 focus:border-[#6ee7ff] px-4 py-3.5 text-[15px] text-white placeholder:text-white/35 focus:outline-none transition-colors normal-case`;
+
+  // Resolving the session — hold a spinner so an authenticated user never flashes
+  // the signed-out gate before the form.
+  if (status === "loading") {
+    return (
+      <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] flex items-center justify-center`}>
+        <Loader2 className="h-6 w-6 animate-spin" style={{ color: ACCENT }} />
+      </div>
+    );
+  }
+
+  // Logged out → gated (the auth panel is already opening via the effect above).
+  // This is what sits behind it / shows if they dismiss it. No email-only path.
+  if (status === "unauthenticated") {
+    return (
+      <div className={`${jakarta.className} min-h-screen bg-[#0a0a0a] text-[#f4f4ef] selection:bg-[#6ee7ff] selection:text-black lowercase flex flex-col`}>
+        <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
+          <div className="max-w-3xl mx-auto px-5 h-16 flex items-center justify-between">
+            <Link href="/">
+              <Logo markFill={ACCENT} barFill="#0a0a0a" className="text-white h-7" />
+            </Link>
+            <Link href="/" className={`${mono.className} text-[13px] text-white/65 hover:text-white transition-colors`}>
+              ← back
+            </Link>
+          </div>
+        </header>
+        <div className="flex-1 flex items-center justify-center px-5">
+          <div className="text-center max-w-sm">
+            <p className={`${mono.className} text-[12px] text-white/55 mb-3`}>[ submit another track ]</p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.03em] mb-4">
+              sign in to drop another <span style={{ color: ACCENT }}>track</span>.
+            </h1>
+            <p className="text-white/65 normal-case leading-relaxed mb-7">
+              your reports live in one place when you&apos;re signed in — pick up right where you left
+              off.
+            </p>
+            <button
+              onClick={() => openAuth("signup", "/submit-score")}
+              className="group inline-flex items-center justify-center gap-2 bg-[#6ee7ff] text-black font-extrabold text-[15px] px-6 py-3.5 hover:bg-white transition-colors"
+            >
+              sign in to continue
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

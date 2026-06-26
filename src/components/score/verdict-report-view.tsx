@@ -27,6 +27,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
 import { ReportWaveform, deriveWaveMoments } from "@/components/score/report-waveform";
 import { scoreConversions } from "@/lib/score-conversions";
+import { useAuthModal } from "@/components/providers";
 import {
   ArrowRight,
   User,
@@ -233,6 +234,7 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
 
   const [unlocking, setUnlocking] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
+  const { open: openAuth } = useAuthModal();
 
   // Checkout flows mirror report-view.tsx: POST → Stripe redirect. The demo
   // (no slug / isDemo) just bounces to marketing.
@@ -275,7 +277,10 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
         scoreConversions.startSubscribeCheckout("monthly");
         return (window.location.href = json.url);
       }
-      window.location.href = `/login?callbackUrl=${encodeURIComponent(`/report/${D.slug}`)}`;
+      // Not signed in: pop the auth panel in place (no full-page bounce). Back on
+      // the report logged in, the subscribe button completes to Stripe.
+      setSubscribing(false);
+      openAuth("signup", `/report/${D.slug}`);
     } catch {
       setSubscribing(false);
     }
