@@ -73,10 +73,10 @@ const STATUS = {
 // Verdict-specific headline copy. Honest by construction — the detail line is a
 // fallback only; when the report carries a real synthesis we lead with that.
 const VERDICT_COPY: Record<Verdict, { decision: string }> = {
-  RELEASE_READY: { decision: "this is ready to release." },
-  ALMOST_THERE: { decision: "this is one fix away from release." },
-  NEEDS_WORK: { decision: "this needs work before it's ready." },
-  NOT_READY: { decision: "this isn't ready to release yet." },
+  RELEASE_READY: { decision: "This is ready to release." },
+  ALMOST_THERE: { decision: "This is one fix away from release." },
+  NEEDS_WORK: { decision: "This needs work before it's ready." },
+  NOT_READY: { decision: "This isn't ready to release yet." },
 };
 
 // ── view model (a subset of the live ReportViewModel + the verdict payload) ──
@@ -205,10 +205,10 @@ function SectionHead({
         >
           {n}
         </span>
-        <span className={`${mono.className} text-[12px] text-white/55 min-w-0 truncate`}>{kicker}</span>
+        <span className={`${mono.className} text-[11px] uppercase tracking-[0.15em] text-white/55 min-w-0 truncate`}>{kicker}</span>
         <span className="h-px flex-1 bg-white/12" />
       </div>
-      <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-[1.12]">{title}</h2>
+      <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-[1.12] normal-case">{title}</h2>
       {children && (
         <p className="text-[15px] text-white/70 leading-relaxed normal-case mt-3 max-w-xl">{children}</p>
       )}
@@ -395,7 +395,7 @@ export function VerdictReportView({
         >
           {current.label}
         </p>
-        <p className="text-xl sm:text-2xl font-bold tracking-tight max-w-lg mx-auto">
+        <p className="text-xl sm:text-2xl font-bold tracking-tight max-w-lg mx-auto normal-case">
           {VERDICT_COPY[D.verdict].decision}
         </p>
         {D.summaryHeadline && (
@@ -413,7 +413,7 @@ export function VerdictReportView({
           {((axes.length
             ? [
                 { v: `${D.score}`, suffix: "/100", l: "resonance score", ink: "#f4f4ef" },
-                { v: `${inBand} / ${axes.length}`, l: "craft axes in-band or close", ink: GREEN },
+                { v: `${inBand} / ${axes.length}`, l: "axes inside the release band", ink: GREEN },
                 { v: `${outOfBand}`, l: outOfBand === 1 ? "blocker to release" : "blockers to release", ink: outOfBand ? WARN : GREEN },
               ]
             : [
@@ -455,7 +455,7 @@ export function VerdictReportView({
                   )}
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: ACCENT }} />
                 </span>
-                <span className={`${mono.className} text-[12px] tracking-wide`} style={{ color: ACCENT }}>
+                <span className={`${mono.className} text-[12px] uppercase tracking-[0.15em]`} style={{ color: ACCENT }}>
                   {D.humanReviewsIn < D.humanReviewsTotal ? "the room · live" : "the room"}
                 </span>
               </div>
@@ -467,8 +467,8 @@ export function VerdictReportView({
               </div>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">
-              real listeners are weighing in alongside the verdict
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1 normal-case">
+              Real listeners are weighing in
             </h2>
             <p className="text-[14px] text-white/65 leading-relaxed mb-6 normal-case">
               {D.humanReviewsIn < D.humanReviewsTotal
@@ -524,12 +524,12 @@ export function VerdictReportView({
           <section className="border border-white/12 bg-[#0c0c0c] p-6 sm:p-7">
             <div className="flex items-center gap-2.5 mb-3">
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white/40" />
-              <span className={`${mono.className} text-[12px] tracking-wide text-white/55`}>
+              <span className={`${mono.className} text-[12px] uppercase tracking-[0.15em] text-white/55`}>
                 the room · not this one
               </span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight mb-2">
-              the verdict is here — but this track didn&apos;t get the real room.
+            <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight mb-2 normal-case">
+              The verdict is here — but this track didn&apos;t get the real room.
             </h3>
             <p className="text-white/65 normal-case leading-relaxed max-w-lg">
               you&apos;ve used all your{" "}
@@ -547,8 +547,8 @@ export function VerdictReportView({
           <SectionCard id="bar">
             <SectionHead
               n="01"
-              kicker={`the release bar · vs released ${D.genre.toLowerCase()}`}
-              title="where you sit vs what gets released"
+              kicker={`Release bar · measured against ${D.genre.toLowerCase()}`}
+              title="How you stack up against released tracks"
             >
               the things we measure straight from your audio. the{" "}
               <span className="text-[#6ee7ff]">shaded band</span> is where{" "}
@@ -638,8 +638,8 @@ export function VerdictReportView({
           <SectionCard id="next">
             <SectionHead
               n="02"
-              kicker="what stands between this and release"
-              title={blockers.length === 1 ? "one thing to clear" : `${blockers.length} things, ranked`}
+              kicker="What's blocking release"
+              title={blockers.length === 1 ? "One fix stands between you and release" : `${blockers.length} fixes, ranked by impact`}
             >
               {outOfBand > 0 ? (
                 <>clear the top one and the call moves toward <span style={{ color: GREEN }}>release ready</span>.</>
@@ -686,8 +686,8 @@ export function VerdictReportView({
           <SectionCard>
             <SectionHead
               n="03"
-              kicker="the moment map · from your audio"
-              title="where it happens in the track"
+              kicker="Moment map · from your audio"
+              title="Where each issue happens in the track"
             >
               the real frequency-split waveform the verdict is grounded in — every marker the
               analysis flagged.
@@ -701,8 +701,8 @@ export function VerdictReportView({
           <SectionCard>
             <SectionHead
               n="04"
-              kicker="the craft check · quality on its own terms"
-              title="how strong the craft is, genre aside"
+              kicker="Craft check · quality, genre aside"
+              title="How strong the craft is on its own"
             >
               the release bar above asks <em>&quot;is this where released tracks sit?&quot;</em> this
               asks a different question —{" "}
@@ -743,8 +743,8 @@ export function VerdictReportView({
           <SectionCard id="read">
             <SectionHead
               n="05"
-              kicker="the read · the full synthesis"
-              title="the full read"
+              kicker="The full read"
+              title="The verdict, in full"
               ink={VIOLET}
             >
               the verdict in long form — the energy arc, the moments, and the one thing the call
@@ -770,8 +770,8 @@ export function VerdictReportView({
             <SectionCard>
               <SectionHead
                 n="06"
-                kicker="the bottom line · what to do next"
-                title="your next move"
+                kicker="Bottom line · your next move"
+                title="Your next move"
                 ink={GREEN}
               >
                 the whole report in one line — what to protect, and the one thing to change first.
@@ -828,10 +828,10 @@ export function VerdictReportView({
         {!D.unlocked && (
           <section id="unlock" className="border border-white/12 bg-[#0c0c0c] p-7 sm:p-10 text-center">
             <Kicker>{openRead ? "fill the room + go deeper" : "unlock the verdict"}</Kicker>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3 normal-case">
               {openRead
-                ? "send it to the room + open the deep read."
-                : "open the full release decision."}
+                ? "Send it to the room and open the deep read."
+                : "Open the full release decision."}
             </h2>
             <p className="text-white/70 text-[15px] normal-case leading-relaxed max-w-lg mx-auto mb-7">
               {openRead
@@ -905,8 +905,8 @@ export function VerdictReportView({
         {D.unlocked && (
           <section className="border border-white/12 bg-[#0c0c0c] p-7 sm:p-10 text-center">
             <Kicker>before every release</Kicker>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
-              run the next one through the gate.
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3 normal-case">
+              Run your next track through the gate.
             </h2>
             <p className="text-white/70 text-[15px] normal-case leading-relaxed max-w-lg mx-auto mb-7">
               fix it, re-upload, and the bar tells you what changed — the same check on every track
