@@ -40,6 +40,19 @@ describe('isPrivateSoundcloudUrl', () => {
     expect(isPrivateSoundcloudUrl('https://example.com/a/b/s-token')).toBe(false)
     expect(isPrivateSoundcloudUrl('not a url')).toBe(false)
   })
+
+  it('handles real-world edge cases', () => {
+    // trailing slash after the token
+    expect(isPrivateSoundcloudUrl('https://soundcloud.com/artist/track/s-AbCd1234/')).toBe(true)
+    // mobile / regional subdomain
+    expect(isPrivateSoundcloudUrl('https://m.soundcloud.com/artist/track/s-AbCd1234')).toBe(true)
+    // protocol-less paste still normalizes + flags
+    expect(isPrivateSoundcloudUrl('soundcloud.com/artist/track?secret_token=s-xyz')).toBe(true)
+    // secret_token is keyed on presence, not value format
+    expect(isPrivateSoundcloudUrl('https://soundcloud.com/artist/track?secret_token=anything')).toBe(true)
+    // a public playlist whose name contains hyphens is NOT a token
+    expect(isPrivateSoundcloudUrl('https://soundcloud.com/artist/sets/summer-2026-mix')).toBe(false)
+  })
 })
 
 describe('isSupportedTrackUrl rejects private SoundCloud links', () => {
