@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { getRelativeTime, mono } from "../../admin-ui";
+import { RoomToggle } from "./room-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -133,6 +134,7 @@ export default async function AdminReportsPage({
                 <th className="text-left font-medium px-3 py-2">Status</th>
                 <th className="text-left font-medium px-3 py-2">Paid</th>
                 <th className="text-left font-medium px-3 py-2">Submitted</th>
+                <th className="text-right font-medium px-3 py-2">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.06]">
@@ -178,12 +180,15 @@ export default async function AdminReportsPage({
                     <td className="px-3 py-2 text-white/45" title={new Date(r.createdAt).toLocaleString()}>
                       {getRelativeTime(r.createdAt)}
                     </td>
+                    <td className="px-3 py-2 text-right">
+                      <RoomToggle id={r.id} skipped={r.humanRoomSkipped} />
+                    </td>
                   </tr>
                 );
               })}
               {reports.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="px-3 py-8 text-center text-white/40">No reports found</td>
+                  <td colSpan={10} className="px-3 py-8 text-center text-white/40">No reports found</td>
                 </tr>
               )}
             </tbody>
