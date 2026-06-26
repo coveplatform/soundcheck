@@ -1145,7 +1145,7 @@ export default function ScorePage() {
                     {s.name}
                   </span>
                 ))}
-                <span className="text-white/30">or a direct mp3 / wav link</span>
+                <span className="text-white/30">or mp3/wav</span>
               </div>
 
               {error && (
@@ -1153,15 +1153,13 @@ export default function ScorePage() {
               )}
             </form>
 
-            {/* trust tags */}
+            {/* trust tags — three, tight */}
             <div className={`${mono.className} mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-white/50`}>
               <span className="inline-flex items-center gap-1.5" style={{ color: ACCENT }}>
                 <Zap className="h-3.5 w-3.5" /> instant verdict
               </span>
               <span className="text-white/20">·</span>
-              <span>a room of real listeners</span>
-              <span className="text-white/20">·</span>
-              <span>measured, not guessed</span>
+              <span>real listeners</span>
               <span className="text-white/20">·</span>
               <span>no card</span>
             </div>
