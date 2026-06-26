@@ -652,26 +652,84 @@ export default function ScorePage() {
   const [authBusy, setAuthBusy] = useState(false);
   const [authError, setAuthError] = useState("");
 
+  // The real verdict, revealed in the "done" modal BEFORE the account ask — the
+  // headline (ladder + score) is free even before claim, so a logged-out user
+  // sees the actual result, then signs up to open the full read. Polled from the
+  // status endpoint once generation lands.
+  const [doneVerdict, setDoneVerdict] = useState<{ score: number; verdict: string } | null>(null);
+  useEffect(() => {
+    if (phase !== "done" || session?.user) return;
+    let cancelled = false;
+    let tries = 0;
+    const poll = async () => {
+      if (cancelled) return;
+      const started = await ensureStarted(trackUrl);
+      const slug = started?.slug;
+      if (!slug || started?.sealed || cancelled) return;
+      try {
+        const r = await fetch(`/api/score/${slug}/status`);
+        const d = await r.json().catch(() => null);
+        if (cancelled) return;
+        if (d?.ready && typeof d.score === "number") {
+          setDoneVerdict({ score: d.score, verdict: d.verdict ?? "" });
+          return;
+        }
+      } catch {
+        /* keep polling */
+      }
+      if (tries++ < 8 && !cancelled) setTimeout(poll, 2000);
+    };
+    void poll();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, session]);
+
   const continueWithGoogle = async () => {
     // Kick off generation before the Google redirect so it builds during auth.
     signIn("google", { callbackUrl: await finishUrl() });
   };
 
+  // One email field that signs in OR signs up — no mode toggle. Existing account
+  // → sign in; new email → create the account then sign in. This is the primary
+  // CTA, so a brand-new user must be able to complete here, not just Google users.
   const continueWithEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     if (authBusy) return;
     setAuthError("");
     setAuthBusy(true);
-    const res = await signIn("credentials", {
-      email: authEmail.trim(),
-      password: authPassword,
-      redirect: false,
-    });
-    if (res?.ok) {
+    const email = authEmail.trim();
+    // Existing account first.
+    const signin = await signIn("credentials", { email, password: authPassword, redirect: false });
+    if (signin?.ok) {
       window.location.href = await finishUrl();
       return;
     }
-    setAuthError("wrong email or password");
+    // No existing credential matched — try to create the account.
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password: authPassword, acceptedTerms: true }),
+    });
+    if (res.ok) {
+      const after = await signIn("credentials", { email, password: authPassword, redirect: false });
+      if (after?.ok) {
+        window.location.href = await finishUrl();
+        return;
+      }
+      setAuthError("account created — please try once more.");
+      setAuthBusy(false);
+      return;
+    }
+    const data = await res.json().catch(() => null);
+    // "already in use" means the email exists, so the password (not the account)
+    // was wrong on the sign-in above.
+    setAuthError(
+      /already in use/i.test(data?.error ?? "")
+        ? "wrong password for that email — try again, or reset it from sign in."
+        : data?.error ?? "couldn't create your account. try again."
+    );
     setAuthBusy(false);
   };
 
@@ -1751,7 +1809,7 @@ export default function ScorePage() {
               })}
               {phase === "done" && (
                 <div className="text-white mt-2 pt-2 border-t border-white/10">
-                  <span style={{ color: ACCENT }}>✓</span> done · sign in to open your report
+                  <span style={{ color: ACCENT }}>✓</span> done · your verdict is ready
                 </div>
               )}
             </div>
@@ -1774,8 +1832,33 @@ export default function ScorePage() {
                   </>
                 ) : (
                   <div className="space-y-3">
+                    {doneVerdict &&
+                      (() => {
+                        const map: Record<string, { label: string; ink: string }> = {
+                          NOT_READY: { label: "not ready", ink: "#ff7a90" },
+                          NEEDS_WORK: { label: "needs work", ink: "#b8a4ff" },
+                          ALMOST_THERE: { label: "almost there", ink: "#6ee7ff" },
+                          RELEASE_READY: { label: "release ready", ink: "#7cffc4" },
+                        };
+                        const v = map[doneVerdict.verdict] ?? { label: "your read", ink: ACCENT };
+                        return (
+                          <div className="text-center pb-1">
+                            <p className={`${mono.className} text-[11px] text-white/45 uppercase tracking-[0.2em] mb-1`}>
+                              the verdict
+                            </p>
+                            <p className="text-3xl font-extrabold tracking-tight leading-none" style={{ color: v.ink }}>
+                              {v.label}
+                            </p>
+                            <p className={`${mono.className} text-[13px] text-white/55 mt-1.5`}>
+                              {doneVerdict.score}/100 resonance
+                            </p>
+                          </div>
+                        );
+                      })()}
                     <p className={`${mono.className} text-[12px] text-white/55 text-center normal-case`}>
-                      sign in to open your report — it lands the moment it&apos;s done.
+                      {doneVerdict
+                        ? "create your free account to open the full read — the release bar, the fixes and the room."
+                        : "your report’s ready — create your free account to open it."}
                     </p>
                     <button
                       onClick={continueWithGoogle}
@@ -1821,11 +1904,9 @@ export default function ScorePage() {
                       <p className={`${mono.className} text-[13px] text-red-400 text-center`}>{authError}</p>
                     )}
                     <p className={`${mono.className} text-[11px] text-white/30 text-center normal-case`}>
-                      no account? continue with google to start instantly, or{" "}
-                      <Link href={`/login?callbackUrl=${encodeURIComponent(buildFinish())}`} className="hover:text-white transition-colors" style={{ color: ACCENT }}>
-                        sign up
-                      </Link>
-                      .
+                      new here? your email above creates your account. by continuing you agree to our{" "}
+                      <Link href="/terms" className="hover:text-white transition-colors">terms</Link> &{" "}
+                      <Link href="/privacy" className="hover:text-white transition-colors">privacy</Link>.
                     </p>
                   </div>
                 )

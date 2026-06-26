@@ -22,6 +22,7 @@ export async function GET(
       where: { slug },
       select: {
         score: true,
+        verdict: true,
         trackTitle: true,
         artworkUrl: true,
         reviewerQuotes: true,
@@ -47,6 +48,10 @@ export async function GET(
       ready,
       running,
       analyzed: Boolean(progress?.analyzed),
+      // The verdict headline (ladder + score) is free even before claim — it's
+      // what lets the landing reveal the result before asking for an account.
+      score: ready ? report.score : null,
+      verdict: ready ? report.verdict ?? null : null,
       trackTitle: report.trackTitle,
       artworkUrl: report.artworkUrl,
     });

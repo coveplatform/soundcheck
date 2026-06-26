@@ -57,7 +57,9 @@ export default function LoginPage() {
       .then((session) => {
         if (cancelled) return;
         if (session?.user) {
-          router.replace("/dashboard");
+          // Honor where they were headed (e.g. a report they were unlocking) —
+          // a stale-but-logged-in tab should land back there, not on /dashboard.
+          router.replace(callbackUrl && callbackUrl !== "/" ? callbackUrl : "/dashboard");
           router.refresh();
           return;
         }
@@ -71,7 +73,7 @@ export default function LoginPage() {
     return () => {
       cancelled = true;
     };
-  }, [router]);
+  }, [router, callbackUrl]);
 
   useEffect(() => {
     if (!authError) return;

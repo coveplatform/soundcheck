@@ -358,9 +358,12 @@ export function ReportView({ data }: { data: ReportViewModel }) {
     if (!params.has("unlocked") && !params.has("subscribed")) return;
     setFinalizing(true);
     let tries = 0;
+    // ~60s: a cold Stripe webhook + Replicate cold-start can lag the success
+    // redirect by well over the old 20s; keep reconciling so a paying customer
+    // never sits past the unlock landing.
     const t = setInterval(() => {
       tries += 1;
-      if (tries > 10) {
+      if (tries > 30) {
         setFinalizing(false);
         clearInterval(t);
         return;
