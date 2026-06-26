@@ -261,6 +261,10 @@ export default async function ReportPage({
   // firing from the webhook.
   const sp = await searchParams;
   const justPaid = sp.unlocked != null || sp.subscribed != null;
+  // Landing funnel: ?signup=1 (with the pre-start ?claim token) routes a logged-out
+  // visitor here to see the verdict + locked report with the signup panel over it.
+  const wantSignup = sp.signup != null;
+  const claimToken = typeof sp.claim === "string" ? sp.claim : null;
   const sealedAwaiting =
     (report.reviewerQuotes as { sealed?: boolean } | null)?.sealed === true &&
     report.score == null &&
@@ -366,6 +370,18 @@ export default async function ReportPage({
     report.paidAt == null &&
     (await isFreeOpenRead({ id: report.id, email: report.email }));
 
+  // Gated content must never reach a locked client — the view blurs it with CSS,
+  // but blurred-real-text is readable from devtools, so we swap the gated fields
+  // (the full read, the room quotes, the ranked-fix details past the first) for
+  // placeholders BEFORE they leave the server. Mirrors the view's free/locked
+  // split: verdict, score, dimensions, headlines, ratings and the first fix stay
+  // real; everything behind the unlock is replaced.
+  const lockedView = report.paidAt == null && !openRead;
+  const LOCK_PARA =
+    "the full written read opens when you create your free account — the energy arc, the standout moments, and the one change that moves the verdict, in long form.";
+  const LOCK_LINE =
+    "create your free account to read this in full — the detail behind the call.";
+
   const data: ReportViewModel = {
     slug: report.slug,
     isDemo: false,
@@ -438,9 +454,12 @@ export default async function ReportPage({
       openRead: data.openRead,
       verdict: data.verdict,
       releaseBar,
-      blockers,
+      // First fix's detail is free; the rest are gated → placeholder when locked.
+      blockers: lockedView
+        ? blockers.map((b, i) => (i === 0 ? b : { ...b, detail: LOCK_LINE }))
+        : blockers,
       score: data.score,
-      aiSummary: data.aiSummary,
+      aiSummary: lockedView ? LOCK_PARA : data.aiSummary,
       summaryHeadline: data.summaryHeadline,
       categories: data.categories.map((c) => ({
         label: c.label,
@@ -448,13 +467,23 @@ export default async function ReportPage({
         tag: c === strongest ? "strongest" : null,
       })),
       waveform: data.waveform,
-      humanReviews: data.humanReviews,
+      // Headlines + ratings are free; the room's full quotes are gated.
+      humanReviews: lockedView
+        ? data.humanReviews.map((h) => ({ ...h, quote: LOCK_LINE }))
+        : data.humanReviews,
       humanReviewsIn: data.humanReviewsIn,
       humanReviewsTotal: data.humanReviewsTotal,
       roomSkipped: data.roomSkipped,
       roomResetsAt: data.roomResetsAt,
     };
-    return <VerdictReportView data={verdictData} />;
+    const autoSignup = wantSignup
+      ? {
+          claimHref: claimToken
+            ? `/score/finish?slug=${encodeURIComponent(report.slug)}&claim=${encodeURIComponent(claimToken)}`
+            : `/report/${report.slug}`,
+        }
+      : undefined;
+    return <VerdictReportView data={verdictData} autoSignup={autoSignup} />;
   }
 
   return <ReportView data={data} />;

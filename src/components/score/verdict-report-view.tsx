@@ -21,7 +21,8 @@
  *  - sealed     → blockers/notes blurred behind the paywall, headlines free.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
@@ -217,7 +218,17 @@ function SectionHead({
 
 // ── main ─────────────────────────────────────────────────────────────
 
-export function VerdictReportView({ data }: { data: VerdictReportData }) {
+export function VerdictReportView({
+  data,
+  autoSignup,
+}: {
+  data: VerdictReportData;
+  /** When set, pop the signup panel over the (dimmed) report on arrival — the
+   *  landing funnel routes logged-out users here so they see their verdict +
+   *  the locked report behind the account ask. `claimHref` claims the report
+   *  after auth. */
+  autoSignup?: { claimHref: string };
+}) {
   const D = data;
   // Gate model: open-read = read free, room/deep gated; locked = sealed teaser.
   const openRead = Boolean(D.openRead);
@@ -235,6 +246,16 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
   const [unlocking, setUnlocking] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
   const { open: openAuth } = useAuthModal();
+  const { status: authStatus } = useSession();
+
+  // Funnel arrival: a logged-out visitor routed from the landing reveal sees the
+  // verdict + the locked report, with the signup panel popped over the dimmed
+  // page. Fire once, only when actually logged out (an authed user just reads).
+  useEffect(() => {
+    if (autoSignup && authStatus === "unauthenticated") {
+      openAuth("signup", autoSignup.claimHref);
+    }
+  }, [autoSignup, authStatus, openAuth]);
 
   // Checkout flows mirror report-view.tsx: POST → Stripe redirect. The demo
   // (no slug / isDemo) just bounces to marketing.
