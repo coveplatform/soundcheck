@@ -6,6 +6,7 @@ import { generateAndStoreReport, regenerateDeepReport } from "@/lib/score-report
 import { decideRoomEligibility } from "@/lib/score-review";
 import { isScoreSubscribed } from "@/lib/score-subscription";
 import { freeReadUsed } from "@/lib/score-free-cap";
+import { ensureArtistProfile } from "@/lib/ensure-artist-profile";
 import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
 import { isSupportedTrackUrl, isPrivateSoundcloudUrl, normalizeTrackUrl, PRIVATE_SOUNDCLOUD_REASON } from "@/lib/track-url";
 import { resolveShortUrl } from "@/lib/metadata";
@@ -80,10 +81,10 @@ export async function POST(request: Request) {
     // uses the flag to set expectations (sealed-report upsell).
     const usedFreeRead = await freeReadUsed(effectiveEmail);
 
+    // Ensure (don't just look up) the profile so an authenticated submission
+    // always links — OAuth users have no profile until we make one.
     const artistId = session?.user?.id
-      ? await prisma.artistProfile
-          .findUnique({ where: { userId: session.user.id }, select: { id: true } })
-          .then((p) => p?.id ?? null)
+      ? await ensureArtistProfile(session.user.id)
       : null;
 
     // ── Path 1: finalize a pre-started report ──────────────────────────

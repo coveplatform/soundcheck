@@ -10,6 +10,7 @@ import {
 } from "@/lib/score-subscription";
 import { isSupportedTrackUrl, isPrivateSoundcloudUrl, normalizeTrackUrl, PRIVATE_SOUNDCLOUD_REASON } from "@/lib/track-url";
 import { resolveShortUrl } from "@/lib/metadata";
+import { ensureArtistProfile } from "@/lib/ensure-artist-profile";
 
 /**
  * Pay-to-continue checkout for an artist past their lifetime free read.
@@ -69,11 +70,7 @@ export async function POST(request: Request) {
     }
 
     const userId = session?.user?.id;
-    const artistId = userId
-      ? await prisma.artistProfile
-          .findUnique({ where: { userId }, select: { id: true } })
-          .then((p) => p?.id ?? null)
-      : null;
+    const artistId = userId ? await ensureArtistProfile(userId) : null;
     const ip =
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       request.headers.get("x-real-ip") ||

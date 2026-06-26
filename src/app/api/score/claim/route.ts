@@ -6,6 +6,7 @@ import { decideRoomEligibility } from "@/lib/score-review";
 import { regenerateDeepReport } from "@/lib/score-report-ai";
 import { isScoreSubscribed } from "@/lib/score-subscription";
 import { freeReadUsed } from "@/lib/score-free-cap";
+import { ensureArtistProfile } from "@/lib/ensure-artist-profile";
 import { sendAdminNewScoreSubmissionEmail } from "@/lib/email";
 
 // Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
@@ -65,9 +66,7 @@ export async function POST(request: Request) {
     // Computed BEFORE the email attaches so this claim doesn't count itself.
     const usedFreeRead = await freeReadUsed(email);
 
-    const artistId = await prisma.artistProfile
-      .findUnique({ where: { userId: session.user.id }, select: { id: true } })
-      .then((p) => p?.id ?? null);
+    const artistId = await ensureArtistProfile(session.user.id);
 
     await prisma.trackScoreReport.update({
       where: { id: report.id },
