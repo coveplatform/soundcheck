@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useAuthModal } from "@/components/providers";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Logo } from "@/components/ui/logo";
@@ -646,99 +646,62 @@ export default function ScorePage() {
     return buildFinish();
   };
 
-  // Inline auth (instead of bouncing to /login).
-  const [authEmail, setAuthEmail] = useState("");
-  const [authPassword, setAuthPassword] = useState("");
-  const [authBusy, setAuthBusy] = useState(false);
-  const [authError, setAuthError] = useState("");
-
-  // The real verdict, revealed in the "done" modal BEFORE the account ask — the
-  // headline (ladder + score) is free even before claim, so a logged-out user
-  // sees the actual result, then signs up to open the full read. Polled from the
-  // status endpoint once generation lands.
-  const [doneVerdict, setDoneVerdict] = useState<{ score: number; verdict: string } | null>(null);
+  // Logged-out + the modal has reached "done": hand straight off to the real
+  // report. There the verdict renders and the signup panel pops over the dimmed
+  // page (?signup=1&claim=…) — that's the only account ask. No auth is ever
+  // shown inside this modal. We poll briefly so the report opens with the
+  // verdict already in; if it's still generating we route anyway and the
+  // report's pending view takes over.
   useEffect(() => {
     if (phase !== "done" || session?.user) return;
     let cancelled = false;
     let tries = 0;
-    const poll = async () => {
+    const handoff = async () => {
       if (cancelled) return;
       const started = await ensureStarted(trackUrl);
+      // Past their free read → the pay-to-continue wall, not the report.
+      if (started?.sealed) {
+        setPaywall({
+          mode: "track",
+          url: normalizeTrackUrl(trackUrl),
+          title: meta?.title?.trim() || undefined,
+        });
+        return;
+      }
       const slug = started?.slug;
-      if (!slug || started?.sealed || cancelled) return;
+      if (!slug) {
+        // start call hasn't landed yet — wait for the slug, then hand off.
+        if (tries++ < 8 && !cancelled) setTimeout(handoff, 2000);
+        return;
+      }
+      const claim = started?.claimToken
+        ? `&claim=${encodeURIComponent(started.claimToken)}`
+        : "";
+      const toReport = () =>
+        window.location.assign(`/report/${slug}?signup=1${claim}`);
       try {
         const r = await fetch(`/api/score/${slug}/status`);
         const d = await r.json().catch(() => null);
         if (cancelled) return;
-        if (d?.ready && typeof d.score === "number") {
-          // Brief verdict flash in the modal, then hand off to the real report.
-          setDoneVerdict({ score: d.score, verdict: d.verdict ?? "" });
-          // Reveal on the real report page: the verdict + the locked report,
-          // with the signup panel popped over the dimmed page (?signup=1). The
-          // claim token finalizes the report once they create the account.
-          const claim = started?.claimToken
-            ? `&claim=${encodeURIComponent(started.claimToken)}`
-            : "";
-          window.location.assign(`/report/${slug}?signup=1${claim}`);
+        // Ready → open with the verdict in. Otherwise give it a few tries, then
+        // route to the still-generating report rather than stranding the modal.
+        if (d?.ready || tries++ >= 5) {
+          toReport();
           return;
         }
       } catch {
-        /* keep polling */
+        if (tries++ >= 5) {
+          toReport();
+          return;
+        }
       }
-      if (tries++ < 8 && !cancelled) setTimeout(poll, 2000);
+      if (!cancelled) setTimeout(handoff, 2000);
     };
-    void poll();
+    void handoff();
     return () => {
       cancelled = true;
     };
   }, [phase, session]);
-
-  const continueWithGoogle = async () => {
-    // Kick off generation before the Google redirect so it builds during auth.
-    signIn("google", { callbackUrl: await finishUrl() });
-  };
-
-  // One email field that signs in OR signs up — no mode toggle. Existing account
-  // → sign in; new email → create the account then sign in. This is the primary
-  // CTA, so a brand-new user must be able to complete here, not just Google users.
-  const continueWithEmail = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (authBusy) return;
-    setAuthError("");
-    setAuthBusy(true);
-    const email = authEmail.trim();
-    // Existing account first.
-    const signin = await signIn("credentials", { email, password: authPassword, redirect: false });
-    if (signin?.ok) {
-      window.location.href = await finishUrl();
-      return;
-    }
-    // No existing credential matched — try to create the account.
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password: authPassword, acceptedTerms: true }),
-    });
-    if (res.ok) {
-      const after = await signIn("credentials", { email, password: authPassword, redirect: false });
-      if (after?.ok) {
-        window.location.href = await finishUrl();
-        return;
-      }
-      setAuthError("account created — please try once more.");
-      setAuthBusy(false);
-      return;
-    }
-    const data = await res.json().catch(() => null);
-    // "already in use" means the email exists, so the password (not the account)
-    // was wrong on the sign-in above.
-    setAuthError(
-      /already in use/i.test(data?.error ?? "")
-        ? "wrong password for that email — try again, or reset it from sign in."
-        : data?.error ?? "couldn't create your account. try again."
-    );
-    setAuthBusy(false);
-  };
 
   const seeResults = async () => {
     if (busy) return;
@@ -1849,82 +1812,10 @@ export default function ScorePage() {
                     )}
                   </>
                 ) : (
-                  <div className="space-y-3">
-                    {doneVerdict &&
-                      (() => {
-                        const map: Record<string, { label: string; ink: string }> = {
-                          NOT_READY: { label: "not ready", ink: "#ff7a90" },
-                          NEEDS_WORK: { label: "needs work", ink: "#b8a4ff" },
-                          ALMOST_THERE: { label: "almost there", ink: "#6ee7ff" },
-                          RELEASE_READY: { label: "release ready", ink: "#7cffc4" },
-                        };
-                        const v = map[doneVerdict.verdict] ?? { label: "your read", ink: ACCENT };
-                        return (
-                          <div className="text-center pb-1">
-                            <p className={`${mono.className} text-[11px] text-white/45 uppercase tracking-[0.2em] mb-1`}>
-                              the verdict
-                            </p>
-                            <p className="text-3xl font-extrabold tracking-tight leading-none" style={{ color: v.ink }}>
-                              {v.label}
-                            </p>
-                            <p className={`${mono.className} text-[13px] text-white/55 mt-1.5`}>
-                              {doneVerdict.score}/100 resonance
-                            </p>
-                          </div>
-                        );
-                      })()}
-                    <p className={`${mono.className} text-[12px] text-white/55 text-center normal-case`}>
-                      {doneVerdict
-                        ? "create your free account to open the full read — the release bar, the fixes and the room."
-                        : "your report’s ready — create your free account to open it."}
-                    </p>
-                    <button
-                      onClick={continueWithGoogle}
-                      className="w-full inline-flex items-center justify-center gap-2.5 bg-white text-black font-extrabold text-[15px] py-3.5 hover:bg-white/90 transition-colors"
-                    >
-                      <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                      </svg>
-                      continue with google
-                    </button>
-                    <div className={`${mono.className} flex items-center gap-3 text-[11px] text-white/25`}>
-                      <div className="h-px bg-white/10 flex-1" /> or <div className="h-px bg-white/10 flex-1" />
-                    </div>
-                    <form onSubmit={continueWithEmail} className="space-y-2">
-                      <input
-                        type="email"
-                        value={authEmail}
-                        onChange={(e) => setAuthEmail(e.target.value)}
-                        placeholder="email"
-                        required
-                        className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-4 py-3 text-[16px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
-                      />
-                      <input
-                        type="password"
-                        value={authPassword}
-                        onChange={(e) => setAuthPassword(e.target.value)}
-                        placeholder="password"
-                        required
-                        className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-4 py-3 text-[16px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
-                      />
-                      <button
-                        type="submit"
-                        disabled={authBusy}
-                        className="w-full bg-[#6ee7ff] text-black font-extrabold text-sm py-3 hover:bg-white transition-colors disabled:opacity-60"
-                      >
-                        {authBusy ? "signing in…" : "continue with email"}
-                      </button>
-                    </form>
-                    {authError && (
-                      <p className={`${mono.className} text-[13px] text-red-400 text-center`}>{authError}</p>
-                    )}
-                    <p className={`${mono.className} text-[11px] text-white/30 text-center normal-case`}>
-                      new here? your email above creates your account. by continuing you agree to our{" "}
-                      <Link href="/terms" className="hover:text-white transition-colors">terms</Link> &{" "}
-                      <Link href="/privacy" className="hover:text-white transition-colors">privacy</Link>.
+                  <div className="flex flex-col items-center justify-center gap-3 py-4 text-center">
+                    <Loader2 className="h-5 w-5 animate-spin" style={{ color: ACCENT }} />
+                    <p className={`${mono.className} text-[13px] text-white/55 normal-case`}>
+                      your verdict’s ready — opening your report…
                     </p>
                   </div>
                 )
