@@ -1,6 +1,8 @@
 // Generate a cover image for a "The Drop" blog post in the established
-// painterly mid-century illustration style, and write it to
-// public/blog/blog<N>.jpg (optimized JPEG, matching the rest of the series).
+// gritty hand-drawn risograph / oil-pastel zine style (an edgier evolution of
+// the original series: harder ink, higher contrast, acid colours, rougher
+// paper, more attitude), and write it to public/blog/blog<N>.jpg (optimized
+// JPEG, matching the rest of the series).
 //
 // Usage:
 //   node scripts/gen-blog-cover.mjs <N> ["post title or topic"]
@@ -61,18 +63,18 @@ const backdrop = pick([
   "a sunset-orange glow spilling across the floorboards",
 ]);
 const palette = pick([
-  "violet, lavender and hot pink dominant, with coral-orange pops",
-  "cobalt blue and purple dominant, with teal-green and pink pops",
-  "magenta and indigo dominant, with warm orange and lime accents",
-  "purple and periwinkle dominant, with coral and turquoise accents",
+  "two-colour acid riso — electric magenta and cyan, hard overprint where they overlap, on grimy off-white",
+  "neon green and deep ink-black dominant, with a single hot-orange spot colour",
+  "blood-orange and cobalt clash, high contrast, with bruised purple in the shadows",
+  "hot pink and toxic yellow over near-black, harsh and loud",
 ]);
 
-const prompt = `A hand-drawn editorial illustration in OIL PASTEL and COLORED PENCIL, risograph print style — part of a consistent series of music-blog cover art with a loose, energetic, slightly weird hand-made feel.
-Scene: ${scene}, inside a warm, cluttered, cozy room. ${backdrop}.
-Scattered details around the room: leafy potted plants, a chunky speaker or amp, vinyl records and a turntable, a striped woven rug, and a few abstract squiggles and shapes taped on the walls.
-Texture and technique (most important): heavy VISIBLE crayon and colored-pencil strokes, dense directional hatching and scribble filling the background, grainy cream / off-white paper showing through the marks. Loose, wobbly, imperfect hand-drawn linework. Naive folk-art / indie zine feel — a little weird and edgy. NOT clean, NOT flat vector, NOT smooth, NOT glossy digital art.
-Palette: limited vibrant risograph colours — ${palette} — over a cream paper base.
-Wide landscape composition, flat playful perspective, lots of small hand-drawn details. No text, no lettering, no watermark, no logos.${
+const prompt = `A gritty hand-drawn editorial illustration in OIL PASTEL, GREASE PENCIL and risograph PRINT style — part of a consistent series of music-blog cover art, but the edgier, punkier end of it: raw, high-energy, a bit confrontational. Indie zine / DIY gig-poster / punk fanzine attitude.
+Scene: ${scene}, in a raw, lived-in space. ${backdrop}.
+Scattered details: a beat-up speaker stack or amp, tangled cables, vinyl and a turntable, gaffer-taped flyers and torn posters on the walls, a few harsh marker scrawls and abstract shapes.
+Texture and technique (most important): hard, confident BLACK INK linework with rough, jagged, imperfect edges; heavy visible grease-pencil and crayon strokes; dense aggressive directional hatching and scribble; misregistered risograph overprint (colours slightly off-aligned, halftone grain); grimy, grainy off-white paper with smudges and ink specks showing through. High contrast, loud, raw. NOT cozy, NOT soft, NOT pastel, NOT clean, NOT flat vector, NOT smooth, NOT glossy digital art.
+Palette: limited, harsh, high-contrast risograph colours — ${palette}. Let the two ink colours clash rather than blend.
+Wide landscape composition, bold flat graphic perspective, strong silhouettes, lots of rough hand-drawn detail. No text, no lettering, no watermark, no logos.${
   topic ? `\nMood should loosely suit a blog post about: ${topic}.` : ""
 }`;
 
