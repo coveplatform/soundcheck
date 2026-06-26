@@ -641,7 +641,7 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
                       <div className="flex items-start justify-between gap-3">
                         <p className="text-[15px] font-bold text-white leading-snug">{b.label}</p>
                         <span
-                          className={`${mono.className} text-[11px] whitespace-nowrap text-right max-w-[40%]`}
+                          className={`${mono.className} text-[11px] text-right max-w-[45%] shrink-0`}
                           style={{ color: ink }}
                         >
                           {b.weight}
@@ -690,9 +690,9 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
             </SectionHead>
             <div className="space-y-5">
               {D.categories.map((cat) => (
-                <div key={cat.label} className="flex items-center gap-4">
-                  <div className="flex items-center gap-2.5 w-52 shrink-0">
-                    <span className="text-[15px] text-white/85">{cat.label}</span>
+                <div key={cat.label} className="flex items-center gap-3 sm:gap-4">
+                  <div className="flex items-center gap-2 w-32 sm:w-52 shrink-0 min-w-0">
+                    <span className="text-[13px] sm:text-[15px] text-white/85 leading-tight">{cat.label}</span>
                     {cat.tag && (
                       <span
                         className={`${mono.className} text-[10px] font-bold text-black px-1.5 py-0.5`}
@@ -708,7 +708,7 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
                       style={{ width: `${(cat.score / 5) * 100}%`, background: ACCENT }}
                     />
                   </div>
-                  <span className={`${mono.className} text-[14px] font-bold w-12 text-right`} style={{ color: ACCENT }}>
+                  <span className={`${mono.className} text-[14px] font-bold w-10 sm:w-12 text-right shrink-0`} style={{ color: ACCENT }}>
                     {cat.score.toFixed(1)}
                   </span>
                 </div>
