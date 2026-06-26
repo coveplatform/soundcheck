@@ -1,3 +1,12 @@
+/**
+ * ⚠️ CLASSIC (LEGACY) — peer-review assignment engine for the decommissioned
+ * MixReflect Classic product (the `Track` model, credits/slots, /api/tracks,
+ * /api/reviews, the (dashboard) review queue). The LIVE product is Score /
+ * Verdict — its reviewer "room of 5" lives in `score-review.ts` and reads
+ * `TrackScoreReport` + `isScoreReviewer`. Do NOT wire new features here; this
+ * file is referenced only by the shared Stripe webhook for legacy Track
+ * checkouts. New reviewer logic → `score-review.ts`. See AGENT.md.
+ */
 import { prisma } from "./prisma";
 import { PackageType, ReviewerTier } from "@prisma/client";
 import type { Prisma } from "@prisma/client";

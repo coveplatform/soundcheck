@@ -6,7 +6,7 @@ import { assignReviewersToTrack } from "@/lib/queue";
 import { sendTrackQueuedEmail, sendAdminNewTrackNotification } from "@/lib/email";
 import { finalizePaidCheckoutSession } from "@/lib/payments";
 import { activateSubscriber, updateSubscriberStatus } from "@/lib/score-subscription";
-import { decideRoomEligibility } from "@/lib/score-review";
+import { decideRoomEligibility, notifyScoreReviewersOfNewTrack } from "@/lib/score-review";
 import { generateAndStoreReport, regenerateDeepReport } from "@/lib/score-report-ai";
 import type Stripe from "stripe";
 
@@ -133,6 +133,11 @@ async function handleScoreUnlockCheckout(session: Stripe.Checkout.Session) {
       await regenerateDeepReport(reportId).catch((err) =>
         console.error("Error generating deep report after unlock:", err)
       );
+      // The track is now in the claim pool — nudge the reviewer pool so it gets
+      // picked up instead of sitting idle (the room is pull-based).
+      await notifyScoreReviewersOfNewTrack(reportId).catch((err) =>
+        console.error("Error notifying reviewers after unlock:", err)
+      );
     });
 
     console.log(`Unlocked score report ${reportId} (session ${session.id})`);
@@ -188,6 +193,10 @@ async function handleScoreSubscriptionCheckout(session: Stripe.Checkout.Session)
           }
           await regenerateDeepReport(report.id).catch((err) =>
             console.error("Error generating deep report after subscribe:", err)
+          );
+          // Subscriber's room-granted track → nudge the reviewer pool to claim it.
+          await notifyScoreReviewersOfNewTrack(report.id).catch((err) =>
+            console.error("Error notifying reviewers after subscribe:", err)
           );
         });
       }

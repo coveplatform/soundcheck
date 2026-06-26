@@ -1,6 +1,10 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { sendScoreReviewLandedEmail, sendScoreRoomCompleteEmail } from "@/lib/email/score";
+import {
+  sendScoreReviewLandedEmail,
+  sendScoreRoomCompleteEmail,
+  sendScoreTrackAvailableEmail,
+} from "@/lib/email/score";
 
 // Either the base client or a transaction client — lets the assignment logic run
 // inside claimAndAssignRoom's transaction (so the cap check + assign are atomic).
@@ -365,6 +369,64 @@ export async function getScoreReviewQueue(userId: string): Promise<QueueItem[]> 
     .map((r) => ({ id: r.id, trackTitle: r.trackTitle, genre: r.genre, claimed: false }));
 
   return [...claimedItems, ...availableItems];
+}
+
+/**
+ * Notify the reviewer pool that a track just entered the claim pool, so it gets
+ * picked up instead of sitting idle. The room is pull-based (reviewers claim from
+ * `/score-review`), so without this nudge tracks sit unclaimed — best-effort,
+ * fire-and-forget from the caller. Fires once per track (the webhook unlock /
+ * subscribe path runs once per payment). Toggle off with NOTIFY_SCORE_REVIEWERS=false.
+ *
+ * Recipients = real `isScoreReviewer` users, minus seed placeholders and the
+ * track's own owner. Returns how many emails sent.
+ */
+export async function notifyScoreReviewersOfNewTrack(reportId: string): Promise<number> {
+  if (process.env.NOTIFY_SCORE_REVIEWERS === "false") return 0;
+
+  const report = await prisma.trackScoreReport.findUnique({
+    where: { id: reportId },
+    select: {
+      genre: true,
+      email: true,
+      paidAt: true,
+      humanRoomSkipped: true,
+      status: true,
+    },
+  });
+  // Only a live, room-eligible track is worth a nudge.
+  if (!report || !report.paidAt || report.humanRoomSkipped || report.status === "COMPLETED") {
+    return 0;
+  }
+
+  const ownerEmail = report.email?.trim().toLowerCase() ?? "";
+  const reviewers = await prisma.user.findMany({
+    where: {
+      isScoreReviewer: true,
+      // never email seed placeholders or the track's own owner
+      email: { not: { contains: "@seed.mixreflect.com" } },
+      ...(ownerEmail ? { NOT: { email: { equals: ownerEmail, mode: "insensitive" } } } : {}),
+    },
+    select: { email: true },
+  });
+  const emails = reviewers.map((r) => r.email).filter((e): e is string => Boolean(e));
+  if (emails.length === 0) return 0;
+
+  const concurrency = Number(process.env.NOTIFY_CONCURRENCY ?? "10");
+  let sent = 0;
+  for (let i = 0; i < emails.length; i += concurrency) {
+    const batch = emails.slice(i, i + concurrency);
+    const results = await Promise.allSettled(
+      batch.map((to) =>
+        sendScoreTrackAvailableEmail({ to, genre: report.genre, rateCents: SCORE_REVIEW_RATE_CENTS })
+      )
+    );
+    for (const r of results) {
+      if (r.status === "fulfilled" && r.value) sent++;
+      else if (r.status === "rejected") console.error("notifyScoreReviewersOfNewTrack: send failed", r.reason);
+    }
+  }
+  return sent;
 }
 
 /** A reviewer's own completed reactions, newest first — for their history view. */

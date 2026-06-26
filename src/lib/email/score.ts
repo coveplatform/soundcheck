@@ -119,6 +119,28 @@ export async function sendScoreRoomCompleteEmail(args: {
   return sendEmail({ to: args.to, subject: `✓ the room's in on ${title}`, html: shell(content) });
 }
 
+// ── Reviewer nudge: a track is waiting in the room to claim ─────────
+export async function sendScoreTrackAvailableEmail(args: {
+  to: string;
+  genre?: string | null;
+  rateCents: number;
+}): Promise<boolean> {
+  const url = `${getAppUrl()}/score-review`;
+  const rate = `$${(args.rateCents / 100).toFixed(2)}`;
+  const g = args.genre?.trim();
+  const content = `
+    ${kicker("the room · a track is waiting")}
+    ${h1("A track just landed in the room 🎧")}
+    ${p(`A${g ? ` ${g}` : " new"} track is waiting for an honest reaction. Claim it, give it a real two-minute listen, and earn <strong style="color:${TEXT};">${rate}</strong>.`)}
+    ${p(`First come, first served — whoever gets to the room first claims it.`)}
+    ${button("Claim it in the room →", url)}`;
+  return sendEmail({
+    to: args.to,
+    subject: `🎧 a${g ? ` ${g}` : " new"} track is waiting in the room`,
+    html: shell(content),
+  });
+}
+
 // ── "What's new" announcement blast ─────────────────────────────────
 export function buildNewMixReflectAnnouncement(userName?: string | null): { subject: string; html: string } {
   const app = getAppUrl();

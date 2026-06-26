@@ -1,3 +1,9 @@
+/**
+ * ⚠️ CLASSIC (LEGACY) emails — the light/purple peer-review template for the
+ * decommissioned MixReflect Classic product. Do NOT add Score/Verdict emails
+ * here. Score-product emails (dark/icy-cyan brand) live in `email/score.ts` —
+ * including the reviewer "a track is waiting in the room" nudge. See AGENT.md.
+ */
 import { COLORS, getAppUrl, emailWrapper, emailButton, sendEmail } from "./templates";
 
 export async function sendTierChangeEmail(params: {
