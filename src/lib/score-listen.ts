@@ -15,6 +15,27 @@
 
 import { SCORE_GENRES, isScoreGenre } from "@/lib/score-genres";
 
+/** What KIND of track this is. The listen pass is the only stage that hears
+ *  audio, so it classifies the track's *form* here — and that gates which
+ *  dimensions and release-bar axes even apply downstream, so an instrumental is
+ *  never judged on vocals and an ambient piece is never judged on a radio hook. */
+export type TrackType =
+  | "song" // vocal-led song — the default shape
+  | "instrumental" // melodic instrumental: guitar piece, piano, lead/riff-driven, no vocals
+  | "beat" // loop-based producer beat, made to be rapped/sung over
+  | "ambient" // texture / drone / soundscape — mood over hook, by design
+  | "interlude" // short sketch / skit / interlude, not a full song
+  | "experimental"; // noise / avant-garde / sound-art
+
+export const TRACK_TYPES: TrackType[] = [
+  "song",
+  "instrumental",
+  "beat",
+  "ambient",
+  "interlude",
+  "experimental",
+];
+
 export type ListenFindings = {
   /** Genre heard, constrained to the product's genre list (or null if unsure).
    *  The listen pass is the only stage that actually hears audio, so it's the
@@ -22,6 +43,14 @@ export type ListenFindings = {
   detectedGenre: string | null;
   /** How sure the model is of the genre — gates whether we override "Other". */
   genreConfidence: "low" | "medium" | "high";
+  /** What kind of track this is — gates which dimensions/axes apply downstream. */
+  trackType: TrackType;
+  /** One line: what this track is trying to be (judgment + prose context). */
+  intent: string | null;
+  /** Is the track carried by vocals? false for instrumentals/ambient/most beats. */
+  vocalCentric: boolean;
+  /** Is it reaching for a hook at all? false for ambient/experimental/interludes. */
+  hasHookAmbition: boolean;
   vocals: {
     present: boolean;
     sung: boolean;
@@ -62,10 +91,18 @@ Be specific and honest — this feeds a scoring system, so flattery corrupts it.
 
 Classify the GENRE from what you actually hear — instrumentation, rhythm, production style — independently of any tag the artist gave (their tag may be missing or wrong). Pick the single best fit from this list: ${SCORE_GENRES.join(", ")}. Use "Other" only when nothing genuinely fits, and set genreConfidence honestly (a sparse acoustic guitar take is "Singer-Songwriter" with high confidence; an ambiguous beat may be "low").
 
+Also classify what KIND of track this is and judge it on its OWN terms — never fault it for not being a thing it isn't reaching for:
+- "song" = vocal-led; "instrumental" = melodic, lead/riff-driven, no vocals; "beat" = loop-based producer beat meant to be rapped/sung over; "ambient" = texture/mood with no hook by design; "interlude" = short sketch, not a full song; "experimental" = noise / sound-art.
+- Set vocalCentric (is the track carried by vocals?) and hasHookAmbition (is it even reaching for a hook? — false for ambient, experimental, and most interludes) honestly. An instrumental having no vocals is the FORMAT, not a weakness — do not list "no vocals" as a weakness for an instrumental, and do not call a hookless ambient piece "forgettable" for lacking a hook it never wanted.
+
 Return STRICT JSON only:
 {
   "detectedGenre": <one of: ${SCORE_GENRES.join(", ")}>,
   "genreConfidence": "low"|"medium"|"high",
+  "trackType": "song"|"instrumental"|"beat"|"ambient"|"interlude"|"experimental",
+  "intent": "<one line: what this track is trying to be>",
+  "vocalCentric": <bool>,
+  "hasHookAmbition": <bool>,
   "vocals": { "present": <bool — any vocal at all>, "sung": <bool — actual sung/rapped human vocal, not a chop/sample texture>, "performance": <string or null — if sung: pitch accuracy, delivery, conviction, where it sits in the mix> },
   "hookMelody": { "strength": "weak"|"decent"|"strong"|"exceptional", "note": "<what the main hook/melody/lead actually is and whether it sticks>" },
   "mixCharacter": "<2-3 sentences: what the mix actually sounds like — clarity, balance, low end, top end, anything audibly off (mud, harshness, buried elements, clipping)>",
@@ -85,6 +122,12 @@ function coerceFindings(raw: unknown): ListenFindings | null {
   return {
     detectedGenre: isScoreGenre(o.detectedGenre) ? o.detectedGenre : null,
     genreConfidence: oneOf(o.genreConfidence, ["low", "medium", "high"], "low"),
+    trackType: oneOf(o.trackType, TRACK_TYPES, "song"),
+    intent: typeof o.intent === "string" && o.intent.trim() ? o.intent.trim() : null,
+    // Fall back to the vocal read / "true" when the model omits the flags, so an
+    // older response shape keeps today's behaviour (judged as a song).
+    vocalCentric: o.vocalCentric != null ? Boolean(o.vocalCentric) : Boolean(o.vocals?.sung),
+    hasHookAmbition: o.hasHookAmbition != null ? Boolean(o.hasHookAmbition) : true,
     vocals: {
       present: Boolean(o.vocals?.present),
       sung: Boolean(o.vocals?.sung),
@@ -222,6 +265,7 @@ export function describeListenFindings(lf: ListenFindings): string {
     ...(lf.detectedGenre
       ? [`- genre heard: ${lf.detectedGenre} (${lf.genreConfidence} confidence)`]
       : []),
+    `- track type: ${lf.trackType}${lf.intent ? ` — ${lf.intent}` : ""}${!lf.vocalCentric ? " (not vocal-led — do NOT judge it on vocals)" : ""}${!lf.hasHookAmbition ? " (not reaching for a hook — do NOT penalise hook absence)" : ""}`,
     `- vocals: ${lf.vocals.sung ? `sung/rapped vocal present${lf.vocals.performance ? ` — ${lf.vocals.performance}` : ""}` : lf.vocals.present ? "vocal textures present but nothing clearly sung" : "instrumental (no vocals heard)"}`,
     `- hook/melody: ${lf.hookMelody.strength}${lf.hookMelody.note ? ` — ${lf.hookMelody.note}` : ""}`,
     `- mix: ${lf.mixCharacter}`,

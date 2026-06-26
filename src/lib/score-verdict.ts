@@ -98,9 +98,14 @@ function bandToZone(
  */
 export function buildReleaseBar(
   features: AudioFeatures | null,
-  genre: string | null | undefined
+  genre: string | null | undefined,
+  opts?: { hookApplies?: boolean }
 ): ReleaseAxis[] {
   if (!features) return [];
+  // A "time to hook" clock is meaningless for music that isn't reaching for a
+  // hook (ambient, experimental, an interlude). Default true so song/instrumental
+  // tracks — and any path with no listen evidence — behave exactly as before.
+  const hookApplies = opts?.hookApplies !== false;
   const nm = genreNorms(genre);
   const axes: ReleaseAxis[] = [];
 
@@ -158,7 +163,7 @@ export function buildReleaseBar(
   }
 
   // ── time to hook (intro lift) ──
-  if (features.introLiftSec != null) {
+  if (features.introLiftSec != null && hookApplies) {
     const [median, long] = nm.introLiftSec;
     // The genre long-side is a streaming-era yardstick (hook fast or lose them)
     // that doesn't fit long-form music — a 7-minute track earns a longer runway
@@ -325,7 +330,12 @@ export function buildVerdictPayload(
   genre: string | null | undefined
 ): VerdictPayloadResult | null {
   if (!VERDICT_REPORT) return null;
-  const releaseBar = buildReleaseBar(features, genre);
+  // The listen pass (persisted in evidence) knows whether this track reaches for a
+  // hook at all — gate the time-to-hook axis on it. Absent (v1 / no listen) → the
+  // axis is emitted as before.
+  const listen = generated.evidence?.listen ?? null;
+  const hookApplies = listen ? listen.hasHookAmbition : true;
+  const releaseBar = buildReleaseBar(features, genre, { hookApplies });
   // No measured axes → nothing honest to show on the bar; skip the verdict layout
   // and let the report fall back to the legacy view.
   if (releaseBar.length === 0) return null;

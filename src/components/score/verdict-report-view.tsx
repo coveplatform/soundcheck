@@ -652,7 +652,7 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
             <SectionHead
               n="03"
               kicker="the moment map · from your audio"
-              title="where the verdict comes from"
+              title="where it happens in the track"
             >
               the real frequency-split waveform the verdict is grounded in — every marker the
               analysis flagged.
@@ -709,7 +709,7 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
             <SectionHead
               n="05"
               kicker="the read · the full synthesis"
-              title="the whole track, walked"
+              title="the full read"
               ink={VIOLET}
             >
               the verdict in long form — the energy arc, the moments, and the one thing the call
@@ -723,30 +723,71 @@ export function VerdictReportView({ data }: { data: VerdictReportData }) {
           </SectionCard>
         )}
 
-        {/* ── WHY YOU CAN TRUST THE CALL — honest, no fabricated stats ── */}
-        <SectionCard>
-          <SectionHead
-            n="06"
-            kicker="why you can trust the call"
-            title={
-              <span className="inline-flex items-start gap-2.5">
-                <ShieldCheck className="h-6 w-6 mt-1 shrink-0" style={{ color: GREEN }} />
-                the verdict is measured, and we keep score on it.
-              </span>
-            }
-            ink={GREEN}
-          >
-            every axis on the release bar is measured straight from your audio — loudness, dynamics,
-            the time it takes to reach the hook. the bands are where released tracks in your genre
-            sit. as the reference corpus fills, the call gets sharper, and we track what cleared
-            tracks do after release to keep the bar honest.
-          </SectionHead>
-          <p className={`${mono.className} text-[11px] text-white/40 mt-3 normal-case leading-relaxed`}>
-            the released-track reference corpus is still being built — bands marked{" "}
-            <span className="text-white/60">estimated</span> are derived from genre norms until it
-            lands. we don&apos;t claim a percentile we can&apos;t back.
-          </p>
-        </SectionCard>
+        {/* ── THE MOVE — the report distilled to one action (replaces trust block) ── */}
+        {(() => {
+          const strongest = D.categories.find((c) => c.tag === "strongest");
+          const top = blockers[0];
+          const curIdx = LADDER.findIndex((l) => l.key === D.verdict);
+          const nextRung =
+            curIdx >= 0 && curIdx < LADDER.length - 1 ? LADDER[curIdx + 1] : null;
+          if (!strongest && !top) return null;
+          return (
+            <SectionCard>
+              <SectionHead
+                n="06"
+                kicker="the bottom line · what to do next"
+                title="your next move"
+                ink={GREEN}
+              >
+                the whole report in one line — what to protect, and the one thing to change first.
+              </SectionHead>
+              <div className="grid sm:grid-cols-2 gap-px bg-white/10 border border-white/10">
+                {strongest && (
+                  <div className="bg-[#0a0a0a] p-5">
+                    <p className={`${mono.className} text-[11px] tracking-wide mb-2`} style={{ color: GREEN }}>
+                      protect this
+                    </p>
+                    <p className="text-[15px] font-bold text-white leading-snug normal-case">
+                      {strongest.label} is your strongest axis — don&apos;t lose it in the fix.
+                    </p>
+                  </div>
+                )}
+                {top && (
+                  <div className="bg-[#0a0a0a] p-5">
+                    <p
+                      className={`${mono.className} text-[11px] tracking-wide mb-2`}
+                      style={{ color: outOfBand ? WARN : ACCENT }}
+                    >
+                      {outOfBand ? "fix this first" : "polish this first"}
+                    </p>
+                    <p className="text-[15px] font-bold text-white leading-snug normal-case">
+                      {top.label}
+                    </p>
+                    {outOfBand > 0 && nextRung && (
+                      <p className="text-[13px] text-white/60 leading-relaxed normal-case mt-2">
+                        clear it and the call moves toward{" "}
+                        <span style={{ color: nextRung.ink }}>{nextRung.label}</span>.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </SectionCard>
+          );
+        })()}
+
+        {/* honest provenance — compact strip, not its own section */}
+        <div
+          className={`${mono.className} flex items-start gap-2.5 text-[11px] text-white/40 normal-case leading-relaxed border-t border-white/10 pt-5`}
+        >
+          <ShieldCheck className="h-4 w-4 shrink-0 mt-px" style={{ color: GREEN }} />
+          <span>
+            every axis is measured straight from your audio — no fabricated stats, no percentile we
+            can&apos;t back.
+            {anyEstimated &&
+              " bands marked estimated are genre norms until the released-track corpus lands."}
+          </span>
+        </div>
 
         {/* ── UNLOCK / RE-CHECK CTA ── */}
         {!D.unlocked && (

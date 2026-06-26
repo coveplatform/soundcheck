@@ -10,6 +10,7 @@ import {
   describeListenFindings,
   listenToTrack,
   type ListenFindings,
+  type TrackType,
 } from "@/lib/score-listen";
 
 /**
@@ -49,6 +50,9 @@ export type GradeResult = {
   genre: string;
   /** True when `genre` came from the listen pass rather than the artist. */
   genreFromListen: boolean;
+  /** The kind of track the engine judged it as (drives the dimension weighting
+   *  and, downstream, which release-bar axes apply). "song" when no listen ran. */
+  trackType: TrackType;
   /** The findings sheet (pass-1 output) — fed to the prose pass as evidence. */
   findingsText: string;
   /** What the engine knew, for debugging/persistence (no audio payloads). */
@@ -70,14 +74,30 @@ export type GradeInput = {
 
 const DIM_KEYS = ["hook", "production", "retention", "emotional", "commercial"] as const;
 
-/** Fixed dimension weights — sum 1.0. Overall 0-100 = weighted avg / 5 × 100. */
-const WEIGHTS: GradedDimensions = {
-  hook: 0.26,
-  production: 0.22,
-  retention: 0.2,
-  emotional: 0.16,
-  commercial: 0.16,
+/**
+ * Dimension weights BY TRACK TYPE — the overall (weighted avg / 5 × 100) should
+ * reflect what the track is TRYING to be, not a fixed vocal-song template. A
+ * melodic instrumental still has a "hook" (its lead motif), so it keeps some hook
+ * weight; an ambient piece reaches for none, so hook all but drops out and
+ * production/emotional/retention carry it. "song" is the original blend, so a
+ * normal vocal track scores exactly as before. Each row sums to ~1.0 and is
+ * renormalised at use, so the math can never drift if a row is edited.
+ */
+const WEIGHTS_BY_TYPE: Record<TrackType, GradedDimensions> = {
+  song: { hook: 0.26, production: 0.22, retention: 0.2, emotional: 0.16, commercial: 0.16 },
+  instrumental: { hook: 0.14, production: 0.26, retention: 0.22, emotional: 0.24, commercial: 0.14 },
+  beat: { hook: 0.24, production: 0.3, retention: 0.2, emotional: 0.1, commercial: 0.16 },
+  ambient: { hook: 0.06, production: 0.3, retention: 0.24, emotional: 0.3, commercial: 0.1 },
+  interlude: { hook: 0.12, production: 0.3, retention: 0.18, emotional: 0.28, commercial: 0.12 },
+  experimental: { hook: 0.08, production: 0.28, retention: 0.22, emotional: 0.3, commercial: 0.12 },
 };
+
+/** Weight vector for a track type, renormalised to sum exactly 1.0. */
+function weightsFor(trackType: TrackType): GradedDimensions {
+  const w = WEIGHTS_BY_TYPE[trackType] ?? WEIGHTS_BY_TYPE.song;
+  const sum = DIM_KEYS.reduce((s, k) => s + w[k], 0) || 1;
+  return Object.fromEntries(DIM_KEYS.map((k) => [k, w[k] / sum])) as GradedDimensions;
+}
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 const r1 = (v: number) => Math.round(v * 10) / 10;
@@ -173,8 +193,16 @@ function gradingPrompt(
   input: GradeInput,
   findingsText: string,
   priors: MeasuredPriors,
-  spanNote: string | null
+  spanNote: string | null,
+  trackType: TrackType
 ): string {
+  // For anything but a vocal-led song, tell the grader to judge each dimension on
+  // the track's own terms — the weighting already de-emphasises what the track
+  // isn't reaching for, so the grader must not ALSO punish it for that absence.
+  const typeNote =
+    trackType === "song"
+      ? null
+      : `TRACK TYPE: ${trackType}. This is NOT a vocal-led song — grade it on its own terms. Read "hook" as the strength of its central motif / lead / loop (an instrumental's hook is its melodic or rhythmic figure, not a vocal); read "emotional" from the music itself; read "commercial" as fit-for-its-own-lane, NOT mainstream-radio potential. Do NOT dock a dimension the track isn't reaching for — no vocals on an instrumental, or no big hook on an ambient/experimental piece, is the FORMAT, not a fault. Grade what is actually there.`;
   const priorLines: string[] = [];
   if (priors.production != null)
     priorLines.push(
@@ -190,7 +218,7 @@ function gradingPrompt(
 
 GENRE: ${input.genre}
 TRACK: "${input.trackTitle?.trim() || "(untitled)"}"
-${spanNote ? `\n${spanNote}\n` : ""}
+${typeNote ? `\n${typeNote}\n` : ""}${spanNote ? `\n${spanNote}\n` : ""}
 FINDINGS SHEET:
 ${findingsText}
 
@@ -296,6 +324,9 @@ export async function gradeTrack(input: GradeInput): Promise<GradeResult | null>
       })
     : null;
   const listenText = listen ? describeListenFindings(listen) : null;
+  // What KIND of track this is drives the dimension weighting (and, downstream,
+  // which release-bar axes apply). No listen → judged as a song, exactly as before.
+  const trackType: TrackType = listen?.trackType ?? "song";
 
   // Resolve genre (artist pick > confident listen detection > "Other"), then
   // assemble all genre-relative evidence against THAT genre.
@@ -337,7 +368,7 @@ export async function gradeTrack(input: GradeInput): Promise<GradeResult | null>
     f?.sourceDurationSec && f.durationSec && f.sourceDurationSec > f.durationSec + 5
       ? `SPAN: only the opening ${Math.round(f.durationSec)}s of a ${Math.round(f.sourceDurationSec)}s track was analysed and heard — the payoff may live beyond the evidence.`
       : null;
-  const prompt = gradingPrompt(gi, findingsText, priors, spanNote);
+  const prompt = gradingPrompt(gi, findingsText, priors, spanNote, trackType);
   const samples = (
     await Promise.all([
       jsonCall(apiKey, model, prompt, 0.7, 400),
@@ -359,8 +390,11 @@ export async function gradeTrack(input: GradeInput): Promise<GradeResult | null>
   if (priors.structure != null)
     dims.retention = r1(clamp(dims.retention, priors.structure - 1.0, priors.structure + 1.0));
 
-  // Overall: fixed weighted blend — arithmetic, never re-judged.
-  const weighted = DIM_KEYS.reduce((s, k) => s + dims[k] * WEIGHTS[k], 0);
+  // Overall: track-type-weighted blend — arithmetic, never re-judged. The weights
+  // reflect what this kind of track is reaching for, so an instrumental isn't
+  // dragged by a low (and irrelevant) vocal-hook grade.
+  const weights = weightsFor(trackType);
+  const weighted = DIM_KEYS.reduce((s, k) => s + dims[k] * weights[k], 0);
   const score = Math.round(clamp((weighted / 5) * 100, 5, 98));
 
   return {
@@ -368,6 +402,7 @@ export async function gradeTrack(input: GradeInput): Promise<GradeResult | null>
     dims,
     genre: resolvedGenre,
     genreFromListen,
+    trackType,
     findingsText,
     evidence: { listen, priors, normLines, gradeSamples: samples },
   };
