@@ -351,7 +351,7 @@ export function describeFeatures(f: AudioFeatures): string {
   }
   if (f.energyDips?.length) {
     lines.push(
-      `attention likely dips around: ${f.energyDips.map((d) => mmss(d.startSec)).join(", ")}`
+      `energy pulls back around: ${f.energyDips.map((d) => mmss(d.startSec)).join(", ")} — a pull-back can be an intentional bridge / breakdown / beat-switch (often the quiet-before-the-lift) OR a genuine sag; decide which from whether the track lifts again after, and do NOT assume it loses listeners`
     );
   }
   return lines.join("\n");

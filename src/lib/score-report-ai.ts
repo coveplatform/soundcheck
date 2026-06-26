@@ -8,6 +8,7 @@ import {
 import { gradeTrack, type GradeResult } from "@/lib/score-engine";
 import { fetchTrackMeta, oembedUrlFor } from "@/lib/track-metadata";
 import { buildVerdictPayload } from "@/lib/score-verdict";
+import { genreFamily } from "@/lib/genre-norms";
 
 /**
  * Score-report generation.
@@ -170,6 +171,36 @@ function clamp(n: number, lo: number, hi: number): number {
 
 // ── Prompt ──────────────────────────────────────────────────────────
 
+// Genre-aware structural expectations, so the read judges arrangement by the
+// genre's own conventions instead of a generic pop template — this is what keeps
+// the model from reading a deliberate bridge / breakdown / dynamic valley as a
+// flaw ("the mid-section lulls").
+function genreStructureHint(genre: string, features?: AudioFeatures | null): string {
+  const byFamily: Record<string, string> = {
+    electronic:
+      "Electronic / house / techno / EDM is loop- and build-based: a long intro, a breakdown before the drop and stretches of sustained energy are the form. A mid-track pull-back is almost always the breakdown setting up the next section — judge the drop's payoff and the groove, not the dip.",
+    rock:
+      "Rock / metal lives on dynamics: quiet verses into loud choruses, a bridge or a breakdown before a final heavy section. A drop in energy mid-track is intentional tension-before-release, not a sag — judge the riff, the build and whether the payoff actually hits.",
+    pop:
+      "Pop is verse–chorus–bridge: the bridge is a deliberate reset before the last chorus, so a dip there is by design. Judge the hook and whether each chorus lands harder, not the bridge's lower energy.",
+    rnb:
+      "R&B / soul leans on groove, space and vocal performance over constant energy — laid-back, sparse sections are intentional. Judge the pocket, the vocal and the mood, not whether energy keeps climbing.",
+    lofi:
+      "Lo-fi / chill / ambient is texture and mood over structure: slow evolution, dynamic valleys and gentle repetition ARE the format. Do NOT expect a hook or a big arc, and never read low or steady energy as a flaw — judge atmosphere, sound design and how well it holds a vibe.",
+    acoustic:
+      "Acoustic / singer-songwriter is built around the song and the performance; dynamics are subtle and a quiet passage is the point. Judge melody, lyric and delivery, not energy, gloss or 'drops'.",
+    hiphop:
+      "Hip-hop rides the beat and the vocal: sustained, loop-based beats are deliberate and a beat-switch is a feature, not a lull. Judge the flow, the pocket and the hook.",
+  };
+  const hint = byFamily[genreFamily(genre)] ?? byFamily.pop;
+  const instrumental =
+    /instrumental/i.test(genre) ||
+    (features?.vocalPresence != null && features.vocalPresence < 0.2)
+      ? " This reads as largely instrumental — there's no vocal hook to carry it, so judge it on the lead motif, groove, progression and sound design, and do NOT fault it for 'missing' or 'buried' vocals."
+      : "";
+  return `\n\nGENRE STRUCTURE (read the arrangement by THIS genre's conventions, not a generic pop template): ${hint}${instrumental}`;
+}
+
 function buildPrompt(input: ReportInput, opts: GenerateOpts = {}): string {
   const deep = opts.depth === "deep";
   const lockedBlock = opts.locked
@@ -196,9 +227,10 @@ function buildPrompt(input: ReportInput, opts: GenerateOpts = {}): string {
   // stays conservative; the deep read is told to actually WALK that full map.
   const measured = input.features
     ? deep
-      ? `\n\nMEASURED AUDIO (real DSP analysis of this track's arrangement — the section map and energy arc below are ground truth for what's actually there):\n${describeFeatures(input.features)}\n\nThis is the PREMIUM read, so USE the whole arrangement above: walk the track section by section in order, and tie every observation to the measured spans and the moments attention dips, by their timestamps (e.g. "the breakdown around 1:40 pulls the floor out", "it doesn't lift again until ~2:10", "the vocal sits back through the second verse"). Translate the numbers into how it FEELS — write like a person, not a report. Hard rules: do NOT quote raw measurements, percentages, BPM/LUFS values or "x/100" scores in your prose; the analysis covers up to the first few minutes, so do NOT claim a total runtime or describe an ending you can't see in the data; do NOT invent technical issues the data doesn't support. For things the data can't measure (melody, lyrics, taste), say it's a judgement call.`
-      : `\n\nMEASURED AUDIO (real DSP analysis of the OPENING of this track — treat as ground truth for what's actually there):\n${describeFeatures(input.features)}\n\nUse this to ground WHERE things happen: point to the arrangement spans and the moments attention dips by their timestamps (e.g. "it sags around 1:12", "the hook doesn't land till ~0:25"). Translate everything else into how it FEELS to a listener — write like a person, not a report. Hard rules: do NOT quote raw measurements, percentages, BPM/LUFS values or "x/100" scores in your prose; do NOT state the track's total length or duration (you've only analysed the opening window, so you don't know how long the full track is); do NOT invent technical issues the data doesn't support. For things the data can't measure (melody, lyrics, taste), say it's a judgement call.`
+      ? `\n\nMEASURED AUDIO (real DSP analysis of this track's arrangement — the section map and energy arc below are ground truth for what's actually there):\n${describeFeatures(input.features)}\n\nThis is the PREMIUM read, so USE the whole arrangement above: walk the track section by section in order, and tie every observation to the measured spans and where the energy pulls back (and whether it lifts again after), by their timestamps (e.g. "the breakdown around 1:40 pulls the floor out", "it doesn't lift again until ~2:10", "the vocal sits back through the second verse"). Translate the numbers into how it FEELS — write like a person, not a report. Hard rules: do NOT quote raw measurements, percentages, BPM/LUFS values or "x/100" scores in your prose; the analysis covers up to the first few minutes, so do NOT claim a total runtime or describe an ending you can't see in the data; do NOT invent technical issues the data doesn't support. For things the data can't measure (melody, lyrics, taste), say it's a judgement call.`
+      : `\n\nMEASURED AUDIO (real DSP analysis of the OPENING of this track — treat as ground truth for what's actually there):\n${describeFeatures(input.features)}\n\nUse this to ground WHERE things happen: point to the arrangement spans and where the energy pulls back (and whether it lifts again after) by their timestamps (e.g. "the energy pulls back around 1:12 — likely a bridge", "the hook doesn't land till ~0:25"). Translate everything else into how it FEELS to a listener — write like a person, not a report. Hard rules: do NOT quote raw measurements, percentages, BPM/LUFS values or "x/100" scores in your prose; do NOT state the track's total length or duration (you've only analysed the opening window, so you don't know how long the full track is); do NOT invent technical issues the data doesn't support. For things the data can't measure (melody, lyrics, taste), say it's a judgement call.`
     : `\n\n(No audio measurements were available for this track. Give a careful read from the title, genre and notes only — do NOT fabricate specific technical claims like exact timestamps, loudness values, or "the intro drags". Keep concrete acoustic claims general and clearly hedged.)`;
+  const genreStructure = genreStructureHint(input.genre, input.features);
   const artist = input.artist?.trim();
   const recognition = artist
     ? `\n\nThe title and artist above are real metadata. If you recognise this as a commercially released or well-known track (a charting single, a classic, an established artist), factor that in — professionally finished, widely-heard music belongs in the upper score bands (it already passed the bar this tool measures). Don't pretend a known hit is a rough demo. If you DON'T recognise it, judge it on its merits as below — most submissions are unknown independent artists, and that's fine.`
@@ -212,7 +244,7 @@ Break your read into six analytical angles — a producer's read, a casual first
 TRACK: "${title}"
 ARTIST: ${artist || "(unknown)"}
 GENRE: ${input.genre}
-ARTIST'S NOTE: ${input.notes?.trim() || "(none)"}${recognition}${measured}${evidenceBlock}${lockedBlock}${priorBlock}
+ARTIST'S NOTE: ${input.notes?.trim() || "(none)"}${recognition}${measured}${genreStructure}${evidenceBlock}${lockedBlock}${priorBlock}
 
 Produce a reaction report as STRICT JSON (no markdown, no commentary, no code fences). Shape:
 
@@ -256,6 +288,7 @@ Calibration rules:
 - A professionally produced, widely-loved or chart-successful track should score 85+. Do NOT default to the 55-65 band — reserve sub-70 for tracks with genuine, audible weaknesses.
 - Long intros, extended builds, repetition or long runtimes are NORMAL in many genres (techno, ambient, metal, post-rock, jazz). Do NOT lower the SCORE for them when they're a deliberate, well-executed genre convention — raise them as feedback only if they actually hurt the track.
 - IMPORTANT: consistent, sustained energy is a deliberate, professional choice in modern pop, hip-hop, EDM and rock — it is NOT monotony and must NOT lower the score. The audio structure read is coarse and often collapses a loud, well-mastered track into ONE long section with "steady energy"; when you see that, treat it as a sign of a polished, radio-ready master, and lean your judgement on hook, production, emotional pull and overall appeal rather than assuming "flat energy = no dynamics = bad."
+- STRUCTURE / dynamics: a mid-track drop in energy is usually DELIBERATE — a bridge, a breakdown, a beat-switch or the quiet-before-the-drop. Tension-and-release is good songwriting. Only call a dip a problem if momentum never recovers (it sags and STAYS sagged through the rest of the analysed span); if the track lifts again after, treat the dip as intentional contrast — do NOT flag it, and do NOT reflexively tell the artist to "tighten the mid-section." Read the dip by the genre's conventions (see GENRE STRUCTURE above) before judging it.
 - Keep the qualitative read and the 3 fixes sharp and honest even when the score is high — a 92 track still has things to improve. The score rewards craft, hooks and appeal; the fixes are where you stay critical.
 - Vary scores realistically across submissions — but a great song should read great.
 
@@ -269,7 +302,7 @@ CALIBRATION EXAMPLES (how the same scale should land):
 Rules:
 - Be honest and specific to the genre.
 - The angles can emphasise different things (one flags the hook, another the mix), but they describe the SAME track — don't invent contradictory facts between them.
-- Reference energy lulls, pacing, structural feel, the emotional arc, hooks, where people drifted. NOT mixing/EQ/frequency jargon.
+- Reference pacing, structural feel, the emotional arc, hooks and where people genuinely drifted — but only call out an energy dip if it actually hurts the track (a sag that never recovers), not every valley in the energy curve. NOT mixing/EQ/frequency jargon.
 - Return ONLY the JSON object.`;
 }
 
