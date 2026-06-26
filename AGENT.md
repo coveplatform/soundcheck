@@ -4,9 +4,58 @@
 
 ## What This Is
 
-**MixReflect** — music feedback SaaS. Every user both submits tracks for feedback AND reviews other tracks. Credits tie the two sides together: earn by reviewing, spend to get reviews on your own tracks.
+**MixReflect** — an AI + human music feedback product. An artist submits a track URL (or upload) and gets an instant **release verdict** (not ready / needs work / almost there / release ready) backed by a measured analysis, plus a paid "room of 5" real human listeners and a deep read.
+
+> ⚠️ **The product cut over to the Score / Verdict model on 2026-06-09 and repositioned to verdict-first on 2026-06-25.** Many sections further down describe **MixReflect Classic** (the peer-to-peer, review-to-earn-credits app) which is **decommissioned**. Treat Classic details (credits, slots, `/tracks`, `/submit`, the peer review queue, slot model) as **legacy** unless you're touching shared infra (auth, Stripe, Prisma, email). The live product is the **Score / Verdict** section immediately below. See also `docs/decision-report-migration.md`.
 
 Live at: `https://www.mixreflect.com`
+
+---
+
+## Score / Verdict Product (CURRENT — this is the live product)
+
+A track URL → instant measured read → a **verdict-first decision report**, with a paid human "room of 5" and deep read.
+
+### Funnel / auth
+- **Landing** (`src/app/page.tsx`): paste a link → `/api/score/start` kicks generation in the background → ~18s "analysis theater" → the **done modal reveals the real verdict** (ladder + score) *then* asks for an account. The full read opens only after the report is claimed (preserves the free-tier economics).
+- **Auth is in-context everywhere** via the global modal — `useAuthModal()` from `@/components/providers` (`src/components/auth/auth-modal.tsx`). The hero, report subscribe, sealed paywall, and `/submit-score` all pop the panel instead of bouncing to a page. Email path creates the account then signs in; Google works too.
+- After auth → `/score/finish` claims the anonymous report (single-use `claimToken`) → `/report/[slug]`.
+- **`/submit-score`** = the signed-in "submit another track" surface; gated client-side by popping the auth modal (not middleware).
+- **`/login` + `/signup`** (`(auth)` route group) are **fallback-only** (server redirects, deep links, password reset) — restyled to the black/`#6ee7ff` score aesthetic; they honor `callbackUrl`.
+
+### Free-tier ladder (`src/lib/score-free-tier.ts`, `FREE_FULL_READ=true`)
+1. First report **free for life** (one per email) — full AI read opens after claim.
+2. Track 2+ generates but renders **sealed**; `$6.95` unlock opens it + the room.
+3. `$19.95/mo` unlimited — auto-unlock; human room on **3 tracks per cycle** (`SCORE_ROOM_CAP=3`).
+
+### The report (`src/app/(public)/report/[id]/page.tsx`)
+- Renders **`VerdictReportView` for every valid report** (verdict-first). New reports carry a measured **release bar** (`buildReleaseBar`/`buildVerdictPayload` in `src/lib/score-verdict.ts`); older ones show the same layout with the bar omitted and blockers derived from stored priority fixes.
+- Verdict label from score bands (`verdictForScore`), capped **down only** by measured blockers (`deriveVerdict`).
+
+### Scoring engine (`src/lib/score-engine.ts`)
+- Two-pass: findings → graded median dims, plus a **listen pass** (`src/lib/score-listen.ts`) that hears the opening and classifies genre + **track type** (song/instrumental/beat/ambient/interlude/experimental).
+- **Track-type-adaptive weights** (`WEIGHTS_BY_TYPE`): an instrumental isn't judged on vocals, ambient isn't judged on a hook. Genre norms in `src/lib/genre-norms.ts` are all `estimated` until a measured corpus exists.
+
+### Room of 5 (`src/lib/score-review.ts`)
+Real human reviewers (`isScoreReviewer` users). **Claim-pool model** — paying marks the track available and reviewers pull/claim it (no push-assignment). `SCORE_ROOM_CAP=3` per unlimited cycle.
+
+### Audio worker
+`AUDIO_WORKER_URL` (Render) produces the DSP features the release bar needs. **Prod-only** — it's `http://127.0.0.1:8090` in `.env.local`, so the worker is NOT reachable/testable from a local checkout (analysis returns null locally).
+
+### Key Score files
+- `src/app/page.tsx` — landing + reveal/auth funnel
+- `src/app/(public)/report/[id]/page.tsx` — report render gate
+- `src/components/score/verdict-report-view.tsx` — verdict report UI
+- `src/components/score/sealed-paywall.tsx` — the hard pay wall
+- `src/lib/{score-engine,score-listen,score-verdict,genre-norms,score-free-cap,score-review}.ts`
+- `src/app/api/score/{start,submit,sealed-checkout,subscribe,claim,[id]/unlock,[id]/status,[id]/generate}/route.ts`
+- `src/lib/track-url.ts` — URL gating, incl. `isPrivateSoundcloudUrl` (private SC links rejected at all 3 ingestion routes)
+- `scripts/_check-latest-report.ts` — read-only report/room health monitor (`npx tsx scripts/_check-latest-report.ts 10`)
+
+### Known open issues (Score) — as of 2026-06-26
+- **The room of 5 doesn't deliver.** Claim-pool: paying marks a track available but reviewers must claim it, and they aren't — recent *paid* reports show 0 seats despite ~11 real reviewers. Paying customers get the AI read and **zero human reactions**. Decide: push-assignment (`assignScoreReviewers` exists) vs. fixing the claim surface. Respect `SCORE_ROOM_CAP=3`.
+- **Old reports lack a measured release bar** (predate the 2026-06-25 feature). They render the verdict layout without the bar; a prod regen would backfill it (worker is prod-only).
+- **Subscription back-unlock leaves sealed backlog ungenerated** — `paidAt` is set on all of a subscriber's reports but only the `fromReport` generates, so sealed backlog tracks can sit `PENDING`.
 
 ---
 
