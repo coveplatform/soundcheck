@@ -1,7 +1,7 @@
 import { prisma } from "./prisma";
 import { PackageType, ReviewerTier } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
-import { sendTierChangeEmail } from "@/lib/email";
+import { sendTierChangeEmail, sendNewTrackAvailableEmail } from "@/lib/email";
 
 const MIN_REVIEWER_ACCOUNT_AGE_HOURS = Number(
   process.env.MIN_REVIEWER_ACCOUNT_AGE_HOURS ?? "24"
@@ -296,6 +296,71 @@ export async function getEligiblePeerReviewers(
   });
 
   return peerReviewers;
+}
+
+/**
+ * Email the pool of reviewers that a new track just landed in the review room.
+ *
+ * Best-effort and non-blocking: any send failure is logged and swallowed so a
+ * flaky email provider never breaks the request-reviews flow. Call this only
+ * when a track FIRST enters the review pool (a freshly QUEUED track), not on
+ * every top-up of reviews for an existing track.
+ *
+ * Recipients are the eligible peer reviewers (onboarded artists, excluding the
+ * track owner), minus internal test/seed accounts. Disable with
+ * NOTIFY_REVIEWERS_NEW_TRACK=false.
+ */
+export async function notifyReviewersOfNewTrack(
+  trackId: string,
+  db: Prisma.TransactionClient | typeof prisma = prisma
+): Promise<{ sent: number; skipped: number }> {
+  if (process.env.NOTIFY_REVIEWERS_NEW_TRACK === "false") {
+    return { sent: 0, skipped: 0 };
+  }
+
+  const track = await db.track.findUnique({
+    where: { id: trackId },
+    select: {
+      title: true,
+      Genre: { select: { name: true } },
+    },
+  });
+  if (!track) return { sent: 0, skipped: 0 };
+
+  const genreNames = track.Genre.map((g) => g.name);
+  const reviewers = await getEligiblePeerReviewers(trackId, db);
+
+  // Build a deduped recipient list, excluding internal test/seed accounts.
+  const testEmails = new Set(TEST_REVIEWER_EMAILS.map((e) => e.toLowerCase()));
+  const recipients = new Set<string>();
+  for (const r of reviewers) {
+    const email = r.User?.email?.trim();
+    if (!email) continue;
+    const lower = email.toLowerCase();
+    if (testEmails.has(lower)) continue;
+    if (lower.endsWith("@seed.mixreflect.com")) continue;
+    recipients.add(email);
+  }
+
+  const emails = Array.from(recipients);
+  const concurrency = Number(process.env.NOTIFY_CONCURRENCY ?? "10");
+  const batchSize = Number.isFinite(concurrency) && concurrency > 0 ? concurrency : 10;
+
+  let sent = 0;
+  for (let i = 0; i < emails.length; i += batchSize) {
+    const batch = emails.slice(i, i + batchSize);
+    const results = await Promise.allSettled(
+      batch.map((to) =>
+        sendNewTrackAvailableEmail({ to, trackTitle: track.title, genreNames })
+      )
+    );
+    for (const res of results) {
+      if (res.status === "fulfilled") sent += 1;
+      else console.error("notifyReviewersOfNewTrack: send failed", res.reason);
+    }
+  }
+
+  return { sent, skipped: emails.length - sent };
 }
 
 export async function assignReviewersToRecentTracks(limit = 20) {

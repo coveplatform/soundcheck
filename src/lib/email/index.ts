@@ -8,6 +8,7 @@ export { sendPasswordResetEmail } from "./auth";
 export {
   sendTierChangeEmail,
   sendTrackQueuedEmail,
+  sendNewTrackAvailableEmail,
   sendReviewProgressEmail,
   sendInvalidTrackLinkEmail,
 } from "./reviews";

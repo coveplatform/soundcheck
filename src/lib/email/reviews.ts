@@ -68,6 +68,50 @@ export async function sendTrackQueuedEmail(artistEmail: string, trackTitle: stri
   });
 }
 
+export async function sendNewTrackAvailableEmail(params: {
+  to: string;
+  trackTitle: string;
+  genreNames?: string[];
+}) {
+  if (!params.to) return;
+
+  const reviewUrl = `${getAppUrl()}/review`;
+  const genreLine =
+    params.genreNames && params.genreNames.length > 0
+      ? `<p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase; letter-spacing: 0.5px;">Genre</p>
+         <p style="margin: 0 0 16px; font-size: 14px; color: ${COLORS.gray};">${params.genreNames.join(", ")}</p>`
+      : "";
+
+  const content = `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-block; background-color: ${COLORS.purple}; padding: 8px 16px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: ${COLORS.white}; border-radius: 6px;">
+        New Track
+      </div>
+    </div>
+    <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: ${COLORS.black}; text-align: center;">
+      A new track just landed
+    </h1>
+    <div style="background-color: ${COLORS.bg}; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+      <p style="margin: 0 0 4px; font-size: 12px; color: ${COLORS.grayLight}; text-transform: uppercase; letter-spacing: 0.5px;">Track</p>
+      <p style="margin: 0 0 16px; font-size: 18px; font-weight: 700; color: ${COLORS.black};">${params.trackTitle}</p>
+      ${genreLine}
+    </div>
+    <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: ${COLORS.gray}; text-align: center;">
+      A fresh track is up for review. Be one of the first to react — review it to earn a credit toward your own tracks.
+    </p>
+    ${emailButton("Review it now", reviewUrl)}
+    <p style="margin: 0; font-size: 13px; line-height: 1.6; color: ${COLORS.grayLight}; text-align: center;">
+      Tracks get claimed fast, so jump in while it's open.
+    </p>
+  `;
+
+  await sendEmail({
+    to: params.to,
+    subject: `🎧 New track to review: ${params.trackTitle}`,
+    html: emailWrapper(content),
+  });
+}
+
 export async function sendReviewProgressEmail(
   artistEmail: string,
   trackTitle: string,

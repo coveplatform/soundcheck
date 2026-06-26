@@ -6,7 +6,7 @@ import { TrackStatus } from "@prisma/client";
 
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { assignReviewersToTrack } from "@/lib/queue";
+import { assignReviewersToTrack, notifyReviewersOfNewTrack } from "@/lib/queue";
 import { hasAvailableSlot, ACTIVE_TRACK_STATUSES } from "@/lib/slots";
 import { detectSource } from "@/lib/metadata";
 
@@ -208,6 +208,18 @@ export async function POST(
 
     await assignReviewersToTrack(track.id);
     // Track B doesn't need independent assignment — reviewers are assigned via Track A claim
+
+    // Notify the reviewer pool only when this track FIRST enters the review
+    // room (no prior reviews) — not on top-ups of an existing track. Best-effort:
+    // a mail failure must never break the request-reviews response.
+    if (!hasExistingReviews) {
+      try {
+        await notifyReviewersOfNewTrack(track.id);
+      } catch (err) {
+        console.error("Failed to notify reviewers of new track:", err);
+      }
+    }
+
     revalidateTag("sidebar", { expire: 0 });
 
     return NextResponse.json({ success: true });
