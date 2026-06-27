@@ -24,7 +24,7 @@ Real numbers pulled from the production DB this date:
   regenerated in the new grittier art style.
 
 ## Current image counter
-Last used: blog25 → next post uses blog26
+Last used: blog26 → next post uses blog27
 
 ## Blog post queue
 
@@ -32,7 +32,7 @@ Last used: blog25 → next post uses blog26
 |--------|-----------|-------|---------------|-------|
 | DONE | 2026-06-26 | How Do I Know When a Song Is Finished? | when is a song finished | blog24.jpg |
 | DONE | 2026-06-26 | Why Do Listeners Skip My Song in the First 30 Seconds? | why do people skip my song | blog25.jpg |
-| PENDING | | What Makes a Song Catchy? The Anatomy of a Hook That Sticks | what makes a song catchy | hook score dim |
+| DONE | 2026-06-27 | What Makes a Song Catchy? The Anatomy of a Hook That Sticks | what makes a song catchy | blog26.jpg |
 | PENDING | | How Much Does It Cost to Get Your Music Reviewed in 2026? | cost to get music reviewed | bottom-funnel / pricing intent |
 | PENDING | | Why Does Nobody Listen to My Music? | why does nobody listen to my music | high-emotion search |
 | PENDING | | Is My Mix Too Loud? Loudness, LUFS and the Streaming Norm | is my mix too loud | production score dim |

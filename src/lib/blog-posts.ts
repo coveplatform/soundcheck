@@ -20,6 +20,111 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "what-makes-a-song-catchy",
+    title: "What Makes a Song Catchy? The Anatomy of a Hook That Sticks",
+    coverImage: "/blog/blog26.jpg",
+    excerpt:
+      "A song is catchy when its hook sits in the gap between predictable and surprising — familiar enough to lock on to instantly, novel enough to stick. Most producers overthink it: great hooks are short, simple, and built around one idea executed with conviction. The anatomy is learnable.",
+    category: "GUIDE",
+    date: "June 27, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "A song is catchy when its hook sits in the gap between predictable and surprising — familiar enough that your brain locks on in the first few seconds, different enough that you want to hear it again. That balance is almost always achieved with a short, simple melodic or rhythmic idea that repeats at the right moments, supported by production that makes it feel inevitable. Catchiness is not magic and it is not random: it is the result of specific decisions about repetition, contrast, and timing.",
+      },
+      {
+        type: "h2",
+        text: "What actually is a hook?",
+      },
+      {
+        type: "paragraph",
+        text: "A hook is any element of a song that grabs attention and demands replay. It is usually a short melodic phrase, a lyric, a rhythmic pattern, or a production moment — sometimes all four at once. The word gets used loosely, but what distinguishes a real hook from a memorable section is specificity: a hook is the single thing you find yourself humming after the song ends, even if you cannot name it. It does not have to be the chorus. A riff, a vocal adlib, a synth stab, a drum pattern — anything short and distinctive that repeats in a way that builds expectation can function as a hook.",
+      },
+      {
+        type: "h2",
+        text: "Why do some melodies stick and others don't?",
+      },
+      {
+        type: "paragraph",
+        text: "Melodies that stick share a few consistent properties: they move mostly by step (small intervals) rather than large jumps, they contain repetition within the phrase itself, they sit in a singable range, and they have at least one moment of melodic expectation that gets slightly subverted before resolving. The subversion is key. A melody that does exactly what you expect at every turn does not stick because your brain stops tracking it. One small moment of surprise — a held note that goes up when you expected down, a phrase that resolves half a beat later than the grid — is what makes a melody memorable rather than just pleasant.",
+      },
+      {
+        type: "quote",
+        text: "The catchiest hooks are not clever. They are obvious in exactly the right way — so direct that the listener feels like they could have written it themselves, and somehow did not.",
+      },
+      {
+        type: "h2",
+        text: "Why are the catchiest hooks so short?",
+      },
+      {
+        type: "paragraph",
+        text: "Short hooks work because of how working memory processes music. Your brain can hold roughly seven seconds of audio in immediate recall. A hook that fits inside that window can be fully processed, predicted, and anticipated before it loops again. That anticipation is the mechanism of catchiness: the brain leans forward just slightly before the hook returns, and the payoff of that expectation being met (or lightly subverted) registers as pleasure. A hook that runs 16 bars before repeating never builds that loop. The brain has moved on before it can form an expectation. This is why 'yeah yeah yeah', 'da da da', one-line refrains, and two-bar melodic cells dominate commercial music across every genre. Length is the enemy of catchiness.",
+      },
+      {
+        type: "h2",
+        text: "What makes a hook land beyond the melody?",
+      },
+      {
+        type: "list",
+        items: [
+          "Repetition with variation: the hook repeats frequently enough to build expectation, but is never quite identical each time — a different vocal delivery, a subtle production shift, a harmony added on the third appearance.",
+          "Rhythmic placement: hooks that land slightly ahead of or behind the beat have more forward momentum than ones that sit squarely on the grid. Syncopation creates the impression the music is pulling you forward.",
+          "Frequency contrast: a hook that arrives at a higher or brighter frequency than the verse cuts through and feels like the track opening up. The contrast itself signals arrival.",
+          "A lyric that completes a thought: the most durable hooks pair a strong melody with a lyric that is either instantly relatable, slightly cryptic, or creates a question in the listener's mind. Open vowels and hard consonants also stick better than closed vowel sounds.",
+          "Production that emphasises the hook by stripping back rather than adding: counterintuitively, a sparser mix at the hook often lands harder than a busier one.",
+          "A first appearance delayed just long enough: when the hook arrives 45 to 60 seconds in after a verse of rising expectation, it lands harder than if it had opened the song. Timing the debut of the hook is one of the most underused decisions in arrangement.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Can you engineer catchiness or does it just happen?",
+      },
+      {
+        type: "paragraph",
+        text: "You can get close. The elements above are consistent enough across genres and decades that applying them deliberately will make a hook more durable even when inspiration was not the starting point. What you cannot engineer is the core melodic idea itself — that requires a combination of craft, taste, and enough variety in your reference listening that you are not unconsciously recycling someone else's hook. The process most working writers use is volume: generate more hook candidates than you need, capture every rough idea immediately (voice memo, a cheap phrase loop, whatever is fastest), and filter later. A session where you generate 12 hook candidates and choose the best one will consistently outperform a session where you commit to the first idea and refine it for hours.",
+      },
+      {
+        type: "h2",
+        text: "How do you know if your hook is actually catchy?",
+      },
+      {
+        type: "paragraph",
+        text: "You cannot reliably judge your own hook. After 30 listens, every phrase sounds catchy to the person who wrote it and tired to someone hearing it cold. The only real test is fresh ears. Play just the hook to someone who has never heard the track and ask them to hum it back 10 minutes later — if they can, you have a hook. MixReflect runs this test systematically: paste a link and get an AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus real reactions from a panel of five listeners hearing it for the first time. The hook dimension specifically tells you whether your central melodic idea is landing, or whether the strongest moment in the track is something you did not intend. First report is free.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "What makes a song catchy?",
+            a: "A catchy song has a short, simple melodic or rhythmic hook that repeats frequently enough to build expectation, sits in a singable range, and contains at least one moment of slight surprise before resolving. The hook is usually supported by production that emphasises it — stripping back rather than adding more when it arrives. Catchiness is consistent enough across genres that it can be approached deliberately rather than waiting for inspiration.",
+          },
+          {
+            q: "How long should a hook be?",
+            a: "Most durable hooks are between 2 and 7 seconds. That range fits inside working memory, which means the brain can predict and anticipate the hook before it repeats, and that anticipation is the core mechanism of catchiness. Hooks longer than 10 to 12 seconds struggle to build the same loop because the brain has moved on before the pattern completes.",
+          },
+          {
+            q: "Why do simple songs get stuck in your head?",
+            a: "Because simplicity is what allows the brain to form a complete prediction before the hook returns. A complex melodic phrase requires cognitive effort to process, and that effort works against the automatic replay loop. Songs that get stuck are almost always ones where the core idea is so simple it requires almost no effort to hold in memory, freeing the brain to run it on repeat involuntarily.",
+          },
+          {
+            q: "What is the difference between a hook and a chorus?",
+            a: "A chorus is a structural section of a song that typically contains the main lyric and melody, and repeats after each verse. A hook is the specific element within a song that grabs and holds attention — it can live in the chorus, but it can also be a guitar riff in the intro, a rhythmic vocal phrase in a verse, or a production moment between sections. Every great chorus has a hook, but not every hook is in the chorus.",
+          },
+          {
+            q: "Do catchy songs need to have lyrics?",
+            a: "No. A melodic riff, a rhythmic drum pattern, a synth motif, or a bass line can all function as hooks with no lyrics attached. Instrumental music produces earworms as effectively as vocal music when the melodic or rhythmic idea is short, repetitive, and slightly unexpected. Many of the most durable hooks in pop and electronic music are primarily production-based rather than vocal.",
+          },
+          {
+            q: "Can you make a song catchier after you have already written it?",
+            a: "Usually yes, through arrangement and production rather than rewriting the melody. Bringing the hook earlier in the track, giving it more space in the mix, adding a subtle variation on its second appearance, and stripping the arrangement around it rather than layering on top are all reliable ways to improve catchiness post-composition. If the core melodic idea is genuinely weak, no production fix will fully compensate — but most songs have stronger hooks than their current arrangement reveals.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "why-do-listeners-skip-my-song",
     title: "Why Do Listeners Skip My Song in the First 30 Seconds?",
     coverImage: "/blog/blog25.jpg",
