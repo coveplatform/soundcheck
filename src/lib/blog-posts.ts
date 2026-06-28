@@ -20,6 +20,121 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "how-much-does-it-cost-to-get-your-music-reviewed",
+    title: "How Much Does It Cost to Get Your Music Reviewed in 2026?",
+    coverImage: "/blog/blog27.jpg",
+    excerpt:
+      "Getting your music reviewed in 2026 costs anywhere from nothing to several hundred dollars, depending on the platform and what you actually get back. Most paid services charge between $10 and $80 per submission. The honest question is not what it costs but whether the feedback is specific enough to change anything.",
+    category: "GUIDE",
+    date: "June 28, 2026",
+    readTime: "7 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "Getting your music reviewed in 2026 costs anywhere from nothing to several hundred dollars, depending on the platform and what you are actually buying. Most paid services charge between $10 and $80 per submission, with premium options like independent consultants or A&R-style sessions running significantly higher. The price is almost never the useful number to focus on — what matters is whether the feedback you get back is specific enough to act on.",
+      },
+      {
+        type: "h2",
+        text: "What are the main ways to get music reviewed, and what do they cost?",
+      },
+      {
+        type: "paragraph",
+        text: "The landscape splits into a few distinct categories, each with a different cost structure and a different kind of return.",
+      },
+      {
+        type: "list",
+        items: [
+          "Free platforms (SoundCloud comments, Reddit, Discord communities): no cost, but feedback quality is unpredictable and you have no control over who reviews it or what criteria they use.",
+          "Blog and curator submission services (SubmitHub, Groover): typically $1 to $5 per submission to an individual curator or blogger. You submit to many and get back a small percentage of responses, often brief.",
+          "AI music feedback tools ($0 to $30 per report): instant turnaround, consistent criteria, often cheaper than a single blog pitch. Quality depends on what dimensions the tool actually scores.",
+          "Human panel feedback services ($20 to $80 per review): structured responses from real listeners or vetted professionals. Best for understanding how your music lands on fresh ears before release.",
+          "Independent music consultants and producers ($100 to $500+ per session): experienced A&R-style critique at a high price. Only makes sense when the stakes and budget are both meaningful.",
+          "Major editorial outlets (Pitchfork, NME, DIY): not purchasable directly. Typically require publicist relationships, with campaign costs of $500 to $2,000+ and no guaranteed placement.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Why is the price range so wide?",
+      },
+      {
+        type: "paragraph",
+        text: "The range reflects what is actually being sold. A $2 SubmitHub submission buys a single curator's 90 seconds of attention and a brief note if they pass. A $300 consultant session buys hours of experienced critique with industry context. In between, you are mostly paying for the specificity and expertise of the feedback, the credibility of whoever delivers it, and the turnaround speed. The wide range also reflects a market with almost no quality standards: anyone can charge for music feedback, and the gap between a $10 service that gives genuinely useful information and one that sends a template response is invisible from the outside.",
+      },
+      {
+        type: "quote",
+        text: "The most expensive review is not always the most useful one. A $20 session with five strangers hearing your track cold will often tell you more than a $150 industry critique from someone who has heard 10,000 songs this month and is pattern-matching rather than listening.",
+      },
+      {
+        type: "h2",
+        text: "What do you actually get for the money?",
+      },
+      {
+        type: "paragraph",
+        text: "The quality gap between services is larger than the price gap. A $40 review from one platform might tell you your hook is weak, your intro runs too long, and your chorus lacks emotional contrast. A $60 review from another might say the track 'has potential but needs work.' The second is not better because it costs more — it is less useful at any price. What separates high-quality feedback from low-quality feedback is specificity: does it tell you what is wrong, where it goes wrong, and what you could change? If a review could apply to almost any track without modification, it is not worth what you paid.",
+      },
+      {
+        type: "h2",
+        text: "Is free music feedback worth anything?",
+      },
+      {
+        type: "paragraph",
+        text: "Sometimes, but with real limitations. Free feedback from peers on Reddit or Discord is unstructured, heavily influenced by personal taste, and rarely reflects consistent evaluative criteria. Friends and bandmates are almost never reliable — most people tell you what they think you want to hear. Free AI tools can be fast and consistent, but depth depends on what the model was trained on. The realistic floor for free feedback: useful for catching obvious problems, unreliable for nuanced creative decisions, and never a substitute for cold-ear listener data.",
+      },
+      {
+        type: "h2",
+        text: "When does paying for music feedback actually make sense?",
+      },
+      {
+        type: "list",
+        items: [
+          "Before you release, not after. Paid feedback is most valuable when you can still act on it — mix decisions, arrangement changes, intro length. Post-release feedback is interesting but has no leverage.",
+          "When you have specific decisions to make. Choosing between two mixes, two hook variations, or two track orders is exactly where structured external feedback pays off.",
+          "When you are too close to the material to hear it clearly. After 50 listens, every track sounds either finished or irreparably broken. Fresh ears with a consistent scoring rubric cut through that.",
+          "When the cost of a bad release is real. If you are spending money on a video, a PR campaign, or a tour push, paying $20 to $50 to confirm the track is ready is cheap insurance.",
+          "When you are trying to improve, not just validate. The best feedback tells you something you did not know. If you want confirmation, that is expensive therapy. If you want information, it can be highly cost-effective.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "How do you know if a review service is worth it before you pay?",
+      },
+      {
+        type: "paragraph",
+        text: "Look for sample reviews if the platform publishes them, and check whether the feedback is specific to individual tracks or clearly templated. Prioritise services that score across multiple dimensions — hook strength, production quality, emotional impact, retention — rather than issuing a single pass/fail verdict. MixReflect does exactly this: paste a link and get an AI score out of 100 across hook, production, retention, emotional impact, and commercial pull, plus reactions from a panel of five real listeners hearing your track for the first time. The panel element matters because it is the closest available approximation to a first-time listener on a streaming platform — people with no prior relationship with your music telling you what actually happened when they heard it. First report is free, so you can check whether the feedback quality is worth paying for before you spend anything.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How much does it cost to get your music reviewed?",
+            a: "Costs range from free to several hundred dollars depending on the service. Blog submission platforms like SubmitHub and Groover charge $1 to $5 per submission to individual curators. AI feedback tools and human panel services typically run $10 to $80 per report. Independent consultants or A&R-style sessions cost $100 to $500 or more. The price does not reliably predict the quality or usefulness of the feedback you get back.",
+          },
+          {
+            q: "Is it worth paying for music feedback?",
+            a: "It depends on what you are trying to learn. If you need specific, actionable information before a release — whether your hook lands, where listeners drop off, whether your mix translates — then paid feedback with consistent scoring criteria is usually worth it. If you are looking for general encouragement, free community feedback is often sufficient. The value is in the specificity of what you get back, not the price.",
+          },
+          {
+            q: "What is the difference between SubmitHub and a music feedback service?",
+            a: "SubmitHub is a submission platform connecting artists with curators, bloggers, and playlist owners. You pay for attention and a potential placement, with brief written notes if they pass. A music feedback service is specifically designed to evaluate your track across defined criteria and tell you what works and what does not, regardless of whether it fits a particular playlist. They serve different goals: SubmitHub is for distribution access, feedback services are for creative development.",
+          },
+          {
+            q: "Can I get free honest music feedback?",
+            a: "Yes, but with caveats. Communities like r/makinghiphop, r/WeAreTheMusicMakers, and genre-specific Discord servers provide genuine feedback from peers, but quality is inconsistent. Friends and bandmates rarely give honest negative feedback. The most reliable free feedback comes from people who have no reason to protect your feelings — strangers hearing your track cold without knowing you made it.",
+          },
+          {
+            q: "What should a good music review include?",
+            a: "A useful music review should tell you what works, what does not, and why — with specific reference to your track rather than generic advice that could apply to anything. The best reviews score across multiple dimensions (hook strength, production quality, emotional impact, commercial potential, retention), identify the strongest and weakest moments, and give you something concrete to change. A review that says 'the track has good energy but could be stronger' is not feedback — it is a placeholder.",
+          },
+          {
+            q: "How many listens does a music reviewer give a track?",
+            a: "It varies widely. Curators on submission platforms often make a decision in 90 seconds or less. Professional reviewers at editorial outlets may listen two or three times. Human panel services and AI tools analyse the full track but simulate a first-listen experience. The cold-listen perspective is the most valuable for understanding how your music lands on a real audience, since most streaming listeners never give a track a second chance.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "what-makes-a-song-catchy",
     title: "What Makes a Song Catchy? The Anatomy of a Hook That Sticks",
     coverImage: "/blog/blog26.jpg",
