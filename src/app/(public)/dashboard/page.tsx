@@ -291,7 +291,7 @@ export default async function ReportsPage() {
               const unlocked = r.paidAt != null;
               return (
                 <div key={r.slug} className="relative bg-[#0a0a0a]">
-                  <DeleteReportButton reportId={r.id} />
+                  <DeleteReportButton reportId={r.id} paid={unlocked} />
                   <Link
                     href={`/report/${r.slug}`}
                     className="group bg-[#0a0a0a] p-4 sm:p-5 hover:bg-[#0e0e0e] transition-colors flex items-center gap-4"

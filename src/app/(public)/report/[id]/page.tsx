@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getReportHumanReviews, getScoreRoomQuota } from "@/lib/score-review";
 import { isFreeOpenRead } from "@/lib/score-free-cap";
+import { reconcileScoreUnlock } from "@/lib/score-unlock";
 import { SealedPaywall } from "@/components/score/sealed-paywall";
 import { ReportView, type ReportViewModel, type Verdict } from "./report-view";
 import {
@@ -247,7 +248,7 @@ export default async function ReportPage({
     );
   }
 
-  const report = await prisma.trackScoreReport.findUnique({
+  let report = await prisma.trackScoreReport.findUnique({
     where: { slug: id },
   });
 
@@ -261,6 +262,20 @@ export default async function ReportPage({
   // firing from the webhook.
   const sp = await searchParams;
   const justPaid = sp.unlocked != null || sp.subscribed != null;
+
+  // Self-heal a webhook that never landed: back from Stripe (?unlocked=1) but
+  // still not paid → verify the session with Stripe and unlock now, so the first
+  // paint after checkout isn't a wall for someone who just paid. No-op unless
+  // Stripe confirms payment; idempotent with the webhook.
+  if (sp.unlocked != null && report.paidAt == null && report.stripeSessionId) {
+    const { reconciled } = await reconcileScoreUnlock(report.id, report.stripeSessionId).catch(
+      () => ({ reconciled: false })
+    );
+    if (reconciled) {
+      const refreshed = await prisma.trackScoreReport.findUnique({ where: { id: report.id } });
+      if (refreshed) report = refreshed;
+    }
+  }
   // Landing funnel: ?signup=1 (with the pre-start ?claim token) routes a logged-out
   // visitor here to see the verdict + locked report with the signup panel over it.
   const wantSignup = sp.signup != null;
@@ -443,6 +458,15 @@ export default async function ReportPage({
       (best, c) => (c.score > best.score ? c : best),
       data.categories[0]
     );
+    // Content-leak guard: the view CSS-blurs each in-band/edge axis's `band` +
+    // `note` prose for locked viewers, but blurred text is readable from the RSC
+    // payload. Strip it server-side (the dot position + measured value stay — the
+    // teaser). Out-of-band axes are shown free to entice, so keep theirs.
+    const gatedReleaseBar = lockedView
+      ? releaseBar.map((a) =>
+          a.status !== "out" ? { ...a, band: "", note: LOCK_LINE } : a
+        )
+      : releaseBar;
     const verdictData: VerdictReportData = {
       slug: data.slug,
       trackTitle: data.trackTitle,
@@ -453,7 +477,7 @@ export default async function ReportPage({
       unlocked: data.unlocked,
       openRead: data.openRead,
       verdict: data.verdict,
-      releaseBar,
+      releaseBar: gatedReleaseBar,
       // First fix's detail is free; the rest are gated → placeholder when locked.
       blockers: lockedView
         ? blockers.map((b, i) => (i === 0 ? b : { ...b, detail: LOCK_LINE }))

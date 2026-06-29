@@ -19,7 +19,9 @@ export async function freeReadUsed(email: string): Promise<boolean> {
   if (!FREE_FULL_READ || !email) return false;
   if (await isScoreSubscribed(email)) return false;
   const used = await prisma.trackScoreReport.count({
-    where: { email, ...VALID_READ },
+    // Case-insensitive: emails are stored un-normalized, so an exact match would
+    // let "Kris@x.com" and "kris@x.com" each mint a separate lifetime free read.
+    where: { email: { equals: email, mode: "insensitive" }, ...VALID_READ },
   });
   return used >= FREE_READS_LIFETIME;
 }
@@ -36,7 +38,7 @@ export async function isFreeOpenRead(report: {
 }): Promise<boolean> {
   if (!FREE_FULL_READ || !report.email) return false;
   const first = await prisma.trackScoreReport.findFirst({
-    where: { email: report.email, ...VALID_READ },
+    where: { email: { equals: report.email, mode: "insensitive" }, ...VALID_READ },
     orderBy: { createdAt: "asc" },
     select: { id: true },
   });

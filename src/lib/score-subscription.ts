@@ -37,7 +37,10 @@ export async function isScoreSubscribed(email: string | null | undefined): Promi
  */
 export async function unlockAllForEmail(email: string): Promise<number> {
   const res = await prisma.trackScoreReport.updateMany({
-    where: { email: norm(email), paidAt: null },
+    // Case-insensitive: report.email is stored un-normalized (trimmed, not
+    // lowercased), so an exact norm() match silently misses rows whose case
+    // differs — leaving a paying subscriber's reports walled.
+    where: { email: { equals: email, mode: "insensitive" }, paidAt: null },
     data: { paidAt: new Date(), humanRoomSkipped: true },
   });
   return res.count;

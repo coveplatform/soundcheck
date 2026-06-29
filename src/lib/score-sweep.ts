@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { regenerateDeepReport } from "@/lib/score-report-ai";
+import { regenerateDeepReport, generateAndStoreReport } from "@/lib/score-report-ai";
+import { assignScoreReviewers, notifyScoreReviewersOfNewTrack } from "@/lib/score-review";
 import { ADMIN_EMAIL, emailWrapper, getAppUrl, sendEmail } from "@/lib/email";
 
 /**
@@ -11,21 +12,59 @@ import { ADMIN_EMAIL, emailWrapper, getAppUrl, sendEmail } from "@/lib/email";
  */
 
 // regenerateDeepReport runs full deep DSP (Replicate stems) + a big LLM call —
-// minutes each. Cap the work per sweep so the cron invocation finishes inside
-// its own maxDuration; the backlog (if any) drains across runs.
-const DEEP_SWEEP_LIMIT = 2;
-const DEEP_SWEEP_TIME_BUDGET_MS = 200_000;
+// minutes each. Run ONE per invocation so it gets the whole function budget
+// (a cold-start deep read can approach the maxDuration ceiling); the backlog
+// drains across the dedicated, frequent deep-read cron rather than one slow
+// daily pass.
+const DEEP_SWEEP_LIMIT = 1;
+const DEEP_SWEEP_TIME_BUDGET_MS = 280_000;
 
 // Don't sweep a report the moment it's paid — the legitimate after() hooks get
 // a generous head start before we conclude they died.
 const DEEP_GRACE_MS = 15 * 60 * 1000;
+
+// After a failed attempt, let a report cool down before retrying it, so a
+// repeatedly-failing record yields its slot to never-tried ones instead of
+// pinning the head of the queue (the head-of-line starvation bug).
+const DEEP_RETRY_COOLDOWN_MS = 30 * 60 * 1000;
 
 /**
  * Re-fire the premium deep read for paid reports where it never landed
  * (`paidAt` set, instant read done, but `reviewerQuotes.deep` absent). Without
  * this, a Replicate cold start blowing the function budget means the buyer
  * silently keeps the teaser-grade prose forever.
+ *
+ * Starvation-safe: terminally-failed reports (`deepFailed`, set by
+ * regenerateDeepReport after MAX_DEEP_ATTEMPTS) are skipped, recently-attempted
+ * ones cool down, and never-attempted reports are ordered first — so one
+ * poisoned record can't block everyone behind it.
  */
+/**
+ * Pure selection logic for the deep-read sweep — exported so the starvation
+ * guarantee (the production incident) is unit-testable without a DB.
+ *
+ * Drops terminally-failed (`deepFailed`), already-done (`deep`), invalid, and
+ * cooling-down reports, then orders never-attempted FIRST and a failing record
+ * LAST so one poisoned report can never pin the head of the queue.
+ */
+export function selectDeepSweepCandidates<
+  T extends { reviewerQuotes?: unknown }
+>(candidates: T[], now: number, cooldownMs = DEEP_RETRY_COOLDOWN_MS): T[] {
+  const lastAttempt = (r: T): number => {
+    const q = (r.reviewerQuotes ?? {}) as Record<string, unknown>;
+    const t = typeof q.deepLastAttemptAt === "string" ? Date.parse(q.deepLastAttemptAt) : NaN;
+    return Number.isFinite(t) ? (t as number) : 0;
+  };
+  const missing = candidates.filter((r) => {
+    const q = (r.reviewerQuotes ?? {}) as Record<string, unknown>;
+    if (q.deep || q.invalid || q.deepFailed) return false;
+    const last = lastAttempt(r);
+    if (last > 0 && now - last < cooldownMs) return false; // cooling down
+    return true;
+  });
+  return missing.sort((a, b) => lastAttempt(a) - lastAttempt(b));
+}
+
 export async function sweepMissingDeepReads() {
   const cutoff = new Date(Date.now() - DEEP_GRACE_MS);
   const candidates = await prisma.trackScoreReport.findMany({
@@ -34,17 +73,15 @@ export async function sweepMissingDeepReads() {
       score: { not: null },
     },
     orderBy: { paidAt: "asc" },
-    take: 50,
-    select: { id: true, slug: true, reviewerQuotes: true },
+    take: 200,
+    select: { id: true, slug: true, paidAt: true, reviewerQuotes: true },
   });
 
-  const missing = candidates.filter((r) => {
-    const q = (r.reviewerQuotes ?? {}) as Record<string, unknown>;
-    return !q.deep && !q.invalid;
-  });
+  const missing = selectDeepSweepCandidates(candidates, Date.now());
 
   const started = Date.now();
   let repaired = 0;
+  let failed = 0;
   const attempted: string[] = [];
   for (const r of missing.slice(0, DEEP_SWEEP_LIMIT)) {
     if (Date.now() - started > DEEP_SWEEP_TIME_BUDGET_MS) break;
@@ -53,16 +90,83 @@ export async function sweepMissingDeepReads() {
       await regenerateDeepReport(r.id);
       repaired++;
     } catch (err) {
+      failed++;
       console.error(`[score-sweep] deep re-read failed for ${r.slug}:`, err);
     }
   }
 
-  if (missing.length > 0) {
+  // Surface reports we've now given up on, once, so they don't vanish silently.
+  const nowFailed = await prisma.trackScoreReport.count({
+    where: { paidAt: { not: null }, reviewerQuotes: { path: ["deepFailed"], equals: true } },
+  });
+
+  if (missing.length > 0 || nowFailed > 0) {
     console.log(
-      `[score-sweep] deep reads missing on ${missing.length} paid report(s); repaired ${repaired} this run (${attempted.join(", ")})`
+      `[score-sweep] deep reads missing on ${missing.length} paid report(s); repaired ${repaired}, failed ${failed} this run (${attempted.join(", ")}); ${nowFailed} terminally failed`
     );
   }
-  return { missing: missing.length, repaired, attempted };
+  return { missing: missing.length, repaired, failed, terminallyFailed: nowFailed, attempted };
+}
+
+// A paid/owned report whose generation died leaves score=null with nothing to
+// heal it once the user closes the pending page. Give the legitimate in-flight
+// run a grace window, then rebuild it server-side.
+const INSTANT_GRACE_MS = 10 * 60 * 1000;
+const INSTANT_SWEEP_LIMIT = 3;
+
+/**
+ * Re-fire the INSTANT read for paid or claimed reports stuck at score=null —
+ * generation rides `after()` and a serverless kill can eat it silently. The
+ * deep-read sweep filters `score: { not: null }`, so without this a PAID sealed
+ * report (or a signed-in user's report) whose generation died sits blank
+ * forever once they leave the pending page (the client poll is the only other
+ * recovery). generateAndStoreReport self-guards (atomic claim, no-op if already
+ * scored or live), so this is safe to fire alongside any in-flight run.
+ */
+export async function sweepMissingInstantReads() {
+  const cutoff = new Date(Date.now() - INSTANT_GRACE_MS);
+  const candidates = await prisma.trackScoreReport.findMany({
+    where: {
+      score: null,
+      createdAt: { lt: cutoff },
+      // Recoverable + owned: a real payment, or a signed-in claim. Anonymous
+      // unclaimed /start rows are swept by the abandoned-report GC, not rebuilt.
+      OR: [{ paidAt: { not: null } }, { claimedAt: { not: null } }],
+    },
+    orderBy: { createdAt: "asc" },
+    take: 100,
+    select: { id: true, slug: true, paidAt: true, reviewerQuotes: true },
+  });
+
+  // Skip pay-to-continue walls (sealed + unpaid) — those are intentionally
+  // ungenerated until payment; generation fires from the webhook on `paidAt`.
+  const stuck = candidates.filter((r) => {
+    const q = (r.reviewerQuotes ?? {}) as Record<string, unknown>;
+    if (q.invalid) return false;
+    if (q.sealed === true && r.paidAt == null) return false;
+    return true;
+  });
+
+  let repaired = 0;
+  let failed = 0;
+  const attempted: string[] = [];
+  for (const r of stuck.slice(0, INSTANT_SWEEP_LIMIT)) {
+    attempted.push(r.slug);
+    try {
+      await generateAndStoreReport(r.id);
+      repaired++;
+    } catch (err) {
+      failed++;
+      console.error(`[score-sweep] instant re-read failed for ${r.slug}:`, err);
+    }
+  }
+
+  if (stuck.length > 0) {
+    console.log(
+      `[score-sweep] ${stuck.length} owned report(s) stuck at score=null; repaired ${repaired}, failed ${failed} this run (${attempted.join(", ")})`
+    );
+  }
+  return { stuck: stuck.length, repaired, failed, attempted };
 }
 
 // A paid room that hasn't filled in this long is a broken promise, not a queue.
@@ -103,7 +207,24 @@ export async function alertStuckPaidRooms() {
       !q.roomStallAlertedAt
     );
   });
-  if (stuck.length === 0) return { alerted: 0 };
+  if (stuck.length === 0) return { alerted: 0, pushAssigned: 0 };
+
+  // Last resort: the room is normally a claim pool, but after 48h of a quiet pool
+  // a PAID room must not sit empty forever. Push-assign the shortfall to real
+  // reviewers (least-recently-active first) and re-nudge them, then still alert
+  // admin. assignScoreReviewers tops up to target and never double-assigns.
+  let pushAssigned = 0;
+  for (const r of stuck) {
+    try {
+      const added = await assignScoreReviewers(r.id, r.humanReviewsRequested);
+      pushAssigned += added;
+      if (added > 0) {
+        await notifyScoreReviewersOfNewTrack(r.id).catch(() => {});
+      }
+    } catch (err) {
+      console.error(`[score-sweep] push-assign failed for ${r.slug}:`, err);
+    }
+  }
 
   const rows = stuck
     .map((r) => {
@@ -131,7 +252,7 @@ export async function alertStuckPaidRooms() {
   } catch (err) {
     // Don't mark alerted if the email never went out.
     console.error("[score-sweep] stuck-room alert email failed:", err);
-    return { alerted: 0, stuck: stuck.length };
+    return { alerted: 0, pushAssigned, stuck: stuck.length };
   }
 
   // Mark each report alerted (jsonb_set — never clobber the rest of the
@@ -142,5 +263,5 @@ export async function alertStuckPaidRooms() {
       .$executeRaw`UPDATE "TrackScoreReport" SET "reviewerQuotes" = jsonb_set(COALESCE("reviewerQuotes", '{}'::jsonb), '{roomStallAlertedAt}', to_jsonb(${alertedAt}::text)) WHERE id = ${r.id}`
       .catch((err) => console.error(`[score-sweep] failed to mark ${r.slug} alerted:`, err));
   }
-  return { alerted: stuck.length };
+  return { alerted: stuck.length, pushAssigned };
 }
