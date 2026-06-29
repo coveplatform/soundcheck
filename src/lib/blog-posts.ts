@@ -20,6 +20,122 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "why-does-nobody-listen-to-my-music",
+    title: "Why Does Nobody Listen to My Music?",
+    coverImage: "/blog/blog28.jpg",
+    excerpt:
+      "If nobody is listening to your music, the problem is almost never the music itself — it is usually distribution, discovery, or the first impression your track makes in the first ten seconds. Here is how to diagnose which one you are actually dealing with.",
+    category: "GUIDE",
+    date: "June 29, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "If nobody is listening to your music, the honest answer is that it is almost never purely about talent or quality. Most artists who cannot get ears on their work are stuck on one of three things: the music is not actually reaching new people, it is reaching them but not holding them past the first ten seconds, or it is not being shared by anyone who has heard it. These are very different problems with very different fixes, and treating them as one vague failure of 'not getting noticed' is why most artists spin their wheels for years without making progress.",
+      },
+      {
+        type: "h2",
+        text: "Is the problem reach or retention?",
+      },
+      {
+        type: "paragraph",
+        text: "The first thing to separate is whether people are not finding your music, or whether they are finding it and bouncing. If your Spotify for Artists dashboard shows low listener numbers but a reasonable number of streams per listener, you have a reach problem. If you have decent play counts but most tracks are cut off before 30 seconds, you have a retention problem. These look identical from the outside — nobody is talking about your music — but they require completely different responses. Reach problems are solved by distribution and promotion. Retention problems are solved by the music itself, specifically the first 15 to 30 seconds.",
+      },
+      {
+        type: "h2",
+        text: "Why do most people stop listening in the first 30 seconds?",
+      },
+      {
+        type: "paragraph",
+        text: "The streaming listener in 2026 skips fast and without guilt. They did not seek out your track specifically; the algorithm or a playlist surface brought it to them, and they are evaluating it cold. The first 15 seconds needs to answer one question: is this worth my time? A slow intro, a long fade-in, a beat that does not establish its character quickly, or a hook that takes 90 seconds to arrive are all credible reasons to skip. This is not about dumbing down your music. It is about respecting that first-listen attention is the scarcest thing in streaming, and the beginning of your track has a job to do.",
+      },
+      {
+        type: "quote",
+        text: "Most artists think nobody listening means nobody cares about their music. Usually it means nobody has heard more than 15 seconds of it. Those are not the same problem.",
+      },
+      {
+        type: "h2",
+        text: "Why is sharing so rare and what can you do about it?",
+      },
+      {
+        type: "paragraph",
+        text: "Most music does not get shared because sharing is a social act that carries personal risk. When someone shares your track with a friend, they are putting their taste on the line. People share music when it is distinctive enough to say something about them, when it is likely to land well with who they are sending it to, or when they feel some ownership over having discovered it. Generic, competent music rarely gets shared even when it is technically good. Music that makes a specific emotional promise and delivers it, or that is bold enough to polarise opinion, travels. The goal is not to be for everyone — music that tries to please everyone gives nobody a reason to pass it on.",
+      },
+      {
+        type: "h2",
+        text: "What does the algorithm actually reward?",
+      },
+      {
+        type: "list",
+        items: [
+          "Save rate: listeners saving your track to their library signals strong preference and is the single biggest indicator the algorithm uses to push a track further.",
+          "Stream completion: tracks that get listened to past the 30-second mark, and especially to completion, are ranked higher in discovery feeds than tracks with high skip rates.",
+          "Repeat listens: a listener who plays your track twice in a session is a much stronger signal than two different listeners each playing it once.",
+          "Playlist adds from listeners: when real people add your track to their own playlists (not just editorial ones), it signals genuine fan behaviour rather than passive exposure.",
+          "Profile follows after a listen: if someone listens to your track and then follows your artist profile, the algorithm treats that as high-quality engagement.",
+          "Click-through from social links: traffic driven from outside Spotify — particularly Instagram bio links and TikTok — lifts your editorial playlist consideration score.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Is the music itself the problem?",
+      },
+      {
+        type: "paragraph",
+        text: "Sometimes yes, but probably not in the way you think. 'Is my music good enough?' is the wrong question because good is relative and context-dependent. The more useful question is: does this track deliver on its premise within the first 30 seconds, does the hook justify the wait, and is the emotional payoff real or just technically present? A production can be flawless and still not hold a listener if the emotional arc is flat. A song can be slightly rough around the edges and generate real word-of-mouth if the hook is undeniable. What you actually need is honest feedback from people who do not know you, listening cold, telling you where they checked out and why.",
+      },
+      {
+        type: "paragraph",
+        text: "MixReflect is built for exactly this: paste a link and get an instant AI score out of 100 across hook strength, production, retention, emotional impact, and commercial pull, plus reactions from a panel of five real listeners hearing your track completely fresh. That combination tells you whether the issue is in the music or somewhere else in the chain. The first report is free.",
+      },
+      {
+        type: "h2",
+        text: "What should you actually do if nobody is listening?",
+      },
+      {
+        type: "list",
+        items: [
+          "Diagnose before acting: check your streaming analytics to separate a reach problem from a retention problem before spending money or time on promotion.",
+          "Fix the intro first: if retention data shows people leaving before 30 seconds, re-edit the intro before any promotion. Spending on ads for a track with a 20% completion rate is burning money.",
+          "Submit to SubmitHub, Groover, or independent blogs in your genre: even modest playlist placements expose you to listeners who are actively searching for new music in your space.",
+          "Build an audience on one platform before spreading thin: pick TikTok, Instagram Reels, or YouTube Shorts based on where your genre performs best and go deep on one of them.",
+          "Release consistently rather than waiting for the 'right' track: the algorithm rewards artists who release regularly. One track a year gives you no data and no momentum.",
+          "Get honest external feedback before you release: not from friends and not from comments — from strangers who will tell you what is actually happening when they hear it for the first time.",
+        ],
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "Why does nobody listen to my music even when I promote it?",
+            a: "Usually because promotion is bringing people to the track but the track is not holding them. Check your skip rate and average listen duration in Spotify for Artists. If people are leaving before 30 seconds, the intro is too slow or the hook is arriving too late. No amount of promotion fixes a retention problem in the music itself.",
+          },
+          {
+            q: "How do I get people to actually listen to my music?",
+            a: "The most reliable paths are playlist pitching (through Spotify for Artists for editorial consideration, and through services like SubmitHub or Groover for independent curators), consistent short-form video content showing the music in context rather than just announcing it, and building genuine community in one place before trying to be everywhere. There is no fast route that bypasses actually reaching real listeners one at a time.",
+          },
+          {
+            q: "Does releasing more music help you get more listeners?",
+            a: "Yes, in two ways. First, consistent releasing signals to the Spotify algorithm that you are an active artist, which improves your algorithmic playlist consideration. Second, each release is a new entry point for discovery — someone who skips your first track might find your third one through a different playlist. Quality still matters, but frequency matters more than most artists acknowledge.",
+          },
+          {
+            q: "How long does it take to build a music audience from zero?",
+            a: "Realistically, 12 to 24 months of consistent releasing and promotion to build a small but loyal audience with no pre-existing fanbase or label support. Some artists get lucky early with a viral moment, but building a stable listener base that grows release to release is a longer game than most people expect when they start.",
+          },
+          {
+            q: "Is social media necessary for getting music listeners?",
+            a: "Not strictly necessary, but it is the most controllable lever available to independent artists for driving new listeners. Streaming algorithms are opaque; social content is something you can actually control and test. The artists who grow fastest without a label nearly always have a consistent social presence where they show personality and process, not just finished releases.",
+          },
+          {
+            q: "How do I know if my music is actually good or if I just need better promotion?",
+            a: "Get feedback from people who do not know you and have no reason to protect your feelings. Check whether listeners are completing the track or skipping early. Look at save rates relative to play counts. If 10% or more of listeners are saving the track, the music is landing and the problem is reach. If nobody is saving it and skip rates are high, the music needs work before the promotion makes sense.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-much-does-it-cost-to-get-your-music-reviewed",
     title: "How Much Does It Cost to Get Your Music Reviewed in 2026?",
     coverImage: "/blog/blog27.jpg",

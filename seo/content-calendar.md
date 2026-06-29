@@ -24,7 +24,7 @@ Real numbers pulled from the production DB this date:
   regenerated in the new grittier art style.
 
 ## Current image counter
-Last used: blog27 → next post uses blog28
+Last used: blog28 → next post uses blog29
 
 ## Blog post queue
 
@@ -34,7 +34,7 @@ Last used: blog27 → next post uses blog28
 | DONE | 2026-06-26 | Why Do Listeners Skip My Song in the First 30 Seconds? | why do people skip my song | blog25.jpg |
 | DONE | 2026-06-27 | What Makes a Song Catchy? The Anatomy of a Hook That Sticks | what makes a song catchy | blog26.jpg |
 | DONE | 2026-06-28 | How Much Does It Cost to Get Your Music Reviewed in 2026? | cost to get music reviewed | blog27.jpg |
-| PENDING | | Why Does Nobody Listen to My Music? | why does nobody listen to my music | high-emotion search |
+| DONE | 2026-06-29 | Why Does Nobody Listen to My Music? | why does nobody listen to my music | blog28.jpg |
 | PENDING | | Is My Mix Too Loud? Loudness, LUFS and the Streaming Norm | is my mix too loud | production score dim |
 | PENDING | | How to Get More Spotify Streams (Without Buying Them) | how to get more spotify streams | high volume |
 | PENDING | | Song Structure: How to Arrange a Track That Holds Attention | how to structure a song | retention / arrangement |
