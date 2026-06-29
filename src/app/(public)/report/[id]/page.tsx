@@ -458,6 +458,15 @@ export default async function ReportPage({
       (best, c) => (c.score > best.score ? c : best),
       data.categories[0]
     );
+    // Content-leak guard: the view CSS-blurs each in-band/edge axis's `band` +
+    // `note` prose for locked viewers, but blurred text is readable from the RSC
+    // payload. Strip it server-side (the dot position + measured value stay — the
+    // teaser). Out-of-band axes are shown free to entice, so keep theirs.
+    const gatedReleaseBar = lockedView
+      ? releaseBar.map((a) =>
+          a.status !== "out" ? { ...a, band: "", note: LOCK_LINE } : a
+        )
+      : releaseBar;
     const verdictData: VerdictReportData = {
       slug: data.slug,
       trackTitle: data.trackTitle,
@@ -468,7 +477,7 @@ export default async function ReportPage({
       unlocked: data.unlocked,
       openRead: data.openRead,
       verdict: data.verdict,
-      releaseBar,
+      releaseBar: gatedReleaseBar,
       // First fix's detail is free; the rest are gated → placeholder when locked.
       blockers: lockedView
         ? blockers.map((b, i) => (i === 0 ? b : { ...b, detail: LOCK_LINE }))
