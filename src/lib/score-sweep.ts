@@ -39,6 +39,32 @@ const DEEP_RETRY_COOLDOWN_MS = 30 * 60 * 1000;
  * ones cool down, and never-attempted reports are ordered first — so one
  * poisoned record can't block everyone behind it.
  */
+/**
+ * Pure selection logic for the deep-read sweep — exported so the starvation
+ * guarantee (the production incident) is unit-testable without a DB.
+ *
+ * Drops terminally-failed (`deepFailed`), already-done (`deep`), invalid, and
+ * cooling-down reports, then orders never-attempted FIRST and a failing record
+ * LAST so one poisoned report can never pin the head of the queue.
+ */
+export function selectDeepSweepCandidates<
+  T extends { reviewerQuotes?: unknown }
+>(candidates: T[], now: number, cooldownMs = DEEP_RETRY_COOLDOWN_MS): T[] {
+  const lastAttempt = (r: T): number => {
+    const q = (r.reviewerQuotes ?? {}) as Record<string, unknown>;
+    const t = typeof q.deepLastAttemptAt === "string" ? Date.parse(q.deepLastAttemptAt) : NaN;
+    return Number.isFinite(t) ? (t as number) : 0;
+  };
+  const missing = candidates.filter((r) => {
+    const q = (r.reviewerQuotes ?? {}) as Record<string, unknown>;
+    if (q.deep || q.invalid || q.deepFailed) return false;
+    const last = lastAttempt(r);
+    if (last > 0 && now - last < cooldownMs) return false; // cooling down
+    return true;
+  });
+  return missing.sort((a, b) => lastAttempt(a) - lastAttempt(b));
+}
+
 export async function sweepMissingDeepReads() {
   const cutoff = new Date(Date.now() - DEEP_GRACE_MS);
   const candidates = await prisma.trackScoreReport.findMany({
@@ -51,25 +77,7 @@ export async function sweepMissingDeepReads() {
     select: { id: true, slug: true, paidAt: true, reviewerQuotes: true },
   });
 
-  const now = Date.now();
-  const missing = candidates.filter((r) => {
-    const q = (r.reviewerQuotes ?? {}) as Record<string, unknown>;
-    if (q.deep || q.invalid || q.deepFailed) return false;
-    // Cooling down after a recent attempt? Skip this run; let others go first.
-    const last = typeof q.deepLastAttemptAt === "string" ? Date.parse(q.deepLastAttemptAt) : NaN;
-    if (Number.isFinite(last) && now - last < DEEP_RETRY_COOLDOWN_MS) return false;
-    return true;
-  });
-
-  // Never-attempted first, then least-recently-attempted — a failing record
-  // sinks to the back each round so forward progress is guaranteed.
-  missing.sort((a, b) => {
-    const qa = (a.reviewerQuotes ?? {}) as Record<string, unknown>;
-    const qb = (b.reviewerQuotes ?? {}) as Record<string, unknown>;
-    const la = typeof qa.deepLastAttemptAt === "string" ? Date.parse(qa.deepLastAttemptAt) : 0;
-    const lb = typeof qb.deepLastAttemptAt === "string" ? Date.parse(qb.deepLastAttemptAt) : 0;
-    return la - lb;
-  });
+  const missing = selectDeepSweepCandidates(candidates, Date.now());
 
   const started = Date.now();
   let repaired = 0;
