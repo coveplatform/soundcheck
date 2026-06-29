@@ -10,6 +10,10 @@
       "schedule": "0 3 * * *"
     },
     {
+      "path": "/api/cron/deep-reads",
+      "schedule": "*/10 * * * *"
+    },
+    {
       "path": "/api/cron/chart-finalize",
       "schedule": "1 0 * * *"
     },

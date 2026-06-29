@@ -4,10 +4,11 @@ import {
   cleanupExpiredCheckouts,
   cleanupAbandonedScoreReports,
 } from "@/lib/cleanup";
-import { sweepMissingDeepReads, alertStuckPaidRooms } from "@/lib/score-sweep";
+import { alertStuckPaidRooms } from "@/lib/score-sweep";
 
-// The deep-read sweep re-runs full deep analyses (Replicate stems + LLM) —
-// minutes per report. Same ceiling as the generation routes.
+// Quick deletes + a best-effort stuck-room alert. The heavy deep-read sweep now
+// lives on its own frequent cron (/api/cron/deep-reads) so paid deliverables
+// aren't gated by this once-daily job.
 export const maxDuration = 300;
 
 /**
@@ -59,18 +60,11 @@ export async function POST(request: Request) {
         }),
       ]);
 
-    // Sequential and last: each repair is minutes of DSP + LLM, so it gets
-    // whatever remains of the invocation budget after the quick tasks.
-    const deepSweep = await sweepMissingDeepReads().catch((err) => {
-      console.error("[Cleanup] deep-read sweep failed:", err);
-      return { missing: 0, repaired: 0, attempted: [] as string[] };
-    });
-
     const totalDeleted =
       abandonedResult.deleted + expiredResult.deleted + abandonedReportsResult.deleted;
 
     console.log(
-      `[Cleanup] Job complete. Deleted ${totalDeleted} total (${abandonedResult.deleted} abandoned tracks, ${expiredResult.deleted} expired, ${abandonedReportsResult.deleted} abandoned score reports); deep sweep repaired ${deepSweep.repaired}/${deepSweep.missing}; stuck-room alerts ${stuckRooms.alerted}`
+      `[Cleanup] Job complete. Deleted ${totalDeleted} total (${abandonedResult.deleted} abandoned tracks, ${expiredResult.deleted} expired, ${abandonedReportsResult.deleted} abandoned score reports); stuck-room alerts ${stuckRooms.alerted}`
     );
 
     return NextResponse.json({
@@ -87,7 +81,6 @@ export async function POST(request: Request) {
         deleted: abandonedReportsResult.deleted,
         reports: abandonedReportsResult.reports,
       },
-      deepSweep,
       stuckRooms,
       total: totalDeleted,
       timestamp: new Date().toISOString(),

@@ -1119,6 +1119,11 @@ async function runGeneration(
   }
 }
 
+/** Give a paid deep read this many shots before marking it terminally failed
+ * (so the sweep stops retrying a poisoned report every run and starving the
+ * queue behind it). Surfaced for an admin instead of looping forever. */
+export const MAX_DEEP_ATTEMPTS = 3;
+
 /**
  * Premium "deep read", regenerated AFTER purchase.
  *
@@ -1143,80 +1148,136 @@ export async function regenerateDeepReport(reportId: string): Promise<void> {
   if (!report) return;
 
   const quotes = (report.reviewerQuotes as Record<string, any> | null) ?? {};
-  // Need an instant read first; never deepen a too-short / invalid report; and
-  // don't redo it if we already have.
+  // Need an instant read first; never deepen a too-short / invalid report; don't
+  // redo it if we already have; and don't loop on one we've already given up on.
   if (report.score == null) return;
   if (quotes.invalid) return;
   if (quotes.deep) return;
+  if (quotes.deepFailed) return;
 
-  // Deep read runs the stem-separation pass (drums/bass/vocals/other balance) —
-  // nobody is waiting on this path, and the premium prose is what consumes the
-  // stem data. (Restored: dd07779 accidentally made this the shallow one.)
-  const [acquiredDeep, meta] = await Promise.all([
-    acquireAudioFeatures(report.trackUrl, { deep: true }).catch(() => null),
-    fetchTrackMeta(report.trackUrl).catch(() => null),
-  ]);
-  // The instant read already passed the length cap, so tooLong here means the
-  // cap was tightened since — degrade to an ungrounded deep read, never fail
-  // a paid unlock over it.
-  const features =
-    acquiredDeep && !("tooLong" in acquiredDeep) ? acquiredDeep : null;
-
-  const prior = features?.fingerprint
-    ? await findPriorVersion(report.email, features.fingerprint, report.id)
-    : undefined;
-
-  const generated = await generateReport(
-    {
-      trackTitle: report.trackTitle || meta?.title || null,
-      artist: meta?.artist ?? null,
-      genre: report.genre ?? "Other",
-      notes: report.notes,
-      features,
-    },
-    {
-      depth: "deep",
-      prior,
-      locked: {
-        score: report.score,
-        categories: [
-          { key: "hook", score: report.hookScore ?? 0 },
-          { key: "production", score: report.productionScore ?? 0 },
-          { key: "retention", score: report.retentionScore ?? 0 },
-          { key: "emotional", score: report.emotionalScore ?? 0 },
-          { key: "commercial", score: report.commercialScore ?? 0 },
-        ],
+  // Record THIS attempt up-front, before any heavy work. A deep read can be a
+  // Replicate cold start + stems + a big LLM call (minutes) and can be killed
+  // mid-flight by the function budget — persisting the counter first means even
+  // a silent kill advances it. The sweep uses `deepAttempts` / `deepLastAttemptAt`
+  // to (a) stop retrying a poisoned report forever and (b) order never-attempted
+  // reports ahead of repeatedly-failing ones, so one bad record can't starve the
+  // whole queue (the head-of-line bug).
+  const attempts = (Number(quotes.deepAttempts) || 0) + 1;
+  await prisma.trackScoreReport
+    .update({
+      where: { id: reportId },
+      data: {
+        reviewerQuotes: {
+          ...quotes,
+          deepAttempts: attempts,
+          deepLastAttemptAt: new Date().toISOString(),
+        },
       },
+    })
+    .catch(() => {});
+
+  try {
+    // Deep read runs the stem-separation pass (drums/bass/vocals/other balance) —
+    // nobody is waiting on this path, and the premium prose is what consumes the
+    // stem data. (Restored: dd07779 accidentally made this the shallow one.)
+    const [acquiredDeep, meta] = await Promise.all([
+      acquireAudioFeatures(report.trackUrl, { deep: true }).catch(() => null),
+      fetchTrackMeta(report.trackUrl).catch(() => null),
+    ]);
+    // The instant read already passed the length cap, so tooLong here means the
+    // cap was tightened since — degrade to an ungrounded deep read, never fail
+    // a paid unlock over it.
+    const features =
+      acquiredDeep && !("tooLong" in acquiredDeep) ? acquiredDeep : null;
+
+    const prior = features?.fingerprint
+      ? await findPriorVersion(report.email, features.fingerprint, report.id)
+      : undefined;
+
+    const generated = await generateReport(
+      {
+        trackTitle: report.trackTitle || meta?.title || null,
+        artist: meta?.artist ?? null,
+        genre: report.genre ?? "Other",
+        notes: report.notes,
+        features,
+      },
+      {
+        depth: "deep",
+        prior,
+        locked: {
+          score: report.score,
+          categories: [
+            { key: "hook", score: report.hookScore ?? 0 },
+            { key: "production", score: report.productionScore ?? 0 },
+            { key: "retention", score: report.retentionScore ?? 0 },
+            { key: "emotional", score: report.emotionalScore ?? 0 },
+            { key: "commercial", score: report.commercialScore ?? 0 },
+          ],
+        },
+      }
+    );
+
+    // Prose-only update: score / percentile / verdict / category numbers are NOT
+    // touched — they stay exactly as the instant read set them. The waveform IS
+    // refreshed (the deep pass may have measured it when the instant one missed).
+    // Re-read the row's quotes so we don't clobber the attempt bump with a stale
+    // snapshot, and clear the attempt bookkeeping on success.
+    const fresh = await prisma.trackScoreReport.findUnique({
+      where: { id: reportId },
+      select: { reviewerQuotes: true },
+    });
+    const cur = (fresh?.reviewerQuotes as Record<string, any> | null) ?? quotes;
+    const { deepAttempts: _a, deepLastAttemptAt: _l, deepFailed: _f, ...keep } = cur;
+    void _a; void _l; void _f;
+    await prisma.trackScoreReport.update({
+      where: { id: reportId },
+      data: {
+        ...(features?.waveform
+          ? {
+              waveform: {
+                ...features.waveform,
+                durationSec: features.durationSec ?? null,
+                sourceDurationSec: features.sourceDurationSec ?? null,
+              } as object,
+            }
+          : {}),
+        aiSummary: generated.aiSummary,
+        reviewerQuotes: {
+          ...keep,
+          headline: generated.summaryHeadline,
+          reactions: generated.reactions,
+          categoryNotes: Object.fromEntries(
+            generated.categories.map((c) => [c.key, c.note])
+          ),
+          grounded: features != null,
+          deep: true,
+        },
+        priorityFixes: generated.priorityFixes,
+      },
+    });
+  } catch (err) {
+    // After MAX_DEEP_ATTEMPTS, stop retrying forever — mark it terminally failed
+    // so the sweep skips it and surfaces it instead of looping the poisoned head.
+    if (attempts >= MAX_DEEP_ATTEMPTS) {
+      await prisma.trackScoreReport
+        .update({
+          where: { id: reportId },
+          data: {
+            reviewerQuotes: {
+              ...quotes,
+              deepAttempts: attempts,
+              deepLastAttemptAt: new Date().toISOString(),
+              deepFailed: true,
+            },
+          },
+        })
+        .catch(() => {});
+      console.error(
+        `[score-report] deep read permanently failed for ${reportId} after ${attempts} attempts:`,
+        err
+      );
     }
-  );
-
-  // Prose-only update: score / percentile / verdict / category numbers are NOT
-  // touched — they stay exactly as the instant read set them. The waveform IS
-  // refreshed (the deep pass may have measured it when the instant one missed).
-  await prisma.trackScoreReport.update({
-    where: { id: reportId },
-    data: {
-      ...(features?.waveform
-        ? {
-            waveform: {
-              ...features.waveform,
-              durationSec: features.durationSec ?? null,
-              sourceDurationSec: features.sourceDurationSec ?? null,
-            } as object,
-          }
-        : {}),
-      aiSummary: generated.aiSummary,
-      reviewerQuotes: {
-        ...quotes,
-        headline: generated.summaryHeadline,
-        reactions: generated.reactions,
-        categoryNotes: Object.fromEntries(
-          generated.categories.map((c) => [c.key, c.note])
-        ),
-        grounded: features != null,
-        deep: true,
-      },
-      priorityFixes: generated.priorityFixes,
-    },
-  });
+    throw err;
+  }
 }
