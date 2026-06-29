@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { sweepMissingDeepReads, sweepMissingInstantReads } from "@/lib/score-sweep";
 
 // One deep read (Replicate cold start + stems + a big LLM call) can approach the
-// ceiling, so the sweep does ONE report per invocation and this cron runs often
-// (every ~10 min) to drain a backlog quickly — instead of 2/day inside the
-// daily cleanup, which structurally could never keep up.
+// ceiling. Split out of the daily cleanup so paid deliverables get the whole
+// function budget and the sweep can drain several per run (time-budget gated).
+// On a plan that allows sub-daily crons, raise the frequency for faster drain.
 export const maxDuration = 300;
 
 /**

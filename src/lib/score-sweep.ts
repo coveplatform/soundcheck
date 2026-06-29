@@ -12,11 +12,10 @@ import { ADMIN_EMAIL, emailWrapper, getAppUrl, sendEmail } from "@/lib/email";
  */
 
 // regenerateDeepReport runs full deep DSP (Replicate stems) + a big LLM call —
-// minutes each. Run ONE per invocation so it gets the whole function budget
-// (a cold-start deep read can approach the maxDuration ceiling); the backlog
-// drains across the dedicated, frequent deep-read cron rather than one slow
-// daily pass.
-const DEEP_SWEEP_LIMIT = 1;
+// minutes each. The dedicated deep-read cron is daily on the current plan, so
+// process as many as fit in the function's time budget per run (sequential;
+// the budget check below stops before the next one if we're out of time).
+const DEEP_SWEEP_LIMIT = 5;
 const DEEP_SWEEP_TIME_BUDGET_MS = 280_000;
 
 // Don't sweep a report the moment it's paid — the legitimate after() hooks get
