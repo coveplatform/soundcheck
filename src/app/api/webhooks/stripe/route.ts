@@ -8,6 +8,7 @@ import { finalizePaidCheckoutSession } from "@/lib/payments";
 import { activateSubscriber, updateSubscriberStatus } from "@/lib/score-subscription";
 import { decideRoomEligibility, notifyScoreReviewersOfNewTrack } from "@/lib/score-review";
 import { generateAndStoreReport, regenerateDeepReport } from "@/lib/score-report-ai";
+import { markScoreUnlockPaid, deliverScoreUnlock } from "@/lib/score-unlock";
 import type Stripe from "stripe";
 
 // Deep DSP (Replicate stems) + LLM no longer fit in 60s — especially on a
@@ -69,81 +70,80 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   }
 
-  switch (event.type) {
-    case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      await handleCheckoutComplete(session);
-      break;
-    }
+  // Process inside a guard: the dedup row was inserted BEFORE this runs, so if
+  // processing throws we must roll it back — otherwise the event is marked
+  // "seen", Stripe's retry is deduped away, and the effect (e.g. setting paidAt)
+  // is lost forever. Roll back + return non-2xx so Stripe redelivers.
+  try {
+    switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        await handleCheckoutComplete(session);
+        break;
+      }
 
-    case "checkout.session.expired": {
-      const session = event.data.object as Stripe.Checkout.Session;
-      await handleCheckoutExpired(session);
-      break;
-    }
+      case "checkout.session.expired": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        await handleCheckoutExpired(session);
+        break;
+      }
 
-    case "customer.subscription.created":
-    case "customer.subscription.updated":
-    case "customer.subscription.deleted": {
-      const subscription = event.data.object as Stripe.Subscription;
-      await handleSubscriptionChange(subscription);
-      break;
-    }
+      case "customer.subscription.created":
+      case "customer.subscription.updated":
+      case "customer.subscription.deleted": {
+        const subscription = event.data.object as Stripe.Subscription;
+        await handleSubscriptionChange(subscription);
+        break;
+      }
 
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
+    }
+  } catch (err) {
+    console.error(`Stripe webhook handler failed for ${event.type} (${event.id}):`, err);
+    // Release the dedup claim so the retry can re-process this event.
+    await prisma
+      .$executeRaw`DELETE FROM "StripeWebhookEvent" WHERE "id" = ${event.id}`
+      .catch((e) => console.error("Failed to roll back webhook dedup row:", e));
+    return NextResponse.json({ error: "handler failed" }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });
 }
 
 async function handleScoreUnlockCheckout(session: Stripe.Checkout.Session) {
-  try {
-    const reportId = session.metadata?.reportId;
-    if (!reportId) {
-      console.error("Missing reportId in score_unlock metadata", { sessionId: session.id });
-      return;
-    }
-
-    // One-off unlock: mark paid + room-eligible. The room is a claim pool now —
-    // setting paidAt with humanRoomSkipped=false (the default) makes the track
-    // available for real reviewers to pick up; no push-assignment needed.
-    await prisma.trackScoreReport.update({
-      where: { id: reportId },
-      data: {
-        paidAt: new Date(),
-        status: "IN_REVIEW",
-        stripeSessionId: session.id,
-        humanRoomSkipped: false,
-      },
-    });
-
-    // Build the read now that they've paid. Two cases, both idempotent:
-    //  • SEALED report (pay-to-continue wall): score is null — generateAndStoreReport
-    //    runs the full instant read, then auto-chains the deep read (it re-reads
-    //    paidAt on completion, which we just set above).
-    //  • Already-generated report (the report-page unlock): generateAndStoreReport
-    //    no-ops on the in-flight claim, so the explicit deep read below runs.
-    after(async () => {
-      try {
-        await generateAndStoreReport(reportId);
-      } catch (err) {
-        console.error("Error generating report after unlock:", err);
-      }
-      await regenerateDeepReport(reportId).catch((err) =>
-        console.error("Error generating deep report after unlock:", err)
-      );
-      // The track is now in the claim pool — nudge the reviewer pool so it gets
-      // picked up instead of sitting idle (the room is pull-based).
-      await notifyScoreReviewersOfNewTrack(reportId).catch((err) =>
-        console.error("Error notifying reviewers after unlock:", err)
-      );
-    });
-
-    console.log(`Unlocked score report ${reportId} (session ${session.id})`);
-  } catch (error) {
-    console.error("Error handling score unlock checkout:", error);
+  const reportId = session.metadata?.reportId;
+  if (!reportId) {
+    console.error("Missing reportId in score_unlock metadata", { sessionId: session.id });
+    return;
   }
+
+  // CRITICAL write — set paidAt. Deliberately NOT swallowed: a real DB error
+  // propagates so the webhook returns non-2xx and Stripe retries (otherwise a
+  // transient failure silently loses the unlock — paid but still locked).
+  const { found, newlyPaid } = await markScoreUnlockPaid(reportId, session.id);
+
+  // Report is gone (deleted before the webhook landed) → refund the orphaned
+  // charge rather than retry forever, and alert. Mirrors the legacy track path.
+  if (!found) {
+    console.error(`score_unlock for missing report ${reportId} — refunding session ${session.id}`);
+    const pi = typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id;
+    if (pi) {
+      await getStripe()
+        .refunds.create({ payment_intent: pi })
+        .catch((e) => console.error("Orphaned-unlock refund failed:", e));
+    }
+    return;
+  }
+
+  // Delivery (instant read / deep read / reviewer nudge) is recoverable by the
+  // sweeps, so it stays fire-and-forget. Only kick it when we actually moved the
+  // report to paid — a duplicate webhook shouldn't re-run generation.
+  if (newlyPaid) {
+    after(() => deliverScoreUnlock(reportId));
+  }
+
+  console.log(`Unlocked score report ${reportId} (session ${session.id}, newlyPaid=${newlyPaid})`);
 }
 
 async function handleScoreSubscriptionCheckout(session: Stripe.Checkout.Session) {
