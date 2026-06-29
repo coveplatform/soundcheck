@@ -621,8 +621,15 @@ async function generateViaPrompt(
 ): Promise<GeneratedReport> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    // No key at all = a non-prod environment by definition; the canned report
-    // keeps local dev working without burning API credit.
+    // In production the key MUST be set — a key outage/misconfig must never
+    // persist the canned fallback as a real, "grounded"-flagged score (that
+    // would silently ship fiction to every submitter during the outage). Throw
+    // so the report stays unscored and the self-heal / instant-read sweep retries
+    // once the key is back. Locally (no key by design) keep the canned report so
+    // dev works without burning API credit.
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("[score-report] OPENAI_API_KEY missing in production — refusing to persist a fallback read");
+    }
     console.warn("[score-report] OPENAI_API_KEY not set, using fallback");
     return fallbackReport(input);
   }

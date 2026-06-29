@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { regenerateDeepReport, generateAndStoreReport } from "@/lib/score-report-ai";
+import { assignScoreReviewers, notifyScoreReviewersOfNewTrack } from "@/lib/score-review";
 import { ADMIN_EMAIL, emailWrapper, getAppUrl, sendEmail } from "@/lib/email";
 
 /**
@@ -198,7 +199,24 @@ export async function alertStuckPaidRooms() {
       !q.roomStallAlertedAt
     );
   });
-  if (stuck.length === 0) return { alerted: 0 };
+  if (stuck.length === 0) return { alerted: 0, pushAssigned: 0 };
+
+  // Last resort: the room is normally a claim pool, but after 48h of a quiet pool
+  // a PAID room must not sit empty forever. Push-assign the shortfall to real
+  // reviewers (least-recently-active first) and re-nudge them, then still alert
+  // admin. assignScoreReviewers tops up to target and never double-assigns.
+  let pushAssigned = 0;
+  for (const r of stuck) {
+    try {
+      const added = await assignScoreReviewers(r.id, r.humanReviewsRequested);
+      pushAssigned += added;
+      if (added > 0) {
+        await notifyScoreReviewersOfNewTrack(r.id).catch(() => {});
+      }
+    } catch (err) {
+      console.error(`[score-sweep] push-assign failed for ${r.slug}:`, err);
+    }
+  }
 
   const rows = stuck
     .map((r) => {
@@ -226,7 +244,7 @@ export async function alertStuckPaidRooms() {
   } catch (err) {
     // Don't mark alerted if the email never went out.
     console.error("[score-sweep] stuck-room alert email failed:", err);
-    return { alerted: 0, stuck: stuck.length };
+    return { alerted: 0, pushAssigned, stuck: stuck.length };
   }
 
   // Mark each report alerted (jsonb_set — never clobber the rest of the
@@ -237,5 +255,5 @@ export async function alertStuckPaidRooms() {
       .$executeRaw`UPDATE "TrackScoreReport" SET "reviewerQuotes" = jsonb_set(COALESCE("reviewerQuotes", '{}'::jsonb), '{roomStallAlertedAt}', to_jsonb(${alertedAt}::text)) WHERE id = ${r.id}`
       .catch((err) => console.error(`[score-sweep] failed to mark ${r.slug} alerted:`, err));
   }
-  return { alerted: stuck.length };
+  return { alerted: stuck.length, pushAssigned };
 }
