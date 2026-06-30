@@ -89,8 +89,8 @@ export default function SubmitScorePage() {
         setUploading(false);
         return;
       }
-      const { uploadUrl, fileUrl } = await presignRes.json();
-      const up = await fetch(uploadUrl, { method: "PUT", body: file, headers: { "Content-Type": file.type || "audio/mpeg" } });
+      const { uploadUrl, fileUrl, contentType } = await presignRes.json();
+      const up = await fetch(uploadUrl, { method: "PUT", body: file, headers: { "Content-Type": contentType || "audio/mpeg" } });
       if (!up.ok) { setError("Upload failed. Try again."); setUploading(false); return; }
       setUploadedName(file.name);
       setTrackUrl(fileUrl);

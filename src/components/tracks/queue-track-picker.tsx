@@ -156,11 +156,11 @@ export function QueueTrackPicker({ tracks, credits, isPro = false, open, onClose
         setVersionBUrlError(d.error || "Upload failed");
         return;
       }
-      const { uploadUrl, fileUrl } = await presignRes.json();
+      const { uploadUrl, fileUrl, contentType } = await presignRes.json();
       const upRes = await fetch(uploadUrl, {
         method: "PUT",
         body: file,
-        headers: { "Content-Type": file.type || "audio/mpeg" },
+        headers: { "Content-Type": contentType || "audio/mpeg" },
       });
       if (!upRes.ok) { setVersionBUrlError("Upload failed"); return; }
       setVersionBUploadedUrl(fileUrl);
