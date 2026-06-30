@@ -20,6 +20,122 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "is-my-mix-too-loud",
+    title: "Is My Mix Too Loud? Loudness, LUFS and the Streaming Norm",
+    coverImage: "/blog/blog29.jpg",
+    excerpt:
+      "If your mix is hitting above -8 LUFS integrated, streaming platforms will turn it down automatically and the result is usually worse than a well-balanced mix at -14 LUFS. Here is what the numbers mean and how to use them before you master.",
+    category: "GUIDE",
+    date: "June 30, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "If your mix is consistently hitting above -8 LUFS integrated, it is almost certainly too loud for streaming, and platforms like Spotify, Apple Music, and YouTube will turn it down automatically. The standard target is around -14 LUFS integrated with a true peak ceiling of -1 dBTP. Getting louder than that does not help your track compete — it just means the platform does the volume reduction for you, often in a way that introduces harshness or destroys the dynamics you spent hours shaping.",
+      },
+      {
+        type: "h2",
+        text: "What is LUFS and why does it matter for your mix?",
+      },
+      {
+        type: "paragraph",
+        text: "LUFS stands for Loudness Units relative to Full Scale, and it is a perceptual loudness measurement that weights different frequencies the way human hearing does. Unlike peak level, which tells you the absolute highest point in your audio waveform, LUFS tells you how loud the track actually sounds over time. Streaming platforms use LUFS to normalise playback: they measure the integrated loudness of every track and adjust volume to hit a consistent target. This means the old tactic of brickwall limiting your master to 0 dBFS to win volume on CD or radio does not work on streaming. A track that measures -7 LUFS will be turned down to -14. A track that measures -20 LUFS will be turned up. The platform controls the final playback volume, not you.",
+      },
+      {
+        type: "h2",
+        text: "What loudness target should you aim for on each platform?",
+      },
+      {
+        type: "list",
+        items: [
+          "Spotify: normalises to -14 LUFS integrated with a -1 dBTP true peak limit. Tracks quieter than -14 LUFS are turned up; tracks louder are turned down.",
+          "Apple Music: targets -16 LUFS integrated when Sound Check is enabled (the default for most listeners). Slightly more headroom than Spotify.",
+          "YouTube: normalises to -14 LUFS. Loud masters get turned down and can sound harsh due to the platform codec interacting with already-limited dynamics.",
+          "Tidal: broadly targets -14 LUFS and applies less aggressive limiting at high quality settings than lossy platforms.",
+          "Amazon Music: aligns with -14 LUFS on most device and playback settings.",
+          "Practical target: master to -14 LUFS integrated, -1 dBTP true peak. This covers every major platform with no automatic gain reduction and leaves your dynamics intact.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Why does streaming turn down loud mixes, and what actually happens when it does?",
+      },
+      {
+        type: "paragraph",
+        text: "Loudness normalisation exists because the listener experience across a playlist would be intolerable without it. A heavily limited club track at -7 LUFS would blow out the speakers between two jazz tracks at -18 LUFS. Platforms solved this by measuring every track and adjusting playback volume to a consistent target. What they do not do is re-master your audio — they just apply a gain reduction. If you have pushed your mix to -7 LUFS through heavy limiting, the platform applies roughly 7 dB of gain reduction. The result is a track with the same squashed dynamics as your over-limited master, played at the same volume as everything else. You do not gain perceived loudness. You lose dynamic contrast.",
+      },
+      {
+        type: "quote",
+        text: "The loudness war ended on streaming. A -7 LUFS master does not sound louder than a -14 LUFS master on Spotify. It sounds worse at the same volume.",
+      },
+      {
+        type: "h2",
+        text: "How do you know if your mix is too loud before mastering?",
+      },
+      {
+        type: "paragraph",
+        text: "At the mix stage, loudness is less the concern than headroom and dynamics. A well-mixed track typically sits between -18 and -12 LUFS integrated on the mix bus, with peaks well below 0 dBFS, giving the mastering stage room to work. The warning signs that your mix is already too hot before mastering: the master fader is clipping, individual bus channels are sitting in the red consistently, or the overall feel is dense and fatiguing rather than punchy and dynamic. Compression in a mix is healthy; limiting at the mix stage to chase apparent loudness is almost always a mistake that costs you in mastering.",
+      },
+      {
+        type: "h2",
+        text: "What should you actually check to know if your loudness is right?",
+      },
+      {
+        type: "list",
+        items: [
+          "Use a LUFS meter on your master bus: most DAWs include one, or use a free plugin like YouLean Loudness Meter or Klangfreund MAAT. Aim for -14 LUFS integrated on your final master.",
+          "Set a true peak ceiling of -1 dBTP: this prevents inter-sample peaks from clipping after encoding to lossy formats like MP3 or AAC — the safe ceiling for every major platform.",
+          "Listen on multiple playback systems: headphones, phone speaker, car stereo, and a mono Bluetooth speaker. If your mix only works loud, it does not work.",
+          "Reference against a released track in your genre: import a professionally mastered commercial release and A/B your mix at matched loudness. Your dynamic feel should be comparable.",
+          "Check your dynamic range: a PLR (peak-to-loudness ratio) below 6 is generally over-compressed for streaming. Most well-mastered tracks sit between 8 and 14 PLR.",
+          "Leave -3 to -6 dB of headroom on your mix bus: do not limit hard at the mix stage. Give the mastering engineer or your mastering chain room to work.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "How does loudness affect how listeners actually hear your track?",
+      },
+      {
+        type: "paragraph",
+        text: "This is where LUFS numbers become a creative concern, not just a technical one. A mix with good dynamic range — where the verses breathe and the chorus genuinely hits harder — sounds more impactful at -14 LUFS than a brickwalled master at the same playback level. The contrast between quiet and loud is what makes a chorus feel like a release, a drop feel physical, a breakdown feel real. When everything is loud all the time, nothing is loud. The tracks that land hardest on streaming are almost always the ones that use dynamic contrast intelligently, not the ones that chase numbers.",
+      },
+      {
+        type: "paragraph",
+        text: "If you want to know whether your loudness decisions are actually working on real listeners, MixReflect scores your track out of 100 across production quality, hook strength, retention, emotional impact, and commercial pull, and pairs that score with reactions from five real listeners hearing it cold. The production dimension specifically captures whether your mix has the punch, clarity, and dynamic feel of a release-ready track, or whether it sounds fatiguing, thin, or over-compressed. Paste a link and get the result before you commit to a master.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "Is my mix too loud if it hits 0 dBFS?",
+            a: "Not necessarily, but it is a warning sign. 0 dBFS on the mix bus means you are at the absolute ceiling, leaving no headroom for mastering and making inter-sample clipping likely after codec encoding. Most engineers keep the mix bus peak well below 0 dBFS and reserve limiting for the mastering stage. The more meaningful measurement is integrated LUFS, not the peak.",
+          },
+          {
+            q: "What LUFS should I target for my final master?",
+            a: "-14 LUFS integrated is the standard target for Spotify, YouTube, and Tidal. Apple Music normalises to -16 LUFS with Sound Check on. The safest single target that covers all platforms without triggering automatic gain reduction is -14 LUFS integrated with a -1 dBTP true peak ceiling.",
+          },
+          {
+            q: "Does mastering to -14 LUFS make my music sound quieter?",
+            a: "No, because the platform normalises everything to the same loudness. A track mastered at -14 LUFS and a track mastered at -7 LUFS play back at the same perceived volume on Spotify. The -14 LUFS master typically sounds better because it retains dynamic range rather than having it crushed by limiting.",
+          },
+          {
+            q: "What is the difference between LUFS, dB, and dBFS?",
+            a: "dB is a general unit measuring a ratio. dBFS (decibels relative to full scale) measures the absolute peak level of a digital signal where 0 dBFS is the maximum. LUFS (Loudness Units relative to Full Scale) is a time-averaged, frequency-weighted measurement of perceived loudness over the full track. For streaming targets, LUFS is the relevant measurement; dBFS is used for setting true peak ceilings.",
+          },
+          {
+            q: "Can I check LUFS without extra plugins?",
+            a: "Most modern DAWs include a built-in loudness meter: Logic Pro has the Loudness Meter in its mastering tools, Ableton includes loudness analysis, and Pro Tools has an integrated LUFS meter. Free standalone options include YouLean Loudness Meter and the Orban Loudness Meter. Any of these gives you an accurate integrated LUFS reading.",
+          },
+          {
+            q: "Should I worry about LUFS during mixing or only at mastering?",
+            a: "Primarily at mastering, but loudness awareness during mixing helps. A mix sitting around -18 to -12 LUFS integrated on the mix bus is in the right range to give mastering room to work. If your mix is already hitting -8 LUFS before mastering, your channels or buses are probably over-compressed and the master will not improve things.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "why-does-nobody-listen-to-my-music",
     title: "Why Does Nobody Listen to My Music?",
     coverImage: "/blog/blog28.jpg",
