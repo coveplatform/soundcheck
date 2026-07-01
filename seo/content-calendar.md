@@ -24,7 +24,7 @@ Real numbers pulled from the production DB this date:
   regenerated in the new grittier art style.
 
 ## Current image counter
-Last used: blog29 → next post uses blog30
+Last used: blog30 → next post uses blog31
 
 ## Blog post queue
 
@@ -36,7 +36,7 @@ Last used: blog29 → next post uses blog30
 | DONE | 2026-06-28 | How Much Does It Cost to Get Your Music Reviewed in 2026? | cost to get music reviewed | blog27.jpg |
 | DONE | 2026-06-29 | Why Does Nobody Listen to My Music? | why does nobody listen to my music | blog28.jpg |
 | DONE | 2026-06-30 | Is My Mix Too Loud? Loudness, LUFS and the Streaming Norm | is my mix too loud | blog29.jpg |
-| PENDING | | How to Get More Spotify Streams (Without Buying Them) | how to get more spotify streams | high volume |
+| DONE | 2026-07-01 | How to Get More Spotify Streams (Without Buying Them) | how to get more spotify streams | blog30.jpg |
 | PENDING | | Song Structure: How to Arrange a Track That Holds Attention | how to structure a song | retention / arrangement |
 | PENDING | | How to Make Your Chorus Hit Harder | how to make a chorus hit | hook / production |
 | PENDING | | Is My Song Good? An Honest Way to Tell Before You Release | is my song good | core product query — high intent |

@@ -20,6 +20,118 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "how-to-get-more-spotify-streams",
+    title: "How to Get More Spotify Streams (Without Buying Them)",
+    coverImage: "/blog/blog30.jpg",
+    excerpt:
+      "Getting more Spotify streams without buying them comes down to three things: a track that holds listeners past 30 seconds, a release strategy that gives the algorithm something to work with, and genuine placement in the right playlists. Here is how to approach all three.",
+    category: "GUIDE",
+    date: "July 1, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "Getting more Spotify streams without buying them is not a mystery, but it is also not a hack. The tracks that accumulate real streams do so because they hold listeners past the 30-second mark, get shared by people who genuinely like them, and land in playlists — editorial or algorithmic — that put them in front of new ears. If your stream counts are flat, one of those three things is broken, and no amount of posting to Instagram will fix the underlying problem.",
+      },
+      {
+        type: "h2",
+        text: "Why does Spotify's algorithm decide who hears your music?",
+      },
+      {
+        type: "paragraph",
+        text: "Spotify's algorithm is essentially a feedback loop: it serves your track to a small test audience and watches what happens. If listeners save it, add it to playlists, replay it, or share it, the algorithm reads those signals as evidence that more people should hear it. If they skip in the first 30 seconds, the experiment ends there. This means the quality of your track's first 30 seconds is more important than your follower count, your marketing budget, or how many times you post about the release. A mediocre hook with a massive ad spend will underperform a genuinely great hook with zero budget.",
+      },
+      {
+        type: "h2",
+        text: "What actually moves the needle on Spotify streams?",
+      },
+      {
+        type: "list",
+        items: [
+          "Skip rate in the first 30 seconds: this is the algorithm's primary rejection signal. If your intro drags or the energy drop-off is too sudden, fix it before you release.",
+          "Save rate: listeners who save your track are telling Spotify it is worth keeping. A healthy save rate (aim for 20%+ of streams) is one of the clearest signals that the algorithm should keep distributing your music.",
+          "Playlist adds: when real listeners add your track to their own playlists, it signals organic engagement far more clearly than editorial placement. Encourage it.",
+          "Streams-to-listeners ratio: if you have 500 listeners and 2,000 streams, that repeat listening tells the algorithm something meaningful. Songs people go back to get rewarded.",
+          "Release radar and Discover Weekly: these are earned, not bought. You get on them by having a verified artist profile, releasing consistently, and generating the engagement signals above.",
+          "Spotify for Artists pitch: submit your unreleased track at least 7 days before your release date. This is the only direct way to request editorial playlist consideration. Missing this window closes that door entirely.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Is playlist pitching actually worth doing?",
+      },
+      {
+        type: "paragraph",
+        text: "Yes, but not the way most artists approach it. Cold-emailing playlist curators with a form letter is close to useless. What works is identifying playlists with real, engaged followers (not inflated counts from follow-for-follow schemes), whose mood and genre actually match your track, and reaching out with a specific, human pitch that explains why the track fits. SubmitHub formalises this process and gives you curator feedback even on rejections — worth the cost for the data alone. Groover works similarly in the European market. But the honest truth is that unless your track can hold listeners, a playlist spot is just a temporary traffic spike followed by a crash in skip rates that damages your algorithm standing.",
+      },
+      {
+        type: "quote",
+        text: "Playlist placement does not rescue a weak hook. It just puts the weak hook in front of more people who will skip it faster.",
+      },
+      {
+        type: "h2",
+        text: "How do you optimise your Spotify profile to convert streams into followers?",
+      },
+      {
+        type: "list",
+        items: [
+          "Claim your Spotify for Artists profile: you need this before you can pitch for playlists, pin tracks, or see listener demographics.",
+          "Pin your strongest or most recent track: the first thing a new listener hears from your profile page matters. Make it count.",
+          "Write a real bio: not a list of influences, but something a new listener would actually want to read. Three sentences about what you make and why is better than a paragraph of genre tags.",
+          "Link your socials and tour dates: Spotify for Artists lets you surface upcoming shows. Use it.",
+          "Use Canvas: looping 3-8 second videos attached to your tracks increase saves and shares according to Spotify's own data. Simple motion graphics work fine — it does not have to be a mini-film.",
+          "Release consistently: the algorithm rewards artists who release regularly. Every new track is an opportunity to re-enter new listener queues. Twelve singles across a year typically outperforms one album drop.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Does promoting Spotify streams on social media actually work?",
+      },
+      {
+        type: "paragraph",
+        text: "It depends entirely on what you are sharing. Posting a link to your Spotify with 'out now, go stream it' is one of the lowest-converting things you can do. What converts is giving someone a genuine reason to care before they click: a clip that hooks them in the first two seconds, a behind-the-scenes moment that builds connection, or a reaction or story that makes the song feel like something they need to hear. TikTok sounds driving Spotify streams is a documented pattern, but it only works when the TikTok content itself is compelling enough to earn the click — the platform does not automatically convert attention into streams.",
+      },
+      {
+        type: "h2",
+        text: "How do you know if your track is ready to release on Spotify?",
+      },
+      {
+        type: "paragraph",
+        text: "This is the part most artists skip, and it is the most expensive mistake in the list. Releasing a track that is not ready — one with a weak hook, a production level below your target genre, or a retention problem in the second half — trains the algorithm that your music gets skipped. That reputation follows you into your next release. Before you push to streaming, you need honest feedback on whether the hook lands, whether the production holds up against released tracks in your genre, and whether the track actually keeps listeners through to the end. MixReflect does this: paste a link and get an AI score out of 100 across hook strength, production, retention, emotional impact, and commercial pull, plus honest reactions from five real listeners hearing it cold. The feedback is sometimes uncomfortable, but it is exactly what you need before you bet your algorithm standing on a release.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How long does it take to grow Spotify streams organically?",
+            a: "For most independent artists releasing consistently and pitching playlists, meaningful algorithmic traction takes 6-18 months of releases. Individual tracks can break through faster if they land a significant playlist or go viral on a short-form platform, but building a reliable stream base is a long game. Releasing one track and waiting is almost never a winning strategy.",
+          },
+          {
+            q: "Do Spotify ads work for getting more streams?",
+            a: "Spotify's own ad platform (Spotify Ad Studio) can drive streams, but the cost-per-stream is high and the audience targeting is limited compared to Meta or TikTok. Most independent artists see better ROI running short-form video content than paying directly for Spotify ads. Where Spotify ads help is in driving profile follows and building awareness before a release, not in directly accumulating stream counts cheaply.",
+          },
+          {
+            q: "Is buying Spotify streams illegal or just a bad idea?",
+            a: "Buying streams violates Spotify's terms of service and can result in your tracks being removed or your account being suspended. Beyond the policy risk, purchased streams are typically from bots or low-quality listener farms, which means abysmal save rates and high skip rates — exactly the signals that tell the algorithm to stop distributing your music. It is both against the rules and actively counterproductive.",
+          },
+          {
+            q: "How many streams does it take to get on Discover Weekly?",
+            a: "There is no published stream threshold for Discover Weekly. It is driven by listener behaviour signals — saves, replays, completion rate, playlist adds — rather than raw stream counts. Artists with a few hundred genuine engaged streams can appear in Discover Weekly; artists with inflated stream counts from bots almost never do, because the engagement rate is too low.",
+          },
+          {
+            q: "Does releasing on a Friday make a difference for Spotify streams?",
+            a: "Friday is the global release day because editorial playlist refreshes happen on Fridays, giving you the best chance of landing on New Music Friday and similar editorial playlists if you have been pitched through Spotify for Artists. For algorithmic playlists like Discover Weekly and Release Radar, the day of the week matters less — but releasing on Friday does put you in the same window as editorial consideration, so it is the default for most artists.",
+          },
+          {
+            q: "Should I put all my songs on Spotify or hold some back?",
+            a: "Put them on. Withholding catalogue from streaming platforms to build an exclusive relationship with your direct audience is a strategy that works for very few artists, and usually only those who already have a substantial following. For artists building from zero, every song on Spotify is another potential entry point for the algorithm and for new listeners finding your back catalogue after hearing one track.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "is-my-mix-too-loud",
     title: "Is My Mix Too Loud? Loudness, LUFS and the Streaming Norm",
     coverImage: "/blog/blog29.jpg",
