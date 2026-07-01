@@ -373,7 +373,7 @@ function audioDuration(file: File): Promise<number | null> {
 const FAQS: { q: string; a: string }[] = [
   {
     q: "How does the release verdict work?",
-    a: "Paste a link or upload your track and the AI listens to the whole thing, then calls it on a four-state ladder — release ready, almost there, needs work or not ready — measured against what actually gets released in your genre. You also get a score out of 100 as supporting evidence, a written read across five dimensions, and the three fixes that close the gap.",
+    a: "Paste a link to your track and the AI listens to the whole thing, then calls it on a four-state ladder — release ready, almost there, needs work or not ready — measured against what actually gets released in your genre. You also get a score out of 100 as supporting evidence, a written read across five dimensions, and the three fixes that close the gap.",
   },
   {
     q: "Who are the five listeners in the room?",
@@ -389,7 +389,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "What can I submit?",
-    a: "A SoundCloud, YouTube or direct link to your track, or just drag in an MP3 or WAV. Unreleased demos, rough mixes and finished masters are all fine — most people use it before they release.",
+    a: "A SoundCloud, YouTube, Bandcamp or direct link to your track. Unreleased demos, rough mixes and finished masters are all fine — most people use it before they release.",
   },
   {
     q: "How is this different from SubmitHub or Groover?",
@@ -965,50 +965,24 @@ export default function ScorePage() {
             {/* paste box + preview card */}
             <form onSubmit={start} className="mt-8 max-w-xl">
               {!isUrl ? (
-                <div
-                  onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-                  onDragLeave={() => setDragging(false)}
-                  onDrop={(e) => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
-                >
-                  <input
-                    type="url"
-                    value={trackUrl}
-                    onChange={(e) => setTrackUrl(e.target.value)}
-                    onBlur={() => setTrackUrl((v) => normalizeTrackUrl(v))}
-                    onPaste={(e) => {
-                      // links pasted without a protocol still get the preview card
-                      const text = e.clipboardData.getData("text");
-                      const normalized = normalizeTrackUrl(text);
-                      if (normalized !== text) {
-                        e.preventDefault();
-                        setTrackUrl(normalized);
-                      }
-                    }}
-                    placeholder="paste a soundcloud, youtube or mp3 link…"
-                    className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-5 py-4 text-[16px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
-                  />
-                  <label
-                    className={`${mono.className} mt-2.5 flex items-center justify-center gap-2 border border-dashed py-3.5 text-[13px] cursor-pointer transition-colors ${
-                      dragging
-                        ? "border-[#6ee7ff] bg-[#6ee7ff]/10 text-white"
-                        : "border-white/20 hover:border-[#6ee7ff] text-white/60 hover:text-white"
-                    } ${uploading ? "opacity-60 pointer-events-none" : ""}`}
-                  >
-                    {uploading ? (
-                      <><Loader2 className="h-4 w-4 animate-spin" /> uploading…</>
-                    ) : dragging ? (
-                      "drop your mp3 here"
-                    ) : (
-                      <><Upload className="h-4 w-4" /> upload or drag an mp3 (max 25mb)</>
-                    )}
-                    <input
-                      type="file"
-                      accept="audio/mpeg,audio/mp3,.mp3"
-                      className="hidden"
-                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
-                    />
-                  </label>
-                </div>
+                // mp3 upload temporarily disabled (AWS upload key rotation) — paste-only
+                <input
+                  type="url"
+                  value={trackUrl}
+                  onChange={(e) => setTrackUrl(e.target.value)}
+                  onBlur={() => setTrackUrl((v) => normalizeTrackUrl(v))}
+                  onPaste={(e) => {
+                    // links pasted without a protocol still get the preview card
+                    const text = e.clipboardData.getData("text");
+                    const normalized = normalizeTrackUrl(text);
+                    if (normalized !== text) {
+                      e.preventDefault();
+                      setTrackUrl(normalized);
+                    }
+                  }}
+                  placeholder="paste a soundcloud, youtube or mp3 link…"
+                  className={`${mono.className} w-full bg-[#141414] border border-white/15 focus:border-[#6ee7ff] px-5 py-4 text-[16px] text-white placeholder:text-white/30 focus:outline-none transition-colors normal-case`}
+                />
               ) : (
                 <div
                   className="flex items-center gap-4 bg-[#141414] border p-3.5"

@@ -393,43 +393,8 @@ export function QueueTrackPicker({ tracks, credits, isPro = false, open, onClose
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-black/40">
                 Version B
               </p>
-              {/* Link / File toggle */}
-              <div className="flex border border-black/10 overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setVersionBInputMode("link");
-                    setVersionBUploadedUrl("");
-                    setVersionBFileName("");
-                    setVersionBUrlError("");
-                  }}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-black transition-colors",
-                    versionBInputMode === "link" ? "bg-black text-white" : "bg-white text-black/40 hover:text-black"
-                  )}
-                >
-                  <Link2 className="h-3 w-3" />
-                  Link
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setVersionBInputMode("file");
-                    setVersionBUrl("");
-                    setVersionBSourceType(null);
-                    setVersionBTitle("");
-                    setVersionBArtworkUrl(null);
-                    setVersionBUrlError("");
-                  }}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-black transition-colors border-l border-black/10",
-                    versionBInputMode === "file" ? "bg-black text-white" : "bg-white text-black/40 hover:text-black"
-                  )}
-                >
-                  <Upload className="h-3 w-3" />
-                  File
-                </button>
-              </div>
+              {/* Link / File toggle removed — mp3 upload temporarily disabled
+                  (AWS upload key rotation); version B stays link-only. */}
             </div>
 
             {versionBInputMode === "link" ? (

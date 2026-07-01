@@ -478,8 +478,8 @@ export default function SubmitTrackPage() {
               </h1>
               <p className="text-base text-white/40 mt-3 font-medium">
                 {abTestMode
-                  ? "Upload two versions — listeners hear both and pick the winner."
-                  : "Paste a link from SoundCloud, Bandcamp, or YouTube — or upload an MP3."}
+                  ? "Paste two versions — listeners hear both and pick the winner."
+                  : "Paste a link from SoundCloud, Bandcamp, or YouTube."}
               </p>
 
               {/* Mode picker */}
@@ -525,34 +525,8 @@ export default function SubmitTrackPage() {
             </div>
           </div>
 
-          {/* Mode toggle band */}
-          <div className="bg-[#241440]">
-            <div className={cn(W, "py-1 flex")}>
-              {([
-                { mode: "link" as UploadMode, Icon: Link2,  label: "Paste a link"  },
-                { mode: "file" as UploadMode, Icon: Upload, label: "Upload MP3"    },
-              ]).map(({ mode, Icon, label }) => (
-                <button
-                  key={mode}
-                  type="button"
-                  onClick={() => {
-                    setUploadMode(mode); setError("");
-                    if (mode === "link") { setUploadedUrl(""); setUploadedFileName(""); setArtworkUrl(null); }
-                    else { setUrl(""); setUrlError(""); setSourceType(null); setArtworkUrl(null); }
-                  }}
-                  className={cn(
-                    "flex items-center gap-2 px-5 py-4 text-sm font-bold transition-all border-b-2",
-                    uploadMode === mode
-                      ? "border-purple-400 text-white"
-                      : "border-transparent text-white/30 hover:text-white/60"
-                  )}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Mode toggle band removed — mp3 upload temporarily disabled
+              (AWS upload key rotation); uploadMode stays "link" (paste-only). */}
 
           {/* Form band */}
           <div className="bg-white py-10">

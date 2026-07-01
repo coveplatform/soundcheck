@@ -326,55 +326,24 @@ export default function SubmitScorePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <Field label="track link" required>
             {!isUrl ? (
-              <div
-                onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={(e) => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
-              >
-                <input
-                  type="url"
-                  value={trackUrl}
-                  onChange={(e) => setTrackUrl(e.target.value)}
-                  onBlur={() => setTrackUrl((v) => normalizeTrackUrl(v))}
-                  onPaste={(e) => {
-                    // links pasted without a protocol still get the preview card
-                    const text = e.clipboardData.getData("text");
-                    const normalized = normalizeTrackUrl(text);
-                    if (normalized !== text) {
-                      e.preventDefault();
-                      setTrackUrl(normalized);
-                    }
-                  }}
-                  placeholder="paste a soundcloud, youtube, bandcamp or mp3 link…"
-                  className={inputCls}
-                />
-                <div className="mt-3 flex items-center gap-3">
-                  <div className="h-px bg-white/10 flex-1" />
-                  <span className={`${mono.className} text-[11px] text-white/30`}>or</span>
-                  <div className="h-px bg-white/10 flex-1" />
-                </div>
-                <label
-                  className={`${mono.className} mt-3 flex items-center justify-center gap-2 border border-dashed text-[13px] py-3.5 cursor-pointer transition-colors ${
-                    dragging
-                      ? "border-[#6ee7ff] bg-[#6ee7ff]/10 text-white"
-                      : "border-white/20 hover:border-[#6ee7ff] text-white/70 hover:text-white"
-                  } ${uploading ? "opacity-60 pointer-events-none" : ""}`}
-                >
-                  {uploading ? (
-                    <><Loader2 className="h-4 w-4 animate-spin" /> uploading…</>
-                  ) : dragging ? (
-                    "drop your mp3 here"
-                  ) : (
-                    <><Upload className="h-4 w-4" /> upload or drag an mp3 (max 25mb)</>
-                  )}
-                  <input
-                    type="file"
-                    accept="audio/mpeg,audio/mp3,.mp3"
-                    className="hidden"
-                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
-                  />
-                </label>
-              </div>
+              // mp3 upload temporarily disabled (AWS upload key rotation) — paste-only
+              <input
+                type="url"
+                value={trackUrl}
+                onChange={(e) => setTrackUrl(e.target.value)}
+                onBlur={() => setTrackUrl((v) => normalizeTrackUrl(v))}
+                onPaste={(e) => {
+                  // links pasted without a protocol still get the preview card
+                  const text = e.clipboardData.getData("text");
+                  const normalized = normalizeTrackUrl(text);
+                  if (normalized !== text) {
+                    e.preventDefault();
+                    setTrackUrl(normalized);
+                  }
+                }}
+                placeholder="paste a soundcloud, youtube, bandcamp or mp3 link…"
+                className={inputCls}
+              />
             ) : (
               <div
                 className="flex items-center gap-4 bg-[#141414] border p-3.5"
