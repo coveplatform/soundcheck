@@ -20,6 +20,113 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "song-structure-how-to-arrange-a-track",
+    title: "Song Structure: How to Arrange a Track That Holds Attention",
+    coverImage: "/blog/blog31.jpg",
+    excerpt:
+      "Knowing how to structure a song is really knowing how to manage energy and contrast. The tracks that hold listeners from start to finish are not necessarily the most complex ones — they are the ones where every section earns its place and the chorus arrives before the listener loses patience.",
+    category: "GUIDE",
+    date: "July 2, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "Knowing how to structure a song is really knowing how to manage energy across time. The most reliable structures work because they deliver contrast at predictable intervals, give listeners something to anticipate, and make the chorus feel like a release rather than just the next section. What kills tracks is not the wrong structure — it is sections that outstay their welcome, choruses that arrive too late, and arrangements that mistake length for depth.",
+      },
+      {
+        type: "h2",
+        text: "Why does song structure affect whether listeners stay or skip?",
+      },
+      {
+        type: "paragraph",
+        text: "The skip happens when listeners stop feeling like something new is coming. A track with an overlong intro, a verse that loops without forward momentum, or a chorus that never arrives creates the sensation of treading water. Structure is essentially a contract with the listener: it sets up expectations and then satisfies or productively subverts them. When the structure breaks that contract, the listener's finger goes to the next track and Spotify's algorithm registers a skip. That skip follows your track's reputation into the next release cycle.",
+      },
+      {
+        type: "h2",
+        text: "What are the main song structures and when does each one work?",
+      },
+      {
+        type: "list",
+        items: [
+          "Verse-Chorus (VCVCBC): the default for most pop, hip-hop, and commercial music. Works because it creates a clear call-and-response between narrative (verse) and payoff (chorus). The risk is predictability; the fix is making the chorus undeniable enough that the pattern never gets boring.",
+          "AABA (32-bar form): the jazz and older pop standard. The B section provides contrast midway through; the return to A lands with fresh ears. Underused in modern music and often more emotionally effective than verse-chorus for intimate or lyric-heavy tracks.",
+          "AAA (through-composed verse): used where lyrical narrative matters more than a repeating hook — folk, certain country, older soul. Without a chorus, you need strong melodic variation between verses or it collapses into monotony.",
+          "Verse-Pre-Chorus-Chorus: the pre-chorus is underrated. It builds anticipation and raises energy before the payoff, making the chorus hit harder than going verse-to-chorus directly. If your chorus feels underwhelming, a missing pre-chorus is often the reason.",
+          "Drop structure (intro-build-drop): standard in electronic and dance music. The 'chorus' is often purely sonic rather than melodic. Works on the same principle as verse-chorus but replaces harmonic resolution with energy contrast.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "How do you decide where the chorus should first appear?",
+      },
+      {
+        type: "paragraph",
+        text: "Earlier than you think. Most independent artists bring the first chorus in too late. In commercial music, the hook or chorus often appears before the 60-second mark and sometimes before 30 seconds. The verse exists to build context and tension; if it is doing neither, it is dead time. A useful test: play your track for someone who has never heard it and watch the moment their attention starts to wander. That moment is almost certainly before your chorus arrives.",
+      },
+      {
+        type: "quote",
+        text: "If you cannot get to the chorus in under a minute, the verse is not doing enough.",
+      },
+      {
+        type: "h2",
+        text: "What arrangement techniques actually hold attention through a whole track?",
+      },
+      {
+        type: "list",
+        items: [
+          "Build through the verses: every verse should feel slightly different from the last. Add or strip elements, shift the vocal delivery, change the texture. A copy-pasted second verse is one of the most reliable ways to lose a listener by the halfway mark.",
+          "Use the pre-chorus to earn the drop: the build into the chorus is not just about getting louder. Harmonic tension, a held note, a rhythmic pause, or stripping the production back before the chorus all make the payoff feel like a release rather than just the next bar.",
+          "Vary the final chorus: a key change, added harmony, a stripped rebuild, or a double chorus signals to the listener that the song knows it is approaching its peak. A final chorus that sounds identical to the first one wastes the emotional momentum you spent three minutes building.",
+          "Cut the outro short: most outros are longer than they need to be. If you are repeating the chorus four more times after the peak, you are burning goodwill. Two solid iterations of the hook and out is almost always better than six.",
+          "Trust negative space: the sections that breathe — a stripped-back breakdown, a bar of near-silence before the drop — are often what make the powerful sections feel powerful. Not every bar needs to be full.",
+          "Plot the energy curve: map the energy level of your track across its runtime. There should be at least one clear peak, one clear trough, and an overall shape that rises toward the final chorus. A flat energy curve is a structural problem that mixing cannot fix.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Does structure matter if the production already sounds great?",
+      },
+      {
+        type: "paragraph",
+        text: "Yes, and this is the part most producers resist hearing. A great-sounding track with poor structure will still lose listeners by the second verse. Production can buy you an extra 10 to 15 seconds of patience — a satisfying drop, a perfect snare sound, a genuinely arresting intro all keep ears engaged temporarily — but structure determines whether the listener finishes the track, replays it, or saves it. Those are the retention signals Spotify uses to decide whether your music reaches more people. Getting the structure right is not a creative compromise. It is a prerequisite for any other quality to matter.",
+      },
+      {
+        type: "paragraph",
+        text: "If you want to know whether your arrangement is actually holding attention, MixReflect will tell you where it loses people. Paste a link and get an AI score out of 100 across hook strength, production, retention, emotional impact, and commercial pull, plus honest reactions from five real listeners who heard it cold. The retention dimension flags where the energy drops off, where the structure felt predictable, and where listeners checked out. If the feedback keeps pointing to the second verse, you know what to fix before you release.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "What is the most important part of a song's structure?",
+            a: "The moment the first chorus arrives. Everything before it is setup; the chorus is the payoff the listener has been building toward. If the chorus arrives too late, does not contrast enough with the verses, or simply is not strong enough melodically, no other structural choice will rescue the track. Get the chorus right first, then build everything else around it.",
+          },
+          {
+            q: "How long should a song intro be?",
+            a: "Under 15 seconds for most genres targeting streaming. Algorithmic playlists and casual listeners have zero tolerance for intros that delay the hook. If your intro runs past 20 seconds, you need a clear reason for it — building tension toward a specific payoff, establishing a soundscape the rest of the track subverts, or serving a live context where the DJ is mixing in. For most artists releasing to streaming, the intro is where the track starts losing the listener before the verse even begins.",
+          },
+          {
+            q: "Should every song have a bridge?",
+            a: "No. A bridge earns its place by providing genuine contrast: a new harmonic area, a lyrical left turn, a stripped-back moment before the final chorus. A bridge that sounds like a slightly different verse is worse than no bridge, because it adds runtime without reward. Ask yourself: does this section make the final chorus feel bigger than it would without it? If the honest answer is no, cut it.",
+          },
+          {
+            q: "Why does my track feel too long?",
+            a: "The most common culprits are: an intro that runs past 20 seconds, a third or fourth verse that repeats what the first two already covered, an outro that loops the chorus more times than the listener wants to hear, or a bridge that adds length without payoff. A streaming track rarely needs to exceed 3.5 minutes unless the structure genuinely justifies the runtime. Time your sections individually and cut anything that is not earning its place.",
+          },
+          {
+            q: "How do I know if my verse is working before the chorus arrives?",
+            a: "Test it in isolation. Play just the verse to someone who has not heard the track and watch their face at the 30-second mark. If they look distracted or reach for their phone, the verse is not pulling them forward. A good verse creates curiosity — it raises a question that the chorus answers. If the verse is only establishing the production vibe without any forward momentum, shorten it or add a melodic or lyrical hook within the verse itself.",
+          },
+          {
+            q: "Does song structure differ between genres?",
+            a: "Yes, but the underlying principle stays the same: contrast and payoff at regular intervals. EDM replaces melody with energy and the drop is the chorus equivalent. Hip-hop often extends the verse and abbreviates the chorus, using lyrical density to sustain attention. Folk and country sometimes abandon the chorus entirely and sustain interest through narrative. The form changes; the requirement to earn the listener's time every 30 to 60 seconds does not.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-to-get-more-spotify-streams",
     title: "How to Get More Spotify Streams (Without Buying Them)",
     coverImage: "/blog/blog30.jpg",
