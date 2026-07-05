@@ -20,6 +20,115 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "is-my-song-good",
+    title: "Is My Song Good? An Honest Way to Tell Before You Release",
+    coverImage: "/blog/blog33.jpg",
+    excerpt:
+      "Knowing whether your song is good before you release it is harder than it sounds, because your ears stop being reliable after dozens of sessions with the same track. The honest way to tell requires a mix of objective benchmarks and cold ears that have never heard it before.",
+    category: "GUIDE",
+    date: "July 5, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "Knowing whether your song is good before you release it is harder than it sounds, because your ears have gone deaf to it. After fifty listens in your own studio, you cannot hear the track the way a first-time listener will. The honest answer to 'is my song good?' is not something you can arrive at alone — it requires a set of objective benchmarks you can run yourself, and then real outside ears before you commit to releasing.",
+      },
+      {
+        type: "h2",
+        text: "Why can't you trust your own ears to judge your song?",
+      },
+      {
+        type: "paragraph",
+        text: "Producer's ear fatigue is not just about hearing damage from loud monitoring. It is a cognitive problem: after enough exposure to the same recording, your brain starts predicting what comes next rather than actually listening. The hook that felt powerful on day one becomes invisible by day twenty because you have heard it so many times it no longer registers as a hook at all. This is why so many artists release songs they later cringe at. The track sounded finished because familiarity had erased every rough edge. The listeners who skip in the first 30 seconds are hearing something your ears no longer detect.",
+      },
+      {
+        type: "h2",
+        text: "What are the objective signs a song is working?",
+      },
+      {
+        type: "list",
+        items: [
+          "The hook arrives before 60 seconds: if you cannot get to the most memorable moment of your track within the first minute, a streaming listener will never hear it. Time your intro and first verse. If the hook is buried past the 90-second mark, the structure is the problem, not the mix.",
+          "The chorus melody peaks higher than the verse: plot the highest note in each section. If your verse and chorus share the same melodic ceiling, there is no lift. Listeners feel a chorus as a physical rise because it is usually a literal pitch rise.",
+          "People who have not heard it before react clearly: a confused or politely positive reaction is not a good sign. The tracks that are genuinely good produce a specific, unprompted reaction in new listeners — a comment, a head nod, a question about the artist. Neutral silence is a bad signal.",
+          "You can describe what the song is about in one sentence: if you struggle to articulate the core idea, the song probably lacks a clear emotional centre. That vagueness shows up in the listening experience as a track that does not stick.",
+          "The outro ends before the listener's patience does: most tracks run 30 to 60 seconds longer than they need to. If your track exceeds 3.5 minutes and every section is not earning its place, it is structurally overweight.",
+          "It sounds like something, but not like a copy: the best test of originality is whether a new listener can name a specific artist it sounds exactly like. Some reference is fine; sounding indistinguishable from a reference is not a compliment.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What does 'good' actually mean for a release?",
+      },
+      {
+        type: "paragraph",
+        text: "Good is context-dependent, which is part of why the question is so hard to answer. A song can be technically well-mixed, structurally sound, and still fail to connect because it is aimed at no one in particular. Good for a streaming release means something specific: it holds listeners past 30 seconds, generates saves and replays, and delivers a clear emotional payoff that justifies the runtime. Good for a sync placement means something different: it serves a visual context without distracting from it. Good for a live show is different again. Before you ask 'is my song good?', ask 'good for what?' The answer sharpens everything else.",
+      },
+      {
+        type: "h2",
+        text: "Who should you play it to before you release?",
+      },
+      {
+        type: "paragraph",
+        text: "Not your friends, unless they are unusually honest. The people closest to you have social incentives to be kind, and kind feedback is useless when you are trying to decide whether something is ready to release. You need people who have no relationship with you and nothing to gain by sparing your feelings. The reaction that tells you most is the one from someone who heard the track cold, with no context about who made it, what it cost, or how long it took.",
+      },
+      {
+        type: "quote",
+        text: "Polite feedback from someone who likes you is worse than no feedback at all. It gives you false confidence without giving you anything to fix.",
+      },
+      {
+        type: "h2",
+        text: "What should you check in a final listen before releasing?",
+      },
+      {
+        type: "list",
+        items: [
+          "Listen on at least three different playback systems: headphones, phone speaker, and a car or small Bluetooth speaker. A mix that only sounds good on your studio monitors has a real-world problem.",
+          "Check the intro length: if the first sound of musical content comes after 15 seconds, trim it. Streaming platforms penalise skip rates, and slow intros drive skips.",
+          "Confirm the loudness target: export to a reference track at -14 LUFS integrated and listen in context. If your track sounds noticeably quieter or thinner than commercial references, the master needs revisiting.",
+          "Test the hook in isolation: can you sing back the main melodic phrase 10 minutes after you stop listening? If not, the hook may not be as memorable as familiarity has made it feel.",
+          "Read the lyrics out loud: awkward phrasing that blends into the melody when sung becomes obvious when spoken. This one step catches more lyrical problems than another hour in the DAW.",
+          "Play it after a week away: take 7 days off the track completely, then do one final listen. The problems that survive fresh ears after a week of distance are usually the real ones.",
+          "Get a reaction from someone outside your circle: one honest stranger's response is worth more than ten supportive friends.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "If you want a structured answer to 'is my song good?' before you release, MixReflect gives you one. Paste a link and get an AI score out of 100 across hook strength, production quality, retention, emotional impact, and commercial pull, plus honest reactions from five real listeners who heard it cold with no context. The score does not tell you whether to release — that is your call. But it tells you which specific dimension is dragging the track down, and that is the information that changes what you do next.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How do you know if your song is ready to release?",
+            a: "A song is ready when it holds new listeners past the 30-second mark, delivers a clear emotional or sonic payoff before the 60-second mark, and has been tested on at least one person who had no prior exposure to it and no social incentive to be kind. If the reaction from that person is specific and positive rather than politely vague, the track is probably ready. If you keep finding things to fix after multiple revision passes, that is sometimes a sign of perfectionism, but more often a sign the core of the song still needs work.",
+          },
+          {
+            q: "Is it bad to release a song you are not 100% happy with?",
+            a: "Releasing something imperfect is often better than not releasing at all, but only if the imperfection is in the details rather than the foundation. A mix that is not quite right can be improved on re-upload; a song with no clear hook, an overlong intro, or no emotional through-line will not be saved by a better mix. Know the difference between craft imperfection, which is normal and acceptable, and structural problems, which will undermine the release regardless of how polished the rest of the track is.",
+          },
+          {
+            q: "How many listens should I do before deciding a song is done?",
+            a: "Fewer than you think. After about ten focused critical listens in a session, your ability to evaluate the track accurately drops sharply. Taking a full day away between major revision passes restores some objectivity. The final decision should come after a cold listen, ideally after several days away from the track, on playback systems other than your studio setup. If the song still holds up in that context, you have a reliable reading of its quality.",
+          },
+          {
+            q: "What makes a song good vs just professionally produced?",
+            a: "Production quality and songwriting quality are separate things, and conflating them is one of the most common mistakes independent artists make. A song can be technically flawless and emotionally empty. The qualities that make a song genuinely good are harder to define but easier to feel: it says something specific, the hook is memorable rather than just catchy, and the listening experience leaves you wanting to replay it rather than just move on. Production raises the ceiling; the song itself determines whether the listener comes back.",
+          },
+          {
+            q: "Should I trust AI feedback on my music?",
+            a: "AI feedback is useful when it is measuring something specific and consistent, like hook arrival timing, loudness, or skip-rate predictors. It is less reliable for evaluating emotional resonance, cultural specificity, or whether a lyric lands. The most useful approach combines AI scoring, which gives you consistent benchmarks across multiple tracks, with real human reactions, which tell you what actually happens when a stranger hears it cold. Neither alone gives you the full picture.",
+          },
+          {
+            q: "Why do songs that sound great in the studio feel flat on release?",
+            a: "Three common reasons. First, familiarity bias: you have heard it so many times that your evaluation is no longer based on a genuine first listen. Second, context collapse: a track that sounds enormous on studio monitors often loses 30 to 40 percent of its perceived energy on earbuds or a phone speaker, which is how most people will hear it. Third, the feedback loop breaks: releasing removes the urgency to keep improving, and you suddenly hear the track the way everyone else does, stripped of the producer's emotional investment. Testing on multiple systems before release and getting outside ears beforehand both significantly reduce this gap.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "how-to-make-your-chorus-hit-harder",
     title: "How to Make Your Chorus Hit Harder",
     coverImage: "/blog/blog32.jpg",

@@ -24,7 +24,7 @@ Real numbers pulled from the production DB this date:
   regenerated in the new grittier art style.
 
 ## Current image counter
-Last used: blog32 → next post uses blog33
+Last used: blog33 → next post uses blog34
 
 ## Blog post queue
 
@@ -39,7 +39,7 @@ Last used: blog32 → next post uses blog33
 | DONE | 2026-07-01 | How to Get More Spotify Streams (Without Buying Them) | how to get more spotify streams | blog30.jpg |
 | DONE | 2026-07-02 | Song Structure: How to Arrange a Track That Holds Attention | how to structure a song | blog31.jpg |
 | DONE | 2026-07-03 | How to Make Your Chorus Hit Harder | how to make a chorus hit | blog32.jpg |
-| PENDING | | Is My Song Good? An Honest Way to Tell Before You Release | is my song good | core product query — high intent |
+| DONE | 2026-07-05 | Is My Song Good? An Honest Way to Tell Before You Release | is my song good | blog33.jpg |
 | PENDING | | Mixing vs Mastering: What's the Difference? | mixing vs mastering | high volume, evergreen |
 | PENDING | | AI vs Human Music Feedback: Which Can You Trust? | ai vs human music feedback | INDUSTRY — product-aligned |
 | PENDING | | Why Do All My Songs Sound the Same? | why do my songs sound the same | originality / variety |
