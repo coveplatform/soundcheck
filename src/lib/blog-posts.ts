@@ -20,6 +20,114 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "mixing-vs-mastering",
+    title: "Mixing vs Mastering: What's the Difference?",
+    coverImage: "/blog/blog34.jpg",
+    excerpt:
+      "Mixing is the process of balancing every element inside your session so each part sits clearly in the track. Mastering is what comes after: it takes the finished stereo file and prepares it for distribution. They are two separate jobs that require two separate sets of ears, and conflating them is one of the most common reasons independent releases sound worse than they should.",
+    category: "GUIDE",
+    date: "July 6, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "Mixing is the process of balancing and blending every element in your session — levels, panning, EQ, compression, effects — so each part sits clearly in the track. Mastering is what comes after: it takes the finished stereo mix file and prepares it for distribution by levelling it against commercial references, catching anything the mix missed, and exporting it in the correct format for streaming, vinyl, or CD. They are two different jobs done at two different stages with two different sets of ears, and treating them as one is one of the most reliable ways to undermine a release.",
+      },
+      {
+        type: "h2",
+        text: "What does mixing actually do?",
+      },
+      {
+        type: "paragraph",
+        text: "Mixing happens inside the session, with access to every individual track and stem. The mix engineer works with the kick drum, the bass, each vocal take, every synth layer separately. Their job is to make all of those elements work together as a unified sound rather than a pile of competing parts. This involves level balancing, panning decisions, EQ to give each element its own frequency space, compression to control dynamics and punch, and effects like reverb and delay to place sounds convincingly in a space. When mixing is done well, you hear the song, not the individual parts. When it is done badly, you hear the parts fighting each other.",
+      },
+      {
+        type: "h2",
+        text: "What does mastering actually do?",
+      },
+      {
+        type: "paragraph",
+        text: "Mastering starts where mixing ends. The mastering engineer receives a single stereo file and works with the whole picture, not individual elements, because they cannot separate them anymore. Mastering involves final EQ to catch any tonal imbalances the mixing room did not reveal, compression and limiting to bring the track to a competitive loudness level without destroying dynamics, and technical preparation for the target format. Streaming platforms want around -14 LUFS integrated. Vinyl has different requirements entirely. A good master makes the track translate across playback systems and sit level with other releases on a playlist. A bad one, or a skipped one, means your track either sounds quieter than everything around it or distorts on cheaper playback hardware.",
+      },
+      {
+        type: "h2",
+        text: "Why do so many independent artists confuse the two?",
+      },
+      {
+        type: "paragraph",
+        text: "Mostly because DAW software puts mixing and mastering tools in the same interface. When you open a plugin on your master bus, you are technically in mastering territory. When you open the same plugin on a single track, you are mixing. The tools look identical; the context separates them. The confusion gets reinforced by tutorials that treat a basic limiter on the master bus as 'mastering,' when real mastering is a separate session done on a rendered mix file in a room calibrated for the purpose. Conflating them means neither gets done properly, and the release pays for it.",
+      },
+      {
+        type: "quote",
+        text: "A mastering engineer cannot fix a bad mix. They can make it louder, but that only makes the problems more audible at higher volume.",
+      },
+      {
+        type: "h2",
+        text: "Do you need both for every release?",
+      },
+      {
+        type: "list",
+        items: [
+          "If you are releasing to streaming platforms, mastering is not optional: without it your track will either be flagged for technical issues or turned down by the platform's normalisation algorithm, making it sound quieter than everything around it on a playlist.",
+          "If your budget only covers one professional service, spend it on mixing: a strong mix makes mastering straightforward; a weak mix gives the mastering engineer problems they cannot fix at the stereo bus level.",
+          "If you are paying for professional mastering, make sure the mix is genuinely finished first: mastering engineers regularly receive mixes that still need work, which means you are paying mastering rates for decisions that should have been resolved in the session.",
+          "If you are mastering your own music, leave at least -6 dBFS of headroom on your mix export: mastering requires dynamic range to work with, and a mix already peaking near zero has no room for a limiter to add competitive loudness without distortion.",
+          "If you are releasing an EP or album, having all tracks mastered in the same session matters: a mastering engineer can match levels and tonal balance across tracks so the project sounds like a coherent body of work rather than a collection of disconnected singles.",
+          "If you are using an AI mastering tool, treat it as a finishing step on a proper mix, not a substitute for either mixing or mastering: tools like automated online services produce acceptable results for early releases, but they cannot diagnose whether the mix itself is the problem.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "What should your mix look like before you send it to mastering?",
+      },
+      {
+        type: "list",
+        items: [
+          "Export at the highest bit depth your DAW supports (24-bit minimum, 32-bit float if available) — do not convert to 16-bit or MP3 before mastering.",
+          "Check that the mix peaks no higher than -6 dBFS true peak: anything higher leaves no room to add competitive loudness without distortion.",
+          "Remove any limiting or heavy compression from the master bus before export: if you have been hitting a loudness target while mixing, take those tools off before rendering the file.",
+          "Verify there is no clipping on individual tracks: a limiter on the master bus can hide clipping artefacts inside the DAW that will surface in the mastered file.",
+          "Do a final check on at least three playback systems (headphones, a small speaker, and a car or phone): problems that survive all three are the ones a mastering engineer will not be able to ignore either.",
+          "Include a reference track if you are working with a human mastering engineer: one commercially released track close to your target sound gives them a concrete benchmark and cuts revision rounds.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "Before you send a mix out for mastering, it is worth checking whether the mix itself is the problem. MixReflect gives you an AI score out of 100 across hook strength, production quality, retention, emotional impact, and commercial pull, plus reactions from five real listeners who have never heard it before. The production dimension specifically tells you whether the mix is competing with itself or sitting cleanly, which is exactly the thing mastering cannot fix if the mix did not. Paste a link and find out before you spend money on a mastering session.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "Can I mix and master my own music?",
+            a: "Yes, but not in the same session. The problem is not skill — it is perception. After spending hours inside a mix, your ears are too familiar with it to evaluate it objectively. Bounce a rough mix, walk away for at least a day, and come back with fresh ears before the mastering pass. Even professional mix engineers who master their own work follow this rule. The session break is not optional; it is the only way to approximate the fresh perspective a separate engineer would bring.",
+          },
+          {
+            q: "How much should mixing and mastering cost?",
+            a: "Rates vary widely by market and experience level. Professional mixing at the lower end runs around $150-400 per song; established engineers in major markets charge $500-2000 or more. Mastering typically runs $50-200 per track for professional human mastering. AI mastering services charge $5-25 per track. For independent releases in early career stages, the most practical option is often self-mixing with AI mastering, then stepping up to professional mixing once the release budget justifies it.",
+          },
+          {
+            q: "What is stem mastering?",
+            a: "Stem mastering is a hybrid approach where the mastering engineer receives grouped stems (drums, bass, music, vocals) rather than a single stereo file. It gives them slightly more control to address specific frequency or dynamic issues in a stem without touching the whole mix. It costs more than standard mastering and requires the mixing engineer to prepare the exports correctly. For most independent releases it is not necessary; it is most useful when the mix is technically good but one element needs targeted treatment that cannot be addressed at the stereo bus.",
+          },
+          {
+            q: "Does mastering fix a bad mix?",
+            a: "No. Mastering can apply broad tonal corrections and bring a track to competitive loudness, but it works on the full stereo image. If the bass is too loud in the mix, the mastering engineer can reduce low frequencies, but that will also affect the kick drum, the bass guitar, and anything else living in that range. If the vocals are buried, mastering cannot un-bury them without also lifting everything else in the mid-range. Mix problems that survive to mastering stay in the release.",
+          },
+          {
+            q: "Should I use reference tracks when mixing?",
+            a: "Yes, and do it actively rather than occasionally. Import two or three commercially released tracks that are close to your target sound and A/B them against your mix at matched loudness throughout the session. The goal is not to copy their sound but to calibrate your ears. Studio monitor rooms develop biases that make certain frequencies feel normal when they are not. A reference track from a professionally mixed release heard on the same monitors in the same room immediately exposes those biases.",
+          },
+          {
+            q: "What loudness target should I aim for when mixing for streaming?",
+            a: "Mix without a loudness target and master to around -14 LUFS integrated for streaming platforms. Spotify, Apple Music, YouTube, and Tidal all normalise playback to approximately this level, which means a track mastered louder will be turned down to match and a track mastered quieter will be turned up. The competitive loudness race is over for streaming because normalisation equalises it. What matters now is dynamic range: the tracks that sound best after normalisation are the ones with enough dynamics to survive it, not the ones that were limited the hardest.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "is-my-song-good",
     title: "Is My Song Good? An Honest Way to Tell Before You Release",
     coverImage: "/blog/blog33.jpg",
