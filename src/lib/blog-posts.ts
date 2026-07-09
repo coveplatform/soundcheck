@@ -20,6 +20,111 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "what-makes-a-song-commercial",
+    title: "What Does It Mean for a Song to Be 'Commercial'?",
+    coverImage: "/blog/blog37.jpg",
+    excerpt:
+      "A commercial song isn't a compromised song — it's one built to remove barriers between itself and a wide audience. The qualities that make a song commercial are mostly structural and sonic, and most of them can be identified before you release.",
+    category: "INDUSTRY",
+    date: "July 9, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "A commercial song is one that a wide audience is likely to find, engage with, and return to — and that therefore has the potential to generate revenue. That definition says nothing about artistic compromise. The qualities that make a song commercial are mostly structural and sonic: a clear hook that arrives early, a chorus that pays off the verse's tension, a mix that translates across earbuds and laptop speakers, and an emotional core that doesn't require prior knowledge of the artist to feel. Most of these qualities can be assessed before you release.",
+      },
+      {
+        type: "h2",
+        text: "Why does the word 'commercial' sound like an insult?",
+      },
+      {
+        type: "paragraph",
+        text: "Because it has been used as one — usually by critics or musicians who conflate 'designed to reach people' with 'artistically hollow.' The confusion is understandable but not accurate. Some of the most formally interesting music ever made is also deeply commercial: it reaches people because it works on multiple levels at once, not because it was simplified. The opposite is also true: a lot of music that considers itself non-commercial is simply music that hasn't yet figured out how to connect. Calling that artistic integrity is one way to frame it. Another way is that the work is not finished yet.",
+      },
+      {
+        type: "h2",
+        text: "What specific qualities make a song commercially viable?",
+      },
+      {
+        type: "list",
+        items: [
+          "Hook arrival time: radio and streaming editorial guidelines consistently favour tracks where something distinctive and memorable arrives within the first 30 seconds. A track that builds for two minutes before revealing its best idea loses most of its potential audience before the hook lands.",
+          "Chorus contrast: the chorus needs to feel clearly different from the verse — higher in pitch, denser or sparser in arrangement, more energetically loaded. Listeners navigate songs through contrast. If the chorus doesn't signal its arrival, they don't register it as a payoff.",
+          "Mix translation: a track that sounds good only on studio monitors or expensive headphones is not commercially viable regardless of its other qualities. The song needs to hold up on Bluetooth speakers, in earbuds, in a car — because that's where the overwhelming majority of listening happens.",
+          "Accessible emotional register: commercial songs are not necessarily simple emotionally, but the emotional content is accessible without context. A listener encountering the track for the first time needs a way in. Lyrics or sonic choices that require shared history with the artist are barriers.",
+          "Tempo and energy fit: commercially viable tracks tend to occupy tempo ranges and energy levels that fit recognisable listening contexts — workouts, commutes, late nights, focus sessions. A track that fits nowhere specific has a harder time finding playlist placement, which is a primary discovery mechanism.",
+          "Verse-to-chorus economy: commercially successful tracks almost never waste space. Every section does something specific. Bridges resolve tension. Pre-choruses build expectation. Outros leave the listener somewhere, not just fade out because the track ran out of ideas.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Is commercial quality the same as artistic quality?",
+      },
+      {
+        type: "paragraph",
+        text: "Not always, but they overlap more than critics tend to admit. Commercial viability requires that the song communicates clearly to someone who does not know you and has no investment in your success. That is also a reasonable description of what makes art work: it creates an experience that transfers from the person who made it to someone who did not. Where they diverge is at the edges. Highly experimental work that rewards deep attention may be artistically significant but commercially inaccessible — not because it is bad, but because its payoff structure requires more from the listener than most listeners are willing to invest on a first listen. Most genuinely strong music sits in the overlap.",
+      },
+      {
+        type: "h2",
+        text: "Why does the industry use 'commercial pull' as a specific metric?",
+      },
+      {
+        type: "paragraph",
+        text: "Because commercial viability is not one thing — it is a compound quality that includes hook strength, sonic positioning, lyrical accessibility, mix quality, and structural clarity, and different tracks fail commercially for different reasons. A song with a strong hook and a poor mix has commercial pull in the writing but not in the execution. A song with a great mix but a hook that never quite lands has the opposite problem. Breaking commercial potential into its component parts is how you identify which specific element to fix rather than concluding that the track 'just needs more work' without knowing where to start.",
+      },
+      {
+        type: "quote",
+        text: "Commercial doesn't mean safe. It means the track has done the work of removing the barriers between itself and the listener. Whether what it delivers once those barriers are down is interesting — that's the artistic question.",
+      },
+      {
+        type: "h2",
+        text: "Can you make a song more commercial without losing what makes it yours?",
+      },
+      {
+        type: "paragraph",
+        text: "Usually, yes — because most of the barriers to commercial viability are structural, not identity-level. Moving the hook earlier does not change who you are as an artist. Tightening the verse so the chorus lands sooner does not dilute your message. Getting the mix to translate on consumer playback devices does not compromise the production. Most of the commercial-viability fixes that matter are in the editing, not the conception. The places where commercial and artistic goals genuinely conflict — where you would have to remove something real to make the track accessible — those places are worth fighting for. But they are rarer than artists tend to assume when the feedback is 'it doesn't feel commercial enough.'",
+      },
+      {
+        type: "h2",
+        text: "How do you actually measure whether a song has commercial pull?",
+      },
+      {
+        type: "paragraph",
+        text: "The most reliable method is getting reactions from people who have no investment in your success hearing it cold — because commercial pull, by definition, is about the track's ability to work on strangers. If the people who like it are all people who already know and like you, you don't yet know whether the track has commercial pull. You only know it has social pull within your existing circle. MixReflect scores your track out of 100 on five dimensions including commercial pull specifically — using AI analysis alongside reactions from five real listeners who come to the track with no prior knowledge of you or your work. The commercial pull score surfaces how the structural, sonic, and emotional elements register to someone encountering the track for the first time, which is the only version of commercial viability that matters.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "Does a song have to sound mainstream to be commercial?",
+            a: "No. Commercial viability is about a song's ability to reach a wide audience within its genre, not about sounding like pop radio. A niche genre can have commercially successful tracks that would sound out of place on mainstream radio. The question is whether the song works for the audience it is targeting: arrives early with something compelling, delivers on that promise, and translates across the listening environments that audience uses. Mainstream is one version of commercial. It is not the definition.",
+          },
+          {
+            q: "Why do A&R people keep saying a song 'isn't commercial enough'?",
+            a: "Usually because one or more of the structural elements that determine commercial viability — hook timing, chorus contrast, mix translation, emotional accessibility — is underdeveloped. 'Not commercial enough' is industry shorthand for 'the song hasn't done enough of the structural work that lets it reach people who don't already know you.' It is rarely useful feedback on its own because it doesn't identify which element is the problem. If you hear it repeatedly on the same track, the diagnostic work is to test each structural element independently rather than trying to make the whole song 'more commercial' as an undirected gesture.",
+          },
+          {
+            q: "Is there a difference between commercial and popular?",
+            a: "Yes. Popular describes what is already reaching large audiences. Commercial describes what has the structural potential to reach large audiences if distributed correctly. A song can be commercial but not yet popular — it has the qualities, but hasn't found its audience. A song can be popular but not commercial in the traditional sense — it spreads through a specific community but would not translate outside it. The distinction matters because one is about the track's qualities and the other is about its distribution history.",
+          },
+          {
+            q: "Do streaming algorithms favour commercial-sounding music?",
+            a: "They favour engagement signals — saves, shares, replays, low skip rates — which tend to correlate with commercial qualities. A strong hook that keeps listeners through the first 30 seconds directly affects the skip rate, which algorithms track. A chorus that hits hard enough to earn a save affects the save rate. The relationship between commercial quality and algorithmic performance is real but indirect. The algorithm doesn't evaluate the music; it evaluates listener behaviour in response to it. Commercial qualities drive the behaviour the algorithm rewards.",
+          },
+          {
+            q: "Can a song be too commercial — so polished it loses its appeal?",
+            a: "Yes, though it is rarer than artists fear. Overproduction in pursuit of commercial viability can strip out the rough edges that make a track feel human and distinctive. A song that sounds exactly like every other well-produced track in its genre has no commercial pull advantage over those tracks, and it has lost whatever was distinctive about the original idea. The goal is not maximum polish — it is removing the specific barriers that prevent connection while keeping what makes the track interesting. Those are different targets, and confusing them is how you produce something technically competent and completely forgettable.",
+          },
+          {
+            q: "How important is the intro for commercial viability?",
+            a: "Very important, and more so on streaming than anywhere else. Skip rates peak in the first 15-30 seconds, which means the intro is where most potential listeners make their decision. A track that spends its first 30 seconds on an atmospheric build that doesn't surface the hook loses the majority of people who will ever encounter it. This is not an argument against intros — it is an argument for intros that establish the track's identity quickly, even if the full hook arrives later. The listener needs something to hold onto in the first 30 seconds, or they won't stay for what comes after.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "why-do-all-my-songs-sound-the-same",
     title: "Why Do All My Songs Sound the Same?",
     coverImage: "/blog/blog36.jpg",

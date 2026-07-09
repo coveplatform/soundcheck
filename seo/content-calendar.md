@@ -24,7 +24,7 @@ Real numbers pulled from the production DB this date:
   regenerated in the new grittier art style.
 
 ## Current image counter
-Last used: blog36 → next post uses blog37
+Last used: blog37 → next post uses blog38
 
 ## Blog post queue
 
@@ -43,7 +43,7 @@ Last used: blog36 → next post uses blog37
 | DONE | 2026-07-06 | Mixing vs Mastering: What's the Difference? | mixing vs mastering | blog34.jpg |
 | DONE | 2026-07-07 | AI vs Human Music Feedback: Which Can You Trust? | ai vs human music feedback | blog35.jpg |
 | DONE | 2026-07-08 | Why Do All My Songs Sound the Same? | why do my songs sound the same | blog36.jpg |
-| PENDING | | What Does It Mean for a Song to Be "Commercial"? | what makes a song commercial | commercial-pull score dim |
+| DONE | 2026-07-09 | What Does It Mean for a Song to Be "Commercial"? | what makes a song commercial | blog37.jpg |
 | PENDING | | How to Finish More Songs (And Stop Abandoning Them) | how to finish songs | workflow / habit |
 | PENDING | | Is It Worth Paying for Music Feedback? | is paid music feedback worth it | bottom-funnel / product |
 | DONE | 2026-06-24 | Best AI Tools for Music Feedback in 2026 | ai music feedback | blog23.jpg |
