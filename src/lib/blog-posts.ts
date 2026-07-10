@@ -20,6 +20,112 @@ export type BlogPost = {
 
 const _posts: BlogPost[] = [
   {
+    slug: "how-to-finish-more-songs",
+    title: "How to Finish More Songs (And Stop Abandoning Them)",
+    coverImage: "/blog/blog38.jpg",
+    excerpt:
+      "Most unfinished songs are not abandoned because the idea ran out — they are abandoned because a specific decision got too hard and the easier path was opening a new project. Finishing more songs is mostly a workflow problem, and workflow problems have concrete fixes.",
+    category: "GUIDE",
+    date: "July 10, 2026",
+    readTime: "8 min read",
+    content: [
+      {
+        type: "paragraph",
+        text: "Most unfinished songs are not abandoned because inspiration dried up — they are abandoned because a specific decision got hard and opening a new project felt easier. The graveyard of 80%-done tracks in your DAW is not a creativity problem. It is a decision-making and workflow problem, and that means it has concrete, practical fixes. The artists who finish more songs are not more talented or more inspired; they have better rules for how they work.",
+      },
+      {
+        type: "h2",
+        text: "Why do songs get abandoned in the first place?",
+      },
+      {
+        type: "paragraph",
+        text: "The most common exit point is the transition from 'this sounds promising' to 'I have to commit to something.' A loop sounds great. The verse works. Then the chorus has to be a specific thing, and the bridge has to earn its place, and suddenly the track is confronting you with the gap between what you imagined and what you have actually built. That gap is uncomfortable, and the path of least resistance is starting something new where the gap does not yet exist. The second most common exit point is perfectionism — not finishing because the track does not yet sound the way you want it to, which is a problem that can extend indefinitely if you let it.",
+      },
+      {
+        type: "h2",
+        text: "Is the problem inspiration, or is it something else entirely?",
+      },
+      {
+        type: "paragraph",
+        text: "Almost always something else. Inspiration is not the bottleneck for most producers with a catalogue of unfinished work — they clearly had enough motivation to start. The bottleneck is completion. Completion requires tolerating the specific discomfort of committing to an imperfect decision and moving past it. Artists who are good at finishing have usually lowered their internal bar for 'good enough to proceed' at the in-progress stage, which is different from lowering it for the finished product. The finished song can still be excellent. You just can't get there by treating every in-session decision as final.",
+      },
+      {
+        type: "h2",
+        text: "What specific habits actually lead to finishing more songs?",
+      },
+      {
+        type: "list",
+        items: [
+          "Set a session goal before you open the DAW: 'I will finish the chorus arrangement today' is more useful than 'I will work on the track.' A session without a defined goal tends to drift toward the parts of the project that already feel good, which is polishing rather than progressing.",
+          "Time-box decisions: give yourself 20 minutes to solve a specific problem — the melody of the bridge, the sound of the lead synth — and move forward with whatever you have at the end of that time. Most good decisions in music are made under moderate pressure, not extended deliberation.",
+          "Separate writing sessions from mixing sessions: trying to simultaneously write, arrange, and mix a track is a reliable way to finish none of the above. Keep writing and mixing in separate sessions, even if they happen the same day.",
+          "Treat the first complete draft as a milestone, not the product: getting from beginning to end of a track, even roughly, is a specific skill that requires practice. A rough end-to-end draft is worth finishing because it tells you what the song actually is, which you cannot know from a polished loop.",
+          "Cap your work-in-progress count: decide on a number — three tracks, five tracks, whatever fits your schedule — and enforce a rule that you cannot start a new project until one is complete. Constraints on starting are more effective than motivation to finish.",
+          "Give the unfinished track a deadline: a real one, even arbitrary — 'this track gets finished or deleted by the end of the month.' The deletion option is not a threat; sometimes the right answer for a track that has been 80% done for a year is to close it and move on. Knowing that is on the table focuses the work.",
+          "Get outside ears on it before you decide it needs more work: one of the most reliable ways to kill a track is to keep working on it past the point where further changes are improving it. An outside listener can tell you whether the track already does what you intend, or whether specific things actually need fixing.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "Why do producers keep starting new tracks instead of finishing the ones they have?",
+      },
+      {
+        type: "paragraph",
+        text: "Because starting is the best part. The early stage of a track is pure potential — it has not yet failed to be what you imagined it could be. Finishing requires confronting the ways the track is specific rather than potential, and that specificity is where most artistic discomfort lives. Some artists call this 'losing interest,' but it is more accurate to call it 'avoiding the hard part.' The hard part is almost always structural: an ending that doesn't land, a chorus that doesn't pay off the verse, a bridge that sits awkwardly. These are solvable problems, but they require sitting with the discomfort long enough to solve them rather than resetting to a fresh blank project.",
+      },
+      {
+        type: "quote",
+        text: "Starting is easy because a new idea has not yet failed. Finishing is where you find out what the song actually is — and that is exactly why most people avoid it.",
+      },
+      {
+        type: "h2",
+        text: "How do you know when a song is finished versus when it just needs more work?",
+      },
+      {
+        type: "paragraph",
+        text: "This is the question that keeps tracks in limbo indefinitely, and the honest answer is that you often cannot tell from inside the project. When you have spent 40 hours on a track, every choice is loaded with your own intention and context. You know what you were trying to do, and you hear the track through that knowledge, which means you cannot cleanly assess whether it is working on its own terms. The only reliable way to find out is getting the reaction of someone hearing it cold — someone with no investment in your process and no knowledge of what you were going for. MixReflect gives you an AI score across five dimensions (hook, production, retention, emotional impact, and commercial pull) plus reactions from five real listeners hearing the track fresh. That combination tells you specifically what is and is not landing, which is far more useful than your own assessment of whether it 'needs more work.'",
+      },
+      {
+        type: "h2",
+        text: "What is the single highest-leverage change you can make to your workflow?",
+      },
+      {
+        type: "paragraph",
+        text: "Stop treating unfinished tracks as assets. An unfinished track is not potential — it is already spent time that has not yet generated a return. A track you finish, even imperfectly, is a real thing that exists in the world: you can release it, share it, get feedback on it, play it for people, and learn from how it lands. A track you do not finish is none of those things. The producers who build quickly and finish consistently are not better at polishing — they are better at deciding that done is worth more than perfect. That shift in how you value completion is the thing that changes everything else.",
+      },
+      {
+        type: "faq",
+        items: [
+          {
+            q: "How many unfinished tracks is normal for a producer?",
+            a: "There is no universal number, but if your ratio of started to finished tracks is worse than roughly 5:1, you have a workflow problem worth addressing. Some of those abandoned tracks genuinely deserved to be abandoned — not every idea becomes a song. But if the majority of your unfinished tracks are abandoned at the 60-80% completion mark, the problem is finishing, not the quality of your ideas.",
+          },
+          {
+            q: "Should I go back and finish old tracks, or start fresh?",
+            a: "Depends on how old they are and why they were abandoned. If a track stalled because you hit a specific structural problem — the chorus never worked, the arrangement got bloated — it is worth going back with fresh ears and a time-boxed session to solve the specific problem. If a track was abandoned because the production style feels dated or the fundamental idea no longer interests you, starting fresh is usually more efficient than retrofitting old work. The test is whether the core of the track still feels like something worth building on.",
+          },
+          {
+            q: "Does collaboration help with finishing songs?",
+            a: "Often, yes — specifically because a collaborator creates external accountability. When another person is waiting on your verse, or when you have committed to a session date, the internal escape route of 'I will just start something else' is no longer available. Collaboration is most effective for producers who are good at starting but struggle to commit past the arrangement stage. The downside is that collaboration introduces creative compromise, which is its own source of stalling if the relationship is not well-defined.",
+          },
+          {
+            q: "Is perfectionism actually a problem, or does it produce better results?",
+            a: "Perfectionism produces better results within a session. It produces worse catalogues over time. An artist who takes three months to finish one track because it has to be perfect will, over three years, have twelve tracks. An artist who finishes one track every two weeks will have over seventy. Volume matters for development — the skills you build on tracks 20 through 40 are not available to you when you are still working on track three. Perfectionism is appropriate at the final stage of a track, not as a constant mode throughout the process.",
+          },
+          {
+            q: "What should I do when I am genuinely stuck on a specific section?",
+            a: "Give yourself a time limit to solve it, then move past it with a placeholder if you cannot. 'Chorus TBD' in a rough draft is not failure — it is information. Finishing the rest of the track often clarifies what the missing section needs to be, because you can hear the gap in context rather than trying to solve it in isolation. A lot of bridge problems resolve themselves once the outro exists and you can hear what the bridge is supposed to be leading toward.",
+          },
+          {
+            q: "How do you stay motivated on a track that is no longer exciting?",
+            a: "Motivation follows completion, not the other way around. The feeling of finishing something — even finishing a section, even a rough pass at a chorus — generates more motivation than waiting until you feel like working. The tracks that feel exciting in session are usually the ones in the early loop-building phase. If you wait for that feeling to return before working on the harder structural problems, it probably will not come. Set a goal for the session, sit down, and do the work whether or not it feels exciting. The excitement comes back when the thing starts working, and that only happens when you push past the resistance.",
+          },
+        ],
+      },
+      { type: "cta" },
+    ],
+  },
+  {
     slug: "what-makes-a-song-commercial",
     title: "What Does It Mean for a Song to Be 'Commercial'?",
     coverImage: "/blog/blog37.jpg",
