@@ -24,7 +24,7 @@ Real numbers pulled from the production DB this date:
   regenerated in the new grittier art style.
 
 ## Current image counter
-Last used: blog38 → next post uses blog39
+Last used: blog39 → next post uses blog40
 
 ## Blog post queue
 
@@ -45,7 +45,7 @@ Last used: blog38 → next post uses blog39
 | DONE | 2026-07-08 | Why Do All My Songs Sound the Same? | why do my songs sound the same | blog36.jpg |
 | DONE | 2026-07-09 | What Does It Mean for a Song to Be "Commercial"? | what makes a song commercial | blog37.jpg |
 | DONE | 2026-07-10 | How to Finish More Songs (And Stop Abandoning Them) | how to finish songs | blog38.jpg |
-| PENDING | | Is It Worth Paying for Music Feedback? | is paid music feedback worth it | bottom-funnel / product |
+| DONE | 2026-07-11 | Is It Worth Paying for Music Feedback? | is paid music feedback worth it | blog39.jpg |
 | DONE | 2026-06-24 | Best AI Tools for Music Feedback in 2026 | ai music feedback | blog23.jpg |
 | DONE | 2026-06-23 | SoundCloud Alternatives (listicle) | soundcloud alternatives | blog22.jpg |
 | DONE | 2026-06-22 | Splice Alternatives (listicle) | splice alternatives | blog21.jpg |
