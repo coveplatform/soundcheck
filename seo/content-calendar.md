@@ -24,7 +24,7 @@ Real numbers pulled from the production DB this date:
   regenerated in the new grittier art style.
 
 ## Current image counter
-Last used: blog40 → next post uses blog41
+Last used: blog41 → next post uses blog42
 
 ## Blog post queue
 
@@ -76,7 +76,7 @@ Last used: blog40 → next post uses blog41
 | Status | Date Done | Slug | Competitor |
 |--------|-----------|------|------------|
 | DONE | 2026-07-12 | /alternatives/bandlab | BandLab — free DAW + community, huge volume | blog40.jpg |
-| PENDING | | /alternatives/fiverr-music | Fiverr (music feedback/mixing gigs) |
+| DONE | 2026-07-14 | /alternatives/fiverr-music | Fiverr (music feedback/mixing gigs) | blog41.jpg |
 | DONE | 2026-06-23 | /alternatives/soundcloud | SoundCloud |
 | DONE | 2026-06-22 | /alternatives/splice | Splice |
 | DONE | 2026-06-21 | /alternatives/distrokid | DistroKid |
