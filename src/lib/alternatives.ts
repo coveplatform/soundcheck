@@ -459,84 +459,6 @@ export const alternativePages: AlternativePage[] = [
     ],
   },
   {
-    slug: "splice",
-    competitor: "Splice",
-    metaTitle: "The Best Splice Alternative for Music Feedback | MixReflect",
-    metaDescription:
-      "Looking for a Splice alternative? MixReflect gives you structured, honest feedback from real listeners on the tracks you build — so you know they're ready before you release.",
-    h1: "The best Splice alternative for honest pre-release feedback",
-    verdict:
-      "MixReflect and Splice solve different problems, but indie producers often need both. Splice is a production resource — a subscription-based marketplace of samples, loops, and plugin rent-to-own that helps you build a track. MixReflect is a development tool — structured, independent feedback from real listeners that tells you whether the track you built is actually ready to release. Splice helps you make the song; MixReflect tells you what to fix before anyone else hears it.",
-    competitorWhat:
-      "Splice is a subscription-based platform for music creators. Its core product, Splice Sounds, gives you access to millions of royalty-free samples and loops you can download and use in your productions. Splice also offers a plugin rent-to-own marketplace and AI-assisted sample generation tools, making it a broad creative resource for producers at any level.",
-    competitorStrength:
-      "Splice Sounds is one of the largest and most browsable royalty-free sample libraries available. The per-credit subscription model lets you download exactly what you need without buying full packs upfront, and the rent-to-own plugin scheme lowers the barrier to professional-grade tools significantly.",
-    rows: [
-      {
-        feature: "Primary purpose",
-        mixreflect: "Structured feedback on an unreleased track — what to fix before release",
-        competitor: "Sample library, plugin marketplace, and production resources",
-      },
-      {
-        feature: "What you get back",
-        mixreflect: "A release verdict out of 100, plus structured reactions from a room of real listeners",
-        competitor: "Royalty-free samples, loops, and access to rent-to-own plugins",
-      },
-      {
-        feature: "Who it's for",
-        mixreflect: "Artists who want to know if their finished (or near-finished) track is ready to release",
-        competitor: "Producers building tracks who need sounds, loops, and plugins",
-      },
-      {
-        feature: "Stage in your workflow",
-        mixreflect: "Pre-release — after the track is built, before it goes public",
-        competitor: "Production — while you're building the track",
-      },
-      {
-        feature: "Catches arrangement and mix issues",
-        mixreflect: "Yes — real listeners flag buried vocals, weak hooks, energy problems",
-        competitor: "No — Splice supplies building blocks; it doesn't evaluate the finished result",
-      },
-      {
-        feature: "Cost model",
-        mixreflect: "Free to submit · $6.95 to unlock a report · $19.95/mo unlimited",
-        competitor: "Subscription from ~$7.99/month for sample credits; plugin rent-to-own billed separately",
-      },
-    ],
-    whenCompetitor: [
-      "You need royalty-free samples, loops, or one-shots for a production",
-      "You want to rent professional plugins before committing to a purchase",
-      "You're actively building a track and need production resources",
-    ],
-    whenMixreflect: [
-      "Your track is built and you want to know if it's actually ready to release",
-      "You want honest feedback from real listeners, not just your own ears",
-      "You want to catch arrangement, mix, or hook problems before they're public",
-    ],
-    faq: [
-      {
-        q: "What is the best alternative to Splice for music feedback?",
-        a: "MixReflect is the best alternative to Splice for pre-release feedback. Splice is a production resource — samples, loops, and plugins to help you build a track. MixReflect is a feedback platform — structured, independent reviews from real listeners that tell you what to fix before you release. They serve different stages of the same workflow: Splice during production, MixReflect before release.",
-      },
-      {
-        q: "Should I use MixReflect after using Splice?",
-        a: "Yes — after you've built a track using Splice samples and loops, MixReflect is the natural next step before releasing it. Splice helps you assemble the production; MixReflect tells you whether it's working. Real listeners can catch hook problems, energy dips, and mix balance issues that are easy to miss when you've been working on a track closely. Getting that feedback before release means you fix the problems before they're permanent.",
-      },
-      {
-        q: "Is MixReflect cheaper than Splice?",
-        a: `MixReflect is free to submit — you get an instant release verdict with no subscription required. ${FREE_MODEL} Splice charges a monthly subscription for sample credits, starting around $7.99/month, with plugin rent-to-own costs on top. Since they solve different problems, many producers use both.`,
-      },
-      {
-        q: "Does Splice give feedback on your music?",
-        a: "No — Splice is a production resource, not a feedback platform. It provides samples, loops, and plugins to help you build tracks, but it doesn't evaluate whether a finished track is ready to release. For that, MixReflect gives you structured, independent feedback from real listeners who review your track before it goes public.",
-      },
-      {
-        q: "What can I use to get feedback on tracks I make with Splice samples?",
-        a: "MixReflect is built exactly for this. You upload your finished (or near-finished) track, real listeners review it independently using a structured format, and you get a release verdict out of 100 plus feedback on what to fix — whether that's the arrangement, the mix balance, the hook, or something else. It's the quality-check step between finishing the production in your DAW and putting the track out.",
-      },
-    ],
-  },
-  {
     slug: "playlist-push",
     competitor: "Playlist Push",
     metaTitle: "The Best Playlist Push Alternative for Music Feedback | MixReflect",
@@ -598,6 +520,84 @@ export const alternativePages: AlternativePage[] = [
       {
         q: "Should I get feedback before running a Playlist Push campaign?",
         a: "Yes — paid promotion is far more effective on a track that's already been quality-checked. Running a campaign on a track with fixable issues (buried vocals, a slow intro, an energy dip) wastes budget and gets weaker curator responses. Getting structured feedback first on MixReflect, fixing any patterns listeners flag, then promoting the stronger version gets more out of every campaign dollar.",
+      },
+    ],
+  },
+  {
+    slug: "splice",
+    competitor: "Splice",
+    metaTitle: "The Best Splice Alternative for Music Feedback | MixReflect",
+    metaDescription:
+      "Looking for a Splice alternative for music feedback? MixReflect gives you honest, structured feedback from real listeners before you release — the missing step after you've built your track.",
+    h1: "The best Splice alternative for pre-release music feedback",
+    verdict:
+      "Splice and MixReflect solve different stages of the music production process, and the best way to use both is in sequence. Splice is a creative toolkit — a massive library of samples and loops, a rent-to-own system for plugins and gear, and cloud saves for your DAW projects. It helps you build a track. MixReflect tells you whether what you've built is ready to release: structured, independent feedback from real listeners on your arrangement, mix balance, hooks, and first impression. If you're making tracks with Splice samples and wondering whether they're release-ready, MixReflect fills the gap Splice doesn't cover.",
+    competitorWhat:
+      "Splice is a platform for music producers with three core products: Splice Sounds, a subscription-based library of over four million samples, loops, and presets; Rent-to-Own, a payment plan that spreads the cost of plugins and music software across monthly installments; and cloud backup for DAW projects, which stores save states and enables collaboration. It is used primarily at the production and composition stage.",
+    competitorStrength:
+      "Splice's sample library is one of the most comprehensive available — broad genre coverage, flexible per-credit access, and a huge inventory of loops and one-shots. The Rent-to-Own system is a practical way to access professional plugins without a large upfront cost, which makes it genuinely useful for producers building out a toolkit on a budget.",
+    rows: [
+      {
+        feature: "Primary purpose",
+        mixreflect: "Pre-release feedback — an honest verdict on whether the track is ready",
+        competitor: "Samples, loops, and plugins for building tracks",
+      },
+      {
+        feature: "What you get back",
+        mixreflect: "A score out of 100 plus structured listener reactions on arrangement, mix, and hooks",
+        competitor: "Access to sample and preset libraries; software on a payment plan",
+      },
+      {
+        feature: "Who evaluates the track",
+        mixreflect: "An instant release verdict plus a room of real listeners",
+        competitor: "No feedback on your track — Splice is a production resource, not a review platform",
+      },
+      {
+        feature: "Catches pre-release issues",
+        mixreflect: "Yes — listeners flag buried vocals, weak hooks, mid-section drift",
+        competitor: "No — Splice is for building tracks, not evaluating them for release",
+      },
+      {
+        feature: "Best stage to use",
+        mixreflect: "Pre-release, while the track can still change",
+        competitor: "Production stage — finding sounds, building arrangements, managing plugins",
+      },
+      {
+        feature: "Cost model",
+        mixreflect: "Free to submit · $6.95 to unlock a report · $19.95/mo unlimited",
+        competitor: "Subscription for Splice Sounds; pay-per-plugin for Rent-to-Own",
+      },
+    ],
+    whenCompetitor: [
+      "You need samples, loops, or presets to build or layer a track",
+      "You want to spread the cost of plugins across monthly installments",
+      "You want cloud backup and version history for your DAW projects",
+    ],
+    whenMixreflect: [
+      "Your track is built and you want to know if it's actually ready to release",
+      "You want honest feedback from real listeners on what to fix before you publish",
+      "You want to know how a first-time listener experiences your arrangement and mix",
+    ],
+    faq: [
+      {
+        q: "What is the best Splice alternative for music feedback?",
+        a: "MixReflect is the best option if you want feedback on a track rather than a different sample library. Splice is a production platform — it doesn't evaluate tracks. MixReflect fills that gap: you submit an unreleased track, real listeners review it independently using a structured format, and you get an honest verdict on whether it's ready to release and what to fix. If you're looking for an alternative sample library, options include Looperman, Loopmasters, and the Native Instruments ecosystem.",
+      },
+      {
+        q: "Does Splice give feedback on your music?",
+        a: "No. Splice is a production toolkit — it provides samples, plugins, and collaboration tools for building tracks, but it doesn't review or evaluate your music. There's no feedback mechanism for getting an outside opinion on whether your arrangement is working, whether the mix is balanced, or whether the track is ready to release. MixReflect is purpose-built for that: structured, independent feedback from real listeners on an unreleased track.",
+      },
+      {
+        q: "Should I get feedback on my track before releasing it?",
+        a: "Yes — and for producers using Splice samples, the gap between 'I've built something' and 'I know it's ready' is often where tracks go wrong. It's easy to loop on a production without catching issues a first-time listener would notice immediately: a hook that doesn't resolve, a mix balance problem from dense layering, or a mid-section that loses energy. Getting structured feedback on MixReflect before release means you catch those patterns and fix them before the track is public.",
+      },
+      {
+        q: "Is MixReflect cheaper than Splice?",
+        a: `MixReflect is free to submit — you get an instant release verdict with no subscription required. ${FREE_MODEL} Splice Sounds starts at around $7.99/month for credits, scaling with usage; plugins via Rent-to-Own vary by software. MixReflect and Splice serve different needs, but for pre-release feedback specifically, MixReflect has no ongoing cost to get started.`,
+      },
+      {
+        q: "How do I know if my Splice-produced track is ready to release?",
+        a: "The most reliable method is structured feedback from listeners who don't know the track. MixReflect gives you that: you upload the unreleased track, real listeners review it independently using a structured format, and you see where multiple people flag the same issue. If three listeners independently say the hook doesn't resolve, that's the thing to fix. If feedback is scattered and largely positive, the track is ready. It's a faster and more honest read than asking friends or looping on it alone.",
       },
     ],
   },
