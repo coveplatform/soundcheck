@@ -67,7 +67,7 @@ questions, ≥1 FAQ block, quote + list blocks, CTA, natural tie-in.)*
 ### Alternatives pages (monthly cadence) — next in queue
 | Status | Slug | Competitor |
 |---|---|---|
-| ⏳ | /alternatives/splice | Splice |
+| ✅ | /alternatives/splice | Splice |
 | ⏳ | /alternatives/distrokid | DistroKid |
 | ⏳ | /alternatives/soundcloud | SoundCloud |
 
